@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
+import Modal from '../components/Modal';
 
 export default function Rankings() {
   const [activeTab, setActiveTab] = useState('limits');
@@ -16,6 +17,10 @@ export default function Rankings() {
   const [positionFilter, setPositionFilter] = useState('overall');
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [dragOverIndex, setDragOverIndex] = useState(null);
+  const [showCsvModal, setShowCsvModal] = useState(false);
+  const [csvText, setCsvText] = useState('');
+  const [csvUploadError, setCsvUploadError] = useState('');
+  const [isDraggingFile, setIsDraggingFile] = useState(false);
 
   // Mock rankings data - in a real app, this would come from an API
   const mockRankings = {
@@ -191,6 +196,170 @@ export default function Rankings() {
       ...prev,
       [position]: Math.max(0, parseInt(value) || 0)
     }));
+  };
+
+  const parseCSV = (csvContent) => {
+    try {
+      setCsvUploadError('');
+      const lines = csvContent.trim().split('\n');
+      if (lines.length < 2) {
+        setCsvUploadError('CSV file is empty or invalid');
+        return;
+      }
+
+      // Parse headers
+      const headers = lines[0].split(',').map(h => h.trim());
+      const idIndex = headers.findIndex(h => h.toLowerCase() === 'id');
+      const nameIndex = headers.findIndex(h => h.toLowerCase() === 'name');
+      const teamIndex = headers.findIndex(h => h.toLowerCase() === 'team');
+      const positionIndex = headers.findIndex(h => h.toLowerCase() === 'position');
+      const adpIndex = headers.findIndex(h => h.toLowerCase() === 'adp');
+      const rankIndex = headers.findIndex(h => h.toLowerCase() === 'rank');
+      
+      // Handle "P Rk" column (position rank)
+      let projIndex = headers.findIndex(h => h.toLowerCase() === 'proj');
+      if (projIndex === -1) {
+        projIndex = headers.findIndex(h => h.toLowerCase() === 'p rk');
+      }
+
+      if (nameIndex === -1 || teamIndex === -1 || positionIndex === -1) {
+        setCsvUploadError('CSV must contain Name, Team, and Position columns');
+        return;
+      }
+
+      // Parse data
+      const parsedPlayers = [];
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map(v => v.trim());
+        if (values.length < headers.length) continue;
+
+        // Skip empty rows
+        if (!values[nameIndex]) continue;
+
+        const player = {
+          id: idIndex !== -1 ? parseInt(values[idIndex]) || i : i,
+          name: values[nameIndex],
+          team: values[teamIndex],
+          position: values[positionIndex],
+          adp: adpIndex !== -1 ? parseFloat(values[adpIndex]) || 0 : 0,
+          proj: 0, // Will calculate based on rank
+          tier: 1 // Default tier
+        };
+
+        // If we have a rank, use it to calculate a pseudo projection value
+        if (rankIndex !== -1) {
+          const rank = parseInt(values[rankIndex]) || 0;
+          // Generate a projection value that decreases with rank
+          player.proj = Math.max(100, 300 - rank * 2);
+        }
+
+        parsedPlayers.push(player);
+      }
+
+      // Update limits with parsed players
+      setLimits(parsedPlayers);
+      setShowCsvModal(false);
+      setCsvText('');
+      alert(`Successfully imported ${parsedPlayers.length} players`);
+    } catch (error) {
+      setCsvUploadError('Error parsing CSV: ' + error.message);
+    }
+  };
+
+  const handleCsvUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target.result;
+        setCsvText(content);
+        parseCSV(content);
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  const handleCsvTextSubmit = () => {
+    if (csvText.trim()) {
+      parseCSV(csvText);
+    }
+  };
+
+  const exportToCSV = () => {
+    const headers = ['Id', 'Name', 'Team', 'Position', 'ADP', 'Proj'];
+    const rows = limits.map((player, index) => [
+      index + 1,
+      player.name,
+      player.team,
+      player.position,
+      player.adp,
+      player.proj
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.join(','))
+    ].join('\n');
+
+    // Create and download file
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'rankings.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  };
+
+  const handleClearAll = () => {
+    setLimits([]);
+  };
+
+  const handleSave = () => {
+    // Save rankings to database or local storage
+    console.log('Saving rankings:', limits);
+    alert('Rankings saved successfully!');
+  };
+
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingFile(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingFile(false);
+  };
+
+  const handleDragOverFile = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleFileDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingFile(false);
+
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      const file = files[0];
+      if (file.type === 'text/csv' || file.name.endsWith('.csv')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const content = e.target.result;
+          setCsvText(content);
+          parseCSV(content);
+        };
+        reader.readAsText(file);
+      } else {
+        setCsvUploadError('Please upload a CSV file');
+      }
+    }
   };
 
   return (
@@ -503,15 +672,24 @@ export default function Rankings() {
             {/* Bottom Actions */}
             <div className="mt-8 flex justify-between items-center">
               <div className="flex space-x-4">
-                <button className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors">
+                <button 
+                  onClick={() => setShowCsvModal(true)}
+                  className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                >
                   CSV Upload/Download
                 </button>
               </div>
               <div className="flex space-x-4">
-                <button className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors">
+                <button 
+                  onClick={handleClearAll}
+                  className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                >
                   Clear
                 </button>
-                <button className="px-4 py-2 bg-[#3B82F6] text-white rounded-lg hover:bg-[#1d4ed8] transition-colors">
+                <button 
+                  onClick={handleSave}
+                  className="px-4 py-2 bg-[#3B82F6] text-white rounded-lg hover:bg-[#1d4ed8] transition-colors"
+                >
                   Save
                 </button>
               </div>
@@ -519,6 +697,98 @@ export default function Rankings() {
           </div>
         </main>
       </div>
+
+      {/* CSV Upload/Download Modal */}
+      <Modal open={showCsvModal} onClose={() => setShowCsvModal(false)}>
+        <div className="w-[700px]">
+          <h2 className="text-2xl font-bold mb-6 text-white">CSV upload</h2>
+          
+          <div className="flex justify-end mb-4 space-x-2">
+            <button
+              onClick={exportToCSV}
+              className="flex items-center px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 hover:text-white transition-colors"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              CSV download
+            </button>
+            <label className="flex items-center px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 hover:text-white transition-colors cursor-pointer">
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+              CSV upload
+              <input
+                type="file"
+                accept=".csv"
+                onChange={handleCsvUpload}
+                className="hidden"
+              />
+            </label>
+          </div>
+
+          <div 
+            className={`bg-gray-900 rounded-lg border-2 border-dashed p-8 transition-colors ${
+              isDraggingFile ? 'border-[#3B82F6] bg-blue-900/20' : 'border-gray-600'
+            }`} 
+            style={{ minHeight: '400px' }}
+            onDragEnter={handleDragEnter}
+            onDragOver={handleDragOverFile}
+            onDragLeave={handleDragLeave}
+            onDrop={handleFileDrop}
+          >
+            <label className="flex flex-col items-center justify-center h-full cursor-pointer">
+              <svg className={`w-16 h-16 mb-4 ${isDraggingFile ? 'text-[#3B82F6]' : 'text-gray-500'} transition-colors`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+              <p className="text-gray-300 mb-2 text-center">
+                Drag/click here or use the csv upload button to import players from a created list or copy and paste into this text field
+              </p>
+              <p className="text-gray-500 text-sm text-center">
+                Be sure to press save so that your imported players are applied to your rankings.
+              </p>
+              <input
+                type="file"
+                accept=".csv"
+                onChange={handleCsvUpload}
+                className="hidden"
+              />
+            </label>
+            <textarea
+              value={csvText}
+              onChange={(e) => setCsvText(e.target.value)}
+              placeholder="Or paste your CSV content here..."
+              className="mt-6 w-full h-40 p-4 bg-gray-800 text-white border border-gray-700 rounded-lg resize-none focus:outline-none focus:border-[#3B82F6] placeholder-gray-500"
+              style={{ fontFamily: 'monospace' }}
+            />
+          </div>
+
+          {csvUploadError && (
+            <div className="mt-4 p-3 bg-red-900/50 border border-red-500 text-red-300 rounded-lg">
+              {csvUploadError}
+            </div>
+          )}
+
+          <div className="flex justify-end mt-6 space-x-3">
+            <button
+              onClick={() => {
+                setShowCsvModal(false);
+                setCsvText('');
+                setCsvUploadError('');
+              }}
+              className="px-6 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+            >
+              Clear
+            </button>
+            <button
+              onClick={handleCsvTextSubmit}
+              className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition-colors"
+            >
+              Save
+            </button>
+          </div>
+        </div>
+      </Modal>
     </>
   );
 } 
