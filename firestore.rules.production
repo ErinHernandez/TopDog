@@ -1,0 +1,41 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can read and write their own data
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Users can read and write their own transactions
+    match /transactions/{transactionId} {
+      allow read, write: if request.auth != null && 
+        request.auth.uid == resource.data.userId;
+    }
+    
+    // Users can read and write their own teams
+    match /teams/{teamId} {
+      allow read, write: if request.auth != null && 
+        request.auth.uid == resource.data.userId;
+    }
+    
+    // Draft rooms - users can read all, but only write if they're participants
+    match /draftRooms/{roomId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && 
+        (request.auth.uid in resource.data.participants || 
+         resource.data.createdBy == request.auth.uid);
+    }
+    
+    // Development tournaments - only allow in development environment
+    match /devTournaments/{tournamentId} {
+      allow read, write: if request.auth != null && 
+        (request.auth.uid in ['Not Todd Middleton', 'developer1', 'developer2', 'admin']);
+    }
+    
+    // Player pool - read-only for all authenticated users
+    match /playerPool/{playerId} {
+      allow read: if request.auth != null;
+      allow write: if false; // No one can write to player pool
+    }
+  }
+} 
