@@ -9,7 +9,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import MobilePhoneFrameVX, { MobilePhoneContentVX } from '../shared/MobilePhoneFrameVX';
-import MobileHeaderVX from '../shared/MobileHeaderVX';
+import AppHeaderVX from '../shared/AppHeaderVX';
 import MobileFooterAppVX, { type AppTab } from '../shared/MobileFooterAppVX';
 import {
   LobbyTabVX,
@@ -18,6 +18,10 @@ import {
   ExposureTabVX,
   ProfileTabVX,
 } from './tabs';
+import AutodraftLimitsModalVX from './tabs/modals/AutodraftLimitsModalVX';
+import RankingsModalVX from './tabs/modals/RankingsModalVX';
+import DepositHistoryModalVX from './tabs/modals/DepositHistoryModalVX';
+import WithdrawModalVX from './tabs/modals/WithdrawModalVX';
 
 // ============================================================================
 // TYPES
@@ -59,11 +63,17 @@ export default function MobileAppVX({
   
   // Modal states
   const [showTournamentModal, setShowTournamentModal] = useState(false);
+  const [showAutodraftModal, setShowAutodraftModal] = useState(false);
+  const [showRankingsModal, setShowRankingsModal] = useState(false);
+  const [rankingsHasUnsavedChanges, setRankingsHasUnsavedChanges] = useState(false);
+  const [rankingsExternalCloseAttempt, setRankingsExternalCloseAttempt] = useState(false);
+  const [showDepositHistoryModal, setShowDepositHistoryModal] = useState(false);
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false);
 
   // Handle tab parameter from URL
   useEffect(() => {
     if (router.isReady && router.query.tab) {
-      const validTabs: AppTab[] = ['Lobby', 'My Teams', 'Exposure', 'Profile'];
+      const validTabs: AppTab[] = ['Lobby', 'Live Drafts', 'My Teams', 'Exposure', 'Profile'];
       if (validTabs.includes(router.query.tab as AppTab)) {
         setActiveTab(router.query.tab as AppTab);
       }
@@ -92,25 +102,26 @@ export default function MobileAppVX({
       
       case 'My Teams':
         return (
-          <div className="flex-1 min-h-0">
-            <MyTeamsTabVX 
-              selectedTeam={selectedTeam} 
-              setSelectedTeam={setSelectedTeam}
-              setDraftBoardTeam={setDraftBoardTeam}
-              setShowDraftBoard={setShowDraftBoard}
-            />
-          </div>
+          <MyTeamsTabVX 
+            selectedTeam={selectedTeam} 
+            setSelectedTeam={setSelectedTeam}
+            setDraftBoardTeam={setDraftBoardTeam}
+            setShowDraftBoard={setShowDraftBoard}
+          />
         );
       
       case 'Exposure':
-        return (
-          <div className="flex-1 min-h-0">
-            <ExposureTabVX />
-          </div>
-        );
+        return <ExposureTabVX />;
       
       case 'Profile':
-        return <ProfileTabVX />;
+        return (
+          <ProfileTabVX 
+            onOpenAutodraftLimits={() => setShowAutodraftModal(true)}
+            onOpenRankings={() => setShowRankingsModal(true)}
+            onOpenDepositHistory={() => setShowDepositHistoryModal(true)}
+            onOpenWithdraw={() => setShowWithdrawModal(true)}
+          />
+        );
       
       default:
         return (
@@ -127,22 +138,24 @@ export default function MobileAppVX({
   return (
     <MobilePhoneFrameVX>
       <MobilePhoneContentVX>
-        {/* Mobile Header */}
-        <MobileHeaderVX
+        {/* App Header */}
+        <AppHeaderVX
           showBackButton={activeTab === 'My Teams' && selectedTeam !== null}
           onBackClick={() => setSelectedTeam(null)}
-          showDepositButton={true}
+          showDeposit={true}
+          onLogoClick={() => {
+            // Check if Rankings modal is open with unsaved changes
+            if (showRankingsModal && rankingsHasUnsavedChanges) {
+              setRankingsExternalCloseAttempt(true);
+            } else {
+              setShowRankingsModal(false);
+              setActiveTab('Lobby');
+            }
+          }}
         />
 
-        {/* Main Content */}
-        <div 
-          className="flex flex-col overflow-hidden"
-          style={{ 
-            height: (activeTab === 'Exposure' || activeTab === 'My Teams')
-              ? 'calc(100% - 80px + 15px)'
-              : 'calc(100% - 60px - 80px)'
-          }}
-        >
+        {/* Main Content - uses flex-1 to fill remaining space between header and footer */}
+        <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
           {renderTabContent()}
         </div>
 
@@ -198,153 +211,455 @@ export default function MobileAppVX({
             }}
           />
         )}
+
+        {/* Autodraft Limits Modal */}
+        <AutodraftLimitsModalVX
+          isOpen={showAutodraftModal}
+          onClose={() => setShowAutodraftModal(false)}
+        />
+
+        {/* Rankings Modal */}
+        <RankingsModalVX
+          isOpen={showRankingsModal}
+          onClose={() => {
+            setShowRankingsModal(false);
+            setActiveTab('Lobby');
+          }}
+          onUnsavedChangesChange={setRankingsHasUnsavedChanges}
+          externalCloseAttempt={rankingsExternalCloseAttempt}
+          onExternalCloseHandled={() => setRankingsExternalCloseAttempt(false)}
+        />
+
+        {/* Deposit History Modal */}
+        <DepositHistoryModalVX
+          isOpen={showDepositHistoryModal}
+          onClose={() => setShowDepositHistoryModal(false)}
+        />
+
+        {/* Withdraw Modal */}
+        <WithdrawModalVX
+          isOpen={showWithdrawModal}
+          onClose={() => setShowWithdrawModal(false)}
+        />
       </MobilePhoneContentVX>
     </MobilePhoneFrameVX>
   );
 }
 
 // ============================================================================
-// COMPLETED DRAFT BOARD SHEET
+// COMPLETED DRAFT BOARD SHEET - REPLICATING DraftBoardVX LAYOUT
 // ============================================================================
+
+// Pixel-perfect constants matching DraftBoardVX
+const COMPLETED_BOARD_PX = {
+  // Cell dimensions (from DraftBoardVX)
+  cellWidth: 92,
+  cellHeight: 62,
+  cellMargin: 1,
+  cellBorderRadius: 6,
+  cellBorderWidth: 4,
+  
+  // Team header
+  headerHeight: 20,
+  headerFontSize: 10,
+  headerContentHeight: 70,
+  
+  // Pick cell content
+  pickNumberFontSize: 8,
+  firstNameFontSize: 10,
+  lastNameFontSize: 11,
+  posTeamFontSize: 9,
+  
+  // Nav header
+  navPaddingX: 16,
+  navPaddingY: 12,
+  navBackButtonSize: 40,
+  navBackIconSize: 24,
+  
+  // Footer
+  footerPaddingX: 16,
+  footerPaddingY: 12,
+  footerButtonHeight: 48,
+  footerButtonFontSize: 16,
+  footerButtonBorderRadius: 12,
+} as const;
+
+const COMPLETED_BOARD_COLORS = {
+  // Backgrounds
+  background: '#101927',
+  headerBg: '#1f2937',
+  
+  // Position colors (matching DraftBoardVX)
+  QB: '#F472B6',
+  RB: '#0fba80',
+  WR: '#FBBF25',
+  TE: '#7C3AED',
+  
+  // User colors
+  userBorder: '#3B82F6',
+  
+  // Text
+  white: '#ffffff',
+  gray400: '#9ca3af',
+  gray500: '#6b7280',
+  
+  // Footer
+  buttonBg: '#374151',
+} as const;
 
 interface CompletedDraftBoardSheetProps {
   team: SelectedTeam;
   onClose: () => void;
 }
 
-// Mock completed draft data
-const MOCK_DRAFT_PICKS = [
-  // Round 1
-  { pick: 1, player: "Ja'Marr Chase", pos: 'WR', team: 'CIN', drafter: 'Team 1' },
-  { pick: 2, player: 'CeeDee Lamb', pos: 'WR', team: 'DAL', drafter: 'Team 2' },
-  { pick: 3, player: 'Tyreek Hill', pos: 'WR', team: 'MIA', drafter: 'Team 3' },
-  { pick: 4, player: 'Bijan Robinson', pos: 'RB', team: 'ATL', drafter: 'Team 4' },
-  { pick: 5, player: 'Saquon Barkley', pos: 'RB', team: 'PHI', drafter: 'YOU' },
-  { pick: 6, player: 'Breece Hall', pos: 'RB', team: 'NYJ', drafter: 'Team 6' },
-  { pick: 7, player: 'Amon-Ra St. Brown', pos: 'WR', team: 'DET', drafter: 'Team 7' },
-  { pick: 8, player: 'Garrett Wilson', pos: 'WR', team: 'NYJ', drafter: 'Team 8' },
-  { pick: 9, player: 'Puka Nacua', pos: 'WR', team: 'LAR', drafter: 'Team 9' },
-  { pick: 10, player: 'Chris Olave', pos: 'WR', team: 'NO', drafter: 'Team 10' },
-  { pick: 11, player: 'Jahmyr Gibbs', pos: 'RB', team: 'DET', drafter: 'Team 11' },
-  { pick: 12, player: 'A.J. Brown', pos: 'WR', team: 'PHI', drafter: 'Team 12' },
-  // Round 2
-  { pick: 13, player: 'Davante Adams', pos: 'WR', team: 'LV', drafter: 'Team 12' },
-  { pick: 14, player: 'Travis Kelce', pos: 'TE', team: 'KC', drafter: 'Team 11' },
-  { pick: 15, player: 'Josh Allen', pos: 'QB', team: 'BUF', drafter: 'Team 10' },
-  { pick: 16, player: 'Kyren Williams', pos: 'RB', team: 'LAR', drafter: 'Team 9' },
-  { pick: 17, player: 'Jonathan Taylor', pos: 'RB', team: 'IND', drafter: 'Team 8' },
-  { pick: 18, player: 'Stefon Diggs', pos: 'WR', team: 'HOU', drafter: 'Team 7' },
-  { pick: 19, player: 'DeVonta Smith', pos: 'WR', team: 'PHI', drafter: 'Team 6' },
-  { pick: 20, player: "De'Von Achane", pos: 'RB', team: 'MIA', drafter: 'YOU' },
-  { pick: 21, player: 'Mike Evans', pos: 'WR', team: 'TB', drafter: 'Team 4' },
-  { pick: 22, player: 'Travis Etienne', pos: 'RB', team: 'JAX', drafter: 'Team 3' },
-  { pick: 23, player: 'DK Metcalf', pos: 'WR', team: 'SEA', drafter: 'Team 2' },
-  { pick: 24, player: 'Deebo Samuel', pos: 'WR', team: 'SF', drafter: 'Team 1' },
+// Mock participants for completed draft
+const MOCK_PARTICIPANTS = [
+  { name: 'YOU', id: '1' },
+  { name: 'FLIGHT800', id: '2' },
+  { name: 'TITANIMPLOS1', id: '3' },
+  { name: 'LOLITAEXPRES', id: '4' },
+  { name: 'DRAFTER5', id: '5' },
+  { name: 'DRAFTER6', id: '6' },
+  { name: 'DRAFTER7', id: '7' },
+  { name: 'DRAFTER8', id: '8' },
+  { name: 'DRAFTER9', id: '9' },
+  { name: 'DRAFTER10', id: '10' },
+  { name: 'DRAFTER11', id: '11' },
+  { name: 'DRAFTER12', id: '12' },
 ];
 
-const POSITION_COLORS_MAP: Record<string, string> = {
-  QB: '#F472B6',
-  RB: '#0fba80',
-  WR: '#FBBF25',
-  TE: '#7C3AED',
+// Mock completed draft picks (full 18 rounds x 12 teams = 216 picks)
+const generateMockPicks = () => {
+  const players = [
+    { name: "Ja'Marr Chase", pos: 'WR', team: 'CIN' },
+    { name: 'Bijan Robinson', pos: 'RB', team: 'ATL' },
+    { name: 'Jahmyr Gibbs', pos: 'RB', team: 'DET' },
+    { name: 'CeeDee Lamb', pos: 'WR', team: 'DAL' },
+    { name: 'Ladd McConkey', pos: 'WR', team: 'LAC' },
+    { name: 'Trey McBride', pos: 'TE', team: 'ARI' },
+    { name: 'Bucky Irving', pos: 'RB', team: 'TB' },
+    { name: 'Chase Brown', pos: 'RB', team: 'CIN' },
+    { name: 'Josh Allen', pos: 'QB', team: 'BUF' },
+    { name: 'Lamar Jackson', pos: 'QB', team: 'BAL' },
+    { name: 'Kyren Williams', pos: 'RB', team: 'LAR' },
+    { name: 'Jaxon Smith-Njigba', pos: 'WR', team: 'SEA' },
+    { name: 'Joe Burrow', pos: 'QB', team: 'CIN' },
+    { name: 'Tetairoa McMillan', pos: 'WR', team: 'CAR' },
+    { name: 'DK Metcalf', pos: 'WR', team: 'PIT' },
+    { name: 'Breece Hall', pos: 'RB', team: 'NYJ' },
+    { name: 'Chuba Hubbard', pos: 'RB', team: 'CAR' },
+    { name: 'James Conner', pos: 'RB', team: 'ARI' },
+    { name: 'DJ Moore', pos: 'WR', team: 'CHI' },
+    { name: 'DeVonta Smith', pos: 'WR', team: 'PHI' },
+    { name: 'Baker Mayfield', pos: 'QB', team: 'TB' },
+    { name: 'Tyrone Tracy Jr.', pos: 'RB', team: 'NYG' },
+    { name: 'Travis Hunter', pos: 'WR', team: 'JAC' },
+    { name: 'Emeka Egbuka', pos: 'WR', team: 'TB' },
+    { name: 'Chris Olave', pos: 'WR', team: 'NO' },
+    { name: 'Bo Nix', pos: 'QB', team: 'DEN' },
+    { name: 'Ricky Pearsall', pos: 'WR', team: 'SF' },
+    { name: 'Jaylen Warren', pos: 'RB', team: 'PIT' },
+    { name: 'Tyler Warren', pos: 'TE', team: 'IND' },
+    { name: 'Jauan Jennings', pos: 'WR', team: 'SF' },
+    { name: 'Brock Purdy', pos: 'QB', team: 'SF' },
+    { name: 'Evan Engram', pos: 'TE', team: 'DEN' },
+  ];
+  
+  const picks = [];
+  const totalTeams = 12;
+  const totalRounds = 18;
+  
+  for (let round = 1; round <= totalRounds; round++) {
+    const isSnakeRound = round % 2 === 0;
+    
+    for (let pos = 1; pos <= totalTeams; pos++) {
+      const actualPos = isSnakeRound ? totalTeams - pos + 1 : pos;
+      const pickNumber = (round - 1) * totalTeams + actualPos;
+      const displayPosition = pos;
+      const participantIndex = displayPosition - 1;
+      const playerIndex = (pickNumber - 1) % players.length;
+      
+      picks.push({
+        pickNumber,
+        round,
+        position: displayPosition,
+        participantIndex,
+        player: players[playerIndex],
+      });
+    }
+  }
+  
+  return picks.sort((a, b) => {
+    if (a.round !== b.round) return a.round - b.round;
+    return a.position - b.position;
+  });
 };
 
+const MOCK_COMPLETED_PICKS = generateMockPicks();
+
 function CompletedDraftBoardSheet({ team, onClose }: CompletedDraftBoardSheetProps): React.ReactElement {
+  const totalTeams = MOCK_PARTICIPANTS.length;
+  const totalRounds = 18;
+  
+  const getPositionColor = (pos: string): string => {
+    return COMPLETED_BOARD_COLORS[pos as keyof typeof COMPLETED_BOARD_COLORS] as string || COMPLETED_BOARD_COLORS.gray500;
+  };
+  
+  // Format pick number like DraftBoardVX: "1.01", "2.12", etc.
+  const formatPickNumber = (pickNumber: number): string => {
+    const round = Math.ceil(pickNumber / totalTeams);
+    const posInRound = ((pickNumber - 1) % totalTeams) + 1;
+    return `${round}.${String(posInRound).padStart(2, '0')}`;
+  };
+
+  // Group picks by round for rendering
+  const picksByRound = Array.from({ length: totalRounds }, (_, i) => {
+    const round = i + 1;
+    return MOCK_COMPLETED_PICKS.filter(p => p.round === round);
+  });
+
   return (
-    <div className="absolute inset-0 bg-black/90 z-50 flex flex-col">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700/50 bg-gray-900">
+    <div 
+      className="absolute inset-0 flex flex-col"
+      style={{ 
+        backgroundColor: COMPLETED_BOARD_COLORS.background,
+        zIndex: 50,
+      }}
+    >
+      {/* Navigation Header */}
+      <div 
+        className="flex items-center flex-shrink-0"
+        style={{
+          paddingLeft: `${COMPLETED_BOARD_PX.navPaddingX}px`,
+          paddingRight: `${COMPLETED_BOARD_PX.navPaddingX}px`,
+          paddingTop: `${COMPLETED_BOARD_PX.navPaddingY}px`,
+          paddingBottom: `${COMPLETED_BOARD_PX.navPaddingY}px`,
+          background: 'url(/wr_blue.png) no-repeat center center',
+          backgroundSize: 'cover',
+        }}
+      >
         <button
           onClick={onClose}
-          className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10"
+          className="flex items-center justify-center rounded-full hover:bg-white/10"
+          style={{
+            width: `${COMPLETED_BOARD_PX.navBackButtonSize}px`,
+            height: `${COMPLETED_BOARD_PX.navBackButtonSize}px`,
+          }}
         >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M15 19L8 12L15 5" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+          <svg 
+            width={COMPLETED_BOARD_PX.navBackIconSize} 
+            height={COMPLETED_BOARD_PX.navBackIconSize} 
+            viewBox="0 0 24 24" 
+            fill="none"
+          >
+            <path 
+              d="M15 19L8 12L15 5" 
+              stroke={COMPLETED_BOARD_COLORS.white} 
+              strokeWidth="2.5"
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+            />
           </svg>
         </button>
-        <div className="text-center flex-1">
-          <div className="text-white font-semibold">Completed Draft Board</div>
-          <div className="text-xs text-gray-400">{team.tournamentName}</div>
+        <div className="flex-1 flex justify-center">
+          <img
+            src="/logo.png"
+            alt="TopDog"
+            style={{ height: '48px', width: 'auto' }}
+          />
         </div>
-        <div className="w-10" />
+        <div style={{ width: `${COMPLETED_BOARD_PX.navBackButtonSize}px` }} />
       </div>
 
-      {/* Draft Stats */}
-      <div className="px-4 py-2 bg-gray-800/50 border-b border-gray-700/50">
-        <div className="flex justify-around text-center text-sm">
-          <div>
-            <div className="text-white font-bold">12</div>
-            <div className="text-xs text-gray-400">Teams</div>
-          </div>
-          <div>
-            <div className="text-white font-bold">18</div>
-            <div className="text-xs text-gray-400">Rounds</div>
-          </div>
-          <div>
-            <div className="text-white font-bold">216</div>
-            <div className="text-xs text-gray-400">Total Picks</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Draft Board Grid */}
+      {/* Scrollable Draft Board */}
       <div 
         className="flex-1 overflow-auto"
         style={{
+          WebkitOverflowScrolling: 'touch',
+          overscrollBehavior: 'contain',
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
         }}
       >
-        <div className="p-2">
-          {/* Round Headers */}
-          {[1, 2].map((round) => (
-            <div key={round} className="mb-4">
-              <div className="text-xs text-gray-400 mb-2 px-1">Round {round}</div>
-              <div className="grid grid-cols-4 gap-1">
-                {MOCK_DRAFT_PICKS
-                  .filter(p => Math.ceil(p.pick / 12) === round)
-                  .map((pick) => {
-                    const isYourPick = pick.drafter === 'YOU';
-                    return (
-                      <div
-                        key={pick.pick}
-                        className={`p-2 rounded text-center ${
-                          isYourPick 
-                            ? 'bg-teal-600/30 border border-teal-500/50' 
-                            : 'bg-gray-800/80'
-                        }`}
+        {/* Team Headers - Sticky */}
+        <div 
+          className="sticky top-0 z-10"
+          style={{ 
+            backgroundColor: COMPLETED_BOARD_COLORS.background,
+            paddingTop: '8px',
+          }}
+        >
+          <div 
+            className="flex"
+            style={{ 
+              minWidth: `${totalTeams * (COMPLETED_BOARD_PX.cellWidth + COMPLETED_BOARD_PX.cellMargin * 2)}px`,
+              width: 'max-content',
+            }}
+          >
+            {MOCK_PARTICIPANTS.map((participant, index) => {
+              const isUser = index === 0;
+              const borderColor = isUser ? COMPLETED_BOARD_COLORS.userBorder : '#6B7280';
+              
+              return (
+                <div 
+                  key={participant.id}
+                  className="flex-shrink-0 flex flex-col"
+                  style={{ 
+                    margin: `${COMPLETED_BOARD_PX.cellMargin}px`,
+                    minWidth: `${COMPLETED_BOARD_PX.cellWidth}px`,
+                    width: `${COMPLETED_BOARD_PX.cellWidth}px`,
+                    borderRadius: `${COMPLETED_BOARD_PX.cellBorderRadius}px`,
+                    border: `${COMPLETED_BOARD_PX.cellBorderWidth}px solid ${borderColor}`,
+                    backgroundColor: COMPLETED_BOARD_COLORS.headerBg,
+                    overflow: 'hidden',
+                  }}
+                >
+                  {/* Username Header */}
+                  <div 
+                    className="text-center font-medium flex items-center justify-center px-1"
+                    style={{ 
+                      height: `${COMPLETED_BOARD_PX.headerHeight}px`,
+                      fontSize: `${COMPLETED_BOARD_PX.headerFontSize}px`,
+                      textTransform: 'uppercase',
+                      backgroundColor: borderColor,
+                      color: COMPLETED_BOARD_COLORS.white,
+                    }}
+                  >
+                    {participant.name.length > 12 
+                      ? participant.name.substring(0, 12) 
+                      : participant.name
+                    }
+                  </div>
+                  
+                  {/* Spacer for header alignment */}
+                  <div style={{ height: `${COMPLETED_BOARD_PX.headerContentHeight}px` }} />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Draft Grid */}
+        <div>
+          {picksByRound.map((roundPicks, roundIndex) => (
+            <div 
+              key={roundIndex}
+              className="flex"
+              style={{ 
+                minWidth: `${totalTeams * (COMPLETED_BOARD_PX.cellWidth + COMPLETED_BOARD_PX.cellMargin * 2)}px`,
+                width: 'max-content',
+              }}
+            >
+              {roundPicks.map((pickData) => {
+                const isUserPick = pickData.participantIndex === 0;
+                const posColor = getPositionColor(pickData.player.pos);
+                
+                return (
+                  <div
+                    key={pickData.pickNumber}
+                    className="flex-shrink-0 transition-colors"
+                    style={{
+                      minWidth: `${COMPLETED_BOARD_PX.cellWidth}px`,
+                      width: `${COMPLETED_BOARD_PX.cellWidth}px`,
+                      margin: `${COMPLETED_BOARD_PX.cellMargin}px`,
+                      marginTop: roundIndex === 0 ? '7px' : `${COMPLETED_BOARD_PX.cellMargin}px`,
+                      borderRadius: `${COMPLETED_BOARD_PX.cellBorderRadius}px`,
+                      border: `${COMPLETED_BOARD_PX.cellBorderWidth}px solid ${posColor}`,
+                      backgroundColor: `${posColor}20`,
+                    }}
+                  >
+                    <div 
+                      className="flex flex-col" 
+                      style={{ 
+                        height: `${COMPLETED_BOARD_PX.cellHeight}px`, 
+                        padding: '2px 3px',
+                      }}
+                    >
+                      {/* Pick number - top left */}
+                      <div 
+                        className="font-medium flex-shrink-0"
+                        style={{ 
+                          fontSize: `${COMPLETED_BOARD_PX.pickNumberFontSize}px`,
+                          lineHeight: '1',
+                          marginTop: '2px',
+                          marginLeft: '1px',
+                          color: COMPLETED_BOARD_COLORS.white,
+                        }}
                       >
-                        <div className="text-xs text-gray-500 mb-1">#{pick.pick}</div>
-                        <div 
-                          className="text-xs font-bold px-1 py-0.5 rounded mx-auto w-fit"
-                          style={{ backgroundColor: POSITION_COLORS_MAP[pick.pos], color: 'white' }}
-                        >
-                          {pick.pos}
-                        </div>
-                        <div className="text-xs text-white mt-1 truncate">{pick.player.split(' ').pop()}</div>
-                        <div className="text-xs text-gray-500">{pick.team}</div>
-                        {isYourPick && (
-                          <div className="text-xs text-teal-400 font-bold mt-1">YOU</div>
-                        )}
+                        {formatPickNumber(pickData.pickNumber)}
                       </div>
-                    );
-                  })}
-              </div>
+                      
+                      {/* Content area */}
+                      <div className="flex-1 flex flex-col justify-center items-center">
+                        {/* First name */}
+                        <div 
+                          className="font-bold text-center truncate w-full"
+                          style={{ 
+                            fontSize: `${COMPLETED_BOARD_PX.firstNameFontSize}px`,
+                            lineHeight: '1.2',
+                            marginTop: '-1px',
+                            color: COMPLETED_BOARD_COLORS.white,
+                          }}
+                        >
+                          {pickData.player.name.split(' ')[0]}
+                        </div>
+                        
+                        {/* Last name */}
+                        <div 
+                          className="font-bold text-center truncate w-full"
+                          style={{ 
+                            fontSize: `${COMPLETED_BOARD_PX.lastNameFontSize}px`,
+                            lineHeight: '1.2',
+                            color: COMPLETED_BOARD_COLORS.white,
+                          }}
+                        >
+                          {pickData.player.name.split(' ').slice(1).join(' ') || pickData.player.name}
+                        </div>
+                        
+                        {/* Position-Team */}
+                        <div 
+                          className="text-center"
+                          style={{ 
+                            fontSize: `${COMPLETED_BOARD_PX.posTeamFontSize}px`,
+                            lineHeight: '1.2',
+                            marginTop: '6px',
+                            color: COMPLETED_BOARD_COLORS.white,
+                          }}
+                        >
+                          {pickData.player.pos}-{pickData.player.team}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           ))}
-          
-          {/* Show more rounds indicator */}
-          <div className="text-center py-4 text-gray-500 text-sm">
-            Showing rounds 1-2 of 18
-          </div>
         </div>
       </div>
 
       {/* Footer */}
-      <div className="px-4 py-3 border-t border-gray-700/50 bg-gray-900">
+      <div 
+        className="flex-shrink-0"
+        style={{
+          paddingLeft: `${COMPLETED_BOARD_PX.footerPaddingX}px`,
+          paddingRight: `${COMPLETED_BOARD_PX.footerPaddingX}px`,
+          paddingTop: `${COMPLETED_BOARD_PX.footerPaddingY}px`,
+          paddingBottom: `${COMPLETED_BOARD_PX.footerPaddingY}px`,
+          backgroundColor: COMPLETED_BOARD_COLORS.background,
+          borderTop: `1px solid #374151`,
+        }}
+      >
         <button
           onClick={onClose}
-          className="w-full bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 rounded-xl transition-colors"
+          className="w-full font-semibold transition-colors hover:bg-gray-600"
+          style={{
+            backgroundColor: COMPLETED_BOARD_COLORS.buttonBg,
+            color: COMPLETED_BOARD_COLORS.white,
+            height: `${COMPLETED_BOARD_PX.footerButtonHeight}px`,
+            fontSize: `${COMPLETED_BOARD_PX.footerButtonFontSize}px`,
+            borderRadius: `${COMPLETED_BOARD_PX.footerButtonBorderRadius}px`,
+          }}
         >
           Close
         </button>

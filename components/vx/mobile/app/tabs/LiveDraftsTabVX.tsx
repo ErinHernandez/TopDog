@@ -7,6 +7,7 @@
  */
 
 import React from 'react';
+import { Button, StatusBadge, ProgressBar, DraftProgress } from '../../../shared';
 
 // ============================================================================
 // TYPES
@@ -92,12 +93,15 @@ export default function LiveDraftsTabVX({
 
       {/* Join New Draft Button */}
       <div className="p-4 border-t border-gray-700/50">
-        <button
-          onClick={onJoinDraft}
-          className="w-full bg-teal-500 hover:bg-teal-600 text-white font-semibold py-3 rounded-xl transition-colors"
+        <Button
+          onClick={() => onJoinDraft?.()}
+          variant="primary"
+          size="lg"
+          fullWidth
+          style={{ backgroundColor: '#14b8a6' }}
         >
           Join New Draft
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -127,9 +131,7 @@ function DraftCard({ draft, onClick }: DraftCardProps): React.ReactElement {
       <div className="flex items-center justify-between mb-2">
         <h3 className="font-semibold text-white">{draft.tournamentName}</h3>
         {isYourTurn && (
-          <span className="px-2 py-1 bg-green-500 text-black text-xs font-bold rounded">
-            YOUR TURN
-          </span>
+          <StatusBadge status="success" label="YOUR TURN" />
         )}
       </div>
       
@@ -145,12 +147,12 @@ function DraftCard({ draft, onClick }: DraftCardProps): React.ReactElement {
       </div>
       
       {/* Progress Bar */}
-      <div className="mt-2 w-full bg-gray-700 rounded-full h-1.5">
-        <div 
-          className={`h-1.5 rounded-full ${isYourTurn ? 'bg-green-500' : 'bg-teal-500'}`}
-          style={{ width: `${(draft.pickNumber / draft.totalPicks) * 100}%` }}
-        />
-      </div>
+      <ProgressBar 
+        value={(draft.pickNumber / draft.totalPicks) * 100}
+        size="sm"
+        color={isYourTurn ? '#22c55e' : '#14b8a6'}
+        className="mt-2"
+      />
     </button>
   );
 }
