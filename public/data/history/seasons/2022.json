@@ -1,0 +1,7731 @@
+{
+  "season": 2022,
+  "players": {
+    "collins_nico": {
+      "playerId": "collins_nico",
+      "espnId": "4258173",
+      "season": 2022,
+      "position": "WR",
+      "team": "HOU",
+      "gamesPlayed": 10,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 66,
+        "receptions": 37,
+        "yards": 481,
+        "touchdowns": 2,
+        "yardsPerReception": 13,
+        "catchRate": 56.1
+      },
+      "fantasy": {
+        "halfPprPoints": 78.6,
+        "halfPprPpg": 7.9
+      }
+    },
+    "barkley_saquon": {
+      "playerId": "barkley_saquon",
+      "espnId": "3929630",
+      "season": 2022,
+      "position": "RB",
+      "team": "PHI",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 295,
+        "yards": 1312,
+        "touchdowns": 10,
+        "yardsPerAttempt": 4.447000026702881,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 76,
+        "receptions": 57,
+        "yards": 338,
+        "touchdowns": 0,
+        "yardsPerReception": 5.929999828338623,
+        "catchRate": 75
+      },
+      "fantasy": {
+        "halfPprPoints": 253.5,
+        "halfPprPpg": 15.8
+      }
+    },
+    "lamb_ceedee": {
+      "playerId": "lamb_ceedee",
+      "espnId": "4241389",
+      "season": 2022,
+      "position": "WR",
+      "team": "DAL",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 10,
+        "yards": 47,
+        "touchdowns": 0,
+        "yardsPerAttempt": 4.699999809265137,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 156,
+        "receptions": 107,
+        "yards": 1359,
+        "touchdowns": 9,
+        "yardsPerReception": 12.701000213623047,
+        "catchRate": 68.6
+      },
+      "fantasy": {
+        "halfPprPoints": 248.1,
+        "halfPprPpg": 14.6
+      }
+    },
+    "brown_amonra": {
+      "playerId": "brown_amonra",
+      "espnId": "4374302",
+      "season": 2022,
+      "position": "WR",
+      "team": "DET",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 9,
+        "yards": 95,
+        "touchdowns": 0,
+        "yardsPerAttempt": 10.555999755859375,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 146,
+        "receptions": 106,
+        "yards": 1161,
+        "touchdowns": 6,
+        "yardsPerReception": 10.95300006866455,
+        "catchRate": 72.6
+      },
+      "fantasy": {
+        "halfPprPoints": 214.6,
+        "halfPprPpg": 13.4
+      }
+    },
+    "mccaffrey_christian": {
+      "playerId": "mccaffrey_christian",
+      "espnId": "3117251",
+      "season": 2022,
+      "position": "RB",
+      "team": "SF",
+      "gamesPlayed": 17,
+      "passing": {
+        "completions": 1,
+        "attempts": 1,
+        "yards": 34,
+        "touchdowns": 1,
+        "interceptions": 0,
+        "completionPct": 100,
+        "yardsPerAttempt": 34
+      },
+      "rushing": {
+        "attempts": 244,
+        "yards": 1139,
+        "touchdowns": 8,
+        "yardsPerAttempt": 4.668000221252441,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 108,
+        "receptions": 85,
+        "yards": 741,
+        "touchdowns": 5,
+        "yardsPerReception": 8.718000411987305,
+        "catchRate": 78.7
+      },
+      "fantasy": {
+        "halfPprPoints": 313.9,
+        "halfPprPpg": 18.5
+      }
+    },
+    "chase_jamarr": {
+      "playerId": "chase_jamarr",
+      "espnId": "4362628",
+      "season": 2022,
+      "position": "WR",
+      "team": "CIN",
+      "gamesPlayed": 12,
+      "passing": null,
+      "rushing": {
+        "attempts": 5,
+        "yards": 8,
+        "touchdowns": 0,
+        "yardsPerAttempt": 1.600000023841858,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 134,
+        "receptions": 87,
+        "yards": 1046,
+        "touchdowns": 9,
+        "yardsPerReception": 12.02299976348877,
+        "catchRate": 64.9
+      },
+      "fantasy": {
+        "halfPprPoints": 202.9,
+        "halfPprPpg": 16.9
+      }
+    },
+    "jefferson_justin": {
+      "playerId": "jefferson_justin",
+      "espnId": "4262921",
+      "season": 2022,
+      "position": "WR",
+      "team": "MIN",
+      "gamesPlayed": 17,
+      "passing": {
+        "completions": 2,
+        "attempts": 2,
+        "yards": 34,
+        "touchdowns": 0,
+        "interceptions": 0,
+        "completionPct": 100,
+        "yardsPerAttempt": 17
+      },
+      "rushing": {
+        "attempts": 4,
+        "yards": 24,
+        "touchdowns": 1,
+        "yardsPerAttempt": 6,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 184,
+        "receptions": 128,
+        "yards": 1809,
+        "touchdowns": 8,
+        "yardsPerReception": 14.133000373840332,
+        "catchRate": 69.6
+      },
+      "fantasy": {
+        "halfPprPoints": 302.7,
+        "halfPprPpg": 17.8
+      }
+    },
+    "henry_derrick": {
+      "playerId": "henry_derrick",
+      "espnId": "3043078",
+      "season": 2022,
+      "position": "RB",
+      "team": "BAL",
+      "gamesPlayed": 16,
+      "passing": {
+        "completions": 2,
+        "attempts": 2,
+        "yards": 4,
+        "touchdowns": 1,
+        "interceptions": 0,
+        "completionPct": 100,
+        "yardsPerAttempt": 2
+      },
+      "rushing": {
+        "attempts": 349,
+        "yards": 1538,
+        "touchdowns": 13,
+        "yardsPerAttempt": 4.4070000648498535,
+        "fumbles": 4
+      },
+      "receiving": {
+        "targets": 41,
+        "receptions": 33,
+        "yards": 398,
+        "touchdowns": 0,
+        "yardsPerReception": 12.060999870300293,
+        "catchRate": 80.5
+      },
+      "fantasy": {
+        "halfPprPoints": 292.3,
+        "halfPprPpg": 18.3
+      }
+    },
+    "london_drake": {
+      "playerId": "london_drake",
+      "espnId": "4426502",
+      "season": 2022,
+      "position": "WR",
+      "team": "ATL",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 117,
+        "receptions": 72,
+        "yards": 866,
+        "touchdowns": 4,
+        "yardsPerReception": 12.027999877929688,
+        "catchRate": 61.5
+      },
+      "fantasy": {
+        "halfPprPoints": 146.6,
+        "halfPprPpg": 8.6
+      }
+    },
+    "brown_aj": {
+      "playerId": "brown_aj",
+      "espnId": "4047646",
+      "season": 2022,
+      "position": "WR",
+      "team": "PHI",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 145,
+        "receptions": 88,
+        "yards": 1496,
+        "touchdowns": 11,
+        "yardsPerReception": 17,
+        "catchRate": 60.7
+      },
+      "fantasy": {
+        "halfPprPoints": 259.6,
+        "halfPprPpg": 15.3
+      }
+    },
+    "jacobs_josh": {
+      "playerId": "jacobs_josh",
+      "espnId": "4047365",
+      "season": 2022,
+      "position": "RB",
+      "team": "GB",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 340,
+        "yards": 1653,
+        "touchdowns": 12,
+        "yardsPerAttempt": 4.861999988555908,
+        "fumbles": 2
+      },
+      "receiving": {
+        "targets": 64,
+        "receptions": 53,
+        "yards": 400,
+        "touchdowns": 0,
+        "yardsPerReception": 7.546999931335449,
+        "catchRate": 82.8
+      },
+      "fantasy": {
+        "halfPprPoints": 303.8,
+        "halfPprPpg": 17.9
+      }
+    },
+    "taylor_jonathan": {
+      "playerId": "taylor_jonathan",
+      "espnId": "4242335",
+      "season": 2022,
+      "position": "RB",
+      "team": "IND",
+      "gamesPlayed": 11,
+      "passing": null,
+      "rushing": {
+        "attempts": 192,
+        "yards": 861,
+        "touchdowns": 4,
+        "yardsPerAttempt": 4.484000205993652,
+        "fumbles": 3
+      },
+      "receiving": {
+        "targets": 40,
+        "receptions": 28,
+        "yards": 143,
+        "touchdowns": 0,
+        "yardsPerReception": 5.10699987411499,
+        "catchRate": 70
+      },
+      "fantasy": {
+        "halfPprPoints": 138.4,
+        "halfPprPpg": 12.6
+      }
+    },
+    "jackson_lamar": {
+      "playerId": "jackson_lamar",
+      "espnId": "3916387",
+      "season": 2022,
+      "position": "QB",
+      "team": "BAL",
+      "gamesPlayed": 12,
+      "passing": {
+        "completions": 203,
+        "attempts": 326,
+        "yards": 2242,
+        "touchdowns": 17,
+        "interceptions": 7,
+        "completionPct": 62.27000045776367,
+        "yardsPerAttempt": 6.876999855041504
+      },
+      "rushing": {
+        "attempts": 112,
+        "yards": 764,
+        "touchdowns": 3,
+        "yardsPerAttempt": 6.821000099182129,
+        "fumbles": 4
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 245.1,
+        "halfPprPpg": 20.4
+      }
+    },
+    "mcbride_trey": {
+      "playerId": "mcbride_trey",
+      "espnId": "4361307",
+      "season": 2022,
+      "position": "TE",
+      "team": "ARI",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 39,
+        "receptions": 29,
+        "yards": 265,
+        "touchdowns": 1,
+        "yardsPerReception": 9.137999534606934,
+        "catchRate": 74.4
+      },
+      "fantasy": {
+        "halfPprPoints": 47,
+        "halfPprPpg": 2.9
+      }
+    },
+    "kittle_george": {
+      "playerId": "kittle_george",
+      "espnId": "3040151",
+      "season": 2022,
+      "position": "TE",
+      "team": "SF",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 86,
+        "receptions": 60,
+        "yards": 765,
+        "touchdowns": 11,
+        "yardsPerReception": 12.75,
+        "catchRate": 69.8
+      },
+      "fantasy": {
+        "halfPprPoints": 172.5,
+        "halfPprPpg": 11.5
+      }
+    },
+    "williams_kyren": {
+      "playerId": "williams_kyren",
+      "espnId": "4430737",
+      "season": 2022,
+      "position": "RB",
+      "team": "LAR",
+      "gamesPlayed": 10,
+      "passing": null,
+      "rushing": {
+        "attempts": 35,
+        "yards": 139,
+        "touchdowns": 0,
+        "yardsPerAttempt": 3.9709999561309814,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 12,
+        "receptions": 9,
+        "yards": 76,
+        "touchdowns": 0,
+        "yardsPerReception": 8.444000244140625,
+        "catchRate": 75
+      },
+      "fantasy": {
+        "halfPprPoints": 26,
+        "halfPprPpg": 2.6
+      }
+    },
+    "higgins_tee": {
+      "playerId": "higgins_tee",
+      "espnId": "4239993",
+      "season": 2022,
+      "position": "WR",
+      "team": "CIN",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 109,
+        "receptions": 74,
+        "yards": 1029,
+        "touchdowns": 7,
+        "yardsPerReception": 13.904999732971191,
+        "catchRate": 67.9
+      },
+      "fantasy": {
+        "halfPprPoints": 181.9,
+        "halfPprPpg": 11.4
+      }
+    },
+    "allen_josh": {
+      "playerId": "allen_josh",
+      "espnId": "3918298",
+      "season": 2022,
+      "position": "QB",
+      "team": "BUF",
+      "gamesPlayed": 16,
+      "passing": {
+        "completions": 359,
+        "attempts": 567,
+        "yards": 4283,
+        "touchdowns": 35,
+        "interceptions": 14,
+        "completionPct": 63.316001892089844,
+        "yardsPerAttempt": 7.553999900817871
+      },
+      "rushing": {
+        "attempts": 124,
+        "yards": 762,
+        "touchdowns": 7,
+        "yardsPerAttempt": 6.144999980926514,
+        "fumbles": 8
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 415.5,
+        "halfPprPpg": 26
+      }
+    },
+    "cook_james": {
+      "playerId": "cook_james",
+      "espnId": "4379399",
+      "season": 2022,
+      "position": "RB",
+      "team": "BUF",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 89,
+        "yards": 507,
+        "touchdowns": 2,
+        "yardsPerAttempt": 5.697000026702881,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 32,
+        "receptions": 21,
+        "yards": 180,
+        "touchdowns": 1,
+        "yardsPerReception": 8.571000099182129,
+        "catchRate": 65.6
+      },
+      "fantasy": {
+        "halfPprPoints": 97.2,
+        "halfPprPpg": 6.1
+      }
+    },
+    "hurts_jalen": {
+      "playerId": "hurts_jalen",
+      "espnId": "4040715",
+      "season": 2022,
+      "position": "QB",
+      "team": "PHI",
+      "gamesPlayed": 15,
+      "passing": {
+        "completions": 306,
+        "attempts": 460,
+        "yards": 3701,
+        "touchdowns": 22,
+        "interceptions": 6,
+        "completionPct": 66.52200317382812,
+        "yardsPerAttempt": 8.045999526977539
+      },
+      "rushing": {
+        "attempts": 165,
+        "yards": 760,
+        "touchdowns": 13,
+        "yardsPerAttempt": 4.605999946594238,
+        "fumbles": 5
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 384,
+        "halfPprPpg": 25.6
+      }
+    },
+    "adams_davante": {
+      "playerId": "adams_davante",
+      "espnId": "16800",
+      "season": 2022,
+      "position": "WR",
+      "team": "LAR",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 3,
+        "yards": -1,
+        "touchdowns": 0,
+        "yardsPerAttempt": -0.3330000042915344,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 180,
+        "receptions": 100,
+        "yards": 1516,
+        "touchdowns": 14,
+        "yardsPerReception": 15.15999984741211,
+        "catchRate": 55.6
+      },
+      "fantasy": {
+        "halfPprPoints": 285.5,
+        "halfPprPpg": 16.8
+      }
+    },
+    "wilson_garrett": {
+      "playerId": "wilson_garrett",
+      "espnId": "4569618",
+      "season": 2022,
+      "position": "WR",
+      "team": "NYJ",
+      "gamesPlayed": 17,
+      "passing": {
+        "completions": 0,
+        "attempts": 1,
+        "yards": 0,
+        "touchdowns": 0,
+        "interceptions": 0,
+        "completionPct": 0,
+        "yardsPerAttempt": 0
+      },
+      "rushing": {
+        "attempts": 4,
+        "yards": 4,
+        "touchdowns": 0,
+        "yardsPerAttempt": 1,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 147,
+        "receptions": 83,
+        "yards": 1103,
+        "touchdowns": 4,
+        "yardsPerReception": 13.288999557495117,
+        "catchRate": 56.5
+      },
+      "fantasy": {
+        "halfPprPoints": 176.2,
+        "halfPprPpg": 10.4
+      }
+    },
+    "evans_mike": {
+      "playerId": "evans_mike",
+      "espnId": "16737",
+      "season": 2022,
+      "position": "WR",
+      "team": "TB",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 127,
+        "receptions": 77,
+        "yards": 1124,
+        "touchdowns": 6,
+        "yardsPerReception": 14.597000122070312,
+        "catchRate": 60.6
+      },
+      "fantasy": {
+        "halfPprPoints": 186.9,
+        "halfPprPpg": 12.5
+      }
+    },
+    "mclaurin_terry": {
+      "playerId": "mclaurin_terry",
+      "espnId": "3121422",
+      "season": 2022,
+      "position": "WR",
+      "team": "WAS",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 7,
+        "yards": 29,
+        "touchdowns": 0,
+        "yardsPerAttempt": 4.14300012588501,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 120,
+        "receptions": 77,
+        "yards": 1191,
+        "touchdowns": 5,
+        "yardsPerReception": 15.468000411987305,
+        "catchRate": 64.2
+      },
+      "fantasy": {
+        "halfPprPoints": 190.5,
+        "halfPprPpg": 11.2
+      }
+    },
+    "hill_tyreek": {
+      "playerId": "hill_tyreek",
+      "espnId": "3116406",
+      "season": 2022,
+      "position": "WR",
+      "team": "MIA",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 7,
+        "yards": 32,
+        "touchdowns": 1,
+        "yardsPerAttempt": 4.571000099182129,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 170,
+        "receptions": 119,
+        "yards": 1710,
+        "touchdowns": 7,
+        "yardsPerReception": 14.369999885559082,
+        "catchRate": 70
+      },
+      "fantasy": {
+        "halfPprPoints": 281.7,
+        "halfPprPpg": 16.6
+      }
+    },
+    "sutton_courtland": {
+      "playerId": "sutton_courtland",
+      "espnId": "3128429",
+      "season": 2022,
+      "position": "WR",
+      "team": "DEN",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": 5,
+        "touchdowns": 0,
+        "yardsPerAttempt": 5,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 109,
+        "receptions": 64,
+        "yards": 829,
+        "touchdowns": 2,
+        "yardsPerReception": 12.95300006866455,
+        "catchRate": 58.7
+      },
+      "fantasy": {
+        "halfPprPoints": 127.4,
+        "halfPprPpg": 8.5
+      }
+    },
+    "hubbard_chuba": {
+      "playerId": "hubbard_chuba",
+      "espnId": "4241416",
+      "season": 2022,
+      "position": "RB",
+      "team": "CAR",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": {
+        "attempts": 95,
+        "yards": 466,
+        "touchdowns": 2,
+        "yardsPerAttempt": 4.90500020980835,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 17,
+        "receptions": 14,
+        "yards": 171,
+        "touchdowns": 0,
+        "yardsPerReception": 12.21399974822998,
+        "catchRate": 82.4
+      },
+      "fantasy": {
+        "halfPprPoints": 82.7,
+        "halfPprPpg": 5.5
+      }
+    },
+    "kamara_alvin": {
+      "playerId": "kamara_alvin",
+      "espnId": "3054850",
+      "season": 2022,
+      "position": "RB",
+      "team": "NO",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": {
+        "attempts": 223,
+        "yards": 897,
+        "touchdowns": 2,
+        "yardsPerAttempt": 4.021999835968018,
+        "fumbles": 2
+      },
+      "receiving": {
+        "targets": 77,
+        "receptions": 57,
+        "yards": 490,
+        "touchdowns": 2,
+        "yardsPerReception": 8.595999717712402,
+        "catchRate": 74
+      },
+      "fantasy": {
+        "halfPprPoints": 191.2,
+        "halfPprPpg": 12.7
+      }
+    },
+    "burrow_joe": {
+      "playerId": "burrow_joe",
+      "espnId": "3915511",
+      "season": 2022,
+      "position": "QB",
+      "team": "CIN",
+      "gamesPlayed": 16,
+      "passing": {
+        "completions": 414,
+        "attempts": 606,
+        "yards": 4475,
+        "touchdowns": 35,
+        "interceptions": 12,
+        "completionPct": 68.31700134277344,
+        "yardsPerAttempt": 7.383999824523926
+      },
+      "rushing": {
+        "attempts": 75,
+        "yards": 257,
+        "touchdowns": 5,
+        "yardsPerAttempt": 3.427000045776367,
+        "fumbles": 0
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 362.7,
+        "halfPprPpg": 22.7
+      }
+    },
+    "conner_james": {
+      "playerId": "conner_james",
+      "espnId": "3045147",
+      "season": 2022,
+      "position": "RB",
+      "team": "ARI",
+      "gamesPlayed": 13,
+      "passing": null,
+      "rushing": {
+        "attempts": 183,
+        "yards": 782,
+        "touchdowns": 7,
+        "yardsPerAttempt": 4.2729997634887695,
+        "fumbles": 3
+      },
+      "receiving": {
+        "targets": 58,
+        "receptions": 46,
+        "yards": 300,
+        "touchdowns": 1,
+        "yardsPerReception": 6.521999835968018,
+        "catchRate": 79.3
+      },
+      "fantasy": {
+        "halfPprPoints": 179.2,
+        "halfPprPpg": 13.8
+      }
+    },
+    "walker_kenneth": {
+      "playerId": "walker_kenneth",
+      "espnId": "4567048",
+      "season": 2022,
+      "position": "RB",
+      "team": "SEA",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": {
+        "attempts": 228,
+        "yards": 1050,
+        "touchdowns": 9,
+        "yardsPerAttempt": 4.605000019073486,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 35,
+        "receptions": 27,
+        "yards": 165,
+        "touchdowns": 0,
+        "yardsPerReception": 6.111000061035156,
+        "catchRate": 77.1
+      },
+      "fantasy": {
+        "halfPprPoints": 189,
+        "halfPprPpg": 12.6
+      }
+    },
+    "metcalf_dk": {
+      "playerId": "metcalf_dk",
+      "espnId": "4047650",
+      "season": 2022,
+      "position": "WR",
+      "team": "PIT",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 141,
+        "receptions": 90,
+        "yards": 1048,
+        "touchdowns": 6,
+        "yardsPerReception": 11.644000053405762,
+        "catchRate": 63.8
+      },
+      "fantasy": {
+        "halfPprPoints": 185.8,
+        "halfPprPpg": 10.9
+      }
+    },
+    "hall_breece": {
+      "playerId": "hall_breece",
+      "espnId": "4427366",
+      "season": 2022,
+      "position": "RB",
+      "team": "NYJ",
+      "gamesPlayed": 7,
+      "passing": null,
+      "rushing": {
+        "attempts": 80,
+        "yards": 463,
+        "touchdowns": 4,
+        "yardsPerAttempt": 5.788000106811523,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 31,
+        "receptions": 19,
+        "yards": 218,
+        "touchdowns": 1,
+        "yardsPerReception": 11.473999977111816,
+        "catchRate": 61.3
+      },
+      "fantasy": {
+        "halfPprPoints": 107.6,
+        "halfPprPpg": 15.4
+      }
+    },
+    "pickens_george": {
+      "playerId": "pickens_george",
+      "espnId": "4426354",
+      "season": 2022,
+      "position": "WR",
+      "team": "DAL",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 3,
+        "yards": 24,
+        "touchdowns": 1,
+        "yardsPerAttempt": 8,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 84,
+        "receptions": 52,
+        "yards": 801,
+        "touchdowns": 4,
+        "yardsPerReception": 15.404000282287598,
+        "catchRate": 61.9
+      },
+      "fantasy": {
+        "halfPprPoints": 138.5,
+        "halfPprPpg": 8.1
+      }
+    },
+    "pollard_tony": {
+      "playerId": "pollard_tony",
+      "espnId": "3916148",
+      "season": 2022,
+      "position": "RB",
+      "team": "TEN",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 193,
+        "yards": 1007,
+        "touchdowns": 9,
+        "yardsPerAttempt": 5.2179999351501465,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 55,
+        "receptions": 39,
+        "yards": 371,
+        "touchdowns": 3,
+        "yardsPerReception": 9.512999534606934,
+        "catchRate": 70.9
+      },
+      "fantasy": {
+        "halfPprPoints": 229.3,
+        "halfPprPpg": 14.3
+      }
+    },
+    "waddle_jaylen": {
+      "playerId": "waddle_jaylen",
+      "espnId": "4372016",
+      "season": 2022,
+      "position": "WR",
+      "team": "MIA",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 3,
+        "yards": 26,
+        "touchdowns": 0,
+        "yardsPerAttempt": 8.666999816894531,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 117,
+        "receptions": 75,
+        "yards": 1356,
+        "touchdowns": 8,
+        "yardsPerReception": 18.079999923706055,
+        "catchRate": 64.1
+      },
+      "fantasy": {
+        "halfPprPoints": 223.7,
+        "halfPprPpg": 13.2
+      }
+    },
+    "moore_dj": {
+      "playerId": "moore_dj",
+      "espnId": "3915416",
+      "season": 2022,
+      "position": "WR",
+      "team": "CHI",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 10,
+        "yards": 53,
+        "touchdowns": 0,
+        "yardsPerAttempt": 5.300000190734863,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 118,
+        "receptions": 63,
+        "yards": 888,
+        "touchdowns": 7,
+        "yardsPerReception": 14.095000267028809,
+        "catchRate": 53.4
+      },
+      "fantasy": {
+        "halfPprPoints": 167.6,
+        "halfPprPpg": 9.9
+      }
+    },
+    "swift_dandre": {
+      "playerId": "swift_dandre",
+      "espnId": "4259545",
+      "season": 2022,
+      "position": "RB",
+      "team": "CHI",
+      "gamesPlayed": 14,
+      "passing": null,
+      "rushing": {
+        "attempts": 99,
+        "yards": 542,
+        "touchdowns": 5,
+        "yardsPerAttempt": 5.474999904632568,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 70,
+        "receptions": 48,
+        "yards": 389,
+        "touchdowns": 3,
+        "yardsPerReception": 8.104000091552734,
+        "catchRate": 68.6
+      },
+      "fantasy": {
+        "halfPprPoints": 165.1,
+        "halfPprPpg": 11.8
+      }
+    },
+    "smith_devonta": {
+      "playerId": "smith_devonta",
+      "espnId": "4241478",
+      "season": 2022,
+      "position": "WR",
+      "team": "PHI",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 136,
+        "receptions": 95,
+        "yards": 1196,
+        "touchdowns": 7,
+        "yardsPerReception": 12.58899974822998,
+        "catchRate": 69.9
+      },
+      "fantasy": {
+        "halfPprPoints": 209.1,
+        "halfPprPpg": 12.3
+      }
+    },
+    "williams_jameson": {
+      "playerId": "williams_jameson",
+      "espnId": "4426388",
+      "season": 2022,
+      "position": "WR",
+      "team": "DET",
+      "gamesPlayed": 6,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": 40,
+        "touchdowns": 0,
+        "yardsPerAttempt": 40,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 9,
+        "receptions": 1,
+        "yards": 41,
+        "touchdowns": 1,
+        "yardsPerReception": 41,
+        "catchRate": 11.1
+      },
+      "fantasy": {
+        "halfPprPoints": 14.6,
+        "halfPprPpg": 2.4
+      }
+    },
+    "montgomery_david": {
+      "playerId": "montgomery_david",
+      "espnId": "4035538",
+      "season": 2022,
+      "position": "RB",
+      "team": "DET",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 201,
+        "yards": 801,
+        "touchdowns": 5,
+        "yardsPerAttempt": 3.984999895095825,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 40,
+        "receptions": 34,
+        "yards": 316,
+        "touchdowns": 1,
+        "yardsPerReception": 9.293999671936035,
+        "catchRate": 85
+      },
+      "fantasy": {
+        "halfPprPoints": 164.7,
+        "halfPprPpg": 10.3
+      }
+    },
+    "mahomes_patrick": {
+      "playerId": "mahomes_patrick",
+      "espnId": "3139477",
+      "season": 2022,
+      "position": "QB",
+      "team": "KC",
+      "gamesPlayed": 17,
+      "passing": {
+        "completions": 435,
+        "attempts": 648,
+        "yards": 5250,
+        "touchdowns": 41,
+        "interceptions": 12,
+        "completionPct": 67.12999725341797,
+        "yardsPerAttempt": 8.10200023651123
+      },
+      "rushing": {
+        "attempts": 61,
+        "yards": 358,
+        "touchdowns": 4,
+        "yardsPerAttempt": 5.86899995803833,
+        "fumbles": 5
+      },
+      "receiving": {
+        "targets": 1,
+        "receptions": 1,
+        "yards": 6,
+        "touchdowns": 0,
+        "yardsPerReception": 6,
+        "catchRate": 100
+      },
+      "fantasy": {
+        "halfPprPoints": 422.9,
+        "halfPprPpg": 24.9
+      }
+    },
+    "jones_aaron": {
+      "playerId": "jones_aaron",
+      "espnId": "3042519",
+      "season": 2022,
+      "position": "RB",
+      "team": "MIN",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 213,
+        "yards": 1121,
+        "touchdowns": 2,
+        "yardsPerAttempt": 5.263000011444092,
+        "fumbles": 3
+      },
+      "receiving": {
+        "targets": 72,
+        "receptions": 59,
+        "yards": 395,
+        "touchdowns": 5,
+        "yardsPerReception": 6.695000171661377,
+        "catchRate": 81.9
+      },
+      "fantasy": {
+        "halfPprPoints": 223.1,
+        "halfPprPpg": 13.1
+      }
+    },
+    "hockenson_tj": {
+      "playerId": "hockenson_tj",
+      "espnId": "4036133",
+      "season": 2022,
+      "position": "TE",
+      "team": "MIN",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 129,
+        "receptions": 86,
+        "yards": 914,
+        "touchdowns": 6,
+        "yardsPerReception": 10.628000259399414,
+        "catchRate": 66.7
+      },
+      "fantasy": {
+        "halfPprPoints": 170.4,
+        "halfPprPpg": 10
+      }
+    },
+    "pacheco_isiah": {
+      "playerId": "pacheco_isiah",
+      "espnId": "4361529",
+      "season": 2022,
+      "position": "RB",
+      "team": "KC",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 170,
+        "yards": 830,
+        "touchdowns": 5,
+        "yardsPerAttempt": 4.881999969482422,
+        "fumbles": 3
+      },
+      "receiving": {
+        "targets": 14,
+        "receptions": 13,
+        "yards": 130,
+        "touchdowns": 0,
+        "yardsPerReception": 10,
+        "catchRate": 92.9
+      },
+      "fantasy": {
+        "halfPprPoints": 132.5,
+        "halfPprPpg": 7.8
+      }
+    },
+    "mayfield_baker": {
+      "playerId": "mayfield_baker",
+      "espnId": "3052587",
+      "season": 2022,
+      "position": "QB",
+      "team": "TB",
+      "gamesPlayed": 12,
+      "passing": {
+        "completions": 201,
+        "attempts": 335,
+        "yards": 2163,
+        "touchdowns": 10,
+        "interceptions": 8,
+        "completionPct": 60,
+        "yardsPerAttempt": 6.456999778747559
+      },
+      "rushing": {
+        "attempts": 31,
+        "yards": 89,
+        "touchdowns": 1,
+        "yardsPerAttempt": 2.871000051498413,
+        "fumbles": 6
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 133.4,
+        "halfPprPpg": 11.1
+      }
+    },
+    "andrews_mark": {
+      "playerId": "andrews_mark",
+      "espnId": "3116365",
+      "season": 2022,
+      "position": "TE",
+      "team": "BAL",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": {
+        "attempts": 3,
+        "yards": 8,
+        "touchdowns": 0,
+        "yardsPerAttempt": 2.6670000553131104,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 113,
+        "receptions": 73,
+        "yards": 847,
+        "touchdowns": 5,
+        "yardsPerReception": 11.602999687194824,
+        "catchRate": 64.6
+      },
+      "fantasy": {
+        "halfPprPoints": 152,
+        "halfPprPpg": 10.1
+      }
+    },
+    "jeudy_jerry": {
+      "playerId": "jeudy_jerry",
+      "espnId": "4241463",
+      "season": 2022,
+      "position": "WR",
+      "team": "CLE",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": {
+        "attempts": 4,
+        "yards": 40,
+        "touchdowns": 0,
+        "yardsPerAttempt": 10,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 100,
+        "receptions": 67,
+        "yards": 972,
+        "touchdowns": 6,
+        "yardsPerReception": 14.506999969482422,
+        "catchRate": 67
+      },
+      "fantasy": {
+        "halfPprPoints": 170.7,
+        "halfPprPpg": 11.4
+      }
+    },
+    "kelce_travis": {
+      "playerId": "kelce_travis",
+      "espnId": "15847",
+      "season": 2022,
+      "position": "TE",
+      "team": "KC",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 2,
+        "yards": 5,
+        "touchdowns": 0,
+        "yardsPerAttempt": 2.5,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 152,
+        "receptions": 110,
+        "yards": 1338,
+        "touchdowns": 12,
+        "yardsPerReception": 12.163999557495117,
+        "catchRate": 72.4
+      },
+      "fantasy": {
+        "halfPprPoints": 261.3,
+        "halfPprPpg": 15.4
+      }
+    },
+    "warren_jaylen": {
+      "playerId": "warren_jaylen",
+      "espnId": "4569987",
+      "season": 2022,
+      "position": "RB",
+      "team": "PIT",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 77,
+        "yards": 379,
+        "touchdowns": 1,
+        "yardsPerAttempt": 4.921999931335449,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 33,
+        "receptions": 28,
+        "yards": 214,
+        "touchdowns": 0,
+        "yardsPerReception": 7.64300012588501,
+        "catchRate": 84.8
+      },
+      "fantasy": {
+        "halfPprPoints": 79.3,
+        "halfPprPpg": 5
+      }
+    },
+    "murray_kyler": {
+      "playerId": "murray_kyler",
+      "espnId": "3917315",
+      "season": 2022,
+      "position": "QB",
+      "team": "ARI",
+      "gamesPlayed": 11,
+      "passing": {
+        "completions": 259,
+        "attempts": 390,
+        "yards": 2368,
+        "touchdowns": 14,
+        "interceptions": 7,
+        "completionPct": 66.41000366210938,
+        "yardsPerAttempt": 6.072000026702881
+      },
+      "rushing": {
+        "attempts": 67,
+        "yards": 418,
+        "touchdowns": 3,
+        "yardsPerAttempt": 6.238999843597412,
+        "fumbles": 6
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 203.5,
+        "halfPprPpg": 18.5
+      }
+    },
+    "olave_chris": {
+      "playerId": "olave_chris",
+      "espnId": "4361370",
+      "season": 2022,
+      "position": "WR",
+      "team": "NO",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 119,
+        "receptions": 72,
+        "yards": 1042,
+        "touchdowns": 4,
+        "yardsPerReception": 14.472000122070312,
+        "catchRate": 60.5
+      },
+      "fantasy": {
+        "halfPprPoints": 164.2,
+        "halfPprPpg": 10.9
+      }
+    },
+    "etienne_travis": {
+      "playerId": "etienne_travis",
+      "espnId": "4239996",
+      "season": 2022,
+      "position": "RB",
+      "team": "JAC",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 220,
+        "yards": 1125,
+        "touchdowns": 5,
+        "yardsPerAttempt": 5.113999843597412,
+        "fumbles": 3
+      },
+      "receiving": {
+        "targets": 45,
+        "receptions": 35,
+        "yards": 316,
+        "touchdowns": 0,
+        "yardsPerReception": 9.029000282287598,
+        "catchRate": 77.8
+      },
+      "fantasy": {
+        "halfPprPoints": 191.6,
+        "halfPprPpg": 11.3
+      }
+    },
+    "meyers_jakobi": {
+      "playerId": "meyers_jakobi",
+      "espnId": "3916433",
+      "season": 2022,
+      "position": "WR",
+      "team": "JAC",
+      "gamesPlayed": 14,
+      "passing": null,
+      "rushing": {
+        "attempts": 2,
+        "yards": -11,
+        "touchdowns": 0,
+        "yardsPerAttempt": -5.5,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 96,
+        "receptions": 67,
+        "yards": 804,
+        "touchdowns": 6,
+        "yardsPerReception": 12,
+        "catchRate": 69.8
+      },
+      "fantasy": {
+        "halfPprPoints": 148.8,
+        "halfPprPpg": 10.6
+      }
+    },
+    "njoku_david": {
+      "playerId": "njoku_david",
+      "espnId": "3123076",
+      "season": 2022,
+      "position": "TE",
+      "team": "CLE",
+      "gamesPlayed": 14,
+      "passing": null,
+      "rushing": {
+        "attempts": 2,
+        "yards": -8,
+        "touchdowns": 0,
+        "yardsPerAttempt": -4,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 80,
+        "receptions": 58,
+        "yards": 628,
+        "touchdowns": 4,
+        "yardsPerReception": 10.82800006866455,
+        "catchRate": 72.5
+      },
+      "fantasy": {
+        "halfPprPoints": 115,
+        "halfPprPpg": 8.2
+      }
+    },
+    "diggs_stefon": {
+      "playerId": "diggs_stefon",
+      "espnId": "2976212",
+      "season": 2022,
+      "position": "WR",
+      "team": "NE",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": -3,
+        "touchdowns": 0,
+        "yardsPerAttempt": -3,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 154,
+        "receptions": 108,
+        "yards": 1429,
+        "touchdowns": 11,
+        "yardsPerReception": 13.230999946594238,
+        "catchRate": 70.1
+      },
+      "fantasy": {
+        "halfPprPoints": 262.6,
+        "halfPprPpg": 16.4
+      }
+    },
+    "mason_jordan": {
+      "playerId": "mason_jordan",
+      "espnId": "4360569",
+      "season": 2022,
+      "position": "RB",
+      "team": "MIN",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 43,
+        "yards": 258,
+        "touchdowns": 1,
+        "yardsPerAttempt": 6,
+        "fumbles": 0
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 31.8,
+        "halfPprPpg": 2
+      }
+    },
+    "prescott_dak": {
+      "playerId": "prescott_dak",
+      "espnId": "2577417",
+      "season": 2022,
+      "position": "QB",
+      "team": "DAL",
+      "gamesPlayed": 12,
+      "passing": {
+        "completions": 261,
+        "attempts": 394,
+        "yards": 2860,
+        "touchdowns": 23,
+        "interceptions": 15,
+        "completionPct": 66.24400329589844,
+        "yardsPerAttempt": 7.258999824523926
+      },
+      "rushing": {
+        "attempts": 45,
+        "yards": 182,
+        "touchdowns": 1,
+        "yardsPerAttempt": 4.044000148773193,
+        "fumbles": 2
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 215.6,
+        "halfPprPpg": 18
+      }
+    },
+    "samuel_deebo": {
+      "playerId": "samuel_deebo",
+      "espnId": "3126486",
+      "season": 2022,
+      "position": "WR",
+      "team": "WAS",
+      "gamesPlayed": 13,
+      "passing": null,
+      "rushing": {
+        "attempts": 42,
+        "yards": 232,
+        "touchdowns": 3,
+        "yardsPerAttempt": 5.52400016784668,
+        "fumbles": 3
+      },
+      "receiving": {
+        "targets": 94,
+        "receptions": 56,
+        "yards": 632,
+        "touchdowns": 2,
+        "yardsPerReception": 11.28600025177002,
+        "catchRate": 59.6
+      },
+      "fantasy": {
+        "halfPprPoints": 144.4,
+        "halfPprPpg": 11.1
+      }
+    },
+    "jennings_jauan": {
+      "playerId": "jennings_jauan",
+      "espnId": "3886598",
+      "season": 2022,
+      "position": "WR",
+      "team": "SF",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 56,
+        "receptions": 35,
+        "yards": 416,
+        "touchdowns": 1,
+        "yardsPerReception": 11.88599967956543,
+        "catchRate": 62.5
+      },
+      "fantasy": {
+        "halfPprPoints": 65.1,
+        "halfPprPpg": 4.1
+      }
+    },
+    "fields_justin": {
+      "playerId": "fields_justin",
+      "espnId": "4362887",
+      "season": 2022,
+      "position": "QB",
+      "team": "NYJ",
+      "gamesPlayed": 15,
+      "passing": {
+        "completions": 192,
+        "attempts": 318,
+        "yards": 2242,
+        "touchdowns": 17,
+        "interceptions": 11,
+        "completionPct": 60.37699890136719,
+        "yardsPerAttempt": 7.050000190734863
+      },
+      "rushing": {
+        "attempts": 160,
+        "yards": 1143,
+        "touchdowns": 8,
+        "yardsPerAttempt": 7.144000053405762,
+        "fumbles": 9
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 309,
+        "halfPprPpg": 20.6
+      }
+    },
+    "purdy_brock": {
+      "playerId": "purdy_brock",
+      "espnId": "4361741",
+      "season": 2022,
+      "position": "QB",
+      "team": "SF",
+      "gamesPlayed": 9,
+      "passing": {
+        "completions": 114,
+        "attempts": 170,
+        "yards": 1374,
+        "touchdowns": 13,
+        "interceptions": 4,
+        "completionPct": 67.05899810791016,
+        "yardsPerAttempt": 8.081999778747559
+      },
+      "rushing": {
+        "attempts": 22,
+        "yards": 13,
+        "touchdowns": 1,
+        "yardsPerAttempt": 0.5910000205039978,
+        "fumbles": 0
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 110.3,
+        "halfPprPpg": 12.3
+      }
+    },
+    "williams_javonte": {
+      "playerId": "williams_javonte",
+      "espnId": "4361579",
+      "season": 2022,
+      "position": "RB",
+      "team": "DAL",
+      "gamesPlayed": 4,
+      "passing": null,
+      "rushing": {
+        "attempts": 47,
+        "yards": 204,
+        "touchdowns": 0,
+        "yardsPerAttempt": 4.340000152587891,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 22,
+        "receptions": 16,
+        "yards": 76,
+        "touchdowns": 0,
+        "yardsPerReception": 4.75,
+        "catchRate": 72.7
+      },
+      "fantasy": {
+        "halfPprPoints": 36,
+        "halfPprPpg": 9
+      }
+    },
+    "dobbins_jk": {
+      "playerId": "dobbins_jk",
+      "espnId": "4241985",
+      "season": 2022,
+      "position": "RB",
+      "team": "DEN",
+      "gamesPlayed": 8,
+      "passing": null,
+      "rushing": {
+        "attempts": 92,
+        "yards": 520,
+        "touchdowns": 2,
+        "yardsPerAttempt": 5.6519999504089355,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 8,
+        "receptions": 7,
+        "yards": 42,
+        "touchdowns": 1,
+        "yardsPerReception": 6,
+        "catchRate": 87.5
+      },
+      "fantasy": {
+        "halfPprPoints": 77.7,
+        "halfPprPpg": 9.7
+      }
+    },
+    "engram_evan": {
+      "playerId": "engram_evan",
+      "espnId": "3051876",
+      "season": 2022,
+      "position": "TE",
+      "team": "DEN",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 2,
+        "yards": 13,
+        "touchdowns": 0,
+        "yardsPerAttempt": 6.5,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 98,
+        "receptions": 73,
+        "yards": 766,
+        "touchdowns": 4,
+        "yardsPerReception": 10.493000030517578,
+        "catchRate": 74.5
+      },
+      "fantasy": {
+        "halfPprPoints": 138.4,
+        "halfPprPpg": 8.1
+      }
+    },
+    "ekeler_austin": {
+      "playerId": "ekeler_austin",
+      "espnId": "3068267",
+      "season": 2022,
+      "position": "RB",
+      "team": "WAS",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 204,
+        "yards": 915,
+        "touchdowns": 13,
+        "yardsPerAttempt": 4.485000133514404,
+        "fumbles": 3
+      },
+      "receiving": {
+        "targets": 127,
+        "receptions": 107,
+        "yards": 722,
+        "touchdowns": 5,
+        "yardsPerReception": 6.748000144958496,
+        "catchRate": 84.3
+      },
+      "fantasy": {
+        "halfPprPoints": 325.2,
+        "halfPprPpg": 19.1
+      }
+    },
+    "herbert_justin": {
+      "playerId": "herbert_justin",
+      "espnId": "4038941",
+      "season": 2022,
+      "position": "QB",
+      "team": "LAC",
+      "gamesPlayed": 17,
+      "passing": {
+        "completions": 477,
+        "attempts": 699,
+        "yards": 4739,
+        "touchdowns": 25,
+        "interceptions": 10,
+        "completionPct": 68.23999786376953,
+        "yardsPerAttempt": 6.78000020980835
+      },
+      "rushing": {
+        "attempts": 54,
+        "yards": 147,
+        "touchdowns": 0,
+        "yardsPerAttempt": 2.7219998836517334,
+        "fumbles": 4
+      },
+      "receiving": {
+        "targets": 2,
+        "receptions": 2,
+        "yards": -10,
+        "touchdowns": 0,
+        "yardsPerReception": -5,
+        "catchRate": 100
+      },
+      "fantasy": {
+        "halfPprPoints": 294.3,
+        "halfPprPpg": 17.3
+      }
+    },
+    "pittman_michael": {
+      "playerId": "pittman_michael",
+      "espnId": "4035687",
+      "season": 2022,
+      "position": "WR",
+      "team": "IND",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 3,
+        "yards": 30,
+        "touchdowns": 0,
+        "yardsPerAttempt": 10,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 141,
+        "receptions": 99,
+        "yards": 925,
+        "touchdowns": 4,
+        "yardsPerReception": 9.343000411987305,
+        "catchRate": 70.2
+      },
+      "fantasy": {
+        "halfPprPoints": 169,
+        "halfPprPpg": 10.6
+      }
+    },
+    "shakir_khalil": {
+      "playerId": "shakir_khalil",
+      "espnId": "4373678",
+      "season": 2022,
+      "position": "WR",
+      "team": "BUF",
+      "gamesPlayed": 14,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 20,
+        "receptions": 10,
+        "yards": 161,
+        "touchdowns": 1,
+        "yardsPerReception": 16.100000381469727,
+        "catchRate": 50
+      },
+      "fantasy": {
+        "halfPprPoints": 27.1,
+        "halfPprPpg": 1.9
+      }
+    },
+    "goff_jared": {
+      "playerId": "goff_jared",
+      "espnId": "3046779",
+      "season": 2022,
+      "position": "QB",
+      "team": "DET",
+      "gamesPlayed": 17,
+      "passing": {
+        "completions": 382,
+        "attempts": 587,
+        "yards": 4438,
+        "touchdowns": 29,
+        "interceptions": 7,
+        "completionPct": 65.0770034790039,
+        "yardsPerAttempt": 7.559999942779541
+      },
+      "rushing": {
+        "attempts": 29,
+        "yards": 73,
+        "touchdowns": 0,
+        "yardsPerAttempt": 2.5169999599456787,
+        "fumbles": 3
+      },
+      "receiving": {
+        "targets": 1,
+        "receptions": 1,
+        "yards": 5,
+        "touchdowns": 0,
+        "yardsPerReception": 5,
+        "catchRate": 100
+      },
+      "fantasy": {
+        "halfPprPoints": 294.8,
+        "halfPprPpg": 17.3
+      }
+    },
+    "stevenson_rhamondre": {
+      "playerId": "stevenson_rhamondre",
+      "espnId": "4569173",
+      "season": 2022,
+      "position": "RB",
+      "team": "NE",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 210,
+        "yards": 1040,
+        "touchdowns": 5,
+        "yardsPerAttempt": 4.952000141143799,
+        "fumbles": 2
+      },
+      "receiving": {
+        "targets": 88,
+        "receptions": 69,
+        "yards": 421,
+        "touchdowns": 1,
+        "yardsPerReception": 6.10099983215332,
+        "catchRate": 78.4
+      },
+      "fantasy": {
+        "halfPprPoints": 216.6,
+        "halfPprPpg": 12.7
+      }
+    },
+    "love_jordan": {
+      "playerId": "love_jordan",
+      "espnId": "4036378",
+      "season": 2022,
+      "position": "QB",
+      "team": "GB",
+      "gamesPlayed": 4,
+      "passing": {
+        "completions": 14,
+        "attempts": 21,
+        "yards": 195,
+        "touchdowns": 1,
+        "interceptions": 0,
+        "completionPct": 66.66699981689453,
+        "yardsPerAttempt": 9.28600025177002
+      },
+      "rushing": {
+        "attempts": 1,
+        "yards": -1,
+        "touchdowns": 0,
+        "yardsPerAttempt": -1,
+        "fumbles": 0
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 11.7,
+        "halfPprPpg": 2.9
+      }
+    },
+    "lawrence_trevor": {
+      "playerId": "lawrence_trevor",
+      "espnId": "4360310",
+      "season": 2022,
+      "position": "QB",
+      "team": "JAC",
+      "gamesPlayed": 17,
+      "passing": {
+        "completions": 387,
+        "attempts": 584,
+        "yards": 4113,
+        "touchdowns": 25,
+        "interceptions": 8,
+        "completionPct": 66.26699829101562,
+        "yardsPerAttempt": 7.043000221252441
+      },
+      "rushing": {
+        "attempts": 62,
+        "yards": 291,
+        "touchdowns": 5,
+        "yardsPerAttempt": 4.693999767303467,
+        "fumbles": 5
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 315.6,
+        "halfPprPpg": 18.6
+      }
+    },
+    "ferguson_jake": {
+      "playerId": "ferguson_jake",
+      "espnId": "4242355",
+      "season": 2022,
+      "position": "WR",
+      "team": "DAL",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 22,
+        "receptions": 19,
+        "yards": 174,
+        "touchdowns": 2,
+        "yardsPerReception": 9.157999992370605,
+        "catchRate": 86.4
+      },
+      "fantasy": {
+        "halfPprPoints": 38.9,
+        "halfPprPpg": 2.4
+      }
+    },
+    "kupp_cooper": {
+      "playerId": "kupp_cooper",
+      "espnId": "2977187",
+      "season": 2022,
+      "position": "WR",
+      "team": "SEA",
+      "gamesPlayed": 9,
+      "passing": {
+        "completions": 0,
+        "attempts": 1,
+        "yards": 0,
+        "touchdowns": 0,
+        "interceptions": 0,
+        "completionPct": 0,
+        "yardsPerAttempt": 0
+      },
+      "rushing": {
+        "attempts": 9,
+        "yards": 52,
+        "touchdowns": 1,
+        "yardsPerAttempt": 5.7779998779296875,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 98,
+        "receptions": 75,
+        "yards": 812,
+        "touchdowns": 6,
+        "yardsPerReception": 10.82699966430664,
+        "catchRate": 76.5
+      },
+      "fantasy": {
+        "halfPprPoints": 165.9,
+        "halfPprPpg": 18.4
+      }
+    },
+    "mooney_darnell": {
+      "playerId": "mooney_darnell",
+      "espnId": "4040655",
+      "season": 2022,
+      "position": "WR",
+      "team": "ATL",
+      "gamesPlayed": 12,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": 2,
+        "touchdowns": 0,
+        "yardsPerAttempt": 2,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 61,
+        "receptions": 40,
+        "yards": 493,
+        "touchdowns": 2,
+        "yardsPerReception": 12.324999809265137,
+        "catchRate": 65.6
+      },
+      "fantasy": {
+        "halfPprPoints": 81.5,
+        "halfPprPpg": 6.8
+      }
+    },
+    "godwin_chris": {
+      "playerId": "godwin_chris",
+      "espnId": "3116165",
+      "season": 2022,
+      "position": "WR",
+      "team": "TB",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": {
+        "attempts": 3,
+        "yards": 5,
+        "touchdowns": 0,
+        "yardsPerAttempt": 1.6670000553131104,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 142,
+        "receptions": 104,
+        "yards": 1023,
+        "touchdowns": 3,
+        "yardsPerReception": 9.836999893188477,
+        "catchRate": 73.2
+      },
+      "fantasy": {
+        "halfPprPoints": 172.8,
+        "halfPprPpg": 11.5
+      }
+    },
+    "goedert_dallas": {
+      "playerId": "goedert_dallas",
+      "espnId": "3121023",
+      "season": 2022,
+      "position": "TE",
+      "team": "PHI",
+      "gamesPlayed": 12,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 69,
+        "receptions": 55,
+        "yards": 702,
+        "touchdowns": 3,
+        "yardsPerReception": 12.763999938964844,
+        "catchRate": 79.7
+      },
+      "fantasy": {
+        "halfPprPoints": 115.7,
+        "halfPprPpg": 9.6
+      }
+    },
+    "shaheed_rashid": {
+      "playerId": "shaheed_rashid",
+      "espnId": "4032473",
+      "season": 2022,
+      "position": "WR",
+      "team": "SEA",
+      "gamesPlayed": 12,
+      "passing": null,
+      "rushing": {
+        "attempts": 4,
+        "yards": 57,
+        "touchdowns": 1,
+        "yardsPerAttempt": 14.25,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 34,
+        "receptions": 28,
+        "yards": 488,
+        "touchdowns": 2,
+        "yardsPerReception": 17.429000854492188,
+        "catchRate": 82.4
+      },
+      "fantasy": {
+        "halfPprPoints": 86.5,
+        "halfPprPpg": 7.2
+      }
+    },
+    "harris_najee": {
+      "playerId": "harris_najee",
+      "espnId": "4241457",
+      "season": 2022,
+      "position": "RB",
+      "team": "LAC",
+      "gamesPlayed": 17,
+      "passing": {
+        "completions": 1,
+        "attempts": 1,
+        "yards": 4,
+        "touchdowns": 0,
+        "interceptions": 0,
+        "completionPct": 100,
+        "yardsPerAttempt": 4
+      },
+      "rushing": {
+        "attempts": 272,
+        "yards": 1034,
+        "touchdowns": 7,
+        "yardsPerAttempt": 3.8010001182556152,
+        "fumbles": 2
+      },
+      "receiving": {
+        "targets": 53,
+        "receptions": 41,
+        "yards": 229,
+        "touchdowns": 3,
+        "yardsPerReception": 5.585000038146973,
+        "catchRate": 77.4
+      },
+      "fantasy": {
+        "halfPprPoints": 207,
+        "halfPprPpg": 12.2
+      }
+    },
+    "chubb_nick": {
+      "playerId": "chubb_nick",
+      "espnId": "3128720",
+      "season": 2022,
+      "position": "RB",
+      "team": "HOU",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 302,
+        "yards": 1525,
+        "touchdowns": 12,
+        "yardsPerAttempt": 5.050000190734863,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 37,
+        "receptions": 27,
+        "yards": 239,
+        "touchdowns": 1,
+        "yardsPerReception": 8.85200023651123,
+        "catchRate": 73
+      },
+      "fantasy": {
+        "halfPprPoints": 267.9,
+        "halfPprPpg": 15.8
+      }
+    },
+    "bateman_rashod": {
+      "playerId": "bateman_rashod",
+      "espnId": "4360939",
+      "season": 2022,
+      "position": "WR",
+      "team": "BAL",
+      "gamesPlayed": 7,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 28,
+        "receptions": 15,
+        "yards": 285,
+        "touchdowns": 2,
+        "yardsPerReception": 19,
+        "catchRate": 53.6
+      },
+      "fantasy": {
+        "halfPprPoints": 48,
+        "halfPprPpg": 6.9
+      }
+    },
+    "robinson_brian": {
+      "playerId": "robinson_brian",
+      "espnId": "4241474",
+      "season": 2022,
+      "position": "RB",
+      "team": "SF",
+      "gamesPlayed": 12,
+      "passing": null,
+      "rushing": {
+        "attempts": 205,
+        "yards": 797,
+        "touchdowns": 2,
+        "yardsPerAttempt": 3.888000011444092,
+        "fumbles": 2
+      },
+      "receiving": {
+        "targets": 12,
+        "receptions": 9,
+        "yards": 60,
+        "touchdowns": 1,
+        "yardsPerReception": 6.666999816894531,
+        "catchRate": 75
+      },
+      "fantasy": {
+        "halfPprPoints": 108.2,
+        "halfPprPpg": 9
+      }
+    },
+    "tagovailoa_tua": {
+      "playerId": "tagovailoa_tua",
+      "espnId": "4241479",
+      "season": 2022,
+      "position": "QB",
+      "team": "MIA",
+      "gamesPlayed": 13,
+      "passing": {
+        "completions": 259,
+        "attempts": 400,
+        "yards": 3548,
+        "touchdowns": 25,
+        "interceptions": 8,
+        "completionPct": 64.75,
+        "yardsPerAttempt": 8.869999885559082
+      },
+      "rushing": {
+        "attempts": 24,
+        "yards": 70,
+        "touchdowns": 0,
+        "yardsPerAttempt": 2.9170000553131104,
+        "fumbles": 2
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 240.9,
+        "halfPprPpg": 18.5
+      }
+    },
+    "pitts_kyle": {
+      "playerId": "pitts_kyle",
+      "espnId": "4360248",
+      "season": 2022,
+      "position": "TE",
+      "team": "ATL",
+      "gamesPlayed": 10,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 59,
+        "receptions": 28,
+        "yards": 356,
+        "touchdowns": 2,
+        "yardsPerReception": 12.71399974822998,
+        "catchRate": 47.5
+      },
+      "fantasy": {
+        "halfPprPoints": 61.6,
+        "halfPprPpg": 6.2
+      }
+    },
+    "ford_jerome": {
+      "playerId": "ford_jerome",
+      "espnId": "4372019",
+      "season": 2022,
+      "position": "RB",
+      "team": "CLE",
+      "gamesPlayed": 13,
+      "passing": null,
+      "rushing": {
+        "attempts": 8,
+        "yards": 12,
+        "touchdowns": 0,
+        "yardsPerAttempt": 1.5,
+        "fumbles": 0
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 1.2,
+        "halfPprPpg": 0.1
+      }
+    },
+    "kirk_christian": {
+      "playerId": "kirk_christian",
+      "espnId": "3895856",
+      "season": 2022,
+      "position": "WR",
+      "team": "HOU",
+      "gamesPlayed": 17,
+      "passing": {
+        "completions": 0,
+        "attempts": 1,
+        "yards": 0,
+        "touchdowns": 0,
+        "interceptions": 0,
+        "completionPct": 0,
+        "yardsPerAttempt": 0
+      },
+      "rushing": {
+        "attempts": 5,
+        "yards": 11,
+        "touchdowns": 0,
+        "yardsPerAttempt": 2.200000047683716,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 133,
+        "receptions": 84,
+        "yards": 1108,
+        "touchdowns": 8,
+        "yardsPerReception": 13.1899995803833,
+        "catchRate": 63.2
+      },
+      "fantasy": {
+        "halfPprPoints": 201.9,
+        "halfPprPpg": 11.9
+      }
+    },
+    "white_rachaad": {
+      "playerId": "white_rachaad",
+      "espnId": "4697815",
+      "season": 2022,
+      "position": "RB",
+      "team": "TB",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 129,
+        "yards": 481,
+        "touchdowns": 1,
+        "yardsPerAttempt": 3.7290000915527344,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 58,
+        "receptions": 50,
+        "yards": 290,
+        "touchdowns": 2,
+        "yardsPerReception": 5.800000190734863,
+        "catchRate": 86.2
+      },
+      "fantasy": {
+        "halfPprPoints": 120.1,
+        "halfPprPpg": 7.1
+      }
+    },
+    "allen_keenan": {
+      "playerId": "allen_keenan",
+      "espnId": "15818",
+      "season": 2022,
+      "position": "WR",
+      "team": "LAC",
+      "gamesPlayed": 10,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": 8,
+        "touchdowns": 0,
+        "yardsPerAttempt": 8,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 89,
+        "receptions": 66,
+        "yards": 752,
+        "touchdowns": 4,
+        "yardsPerReception": 11.394000053405762,
+        "catchRate": 74.2
+      },
+      "fantasy": {
+        "halfPprPoints": 133,
+        "halfPprPpg": 13.3
+      }
+    },
+    "allgeier_tyler": {
+      "playerId": "allgeier_tyler",
+      "espnId": "4373626",
+      "season": 2022,
+      "position": "RB",
+      "team": "ATL",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 210,
+        "yards": 1035,
+        "touchdowns": 3,
+        "yardsPerAttempt": 4.928999900817871,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 17,
+        "receptions": 16,
+        "yards": 139,
+        "touchdowns": 1,
+        "yardsPerReception": 8.687999725341797,
+        "catchRate": 94.1
+      },
+      "fantasy": {
+        "halfPprPoints": 149.4,
+        "halfPprPpg": 9.3
+      }
+    },
+    "henry_hunter": {
+      "playerId": "henry_hunter",
+      "espnId": "3046439",
+      "season": 2022,
+      "position": "TE",
+      "team": "NE",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 59,
+        "receptions": 41,
+        "yards": 509,
+        "touchdowns": 2,
+        "yardsPerReception": 12.414999961853027,
+        "catchRate": 69.5
+      },
+      "fantasy": {
+        "halfPprPoints": 83.4,
+        "halfPprPpg": 4.9
+      }
+    },
+    "aiyuk_brandon": {
+      "playerId": "aiyuk_brandon",
+      "espnId": "4360438",
+      "season": 2022,
+      "position": "WR",
+      "team": "SF",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 2,
+        "yards": 23,
+        "touchdowns": 0,
+        "yardsPerAttempt": 11.5,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 114,
+        "receptions": 78,
+        "yards": 1015,
+        "touchdowns": 8,
+        "yardsPerReception": 13.012999534606934,
+        "catchRate": 68.4
+      },
+      "fantasy": {
+        "halfPprPoints": 190.8,
+        "halfPprPpg": 11.2
+      }
+    },
+    "ertz_zach": {
+      "playerId": "ertz_zach",
+      "espnId": "15835",
+      "season": 2022,
+      "position": "TE",
+      "team": "WAS",
+      "gamesPlayed": 10,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 69,
+        "receptions": 47,
+        "yards": 406,
+        "touchdowns": 4,
+        "yardsPerReception": 8.637999534606934,
+        "catchRate": 68.1
+      },
+      "fantasy": {
+        "halfPprPoints": 88.1,
+        "halfPprPpg": 8.8
+      }
+    },
+    "brown_marquise": {
+      "playerId": "brown_marquise",
+      "espnId": "4241372",
+      "season": 2022,
+      "position": "WR",
+      "team": "KC",
+      "gamesPlayed": 12,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": 1,
+        "touchdowns": 0,
+        "yardsPerAttempt": 1,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 107,
+        "receptions": 67,
+        "yards": 709,
+        "touchdowns": 3,
+        "yardsPerReception": 10.581999778747559,
+        "catchRate": 62.6
+      },
+      "fantasy": {
+        "halfPprPoints": 122.5,
+        "halfPprPpg": 10.2
+      }
+    },
+    "smith_jonnu": {
+      "playerId": "smith_jonnu",
+      "espnId": "3054212",
+      "season": 2022,
+      "position": "TE",
+      "team": "PIT",
+      "gamesPlayed": 14,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": 5,
+        "touchdowns": 0,
+        "yardsPerAttempt": 5,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 38,
+        "receptions": 27,
+        "yards": 245,
+        "touchdowns": 0,
+        "yardsPerReception": 9.074000358581543,
+        "catchRate": 71.1
+      },
+      "fantasy": {
+        "halfPprPoints": 38.5,
+        "halfPprPpg": 2.8
+      }
+    },
+    "smith_geno": {
+      "playerId": "smith_geno",
+      "espnId": "15864",
+      "season": 2022,
+      "position": "QB",
+      "team": "LV",
+      "gamesPlayed": 17,
+      "passing": {
+        "completions": 399,
+        "attempts": 572,
+        "yards": 4282,
+        "touchdowns": 30,
+        "interceptions": 11,
+        "completionPct": 69.75499725341797,
+        "yardsPerAttempt": 7.486000061035156
+      },
+      "rushing": {
+        "attempts": 68,
+        "yards": 366,
+        "touchdowns": 1,
+        "yardsPerAttempt": 5.381999969482422,
+        "fumbles": 3
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 322.9,
+        "halfPprPpg": 19
+      }
+    },
+    "dowdle_rico": {
+      "playerId": "dowdle_rico",
+      "espnId": "4038815",
+      "season": 2022,
+      "position": "RB",
+      "team": "CAR",
+      "gamesPlayed": 5,
+      "passing": null,
+      "rushing": null,
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 0,
+        "halfPprPpg": 0
+      }
+    },
+    "doubs_romeo": {
+      "playerId": "doubs_romeo",
+      "espnId": "4361432",
+      "season": 2022,
+      "position": "WR",
+      "team": "GB",
+      "gamesPlayed": 13,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": 11,
+        "touchdowns": 0,
+        "yardsPerAttempt": 11,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 67,
+        "receptions": 42,
+        "yards": 425,
+        "touchdowns": 3,
+        "yardsPerReception": 10.119000434875488,
+        "catchRate": 62.7
+      },
+      "fantasy": {
+        "halfPprPoints": 82.6,
+        "halfPprPpg": 6.4
+      }
+    },
+    "mixon_joe": {
+      "playerId": "mixon_joe",
+      "espnId": "3116385",
+      "season": 2022,
+      "position": "RB",
+      "team": "HOU",
+      "gamesPlayed": 14,
+      "passing": null,
+      "rushing": {
+        "attempts": 210,
+        "yards": 814,
+        "touchdowns": 7,
+        "yardsPerAttempt": 3.875999927520752,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 75,
+        "receptions": 60,
+        "yards": 441,
+        "touchdowns": 2,
+        "yardsPerReception": 7.349999904632568,
+        "catchRate": 80
+      },
+      "fantasy": {
+        "halfPprPoints": 209.5,
+        "halfPprPpg": 15
+      }
+    },
+    "okonkwo_chig": {
+      "playerId": "okonkwo_chig",
+      "espnId": "4360635",
+      "season": 2022,
+      "position": "TE",
+      "team": "TEN",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 3,
+        "yards": 2,
+        "touchdowns": 0,
+        "yardsPerAttempt": 0.6669999957084656,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 46,
+        "receptions": 32,
+        "yards": 450,
+        "touchdowns": 3,
+        "yardsPerReception": 14.062999725341797,
+        "catchRate": 69.6
+      },
+      "fantasy": {
+        "halfPprPoints": 79.2,
+        "halfPprPpg": 4.7
+      }
+    },
+    "stafford_matthew": {
+      "playerId": "stafford_matthew",
+      "espnId": "12483",
+      "season": 2022,
+      "position": "QB",
+      "team": "LAR",
+      "gamesPlayed": 9,
+      "passing": {
+        "completions": 206,
+        "attempts": 303,
+        "yards": 2087,
+        "touchdowns": 10,
+        "interceptions": 8,
+        "completionPct": 67.98699951171875,
+        "yardsPerAttempt": 6.888000011444092
+      },
+      "rushing": {
+        "attempts": 13,
+        "yards": 9,
+        "touchdowns": 1,
+        "yardsPerAttempt": 0.6919999718666077,
+        "fumbles": 2
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 122.4,
+        "halfPprPpg": 13.6
+      }
+    },
+    "palmer_joshua": {
+      "playerId": "palmer_joshua",
+      "espnId": "4242433",
+      "season": 2022,
+      "position": "WR",
+      "team": "BUF",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": 4,
+        "touchdowns": 0,
+        "yardsPerAttempt": 4,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 107,
+        "receptions": 72,
+        "yards": 769,
+        "touchdowns": 3,
+        "yardsPerReception": 10.680999755859375,
+        "catchRate": 67.3
+      },
+      "fantasy": {
+        "halfPprPoints": 131.3,
+        "halfPprPpg": 8.2
+      }
+    },
+    "thielen_adam": {
+      "playerId": "thielen_adam",
+      "espnId": "16460",
+      "season": 2022,
+      "position": "WR",
+      "team": "PIT",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": 4,
+        "touchdowns": 0,
+        "yardsPerAttempt": 4,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 107,
+        "receptions": 70,
+        "yards": 716,
+        "touchdowns": 6,
+        "yardsPerReception": 10.229000091552734,
+        "catchRate": 65.4
+      },
+      "fantasy": {
+        "halfPprPoints": 143,
+        "halfPprPpg": 8.4
+      }
+    },
+    "robinson_wandale": {
+      "playerId": "robinson_wandale",
+      "espnId": "4569587",
+      "season": 2022,
+      "position": "WR",
+      "team": "NYG",
+      "gamesPlayed": 6,
+      "passing": null,
+      "rushing": {
+        "attempts": 2,
+        "yards": -1,
+        "touchdowns": 0,
+        "yardsPerAttempt": -0.5,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 31,
+        "receptions": 23,
+        "yards": 227,
+        "touchdowns": 1,
+        "yardsPerReception": 9.869999885559082,
+        "catchRate": 74.2
+      },
+      "fantasy": {
+        "halfPprPoints": 40.1,
+        "halfPprPpg": 6.7
+      }
+    },
+    "likely_isaiah": {
+      "playerId": "likely_isaiah",
+      "espnId": "4361050",
+      "season": 2022,
+      "position": "TE",
+      "team": "BAL",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 60,
+        "receptions": 36,
+        "yards": 373,
+        "touchdowns": 3,
+        "yardsPerReception": 10.361000061035156,
+        "catchRate": 60
+      },
+      "fantasy": {
+        "halfPprPoints": 73.3,
+        "halfPprPpg": 4.6
+      }
+    },
+    "darnold_sam": {
+      "playerId": "darnold_sam",
+      "espnId": "3912547",
+      "season": 2022,
+      "position": "QB",
+      "team": "SEA",
+      "gamesPlayed": 6,
+      "passing": {
+        "completions": 82,
+        "attempts": 140,
+        "yards": 1143,
+        "touchdowns": 7,
+        "interceptions": 3,
+        "completionPct": 58.57099914550781,
+        "yardsPerAttempt": 8.163999557495117
+      },
+      "rushing": {
+        "attempts": 26,
+        "yards": 106,
+        "touchdowns": 2,
+        "yardsPerAttempt": 4.077000141143799,
+        "fumbles": 5
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 93.3,
+        "halfPprPpg": 15.6
+      }
+    },
+    "hopkins_deandre": {
+      "playerId": "hopkins_deandre",
+      "espnId": "15795",
+      "season": 2022,
+      "position": "WR",
+      "team": "BAL",
+      "gamesPlayed": 9,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 96,
+        "receptions": 64,
+        "yards": 717,
+        "touchdowns": 3,
+        "yardsPerReception": 11.20300006866455,
+        "catchRate": 66.7
+      },
+      "fantasy": {
+        "halfPprPoints": 121.7,
+        "halfPprPpg": 13.5
+      }
+    },
+    "otton_cade": {
+      "playerId": "otton_cade",
+      "espnId": "4243331",
+      "season": 2022,
+      "position": "TE",
+      "team": "TB",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 65,
+        "receptions": 42,
+        "yards": 391,
+        "touchdowns": 2,
+        "yardsPerReception": 9.3100004196167,
+        "catchRate": 64.6
+      },
+      "fantasy": {
+        "halfPprPoints": 72.1,
+        "halfPprPpg": 4.5
+      }
+    },
+    "rodgers_aaron": {
+      "playerId": "rodgers_aaron",
+      "espnId": "8439",
+      "season": 2022,
+      "position": "QB",
+      "team": "PIT",
+      "gamesPlayed": 17,
+      "passing": {
+        "completions": 350,
+        "attempts": 542,
+        "yards": 3695,
+        "touchdowns": 26,
+        "interceptions": 12,
+        "completionPct": 64.57599639892578,
+        "yardsPerAttempt": 6.816999912261963
+      },
+      "rushing": {
+        "attempts": 34,
+        "yards": 94,
+        "touchdowns": 1,
+        "yardsPerAttempt": 2.765000104904175,
+        "fumbles": 3
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 255.2,
+        "halfPprPpg": 15
+      }
+    },
+    "pierce_alec": {
+      "playerId": "pierce_alec",
+      "espnId": "4360078",
+      "season": 2022,
+      "position": "WR",
+      "team": "IND",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 78,
+        "receptions": 41,
+        "yards": 593,
+        "touchdowns": 2,
+        "yardsPerReception": 14.463000297546387,
+        "catchRate": 52.6
+      },
+      "fantasy": {
+        "halfPprPoints": 91.8,
+        "halfPprPpg": 5.7
+      }
+    },
+    "gesicki_mike": {
+      "playerId": "gesicki_mike",
+      "espnId": "3116164",
+      "season": 2022,
+      "position": "TE",
+      "team": "CIN",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 52,
+        "receptions": 32,
+        "yards": 362,
+        "touchdowns": 5,
+        "yardsPerReception": 11.312999725341797,
+        "catchRate": 61.5
+      },
+      "fantasy": {
+        "halfPprPoints": 82.2,
+        "halfPprPpg": 4.8
+      }
+    },
+    "slayton_darius": {
+      "playerId": "slayton_darius",
+      "espnId": "3916945",
+      "season": 2022,
+      "position": "WR",
+      "team": "NYG",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 71,
+        "receptions": 46,
+        "yards": 724,
+        "touchdowns": 2,
+        "yardsPerReception": 15.73900032043457,
+        "catchRate": 64.8
+      },
+      "fantasy": {
+        "halfPprPoints": 107.4,
+        "halfPprPpg": 6.7
+      }
+    },
+    "hill_justice": {
+      "playerId": "hill_justice",
+      "espnId": "4038441",
+      "season": 2022,
+      "position": "RB",
+      "team": "BAL",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": {
+        "attempts": 49,
+        "yards": 262,
+        "touchdowns": 0,
+        "yardsPerAttempt": 5.3470001220703125,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 12,
+        "receptions": 12,
+        "yards": 58,
+        "touchdowns": 0,
+        "yardsPerReception": 4.833000183105469,
+        "catchRate": 100
+      },
+      "fantasy": {
+        "halfPprPoints": 38,
+        "halfPprPpg": 2.5
+      }
+    },
+    "hunt_kareem": {
+      "playerId": "hunt_kareem",
+      "espnId": "3059915",
+      "season": 2022,
+      "position": "RB",
+      "team": "KC",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 123,
+        "yards": 468,
+        "touchdowns": 3,
+        "yardsPerAttempt": 3.805000066757202,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 44,
+        "receptions": 35,
+        "yards": 210,
+        "touchdowns": 1,
+        "yardsPerReception": 6,
+        "catchRate": 79.5
+      },
+      "fantasy": {
+        "halfPprPoints": 109.3,
+        "halfPprPpg": 6.4
+      }
+    },
+    "freiermuth_pat": {
+      "playerId": "freiermuth_pat",
+      "espnId": "4361411",
+      "season": 2022,
+      "position": "TE",
+      "team": "PIT",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 98,
+        "receptions": 63,
+        "yards": 732,
+        "touchdowns": 2,
+        "yardsPerReception": 11.619000434875488,
+        "catchRate": 64.3
+      },
+      "fantasy": {
+        "halfPprPoints": 116.7,
+        "halfPprPpg": 7.3
+      }
+    },
+    "sanders_miles": {
+      "playerId": "sanders_miles",
+      "espnId": "4045163",
+      "season": 2022,
+      "position": "RB",
+      "team": "DAL",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 259,
+        "yards": 1269,
+        "touchdowns": 11,
+        "yardsPerAttempt": 4.900000095367432,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 26,
+        "receptions": 20,
+        "yards": 78,
+        "touchdowns": 0,
+        "yardsPerReception": 3.9000000953674316,
+        "catchRate": 76.9
+      },
+      "fantasy": {
+        "halfPprPoints": 210.7,
+        "halfPprPpg": 12.4
+      }
+    },
+    "schultz_dalton": {
+      "playerId": "schultz_dalton",
+      "espnId": "3117256",
+      "season": 2022,
+      "position": "TE",
+      "team": "HOU",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 89,
+        "receptions": 57,
+        "yards": 577,
+        "touchdowns": 5,
+        "yardsPerReception": 10.123000144958496,
+        "catchRate": 64
+      },
+      "fantasy": {
+        "halfPprPoints": 116.2,
+        "halfPprPpg": 7.7
+      }
+    },
+    "jones_daniel": {
+      "playerId": "jones_daniel",
+      "espnId": "3917792",
+      "season": 2022,
+      "position": "QB",
+      "team": "IND",
+      "gamesPlayed": 16,
+      "passing": {
+        "completions": 317,
+        "attempts": 472,
+        "yards": 3205,
+        "touchdowns": 15,
+        "interceptions": 5,
+        "completionPct": 67.16100311279297,
+        "yardsPerAttempt": 6.789999961853027
+      },
+      "rushing": {
+        "attempts": 120,
+        "yards": 708,
+        "touchdowns": 7,
+        "yardsPerAttempt": 5.900000095367432,
+        "fumbles": 2
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 296,
+        "halfPprPpg": 18.5
+      }
+    },
+    "johnson_juwan": {
+      "playerId": "johnson_juwan",
+      "espnId": "3929645",
+      "season": 2022,
+      "position": "TE",
+      "team": "NO",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 65,
+        "receptions": 42,
+        "yards": 508,
+        "touchdowns": 7,
+        "yardsPerReception": 12.095000267028809,
+        "catchRate": 64.6
+      },
+      "fantasy": {
+        "halfPprPoints": 113.8,
+        "halfPprPpg": 7.1
+      }
+    },
+    "pierce_dameon": {
+      "playerId": "pierce_dameon",
+      "espnId": "4360238",
+      "season": 2022,
+      "position": "RB",
+      "team": "KC",
+      "gamesPlayed": 13,
+      "passing": null,
+      "rushing": {
+        "attempts": 220,
+        "yards": 939,
+        "touchdowns": 4,
+        "yardsPerAttempt": 4.26800012588501,
+        "fumbles": 4
+      },
+      "receiving": {
+        "targets": 39,
+        "receptions": 30,
+        "yards": 165,
+        "touchdowns": 1,
+        "yardsPerReception": 5.5,
+        "catchRate": 76.9
+      },
+      "fantasy": {
+        "halfPprPoints": 155.4,
+        "halfPprPpg": 12
+      }
+    },
+    "lockett_tyler": {
+      "playerId": "lockett_tyler",
+      "espnId": "2577327",
+      "season": 2022,
+      "position": "WR",
+      "team": "LV",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 117,
+        "receptions": 84,
+        "yards": 1033,
+        "touchdowns": 9,
+        "yardsPerReception": 12.29800033569336,
+        "catchRate": 71.8
+      },
+      "fantasy": {
+        "halfPprPoints": 199.3,
+        "halfPprPpg": 12.5
+      }
+    },
+    "brown_dyami": {
+      "playerId": "brown_dyami",
+      "espnId": "4361577",
+      "season": 2022,
+      "position": "WR",
+      "team": "JAC",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": 15,
+        "touchdowns": 0,
+        "yardsPerAttempt": 15,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 14,
+        "receptions": 5,
+        "yards": 143,
+        "touchdowns": 2,
+        "yardsPerReception": 28.600000381469727,
+        "catchRate": 35.7
+      },
+      "fantasy": {
+        "halfPprPoints": 30.3,
+        "halfPprPpg": 2
+      }
+    },
+    "flacco_joe": {
+      "playerId": "flacco_joe",
+      "espnId": "11252",
+      "season": 2022,
+      "position": "QB",
+      "team": "CIN",
+      "gamesPlayed": 5,
+      "passing": {
+        "completions": 110,
+        "attempts": 191,
+        "yards": 1051,
+        "touchdowns": 5,
+        "interceptions": 3,
+        "completionPct": 57.59199905395508,
+        "yardsPerAttempt": 5.502999782562256
+      },
+      "rushing": {
+        "attempts": 3,
+        "yards": 6,
+        "touchdowns": 0,
+        "yardsPerAttempt": 2,
+        "fumbles": 0
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 59.6,
+        "halfPprPpg": 11.9
+      }
+    },
+    "mostert_raheem": {
+      "playerId": "mostert_raheem",
+      "espnId": "2576414",
+      "season": 2022,
+      "position": "RB",
+      "team": "LV",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 181,
+        "yards": 891,
+        "touchdowns": 3,
+        "yardsPerAttempt": 4.922999858856201,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 42,
+        "receptions": 31,
+        "yards": 202,
+        "touchdowns": 2,
+        "yardsPerReception": 6.515999794006348,
+        "catchRate": 73.8
+      },
+      "fantasy": {
+        "halfPprPoints": 154.8,
+        "halfPprPpg": 9.7
+      }
+    },
+    "wilson_russell": {
+      "playerId": "wilson_russell",
+      "espnId": "14881",
+      "season": 2022,
+      "position": "QB",
+      "team": "NYG",
+      "gamesPlayed": 15,
+      "passing": {
+        "completions": 292,
+        "attempts": 483,
+        "yards": 3524,
+        "touchdowns": 16,
+        "interceptions": 11,
+        "completionPct": 60.45500183105469,
+        "yardsPerAttempt": 7.296000003814697
+      },
+      "rushing": {
+        "attempts": 55,
+        "yards": 277,
+        "touchdowns": 3,
+        "yardsPerAttempt": 5.035999774932861,
+        "fumbles": 2
+      },
+      "receiving": {
+        "targets": 1,
+        "receptions": 1,
+        "yards": 1,
+        "touchdowns": 0,
+        "yardsPerReception": 1,
+        "catchRate": 100
+      },
+      "fantasy": {
+        "halfPprPoints": 240.3,
+        "halfPprPpg": 16
+      }
+    },
+    "kmet_cole": {
+      "playerId": "kmet_cole",
+      "espnId": "4258595",
+      "season": 2022,
+      "position": "TE",
+      "team": "CHI",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 2,
+        "yards": 9,
+        "touchdowns": 0,
+        "yardsPerAttempt": 4.5,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 69,
+        "receptions": 50,
+        "yards": 544,
+        "touchdowns": 7,
+        "yardsPerReception": 10.880000114440918,
+        "catchRate": 72.5
+      },
+      "fantasy": {
+        "halfPprPoints": 122.3,
+        "halfPprPpg": 7.2
+      }
+    },
+    "gainwell_kenneth": {
+      "playerId": "gainwell_kenneth",
+      "espnId": "4371733",
+      "season": 2022,
+      "position": "RB",
+      "team": "PIT",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 53,
+        "yards": 240,
+        "touchdowns": 4,
+        "yardsPerAttempt": 4.5279998779296875,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 29,
+        "receptions": 23,
+        "yards": 169,
+        "touchdowns": 0,
+        "yardsPerReception": 7.3480000495910645,
+        "catchRate": 79.3
+      },
+      "fantasy": {
+        "halfPprPoints": 76.4,
+        "halfPprPpg": 4.5
+      }
+    },
+    "johnson_ty": {
+      "playerId": "johnson_ty",
+      "espnId": "3915411",
+      "season": 2022,
+      "position": "RB",
+      "team": "BUF",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 30,
+        "yards": 160,
+        "touchdowns": 1,
+        "yardsPerAttempt": 5.333000183105469,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 24,
+        "receptions": 12,
+        "yards": 88,
+        "touchdowns": 0,
+        "yardsPerReception": 7.333000183105469,
+        "catchRate": 50
+      },
+      "fantasy": {
+        "halfPprPoints": 36.8,
+        "halfPprPpg": 2.2
+      }
+    },
+    "gibson_antonio": {
+      "playerId": "gibson_antonio",
+      "espnId": "4360294",
+      "season": 2022,
+      "position": "RB",
+      "team": "NE",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": {
+        "attempts": 149,
+        "yards": 546,
+        "touchdowns": 3,
+        "yardsPerAttempt": 3.6640000343322754,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 58,
+        "receptions": 46,
+        "yards": 353,
+        "touchdowns": 2,
+        "yardsPerReception": 7.673999786376953,
+        "catchRate": 79.3
+      },
+      "fantasy": {
+        "halfPprPoints": 142.9,
+        "halfPprPpg": 9.5
+      }
+    },
+    "cooks_brandin": {
+      "playerId": "cooks_brandin",
+      "espnId": "16731",
+      "season": 2022,
+      "position": "WR",
+      "team": "BUF",
+      "gamesPlayed": 13,
+      "passing": null,
+      "rushing": {
+        "attempts": 2,
+        "yards": 7,
+        "touchdowns": 0,
+        "yardsPerAttempt": 3.5,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 93,
+        "receptions": 57,
+        "yards": 699,
+        "touchdowns": 3,
+        "yardsPerReception": 12.262999534606934,
+        "catchRate": 61.3
+      },
+      "fantasy": {
+        "halfPprPoints": 117.1,
+        "halfPprPpg": 9
+      }
+    },
+    "singletary_devin": {
+      "playerId": "singletary_devin",
+      "espnId": "4040761",
+      "season": 2022,
+      "position": "RB",
+      "team": "NYG",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 177,
+        "yards": 819,
+        "touchdowns": 5,
+        "yardsPerAttempt": 4.626999855041504,
+        "fumbles": 3
+      },
+      "receiving": {
+        "targets": 52,
+        "receptions": 38,
+        "yards": 280,
+        "touchdowns": 1,
+        "yardsPerReception": 7.368000030517578,
+        "catchRate": 73.1
+      },
+      "fantasy": {
+        "halfPprPoints": 164.9,
+        "halfPprPpg": 10.3
+      }
+    },
+    "tolbert_jalen": {
+      "playerId": "tolbert_jalen",
+      "espnId": "4249417",
+      "season": 2022,
+      "position": "WR",
+      "team": "DAL",
+      "gamesPlayed": 8,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 3,
+        "receptions": 2,
+        "yards": 12,
+        "touchdowns": 0,
+        "yardsPerReception": 6,
+        "catchRate": 66.7
+      },
+      "fantasy": {
+        "halfPprPoints": 2.2,
+        "halfPprPpg": 0.3
+      }
+    },
+    "gray_noah": {
+      "playerId": "gray_noah",
+      "espnId": "4240472",
+      "season": 2022,
+      "position": "TE",
+      "team": "KC",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": 1,
+        "touchdowns": 1,
+        "yardsPerAttempt": 1,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 34,
+        "receptions": 28,
+        "yards": 299,
+        "touchdowns": 1,
+        "yardsPerReception": 10.678999900817871,
+        "catchRate": 82.4
+      },
+      "fantasy": {
+        "halfPprPoints": 56,
+        "halfPprPpg": 3.3
+      }
+    },
+    "mitchell_elijah": {
+      "playerId": "mitchell_elijah",
+      "espnId": "4241555",
+      "season": 2022,
+      "position": "RB",
+      "team": "KC",
+      "gamesPlayed": 5,
+      "passing": null,
+      "rushing": {
+        "attempts": 45,
+        "yards": 279,
+        "touchdowns": 2,
+        "yardsPerAttempt": 6.199999809265137,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 4,
+        "receptions": 3,
+        "yards": 7,
+        "touchdowns": 0,
+        "yardsPerReception": 2.3329999446868896,
+        "catchRate": 75
+      },
+      "fantasy": {
+        "halfPprPoints": 42.1,
+        "halfPprPpg": 8.4
+      }
+    },
+    "waller_darren": {
+      "playerId": "waller_darren",
+      "espnId": "2576925",
+      "season": 2022,
+      "position": "WR",
+      "team": "MIA",
+      "gamesPlayed": 9,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 43,
+        "receptions": 28,
+        "yards": 388,
+        "touchdowns": 3,
+        "yardsPerReception": 13.857000350952148,
+        "catchRate": 65.1
+      },
+      "fantasy": {
+        "halfPprPoints": 70.8,
+        "halfPprPpg": 7.9
+      }
+    },
+    "westbrookikhine_nick": {
+      "playerId": "westbrookikhine_nick",
+      "espnId": "3929785",
+      "season": 2022,
+      "position": "WR",
+      "team": "MIA",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 50,
+        "receptions": 25,
+        "yards": 397,
+        "touchdowns": 3,
+        "yardsPerReception": 15.880000114440918,
+        "catchRate": 50
+      },
+      "fantasy": {
+        "halfPprPoints": 70.2,
+        "halfPprPpg": 4.1
+      }
+    },
+    "nailor_jalen": {
+      "playerId": "nailor_jalen",
+      "espnId": "4382466",
+      "season": 2022,
+      "position": "WR",
+      "team": "MIN",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 13,
+        "receptions": 9,
+        "yards": 179,
+        "touchdowns": 1,
+        "yardsPerReception": 19.888999938964844,
+        "catchRate": 69.2
+      },
+      "fantasy": {
+        "halfPprPoints": 28.4,
+        "halfPprPpg": 1.9
+      }
+    },
+    "moore_elijah": {
+      "playerId": "moore_elijah",
+      "espnId": "4372414",
+      "season": 2022,
+      "position": "WR",
+      "team": "DEN",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 5,
+        "yards": 5,
+        "touchdowns": 0,
+        "yardsPerAttempt": 1,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 65,
+        "receptions": 37,
+        "yards": 446,
+        "touchdowns": 1,
+        "yardsPerReception": 12.053999900817871,
+        "catchRate": 56.9
+      },
+      "fantasy": {
+        "halfPprPoints": 69.6,
+        "halfPprPpg": 4.4
+      }
+    },
+    "watson_christian": {
+      "playerId": "watson_christian",
+      "espnId": "4248528",
+      "season": 2022,
+      "position": "WR",
+      "team": "GB",
+      "gamesPlayed": 14,
+      "passing": null,
+      "rushing": {
+        "attempts": 7,
+        "yards": 80,
+        "touchdowns": 2,
+        "yardsPerAttempt": 11.428999900817871,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 66,
+        "receptions": 41,
+        "yards": 611,
+        "touchdowns": 7,
+        "yardsPerReception": 14.902000427246094,
+        "catchRate": 62.1
+      },
+      "fantasy": {
+        "halfPprPoints": 143.6,
+        "halfPprPpg": 10.3
+      }
+    },
+    "chandler_ty": {
+      "playerId": "chandler_ty",
+      "espnId": "4242431",
+      "season": 2022,
+      "position": "RB",
+      "team": "MIN",
+      "gamesPlayed": 3,
+      "passing": null,
+      "rushing": {
+        "attempts": 6,
+        "yards": 20,
+        "touchdowns": 0,
+        "yardsPerAttempt": 3.3329999446868896,
+        "fumbles": 0
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 2,
+        "halfPprPpg": 0.7
+      }
+    },
+    "perine_samaje": {
+      "playerId": "perine_samaje",
+      "espnId": "3116389",
+      "season": 2022,
+      "position": "WR",
+      "team": "CIN",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 95,
+        "yards": 394,
+        "touchdowns": 2,
+        "yardsPerAttempt": 4.146999835968018,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 51,
+        "receptions": 38,
+        "yards": 287,
+        "touchdowns": 4,
+        "yardsPerReception": 7.552999973297119,
+        "catchRate": 74.5
+      },
+      "fantasy": {
+        "halfPprPoints": 123.1,
+        "halfPprPpg": 7.7
+      }
+    },
+    "mccloud_rayray": {
+      "playerId": "mccloud_rayray",
+      "espnId": "3728262",
+      "season": 2022,
+      "position": "WR",
+      "team": "NYG",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 4,
+        "yards": 78,
+        "touchdowns": 1,
+        "yardsPerAttempt": 19.5,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 25,
+        "receptions": 14,
+        "yards": 243,
+        "touchdowns": 1,
+        "yardsPerReception": 17.35700035095215,
+        "catchRate": 56
+      },
+      "fantasy": {
+        "halfPprPoints": 51.1,
+        "halfPprPpg": 3
+      }
+    },
+    "white_zamir": {
+      "playerId": "white_zamir",
+      "espnId": "4361777",
+      "season": 2022,
+      "position": "WR",
+      "team": "LV",
+      "gamesPlayed": 14,
+      "passing": null,
+      "rushing": {
+        "attempts": 17,
+        "yards": 70,
+        "touchdowns": 0,
+        "yardsPerAttempt": 4.118000030517578,
+        "fumbles": 0
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 7,
+        "halfPprPpg": 0.5
+      }
+    },
+    "atwell_tutu": {
+      "playerId": "atwell_tutu",
+      "espnId": "4360797",
+      "season": 2022,
+      "position": "WR",
+      "team": "LAR",
+      "gamesPlayed": 13,
+      "passing": null,
+      "rushing": {
+        "attempts": 9,
+        "yards": 34,
+        "touchdowns": 1,
+        "yardsPerAttempt": 3.7780001163482666,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 35,
+        "receptions": 18,
+        "yards": 298,
+        "touchdowns": 1,
+        "yardsPerReception": 16.555999755859375,
+        "catchRate": 51.4
+      },
+      "fantasy": {
+        "halfPprPoints": 54.2,
+        "halfPprPpg": 4.2
+      }
+    },
+    "reynolds_josh": {
+      "playerId": "reynolds_josh",
+      "espnId": "3115306",
+      "season": 2022,
+      "position": "WR",
+      "team": "NYJ",
+      "gamesPlayed": 14,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 59,
+        "receptions": 38,
+        "yards": 479,
+        "touchdowns": 3,
+        "yardsPerReception": 12.604999542236328,
+        "catchRate": 64.4
+      },
+      "fantasy": {
+        "halfPprPoints": 84.9,
+        "halfPprPpg": 6.1
+      }
+    },
+    "fant_noah": {
+      "playerId": "fant_noah",
+      "espnId": "4036131",
+      "season": 2022,
+      "position": "TE",
+      "team": "CIN",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 63,
+        "receptions": 50,
+        "yards": 486,
+        "touchdowns": 4,
+        "yardsPerReception": 9.720000267028809,
+        "catchRate": 79.4
+      },
+      "fantasy": {
+        "halfPprPoints": 97.6,
+        "halfPprPpg": 5.7
+      }
+    },
+    "higbee_tyler": {
+      "playerId": "higbee_tyler",
+      "espnId": "2573401",
+      "season": 2022,
+      "position": "TE",
+      "team": "LAR",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 108,
+        "receptions": 72,
+        "yards": 620,
+        "touchdowns": 3,
+        "yardsPerReception": 8.611000061035156,
+        "catchRate": 66.7
+      },
+      "fantasy": {
+        "halfPprPoints": 116,
+        "halfPprPpg": 6.8
+      }
+    },
+    "hill_taysom": {
+      "playerId": "hill_taysom",
+      "espnId": "2468609",
+      "season": 2022,
+      "position": "TE",
+      "team": "NO",
+      "gamesPlayed": 16,
+      "passing": {
+        "completions": 13,
+        "attempts": 19,
+        "yards": 240,
+        "touchdowns": 2,
+        "interceptions": 0,
+        "completionPct": 68.4209976196289,
+        "yardsPerAttempt": 12.631999969482422
+      },
+      "rushing": {
+        "attempts": 96,
+        "yards": 575,
+        "touchdowns": 7,
+        "yardsPerAttempt": 5.989999771118164,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 13,
+        "receptions": 9,
+        "yards": 77,
+        "touchdowns": 2,
+        "yardsPerReception": 8.555999755859375,
+        "catchRate": 69.2
+      },
+      "fantasy": {
+        "halfPprPoints": 141.3,
+        "halfPprPpg": 8.8
+      }
+    },
+    "dissly_will": {
+      "playerId": "dissly_will",
+      "espnId": "3127292",
+      "season": 2022,
+      "position": "TE",
+      "team": "LAC",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 38,
+        "receptions": 34,
+        "yards": 349,
+        "touchdowns": 3,
+        "yardsPerReception": 10.265000343322754,
+        "catchRate": 89.5
+      },
+      "fantasy": {
+        "halfPprPoints": 69.9,
+        "halfPprPpg": 4.7
+      }
+    },
+    "dillon_aj": {
+      "playerId": "dillon_aj",
+      "espnId": "4239934",
+      "season": 2022,
+      "position": "RB",
+      "team": "PHI",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 186,
+        "yards": 770,
+        "touchdowns": 7,
+        "yardsPerAttempt": 4.139999866485596,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 43,
+        "receptions": 28,
+        "yards": 206,
+        "touchdowns": 0,
+        "yardsPerReception": 7.35699987411499,
+        "catchRate": 65.1
+      },
+      "fantasy": {
+        "halfPprPoints": 153.6,
+        "halfPprPpg": 9
+      }
+    },
+    "herbert_khalil": {
+      "playerId": "herbert_khalil",
+      "espnId": "4035886",
+      "season": 2022,
+      "position": "RB",
+      "team": "NYJ",
+      "gamesPlayed": 13,
+      "passing": null,
+      "rushing": {
+        "attempts": 129,
+        "yards": 731,
+        "touchdowns": 4,
+        "yardsPerAttempt": 5.666999816894531,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 12,
+        "receptions": 9,
+        "yards": 57,
+        "touchdowns": 1,
+        "yardsPerReception": 6.333000183105469,
+        "catchRate": 75
+      },
+      "fantasy": {
+        "halfPprPoints": 113.3,
+        "halfPprPpg": 8.7
+      }
+    },
+    "conklin_tyler": {
+      "playerId": "conklin_tyler",
+      "espnId": "3915486",
+      "season": 2022,
+      "position": "TE",
+      "team": "LAC",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 2,
+        "yards": 3,
+        "touchdowns": 0,
+        "yardsPerAttempt": 1.5,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 87,
+        "receptions": 58,
+        "yards": 552,
+        "touchdowns": 3,
+        "yardsPerReception": 9.517000198364258,
+        "catchRate": 66.7
+      },
+      "fantasy": {
+        "halfPprPoints": 102.5,
+        "halfPprPpg": 6
+      }
+    },
+    "turpin_kavontae": {
+      "playerId": "turpin_kavontae",
+      "espnId": "3676833",
+      "season": 2022,
+      "position": "WR",
+      "team": "DAL",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 3,
+        "yards": 17,
+        "touchdowns": 0,
+        "yardsPerAttempt": 5.666999816894531,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 2,
+        "receptions": 1,
+        "yards": 9,
+        "touchdowns": 0,
+        "yardsPerReception": 9,
+        "catchRate": 50
+      },
+      "fantasy": {
+        "halfPprPoints": 3.1,
+        "halfPprPpg": 0.2
+      }
+    },
+    "knox_dawson": {
+      "playerId": "knox_dawson",
+      "espnId": "3930086",
+      "season": 2022,
+      "position": "TE",
+      "team": "BUF",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 65,
+        "receptions": 48,
+        "yards": 517,
+        "touchdowns": 6,
+        "yardsPerReception": 10.770999908447266,
+        "catchRate": 73.8
+      },
+      "fantasy": {
+        "halfPprPoints": 111.7,
+        "halfPprPpg": 7.4
+      }
+    },
+    "brown_noah": {
+      "playerId": "brown_noah",
+      "espnId": "3121409",
+      "season": 2022,
+      "position": "WR",
+      "team": "WAS",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 74,
+        "receptions": 43,
+        "yards": 555,
+        "touchdowns": 3,
+        "yardsPerReception": 12.906999588012695,
+        "catchRate": 58.1
+      },
+      "fantasy": {
+        "halfPprPoints": 95,
+        "halfPprPpg": 5.9
+      }
+    },
+    "zaccheaus_olamide": {
+      "playerId": "zaccheaus_olamide",
+      "espnId": "3917914",
+      "season": 2022,
+      "position": "WR",
+      "team": "CHI",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 2,
+        "yards": 7,
+        "touchdowns": 0,
+        "yardsPerAttempt": 3.5,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 61,
+        "receptions": 40,
+        "yards": 533,
+        "touchdowns": 3,
+        "yardsPerReception": 13.324999809265137,
+        "catchRate": 65.6
+      },
+      "fantasy": {
+        "halfPprPoints": 92,
+        "halfPprPpg": 5.4
+      }
+    },
+    "hooper_austin": {
+      "playerId": "hooper_austin",
+      "espnId": "3043275",
+      "season": 2022,
+      "position": "TE",
+      "team": "NE",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 60,
+        "receptions": 41,
+        "yards": 444,
+        "touchdowns": 2,
+        "yardsPerReception": 10.829000473022461,
+        "catchRate": 68.3
+      },
+      "fantasy": {
+        "halfPprPoints": 76.9,
+        "halfPprPpg": 4.5
+      }
+    },
+    "renfrow_hunter": {
+      "playerId": "renfrow_hunter",
+      "espnId": "3135321",
+      "season": 2022,
+      "position": "WR",
+      "team": "CAR",
+      "gamesPlayed": 10,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 50,
+        "receptions": 36,
+        "yards": 330,
+        "touchdowns": 2,
+        "yardsPerReception": 9.166999816894531,
+        "catchRate": 72
+      },
+      "fantasy": {
+        "halfPprPoints": 63,
+        "halfPprPpg": 6.3
+      }
+    },
+    "johnson_diontae": {
+      "playerId": "johnson_diontae",
+      "espnId": "3932905",
+      "season": 2022,
+      "position": "WR",
+      "team": "FA",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 7,
+        "yards": 25,
+        "touchdowns": 0,
+        "yardsPerAttempt": 3.571000099182129,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 147,
+        "receptions": 86,
+        "yards": 882,
+        "touchdowns": 0,
+        "yardsPerReception": 10.255999565124512,
+        "catchRate": 58.5
+      },
+      "fantasy": {
+        "halfPprPoints": 133.7,
+        "halfPprPpg": 7.9
+      }
+    },
+    "robinson_demarcus": {
+      "playerId": "robinson_demarcus",
+      "espnId": "3043116",
+      "season": 2022,
+      "position": "WR",
+      "team": "SF",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 75,
+        "receptions": 48,
+        "yards": 458,
+        "touchdowns": 2,
+        "yardsPerReception": 9.541999816894531,
+        "catchRate": 64
+      },
+      "fantasy": {
+        "halfPprPoints": 81.8,
+        "halfPprPpg": 4.8
+      }
+    },
+    "davis_gabe": {
+      "playerId": "davis_gabe",
+      "espnId": "4243537",
+      "season": 2022,
+      "position": "WR",
+      "team": "BUF",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 93,
+        "receptions": 48,
+        "yards": 836,
+        "touchdowns": 7,
+        "yardsPerReception": 17.41699981689453,
+        "catchRate": 51.6
+      },
+      "fantasy": {
+        "halfPprPoints": 149.6,
+        "halfPprPpg": 10
+      }
+    },
+    "dotson_jahan": {
+      "playerId": "dotson_jahan",
+      "espnId": "4361409",
+      "season": 2022,
+      "position": "WR",
+      "team": "PHI",
+      "gamesPlayed": 12,
+      "passing": null,
+      "rushing": {
+        "attempts": 2,
+        "yards": -7,
+        "touchdowns": 0,
+        "yardsPerAttempt": -3.5,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 61,
+        "receptions": 35,
+        "yards": 523,
+        "touchdowns": 7,
+        "yardsPerReception": 14.942999839782715,
+        "catchRate": 57.4
+      },
+      "fantasy": {
+        "halfPprPoints": 111.1,
+        "halfPprPpg": 9.3
+      }
+    },
+    "hollins_mack": {
+      "playerId": "hollins_mack",
+      "espnId": "2991662",
+      "season": 2022,
+      "position": "WR",
+      "team": "NE",
+      "gamesPlayed": 17,
+      "passing": {
+        "completions": 1,
+        "attempts": 1,
+        "yards": 4,
+        "touchdowns": 0,
+        "interceptions": 0,
+        "completionPct": 100,
+        "yardsPerAttempt": 4
+      },
+      "rushing": {
+        "attempts": 4,
+        "yards": 40,
+        "touchdowns": 0,
+        "yardsPerAttempt": 10,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 94,
+        "receptions": 57,
+        "yards": 690,
+        "touchdowns": 4,
+        "yardsPerReception": 12.104999542236328,
+        "catchRate": 60.6
+      },
+      "fantasy": {
+        "halfPprPoints": 125.7,
+        "halfPprPpg": 7.4
+      }
+    },
+    "samuel_curtis": {
+      "playerId": "samuel_curtis",
+      "espnId": "3121427",
+      "season": 2022,
+      "position": "WR",
+      "team": "BUF",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 38,
+        "yards": 187,
+        "touchdowns": 1,
+        "yardsPerAttempt": 4.921000003814697,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 92,
+        "receptions": 64,
+        "yards": 656,
+        "touchdowns": 4,
+        "yardsPerReception": 10.25,
+        "catchRate": 69.6
+      },
+      "fantasy": {
+        "halfPprPoints": 146.3,
+        "halfPprPpg": 8.6
+      }
+    },
+    "tremble_tommy": {
+      "playerId": "tremble_tommy",
+      "espnId": "4372780",
+      "season": 2022,
+      "position": "TE",
+      "team": "CAR",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 32,
+        "receptions": 19,
+        "yards": 174,
+        "touchdowns": 3,
+        "yardsPerReception": 9.157999992370605,
+        "catchRate": 59.4
+      },
+      "fantasy": {
+        "halfPprPoints": 44.9,
+        "halfPprPpg": 2.6
+      }
+    },
+    "jones_zay": {
+      "playerId": "jones_zay",
+      "espnId": "3059722",
+      "season": 2022,
+      "position": "WR",
+      "team": "ARI",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 4,
+        "yards": 18,
+        "touchdowns": 0,
+        "yardsPerAttempt": 4.5,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 121,
+        "receptions": 82,
+        "yards": 823,
+        "touchdowns": 5,
+        "yardsPerReception": 10.036999702453613,
+        "catchRate": 67.8
+      },
+      "fantasy": {
+        "halfPprPoints": 155.1,
+        "halfPprPpg": 9.7
+      }
+    },
+    "cousins_kirk": {
+      "playerId": "cousins_kirk",
+      "espnId": "14880",
+      "season": 2022,
+      "position": "QB",
+      "team": "ATL",
+      "gamesPlayed": 17,
+      "passing": {
+        "completions": 424,
+        "attempts": 643,
+        "yards": 4547,
+        "touchdowns": 29,
+        "interceptions": 14,
+        "completionPct": 65.94100189208984,
+        "yardsPerAttempt": 7.072000026702881
+      },
+      "rushing": {
+        "attempts": 31,
+        "yards": 97,
+        "touchdowns": 2,
+        "yardsPerAttempt": 3.128999948501587,
+        "fumbles": 2
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 305.6,
+        "halfPprPpg": 18
+      }
+    },
+    "dortch_greg": {
+      "playerId": "dortch_greg",
+      "espnId": "4037235",
+      "season": 2022,
+      "position": "WR",
+      "team": "ARI",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 7,
+        "yards": 44,
+        "touchdowns": 0,
+        "yardsPerAttempt": 6.285999774932861,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 64,
+        "receptions": 52,
+        "yards": 467,
+        "touchdowns": 2,
+        "yardsPerReception": 8.980999946594238,
+        "catchRate": 81.3
+      },
+      "fantasy": {
+        "halfPprPoints": 89.1,
+        "halfPprPpg": 5.6
+      }
+    },
+    "moss_zack": {
+      "playerId": "moss_zack",
+      "espnId": "4035676",
+      "season": 2022,
+      "position": "RB",
+      "team": "FA",
+      "gamesPlayed": 13,
+      "passing": null,
+      "rushing": {
+        "attempts": 93,
+        "yards": 456,
+        "touchdowns": 1,
+        "yardsPerAttempt": 4.9029998779296875,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 13,
+        "receptions": 11,
+        "yards": 39,
+        "touchdowns": 0,
+        "yardsPerReception": 3.5450000762939453,
+        "catchRate": 84.6
+      },
+      "fantasy": {
+        "halfPprPoints": 61,
+        "halfPprPpg": 4.7
+      }
+    },
+    "jefferson_van": {
+      "playerId": "jefferson_van",
+      "espnId": "3930066",
+      "season": 2022,
+      "position": "WR",
+      "team": "TEN",
+      "gamesPlayed": 11,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 44,
+        "receptions": 24,
+        "yards": 369,
+        "touchdowns": 3,
+        "yardsPerReception": 15.375,
+        "catchRate": 54.5
+      },
+      "fantasy": {
+        "halfPprPoints": 66.9,
+        "halfPprPpg": 6.1
+      }
+    },
+    "lazard_allen": {
+      "playerId": "lazard_allen",
+      "espnId": "3128390",
+      "season": 2022,
+      "position": "WR",
+      "team": "NYJ",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": {
+        "attempts": 2,
+        "yards": 0,
+        "touchdowns": 0,
+        "yardsPerAttempt": 0,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 100,
+        "receptions": 60,
+        "yards": 788,
+        "touchdowns": 6,
+        "yardsPerReception": 13.133000373840332,
+        "catchRate": 60
+      },
+      "fantasy": {
+        "halfPprPoints": 144.8,
+        "halfPprPpg": 9.7
+      }
+    },
+    "garoppolo_jimmy": {
+      "playerId": "garoppolo_jimmy",
+      "espnId": "16760",
+      "season": 2022,
+      "position": "QB",
+      "team": "LAR",
+      "gamesPlayed": 11,
+      "passing": {
+        "completions": 207,
+        "attempts": 308,
+        "yards": 2437,
+        "touchdowns": 16,
+        "interceptions": 4,
+        "completionPct": 67.20800018310547,
+        "yardsPerAttempt": 7.9120001792907715
+      },
+      "rushing": {
+        "attempts": 23,
+        "yards": 33,
+        "touchdowns": 2,
+        "yardsPerAttempt": 1.434999942779541,
+        "fumbles": 2
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 172.8,
+        "halfPprPpg": 15.7
+      }
+    },
+    "smithschuster_juju": {
+      "playerId": "smithschuster_juju",
+      "espnId": "3120348",
+      "season": 2022,
+      "position": "WR",
+      "team": "KC",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 101,
+        "receptions": 78,
+        "yards": 933,
+        "touchdowns": 3,
+        "yardsPerReception": 11.961999893188477,
+        "catchRate": 77.2
+      },
+      "fantasy": {
+        "halfPprPoints": 150.3,
+        "halfPprPpg": 9.4
+      }
+    },
+    "reynolds_craig": {
+      "playerId": "reynolds_craig",
+      "espnId": "4421446",
+      "season": 2022,
+      "position": "RB",
+      "team": "NE",
+      "gamesPlayed": 9,
+      "passing": null,
+      "rushing": {
+        "attempts": 23,
+        "yards": 102,
+        "touchdowns": 0,
+        "yardsPerAttempt": 4.434999942779541,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 10,
+        "receptions": 9,
+        "yards": 116,
+        "touchdowns": 0,
+        "yardsPerReception": 12.888999938964844,
+        "catchRate": 90
+      },
+      "fantasy": {
+        "halfPprPoints": 26.3,
+        "halfPprPpg": 2.9
+      }
+    },
+    "chestnut_julius": {
+      "playerId": "chestnut_julius",
+      "espnId": "4367567",
+      "season": 2022,
+      "position": "WR",
+      "team": "TEN",
+      "gamesPlayed": 6,
+      "passing": null,
+      "rushing": {
+        "attempts": 9,
+        "yards": 12,
+        "touchdowns": 0,
+        "yardsPerAttempt": 1.3329999446868896,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 3,
+        "receptions": 3,
+        "yards": 41,
+        "touchdowns": 0,
+        "yardsPerReception": 13.666999816894531,
+        "catchRate": 100
+      },
+      "fantasy": {
+        "halfPprPoints": 6.8,
+        "halfPprPpg": 1.1
+      }
+    },
+    "oliver_josh": {
+      "playerId": "oliver_josh",
+      "espnId": "3921690",
+      "season": 2022,
+      "position": "TE",
+      "team": "MIN",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 25,
+        "receptions": 14,
+        "yards": 149,
+        "touchdowns": 2,
+        "yardsPerReception": 10.642999649047852,
+        "catchRate": 56
+      },
+      "fantasy": {
+        "halfPprPoints": 33.9,
+        "halfPprPpg": 2
+      }
+    },
+    "ogunbowale_dare": {
+      "playerId": "ogunbowale_dare",
+      "espnId": "2983509",
+      "season": 2022,
+      "position": "RB",
+      "team": "HOU",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 42,
+        "yards": 123,
+        "touchdowns": 1,
+        "yardsPerAttempt": 2.928999900817871,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 26,
+        "receptions": 20,
+        "yards": 104,
+        "touchdowns": 0,
+        "yardsPerReception": 5.199999809265137,
+        "catchRate": 76.9
+      },
+      "fantasy": {
+        "halfPprPoints": 38.7,
+        "halfPprPpg": 2.3
+      }
+    },
+    "valdesscantling_marquez": {
+      "playerId": "valdesscantling_marquez",
+      "espnId": "3051738",
+      "season": 2022,
+      "position": "WR",
+      "team": "PIT",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": -3,
+        "touchdowns": 0,
+        "yardsPerAttempt": -3,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 81,
+        "receptions": 42,
+        "yards": 687,
+        "touchdowns": 2,
+        "yardsPerReception": 16.35700035095215,
+        "catchRate": 51.9
+      },
+      "fantasy": {
+        "halfPprPoints": 101.4,
+        "halfPprPpg": 6
+      }
+    },
+    "moreau_foster": {
+      "playerId": "moreau_foster",
+      "espnId": "3843945",
+      "season": 2022,
+      "position": "TE",
+      "team": "NO",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 54,
+        "receptions": 33,
+        "yards": 420,
+        "touchdowns": 2,
+        "yardsPerReception": 12.72700023651123,
+        "catchRate": 61.1
+      },
+      "fantasy": {
+        "halfPprPoints": 70.5,
+        "halfPprPpg": 4.7
+      }
+    },
+    "winston_jameis": {
+      "playerId": "winston_jameis",
+      "espnId": "2969939",
+      "season": 2022,
+      "position": "QB",
+      "team": "NYG",
+      "gamesPlayed": 3,
+      "passing": {
+        "completions": 73,
+        "attempts": 115,
+        "yards": 858,
+        "touchdowns": 4,
+        "interceptions": 5,
+        "completionPct": 63.47800064086914,
+        "yardsPerAttempt": 7.460999965667725
+      },
+      "rushing": {
+        "attempts": 5,
+        "yards": 16,
+        "touchdowns": 0,
+        "yardsPerAttempt": 3.200000047683716,
+        "fumbles": 2
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 46.9,
+        "halfPprPpg": 15.6
+      }
+    },
+    "juszczyk_kyle": {
+      "playerId": "juszczyk_kyle",
+      "espnId": "16002",
+      "season": 2022,
+      "position": "RB",
+      "team": "SF",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 7,
+        "yards": 26,
+        "touchdowns": 1,
+        "yardsPerAttempt": 3.7139999866485596,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 23,
+        "receptions": 19,
+        "yards": 200,
+        "touchdowns": 1,
+        "yardsPerReception": 10.526000022888184,
+        "catchRate": 82.6
+      },
+      "fantasy": {
+        "halfPprPoints": 44.1,
+        "halfPprPpg": 2.8
+      }
+    },
+    "calcaterra_grant": {
+      "playerId": "calcaterra_grant",
+      "espnId": "4241374",
+      "season": 2022,
+      "position": "TE",
+      "team": "PHI",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 9,
+        "receptions": 5,
+        "yards": 81,
+        "touchdowns": 0,
+        "yardsPerReception": 16.200000762939453,
+        "catchRate": 55.6
+      },
+      "fantasy": {
+        "halfPprPoints": 10.6,
+        "halfPprPpg": 0.7
+      }
+    },
+    "smartt_stone": {
+      "playerId": "smartt_stone",
+      "espnId": "4250764",
+      "season": 2022,
+      "position": "WR",
+      "team": "NYJ",
+      "gamesPlayed": 7,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 5,
+        "receptions": 4,
+        "yards": 17,
+        "touchdowns": 0,
+        "yardsPerReception": 4.25,
+        "catchRate": 80
+      },
+      "fantasy": {
+        "halfPprPoints": 3.7,
+        "halfPprPpg": 0.5
+      }
+    },
+    "ruckert_jeremy": {
+      "playerId": "ruckert_jeremy",
+      "espnId": "4361372",
+      "season": 2022,
+      "position": "TE",
+      "team": "NYJ",
+      "gamesPlayed": 9,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 2,
+        "receptions": 1,
+        "yards": 8,
+        "touchdowns": 0,
+        "yardsPerReception": 8,
+        "catchRate": 50
+      },
+      "fantasy": {
+        "halfPprPoints": 1.3,
+        "halfPprPpg": 0.1
+      }
+    },
+    "thornton_tyquan": {
+      "playerId": "thornton_tyquan",
+      "espnId": "4362921",
+      "season": 2022,
+      "position": "WR",
+      "team": "KC",
+      "gamesPlayed": 13,
+      "passing": null,
+      "rushing": {
+        "attempts": 3,
+        "yards": 16,
+        "touchdowns": 1,
+        "yardsPerAttempt": 5.333000183105469,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 45,
+        "receptions": 22,
+        "yards": 247,
+        "touchdowns": 2,
+        "yardsPerReception": 11.22700023651123,
+        "catchRate": 48.9
+      },
+      "fantasy": {
+        "halfPprPoints": 55.3,
+        "halfPprPpg": 4.3
+      }
+    },
+    "edwards_gus": {
+      "playerId": "edwards_gus",
+      "espnId": "3051926",
+      "season": 2022,
+      "position": "RB",
+      "team": "FA",
+      "gamesPlayed": 9,
+      "passing": null,
+      "rushing": {
+        "attempts": 87,
+        "yards": 433,
+        "touchdowns": 3,
+        "yardsPerAttempt": 4.9770002365112305,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 2,
+        "receptions": 0,
+        "yards": 0,
+        "touchdowns": 0,
+        "yardsPerReception": 0,
+        "catchRate": 0
+      },
+      "fantasy": {
+        "halfPprPoints": 61.3,
+        "halfPprPpg": 6.8
+      }
+    },
+    "raymond_kalif": {
+      "playerId": "raymond_kalif",
+      "espnId": "2973405",
+      "season": 2022,
+      "position": "WR",
+      "team": "DET",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 7,
+        "yards": 36,
+        "touchdowns": 0,
+        "yardsPerAttempt": 5.14300012588501,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 64,
+        "receptions": 47,
+        "yards": 616,
+        "touchdowns": 0,
+        "yardsPerReception": 13.105999946594238,
+        "catchRate": 73.4
+      },
+      "fantasy": {
+        "halfPprPoints": 88.7,
+        "halfPprPpg": 5.2
+      }
+    },
+    "tucker_justin": {
+      "playerId": "tucker_justin",
+      "espnId": "15683",
+      "season": 2022,
+      "position": "WR",
+      "team": "FA",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 0,
+        "halfPprPpg": 0
+      }
+    },
+    "badie_tyler": {
+      "playerId": "badie_tyler",
+      "espnId": "4362748",
+      "season": 2022,
+      "position": "RB",
+      "team": "DEN",
+      "gamesPlayed": 1,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": 0,
+        "touchdowns": 0,
+        "yardsPerAttempt": 0,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 1,
+        "receptions": 1,
+        "yards": 24,
+        "touchdowns": 1,
+        "yardsPerReception": 24,
+        "catchRate": 100
+      },
+      "fantasy": {
+        "halfPprPoints": 8.9,
+        "halfPprPpg": 8.9
+      }
+    },
+    "taylor_tyrod": {
+      "playerId": "taylor_tyrod",
+      "espnId": "14163",
+      "season": 2022,
+      "position": "QB",
+      "team": "NYJ",
+      "gamesPlayed": 3,
+      "passing": {
+        "completions": 6,
+        "attempts": 8,
+        "yards": 58,
+        "touchdowns": 1,
+        "interceptions": 1,
+        "completionPct": 75,
+        "yardsPerAttempt": 7.25
+      },
+      "rushing": {
+        "attempts": 5,
+        "yards": 70,
+        "touchdowns": 0,
+        "yardsPerAttempt": 14,
+        "fumbles": 1
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 12.3,
+        "halfPprPpg": 4.1
+      }
+    },
+    "shepard_sterling": {
+      "playerId": "shepard_sterling",
+      "espnId": "2976592",
+      "season": 2022,
+      "position": "WR",
+      "team": "TB",
+      "gamesPlayed": 3,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 24,
+        "receptions": 13,
+        "yards": 154,
+        "touchdowns": 1,
+        "yardsPerReception": 11.845999717712402,
+        "catchRate": 54.2
+      },
+      "fantasy": {
+        "halfPprPoints": 27.9,
+        "halfPprPpg": 9.3
+      }
+    },
+    "haskins_hassan": {
+      "playerId": "haskins_hassan",
+      "espnId": "4372071",
+      "season": 2022,
+      "position": "RB",
+      "team": "LAC",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": {
+        "attempts": 25,
+        "yards": 93,
+        "touchdowns": 0,
+        "yardsPerAttempt": 3.7200000286102295,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 12,
+        "receptions": 11,
+        "yards": 57,
+        "touchdowns": 0,
+        "yardsPerReception": 5.182000160217285,
+        "catchRate": 91.7
+      },
+      "fantasy": {
+        "halfPprPoints": 20.5,
+        "halfPprPpg": 1.4
+      }
+    },
+    "akers_cam": {
+      "playerId": "akers_cam",
+      "espnId": "4240021",
+      "season": 2022,
+      "position": "RB",
+      "team": "SEA",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": {
+        "attempts": 188,
+        "yards": 786,
+        "touchdowns": 7,
+        "yardsPerAttempt": 4.181000232696533,
+        "fumbles": 2
+      },
+      "receiving": {
+        "targets": 18,
+        "receptions": 13,
+        "yards": 117,
+        "touchdowns": 0,
+        "yardsPerReception": 9,
+        "catchRate": 72.2
+      },
+      "fantasy": {
+        "halfPprPoints": 138.8,
+        "halfPprPpg": 9.3
+      }
+    },
+    "ingold_alec": {
+      "playerId": "ingold_alec",
+      "espnId": "3917668",
+      "season": 2022,
+      "position": "RB",
+      "team": "MIA",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 6,
+        "yards": 8,
+        "touchdowns": 1,
+        "yardsPerAttempt": 1.3329999446868896,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 23,
+        "receptions": 15,
+        "yards": 105,
+        "touchdowns": 1,
+        "yardsPerReception": 7,
+        "catchRate": 65.2
+      },
+      "fantasy": {
+        "halfPprPoints": 30.8,
+        "halfPprPpg": 1.8
+      }
+    },
+    "sermon_trey": {
+      "playerId": "sermon_trey",
+      "espnId": "4241401",
+      "season": 2022,
+      "position": "RB",
+      "team": "PIT",
+      "gamesPlayed": 2,
+      "passing": null,
+      "rushing": {
+        "attempts": 2,
+        "yards": 19,
+        "touchdowns": 0,
+        "yardsPerAttempt": 9.5,
+        "fumbles": 0
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 1.9,
+        "halfPprPpg": 1
+      }
+    },
+    "parkinson_colby": {
+      "playerId": "parkinson_colby",
+      "espnId": "4242557",
+      "season": 2022,
+      "position": "TE",
+      "team": "LAR",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 34,
+        "receptions": 25,
+        "yards": 322,
+        "touchdowns": 2,
+        "yardsPerReception": 12.880000114440918,
+        "catchRate": 73.5
+      },
+      "fantasy": {
+        "halfPprPoints": 56.7,
+        "halfPprPpg": 3.3
+      }
+    },
+    "pickett_kenny": {
+      "playerId": "pickett_kenny",
+      "espnId": "4240703",
+      "season": 2022,
+      "position": "QB",
+      "team": "LV",
+      "gamesPlayed": 13,
+      "passing": {
+        "completions": 245,
+        "attempts": 389,
+        "yards": 2404,
+        "touchdowns": 7,
+        "interceptions": 9,
+        "completionPct": 62.981998443603516,
+        "yardsPerAttempt": 6.179999828338623
+      },
+      "rushing": {
+        "attempts": 55,
+        "yards": 237,
+        "touchdowns": 3,
+        "yardsPerAttempt": 4.309000015258789,
+        "fumbles": 3
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 156.9,
+        "halfPprPpg": 12.1
+      }
+    },
+    "wright_brock": {
+      "playerId": "wright_brock",
+      "espnId": "4242392",
+      "season": 2022,
+      "position": "TE",
+      "team": "DET",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 24,
+        "receptions": 18,
+        "yards": 216,
+        "touchdowns": 4,
+        "yardsPerReception": 12,
+        "catchRate": 75
+      },
+      "fantasy": {
+        "halfPprPoints": 54.6,
+        "halfPprPpg": 3.2
+      }
+    },
+    "hodge_khadarel": {
+      "playerId": "hodge_khadarel",
+      "espnId": "3047876",
+      "season": 2022,
+      "position": "WR",
+      "team": "ATL",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 20,
+        "receptions": 13,
+        "yards": 202,
+        "touchdowns": 1,
+        "yardsPerReception": 15.538000106811523,
+        "catchRate": 65
+      },
+      "fantasy": {
+        "halfPprPoints": 32.7,
+        "halfPprPpg": 1.9
+      }
+    },
+    "willis_malik": {
+      "playerId": "willis_malik",
+      "espnId": "4242512",
+      "season": 2022,
+      "position": "QB",
+      "team": "GB",
+      "gamesPlayed": 8,
+      "passing": {
+        "completions": 31,
+        "attempts": 61,
+        "yards": 276,
+        "touchdowns": 0,
+        "interceptions": 3,
+        "completionPct": 50.81999969482422,
+        "yardsPerAttempt": 4.525000095367432
+      },
+      "rushing": {
+        "attempts": 27,
+        "yards": 123,
+        "touchdowns": 1,
+        "yardsPerAttempt": 4.556000232696533,
+        "fumbles": 3
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 26.3,
+        "halfPprPpg": 3.3
+      }
+    },
+    "trautman_adam": {
+      "playerId": "trautman_adam",
+      "espnId": "3911853",
+      "season": 2022,
+      "position": "TE",
+      "team": "DEN",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 22,
+        "receptions": 18,
+        "yards": 207,
+        "touchdowns": 1,
+        "yardsPerReception": 11.5,
+        "catchRate": 81.8
+      },
+      "fantasy": {
+        "halfPprPoints": 35.7,
+        "halfPprPpg": 2.4
+      }
+    },
+    "mariota_marcus": {
+      "playerId": "mariota_marcus",
+      "espnId": "2576980",
+      "season": 2022,
+      "position": "QB",
+      "team": "WAS",
+      "gamesPlayed": 13,
+      "passing": {
+        "completions": 184,
+        "attempts": 300,
+        "yards": 2219,
+        "touchdowns": 15,
+        "interceptions": 9,
+        "completionPct": 61.33300018310547,
+        "yardsPerAttempt": 7.396999835968018
+      },
+      "rushing": {
+        "attempts": 85,
+        "yards": 438,
+        "touchdowns": 4,
+        "yardsPerAttempt": 5.1529998779296875,
+        "fumbles": 5
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 207.6,
+        "halfPprPpg": 16
+      }
+    },
+    "moore_skyy": {
+      "playerId": "moore_skyy",
+      "espnId": "4430191",
+      "season": 2022,
+      "position": "WR",
+      "team": "SF",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 3,
+        "yards": 24,
+        "touchdowns": 0,
+        "yardsPerAttempt": 8,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 33,
+        "receptions": 22,
+        "yards": 250,
+        "touchdowns": 0,
+        "yardsPerReception": 11.36400032043457,
+        "catchRate": 66.7
+      },
+      "fantasy": {
+        "halfPprPoints": 38.4,
+        "halfPprPpg": 2.4
+      }
+    },
+    "edwardshelaire_clyde": {
+      "playerId": "edwardshelaire_clyde",
+      "espnId": "4242214",
+      "season": 2022,
+      "position": "WR",
+      "team": "KC",
+      "gamesPlayed": 10,
+      "passing": null,
+      "rushing": {
+        "attempts": 71,
+        "yards": 302,
+        "touchdowns": 3,
+        "yardsPerAttempt": 4.254000186920166,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 23,
+        "receptions": 17,
+        "yards": 151,
+        "touchdowns": 3,
+        "yardsPerReception": 8.881999969482422,
+        "catchRate": 73.9
+      },
+      "fantasy": {
+        "halfPprPoints": 89.8,
+        "halfPprPpg": 9
+      }
+    },
+    "bellinger_daniel": {
+      "playerId": "bellinger_daniel",
+      "espnId": "4361516",
+      "season": 2022,
+      "position": "TE",
+      "team": "NYG",
+      "gamesPlayed": 12,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": 2,
+        "touchdowns": 1,
+        "yardsPerAttempt": 2,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 35,
+        "receptions": 30,
+        "yards": 268,
+        "touchdowns": 2,
+        "yardsPerReception": 8.932999610900879,
+        "catchRate": 85.7
+      },
+      "fantasy": {
+        "halfPprPoints": 60,
+        "halfPprPpg": 5
+      }
+    },
+    "dulcich_greg": {
+      "playerId": "dulcich_greg",
+      "espnId": "4367209",
+      "season": 2022,
+      "position": "TE",
+      "team": "MIA",
+      "gamesPlayed": 10,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 55,
+        "receptions": 33,
+        "yards": 411,
+        "touchdowns": 2,
+        "yardsPerReception": 12.454999923706055,
+        "catchRate": 60
+      },
+      "fantasy": {
+        "halfPprPoints": 69.6,
+        "halfPprPpg": 7
+      }
+    },
+    "hudson_tanner": {
+      "playerId": "hudson_tanner",
+      "espnId": "3050481",
+      "season": 2022,
+      "position": "TE",
+      "team": "CIN",
+      "gamesPlayed": 11,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 15,
+        "receptions": 10,
+        "yards": 132,
+        "touchdowns": 0,
+        "yardsPerReception": 13.199999809265137,
+        "catchRate": 66.7
+      },
+      "fantasy": {
+        "halfPprPoints": 18.2,
+        "halfPprPpg": 1.7
+      }
+    },
+    "wilson_jeff": {
+      "playerId": "wilson_jeff",
+      "espnId": "3122976",
+      "season": 2022,
+      "position": "WR",
+      "team": "MIA",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 176,
+        "yards": 860,
+        "touchdowns": 5,
+        "yardsPerAttempt": 4.886000156402588,
+        "fumbles": 2
+      },
+      "receiving": {
+        "targets": 37,
+        "receptions": 22,
+        "yards": 185,
+        "touchdowns": 1,
+        "yardsPerReception": 8.409000396728516,
+        "catchRate": 59.5
+      },
+      "fantasy": {
+        "halfPprPoints": 151.5,
+        "halfPprPpg": 9.5
+      }
+    },
+    "johnson_tyler": {
+      "playerId": "johnson_tyler",
+      "espnId": "2310331",
+      "season": 2022,
+      "position": "WR",
+      "team": "NYJ",
+      "gamesPlayed": 2,
+      "passing": null,
+      "rushing": null,
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 0,
+        "halfPprPpg": 0
+      }
+    },
+    "carter_michael": {
+      "playerId": "carter_michael",
+      "espnId": "4240657",
+      "season": 2022,
+      "position": "WR",
+      "team": "ARI",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 114,
+        "yards": 402,
+        "touchdowns": 3,
+        "yardsPerAttempt": 3.5260000228881836,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 54,
+        "receptions": 41,
+        "yards": 288,
+        "touchdowns": 0,
+        "yardsPerReception": 7.02400016784668,
+        "catchRate": 75.9
+      },
+      "fantasy": {
+        "halfPprPoints": 107.5,
+        "halfPprPpg": 6.7
+      }
+    },
+    "bourne_kendrick": {
+      "playerId": "bourne_kendrick",
+      "espnId": "3045523",
+      "season": 2022,
+      "position": "WR",
+      "team": "SF",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 6,
+        "yards": 39,
+        "touchdowns": 0,
+        "yardsPerAttempt": 6.5,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 48,
+        "receptions": 35,
+        "yards": 434,
+        "touchdowns": 1,
+        "yardsPerReception": 12.399999618530273,
+        "catchRate": 72.9
+      },
+      "fantasy": {
+        "halfPprPoints": 70.8,
+        "halfPprPpg": 4.4
+      }
+    },
+    "long_hunter": {
+      "playerId": "long_hunter",
+      "espnId": "4239944",
+      "season": 2022,
+      "position": "TE",
+      "team": "JAC",
+      "gamesPlayed": 9,
+      "passing": null,
+      "rushing": null,
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 0,
+        "halfPprPpg": 0
+      }
+    },
+    "bryant_harrison": {
+      "playerId": "bryant_harrison",
+      "espnId": "4040774",
+      "season": 2022,
+      "position": "TE",
+      "team": "HOU",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": 8,
+        "touchdowns": 0,
+        "yardsPerAttempt": 8,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 42,
+        "receptions": 31,
+        "yards": 239,
+        "touchdowns": 1,
+        "yardsPerReception": 7.710000038146973,
+        "catchRate": 73.8
+      },
+      "fantasy": {
+        "halfPprPoints": 46.2,
+        "halfPprPpg": 2.7
+      }
+    },
+    "mundt_johnny": {
+      "playerId": "mundt_johnny",
+      "espnId": "3052096",
+      "season": 2022,
+      "position": "TE",
+      "team": "JAC",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 21,
+        "receptions": 19,
+        "yards": 140,
+        "touchdowns": 1,
+        "yardsPerReception": 7.368000030517578,
+        "catchRate": 90.5
+      },
+      "fantasy": {
+        "halfPprPoints": 29.5,
+        "halfPprPpg": 1.7
+      }
+    },
+    "woods_robert": {
+      "playerId": "woods_robert",
+      "espnId": "15880",
+      "season": 2022,
+      "position": "WR",
+      "team": "FA",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 91,
+        "receptions": 53,
+        "yards": 527,
+        "touchdowns": 2,
+        "yardsPerReception": 9.942999839782715,
+        "catchRate": 58.2
+      },
+      "fantasy": {
+        "halfPprPoints": 91.2,
+        "halfPprPpg": 5.4
+      }
+    },
+    "wilson_zach": {
+      "playerId": "wilson_zach",
+      "espnId": "4361259",
+      "season": 2022,
+      "position": "QB",
+      "team": "MIA",
+      "gamesPlayed": 9,
+      "passing": {
+        "completions": 132,
+        "attempts": 242,
+        "yards": 1688,
+        "touchdowns": 6,
+        "interceptions": 7,
+        "completionPct": 54.54499816894531,
+        "yardsPerAttempt": 6.974999904632568
+      },
+      "rushing": {
+        "attempts": 28,
+        "yards": 102,
+        "touchdowns": 1,
+        "yardsPerAttempt": 3.6429998874664307,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 1,
+        "receptions": 1,
+        "yards": 2,
+        "touchdowns": 1,
+        "yardsPerReception": 2,
+        "catchRate": 100
+      },
+      "fantasy": {
+        "halfPprPoints": 107.4,
+        "halfPprPpg": 11.9
+      }
+    },
+    "bates_john": {
+      "playerId": "bates_john",
+      "espnId": "4048228",
+      "season": 2022,
+      "position": "TE",
+      "team": "WAS",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 22,
+        "receptions": 14,
+        "yards": 108,
+        "touchdowns": 1,
+        "yardsPerReception": 7.714000225067139,
+        "catchRate": 63.6
+      },
+      "fantasy": {
+        "halfPprPoints": 23.8,
+        "halfPprPpg": 1.5
+      }
+    },
+    "williams_jamaal": {
+      "playerId": "williams_jamaal",
+      "espnId": "2980453",
+      "season": 2022,
+      "position": "RB",
+      "team": "FA",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 262,
+        "yards": 1066,
+        "touchdowns": 17,
+        "yardsPerAttempt": 4.068999767303467,
+        "fumbles": 3
+      },
+      "receiving": {
+        "targets": 16,
+        "receptions": 12,
+        "yards": 73,
+        "touchdowns": 0,
+        "yardsPerReception": 6.083000183105469,
+        "catchRate": 75
+      },
+      "fantasy": {
+        "halfPprPoints": 221.9,
+        "halfPprPpg": 13.1
+      }
+    },
+    "gage_russell": {
+      "playerId": "gage_russell",
+      "espnId": "3115378",
+      "season": 2022,
+      "position": "WR",
+      "team": "FA",
+      "gamesPlayed": 13,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 70,
+        "receptions": 51,
+        "yards": 426,
+        "touchdowns": 5,
+        "yardsPerReception": 8.352999687194824,
+        "catchRate": 72.9
+      },
+      "fantasy": {
+        "halfPprPoints": 98.1,
+        "halfPprPpg": 7.5
+      }
+    },
+    "lance_trey": {
+      "playerId": "lance_trey",
+      "espnId": "4383351",
+      "season": 2022,
+      "position": "QB",
+      "team": "LAC",
+      "gamesPlayed": 2,
+      "passing": {
+        "completions": 15,
+        "attempts": 31,
+        "yards": 194,
+        "touchdowns": 0,
+        "interceptions": 1,
+        "completionPct": 48.387001037597656,
+        "yardsPerAttempt": 6.257999897003174
+      },
+      "rushing": {
+        "attempts": 16,
+        "yards": 67,
+        "touchdowns": 0,
+        "yardsPerAttempt": 4.188000202178955,
+        "fumbles": 1
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 13.5,
+        "halfPprPpg": 6.8
+      }
+    },
+    "sample_drew": {
+      "playerId": "sample_drew",
+      "espnId": "3127310",
+      "season": 2022,
+      "position": "TE",
+      "team": "CIN",
+      "gamesPlayed": 2,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 2,
+        "receptions": 2,
+        "yards": -2,
+        "touchdowns": 0,
+        "yardsPerReception": -1,
+        "catchRate": 100
+      },
+      "fantasy": {
+        "halfPprPoints": 0.8,
+        "halfPprPpg": 0.4
+      }
+    },
+    "woerner_charlie": {
+      "playerId": "woerner_charlie",
+      "espnId": "4035020",
+      "season": 2022,
+      "position": "TE",
+      "team": "ATL",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 2,
+        "receptions": 0,
+        "yards": 0,
+        "touchdowns": 0,
+        "yardsPerReception": 0,
+        "catchRate": 0
+      },
+      "fantasy": {
+        "halfPprPoints": 0,
+        "halfPprPpg": 0
+      }
+    },
+    "patterson_cordarrelle": {
+      "playerId": "patterson_cordarrelle",
+      "espnId": "15807",
+      "season": 2022,
+      "position": "RB",
+      "team": "FA",
+      "gamesPlayed": 13,
+      "passing": null,
+      "rushing": {
+        "attempts": 144,
+        "yards": 695,
+        "touchdowns": 8,
+        "yardsPerAttempt": 4.826000213623047,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 31,
+        "receptions": 21,
+        "yards": 122,
+        "touchdowns": 0,
+        "yardsPerReception": 5.809999942779541,
+        "catchRate": 67.7
+      },
+      "fantasy": {
+        "halfPprPoints": 140.2,
+        "halfPprPpg": 10.8
+      }
+    },
+    "granson_kylen": {
+      "playerId": "granson_kylen",
+      "espnId": "4039160",
+      "season": 2022,
+      "position": "TE",
+      "team": "PHI",
+      "gamesPlayed": 13,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": 0,
+        "touchdowns": 0,
+        "yardsPerAttempt": 0,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 40,
+        "receptions": 31,
+        "yards": 302,
+        "touchdowns": 0,
+        "yardsPerReception": 9.741999626159668,
+        "catchRate": 77.5
+      },
+      "fantasy": {
+        "halfPprPoints": 45.7,
+        "halfPprPpg": 3.5
+      }
+    },
+    "kolar_charlie": {
+      "playerId": "kolar_charlie",
+      "espnId": "4241263",
+      "season": 2022,
+      "position": "TE",
+      "team": "BAL",
+      "gamesPlayed": 2,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 6,
+        "receptions": 4,
+        "yards": 49,
+        "touchdowns": 0,
+        "yardsPerReception": 12.25,
+        "catchRate": 66.7
+      },
+      "fantasy": {
+        "halfPprPoints": 6.9,
+        "halfPprPpg": 3.5
+      }
+    },
+    "strong_pierre": {
+      "playerId": "strong_pierre",
+      "espnId": "4249836",
+      "season": 2022,
+      "position": "RB",
+      "team": "GB",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": {
+        "attempts": 10,
+        "yards": 100,
+        "touchdowns": 1,
+        "yardsPerAttempt": 10,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 7,
+        "receptions": 7,
+        "yards": 42,
+        "touchdowns": 0,
+        "yardsPerReception": 6,
+        "catchRate": 100
+      },
+      "fantasy": {
+        "halfPprPoints": 23.7,
+        "halfPprPpg": 1.6
+      }
+    },
+    "knight_zonovan": {
+      "playerId": "knight_zonovan",
+      "espnId": "4427728",
+      "season": 2022,
+      "position": "RB",
+      "team": "ARI",
+      "gamesPlayed": 7,
+      "passing": null,
+      "rushing": {
+        "attempts": 85,
+        "yards": 300,
+        "touchdowns": 1,
+        "yardsPerAttempt": 3.5290000438690186,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 14,
+        "receptions": 13,
+        "yards": 100,
+        "touchdowns": 0,
+        "yardsPerReception": 7.691999912261963,
+        "catchRate": 92.9
+      },
+      "fantasy": {
+        "halfPprPoints": 52.5,
+        "halfPprPpg": 7.5
+      }
+    },
+    "johnson_dernest": {
+      "playerId": "johnson_dernest",
+      "espnId": "3139602",
+      "season": 2022,
+      "position": "RB",
+      "team": "NE",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": {
+        "attempts": 4,
+        "yards": 17,
+        "touchdowns": 0,
+        "yardsPerAttempt": 4.25,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 3,
+        "receptions": 3,
+        "yards": 7,
+        "touchdowns": 0,
+        "yardsPerReception": 2.3329999446868896,
+        "catchRate": 100
+      },
+      "fantasy": {
+        "halfPprPoints": 3.9,
+        "halfPprPpg": 0.3
+      }
+    },
+    "farrell_luke": {
+      "playerId": "farrell_luke",
+      "espnId": "4040612",
+      "season": 2022,
+      "position": "TE",
+      "team": "SF",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 4,
+        "receptions": 4,
+        "yards": 40,
+        "touchdowns": 0,
+        "yardsPerReception": 10,
+        "catchRate": 100
+      },
+      "fantasy": {
+        "halfPprPoints": 6,
+        "halfPprPpg": 0.4
+      }
+    },
+    "miller_scotty": {
+      "playerId": "miller_scotty",
+      "espnId": "3914397",
+      "season": 2022,
+      "position": "WR",
+      "team": "PIT",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": 8,
+        "touchdowns": 0,
+        "yardsPerAttempt": 8,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 40,
+        "receptions": 23,
+        "yards": 185,
+        "touchdowns": 0,
+        "yardsPerReception": 8.043000221252441,
+        "catchRate": 57.5
+      },
+      "fantasy": {
+        "halfPprPoints": 30.8,
+        "halfPprPpg": 2.1
+      }
+    },
+    "homer_travis": {
+      "playerId": "homer_travis",
+      "espnId": "4037457",
+      "season": 2022,
+      "position": "RB",
+      "team": "CHI",
+      "gamesPlayed": 10,
+      "passing": null,
+      "rushing": {
+        "attempts": 19,
+        "yards": 74,
+        "touchdowns": 0,
+        "yardsPerAttempt": 3.8949999809265137,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 18,
+        "receptions": 16,
+        "yards": 157,
+        "touchdowns": 1,
+        "yardsPerReception": 9.812999725341797,
+        "catchRate": 88.9
+      },
+      "fantasy": {
+        "halfPprPoints": 37.1,
+        "halfPprPpg": 3.7
+      }
+    },
+    "krull_lucas": {
+      "playerId": "krull_lucas",
+      "espnId": "4360231",
+      "season": 2022,
+      "position": "TE",
+      "team": "DEN",
+      "gamesPlayed": 1,
+      "passing": null,
+      "rushing": null,
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 0,
+        "halfPprPpg": 0
+      }
+    },
+    "wentz_carson": {
+      "playerId": "wentz_carson",
+      "espnId": "2573079",
+      "season": 2022,
+      "position": "QB",
+      "team": "MIN",
+      "gamesPlayed": 8,
+      "passing": {
+        "completions": 172,
+        "attempts": 276,
+        "yards": 1755,
+        "touchdowns": 11,
+        "interceptions": 9,
+        "completionPct": 62.319000244140625,
+        "yardsPerAttempt": 6.359000205993652
+      },
+      "rushing": {
+        "attempts": 22,
+        "yards": 86,
+        "touchdowns": 1,
+        "yardsPerAttempt": 3.9089999198913574,
+        "fumbles": 3
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 119.8,
+        "halfPprPpg": 15
+      }
+    },
+    "ham_cj": {
+      "playerId": "ham_cj",
+      "espnId": "4012556",
+      "season": 2022,
+      "position": "RB",
+      "team": "MIN",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 4,
+        "yards": 7,
+        "touchdowns": 2,
+        "yardsPerAttempt": 1.75,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 12,
+        "receptions": 10,
+        "yards": 86,
+        "touchdowns": 0,
+        "yardsPerReception": 8.600000381469727,
+        "catchRate": 83.3
+      },
+      "fantasy": {
+        "halfPprPoints": 26.3,
+        "halfPprPpg": 1.5
+      }
+    },
+    "aliecox_mo": {
+      "playerId": "aliecox_mo",
+      "espnId": "2998565",
+      "season": 2022,
+      "position": "TE",
+      "team": "IND",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 28,
+        "receptions": 19,
+        "yards": 189,
+        "touchdowns": 3,
+        "yardsPerReception": 9.946999549865723,
+        "catchRate": 67.9
+      },
+      "fantasy": {
+        "halfPprPoints": 46.4,
+        "halfPprPpg": 2.7
+      }
+    },
+    "watson_deshaun": {
+      "playerId": "watson_deshaun",
+      "espnId": "3122840",
+      "season": 2022,
+      "position": "QB",
+      "team": "CLE",
+      "gamesPlayed": 6,
+      "passing": {
+        "completions": 99,
+        "attempts": 170,
+        "yards": 1102,
+        "touchdowns": 7,
+        "interceptions": 5,
+        "completionPct": 58.23500061035156,
+        "yardsPerAttempt": 6.48199987411499
+      },
+      "rushing": {
+        "attempts": 36,
+        "yards": 175,
+        "touchdowns": 1,
+        "yardsPerAttempt": 4.861000061035156,
+        "fumbles": 1
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 90.6,
+        "halfPprPpg": 15.1
+      }
+    },
+    "bell_david": {
+      "playerId": "bell_david",
+      "espnId": "4570409",
+      "season": 2022,
+      "position": "WR",
+      "team": "FA",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 35,
+        "receptions": 24,
+        "yards": 214,
+        "touchdowns": 0,
+        "yardsPerReception": 8.916999816894531,
+        "catchRate": 68.6
+      },
+      "fantasy": {
+        "halfPprPoints": 33.4,
+        "halfPprPpg": 2.1
+      }
+    },
+    "rush_cooper": {
+      "playerId": "rush_cooper",
+      "espnId": "2972515",
+      "season": 2022,
+      "position": "QB",
+      "team": "BAL",
+      "gamesPlayed": 9,
+      "passing": {
+        "completions": 94,
+        "attempts": 162,
+        "yards": 1051,
+        "touchdowns": 5,
+        "interceptions": 3,
+        "completionPct": 58.025001525878906,
+        "yardsPerAttempt": 6.48799991607666
+      },
+      "rushing": {
+        "attempts": 9,
+        "yards": 6,
+        "touchdowns": 0,
+        "yardsPerAttempt": 0.6669999957084656,
+        "fumbles": 0
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 59.6,
+        "halfPprPpg": 6.6
+      }
+    },
+    "carter_deandre": {
+      "playerId": "carter_deandre",
+      "espnId": "2580216",
+      "season": 2022,
+      "position": "WR",
+      "team": "CLE",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 2,
+        "yards": -15,
+        "touchdowns": 0,
+        "yardsPerAttempt": -7.5,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 65,
+        "receptions": 46,
+        "yards": 538,
+        "touchdowns": 3,
+        "yardsPerReception": 11.696000099182129,
+        "catchRate": 70.8
+      },
+      "fantasy": {
+        "halfPprPoints": 93.3,
+        "halfPprPpg": 5.5
+      }
+    },
+    "dalton_andy": {
+      "playerId": "dalton_andy",
+      "espnId": "14012",
+      "season": 2022,
+      "position": "QB",
+      "team": "CAR",
+      "gamesPlayed": 14,
+      "passing": {
+        "completions": 252,
+        "attempts": 378,
+        "yards": 2871,
+        "touchdowns": 18,
+        "interceptions": 9,
+        "completionPct": 66.66699981689453,
+        "yardsPerAttempt": 7.59499979019165
+      },
+      "rushing": {
+        "attempts": 30,
+        "yards": 54,
+        "touchdowns": 0,
+        "yardsPerAttempt": 1.7999999523162842,
+        "fumbles": 3
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 183.2,
+        "halfPprPpg": 13.1
+      }
+    },
+    "jones_mac": {
+      "playerId": "jones_mac",
+      "espnId": "4241464",
+      "season": 2022,
+      "position": "QB",
+      "team": "SF",
+      "gamesPlayed": 14,
+      "passing": {
+        "completions": 288,
+        "attempts": 442,
+        "yards": 2997,
+        "touchdowns": 14,
+        "interceptions": 11,
+        "completionPct": 65.15799713134766,
+        "yardsPerAttempt": 6.781000137329102
+      },
+      "rushing": {
+        "attempts": 47,
+        "yards": 102,
+        "touchdowns": 1,
+        "yardsPerAttempt": 2.1700000762939453,
+        "fumbles": 3
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 181.1,
+        "halfPprPpg": 12.9
+      }
+    },
+    "ricard_patrick": {
+      "playerId": "ricard_patrick",
+      "espnId": "2975417",
+      "season": 2022,
+      "position": "WR",
+      "team": "BAL",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 7,
+        "yards": 16,
+        "touchdowns": 0,
+        "yardsPerAttempt": 2.2860000133514404,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 13,
+        "receptions": 11,
+        "yards": 74,
+        "touchdowns": 0,
+        "yardsPerReception": 6.7270002365112305,
+        "catchRate": 84.6
+      },
+      "fantasy": {
+        "halfPprPoints": 14.5,
+        "halfPprPpg": 0.9
+      }
+    },
+    "sherfield_trent": {
+      "playerId": "sherfield_trent",
+      "espnId": "3122168",
+      "season": 2022,
+      "position": "WR",
+      "team": "ARI",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 51,
+        "receptions": 30,
+        "yards": 417,
+        "touchdowns": 2,
+        "yardsPerReception": 13.899999618530273,
+        "catchRate": 58.8
+      },
+      "fantasy": {
+        "halfPprPoints": 68.7,
+        "halfPprPpg": 4
+      }
+    },
+    "elliott_ezekiel": {
+      "playerId": "elliott_ezekiel",
+      "espnId": "3051392",
+      "season": 2022,
+      "position": "WR",
+      "team": "FA",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": {
+        "attempts": 231,
+        "yards": 876,
+        "touchdowns": 12,
+        "yardsPerAttempt": 3.7920000553131104,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 23,
+        "receptions": 17,
+        "yards": 92,
+        "touchdowns": 0,
+        "yardsPerReception": 5.4120001792907715,
+        "catchRate": 73.9
+      },
+      "fantasy": {
+        "halfPprPoints": 177.3,
+        "halfPprPpg": 11.8
+      }
+    },
+    "brissett_jacoby": {
+      "playerId": "brissett_jacoby",
+      "espnId": "2578570",
+      "season": 2022,
+      "position": "QB",
+      "team": "ARI",
+      "gamesPlayed": 16,
+      "passing": {
+        "completions": 236,
+        "attempts": 369,
+        "yards": 2608,
+        "touchdowns": 12,
+        "interceptions": 6,
+        "completionPct": 63.957000732421875,
+        "yardsPerAttempt": 7.067999839782715
+      },
+      "rushing": {
+        "attempts": 49,
+        "yards": 243,
+        "touchdowns": 2,
+        "yardsPerAttempt": 4.959000110626221,
+        "fumbles": 1
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 182.6,
+        "halfPprPpg": 11.4
+      }
+    },
+    "hardman_mecole": {
+      "playerId": "hardman_mecole",
+      "espnId": "4035004",
+      "season": 2022,
+      "position": "WR",
+      "team": "BUF",
+      "gamesPlayed": 8,
+      "passing": null,
+      "rushing": {
+        "attempts": 4,
+        "yards": 31,
+        "touchdowns": 2,
+        "yardsPerAttempt": 7.75,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 34,
+        "receptions": 25,
+        "yards": 297,
+        "touchdowns": 4,
+        "yardsPerReception": 11.880000114440918,
+        "catchRate": 73.5
+      },
+      "fantasy": {
+        "halfPprPoints": 81.3,
+        "halfPprPpg": 10.2
+      }
+    },
+    "mullens_nick": {
+      "playerId": "mullens_nick",
+      "espnId": "3059989",
+      "season": 2022,
+      "position": "QB",
+      "team": "JAC",
+      "gamesPlayed": 4,
+      "passing": {
+        "completions": 21,
+        "attempts": 25,
+        "yards": 224,
+        "touchdowns": 1,
+        "interceptions": 1,
+        "completionPct": 84,
+        "yardsPerAttempt": 8.960000038146973
+      },
+      "rushing": {
+        "attempts": 4,
+        "yards": 8,
+        "touchdowns": 0,
+        "yardsPerAttempt": 2,
+        "fumbles": 0
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 12.8,
+        "halfPprPpg": 3.2
+      }
+    },
+    "woods_michael": {
+      "playerId": "woods_michael",
+      "espnId": "4360174",
+      "season": 2022,
+      "position": "WR",
+      "team": "FA",
+      "gamesPlayed": 10,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": -5,
+        "touchdowns": 0,
+        "yardsPerAttempt": -5,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 10,
+        "receptions": 5,
+        "yards": 45,
+        "touchdowns": 0,
+        "yardsPerReception": 9,
+        "catchRate": 50
+      },
+      "fantasy": {
+        "halfPprPoints": 6.5,
+        "halfPprPpg": 0.7
+      }
+    },
+    "howell_sam": {
+      "playerId": "howell_sam",
+      "espnId": "4426875",
+      "season": 2022,
+      "position": "QB",
+      "team": "PHI",
+      "gamesPlayed": 1,
+      "passing": {
+        "completions": 11,
+        "attempts": 19,
+        "yards": 169,
+        "touchdowns": 1,
+        "interceptions": 1,
+        "completionPct": 57.89500045776367,
+        "yardsPerAttempt": 8.895000457763672
+      },
+      "rushing": {
+        "attempts": 5,
+        "yards": 35,
+        "touchdowns": 1,
+        "yardsPerAttempt": 7,
+        "fumbles": 0
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 19.3,
+        "halfPprPpg": 19.3
+      }
+    },
+    "conner_tanner": {
+      "playerId": "conner_tanner",
+      "espnId": "4047422",
+      "season": 2022,
+      "position": "WR",
+      "team": "MIA",
+      "gamesPlayed": 13,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 3,
+        "receptions": 0,
+        "yards": 0,
+        "touchdowns": 0,
+        "yardsPerReception": 0,
+        "catchRate": 0
+      },
+      "fantasy": {
+        "halfPprPoints": 0,
+        "halfPprPpg": 0
+      }
+    },
+    "nwangwu_kene": {
+      "playerId": "nwangwu_kene",
+      "espnId": "4035537",
+      "season": 2022,
+      "position": "RB",
+      "team": "NYJ",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 9,
+        "yards": 14,
+        "touchdowns": 0,
+        "yardsPerAttempt": 1.555999994277954,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 2,
+        "receptions": 2,
+        "yards": 21,
+        "touchdowns": 0,
+        "yardsPerReception": 10.5,
+        "catchRate": 100
+      },
+      "fantasy": {
+        "halfPprPoints": 4.5,
+        "halfPprPpg": 0.3
+      }
+    },
+    "woods_jelani": {
+      "playerId": "woods_jelani",
+      "espnId": "4241410",
+      "season": 2022,
+      "position": "TE",
+      "team": "NYJ",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 40,
+        "receptions": 25,
+        "yards": 312,
+        "touchdowns": 3,
+        "yardsPerReception": 12.479999542236328,
+        "catchRate": 62.5
+      },
+      "fantasy": {
+        "halfPprPoints": 61.7,
+        "halfPprPpg": 4.1
+      }
+    },
+    "chark_dj": {
+      "playerId": "chark_dj",
+      "espnId": "3115394",
+      "season": 2022,
+      "position": "WR",
+      "team": "FA",
+      "gamesPlayed": 11,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 52,
+        "receptions": 30,
+        "yards": 502,
+        "touchdowns": 3,
+        "yardsPerReception": 16.732999801635742,
+        "catchRate": 57.7
+      },
+      "fantasy": {
+        "halfPprPoints": 83.2,
+        "halfPprPpg": 7.6
+      }
+    },
+    "minshew_gardner": {
+      "playerId": "minshew_gardner",
+      "espnId": "4038524",
+      "season": 2022,
+      "position": "QB",
+      "team": "KC",
+      "gamesPlayed": 5,
+      "passing": {
+        "completions": 44,
+        "attempts": 76,
+        "yards": 663,
+        "touchdowns": 3,
+        "interceptions": 3,
+        "completionPct": 57.89500045776367,
+        "yardsPerAttempt": 8.723999977111816
+      },
+      "rushing": {
+        "attempts": 7,
+        "yards": 3,
+        "touchdowns": 1,
+        "yardsPerAttempt": 0.42899999022483826,
+        "fumbles": 4
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 41.8,
+        "halfPprPpg": 8.4
+      }
+    },
+    "dobbs_joshua": {
+      "playerId": "dobbs_joshua",
+      "espnId": "3044720",
+      "season": 2022,
+      "position": "QB",
+      "team": "NE",
+      "gamesPlayed": 2,
+      "passing": {
+        "completions": 40,
+        "attempts": 68,
+        "yards": 411,
+        "touchdowns": 2,
+        "interceptions": 2,
+        "completionPct": 58.82400131225586,
+        "yardsPerAttempt": 6.044000148773193
+      },
+      "rushing": {
+        "attempts": 8,
+        "yards": 44,
+        "touchdowns": 0,
+        "yardsPerAttempt": 5.5,
+        "fumbles": 1
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 26.8,
+        "halfPprPpg": 13.4
+      }
+    },
+    "wallace_tylan": {
+      "playerId": "wallace_tylan",
+      "espnId": "4241424",
+      "season": 2022,
+      "position": "WR",
+      "team": "BAL",
+      "gamesPlayed": 9,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 7,
+        "receptions": 4,
+        "yards": 33,
+        "touchdowns": 0,
+        "yardsPerReception": 8.25,
+        "catchRate": 57.1
+      },
+      "fantasy": {
+        "halfPprPoints": 5.3,
+        "halfPprPpg": 0.6
+      }
+    },
+    "allen_kyle": {
+      "playerId": "allen_kyle",
+      "espnId": "3115293",
+      "season": 2022,
+      "position": "QB",
+      "team": "DET",
+      "gamesPlayed": 2,
+      "passing": {
+        "completions": 46,
+        "attempts": 78,
+        "yards": 416,
+        "touchdowns": 2,
+        "interceptions": 4,
+        "completionPct": 58.9739990234375,
+        "yardsPerAttempt": 5.333000183105469
+      },
+      "rushing": {
+        "attempts": 6,
+        "yards": 13,
+        "touchdowns": 0,
+        "yardsPerAttempt": 2.1670000553131104,
+        "fumbles": 2
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 21.9,
+        "halfPprPpg": 11
+      }
+    },
+    "brown_pharaoh": {
+      "playerId": "brown_pharaoh",
+      "espnId": "2971281",
+      "season": 2022,
+      "position": "TE",
+      "team": "ARI",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 20,
+        "receptions": 12,
+        "yards": 117,
+        "touchdowns": 0,
+        "yardsPerReception": 9.75,
+        "catchRate": 60
+      },
+      "fantasy": {
+        "halfPprPoints": 17.7,
+        "halfPprPpg": 1.1
+      }
+    },
+    "mills_davis": {
+      "playerId": "mills_davis",
+      "espnId": "4242546",
+      "season": 2022,
+      "position": "QB",
+      "team": "HOU",
+      "gamesPlayed": 15,
+      "passing": {
+        "completions": 292,
+        "attempts": 479,
+        "yards": 3118,
+        "touchdowns": 17,
+        "interceptions": 15,
+        "completionPct": 60.959999084472656,
+        "yardsPerAttempt": 6.508999824523926
+      },
+      "rushing": {
+        "attempts": 32,
+        "yards": 108,
+        "touchdowns": 2,
+        "yardsPerAttempt": 3.375,
+        "fumbles": 3
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 200.5,
+        "halfPprPpg": 13.4
+      }
+    },
+    "burton_michael": {
+      "playerId": "burton_michael",
+      "espnId": "2515270",
+      "season": 2022,
+      "position": "RB",
+      "team": "DEN",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 5,
+        "yards": 7,
+        "touchdowns": 0,
+        "yardsPerAttempt": 1.399999976158142,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 3,
+        "receptions": 2,
+        "yards": 11,
+        "touchdowns": 0,
+        "yardsPerReception": 5.5,
+        "catchRate": 66.7
+      },
+      "fantasy": {
+        "halfPprPoints": 2.8,
+        "halfPprPpg": 0.2
+      }
+    },
+    "trubisky_mitchell": {
+      "playerId": "trubisky_mitchell",
+      "espnId": "3039707",
+      "season": 2022,
+      "position": "QB",
+      "team": "BUF",
+      "gamesPlayed": 7,
+      "passing": {
+        "completions": 117,
+        "attempts": 180,
+        "yards": 1252,
+        "touchdowns": 4,
+        "interceptions": 5,
+        "completionPct": 65,
+        "yardsPerAttempt": 6.955999851226807
+      },
+      "rushing": {
+        "attempts": 19,
+        "yards": 38,
+        "touchdowns": 2,
+        "yardsPerAttempt": 2,
+        "fumbles": 0
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 76.9,
+        "halfPprPpg": 11
+      }
+    },
+    "abdullah_ameer": {
+      "playerId": "abdullah_ameer",
+      "espnId": "2576336",
+      "season": 2022,
+      "position": "RB",
+      "team": "IND",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 4,
+        "yards": 20,
+        "touchdowns": 0,
+        "yardsPerAttempt": 5,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 32,
+        "receptions": 25,
+        "yards": 211,
+        "touchdowns": 1,
+        "yardsPerReception": 8.4399995803833,
+        "catchRate": 78.1
+      },
+      "fantasy": {
+        "halfPprPoints": 41.6,
+        "halfPprPpg": 2.4
+      }
+    },
+    "jones_velus": {
+      "playerId": "jones_velus",
+      "espnId": "4035693",
+      "season": 2022,
+      "position": "WR",
+      "team": "SEA",
+      "gamesPlayed": 12,
+      "passing": null,
+      "rushing": {
+        "attempts": 9,
+        "yards": 103,
+        "touchdowns": 1,
+        "yardsPerAttempt": 11.444000244140625,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 14,
+        "receptions": 7,
+        "yards": 107,
+        "touchdowns": 1,
+        "yardsPerReception": 15.28600025177002,
+        "catchRate": 50
+      },
+      "fantasy": {
+        "halfPprPoints": 36.5,
+        "halfPprPpg": 3
+      }
+    },
+    "bridgewater_teddy": {
+      "playerId": "bridgewater_teddy",
+      "espnId": "16728",
+      "season": 2022,
+      "position": "QB",
+      "team": "TB",
+      "gamesPlayed": 5,
+      "passing": {
+        "completions": 49,
+        "attempts": 79,
+        "yards": 683,
+        "touchdowns": 4,
+        "interceptions": 4,
+        "completionPct": 62.025001525878906,
+        "yardsPerAttempt": 8.645999908447266
+      },
+      "rushing": {
+        "attempts": 3,
+        "yards": 27,
+        "touchdowns": 0,
+        "yardsPerAttempt": 9,
+        "fumbles": 0
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 42,
+        "halfPprPpg": 8.4
+      }
+    },
+    "watson_justin": {
+      "playerId": "watson_justin",
+      "espnId": "3118892",
+      "season": 2022,
+      "position": "WR",
+      "team": "HOU",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 34,
+        "receptions": 15,
+        "yards": 315,
+        "touchdowns": 2,
+        "yardsPerReception": 21,
+        "catchRate": 44.1
+      },
+      "fantasy": {
+        "halfPprPoints": 51,
+        "halfPprPpg": 3
+      }
+    },
+    "hairston_troy": {
+      "playerId": "hairston_troy",
+      "espnId": "4274040",
+      "season": 2022,
+      "position": "WR",
+      "team": "FA",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 8,
+        "receptions": 5,
+        "yards": 19,
+        "touchdowns": 0,
+        "yardsPerReception": 3.799999952316284,
+        "catchRate": 62.5
+      },
+      "fantasy": {
+        "halfPprPoints": 4.4,
+        "halfPprPpg": 0.3
+      }
+    },
+    "thomas_ian": {
+      "playerId": "thomas_ian",
+      "espnId": "4045305",
+      "season": 2022,
+      "position": "TE",
+      "team": "LV",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 30,
+        "receptions": 21,
+        "yards": 197,
+        "touchdowns": 0,
+        "yardsPerReception": 9.380999565124512,
+        "catchRate": 70
+      },
+      "fantasy": {
+        "halfPprPoints": 30.2,
+        "halfPprPpg": 1.8
+      }
+    },
+    "smythe_durham": {
+      "playerId": "smythe_durham",
+      "espnId": "3052897",
+      "season": 2022,
+      "position": "TE",
+      "team": "CHI",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 2,
+        "yards": 1,
+        "touchdowns": 1,
+        "yardsPerAttempt": 0.5,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 20,
+        "receptions": 15,
+        "yards": 129,
+        "touchdowns": 1,
+        "yardsPerReception": 8.600000381469727,
+        "catchRate": 75
+      },
+      "fantasy": {
+        "halfPprPoints": 32.5,
+        "halfPprPpg": 2
+      }
+    },
+    "dallas_deejay": {
+      "playerId": "dallas_deejay",
+      "espnId": "4240631",
+      "season": 2022,
+      "position": "RB",
+      "team": "CAR",
+      "gamesPlayed": 15,
+      "passing": {
+        "completions": 0,
+        "attempts": 1,
+        "yards": 0,
+        "touchdowns": 0,
+        "interceptions": 1,
+        "completionPct": 0,
+        "yardsPerAttempt": 0
+      },
+      "rushing": {
+        "attempts": 35,
+        "yards": 186,
+        "touchdowns": 0,
+        "yardsPerAttempt": 5.314000129699707,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 19,
+        "receptions": 17,
+        "yards": 126,
+        "touchdowns": 0,
+        "yardsPerReception": 7.4120001792907715,
+        "catchRate": 89.5
+      },
+      "fantasy": {
+        "halfPprPoints": 38.7,
+        "halfPprPpg": 2.6
+      }
+    },
+    "saubert_eric": {
+      "playerId": "saubert_eric",
+      "espnId": "2975863",
+      "season": 2022,
+      "position": "TE",
+      "team": "SEA",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 24,
+        "receptions": 15,
+        "yards": 148,
+        "touchdowns": 1,
+        "yardsPerReception": 9.866999626159668,
+        "catchRate": 62.5
+      },
+      "fantasy": {
+        "halfPprPoints": 28.3,
+        "halfPprPpg": 1.7
+      }
+    },
+    "dulin_ashton": {
+      "playerId": "dulin_ashton",
+      "espnId": "4061956",
+      "season": 2022,
+      "position": "WR",
+      "team": "IND",
+      "gamesPlayed": 12,
+      "passing": null,
+      "rushing": {
+        "attempts": 2,
+        "yards": 8,
+        "touchdowns": 0,
+        "yardsPerAttempt": 4,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 22,
+        "receptions": 15,
+        "yards": 207,
+        "touchdowns": 1,
+        "yardsPerReception": 13.800000190734863,
+        "catchRate": 68.2
+      },
+      "fantasy": {
+        "halfPprPoints": 35,
+        "halfPprPpg": 2.9
+      }
+    },
+    "wilson_cedrick": {
+      "playerId": "wilson_cedrick",
+      "espnId": "4036335",
+      "season": 2022,
+      "position": "WR",
+      "team": "MIA",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": 8,
+        "touchdowns": 0,
+        "yardsPerAttempt": 8,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 18,
+        "receptions": 12,
+        "yards": 136,
+        "touchdowns": 0,
+        "yardsPerReception": 11.333000183105469,
+        "catchRate": 66.7
+      },
+      "fantasy": {
+        "halfPprPoints": 20.4,
+        "halfPprPpg": 1.4
+      }
+    },
+    "gallup_michael": {
+      "playerId": "gallup_michael",
+      "espnId": "4036348",
+      "season": 2022,
+      "position": "WR",
+      "team": "FA",
+      "gamesPlayed": 14,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 74,
+        "receptions": 39,
+        "yards": 424,
+        "touchdowns": 4,
+        "yardsPerReception": 10.871999740600586,
+        "catchRate": 52.7
+      },
+      "fantasy": {
+        "halfPprPoints": 85.9,
+        "halfPprPpg": 6.1
+      }
+    },
+    "trask_kyle": {
+      "playerId": "trask_kyle",
+      "espnId": "4034946",
+      "season": 2022,
+      "position": "QB",
+      "team": "ATL",
+      "gamesPlayed": 1,
+      "passing": {
+        "completions": 3,
+        "attempts": 9,
+        "yards": 23,
+        "touchdowns": 0,
+        "interceptions": 0,
+        "completionPct": 33.33300018310547,
+        "yardsPerAttempt": 2.555999994277954
+      },
+      "rushing": null,
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 0.9,
+        "halfPprPpg": 0.9
+      }
+    },
+    "cook_dalvin": {
+      "playerId": "cook_dalvin",
+      "espnId": "3116593",
+      "season": 2022,
+      "position": "RB",
+      "team": "FA",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 264,
+        "yards": 1173,
+        "touchdowns": 8,
+        "yardsPerAttempt": 4.442999839782715,
+        "fumbles": 3
+      },
+      "receiving": {
+        "targets": 56,
+        "receptions": 39,
+        "yards": 295,
+        "touchdowns": 2,
+        "yardsPerReception": 7.564000129699707,
+        "catchRate": 69.6
+      },
+      "fantasy": {
+        "halfPprPoints": 226.3,
+        "halfPprPpg": 13.3
+      }
+    },
+    "heinicke_taylor": {
+      "playerId": "heinicke_taylor",
+      "espnId": "2565969",
+      "season": 2022,
+      "position": "QB",
+      "team": "FA",
+      "gamesPlayed": 9,
+      "passing": {
+        "completions": 161,
+        "attempts": 259,
+        "yards": 1859,
+        "touchdowns": 12,
+        "interceptions": 6,
+        "completionPct": 62.1619987487793,
+        "yardsPerAttempt": 7.177999973297119
+      },
+      "rushing": {
+        "attempts": 28,
+        "yards": 96,
+        "touchdowns": 1,
+        "yardsPerAttempt": 3.428999900817871,
+        "fumbles": 1
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 132,
+        "halfPprPpg": 14.7
+      }
+    },
+    "skowronek_ben": {
+      "playerId": "skowronek_ben",
+      "espnId": "4035656",
+      "season": 2022,
+      "position": "WR",
+      "team": "PIT",
+      "gamesPlayed": 14,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": 17,
+        "touchdowns": 1,
+        "yardsPerAttempt": 17,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 61,
+        "receptions": 39,
+        "yards": 376,
+        "touchdowns": 0,
+        "yardsPerReception": 9.640999794006348,
+        "catchRate": 63.9
+      },
+      "fantasy": {
+        "halfPprPoints": 64.8,
+        "halfPprPpg": 4.6
+      }
+    },
+    "everett_gerald": {
+      "playerId": "everett_gerald",
+      "espnId": "3918639",
+      "season": 2022,
+      "position": "TE",
+      "team": "FA",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": 0,
+        "touchdowns": 0,
+        "yardsPerAttempt": 0,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 87,
+        "receptions": 58,
+        "yards": 555,
+        "touchdowns": 4,
+        "yardsPerReception": 9.569000244140625,
+        "catchRate": 66.7
+      },
+      "fantasy": {
+        "halfPprPoints": 108.5,
+        "halfPprPpg": 6.8
+      }
+    },
+    "tonyan_robert": {
+      "playerId": "tonyan_robert",
+      "espnId": "2975674",
+      "season": 2022,
+      "position": "TE",
+      "team": "KC",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 67,
+        "receptions": 53,
+        "yards": 470,
+        "touchdowns": 2,
+        "yardsPerReception": 8.868000030517578,
+        "catchRate": 79.1
+      },
+      "fantasy": {
+        "halfPprPoints": 85.5,
+        "halfPprPpg": 5
+      }
+    },
+    "davisprice_tyrion": {
+      "playerId": "davisprice_tyrion",
+      "espnId": "4426475",
+      "season": 2022,
+      "position": "RB",
+      "team": "FA",
+      "gamesPlayed": 6,
+      "passing": null,
+      "rushing": {
+        "attempts": 34,
+        "yards": 99,
+        "touchdowns": 0,
+        "yardsPerAttempt": 2.9119999408721924,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 2,
+        "receptions": 0,
+        "yards": 0,
+        "touchdowns": 0,
+        "yardsPerReception": 0,
+        "catchRate": 0
+      },
+      "fantasy": {
+        "halfPprPoints": 9.9,
+        "halfPprPpg": 1.7
+      }
+    },
+    "heyward_connor": {
+      "playerId": "heyward_connor",
+      "espnId": "4241961",
+      "season": 2022,
+      "position": "TE",
+      "team": "PIT",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 2,
+        "yards": 27,
+        "touchdowns": 0,
+        "yardsPerAttempt": 13.5,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 17,
+        "receptions": 12,
+        "yards": 151,
+        "touchdowns": 1,
+        "yardsPerReception": 12.583000183105469,
+        "catchRate": 70.6
+      },
+      "fantasy": {
+        "halfPprPoints": 29.8,
+        "halfPprPpg": 1.8
+      }
+    },
+    "dwelley_ross": {
+      "playerId": "dwelley_ross",
+      "espnId": "3120303",
+      "season": 2022,
+      "position": "TE",
+      "team": "DET",
+      "gamesPlayed": 12,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 5,
+        "receptions": 3,
+        "yards": 105,
+        "touchdowns": 1,
+        "yardsPerReception": 35,
+        "catchRate": 60
+      },
+      "fantasy": {
+        "halfPprPoints": 18,
+        "halfPprPpg": 1.5
+      }
+    },
+    "johnson_jakob": {
+      "playerId": "johnson_jakob",
+      "espnId": "3115349",
+      "season": 2022,
+      "position": "RB",
+      "team": "HOU",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 6,
+        "receptions": 5,
+        "yards": 10,
+        "touchdowns": 0,
+        "yardsPerReception": 2,
+        "catchRate": 83.3
+      },
+      "fantasy": {
+        "halfPprPoints": 3.5,
+        "halfPprPpg": 0.2
+      }
+    },
+    "osborn_kj": {
+      "playerId": "osborn_kj",
+      "espnId": "3916566",
+      "season": 2022,
+      "position": "WR",
+      "team": "ATL",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 3,
+        "yards": 6,
+        "touchdowns": 0,
+        "yardsPerAttempt": 2,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 90,
+        "receptions": 60,
+        "yards": 650,
+        "touchdowns": 5,
+        "yardsPerReception": 10.833000183105469,
+        "catchRate": 66.7
+      },
+      "fantasy": {
+        "halfPprPoints": 125.6,
+        "halfPprPpg": 7.4
+      }
+    },
+    "fehoko_simi": {
+      "playerId": "fehoko_simi",
+      "espnId": "4360739",
+      "season": 2022,
+      "position": "WR",
+      "team": "ARI",
+      "gamesPlayed": 5,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 4,
+        "receptions": 3,
+        "yards": 24,
+        "touchdowns": 0,
+        "yardsPerReception": 8,
+        "catchRate": 75
+      },
+      "fantasy": {
+        "halfPprPoints": 3.9,
+        "halfPprPpg": 0.8
+      }
+    },
+    "allen_brandon": {
+      "playerId": "allen_brandon",
+      "espnId": "2574511",
+      "season": 2022,
+      "position": "QB",
+      "team": "TEN",
+      "gamesPlayed": 1,
+      "passing": {
+        "completions": 3,
+        "attempts": 3,
+        "yards": 22,
+        "touchdowns": 0,
+        "interceptions": 0,
+        "completionPct": 100,
+        "yardsPerAttempt": 7.333000183105469
+      },
+      "rushing": {
+        "attempts": 3,
+        "yards": -1,
+        "touchdowns": 0,
+        "yardsPerAttempt": -0.3330000042915344,
+        "fumbles": 0
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 0.8,
+        "halfPprPpg": 0.8
+      }
+    },
+    "stidham_jarrett": {
+      "playerId": "stidham_jarrett",
+      "espnId": "3892775",
+      "season": 2022,
+      "position": "QB",
+      "team": "DEN",
+      "gamesPlayed": 5,
+      "passing": {
+        "completions": 53,
+        "attempts": 83,
+        "yards": 656,
+        "touchdowns": 4,
+        "interceptions": 3,
+        "completionPct": 63.85499954223633,
+        "yardsPerAttempt": 7.9039998054504395
+      },
+      "rushing": {
+        "attempts": 14,
+        "yards": 84,
+        "touchdowns": 0,
+        "yardsPerAttempt": 6,
+        "fumbles": 1
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 47.6,
+        "halfPprPpg": 9.5
+      }
+    },
+    "quitoriano_teagan": {
+      "playerId": "quitoriano_teagan",
+      "espnId": "4374045",
+      "season": 2022,
+      "position": "TE",
+      "team": "ATL",
+      "gamesPlayed": 9,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 14,
+        "receptions": 7,
+        "yards": 113,
+        "touchdowns": 2,
+        "yardsPerReception": 16.14299964904785,
+        "catchRate": 50
+      },
+      "fantasy": {
+        "halfPprPoints": 26.8,
+        "halfPprPpg": 3
+      }
+    },
+    "turner_cole": {
+      "playerId": "turner_cole",
+      "espnId": "4361438",
+      "season": 2022,
+      "position": "WR",
+      "team": "FA",
+      "gamesPlayed": 10,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 9,
+        "receptions": 2,
+        "yards": 23,
+        "touchdowns": 0,
+        "yardsPerReception": 11.5,
+        "catchRate": 22.2
+      },
+      "fantasy": {
+        "halfPprPoints": 3.3,
+        "halfPprPpg": 0.3
+      }
+    },
+    "rivers_ronnie": {
+      "playerId": "rivers_ronnie",
+      "espnId": "4243003",
+      "season": 2022,
+      "position": "WR",
+      "team": "LAR",
+      "gamesPlayed": 8,
+      "passing": null,
+      "rushing": {
+        "attempts": 9,
+        "yards": 21,
+        "touchdowns": 0,
+        "yardsPerAttempt": 2.3329999446868896,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 5,
+        "receptions": 5,
+        "yards": 29,
+        "touchdowns": 0,
+        "yardsPerReception": 5.800000190734863,
+        "catchRate": 100
+      },
+      "fantasy": {
+        "halfPprPoints": 7.5,
+        "halfPprPpg": 0.9
+      }
+    },
+    "berrios_braxton": {
+      "playerId": "berrios_braxton",
+      "espnId": "3123075",
+      "season": 2022,
+      "position": "WR",
+      "team": "HOU",
+      "gamesPlayed": 17,
+      "passing": {
+        "completions": 1,
+        "attempts": 1,
+        "yards": 2,
+        "touchdowns": 1,
+        "interceptions": 0,
+        "completionPct": 100,
+        "yardsPerAttempt": 2
+      },
+      "rushing": {
+        "attempts": 9,
+        "yards": 91,
+        "touchdowns": 2,
+        "yardsPerAttempt": 10.111000061035156,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 32,
+        "receptions": 18,
+        "yards": 145,
+        "touchdowns": 0,
+        "yardsPerReception": 8.055999755859375,
+        "catchRate": 56.3
+      },
+      "fantasy": {
+        "halfPprPoints": 48.7,
+        "halfPprPpg": 2.9
+      }
+    },
+    "jones_tim": {
+      "playerId": "jones_tim",
+      "espnId": "4245131",
+      "season": 2022,
+      "position": "WR",
+      "team": "JAC",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 4,
+        "receptions": 3,
+        "yards": 30,
+        "touchdowns": 0,
+        "yardsPerReception": 10,
+        "catchRate": 75
+      },
+      "fantasy": {
+        "halfPprPoints": 4.5,
+        "halfPprPpg": 0.3
+      }
+    }
+  }
+}

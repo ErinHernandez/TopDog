@@ -1,0 +1,5361 @@
+{
+  "generatedAt": "2025-12-12T01:02:55.816Z",
+  "playerCount": 449,
+  "players": {
+    "gibbs_jahmyr": {
+      "id": "gibbs_jahmyr",
+      "name": "Jahmyr Gibbs",
+      "position": "RB",
+      "espnId": "4429795",
+      "currentTeam": "DET",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "nabers_malik": {
+      "id": "nabers_malik",
+      "name": "Malik Nabers",
+      "position": "WR",
+      "espnId": "4595348",
+      "currentTeam": "NYG",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "robinson_bijan": {
+      "id": "robinson_bijan",
+      "name": "Bijan Robinson",
+      "position": "RB",
+      "espnId": "4430807",
+      "currentTeam": "ATL",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "collins_nico": {
+      "id": "collins_nico",
+      "name": "Nico Collins",
+      "position": "WR",
+      "espnId": "4258173",
+      "currentTeam": "HOU",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "barkley_saquon": {
+      "id": "barkley_saquon",
+      "name": "Saquon Barkley",
+      "position": "RB",
+      "espnId": "3929630",
+      "currentTeam": "PHI",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "lamb_ceedee": {
+      "id": "lamb_ceedee",
+      "name": "CeeDee Lamb",
+      "position": "WR",
+      "espnId": "4241389",
+      "currentTeam": "DAL",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "mccaffrey_christian": {
+      "id": "mccaffrey_christian",
+      "name": "Christian McCaffrey",
+      "position": "RB",
+      "espnId": "3117251",
+      "currentTeam": "SF",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "brown_amonra": {
+      "id": "brown_amonra",
+      "name": "Amon-Ra St. Brown",
+      "position": "WR",
+      "espnId": "4374302",
+      "currentTeam": "DET",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "chase_jamarr": {
+      "id": "chase_jamarr",
+      "name": "Ja'Marr Chase",
+      "position": "WR",
+      "espnId": "4362628",
+      "currentTeam": "CIN",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "jefferson_justin": {
+      "id": "jefferson_justin",
+      "name": "Justin Jefferson",
+      "position": "WR",
+      "espnId": "4262921",
+      "currentTeam": "MIN",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "henry_derrick": {
+      "id": "henry_derrick",
+      "name": "Derrick Henry",
+      "position": "RB",
+      "espnId": "3043078",
+      "currentTeam": "BAL",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "bowers_brock": {
+      "id": "bowers_brock",
+      "name": "Brock Bowers",
+      "position": "TE",
+      "espnId": "4432665",
+      "currentTeam": "LV",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "thomas_brian": {
+      "id": "thomas_brian",
+      "name": "Brian Thomas Jr.",
+      "position": "WR",
+      "espnId": "4432773",
+      "currentTeam": "JAC",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "achane_devon": {
+      "id": "achane_devon",
+      "name": "De'Von Achane",
+      "position": "RB",
+      "espnId": "4429160",
+      "currentTeam": "MIA",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "nacua_puka": {
+      "id": "nacua_puka",
+      "name": "Puka Nacua",
+      "position": "WR",
+      "espnId": "4426515",
+      "currentTeam": "LAR",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "london_drake": {
+      "id": "london_drake",
+      "name": "Drake London",
+      "position": "WR",
+      "espnId": "4426502",
+      "currentTeam": "ATL",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "brown_aj": {
+      "id": "brown_aj",
+      "name": "A.J. Brown",
+      "position": "WR",
+      "espnId": "4047646",
+      "currentTeam": "PHI",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "taylor_jonathan": {
+      "id": "taylor_jonathan",
+      "name": "Jonathan Taylor",
+      "position": "RB",
+      "espnId": "4242335",
+      "currentTeam": "IND",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "jacobs_josh": {
+      "id": "jacobs_josh",
+      "name": "Josh Jacobs",
+      "position": "RB",
+      "espnId": "4047365",
+      "currentTeam": "GB",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "jackson_lamar": {
+      "id": "jackson_lamar",
+      "name": "Lamar Jackson",
+      "position": "QB",
+      "espnId": "3916387",
+      "currentTeam": "BAL",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "mcbride_trey": {
+      "id": "mcbride_trey",
+      "name": "Trey McBride",
+      "position": "TE",
+      "espnId": "4361307",
+      "currentTeam": "ARI",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "irving_bucky": {
+      "id": "irving_bucky",
+      "name": "Bucky Irving",
+      "position": "RB",
+      "espnId": "4596448",
+      "currentTeam": "TB",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "mcconkey_ladd": {
+      "id": "mcconkey_ladd",
+      "name": "Ladd McConkey",
+      "position": "WR",
+      "espnId": "4612826",
+      "currentTeam": "LAC",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "kittle_george": {
+      "id": "kittle_george",
+      "name": "George Kittle",
+      "position": "TE",
+      "espnId": "3040151",
+      "currentTeam": "SF",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "smithnjigba_jaxon": {
+      "id": "smithnjigba_jaxon",
+      "name": "Jaxon Smith-Njigba",
+      "position": "WR",
+      "espnId": "4430878",
+      "currentTeam": "SEA",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "higgins_tee": {
+      "id": "higgins_tee",
+      "name": "Tee Higgins",
+      "position": "WR",
+      "espnId": "4239993",
+      "currentTeam": "CIN",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "allen_josh": {
+      "id": "allen_josh",
+      "name": "Josh Allen",
+      "position": "QB",
+      "espnId": "3918298",
+      "currentTeam": "BUF",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "brown_chase": {
+      "id": "brown_chase",
+      "name": "Chase Brown",
+      "position": "RB",
+      "espnId": "4362238",
+      "currentTeam": "CIN",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "williams_kyren": {
+      "id": "williams_kyren",
+      "name": "Kyren Williams",
+      "position": "RB",
+      "espnId": "4430737",
+      "currentTeam": "LAR",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "cook_james": {
+      "id": "cook_james",
+      "name": "James Cook III",
+      "position": "RB",
+      "espnId": "4379399",
+      "currentTeam": "BUF",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "harrison_marvin": {
+      "id": "harrison_marvin",
+      "name": "Marvin Harrison Jr.",
+      "position": "WR",
+      "espnId": "4432708",
+      "currentTeam": "ARI",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "hurts_jalen": {
+      "id": "hurts_jalen",
+      "name": "Jalen Hurts",
+      "position": "QB",
+      "espnId": "4040715",
+      "currentTeam": "PHI",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "adams_davante": {
+      "id": "adams_davante",
+      "name": "Davante Adams",
+      "position": "WR",
+      "espnId": "16800",
+      "currentTeam": "LAR",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "evans_mike": {
+      "id": "evans_mike",
+      "name": "Mike Evans",
+      "position": "WR",
+      "espnId": "16737",
+      "currentTeam": "TB",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "wilson_garrett": {
+      "id": "wilson_garrett",
+      "name": "Garrett Wilson",
+      "position": "WR",
+      "espnId": "4569618",
+      "currentTeam": "NYJ",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "mclaurin_terry": {
+      "id": "mclaurin_terry",
+      "name": "Terry McLaurin",
+      "position": "WR",
+      "espnId": "3121422",
+      "currentTeam": "WAS",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "daniels_jayden": {
+      "id": "daniels_jayden",
+      "name": "Jayden Daniels",
+      "position": "QB",
+      "espnId": "4426348",
+      "currentTeam": "WAS",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "hill_tyreek": {
+      "id": "hill_tyreek",
+      "name": "Tyreek Hill",
+      "position": "WR",
+      "espnId": "3116406",
+      "currentTeam": "MIA",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "sutton_courtland": {
+      "id": "sutton_courtland",
+      "name": "Courtland Sutton",
+      "position": "WR",
+      "espnId": "3128429",
+      "currentTeam": "DEN",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "hubbard_chuba": {
+      "id": "hubbard_chuba",
+      "name": "Chuba Hubbard",
+      "position": "RB",
+      "espnId": "4241416",
+      "currentTeam": "CAR",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "burrow_joe": {
+      "id": "burrow_joe",
+      "name": "Joe Burrow",
+      "position": "QB",
+      "espnId": "3915511",
+      "currentTeam": "CIN",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "kamara_alvin": {
+      "id": "kamara_alvin",
+      "name": "Alvin Kamara",
+      "position": "RB",
+      "espnId": "3054850",
+      "currentTeam": "NO",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "conner_james": {
+      "id": "conner_james",
+      "name": "James Conner",
+      "position": "RB",
+      "espnId": "3045147",
+      "currentTeam": "ARI",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "walker_kenneth": {
+      "id": "walker_kenneth",
+      "name": "Kenneth Walker III",
+      "position": "RB",
+      "espnId": "4567048",
+      "currentTeam": "SEA",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "metcalf_dk": {
+      "id": "metcalf_dk",
+      "name": "DK Metcalf",
+      "position": "WR",
+      "espnId": "4047650",
+      "currentTeam": "PIT",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "hall_breece": {
+      "id": "hall_breece",
+      "name": "Breece Hall",
+      "position": "RB",
+      "espnId": "4427366",
+      "currentTeam": "NYJ",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "pollard_tony": {
+      "id": "pollard_tony",
+      "name": "Tony Pollard",
+      "position": "RB",
+      "espnId": "3916148",
+      "currentTeam": "TEN",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "worthy_xavier": {
+      "id": "worthy_xavier",
+      "name": "Xavier Worthy",
+      "position": "WR",
+      "espnId": "4683062",
+      "currentTeam": "KC",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "waddle_jaylen": {
+      "id": "waddle_jaylen",
+      "name": "Jaylen Waddle",
+      "position": "WR",
+      "espnId": "4372016",
+      "currentTeam": "MIA",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "smith_devonta": {
+      "id": "smith_devonta",
+      "name": "DeVonta Smith",
+      "position": "WR",
+      "espnId": "4241478",
+      "currentTeam": "PHI",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "moore_dj": {
+      "id": "moore_dj",
+      "name": "DJ Moore",
+      "position": "WR",
+      "espnId": "3915416",
+      "currentTeam": "CHI",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "ridley_calvin": {
+      "id": "ridley_calvin",
+      "name": "Calvin Ridley",
+      "position": "WR",
+      "espnId": "3925357",
+      "currentTeam": "TEN",
+      "seasonsAvailable": [
+        2021,
+        2023,
+        2024
+      ]
+    },
+    "williams_jameson": {
+      "id": "williams_jameson",
+      "name": "Jameson Williams",
+      "position": "WR",
+      "espnId": "4426388",
+      "currentTeam": "DET",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "pickens_george": {
+      "id": "pickens_george",
+      "name": "George Pickens",
+      "position": "WR",
+      "espnId": "4426354",
+      "currentTeam": "DAL",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "montgomery_david": {
+      "id": "montgomery_david",
+      "name": "David Montgomery",
+      "position": "RB",
+      "espnId": "4035538",
+      "currentTeam": "DET",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "swift_dandre": {
+      "id": "swift_dandre",
+      "name": "D'Andre Swift",
+      "position": "RB",
+      "espnId": "4259545",
+      "currentTeam": "CHI",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "laporta_sam": {
+      "id": "laporta_sam",
+      "name": "Sam LaPorta",
+      "position": "TE",
+      "espnId": "4430027",
+      "currentTeam": "DET",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "odunze_rome": {
+      "id": "odunze_rome",
+      "name": "Rome Odunze",
+      "position": "WR",
+      "espnId": "4431299",
+      "currentTeam": "CHI",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "hockenson_tj": {
+      "id": "hockenson_tj",
+      "name": "T.J. Hockenson",
+      "position": "TE",
+      "espnId": "4036133",
+      "currentTeam": "MIN",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "jones_aaron": {
+      "id": "jones_aaron",
+      "name": "Aaron Jones Sr.",
+      "position": "RB",
+      "espnId": "3042519",
+      "currentTeam": "MIN",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "flowers_zay": {
+      "id": "flowers_zay",
+      "name": "Zay Flowers",
+      "position": "WR",
+      "espnId": "4429615",
+      "currentTeam": "BAL",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "mahomes_patrick": {
+      "id": "mahomes_patrick",
+      "name": "Patrick Mahomes II",
+      "position": "QB",
+      "espnId": "3139477",
+      "currentTeam": "KC",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "pacheco_isiah": {
+      "id": "pacheco_isiah",
+      "name": "Isiah Pacheco",
+      "position": "RB",
+      "espnId": "4361529",
+      "currentTeam": "KC",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "tracy_tyrone": {
+      "id": "tracy_tyrone",
+      "name": "Tyrone Tracy Jr.",
+      "position": "RB",
+      "espnId": "4360516",
+      "currentTeam": "NYG",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "mayfield_baker": {
+      "id": "mayfield_baker",
+      "name": "Baker Mayfield",
+      "position": "QB",
+      "espnId": "3052587",
+      "currentTeam": "TB",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "andrews_mark": {
+      "id": "andrews_mark",
+      "name": "Mark Andrews",
+      "position": "TE",
+      "espnId": "3116365",
+      "currentTeam": "BAL",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "warren_jaylen": {
+      "id": "warren_jaylen",
+      "name": "Jaylen Warren",
+      "position": "RB",
+      "espnId": "4569987",
+      "currentTeam": "PIT",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "jeudy_jerry": {
+      "id": "jeudy_jerry",
+      "name": "Jerry Jeudy",
+      "position": "WR",
+      "espnId": "4241463",
+      "currentTeam": "CLE",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "nix_bo": {
+      "id": "nix_bo",
+      "name": "Bo Nix",
+      "position": "QB",
+      "espnId": "4426338",
+      "currentTeam": "DEN",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "kelce_travis": {
+      "id": "kelce_travis",
+      "name": "Travis Kelce",
+      "position": "TE",
+      "espnId": "15847",
+      "currentTeam": "KC",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "murray_kyler": {
+      "id": "murray_kyler",
+      "name": "Kyler Murray",
+      "position": "QB",
+      "espnId": "3917315",
+      "currentTeam": "ARI",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "olave_chris": {
+      "id": "olave_chris",
+      "name": "Chris Olave",
+      "position": "WR",
+      "espnId": "4361370",
+      "currentTeam": "NO",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "pearsall_ricky": {
+      "id": "pearsall_ricky",
+      "name": "Ricky Pearsall",
+      "position": "WR",
+      "espnId": "4428209",
+      "currentTeam": "SF",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "meyers_jakobi": {
+      "id": "meyers_jakobi",
+      "name": "Jakobi Meyers",
+      "position": "WR",
+      "espnId": "3916433",
+      "currentTeam": "JAC",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "njoku_david": {
+      "id": "njoku_david",
+      "name": "David Njoku",
+      "position": "TE",
+      "espnId": "3123076",
+      "currentTeam": "CLE",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "mason_jordan": {
+      "id": "mason_jordan",
+      "name": "Jordan Mason",
+      "position": "RB",
+      "espnId": "4360569",
+      "currentTeam": "MIN",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "rice_rashee": {
+      "id": "rice_rashee",
+      "name": "Rashee Rice",
+      "position": "WR",
+      "espnId": "4428331",
+      "currentTeam": "KC",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "etienne_travis": {
+      "id": "etienne_travis",
+      "name": "Travis Etienne Jr.",
+      "position": "RB",
+      "espnId": "4239996",
+      "currentTeam": "JAC",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "prescott_dak": {
+      "id": "prescott_dak",
+      "name": "Dak Prescott",
+      "position": "QB",
+      "espnId": "2577417",
+      "currentTeam": "DAL",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "diggs_stefon": {
+      "id": "diggs_stefon",
+      "name": "Stefon Diggs",
+      "position": "WR",
+      "espnId": "2976212",
+      "currentTeam": "NE",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "samuel_deebo": {
+      "id": "samuel_deebo",
+      "name": "Deebo Samuel Sr.",
+      "position": "WR",
+      "espnId": "3126486",
+      "currentTeam": "WAS",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "kraft_tucker": {
+      "id": "kraft_tucker",
+      "name": "Tucker Kraft",
+      "position": "TE",
+      "espnId": "4572680",
+      "currentTeam": "GB",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "jennings_jauan": {
+      "id": "jennings_jauan",
+      "name": "Jauan Jennings",
+      "position": "WR",
+      "espnId": "3886598",
+      "currentTeam": "SF",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "charbonnet_zach": {
+      "id": "charbonnet_zach",
+      "name": "Zach Charbonnet",
+      "position": "RB",
+      "espnId": "4426385",
+      "currentTeam": "SEA",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "dobbins_jk": {
+      "id": "dobbins_jk",
+      "name": "J.K. Dobbins",
+      "position": "RB",
+      "espnId": "4241985",
+      "currentTeam": "DEN",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "addison_jordan": {
+      "id": "addison_jordan",
+      "name": "Jordan Addison",
+      "position": "WR",
+      "espnId": "4429205",
+      "currentTeam": "MIN",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "williams_javonte": {
+      "id": "williams_javonte",
+      "name": "Javonte Williams",
+      "position": "RB",
+      "espnId": "4361579",
+      "currentTeam": "DAL",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "purdy_brock": {
+      "id": "purdy_brock",
+      "name": "Brock Purdy",
+      "position": "QB",
+      "espnId": "4361741",
+      "currentTeam": "SF",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "fields_justin": {
+      "id": "fields_justin",
+      "name": "Justin Fields",
+      "position": "QB",
+      "espnId": "4362887",
+      "currentTeam": "NYJ",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "engram_evan": {
+      "id": "engram_evan",
+      "name": "Evan Engram",
+      "position": "TE",
+      "espnId": "3051876",
+      "currentTeam": "DEN",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "downs_josh": {
+      "id": "downs_josh",
+      "name": "Josh Downs",
+      "position": "WR",
+      "espnId": "4688813",
+      "currentTeam": "IND",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "ekeler_austin": {
+      "id": "ekeler_austin",
+      "name": "Austin Ekeler",
+      "position": "RB",
+      "espnId": "3068267",
+      "currentTeam": "WAS",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "pittman_michael": {
+      "id": "pittman_michael",
+      "name": "Michael Pittman Jr.",
+      "position": "WR",
+      "espnId": "4035687",
+      "currentTeam": "IND",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "maye_drake": {
+      "id": "maye_drake",
+      "name": "Drake Maye",
+      "position": "QB",
+      "espnId": "4431452",
+      "currentTeam": "NE",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "goff_jared": {
+      "id": "goff_jared",
+      "name": "Jared Goff",
+      "position": "QB",
+      "espnId": "3046779",
+      "currentTeam": "DET",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "shakir_khalil": {
+      "id": "shakir_khalil",
+      "name": "Khalil Shakir",
+      "position": "WR",
+      "espnId": "4373678",
+      "currentTeam": "BUF",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "williams_caleb": {
+      "id": "williams_caleb",
+      "name": "Caleb Williams",
+      "position": "QB",
+      "espnId": "4431611",
+      "currentTeam": "CHI",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "bigsby_tank": {
+      "id": "bigsby_tank",
+      "name": "Tank Bigsby",
+      "position": "RB",
+      "espnId": "4429013",
+      "currentTeam": "PHI",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "stevenson_rhamondre": {
+      "id": "stevenson_rhamondre",
+      "name": "Rhamondre Stevenson",
+      "position": "RB",
+      "espnId": "4569173",
+      "currentTeam": "NE",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "herbert_justin": {
+      "id": "herbert_justin",
+      "name": "Justin Herbert",
+      "position": "QB",
+      "espnId": "4038941",
+      "currentTeam": "LAC",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "reed_jayden": {
+      "id": "reed_jayden",
+      "name": "Jayden Reed",
+      "position": "WR",
+      "espnId": "4362249",
+      "currentTeam": "GB",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "stroud_cj": {
+      "id": "stroud_cj",
+      "name": "C.J. Stroud",
+      "position": "QB",
+      "espnId": "4432577",
+      "currentTeam": "HOU",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "coleman_keon": {
+      "id": "coleman_keon",
+      "name": "Keon Coleman",
+      "position": "WR",
+      "espnId": "4635008",
+      "currentTeam": "BUF",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "allen_braelon": {
+      "id": "allen_braelon",
+      "name": "Braelon Allen",
+      "position": "RB",
+      "espnId": "4685247",
+      "currentTeam": "NYJ",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "ferguson_jake": {
+      "id": "ferguson_jake",
+      "name": "Jake Ferguson",
+      "position": "WR",
+      "espnId": "4242355",
+      "currentTeam": "DAL",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "kupp_cooper": {
+      "id": "kupp_cooper",
+      "name": "Cooper Kupp",
+      "position": "WR",
+      "espnId": "2977187",
+      "currentTeam": "SEA",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "love_jordan": {
+      "id": "love_jordan",
+      "name": "Jordan Love",
+      "position": "QB",
+      "espnId": "4036378",
+      "currentTeam": "GB",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "lawrence_trevor": {
+      "id": "lawrence_trevor",
+      "name": "Trevor Lawrence",
+      "position": "QB",
+      "espnId": "4360310",
+      "currentTeam": "JAC",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "mooney_darnell": {
+      "id": "mooney_darnell",
+      "name": "Darnell Mooney",
+      "position": "WR",
+      "espnId": "4040655",
+      "currentTeam": "ATL",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "kincaid_dalton": {
+      "id": "kincaid_dalton",
+      "name": "Dalton Kincaid",
+      "position": "TE",
+      "espnId": "4385690",
+      "currentTeam": "BUF",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "godwin_chris": {
+      "id": "godwin_chris",
+      "name": "Chris Godwin Jr.",
+      "position": "WR",
+      "espnId": "3116165",
+      "currentTeam": "TB",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "goedert_dallas": {
+      "id": "goedert_dallas",
+      "name": "Dallas Goedert",
+      "position": "TE",
+      "espnId": "3121023",
+      "currentTeam": "PHI",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "shaheed_rashid": {
+      "id": "shaheed_rashid",
+      "name": "Rashid Shaheed",
+      "position": "WR",
+      "espnId": "4032473",
+      "currentTeam": "SEA",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "harris_najee": {
+      "id": "harris_najee",
+      "name": "Najee Harris",
+      "position": "RB",
+      "espnId": "4241457",
+      "currentTeam": "LAC",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "chubb_nick": {
+      "id": "chubb_nick",
+      "name": "Nick Chubb",
+      "position": "RB",
+      "espnId": "3128720",
+      "currentTeam": "HOU",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "benson_trey": {
+      "id": "benson_trey",
+      "name": "Trey Benson",
+      "position": "RB",
+      "espnId": "4429275",
+      "currentTeam": "ARI",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "tagovailoa_tua": {
+      "id": "tagovailoa_tua",
+      "name": "Tua Tagovailoa",
+      "position": "QB",
+      "espnId": "4241479",
+      "currentTeam": "MIA",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "davis_ray": {
+      "id": "davis_ray",
+      "name": "Ray Davis",
+      "position": "RB",
+      "espnId": "4429501",
+      "currentTeam": "BUF",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "pitts_kyle": {
+      "id": "pitts_kyle",
+      "name": "Kyle Pitts Sr.",
+      "position": "TE",
+      "espnId": "4360248",
+      "currentTeam": "ATL",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "bateman_rashod": {
+      "id": "bateman_rashod",
+      "name": "Rashod Bateman",
+      "position": "WR",
+      "espnId": "4360939",
+      "currentTeam": "BAL",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "mims_marvin": {
+      "id": "mims_marvin",
+      "name": "Marvin Mims Jr.",
+      "position": "WR",
+      "espnId": "4686472",
+      "currentTeam": "DEN",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "ford_jerome": {
+      "id": "ford_jerome",
+      "name": "Jerome Ford",
+      "position": "RB",
+      "espnId": "4372019",
+      "currentTeam": "CLE",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "robinson_brian": {
+      "id": "robinson_brian",
+      "name": "Brian Robinson Jr.",
+      "position": "RB",
+      "espnId": "4241474",
+      "currentTeam": "SF",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "kirk_christian": {
+      "id": "kirk_christian",
+      "name": "Christian Kirk",
+      "position": "WR",
+      "espnId": "3895856",
+      "currentTeam": "HOU",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "white_rachaad": {
+      "id": "white_rachaad",
+      "name": "Rachaad White",
+      "position": "RB",
+      "espnId": "4697815",
+      "currentTeam": "TB",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "allen_keenan": {
+      "id": "allen_keenan",
+      "name": "Keenan Allen",
+      "position": "WR",
+      "espnId": "15818",
+      "currentTeam": "LAC",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "young_bryce": {
+      "id": "young_bryce",
+      "name": "Bryce Young",
+      "position": "QB",
+      "espnId": "4685720",
+      "currentTeam": "CAR",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "allgeier_tyler": {
+      "id": "allgeier_tyler",
+      "name": "Tyler Allgeier",
+      "position": "RB",
+      "espnId": "4373626",
+      "currentTeam": "ATL",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "tillman_cedric": {
+      "id": "tillman_cedric",
+      "name": "Cedric Tillman",
+      "position": "WR",
+      "espnId": "4369863",
+      "currentTeam": "CLE",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "aiyuk_brandon": {
+      "id": "aiyuk_brandon",
+      "name": "Brandon Aiyuk",
+      "position": "WR",
+      "espnId": "4360438",
+      "currentTeam": "SF",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "penix_michael": {
+      "id": "penix_michael",
+      "name": "Michael Penix Jr.",
+      "position": "QB",
+      "espnId": "4360423",
+      "currentTeam": "ATL",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "henry_hunter": {
+      "id": "henry_hunter",
+      "name": "Hunter Henry",
+      "position": "TE",
+      "espnId": "3046439",
+      "currentTeam": "NE",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "spears_tyjae": {
+      "id": "spears_tyjae",
+      "name": "Tyjae Spears",
+      "position": "RB",
+      "espnId": "4428557",
+      "currentTeam": "TEN",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "ertz_zach": {
+      "id": "ertz_zach",
+      "name": "Zach Ertz",
+      "position": "TE",
+      "espnId": "15835",
+      "currentTeam": "WAS",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "brown_marquise": {
+      "id": "brown_marquise",
+      "name": "Marquise Brown",
+      "position": "WR",
+      "espnId": "4241372",
+      "currentTeam": "KC",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "smith_jonnu": {
+      "id": "smith_jonnu",
+      "name": "Jonnu Smith",
+      "position": "TE",
+      "espnId": "3054212",
+      "currentTeam": "PIT",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "smith_geno": {
+      "id": "smith_geno",
+      "name": "Geno Smith",
+      "position": "QB",
+      "espnId": "15864",
+      "currentTeam": "LV",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "dowdle_rico": {
+      "id": "dowdle_rico",
+      "name": "Rico Dowdle",
+      "position": "RB",
+      "espnId": "4038815",
+      "currentTeam": "CAR",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "doubs_romeo": {
+      "id": "doubs_romeo",
+      "name": "Romeo Doubs",
+      "position": "WR",
+      "espnId": "4361432",
+      "currentTeam": "GB",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "mixon_joe": {
+      "id": "mixon_joe",
+      "name": "Joe Mixon",
+      "position": "RB",
+      "espnId": "3116385",
+      "currentTeam": "HOU",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "okonkwo_chig": {
+      "id": "okonkwo_chig",
+      "name": "Chig Okonkwo",
+      "position": "TE",
+      "espnId": "4360635",
+      "currentTeam": "TEN",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "legette_xavier": {
+      "id": "legette_xavier",
+      "name": "Xavier Legette",
+      "position": "WR",
+      "espnId": "4430034",
+      "currentTeam": "CAR",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "palmer_joshua": {
+      "id": "palmer_joshua",
+      "name": "Joshua Palmer",
+      "position": "WR",
+      "espnId": "4242433",
+      "currentTeam": "BUF",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "strange_brenton": {
+      "id": "strange_brenton",
+      "name": "Brenton Strange",
+      "position": "TE",
+      "espnId": "4430539",
+      "currentTeam": "JAC",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "stafford_matthew": {
+      "id": "stafford_matthew",
+      "name": "Matthew Stafford",
+      "position": "QB",
+      "espnId": "12483",
+      "currentTeam": "LAR",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "thielen_adam": {
+      "id": "thielen_adam",
+      "name": "Adam Thielen",
+      "position": "WR",
+      "espnId": "16460",
+      "currentTeam": "PIT",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "douglas_demario": {
+      "id": "douglas_demario",
+      "name": "DeMario Douglas",
+      "position": "WR",
+      "espnId": "4427095",
+      "currentTeam": "NE",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "robinson_wandale": {
+      "id": "robinson_wandale",
+      "name": "Wan'Dale Robinson",
+      "position": "WR",
+      "espnId": "4569587",
+      "currentTeam": "NYG",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "johnson_roschon": {
+      "id": "johnson_roschon",
+      "name": "Roschon Johnson",
+      "position": "RB",
+      "espnId": "4426386",
+      "currentTeam": "CHI",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "johnston_quentin": {
+      "id": "johnston_quentin",
+      "name": "Quentin Johnston",
+      "position": "WR",
+      "espnId": "4429025",
+      "currentTeam": "LAC",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "corum_blake": {
+      "id": "corum_blake",
+      "name": "Blake Corum",
+      "position": "RB",
+      "espnId": "4429096",
+      "currentTeam": "LAR",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "darnold_sam": {
+      "id": "darnold_sam",
+      "name": "Sam Darnold",
+      "position": "QB",
+      "espnId": "3912547",
+      "currentTeam": "SEA",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "likely_isaiah": {
+      "id": "likely_isaiah",
+      "name": "Isaiah Likely",
+      "position": "TE",
+      "espnId": "4361050",
+      "currentTeam": "BAL",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "shipley_will": {
+      "id": "shipley_will",
+      "name": "Will Shipley",
+      "position": "RB",
+      "espnId": "4431545",
+      "currentTeam": "PHI",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "coker_jalen": {
+      "id": "coker_jalen",
+      "name": "Jalen Coker",
+      "position": "WR",
+      "espnId": "4695883",
+      "currentTeam": "CAR",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "hopkins_deandre": {
+      "id": "hopkins_deandre",
+      "name": "DeAndre Hopkins",
+      "position": "WR",
+      "espnId": "15795",
+      "currentTeam": "BAL",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "otton_cade": {
+      "id": "otton_cade",
+      "name": "Cade Otton",
+      "position": "TE",
+      "espnId": "4243331",
+      "currentTeam": "TB",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "rodgers_aaron": {
+      "id": "rodgers_aaron",
+      "name": "Aaron Rodgers",
+      "position": "QB",
+      "espnId": "8439",
+      "currentTeam": "PIT",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "pierce_alec": {
+      "id": "pierce_alec",
+      "name": "Alec Pierce",
+      "position": "WR",
+      "espnId": "4360078",
+      "currentTeam": "IND",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "gesicki_mike": {
+      "id": "gesicki_mike",
+      "name": "Mike Gesicki",
+      "position": "TE",
+      "espnId": "3116164",
+      "currentTeam": "CIN",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "slayton_darius": {
+      "id": "slayton_darius",
+      "name": "Darius Slayton",
+      "position": "WR",
+      "espnId": "3916945",
+      "currentTeam": "NYG",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "hill_justice": {
+      "id": "hill_justice",
+      "name": "Justice Hill",
+      "position": "RB",
+      "espnId": "4038441",
+      "currentTeam": "BAL",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "hunt_kareem": {
+      "id": "hunt_kareem",
+      "name": "Kareem Hunt",
+      "position": "RB",
+      "espnId": "3059915",
+      "currentTeam": "KC",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "wright_jaylen": {
+      "id": "wright_jaylen",
+      "name": "Jaylen Wright",
+      "position": "RB",
+      "espnId": "4682745",
+      "currentTeam": "MIA",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "guerendo_isaac": {
+      "id": "guerendo_isaac",
+      "name": "Isaac Guerendo",
+      "position": "RB",
+      "espnId": "4372561",
+      "currentTeam": "SF",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "rodriguez_chris": {
+      "id": "rodriguez_chris",
+      "name": "Chris Rodriguez Jr.",
+      "position": "RB",
+      "espnId": "4362619",
+      "currentTeam": "WAS",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "freiermuth_pat": {
+      "id": "freiermuth_pat",
+      "name": "Pat Freiermuth",
+      "position": "TE",
+      "espnId": "4361411",
+      "currentTeam": "PIT",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "mitchell_keaton": {
+      "id": "mitchell_keaton",
+      "name": "Keaton Mitchell",
+      "position": "RB",
+      "espnId": "4596334",
+      "currentTeam": "BAL",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "miller_kendre": {
+      "id": "miller_kendre",
+      "name": "Kendre Miller",
+      "position": "RB",
+      "espnId": "4599739",
+      "currentTeam": "NO",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "wilson_michael": {
+      "id": "wilson_michael",
+      "name": "Michael Wilson",
+      "position": "WR",
+      "espnId": "4360761",
+      "currentTeam": "ARI",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "iosivas_andrei": {
+      "id": "iosivas_andrei",
+      "name": "Andrei Iosivas",
+      "position": "WR",
+      "espnId": "4368003",
+      "currentTeam": "CIN",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "sanders_miles": {
+      "id": "sanders_miles",
+      "name": "Miles Sanders",
+      "position": "RB",
+      "espnId": "4045163",
+      "currentTeam": "DAL",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "schultz_dalton": {
+      "id": "schultz_dalton",
+      "name": "Dalton Schultz",
+      "position": "TE",
+      "espnId": "3117256",
+      "currentTeam": "HOU",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "jones_daniel": {
+      "id": "jones_daniel",
+      "name": "Daniel Jones",
+      "position": "QB",
+      "espnId": "3917792",
+      "currentTeam": "IND",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "mitchell_adonai": {
+      "id": "mitchell_adonai",
+      "name": "Adonai Mitchell",
+      "position": "WR",
+      "espnId": "4597500",
+      "currentTeam": "NYJ",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "johnson_juwan": {
+      "id": "johnson_juwan",
+      "name": "Juwan Johnson",
+      "position": "TE",
+      "espnId": "3929645",
+      "currentTeam": "NO",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "sanders_jatavion": {
+      "id": "sanders_jatavion",
+      "name": "Ja'Tavion Sanders",
+      "position": "TE",
+      "espnId": "4431588",
+      "currentTeam": "CAR",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "lloyd_marshawn": {
+      "id": "lloyd_marshawn",
+      "name": "MarShawn Lloyd",
+      "position": "RB",
+      "espnId": "4429023",
+      "currentTeam": "GB",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "pierce_dameon": {
+      "id": "pierce_dameon",
+      "name": "Dameon Pierce",
+      "position": "RB",
+      "espnId": "4360238",
+      "currentTeam": "KC",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "lockett_tyler": {
+      "id": "lockett_tyler",
+      "name": "Tyler Lockett",
+      "position": "WR",
+      "espnId": "2577327",
+      "currentTeam": "LV",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "austin_calvin": {
+      "id": "austin_calvin",
+      "name": "Calvin Austin III",
+      "position": "WR",
+      "espnId": "4243389",
+      "currentTeam": "PIT",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "brown_dyami": {
+      "id": "brown_dyami",
+      "name": "Dyami Brown",
+      "position": "WR",
+      "espnId": "4361577",
+      "currentTeam": "JAC",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "wicks_dontayvion": {
+      "id": "wicks_dontayvion",
+      "name": "Dontayvion Wicks",
+      "position": "WR",
+      "espnId": "4428850",
+      "currentTeam": "GB",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "flacco_joe": {
+      "id": "flacco_joe",
+      "name": "Joe Flacco",
+      "position": "QB",
+      "espnId": "11252",
+      "currentTeam": "CIN",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "wilson_roman": {
+      "id": "wilson_roman",
+      "name": "Roman Wilson",
+      "position": "WR",
+      "espnId": "4431492",
+      "currentTeam": "PIT",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "washington_malik": {
+      "id": "washington_malik",
+      "name": "Malik Washington",
+      "position": "WR",
+      "espnId": "4569603",
+      "currentTeam": "MIA",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "mostert_raheem": {
+      "id": "mostert_raheem",
+      "name": "Raheem Mostert",
+      "position": "RB",
+      "espnId": "2576414",
+      "currentTeam": "LV",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "tucker_sean": {
+      "id": "tucker_sean",
+      "name": "Sean Tucker",
+      "position": "RB",
+      "espnId": "4430871",
+      "currentTeam": "TB",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "wilson_russell": {
+      "id": "wilson_russell",
+      "name": "Russell Wilson",
+      "position": "QB",
+      "espnId": "14881",
+      "currentTeam": "NYG",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "johnson_theo": {
+      "id": "johnson_theo",
+      "name": "Theo Johnson",
+      "position": "WR",
+      "espnId": "4429148",
+      "currentTeam": "NYG",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "mclaughlin_jaleel": {
+      "id": "mclaughlin_jaleel",
+      "name": "Jaleel McLaughlin",
+      "position": "RB",
+      "espnId": "4722893",
+      "currentTeam": "DEN",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "boutte_kayshon": {
+      "id": "boutte_kayshon",
+      "name": "Kayshon Boutte",
+      "position": "WR",
+      "espnId": "4429022",
+      "currentTeam": "NE",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "vele_devaughn": {
+      "id": "vele_devaughn",
+      "name": "Devaughn Vele",
+      "position": "WR",
+      "espnId": "4569559",
+      "currentTeam": "NO",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "kmet_cole": {
+      "id": "kmet_cole",
+      "name": "Cole Kmet",
+      "position": "TE",
+      "espnId": "4258595",
+      "currentTeam": "CHI",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "gainwell_kenneth": {
+      "id": "gainwell_kenneth",
+      "name": "Kenneth Gainwell",
+      "position": "RB",
+      "espnId": "4371733",
+      "currentTeam": "PIT",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "mcmillan_jalen": {
+      "id": "mcmillan_jalen",
+      "name": "Jalen McMillan",
+      "position": "WR",
+      "espnId": "4430834",
+      "currentTeam": "TB",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "johnson_ty": {
+      "id": "johnson_ty",
+      "name": "Ty Johnson",
+      "position": "RB",
+      "espnId": "3915411",
+      "currentTeam": "BUF",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "richardson_anthony": {
+      "id": "richardson_anthony",
+      "name": "Anthony Richardson Sr.",
+      "position": "QB",
+      "espnId": "4429084",
+      "currentTeam": "IND",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "gibson_antonio": {
+      "id": "gibson_antonio",
+      "name": "Antonio Gibson",
+      "position": "RB",
+      "espnId": "4360294",
+      "currentTeam": "NE",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "cooks_brandin": {
+      "id": "cooks_brandin",
+      "name": "Brandin Cooks",
+      "position": "WR",
+      "espnId": "16731",
+      "currentTeam": "BUF",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "singletary_devin": {
+      "id": "singletary_devin",
+      "name": "Devin Singletary",
+      "position": "RB",
+      "espnId": "4040761",
+      "currentTeam": "NYG",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "tolbert_jalen": {
+      "id": "tolbert_jalen",
+      "name": "Jalen Tolbert",
+      "position": "WR",
+      "espnId": "4249417",
+      "currentTeam": "DAL",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "davis_isaiah": {
+      "id": "davis_isaiah",
+      "name": "Isaiah Davis",
+      "position": "RB",
+      "espnId": "4695404",
+      "currentTeam": "NYJ",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "mitchell_elijah": {
+      "id": "mitchell_elijah",
+      "name": "Elijah Mitchell",
+      "position": "RB",
+      "espnId": "4241555",
+      "currentTeam": "KC",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023
+      ]
+    },
+    "gray_noah": {
+      "id": "gray_noah",
+      "name": "Noah Gray",
+      "position": "TE",
+      "espnId": "4240472",
+      "currentTeam": "KC",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "waller_darren": {
+      "id": "waller_darren",
+      "name": "Darren Waller",
+      "position": "WR",
+      "espnId": "2576925",
+      "currentTeam": "MIA",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023
+      ]
+    },
+    "westbrookikhine_nick": {
+      "id": "westbrookikhine_nick",
+      "name": "Nick Westbrook-Ikhine",
+      "position": "WR",
+      "espnId": "3929785",
+      "currentTeam": "MIA",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "tucker_tre": {
+      "id": "tucker_tre",
+      "name": "Tre Tucker",
+      "position": "WR",
+      "espnId": "4428718",
+      "currentTeam": "LV",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "franklin_troy": {
+      "id": "franklin_troy",
+      "name": "Troy Franklin",
+      "position": "WR",
+      "espnId": "4431280",
+      "currentTeam": "DEN",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "washington_parker": {
+      "id": "washington_parker",
+      "name": "Parker Washington",
+      "position": "WR",
+      "espnId": "4432620",
+      "currentTeam": "JAC",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "wilson_emanuel": {
+      "id": "wilson_emanuel",
+      "name": "Emanuel Wilson",
+      "position": "RB",
+      "espnId": "4887558",
+      "currentTeam": "GB",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "nailor_jalen": {
+      "id": "nailor_jalen",
+      "name": "Jalen Nailor",
+      "position": "WR",
+      "espnId": "4382466",
+      "currentTeam": "MIN",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "brooks_chris": {
+      "id": "brooks_chris",
+      "name": "Chris Brooks",
+      "position": "RB",
+      "espnId": "3149687",
+      "currentTeam": "GB",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "watson_christian": {
+      "id": "watson_christian",
+      "name": "Christian Watson",
+      "position": "WR",
+      "espnId": "4248528",
+      "currentTeam": "GB",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "moore_elijah": {
+      "id": "moore_elijah",
+      "name": "Elijah Moore",
+      "position": "WR",
+      "espnId": "4372414",
+      "currentTeam": "DEN",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "rattler_spencer": {
+      "id": "rattler_spencer",
+      "name": "Spencer Rattler",
+      "position": "QB",
+      "espnId": "4426339",
+      "currentTeam": "NO",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "chandler_ty": {
+      "id": "chandler_ty",
+      "name": "Ty Chandler",
+      "position": "RB",
+      "espnId": "4242431",
+      "currentTeam": "MIN",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "perine_samaje": {
+      "id": "perine_samaje",
+      "name": "Samaje Perine",
+      "position": "WR",
+      "espnId": "3116389",
+      "currentTeam": "CIN",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "mccaffrey_luke": {
+      "id": "mccaffrey_luke",
+      "name": "Luke McCaffrey",
+      "position": "WR",
+      "espnId": "4426948",
+      "currentTeam": "WAS",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "mccloud_rayray": {
+      "id": "mccloud_rayray",
+      "name": "Ray-Ray McCloud III",
+      "position": "WR",
+      "espnId": "3728262",
+      "currentTeam": "NYG",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "burton_jermaine": {
+      "id": "burton_jermaine",
+      "name": "Jermaine Burton",
+      "position": "WR",
+      "espnId": "4429033",
+      "currentTeam": "CIN",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "white_zamir": {
+      "id": "white_zamir",
+      "name": "Zamir White",
+      "position": "WR",
+      "espnId": "4361777",
+      "currentTeam": "LV",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "patrick_tim": {
+      "id": "patrick_tim",
+      "name": "Tim Patrick",
+      "position": "WR",
+      "espnId": "3134353",
+      "currentTeam": "JAC",
+      "seasonsAvailable": [
+        2021,
+        2024
+      ]
+    },
+    "atwell_tutu": {
+      "id": "atwell_tutu",
+      "name": "Tutu Atwell",
+      "position": "WR",
+      "espnId": "4360797",
+      "currentTeam": "LAR",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "estime_audric": {
+      "id": "estime_audric",
+      "name": "Audric Estime",
+      "position": "RB",
+      "espnId": "4569682",
+      "currentTeam": "NO",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "reynolds_josh": {
+      "id": "reynolds_josh",
+      "name": "Josh Reynolds",
+      "position": "WR",
+      "espnId": "3115306",
+      "currentTeam": "NYJ",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "vidal_kimani": {
+      "id": "vidal_kimani",
+      "name": "Kimani Vidal",
+      "position": "RB",
+      "espnId": "4430968",
+      "currentTeam": "LAC",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "fant_noah": {
+      "id": "fant_noah",
+      "name": "Noah Fant",
+      "position": "TE",
+      "espnId": "4036131",
+      "currentTeam": "CIN",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "higbee_tyler": {
+      "id": "higbee_tyler",
+      "name": "Tyler Higbee",
+      "position": "TE",
+      "espnId": "2573401",
+      "currentTeam": "LAR",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "hill_taysom": {
+      "id": "hill_taysom",
+      "name": "Taysom Hill",
+      "position": "TE",
+      "espnId": "2468609",
+      "currentTeam": "NO",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "whittington_jordan": {
+      "id": "whittington_jordan",
+      "name": "Jordan Whittington",
+      "position": "WR",
+      "espnId": "4569382",
+      "currentTeam": "LAR",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "mccormick_sincere": {
+      "id": "mccormick_sincere",
+      "name": "Sincere McCormick",
+      "position": "RB",
+      "espnId": "4430104",
+      "currentTeam": "FA",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "dissly_will": {
+      "id": "dissly_will",
+      "name": "Will Dissly",
+      "position": "TE",
+      "espnId": "3127292",
+      "currentTeam": "LAC",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "dillon_aj": {
+      "id": "dillon_aj",
+      "name": "A.J. Dillon",
+      "position": "RB",
+      "espnId": "4239934",
+      "currentTeam": "PHI",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023
+      ]
+    },
+    "herbert_khalil": {
+      "id": "herbert_khalil",
+      "name": "Khalil Herbert",
+      "position": "RB",
+      "espnId": "4035886",
+      "currentTeam": "NYJ",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "conklin_tyler": {
+      "id": "conklin_tyler",
+      "name": "Tyler Conklin",
+      "position": "TE",
+      "espnId": "3915486",
+      "currentTeam": "LAC",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "turpin_kavontae": {
+      "id": "turpin_kavontae",
+      "name": "KaVontae Turpin",
+      "position": "WR",
+      "espnId": "3676833",
+      "currentTeam": "DAL",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "knox_dawson": {
+      "id": "knox_dawson",
+      "name": "Dawson Knox",
+      "position": "TE",
+      "espnId": "3930086",
+      "currentTeam": "BUF",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "sinnott_ben": {
+      "id": "sinnott_ben",
+      "name": "Ben Sinnott",
+      "position": "TE",
+      "espnId": "4690923",
+      "currentTeam": "WAS",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "barner_aj": {
+      "id": "barner_aj",
+      "name": "AJ Barner",
+      "position": "TE",
+      "espnId": "4576297",
+      "currentTeam": "SEA",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "brown_noah": {
+      "id": "brown_noah",
+      "name": "Noah Brown",
+      "position": "WR",
+      "espnId": "3121409",
+      "currentTeam": "WAS",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "zaccheaus_olamide": {
+      "id": "zaccheaus_olamide",
+      "name": "Olamide Zaccheaus",
+      "position": "WR",
+      "espnId": "3917914",
+      "currentTeam": "CHI",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "mayer_michael": {
+      "id": "mayer_michael",
+      "name": "Michael Mayer",
+      "position": "WR",
+      "espnId": "4429086",
+      "currentTeam": "LV",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "hooper_austin": {
+      "id": "hooper_austin",
+      "name": "Austin Hooper",
+      "position": "TE",
+      "espnId": "3043275",
+      "currentTeam": "NE",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "metchie_john": {
+      "id": "metchie_john",
+      "name": "John Metchie III",
+      "position": "WR",
+      "espnId": "4567096",
+      "currentTeam": "NYJ",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "musgrave_luke": {
+      "id": "musgrave_luke",
+      "name": "Luke Musgrave",
+      "position": "TE",
+      "espnId": "4428085",
+      "currentTeam": "GB",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "renfrow_hunter": {
+      "id": "renfrow_hunter",
+      "name": "Hunter Renfrow",
+      "position": "WR",
+      "espnId": "3135321",
+      "currentTeam": "CAR",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023
+      ]
+    },
+    "robinson_demarcus": {
+      "id": "robinson_demarcus",
+      "name": "Demarcus Robinson",
+      "position": "WR",
+      "espnId": "3043116",
+      "currentTeam": "SF",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "johnson_diontae": {
+      "id": "johnson_diontae",
+      "name": "Diontae Johnson",
+      "position": "WR",
+      "espnId": "3932905",
+      "currentTeam": "FA",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "davis_gabe": {
+      "id": "davis_gabe",
+      "name": "Gabe Davis",
+      "position": "WR",
+      "espnId": "4243537",
+      "currentTeam": "BUF",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "dotson_jahan": {
+      "id": "dotson_jahan",
+      "name": "Jahan Dotson",
+      "position": "WR",
+      "espnId": "4361409",
+      "currentTeam": "PHI",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "hollins_mack": {
+      "id": "hollins_mack",
+      "name": "Mack Hollins",
+      "position": "WR",
+      "espnId": "2991662",
+      "currentTeam": "NE",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "samuel_curtis": {
+      "id": "samuel_curtis",
+      "name": "Curtis Samuel",
+      "position": "WR",
+      "espnId": "3121427",
+      "currentTeam": "BUF",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "mcnichols_jeremy": {
+      "id": "mcnichols_jeremy",
+      "name": "Jeremy McNichols",
+      "position": "RB",
+      "espnId": "3127586",
+      "currentTeam": "WAS",
+      "seasonsAvailable": [
+        2021,
+        2023,
+        2024
+      ]
+    },
+    "tremble_tommy": {
+      "id": "tremble_tommy",
+      "name": "Tommy Tremble",
+      "position": "TE",
+      "espnId": "4372780",
+      "currentTeam": "CAR",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "demercado_emari": {
+      "id": "demercado_emari",
+      "name": "Emari Demercado",
+      "position": "RB",
+      "espnId": "4362478",
+      "currentTeam": "ARI",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "jones_zay": {
+      "id": "jones_zay",
+      "name": "Zay Jones",
+      "position": "WR",
+      "espnId": "3059722",
+      "currentTeam": "ARI",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "cousins_kirk": {
+      "id": "cousins_kirk",
+      "name": "Kirk Cousins",
+      "position": "QB",
+      "espnId": "14880",
+      "currentTeam": "ATL",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "stover_cade": {
+      "id": "stover_cade",
+      "name": "Cade Stover",
+      "position": "TE",
+      "espnId": "4426496",
+      "currentTeam": "HOU",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "jefferson_van": {
+      "id": "jefferson_van",
+      "name": "Van Jefferson",
+      "position": "WR",
+      "espnId": "3930066",
+      "currentTeam": "TEN",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "moss_zack": {
+      "id": "moss_zack",
+      "name": "Zack Moss",
+      "position": "RB",
+      "espnId": "4035676",
+      "currentTeam": "FA",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "lazard_allen": {
+      "id": "lazard_allen",
+      "name": "Allen Lazard",
+      "position": "WR",
+      "espnId": "3128390",
+      "currentTeam": "NYJ",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "dortch_greg": {
+      "id": "dortch_greg",
+      "name": "Greg Dortch",
+      "position": "WR",
+      "espnId": "4037235",
+      "currentTeam": "ARI",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "smithschuster_juju": {
+      "id": "smithschuster_juju",
+      "name": "JuJu Smith-Schuster",
+      "position": "WR",
+      "espnId": "3120348",
+      "currentTeam": "KC",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "garoppolo_jimmy": {
+      "id": "garoppolo_jimmy",
+      "name": "Jimmy Garoppolo",
+      "position": "QB",
+      "espnId": "16760",
+      "currentTeam": "LAR",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "reynolds_craig": {
+      "id": "reynolds_craig",
+      "name": "Craig Reynolds",
+      "position": "RB",
+      "espnId": "4421446",
+      "currentTeam": "NE",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "chestnut_julius": {
+      "id": "chestnut_julius",
+      "name": "Julius Chestnut",
+      "position": "WR",
+      "espnId": "4367567",
+      "currentTeam": "TEN",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "oliver_josh": {
+      "id": "oliver_josh",
+      "name": "Josh Oliver",
+      "position": "TE",
+      "espnId": "3921690",
+      "currentTeam": "MIN",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "ogunbowale_dare": {
+      "id": "ogunbowale_dare",
+      "name": "Dare Ogunbowale",
+      "position": "RB",
+      "espnId": "2983509",
+      "currentTeam": "HOU",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "schoonmaker_luke": {
+      "id": "schoonmaker_luke",
+      "name": "Luke Schoonmaker",
+      "position": "TE",
+      "espnId": "4372096",
+      "currentTeam": "DAL",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "thrash_jamari": {
+      "id": "thrash_jamari",
+      "name": "Jamari Thrash",
+      "position": "WR",
+      "espnId": "4428678",
+      "currentTeam": "CLE",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "winston_jameis": {
+      "id": "winston_jameis",
+      "name": "Jameis Winston",
+      "position": "QB",
+      "espnId": "2969939",
+      "currentTeam": "NYG",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "valdesscantling_marquez": {
+      "id": "valdesscantling_marquez",
+      "name": "Marquez Valdes-Scantling",
+      "position": "WR",
+      "espnId": "3051738",
+      "currentTeam": "PIT",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "moreau_foster": {
+      "id": "moreau_foster",
+      "name": "Foster Moreau",
+      "position": "TE",
+      "espnId": "3843945",
+      "currentTeam": "NO",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "juszczyk_kyle": {
+      "id": "juszczyk_kyle",
+      "name": "Kyle Juszczyk",
+      "position": "RB",
+      "espnId": "16002",
+      "currentTeam": "SF",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "calcaterra_grant": {
+      "id": "calcaterra_grant",
+      "name": "Grant Calcaterra",
+      "position": "TE",
+      "espnId": "4241374",
+      "currentTeam": "PHI",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "smartt_stone": {
+      "id": "smartt_stone",
+      "name": "Stone Smartt",
+      "position": "WR",
+      "espnId": "4250764",
+      "currentTeam": "NYJ",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "hyatt_jalin": {
+      "id": "hyatt_jalin",
+      "name": "Jalin Hyatt",
+      "position": "WR",
+      "espnId": "4692590",
+      "currentTeam": "NYG",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "thornton_tyquan": {
+      "id": "thornton_tyquan",
+      "name": "Tyquan Thornton",
+      "position": "WR",
+      "espnId": "4362921",
+      "currentTeam": "KC",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "ruckert_jeremy": {
+      "id": "ruckert_jeremy",
+      "name": "Jeremy Ruckert",
+      "position": "TE",
+      "espnId": "4361372",
+      "currentTeam": "NYJ",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "raymond_kalif": {
+      "id": "raymond_kalif",
+      "name": "Kalif Raymond",
+      "position": "WR",
+      "espnId": "2973405",
+      "currentTeam": "DET",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "goodson_tyler": {
+      "id": "goodson_tyler",
+      "name": "Tyler Goodson",
+      "position": "RB",
+      "espnId": "4429676",
+      "currentTeam": "IND",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "edwards_gus": {
+      "id": "edwards_gus",
+      "name": "Gus Edwards",
+      "position": "RB",
+      "espnId": "3051926",
+      "currentTeam": "FA",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "tucker_justin": {
+      "id": "tucker_justin",
+      "name": "Justin Tucker",
+      "position": "WR",
+      "espnId": "15683",
+      "currentTeam": "FA",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "badie_tyler": {
+      "id": "badie_tyler",
+      "name": "Tyler Badie",
+      "position": "RB",
+      "espnId": "4362748",
+      "currentTeam": "DEN",
+      "seasonsAvailable": [
+        2022,
+        2024
+      ]
+    },
+    "washington_darnell": {
+      "id": "washington_darnell",
+      "name": "Darnell Washington",
+      "position": "TE",
+      "espnId": "4430802",
+      "currentTeam": "PIT",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "taylor_tyrod": {
+      "id": "taylor_tyrod",
+      "name": "Tyrod Taylor",
+      "position": "QB",
+      "espnId": "14163",
+      "currentTeam": "NYJ",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "shepard_sterling": {
+      "id": "shepard_sterling",
+      "name": "Sterling Shepard",
+      "position": "WR",
+      "espnId": "2976592",
+      "currentTeam": "TB",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "higgins_elijah": {
+      "id": "higgins_elijah",
+      "name": "Elijah Higgins",
+      "position": "TE",
+      "espnId": "4426844",
+      "currentTeam": "ARI",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "haskins_hassan": {
+      "id": "haskins_hassan",
+      "name": "Hassan Haskins",
+      "position": "RB",
+      "espnId": "4372071",
+      "currentTeam": "LAC",
+      "seasonsAvailable": [
+        2022,
+        2024
+      ]
+    },
+    "holani_george": {
+      "id": "holani_george",
+      "name": "George Holani",
+      "position": "RB",
+      "espnId": "4429835",
+      "currentTeam": "SEA",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "milton_joe": {
+      "id": "milton_joe",
+      "name": "Joe Milton III",
+      "position": "QB",
+      "espnId": "4360698",
+      "currentTeam": "DAL",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "cowing_jacob": {
+      "id": "cowing_jacob",
+      "name": "Jacob Cowing",
+      "position": "WR",
+      "espnId": "4575665",
+      "currentTeam": "SF",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "akers_cam": {
+      "id": "akers_cam",
+      "name": "Cam Akers",
+      "position": "RB",
+      "espnId": "4240021",
+      "currentTeam": "SEA",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "ingold_alec": {
+      "id": "ingold_alec",
+      "name": "Alec Ingold",
+      "position": "RB",
+      "espnId": "3917668",
+      "currentTeam": "MIA",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "dell_tank": {
+      "id": "dell_tank",
+      "name": "Tank Dell",
+      "position": "WR",
+      "espnId": "4366031",
+      "currentTeam": "HOU",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "hutchinson_xavier": {
+      "id": "hutchinson_xavier",
+      "name": "Xavier Hutchinson",
+      "position": "WR",
+      "espnId": "4686422",
+      "currentTeam": "HOU",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "hill_julian": {
+      "id": "hill_julian",
+      "name": "Julian Hill",
+      "position": "WR",
+      "espnId": "4365395",
+      "currentTeam": "MIA",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "walker_devontez": {
+      "id": "walker_devontez",
+      "name": "Devontez Walker",
+      "position": "WR",
+      "espnId": "4696882",
+      "currentTeam": "BAL",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "sermon_trey": {
+      "id": "sermon_trey",
+      "name": "Trey Sermon",
+      "position": "RB",
+      "espnId": "4241401",
+      "currentTeam": "PIT",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "rudolph_mason": {
+      "id": "rudolph_mason",
+      "name": "Mason Rudolph",
+      "position": "QB",
+      "espnId": "3116407",
+      "currentTeam": "PIT",
+      "seasonsAvailable": [
+        2021,
+        2023,
+        2024
+      ]
+    },
+    "pickett_kenny": {
+      "id": "pickett_kenny",
+      "name": "Kenny Pickett",
+      "position": "QB",
+      "espnId": "4240703",
+      "currentTeam": "LV",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "wright_brock": {
+      "id": "wright_brock",
+      "name": "Brock Wright",
+      "position": "TE",
+      "espnId": "4242392",
+      "currentTeam": "DET",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "parkinson_colby": {
+      "id": "parkinson_colby",
+      "name": "Colby Parkinson",
+      "position": "TE",
+      "espnId": "4242557",
+      "currentTeam": "LAR",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "bobo_jake": {
+      "id": "bobo_jake",
+      "name": "Jake Bobo",
+      "position": "WR",
+      "espnId": "4360405",
+      "currentTeam": "SEA",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "mingo_jonathan": {
+      "id": "mingo_jonathan",
+      "name": "Jonathan Mingo",
+      "position": "WR",
+      "espnId": "4426485",
+      "currentTeam": "DAL",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "willis_malik": {
+      "id": "willis_malik",
+      "name": "Malik Willis",
+      "position": "QB",
+      "espnId": "4242512",
+      "currentTeam": "GB",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "ali_rasheen": {
+      "id": "ali_rasheen",
+      "name": "Rasheen Ali",
+      "position": "WR",
+      "espnId": "4690013",
+      "currentTeam": "BAL",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "hodge_khadarel": {
+      "id": "hodge_khadarel",
+      "name": "KhaDarel Hodge",
+      "position": "WR",
+      "espnId": "3047876",
+      "currentTeam": "ATL",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "trautman_adam": {
+      "id": "trautman_adam",
+      "name": "Adam Trautman",
+      "position": "TE",
+      "espnId": "3911853",
+      "currentTeam": "DEN",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "mariota_marcus": {
+      "id": "mariota_marcus",
+      "name": "Marcus Mariota",
+      "position": "QB",
+      "espnId": "2576980",
+      "currentTeam": "WAS",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "corley_malachi": {
+      "id": "corley_malachi",
+      "name": "Malachi Corley",
+      "position": "WR",
+      "espnId": "4613104",
+      "currentTeam": "CLE",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "moore_skyy": {
+      "id": "moore_skyy",
+      "name": "Skyy Moore",
+      "position": "WR",
+      "espnId": "4430191",
+      "currentTeam": "SF",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "laube_dylan": {
+      "id": "laube_dylan",
+      "name": "Dylan Laube",
+      "position": "RB",
+      "espnId": "4366963",
+      "currentTeam": "LV",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "vaki_sione": {
+      "id": "vaki_sione",
+      "name": "Sione Vaki",
+      "position": "WR",
+      "espnId": "4912274",
+      "currentTeam": "DET",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "edwardshelaire_clyde": {
+      "id": "edwardshelaire_clyde",
+      "name": "Clyde Edwards-Helaire",
+      "position": "WR",
+      "espnId": "4242214",
+      "currentTeam": "KC",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "browning_jake": {
+      "id": "browning_jake",
+      "name": "Jake Browning",
+      "position": "QB",
+      "espnId": "3886812",
+      "currentTeam": "CIN",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "washington_casey": {
+      "id": "washington_casey",
+      "name": "Casey Washington",
+      "position": "WR",
+      "espnId": "4428796",
+      "currentTeam": "ATL",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "dulcich_greg": {
+      "id": "dulcich_greg",
+      "name": "Greg Dulcich",
+      "position": "TE",
+      "espnId": "4367209",
+      "currentTeam": "MIA",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "baker_javon": {
+      "id": "baker_javon",
+      "name": "Javon Baker",
+      "position": "WR",
+      "espnId": "4692022",
+      "currentTeam": "FA",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "bellinger_daniel": {
+      "id": "bellinger_daniel",
+      "name": "Daniel Bellinger",
+      "position": "TE",
+      "espnId": "4361516",
+      "currentTeam": "NYG",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "hudson_tanner": {
+      "id": "hudson_tanner",
+      "name": "Tanner Hudson",
+      "position": "TE",
+      "espnId": "3050481",
+      "currentTeam": "CIN",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "wilson_jeff": {
+      "id": "wilson_jeff",
+      "name": "Jeff Wilson Jr.",
+      "position": "WR",
+      "espnId": "3122976",
+      "currentTeam": "MIA",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "brooks_jonathon": {
+      "id": "brooks_jonathon",
+      "name": "Jonathon Brooks",
+      "position": "RB",
+      "espnId": "4678008",
+      "currentTeam": "CAR",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "johnson_tyler": {
+      "id": "johnson_tyler",
+      "name": "Tyler Johnson",
+      "position": "WR",
+      "espnId": "2310331",
+      "currentTeam": "NYJ",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "carter_michael": {
+      "id": "carter_michael",
+      "name": "Michael Carter",
+      "position": "WR",
+      "espnId": "4240657",
+      "currentTeam": "ARI",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "bourne_kendrick": {
+      "id": "bourne_kendrick",
+      "name": "Kendrick Bourne",
+      "position": "WR",
+      "espnId": "3045523",
+      "currentTeam": "SF",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "long_hunter": {
+      "id": "long_hunter",
+      "name": "Hunter Long",
+      "position": "TE",
+      "espnId": "4239944",
+      "currentTeam": "JAC",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "bryant_harrison": {
+      "id": "bryant_harrison",
+      "name": "Harrison Bryant",
+      "position": "TE",
+      "espnId": "4040774",
+      "currentTeam": "HOU",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "woods_robert": {
+      "id": "woods_robert",
+      "name": "Robert Woods",
+      "position": "WR",
+      "espnId": "15880",
+      "currentTeam": "FA",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "mundt_johnny": {
+      "id": "mundt_johnny",
+      "name": "Johnny Mundt",
+      "position": "TE",
+      "espnId": "3052096",
+      "currentTeam": "JAC",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "oconnell_aidan": {
+      "id": "oconnell_aidan",
+      "name": "Aidan O'Connell",
+      "position": "QB",
+      "espnId": "4260394",
+      "currentTeam": "LV",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "wilson_zach": {
+      "id": "wilson_zach",
+      "name": "Zach Wilson",
+      "position": "QB",
+      "espnId": "4361259",
+      "currentTeam": "MIA",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023
+      ]
+    },
+    "moore_david": {
+      "id": "moore_david",
+      "name": "David Moore",
+      "position": "WR",
+      "espnId": "4212909",
+      "currentTeam": "CAR",
+      "seasonsAvailable": [
+        2021,
+        2023,
+        2024
+      ]
+    },
+    "bates_john": {
+      "id": "bates_john",
+      "name": "John Bates",
+      "position": "TE",
+      "espnId": "4048228",
+      "currentTeam": "WAS",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "wiley_jared": {
+      "id": "wiley_jared",
+      "name": "Jared Wiley",
+      "position": "TE",
+      "espnId": "4430723",
+      "currentTeam": "KC",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "williams_jamaal": {
+      "id": "williams_jamaal",
+      "name": "Jamaal Williams",
+      "position": "RB",
+      "espnId": "2980453",
+      "currentTeam": "FA",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "lance_trey": {
+      "id": "lance_trey",
+      "name": "Trey Lance",
+      "position": "QB",
+      "espnId": "4383351",
+      "currentTeam": "LAC",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2024
+      ]
+    },
+    "gage_russell": {
+      "id": "gage_russell",
+      "name": "Russell Gage Jr.",
+      "position": "WR",
+      "espnId": "3115378",
+      "currentTeam": "FA",
+      "seasonsAvailable": [
+        2021,
+        2022
+      ]
+    },
+    "durham_payne": {
+      "id": "durham_payne",
+      "name": "Payne Durham",
+      "position": "TE",
+      "espnId": "4372505",
+      "currentTeam": "TB",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "sample_drew": {
+      "id": "sample_drew",
+      "name": "Drew Sample",
+      "position": "TE",
+      "espnId": "3127310",
+      "currentTeam": "CIN",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "luepke_hunter": {
+      "id": "luepke_hunter",
+      "name": "Hunter Luepke",
+      "position": "RB",
+      "espnId": "4383396",
+      "currentTeam": "DAL",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "woerner_charlie": {
+      "id": "woerner_charlie",
+      "name": "Charlie Woerner",
+      "position": "TE",
+      "espnId": "4035020",
+      "currentTeam": "ATL",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "steele_carson": {
+      "id": "steele_carson",
+      "name": "Carson Steele",
+      "position": "RB",
+      "espnId": "4714365",
+      "currentTeam": "KC",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "patterson_cordarrelle": {
+      "id": "patterson_cordarrelle",
+      "name": "Cordarrelle Patterson",
+      "position": "RB",
+      "espnId": "15807",
+      "currentTeam": "FA",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "culp_devin": {
+      "id": "culp_devin",
+      "name": "Devin Culp",
+      "position": "TE",
+      "espnId": "4361112",
+      "currentTeam": "TB",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "shavers_tyrell": {
+      "id": "shavers_tyrell",
+      "name": "Tyrell Shavers",
+      "position": "WR",
+      "espnId": "4241476",
+      "currentTeam": "BUF",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "strong_pierre": {
+      "id": "strong_pierre",
+      "name": "Pierre Strong Jr.",
+      "position": "RB",
+      "espnId": "4249836",
+      "currentTeam": "GB",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "kolar_charlie": {
+      "id": "kolar_charlie",
+      "name": "Charlie Kolar",
+      "position": "TE",
+      "espnId": "4241263",
+      "currentTeam": "BAL",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "granson_kylen": {
+      "id": "granson_kylen",
+      "name": "Kylen Granson",
+      "position": "TE",
+      "espnId": "4039160",
+      "currentTeam": "PHI",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "davis_derius": {
+      "id": "davis_derius",
+      "name": "Derius Davis",
+      "position": "WR",
+      "espnId": "4362477",
+      "currentTeam": "LAC",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "knight_zonovan": {
+      "id": "knight_zonovan",
+      "name": "Zonovan Knight",
+      "position": "RB",
+      "espnId": "4427728",
+      "currentTeam": "ARI",
+      "seasonsAvailable": [
+        2022,
+        2023
+      ]
+    },
+    "johnson_dernest": {
+      "id": "johnson_dernest",
+      "name": "D'Ernest Johnson",
+      "position": "RB",
+      "espnId": "3139602",
+      "currentTeam": "NE",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "farrell_luke": {
+      "id": "farrell_luke",
+      "name": "Luke Farrell",
+      "position": "TE",
+      "espnId": "4040612",
+      "currentTeam": "SF",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "whyle_josh": {
+      "id": "whyle_josh",
+      "name": "Josh Whyle",
+      "position": "TE",
+      "espnId": "4360086",
+      "currentTeam": "GB",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "miller_scotty": {
+      "id": "miller_scotty",
+      "name": "Scotty Miller",
+      "position": "WR",
+      "espnId": "3914397",
+      "currentTeam": "PIT",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "homer_travis": {
+      "id": "homer_travis",
+      "name": "Travis Homer",
+      "position": "RB",
+      "espnId": "4037457",
+      "currentTeam": "CHI",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "krull_lucas": {
+      "id": "krull_lucas",
+      "name": "Lucas Krull",
+      "position": "TE",
+      "espnId": "4360231",
+      "currentTeam": "DEN",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "wentz_carson": {
+      "id": "wentz_carson",
+      "name": "Carson Wentz",
+      "position": "QB",
+      "espnId": "2573079",
+      "currentTeam": "MIN",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "brooks_jalen": {
+      "id": "brooks_jalen",
+      "name": "Jalen Brooks",
+      "position": "WR",
+      "espnId": "4692835",
+      "currentTeam": "ARI",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "ham_cj": {
+      "id": "ham_cj",
+      "name": "C.J. Ham",
+      "position": "RB",
+      "espnId": "4012556",
+      "currentTeam": "MIN",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "aliecox_mo": {
+      "id": "aliecox_mo",
+      "name": "Mo Alie-Cox",
+      "position": "TE",
+      "espnId": "2998565",
+      "currentTeam": "IND",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "watson_deshaun": {
+      "id": "watson_deshaun",
+      "name": "Deshaun Watson",
+      "position": "QB",
+      "espnId": "3122840",
+      "currentTeam": "CLE",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "abanikanda_israel": {
+      "id": "abanikanda_israel",
+      "name": "Israel Abanikanda",
+      "position": "RB",
+      "espnId": "4429202",
+      "currentTeam": "DAL",
+      "seasonsAvailable": [
+        2023
+      ]
+    },
+    "bell_david": {
+      "id": "bell_david",
+      "name": "David Bell",
+      "position": "WR",
+      "espnId": "4570409",
+      "currentTeam": "FA",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "rush_cooper": {
+      "id": "rush_cooper",
+      "name": "Cooper Rush",
+      "position": "QB",
+      "espnId": "2972515",
+      "currentTeam": "BAL",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "carter_deandre": {
+      "id": "carter_deandre",
+      "name": "DeAndre Carter",
+      "position": "WR",
+      "espnId": "2580216",
+      "currentTeam": "CLE",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "dalton_andy": {
+      "id": "dalton_andy",
+      "name": "Andy Dalton",
+      "position": "QB",
+      "espnId": "14012",
+      "currentTeam": "CAR",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "vaughn_deuce": {
+      "id": "vaughn_deuce",
+      "name": "Deuce Vaughn",
+      "position": "RB",
+      "espnId": "4431453",
+      "currentTeam": "DEN",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "jackson_lucky": {
+      "id": "jackson_lucky",
+      "name": "Lucky Jackson",
+      "position": "WR",
+      "espnId": "3915802",
+      "currentTeam": "FA",
+      "seasonsAvailable": [
+        2023
+      ]
+    },
+    "jones_mac": {
+      "id": "jones_mac",
+      "name": "Mac Jones",
+      "position": "QB",
+      "espnId": "4241464",
+      "currentTeam": "SF",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "ricard_patrick": {
+      "id": "ricard_patrick",
+      "name": "Patrick Ricard",
+      "position": "WR",
+      "espnId": "2975417",
+      "currentTeam": "BAL",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "sherfield_trent": {
+      "id": "sherfield_trent",
+      "name": "Trent Sherfield Sr.",
+      "position": "WR",
+      "espnId": "3122168",
+      "currentTeam": "ARI",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "elliott_ezekiel": {
+      "id": "elliott_ezekiel",
+      "name": "Ezekiel Elliott",
+      "position": "WR",
+      "espnId": "3051392",
+      "currentTeam": "FA",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "bagent_tyson": {
+      "id": "bagent_tyson",
+      "name": "Tyson Bagent",
+      "position": "QB",
+      "espnId": "4434153",
+      "currentTeam": "CHI",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "mims_jordan": {
+      "id": "mims_jordan",
+      "name": "Jordan Mims",
+      "position": "RB",
+      "espnId": "4243004",
+      "currentTeam": "TEN",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "gray_eric": {
+      "id": "gray_eric",
+      "name": "Eric Gray",
+      "position": "RB",
+      "espnId": "4570561",
+      "currentTeam": "NYG",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "brissett_jacoby": {
+      "id": "brissett_jacoby",
+      "name": "Jacoby Brissett",
+      "position": "QB",
+      "espnId": "2578570",
+      "currentTeam": "ARI",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "tipton_mason": {
+      "id": "tipton_mason",
+      "name": "Mason Tipton",
+      "position": "WR",
+      "espnId": "4573697",
+      "currentTeam": "NO",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "bell_jaheim": {
+      "id": "bell_jaheim",
+      "name": "Jaheim Bell",
+      "position": "WR",
+      "espnId": "4429262",
+      "currentTeam": "FA",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "hardman_mecole": {
+      "id": "hardman_mecole",
+      "name": "Mecole Hardman Jr.",
+      "position": "WR",
+      "espnId": "4035004",
+      "currentTeam": "BUF",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "mullens_nick": {
+      "id": "mullens_nick",
+      "name": "Nick Mullens",
+      "position": "QB",
+      "espnId": "3059989",
+      "currentTeam": "JAC",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "woods_michael": {
+      "id": "woods_michael",
+      "name": "Michael Woods II",
+      "position": "WR",
+      "espnId": "4360174",
+      "currentTeam": "FA",
+      "seasonsAvailable": [
+        2022,
+        2024
+      ]
+    },
+    "washington_carlos": {
+      "id": "washington_carlos",
+      "name": "Carlos Washington Jr.",
+      "position": "RB",
+      "espnId": "4248425",
+      "currentTeam": "ATL",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "howell_sam": {
+      "id": "howell_sam",
+      "name": "Sam Howell",
+      "position": "QB",
+      "espnId": "4426875",
+      "currentTeam": "PHI",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "conner_tanner": {
+      "id": "conner_tanner",
+      "name": "Tanner Conner",
+      "position": "WR",
+      "espnId": "4047422",
+      "currentTeam": "MIA",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "gipson_xavier": {
+      "id": "gipson_xavier",
+      "name": "Xavier Gipson",
+      "position": "WR",
+      "espnId": "4427278",
+      "currentTeam": "PHI",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "nwangwu_kene": {
+      "id": "nwangwu_kene",
+      "name": "Kene Nwangwu",
+      "position": "RB",
+      "espnId": "4035537",
+      "currentTeam": "NYJ",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "woods_jelani": {
+      "id": "woods_jelani",
+      "name": "Jelani Woods",
+      "position": "TE",
+      "espnId": "4241410",
+      "currentTeam": "NYJ",
+      "seasonsAvailable": [
+        2022
+      ]
+    },
+    "chark_dj": {
+      "id": "chark_dj",
+      "name": "DJ Chark Jr.",
+      "position": "WR",
+      "espnId": "3115394",
+      "currentTeam": "FA",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "minshew_gardner": {
+      "id": "minshew_gardner",
+      "name": "Gardner Minshew II",
+      "position": "QB",
+      "espnId": "4038524",
+      "currentTeam": "KC",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "ogletree_drew": {
+      "id": "ogletree_drew",
+      "name": "Drew Ogletree",
+      "position": "TE",
+      "espnId": "4722908",
+      "currentTeam": "IND",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "dobbs_joshua": {
+      "id": "dobbs_joshua",
+      "name": "Joshua Dobbs",
+      "position": "QB",
+      "espnId": "3044720",
+      "currentTeam": "NE",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "jones_charlie": {
+      "id": "jones_charlie",
+      "name": "Charlie Jones",
+      "position": "WR",
+      "espnId": "4257188",
+      "currentTeam": "CIN",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "wallace_tylan": {
+      "id": "wallace_tylan",
+      "name": "Tylan Wallace",
+      "position": "WR",
+      "espnId": "4241424",
+      "currentTeam": "BAL",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "mcclellan_jase": {
+      "id": "mcclellan_jase",
+      "name": "Jase McClellan",
+      "position": "RB",
+      "espnId": "4429001",
+      "currentTeam": "FA",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "brown_pharaoh": {
+      "id": "brown_pharaoh",
+      "name": "Pharaoh Brown",
+      "position": "TE",
+      "espnId": "2971281",
+      "currentTeam": "ARI",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "allen_kyle": {
+      "id": "allen_kyle",
+      "name": "Kyle Allen",
+      "position": "QB",
+      "espnId": "3115293",
+      "currentTeam": "DET",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "mills_davis": {
+      "id": "mills_davis",
+      "name": "Davis Mills",
+      "position": "QB",
+      "espnId": "4242546",
+      "currentTeam": "HOU",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "burton_michael": {
+      "id": "burton_michael",
+      "name": "Michael Burton",
+      "position": "RB",
+      "espnId": "2515270",
+      "currentTeam": "DEN",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "smith_ainias": {
+      "id": "smith_ainias",
+      "name": "Ainias Smith",
+      "position": "WR",
+      "espnId": "4428532",
+      "currentTeam": "CAR",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "trubisky_mitchell": {
+      "id": "trubisky_mitchell",
+      "name": "Mitchell Trubisky",
+      "position": "QB",
+      "espnId": "3039707",
+      "currentTeam": "BUF",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "abdullah_ameer": {
+      "id": "abdullah_ameer",
+      "name": "Ameer Abdullah",
+      "position": "RB",
+      "espnId": "2576336",
+      "currentTeam": "IND",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "jones_velus": {
+      "id": "jones_velus",
+      "name": "Velus Jones Jr.",
+      "position": "WR",
+      "espnId": "4035693",
+      "currentTeam": "SEA",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "bridgewater_teddy": {
+      "id": "bridgewater_teddy",
+      "name": "Teddy Bridgewater",
+      "position": "QB",
+      "espnId": "16728",
+      "currentTeam": "TB",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023
+      ]
+    },
+    "mallory_will": {
+      "id": "mallory_will",
+      "name": "Will Mallory",
+      "position": "TE",
+      "espnId": "4362523",
+      "currentTeam": "IND",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "watson_justin": {
+      "id": "watson_justin",
+      "name": "Justin Watson",
+      "position": "WR",
+      "espnId": "3118892",
+      "currentTeam": "HOU",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "hairston_troy": {
+      "id": "hairston_troy",
+      "name": "Troy Hairston II",
+      "position": "WR",
+      "espnId": "4274040",
+      "currentTeam": "FA",
+      "seasonsAvailable": [
+        2022,
+        2024
+      ]
+    },
+    "thomas_ian": {
+      "id": "thomas_ian",
+      "name": "Ian Thomas",
+      "position": "TE",
+      "espnId": "4045305",
+      "currentTeam": "LV",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "smythe_durham": {
+      "id": "smythe_durham",
+      "name": "Durham Smythe",
+      "position": "TE",
+      "espnId": "3052897",
+      "currentTeam": "CHI",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "reiman_tip": {
+      "id": "reiman_tip",
+      "name": "Tip Reiman",
+      "position": "TE",
+      "espnId": "4696700",
+      "currentTeam": "ARI",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "saubert_eric": {
+      "id": "saubert_eric",
+      "name": "Eric Saubert",
+      "position": "TE",
+      "espnId": "2975863",
+      "currentTeam": "SEA",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "dallas_deejay": {
+      "id": "dallas_deejay",
+      "name": "DeeJay Dallas",
+      "position": "RB",
+      "espnId": "4240631",
+      "currentTeam": "CAR",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "dulin_ashton": {
+      "id": "dulin_ashton",
+      "name": "Ashton Dulin",
+      "position": "WR",
+      "espnId": "4061956",
+      "currentTeam": "IND",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2024
+      ]
+    },
+    "allen_davis": {
+      "id": "allen_davis",
+      "name": "Davis Allen",
+      "position": "TE",
+      "espnId": "4426553",
+      "currentTeam": "LAR",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "spannford_brevyn": {
+      "id": "spannford_brevyn",
+      "name": "Brevyn Spann-Ford",
+      "position": "TE",
+      "espnId": "4360967",
+      "currentTeam": "DAL",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "gallup_michael": {
+      "id": "gallup_michael",
+      "name": "Michael Gallup",
+      "position": "WR",
+      "espnId": "4036348",
+      "currentTeam": "FA",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023
+      ]
+    },
+    "heinicke_taylor": {
+      "id": "heinicke_taylor",
+      "name": "Taylor Heinicke",
+      "position": "QB",
+      "espnId": "2565969",
+      "currentTeam": "FA",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "cook_dalvin": {
+      "id": "cook_dalvin",
+      "name": "Dalvin Cook",
+      "position": "RB",
+      "espnId": "3116593",
+      "currentTeam": "FA",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "trask_kyle": {
+      "id": "trask_kyle",
+      "name": "Kyle Trask",
+      "position": "QB",
+      "espnId": "4034946",
+      "currentTeam": "ATL",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "adkins_nate": {
+      "id": "adkins_nate",
+      "name": "Nate Adkins",
+      "position": "TE",
+      "espnId": "4383440",
+      "currentTeam": "DEN",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "wilson_cedrick": {
+      "id": "wilson_cedrick",
+      "name": "Cedrick Wilson Jr.",
+      "position": "WR",
+      "espnId": "4036335",
+      "currentTeam": "MIA",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "flournoy_ryan": {
+      "id": "flournoy_ryan",
+      "name": "Ryan Flournoy",
+      "position": "WR",
+      "espnId": "5083754",
+      "currentTeam": "DAL",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "skowronek_ben": {
+      "id": "skowronek_ben",
+      "name": "Ben Skowronek",
+      "position": "WR",
+      "espnId": "4035656",
+      "currentTeam": "PIT",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "everett_gerald": {
+      "id": "everett_gerald",
+      "name": "Gerald Everett",
+      "position": "TE",
+      "espnId": "3918639",
+      "currentTeam": "FA",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "tonyan_robert": {
+      "id": "tonyan_robert",
+      "name": "Robert Tonyan",
+      "position": "TE",
+      "espnId": "2975674",
+      "currentTeam": "KC",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "dwelley_ross": {
+      "id": "dwelley_ross",
+      "name": "Ross Dwelley",
+      "position": "TE",
+      "espnId": "3120303",
+      "currentTeam": "DET",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "davisprice_tyrion": {
+      "id": "davisprice_tyrion",
+      "name": "Tyrion Davis-Price",
+      "position": "RB",
+      "espnId": "4426475",
+      "currentTeam": "FA",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "heyward_connor": {
+      "id": "heyward_connor",
+      "name": "Connor Heyward",
+      "position": "TE",
+      "espnId": "4241961",
+      "currentTeam": "PIT",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "johnson_jakob": {
+      "id": "johnson_jakob",
+      "name": "Jakob Johnson",
+      "position": "RB",
+      "espnId": "3115349",
+      "currentTeam": "HOU",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "osborn_kj": {
+      "id": "osborn_kj",
+      "name": "K.J. Osborn",
+      "position": "WR",
+      "espnId": "3916566",
+      "currentTeam": "ATL",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "gould_anthony": {
+      "id": "gould_anthony",
+      "name": "Anthony Gould",
+      "position": "WR",
+      "espnId": "4429684",
+      "currentTeam": "IND",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "fehoko_simi": {
+      "id": "fehoko_simi",
+      "name": "Simi Fehoko",
+      "position": "WR",
+      "espnId": "4360739",
+      "currentTeam": "ARI",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "blair_chris": {
+      "id": "blair_chris",
+      "name": "Chris Blair",
+      "position": "WR",
+      "espnId": "4369886",
+      "currentTeam": "ATL",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "heath_malik": {
+      "id": "heath_malik",
+      "name": "Malik Heath",
+      "position": "WR",
+      "espnId": "4689334",
+      "currentTeam": "FA",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "weaver_xavier": {
+      "id": "weaver_xavier",
+      "name": "Xavier Weaver",
+      "position": "WR",
+      "espnId": "4428811",
+      "currentTeam": "ARI",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "palmer_trey": {
+      "id": "palmer_trey",
+      "name": "Trey Palmer",
+      "position": "WR",
+      "espnId": "4426407",
+      "currentTeam": "NO",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "allen_brandon": {
+      "id": "allen_brandon",
+      "name": "Brandon Allen",
+      "position": "QB",
+      "espnId": "2574511",
+      "currentTeam": "TEN",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2024
+      ]
+    },
+    "haener_jake": {
+      "id": "haener_jake",
+      "name": "Jake Haener",
+      "position": "QB",
+      "espnId": "4243322",
+      "currentTeam": "NO",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "quitoriano_teagan": {
+      "id": "quitoriano_teagan",
+      "name": "Teagan Quitoriano",
+      "position": "TE",
+      "espnId": "4374045",
+      "currentTeam": "ATL",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "hooker_hendon": {
+      "id": "hooker_hendon",
+      "name": "Hendon Hooker",
+      "position": "QB",
+      "espnId": "4240858",
+      "currentTeam": "FA",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "means_bub": {
+      "id": "means_bub",
+      "name": "Bub Means",
+      "position": "WR",
+      "espnId": "4427985",
+      "currentTeam": "NO",
+      "seasonsAvailable": [
+        2024
+      ]
+    },
+    "stidham_jarrett": {
+      "id": "stidham_jarrett",
+      "name": "Jarrett Stidham",
+      "position": "QB",
+      "espnId": "3892775",
+      "currentTeam": "DEN",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "melton_bo": {
+      "id": "melton_bo",
+      "name": "Bo Melton",
+      "position": "WR",
+      "espnId": "4259305",
+      "currentTeam": "GB",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "turner_cole": {
+      "id": "turner_cole",
+      "name": "Cole Turner",
+      "position": "WR",
+      "espnId": "4361438",
+      "currentTeam": "FA",
+      "seasonsAvailable": [
+        2022,
+        2023
+      ]
+    },
+    "jarrett_rakim": {
+      "id": "jarrett_rakim",
+      "name": "Rakim Jarrett",
+      "position": "WR",
+      "espnId": "4429006",
+      "currentTeam": "FA",
+      "seasonsAvailable": [
+        2023,
+        2024
+      ]
+    },
+    "jones_tim": {
+      "id": "jones_tim",
+      "name": "Tim Jones",
+      "position": "WR",
+      "espnId": "4245131",
+      "currentTeam": "JAC",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "rivers_ronnie": {
+      "id": "rivers_ronnie",
+      "name": "Ronnie Rivers",
+      "position": "WR",
+      "espnId": "4243003",
+      "currentTeam": "LAR",
+      "seasonsAvailable": [
+        2022,
+        2023,
+        2024
+      ]
+    },
+    "berrios_braxton": {
+      "id": "berrios_braxton",
+      "name": "Braxton Berrios",
+      "position": "WR",
+      "espnId": "3123075",
+      "currentTeam": "HOU",
+      "seasonsAvailable": [
+        2021,
+        2022,
+        2023,
+        2024
+      ]
+    }
+  }
+}

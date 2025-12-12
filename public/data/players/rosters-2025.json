@@ -1,0 +1,154 @@
+{
+  "metadata": {
+    "description": "Current team assignments - update on trades/FA signings",
+    "season": "2025",
+    "playerCount": 36,
+    "lastUpdated": "2025-12-06T10:31:04.392Z"
+  },
+  "players": {
+    "allen_josh": {
+      "team": "BUF",
+      "byeWeek": 13
+    },
+    "hurts_jalen": {
+      "team": "PHI",
+      "byeWeek": 14
+    },
+    "jackson_lamar": {
+      "team": "BAL",
+      "byeWeek": 10
+    },
+    "mahomes_patrick": {
+      "team": "KC",
+      "byeWeek": 6
+    },
+    "daniels_jayden": {
+      "team": "WAS",
+      "byeWeek": 14
+    },
+    "burrow_joe": {
+      "team": "CIN",
+      "byeWeek": 10
+    },
+    "stroud_cj": {
+      "team": "HOU",
+      "byeWeek": 11
+    },
+    "murray_kyler": {
+      "team": "ARI",
+      "byeWeek": 7
+    },
+    "richardson_anthony": {
+      "team": "IND",
+      "byeWeek": 12
+    },
+    "williams_caleb": {
+      "team": "CHI",
+      "byeWeek": 13
+    },
+    "robinson_bijan": {
+      "team": "ATL",
+      "byeWeek": 13
+    },
+    "hall_breece": {
+      "team": "NYJ",
+      "byeWeek": 5
+    },
+    "gibbs_jahmyr": {
+      "team": "DET",
+      "byeWeek": 13
+    },
+    "barkley_saquon": {
+      "team": "PHI",
+      "byeWeek": 14
+    },
+    "taylor_jonathan": {
+      "team": "IND",
+      "byeWeek": 12
+    },
+    "henry_derrick": {
+      "team": "BAL",
+      "byeWeek": 10
+    },
+    "achane_devon": {
+      "team": "MIA",
+      "byeWeek": 6
+    },
+    "williams_kyren": {
+      "team": "LAR",
+      "byeWeek": 6
+    },
+    "jacobs_josh": {
+      "team": "GB",
+      "byeWeek": 14
+    },
+    "pacheco_isiah": {
+      "team": "KC",
+      "byeWeek": 6
+    },
+    "chase_jamarr": {
+      "team": "CIN",
+      "byeWeek": 10
+    },
+    "lamb_ceedee": {
+      "team": "DAL",
+      "byeWeek": 14
+    },
+    "hill_tyreek": {
+      "team": "MIA",
+      "byeWeek": 6
+    },
+    "jefferson_justin": {
+      "team": "MIN",
+      "byeWeek": 6
+    },
+    "stbrown_amonra": {
+      "team": "DET",
+      "byeWeek": 13
+    },
+    "harrisonjr_marvin": {
+      "team": "ARI",
+      "byeWeek": 7
+    },
+    "brown_aj": {
+      "team": "PHI",
+      "byeWeek": 14
+    },
+    "wilson_garrett": {
+      "team": "NYJ",
+      "byeWeek": 5
+    },
+    "nacua_puka": {
+      "team": "LAR",
+      "byeWeek": 6
+    },
+    "nabers_malik": {
+      "team": "NYG",
+      "byeWeek": 7
+    },
+    "laporta_sam": {
+      "team": "DET",
+      "byeWeek": 13
+    },
+    "kelce_travis": {
+      "team": "KC",
+      "byeWeek": 6
+    },
+    "mcbride_trey": {
+      "team": "ARI",
+      "byeWeek": 7
+    },
+    "kittle_george": {
+      "team": "SF",
+      "byeWeek": 11
+    },
+    "andrews_mark": {
+      "team": "BAL",
+      "byeWeek": 10
+    },
+    "bowers_brock": {
+      "team": "LV",
+      "byeWeek": 9
+    }
+  }
+}

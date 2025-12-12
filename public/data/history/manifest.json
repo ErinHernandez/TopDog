@@ -1,0 +1,20 @@
+{
+  "version": "2.0.0",
+  "generatedAt": "2025-12-12T01:02:55.819Z",
+  "currentSeason": 2025,
+  "historicalSeasons": [
+    2021,
+    2022,
+    2023,
+    2024
+  ],
+  "playerCount": 449,
+  "sourcePlayerPool": "player-pool-2025.json",
+  "checksums": {
+    "seasons/2021.json": "247ec5c8008b275cf621a37ec802af2517ad1f3351ca3e055e11c3a7eedd0a2c",
+    "seasons/2022.json": "0e70998c9def76592f1946224b5c4ab89c9d64459d16f3e47c0c9af3d5701e60",
+    "seasons/2023.json": "e52de43502ecd8c560b6ac90bd473faa7f8d9afc711ba18a36068460de3462aa",
+    "seasons/2024.json": "866e2b6e9c236ba4d7e7a9c914a817db73365a1992ee012fa9fb1552de2e7e83",
+    "players/index.json": "60182fe3069dfbed0c6864f0b04b915a664747ce760e6546220974b635a34973"
+  }
+}

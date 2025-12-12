@@ -1,0 +1,4456 @@
+{
+  "metadata": {
+    "generatedAt": "2025-12-07T08:32:44.691Z",
+    "season": "2025",
+    "algorithm": "weighted-recency-v1",
+    "blendMode": "blended",
+    "slowPicks": 6480,
+    "fastPicks": 4320,
+    "totalDrafts": 50,
+    "dateRange": {
+      "start": "2025-11-24T09:40:07.638Z",
+      "end": "2025-12-07T03:13:43.405Z"
+    },
+    "params": {
+      "decayDays": 7,
+      "minPicksForConfidence": 50,
+      "outlierThreshold": 2.5,
+      "maxAgeDays": 30,
+      "seedBlendRatio": 0.5
+    }
+  },
+  "players": {
+    "lamb_ceedee": {
+      "adp": 3.7,
+      "pickCount": 50,
+      "highPick": 1,
+      "lowPick": 9,
+      "stdDev": 2.1,
+      "change": 0
+    },
+    "chase_jamarr": {
+      "adp": 1.8,
+      "pickCount": 50,
+      "highPick": 1,
+      "lowPick": 5,
+      "stdDev": 1.2,
+      "change": 0
+    },
+    "robinson_bijan": {
+      "adp": 2.7,
+      "pickCount": 50,
+      "highPick": 1,
+      "lowPick": 6,
+      "stdDev": 1.4,
+      "change": 0
+    },
+    "gibbs_jahmyr": {
+      "adp": 3.1,
+      "pickCount": 50,
+      "highPick": 1,
+      "lowPick": 6,
+      "stdDev": 1.3,
+      "change": 0
+    },
+    "nabers_malik": {
+      "adp": 7.1,
+      "pickCount": 50,
+      "highPick": 4,
+      "lowPick": 10,
+      "stdDev": 1.3,
+      "change": 0
+    },
+    "jefferson_justin": {
+      "adp": 5.8,
+      "pickCount": 50,
+      "highPick": 4,
+      "lowPick": 10,
+      "stdDev": 1.7,
+      "change": 0
+    },
+    "barkley_saquon": {
+      "adp": 5,
+      "pickCount": 50,
+      "highPick": 1,
+      "lowPick": 8,
+      "stdDev": 2,
+      "change": 0
+    },
+    "mccaffrey_christian": {
+      "adp": 9.5,
+      "pickCount": 50,
+      "highPick": 6,
+      "lowPick": 13,
+      "stdDev": 2.3,
+      "change": 0
+    },
+    "collins_nico": {
+      "adp": 7.8,
+      "pickCount": 50,
+      "highPick": 5,
+      "lowPick": 10,
+      "stdDev": 1,
+      "change": 0
+    },
+    "brown_amonra": {
+      "adp": 9.9,
+      "pickCount": 50,
+      "highPick": 7,
+      "lowPick": 14,
+      "stdDev": 1.8,
+      "change": 0
+    },
+    "thomas_brian": {
+      "adp": 12.4,
+      "pickCount": 50,
+      "highPick": 9,
+      "lowPick": 16,
+      "stdDev": 2.1,
+      "change": 0
+    },
+    "henry_derrick": {
+      "adp": 11.5,
+      "pickCount": 50,
+      "highPick": 9,
+      "lowPick": 13,
+      "stdDev": 1.5,
+      "change": 0
+    },
+    "nacua_puka": {
+      "adp": 12.5,
+      "pickCount": 50,
+      "highPick": 9,
+      "lowPick": 16,
+      "stdDev": 1.7,
+      "change": 0
+    },
+    "taylor_jonathan": {
+      "adp": 16.3,
+      "pickCount": 50,
+      "highPick": 11,
+      "lowPick": 19,
+      "stdDev": 2.2,
+      "change": 0
+    },
+    "london_drake": {
+      "adp": 14.9,
+      "pickCount": 50,
+      "highPick": 10,
+      "lowPick": 18,
+      "stdDev": 2,
+      "change": 0
+    },
+    "jeanty_ashton": {
+      "adp": 13.7,
+      "pickCount": 50,
+      "highPick": 10,
+      "lowPick": 18,
+      "stdDev": 2.1,
+      "change": 0
+    },
+    "achane_devon": {
+      "adp": 16.9,
+      "pickCount": 50,
+      "highPick": 14,
+      "lowPick": 20,
+      "stdDev": 1.5,
+      "change": 0
+    },
+    "brown_aj": {
+      "adp": 18.9,
+      "pickCount": 50,
+      "highPick": 14,
+      "lowPick": 24,
+      "stdDev": 2.8,
+      "change": 0
+    },
+    "bowers_brock": {
+      "adp": 18.3,
+      "pickCount": 50,
+      "highPick": 15,
+      "lowPick": 21,
+      "stdDev": 1.4,
+      "change": 0
+    },
+    "jacobs_josh": {
+      "adp": 19.6,
+      "pickCount": 50,
+      "highPick": 17,
+      "lowPick": 24,
+      "stdDev": 1.9,
+      "change": 0
+    },
+    "brown_chase": {
+      "adp": 21.3,
+      "pickCount": 50,
+      "highPick": 19,
+      "lowPick": 24,
+      "stdDev": 1.3,
+      "change": 0
+    },
+    "irving_bucky": {
+      "adp": 21.6,
+      "pickCount": 50,
+      "highPick": 18,
+      "lowPick": 26,
+      "stdDev": 2.1,
+      "change": 0
+    },
+    "mcconkey_ladd": {
+      "adp": 24,
+      "pickCount": 50,
+      "highPick": 20,
+      "lowPick": 27,
+      "stdDev": 1.7,
+      "change": 0
+    },
+    "mcbride_trey": {
+      "adp": 23.3,
+      "pickCount": 50,
+      "highPick": 20,
+      "lowPick": 26,
+      "stdDev": 1.5,
+      "change": 0
+    },
+    "allen_josh": {
+      "adp": 24.7,
+      "pickCount": 50,
+      "highPick": 20,
+      "lowPick": 29,
+      "stdDev": 2.2,
+      "change": 0
+    },
+    "jackson_lamar": {
+      "adp": 26.5,
+      "pickCount": 50,
+      "highPick": 21,
+      "lowPick": 31,
+      "stdDev": 2.6,
+      "change": 0
+    },
+    "williams_kyren": {
+      "adp": 27.3,
+      "pickCount": 50,
+      "highPick": 25,
+      "lowPick": 30,
+      "stdDev": 1.3,
+      "change": 0
+    },
+    "kittle_george": {
+      "adp": 30.2,
+      "pickCount": 50,
+      "highPick": 27,
+      "lowPick": 36,
+      "stdDev": 2.5,
+      "change": 0
+    },
+    "higgins_tee": {
+      "adp": 29.1,
+      "pickCount": 50,
+      "highPick": 26,
+      "lowPick": 31,
+      "stdDev": 1.4,
+      "change": 0
+    },
+    "smithnjigba_jaxon": {
+      "adp": 27.8,
+      "pickCount": 50,
+      "highPick": 24,
+      "lowPick": 32,
+      "stdDev": 2.2,
+      "change": 0
+    },
+    "evans_mike": {
+      "adp": 30.6,
+      "pickCount": 50,
+      "highPick": 25,
+      "lowPick": 35,
+      "stdDev": 2.5,
+      "change": 0
+    },
+    "daniels_jayden": {
+      "adp": 31.6,
+      "pickCount": 50,
+      "highPick": 29,
+      "lowPick": 35,
+      "stdDev": 1.6,
+      "change": 0
+    },
+    "cook_james": {
+      "adp": 33,
+      "pickCount": 50,
+      "highPick": 31,
+      "lowPick": 36,
+      "stdDev": 1.2,
+      "change": 0
+    },
+    "adams_davante": {
+      "adp": 35.9,
+      "pickCount": 50,
+      "highPick": 32,
+      "lowPick": 39,
+      "stdDev": 1.7,
+      "change": 0
+    },
+    "hampton_omarion": {
+      "adp": 37.4,
+      "pickCount": 50,
+      "highPick": 34,
+      "lowPick": 42,
+      "stdDev": 2.5,
+      "change": 0
+    },
+    "hurts_jalen": {
+      "adp": 35.3,
+      "pickCount": 50,
+      "highPick": 32,
+      "lowPick": 38,
+      "stdDev": 2,
+      "change": 0
+    },
+    "hill_tyreek": {
+      "adp": 34.4,
+      "pickCount": 50,
+      "highPick": 31,
+      "lowPick": 37,
+      "stdDev": 1.6,
+      "change": 0
+    },
+    "mclaurin_terry": {
+      "adp": 39.1,
+      "pickCount": 50,
+      "highPick": 35,
+      "lowPick": 43,
+      "stdDev": 2.2,
+      "change": 0
+    },
+    "harrison_marvin": {
+      "adp": 39.8,
+      "pickCount": 50,
+      "highPick": 34,
+      "lowPick": 46,
+      "stdDev": 2.9,
+      "change": 0
+    },
+    "walker_kenneth": {
+      "adp": 40.7,
+      "pickCount": 50,
+      "highPick": 38,
+      "lowPick": 44,
+      "stdDev": 1.5,
+      "change": 0
+    },
+    "wilson_garrett": {
+      "adp": 38.2,
+      "pickCount": 50,
+      "highPick": 30,
+      "lowPick": 43,
+      "stdDev": 3.2,
+      "change": 0
+    },
+    "kamara_alvin": {
+      "adp": 42.5,
+      "pickCount": 50,
+      "highPick": 38,
+      "lowPick": 50,
+      "stdDev": 3.4,
+      "change": 0
+    },
+    "sutton_courtland": {
+      "adp": 42.9,
+      "pickCount": 50,
+      "highPick": 39,
+      "lowPick": 47,
+      "stdDev": 2,
+      "change": 0
+    },
+    "metcalf_dk": {
+      "adp": 46,
+      "pickCount": 50,
+      "highPick": 42,
+      "lowPick": 49,
+      "stdDev": 2.3,
+      "change": 0
+    },
+    "henderson_treveyon": {
+      "adp": 44,
+      "pickCount": 50,
+      "highPick": 40,
+      "lowPick": 47,
+      "stdDev": 1.9,
+      "change": 0
+    },
+    "hall_breece": {
+      "adp": 44.8,
+      "pickCount": 50,
+      "highPick": 40,
+      "lowPick": 49,
+      "stdDev": 3,
+      "change": 0
+    },
+    "mcmillan_tetairoa": {
+      "adp": 47.2,
+      "pickCount": 50,
+      "highPick": 42,
+      "lowPick": 51,
+      "stdDev": 2,
+      "change": 0
+    },
+    "hubbard_chuba": {
+      "adp": 48.8,
+      "pickCount": 50,
+      "highPick": 43,
+      "lowPick": 55,
+      "stdDev": 3.1,
+      "change": 0
+    },
+    "burrow_joe": {
+      "adp": 48,
+      "pickCount": 50,
+      "highPick": 43,
+      "lowPick": 52,
+      "stdDev": 2.4,
+      "change": 0
+    },
+    "moore_dj": {
+      "adp": 50.8,
+      "pickCount": 50,
+      "highPick": 47,
+      "lowPick": 55,
+      "stdDev": 2.2,
+      "change": 0
+    },
+    "conner_james": {
+      "adp": 50.6,
+      "pickCount": 50,
+      "highPick": 46,
+      "lowPick": 55,
+      "stdDev": 2.4,
+      "change": 0
+    },
+    "smith_devonta": {
+      "adp": 52.1,
+      "pickCount": 50,
+      "highPick": 45,
+      "lowPick": 56,
+      "stdDev": 2.5,
+      "change": 0
+    },
+    "worthy_xavier": {
+      "adp": 52.7,
+      "pickCount": 50,
+      "highPick": 48,
+      "lowPick": 61,
+      "stdDev": 3.4,
+      "change": 0
+    },
+    "ridley_calvin": {
+      "adp": 54.9,
+      "pickCount": 50,
+      "highPick": 50,
+      "lowPick": 60,
+      "stdDev": 3,
+      "change": 0
+    },
+    "williams_jameson": {
+      "adp": 54.6,
+      "pickCount": 50,
+      "highPick": 51,
+      "lowPick": 59,
+      "stdDev": 1.9,
+      "change": 0
+    },
+    "waddle_jaylen": {
+      "adp": 59.2,
+      "pickCount": 50,
+      "highPick": 54,
+      "lowPick": 63,
+      "stdDev": 2.1,
+      "change": 0
+    },
+    "montgomery_david": {
+      "adp": 59.4,
+      "pickCount": 50,
+      "highPick": 54,
+      "lowPick": 65,
+      "stdDev": 2.6,
+      "change": 0
+    },
+    "swift_dandre": {
+      "adp": 57.9,
+      "pickCount": 50,
+      "highPick": 55,
+      "lowPick": 62,
+      "stdDev": 1.6,
+      "change": 0
+    },
+    "pickens_george": {
+      "adp": 55.7,
+      "pickCount": 50,
+      "highPick": 52,
+      "lowPick": 62,
+      "stdDev": 2.6,
+      "change": 0
+    },
+    "pollard_tony": {
+      "adp": 57.7,
+      "pickCount": 50,
+      "highPick": 52,
+      "lowPick": 63,
+      "stdDev": 3,
+      "change": 0
+    },
+    "flowers_zay": {
+      "adp": 61.2,
+      "pickCount": 50,
+      "highPick": 55,
+      "lowPick": 67,
+      "stdDev": 3.5,
+      "change": 0
+    },
+    "pacheco_isiah": {
+      "adp": 62.4,
+      "pickCount": 50,
+      "highPick": 57,
+      "lowPick": 69,
+      "stdDev": 3.3,
+      "change": 0
+    },
+    "laporta_sam": {
+      "adp": 63.4,
+      "pickCount": 50,
+      "highPick": 60,
+      "lowPick": 69,
+      "stdDev": 2.4,
+      "change": 0
+    },
+    "harvey_rj": {
+      "adp": 63.1,
+      "pickCount": 50,
+      "highPick": 56,
+      "lowPick": 68,
+      "stdDev": 2.9,
+      "change": 0
+    },
+    "jones_aaron": {
+      "adp": 66.5,
+      "pickCount": 50,
+      "highPick": 62,
+      "lowPick": 70,
+      "stdDev": 2.3,
+      "change": 0
+    },
+    "mahomes_patrick": {
+      "adp": 65.1,
+      "pickCount": 50,
+      "highPick": 61,
+      "lowPick": 68,
+      "stdDev": 1.7,
+      "change": 0
+    },
+    "egbuka_emeka": {
+      "adp": 68,
+      "pickCount": 50,
+      "highPick": 64,
+      "lowPick": 73,
+      "stdDev": 2.4,
+      "change": 0
+    },
+    "hockenson_tj": {
+      "adp": 67.1,
+      "pickCount": 50,
+      "highPick": 61,
+      "lowPick": 72,
+      "stdDev": 3.2,
+      "change": 0
+    },
+    "odunze_rome": {
+      "adp": 68,
+      "pickCount": 50,
+      "highPick": 63,
+      "lowPick": 74,
+      "stdDev": 3.5,
+      "change": 0
+    },
+    "hunter_travis": {
+      "adp": 70,
+      "pickCount": 50,
+      "highPick": 65,
+      "lowPick": 75,
+      "stdDev": 2.5,
+      "change": 0
+    },
+    "tracy_tyrone": {
+      "adp": 71,
+      "pickCount": 50,
+      "highPick": 67,
+      "lowPick": 76,
+      "stdDev": 2.5,
+      "change": 0
+    },
+    "mayfield_baker": {
+      "adp": 72,
+      "pickCount": 50,
+      "highPick": 66,
+      "lowPick": 77,
+      "stdDev": 2.6,
+      "change": 0
+    },
+    "olave_chris": {
+      "adp": 73.3,
+      "pickCount": 50,
+      "highPick": 68,
+      "lowPick": 78,
+      "stdDev": 2.6,
+      "change": 0
+    },
+    "nix_bo": {
+      "adp": 74.4,
+      "pickCount": 50,
+      "highPick": 69,
+      "lowPick": 79,
+      "stdDev": 2.7,
+      "change": 0
+    },
+    "kelce_travis": {
+      "adp": 78.3,
+      "pickCount": 50,
+      "highPick": 73,
+      "lowPick": 85,
+      "stdDev": 3.6,
+      "change": 0
+    },
+    "warren_jaylen": {
+      "adp": 76.1,
+      "pickCount": 50,
+      "highPick": 71,
+      "lowPick": 81,
+      "stdDev": 2.5,
+      "change": 0
+    },
+    "andrews_mark": {
+      "adp": 79.8,
+      "pickCount": 50,
+      "highPick": 76,
+      "lowPick": 85,
+      "stdDev": 2.4,
+      "change": 0
+    },
+    "pearsall_ricky": {
+      "adp": 75.3,
+      "pickCount": 50,
+      "highPick": 70,
+      "lowPick": 79,
+      "stdDev": 2.4,
+      "change": 0
+    },
+    "murray_kyler": {
+      "adp": 79,
+      "pickCount": 50,
+      "highPick": 73,
+      "lowPick": 85,
+      "stdDev": 2.8,
+      "change": 0
+    },
+    "diggs_stefon": {
+      "adp": 81.6,
+      "pickCount": 50,
+      "highPick": 78,
+      "lowPick": 86,
+      "stdDev": 2.4,
+      "change": 0
+    },
+    "jeudy_jerry": {
+      "adp": 76.8,
+      "pickCount": 50,
+      "highPick": 71,
+      "lowPick": 82,
+      "stdDev": 3.3,
+      "change": 0
+    },
+    "johnson_kaleb": {
+      "adp": 80.6,
+      "pickCount": 50,
+      "highPick": 75,
+      "lowPick": 84,
+      "stdDev": 2.6,
+      "change": 0
+    },
+    "prescott_dak": {
+      "adp": 84.7,
+      "pickCount": 50,
+      "highPick": 80,
+      "lowPick": 90,
+      "stdDev": 2.6,
+      "change": 0
+    },
+    "mason_jordan": {
+      "adp": 83.1,
+      "pickCount": 50,
+      "highPick": 78,
+      "lowPick": 88,
+      "stdDev": 2.7,
+      "change": 0
+    },
+    "rice_rashee": {
+      "adp": 84.3,
+      "pickCount": 50,
+      "highPick": 79,
+      "lowPick": 89,
+      "stdDev": 2.7,
+      "change": 0
+    },
+    "etienne_travis": {
+      "adp": 86.1,
+      "pickCount": 50,
+      "highPick": 82,
+      "lowPick": 92,
+      "stdDev": 2.2,
+      "change": 0
+    },
+    "meyers_jakobi": {
+      "adp": 88.3,
+      "pickCount": 50,
+      "highPick": 85,
+      "lowPick": 92,
+      "stdDev": 2,
+      "change": 0
+    },
+    "njoku_david": {
+      "adp": 87.3,
+      "pickCount": 50,
+      "highPick": 83,
+      "lowPick": 92,
+      "stdDev": 2.9,
+      "change": 0
+    },
+    "charbonnet_zach": {
+      "adp": 91,
+      "pickCount": 50,
+      "highPick": 85,
+      "lowPick": 98,
+      "stdDev": 3.5,
+      "change": 0
+    },
+    "samuel_deebo": {
+      "adp": 88.6,
+      "pickCount": 50,
+      "highPick": 84,
+      "lowPick": 92,
+      "stdDev": 2.3,
+      "change": 0
+    },
+    "dobbins_jk": {
+      "adp": 92.4,
+      "pickCount": 50,
+      "highPick": 87,
+      "lowPick": 97,
+      "stdDev": 3,
+      "change": 0
+    },
+    "golden_matthew": {
+      "adp": 91,
+      "pickCount": 50,
+      "highPick": 84,
+      "lowPick": 97,
+      "stdDev": 3.2,
+      "change": 0
+    },
+    "purdy_brock": {
+      "adp": 94.6,
+      "pickCount": 50,
+      "highPick": 89,
+      "lowPick": 99,
+      "stdDev": 2.8,
+      "change": 0
+    },
+    "jennings_jauan": {
+      "adp": 95.3,
+      "pickCount": 50,
+      "highPick": 90,
+      "lowPick": 101,
+      "stdDev": 3.2,
+      "change": 0
+    },
+    "williams_javonte": {
+      "adp": 97.1,
+      "pickCount": 50,
+      "highPick": 92,
+      "lowPick": 101,
+      "stdDev": 2.1,
+      "change": 0
+    },
+    "engram_evan": {
+      "adp": 93.4,
+      "pickCount": 50,
+      "highPick": 86,
+      "lowPick": 100,
+      "stdDev": 4.2,
+      "change": 0
+    },
+    "maye_drake": {
+      "adp": 100.7,
+      "pickCount": 50,
+      "highPick": 95,
+      "lowPick": 105,
+      "stdDev": 2.8,
+      "change": 0
+    },
+    "warren_tyler": {
+      "adp": 95.9,
+      "pickCount": 50,
+      "highPick": 89,
+      "lowPick": 103,
+      "stdDev": 4.2,
+      "change": 0
+    },
+    "fields_justin": {
+      "adp": 99.1,
+      "pickCount": 50,
+      "highPick": 93,
+      "lowPick": 105,
+      "stdDev": 3.7,
+      "change": 0
+    },
+    "kraft_tucker": {
+      "adp": 96.7,
+      "pickCount": 50,
+      "highPick": 89,
+      "lowPick": 103,
+      "stdDev": 4.4,
+      "change": 0
+    },
+    "herbert_justin": {
+      "adp": 103.9,
+      "pickCount": 50,
+      "highPick": 99,
+      "lowPick": 110,
+      "stdDev": 3,
+      "change": 0
+    },
+    "williams_caleb": {
+      "adp": 102.4,
+      "pickCount": 50,
+      "highPick": 96,
+      "lowPick": 110,
+      "stdDev": 3.6,
+      "change": 0
+    },
+    "shakir_khalil": {
+      "adp": 102.5,
+      "pickCount": 50,
+      "highPick": 96,
+      "lowPick": 109,
+      "stdDev": 3.6,
+      "change": 0
+    },
+    "downs_josh": {
+      "adp": 105.8,
+      "pickCount": 50,
+      "highPick": 99,
+      "lowPick": 112,
+      "stdDev": 4.1,
+      "change": 0
+    },
+    "addison_jordan": {
+      "adp": 100.4,
+      "pickCount": 50,
+      "highPick": 92,
+      "lowPick": 107,
+      "stdDev": 4.3,
+      "change": 0
+    },
+    "ekeler_austin": {
+      "adp": 106.4,
+      "pickCount": 50,
+      "highPick": 100,
+      "lowPick": 114,
+      "stdDev": 4.2,
+      "change": 0
+    },
+    "pittman_michael": {
+      "adp": 106.5,
+      "pickCount": 50,
+      "highPick": 102,
+      "lowPick": 113,
+      "stdDev": 2.9,
+      "change": 0
+    },
+    "goff_jared": {
+      "adp": 108.7,
+      "pickCount": 50,
+      "highPick": 102,
+      "lowPick": 113,
+      "stdDev": 3.2,
+      "change": 0
+    },
+    "stevenson_rhamondre": {
+      "adp": 108.8,
+      "pickCount": 50,
+      "highPick": 103,
+      "lowPick": 114,
+      "stdDev": 3.3,
+      "change": 0
+    },
+    "lawrence_trevor": {
+      "adp": 111.8,
+      "pickCount": 50,
+      "highPick": 106,
+      "lowPick": 120,
+      "stdDev": 4.2,
+      "change": 0
+    },
+    "bigsby_tank": {
+      "adp": 110.3,
+      "pickCount": 50,
+      "highPick": 105,
+      "lowPick": 116,
+      "stdDev": 3.1,
+      "change": 0
+    },
+    "reed_jayden": {
+      "adp": 114.9,
+      "pickCount": 50,
+      "highPick": 109,
+      "lowPick": 120,
+      "stdDev": 2.9,
+      "change": 0
+    },
+    "love_jordan": {
+      "adp": 110.2,
+      "pickCount": 50,
+      "highPick": 102,
+      "lowPick": 117,
+      "stdDev": 3.8,
+      "change": 0
+    },
+    "kupp_cooper": {
+      "adp": 112.2,
+      "pickCount": 50,
+      "highPick": 106,
+      "lowPick": 120,
+      "stdDev": 4.1,
+      "change": 0
+    },
+    "skattebo_cam": {
+      "adp": 117.8,
+      "pickCount": 50,
+      "highPick": 112,
+      "lowPick": 124,
+      "stdDev": 3.4,
+      "change": 0
+    },
+    "mooney_darnell": {
+      "adp": 119.7,
+      "pickCount": 50,
+      "highPick": 113,
+      "lowPick": 127,
+      "stdDev": 3.9,
+      "change": 0
+    },
+    "mccarthy_jj": {
+      "adp": 120.9,
+      "pickCount": 50,
+      "highPick": 116,
+      "lowPick": 127,
+      "stdDev": 3.3,
+      "change": 0
+    },
+    "allen_braelon": {
+      "adp": 115.8,
+      "pickCount": 50,
+      "highPick": 108,
+      "lowPick": 122,
+      "stdDev": 4.2,
+      "change": 0
+    },
+    "coleman_keon": {
+      "adp": 115.7,
+      "pickCount": 50,
+      "highPick": 109,
+      "lowPick": 122,
+      "stdDev": 3.7,
+      "change": 0
+    },
+    "ferguson_jake": {
+      "adp": 116.8,
+      "pickCount": 50,
+      "highPick": 109,
+      "lowPick": 124,
+      "stdDev": 3.4,
+      "change": 0
+    },
+    "stroud_cj": {
+      "adp": 119,
+      "pickCount": 50,
+      "highPick": 113,
+      "lowPick": 126,
+      "stdDev": 3.9,
+      "change": 0
+    },
+    "loveland_colston": {
+      "adp": 123.1,
+      "pickCount": 50,
+      "highPick": 117,
+      "lowPick": 129,
+      "stdDev": 2.9,
+      "change": 0
+    },
+    "kincaid_dalton": {
+      "adp": 122.7,
+      "pickCount": 50,
+      "highPick": 117,
+      "lowPick": 129,
+      "stdDev": 3.7,
+      "change": 0
+    },
+    "goedert_dallas": {
+      "adp": 127.8,
+      "pickCount": 50,
+      "highPick": 122,
+      "lowPick": 134,
+      "stdDev": 3.5,
+      "change": 0
+    },
+    "godwin_chris": {
+      "adp": 123.3,
+      "pickCount": 50,
+      "highPick": 116,
+      "lowPick": 130,
+      "stdDev": 3.4,
+      "change": 0
+    },
+    "benson_trey": {
+      "adp": 129.4,
+      "pickCount": 50,
+      "highPick": 123,
+      "lowPick": 137,
+      "stdDev": 4.6,
+      "change": 0
+    },
+    "croskeymerritt_jacory": {
+      "adp": 124.8,
+      "pickCount": 50,
+      "highPick": 118,
+      "lowPick": 131,
+      "stdDev": 3.7,
+      "change": 0
+    },
+    "white_rachaad": {
+      "adp": 131.9,
+      "pickCount": 50,
+      "highPick": 126,
+      "lowPick": 136,
+      "stdDev": 3.2,
+      "change": 0
+    },
+    "shaheed_rashid": {
+      "adp": 127,
+      "pickCount": 50,
+      "highPick": 119,
+      "lowPick": 132,
+      "stdDev": 4.3,
+      "change": 0
+    },
+    "chubb_nick": {
+      "adp": 127.6,
+      "pickCount": 50,
+      "highPick": 121,
+      "lowPick": 135,
+      "stdDev": 4.1,
+      "change": 0
+    },
+    "harris_najee": {
+      "adp": 128.6,
+      "pickCount": 50,
+      "highPick": 123,
+      "lowPick": 134,
+      "stdDev": 3,
+      "change": 0
+    },
+    "mims_marvin": {
+      "adp": 135.9,
+      "pickCount": 50,
+      "highPick": 132,
+      "lowPick": 141,
+      "stdDev": 2.7,
+      "change": 0
+    },
+    "ford_jerome": {
+      "adp": 139.2,
+      "pickCount": 50,
+      "highPick": 133,
+      "lowPick": 146,
+      "stdDev": 3.6,
+      "change": 0
+    },
+    "kirk_christian": {
+      "adp": 133.7,
+      "pickCount": 50,
+      "highPick": 128,
+      "lowPick": 138,
+      "stdDev": 3.2,
+      "change": 0
+    },
+    "robinson_brian": {
+      "adp": 131.1,
+      "pickCount": 50,
+      "highPick": 125,
+      "lowPick": 138,
+      "stdDev": 3.6,
+      "change": 0
+    },
+    "davis_ray": {
+      "adp": 132.7,
+      "pickCount": 50,
+      "highPick": 124,
+      "lowPick": 139,
+      "stdDev": 4.1,
+      "change": 0
+    },
+    "pitts_kyle": {
+      "adp": 134.3,
+      "pickCount": 50,
+      "highPick": 129,
+      "lowPick": 140,
+      "stdDev": 2.5,
+      "change": 0
+    },
+    "tuten_bhayshul": {
+      "adp": 138.7,
+      "pickCount": 50,
+      "highPick": 133,
+      "lowPick": 143,
+      "stdDev": 2.5,
+      "change": 0
+    },
+    "allgeier_tyler": {
+      "adp": 141.3,
+      "pickCount": 50,
+      "highPick": 133,
+      "lowPick": 151,
+      "stdDev": 4.7,
+      "change": 0
+    },
+    "judkins_quinshon": {
+      "adp": 142,
+      "pickCount": 50,
+      "highPick": 136,
+      "lowPick": 148,
+      "stdDev": 3.5,
+      "change": 0
+    },
+    "tagovailoa_tua": {
+      "adp": 140.6,
+      "pickCount": 50,
+      "highPick": 133,
+      "lowPick": 146,
+      "stdDev": 3.6,
+      "change": 0
+    },
+    "bateman_rashod": {
+      "adp": 137.5,
+      "pickCount": 50,
+      "highPick": 128,
+      "lowPick": 144,
+      "stdDev": 3.5,
+      "change": 0
+    },
+    "young_bryce": {
+      "adp": 143,
+      "pickCount": 50,
+      "highPick": 137,
+      "lowPick": 151,
+      "stdDev": 3.2,
+      "change": 0
+    },
+    "henry_hunter": {
+      "adp": 143.9,
+      "pickCount": 50,
+      "highPick": 138,
+      "lowPick": 149,
+      "stdDev": 3.2,
+      "change": 0
+    },
+    "ertz_zach": {
+      "adp": 151.9,
+      "pickCount": 50,
+      "highPick": 145,
+      "lowPick": 159,
+      "stdDev": 3.7,
+      "change": 0
+    },
+    "allen_keenan": {
+      "adp": 145.1,
+      "pickCount": 50,
+      "highPick": 140,
+      "lowPick": 150,
+      "stdDev": 3.1,
+      "change": 0
+    },
+    "tillman_cedric": {
+      "adp": 147.4,
+      "pickCount": 50,
+      "highPick": 139,
+      "lowPick": 155,
+      "stdDev": 4,
+      "change": 0
+    },
+    "higgins_jayden": {
+      "adp": 149.3,
+      "pickCount": 50,
+      "highPick": 140,
+      "lowPick": 156,
+      "stdDev": 4.6,
+      "change": 0
+    },
+    "aiyuk_brandon": {
+      "adp": 146.4,
+      "pickCount": 50,
+      "highPick": 138,
+      "lowPick": 152,
+      "stdDev": 4.1,
+      "change": 0
+    },
+    "sampson_dylan": {
+      "adp": 147.3,
+      "pickCount": 50,
+      "highPick": 140,
+      "lowPick": 159,
+      "stdDev": 5.6,
+      "change": 0
+    },
+    "doubs_romeo": {
+      "adp": 154.2,
+      "pickCount": 50,
+      "highPick": 147,
+      "lowPick": 159,
+      "stdDev": 4.4,
+      "change": 0
+    },
+    "burden_luther": {
+      "adp": 154.3,
+      "pickCount": 50,
+      "highPick": 147,
+      "lowPick": 158,
+      "stdDev": 3,
+      "change": 0
+    },
+    "spears_tyjae": {
+      "adp": 154.4,
+      "pickCount": 50,
+      "highPick": 149,
+      "lowPick": 161,
+      "stdDev": 4.2,
+      "change": 0
+    },
+    "penix_michael": {
+      "adp": 149.8,
+      "pickCount": 50,
+      "highPick": 142,
+      "lowPick": 158,
+      "stdDev": 4.2,
+      "change": 0
+    },
+    "gordon_ollie": {
+      "adp": 157.6,
+      "pickCount": 50,
+      "highPick": 150,
+      "lowPick": 164,
+      "stdDev": 4.6,
+      "change": 0
+    },
+    "blue_jaydon": {
+      "adp": 151.6,
+      "pickCount": 50,
+      "highPick": 146,
+      "lowPick": 160,
+      "stdDev": 3.2,
+      "change": 0
+    },
+    "smith_geno": {
+      "adp": 155,
+      "pickCount": 50,
+      "highPick": 148,
+      "lowPick": 164,
+      "stdDev": 3.9,
+      "change": 0
+    },
+    "dowdle_rico": {
+      "adp": 159.4,
+      "pickCount": 50,
+      "highPick": 152,
+      "lowPick": 166,
+      "stdDev": 4.5,
+      "change": 0
+    },
+    "smith_jonnu": {
+      "adp": 158,
+      "pickCount": 50,
+      "highPick": 151,
+      "lowPick": 166,
+      "stdDev": 3.7,
+      "change": 0
+    },
+    "mixon_joe": {
+      "adp": 161,
+      "pickCount": 50,
+      "highPick": 151,
+      "lowPick": 167,
+      "stdDev": 4.3,
+      "change": 0
+    },
+    "brown_marquise": {
+      "adp": 160.2,
+      "pickCount": 50,
+      "highPick": 153,
+      "lowPick": 168,
+      "stdDev": 4.1,
+      "change": 0
+    },
+    "palmer_joshua": {
+      "adp": 163.5,
+      "pickCount": 50,
+      "highPick": 155,
+      "lowPick": 174,
+      "stdDev": 5.5,
+      "change": 0
+    },
+    "stafford_matthew": {
+      "adp": 161.9,
+      "pickCount": 50,
+      "highPick": 156,
+      "lowPick": 169,
+      "stdDev": 3.7,
+      "change": 0
+    },
+    "ward_cam": {
+      "adp": 168.5,
+      "pickCount": 50,
+      "highPick": 159,
+      "lowPick": 176,
+      "stdDev": 4.4,
+      "change": 0
+    },
+    "douglas_demario": {
+      "adp": 161.8,
+      "pickCount": 50,
+      "highPick": 154,
+      "lowPick": 168,
+      "stdDev": 3.6,
+      "change": 0
+    },
+    "corum_blake": {
+      "adp": 173.1,
+      "pickCount": 50,
+      "highPick": 166,
+      "lowPick": 181,
+      "stdDev": 4.1,
+      "change": 0
+    },
+    "robinson_wandale": {
+      "adp": 166.8,
+      "pickCount": 50,
+      "highPick": 160,
+      "lowPick": 173,
+      "stdDev": 3.7,
+      "change": 0
+    },
+    "legette_xavier": {
+      "adp": 165.9,
+      "pickCount": 50,
+      "highPick": 157,
+      "lowPick": 175,
+      "stdDev": 4.7,
+      "change": 0
+    },
+    "williams_kyle": {
+      "adp": 170.5,
+      "pickCount": 50,
+      "highPick": 163,
+      "lowPick": 183,
+      "stdDev": 5.6,
+      "change": 0
+    },
+    "strange_brenton": {
+      "adp": 167.3,
+      "pickCount": 50,
+      "highPick": 159,
+      "lowPick": 174,
+      "stdDev": 4.3,
+      "change": 0
+    },
+    "thielen_adam": {
+      "adp": 170.2,
+      "pickCount": 50,
+      "highPick": 163,
+      "lowPick": 175,
+      "stdDev": 4.3,
+      "change": 0
+    },
+    "okonkwo_chig": {
+      "adp": 170.7,
+      "pickCount": 50,
+      "highPick": 162,
+      "lowPick": 180,
+      "stdDev": 5.4,
+      "change": 0
+    },
+    "johnston_quentin": {
+      "adp": 171.1,
+      "pickCount": 50,
+      "highPick": 163,
+      "lowPick": 180,
+      "stdDev": 4.6,
+      "change": 0
+    },
+    "harris_tre": {
+      "adp": 174.8,
+      "pickCount": 50,
+      "highPick": 167,
+      "lowPick": 182,
+      "stdDev": 3.7,
+      "change": 0
+    },
+    "likely_isaiah": {
+      "adp": 176.4,
+      "pickCount": 50,
+      "highPick": 169,
+      "lowPick": 184,
+      "stdDev": 4.2,
+      "change": 0
+    },
+    "otton_cade": {
+      "adp": 181.1,
+      "pickCount": 50,
+      "highPick": 174,
+      "lowPick": 188,
+      "stdDev": 3.8,
+      "change": 0
+    },
+    "darnold_sam": {
+      "adp": 173.5,
+      "pickCount": 50,
+      "highPick": 166,
+      "lowPick": 182,
+      "stdDev": 4.7,
+      "change": 0
+    },
+    "johnson_roschon": {
+      "adp": 178.1,
+      "pickCount": 50,
+      "highPick": 170,
+      "lowPick": 189,
+      "stdDev": 5.4,
+      "change": 0
+    },
+    "marks_woody": {
+      "adp": 178.3,
+      "pickCount": 50,
+      "highPick": 167,
+      "lowPick": 186,
+      "stdDev": 6,
+      "change": 0
+    },
+    "taylor_mason": {
+      "adp": 181,
+      "pickCount": 50,
+      "highPick": 175,
+      "lowPick": 188,
+      "stdDev": 3.6,
+      "change": 0
+    },
+    "monangai_kyle": {
+      "adp": 180.4,
+      "pickCount": 50,
+      "highPick": 169,
+      "lowPick": 187,
+      "stdDev": 5.2,
+      "change": 0
+    },
+    "shipley_will": {
+      "adp": 177.2,
+      "pickCount": 50,
+      "highPick": 169,
+      "lowPick": 187,
+      "stdDev": 5.3,
+      "change": 0
+    },
+    "coker_jalen": {
+      "adp": 183,
+      "pickCount": 50,
+      "highPick": 175,
+      "lowPick": 191,
+      "stdDev": 4.4,
+      "change": 0
+    },
+    "pierce_alec": {
+      "adp": 189.2,
+      "pickCount": 50,
+      "highPick": 180,
+      "lowPick": 198,
+      "stdDev": 4.6,
+      "change": 0
+    },
+    "hopkins_deandre": {
+      "adp": 184.5,
+      "pickCount": 50,
+      "highPick": 177,
+      "lowPick": 193,
+      "stdDev": 4.9,
+      "change": 0
+    },
+    "ayomanor_elic": {
+      "adp": 184.6,
+      "pickCount": 50,
+      "highPick": 179,
+      "lowPick": 193,
+      "stdDev": 3.7,
+      "change": 0
+    },
+    "hill_justice": {
+      "adp": 189.7,
+      "pickCount": 50,
+      "highPick": 183,
+      "lowPick": 199,
+      "stdDev": 4.8,
+      "change": 0
+    },
+    "rodgers_aaron": {
+      "adp": 186.9,
+      "pickCount": 50,
+      "highPick": 178,
+      "lowPick": 197,
+      "stdDev": 4.9,
+      "change": 0
+    },
+    "gesicki_mike": {
+      "adp": 186.7,
+      "pickCount": 50,
+      "highPick": 182,
+      "lowPick": 193,
+      "stdDev": 3.7,
+      "change": 0
+    },
+    "freiermuth_pat": {
+      "adp": 193.4,
+      "pickCount": 50,
+      "highPick": 185,
+      "lowPick": 201,
+      "stdDev": 3.7,
+      "change": 0
+    },
+    "wilson_michael": {
+      "adp": 193.8,
+      "pickCount": 50,
+      "highPick": 185,
+      "lowPick": 203,
+      "stdDev": 4.3,
+      "change": 0
+    },
+    "slayton_darius": {
+      "adp": 188.9,
+      "pickCount": 50,
+      "highPick": 182,
+      "lowPick": 196,
+      "stdDev": 4.5,
+      "change": 0
+    },
+    "bryant_pat": {
+      "adp": 197.8,
+      "pickCount": 50,
+      "highPick": 190,
+      "lowPick": 204,
+      "stdDev": 4,
+      "change": 0
+    },
+    "rodriguez_chris": {
+      "adp": 190.7,
+      "pickCount": 50,
+      "highPick": 181,
+      "lowPick": 197,
+      "stdDev": 4.7,
+      "change": 0
+    },
+    "guerendo_isaac": {
+      "adp": 192.6,
+      "pickCount": 50,
+      "highPick": 185,
+      "lowPick": 200,
+      "stdDev": 4.7,
+      "change": 0
+    },
+    "hunt_kareem": {
+      "adp": 195.5,
+      "pickCount": 50,
+      "highPick": 188,
+      "lowPick": 205,
+      "stdDev": 5.4,
+      "change": 0
+    },
+    "jones_daniel": {
+      "adp": 205,
+      "pickCount": 50,
+      "highPick": 192,
+      "lowPick": 215,
+      "stdDev": 6.3,
+      "change": 0
+    },
+    "giddens_dj": {
+      "adp": 195.7,
+      "pickCount": 50,
+      "highPick": 187,
+      "lowPick": 202,
+      "stdDev": 4.7,
+      "change": 0
+    },
+    "mitchell_keaton": {
+      "adp": 200.8,
+      "pickCount": 50,
+      "highPick": 192,
+      "lowPick": 209,
+      "stdDev": 5.2,
+      "change": 0
+    },
+    "wright_jaylen": {
+      "adp": 198.1,
+      "pickCount": 50,
+      "highPick": 192,
+      "lowPick": 206,
+      "stdDev": 3.9,
+      "change": 0
+    },
+    "sanders_jatavion": {
+      "adp": 201.3,
+      "pickCount": 50,
+      "highPick": 191,
+      "lowPick": 213,
+      "stdDev": 7,
+      "change": 0
+    },
+    "miller_kendre": {
+      "adp": 197.6,
+      "pickCount": 50,
+      "highPick": 189,
+      "lowPick": 207,
+      "stdDev": 5.9,
+      "change": 0
+    },
+    "noel_jaylin": {
+      "adp": 206,
+      "pickCount": 50,
+      "highPick": 199,
+      "lowPick": 215,
+      "stdDev": 4.7,
+      "change": 0
+    },
+    "sanders_miles": {
+      "adp": 208.5,
+      "pickCount": 48,
+      "highPick": 200,
+      "lowPick": 216,
+      "stdDev": 4.7,
+      "change": 0
+    },
+    "mitchell_adonai": {
+      "adp": 203.5,
+      "pickCount": 50,
+      "highPick": 196,
+      "lowPick": 212,
+      "stdDev": 5.2,
+      "change": 0
+    },
+    "schultz_dalton": {
+      "adp": 201,
+      "pickCount": 50,
+      "highPick": 193,
+      "lowPick": 209,
+      "stdDev": 4.8,
+      "change": 0
+    },
+    "iosivas_andrei": {
+      "adp": 206.6,
+      "pickCount": 49,
+      "highPick": 198,
+      "lowPick": 216,
+      "stdDev": 4.7,
+      "change": 0
+    },
+    "horton_tory": {
+      "adp": 210.6,
+      "pickCount": 44,
+      "highPick": 203,
+      "lowPick": 216,
+      "stdDev": 4.2,
+      "change": 0
+    },
+    "johnson_juwan": {
+      "adp": 206.2,
+      "pickCount": 50,
+      "highPick": 199,
+      "lowPick": 216,
+      "stdDev": 5.6,
+      "change": 0
+    },
+    "teslaa_isaac": {
+      "adp": 209.8,
+      "pickCount": 44,
+      "highPick": 202,
+      "lowPick": 216,
+      "stdDev": 4.3,
+      "change": 0
+    },
+    "thornton_donte": {
+      "adp": 210.3,
+      "pickCount": 39,
+      "highPick": 203,
+      "lowPick": 216,
+      "stdDev": 3.7,
+      "change": 0
+    },
+    "brooks_tahj": {
+      "adp": 207.6,
+      "pickCount": 50,
+      "highPick": 201,
+      "lowPick": 215,
+      "stdDev": 4.7,
+      "change": 0
+    },
+    "pierce_dameon": {
+      "adp": 210.4,
+      "pickCount": 44,
+      "highPick": 203,
+      "lowPick": 216,
+      "stdDev": 4.1,
+      "change": 0
+    },
+    "bech_jack": {
+      "adp": 213.7,
+      "pickCount": 21,
+      "highPick": 206,
+      "lowPick": 216,
+      "stdDev": 2.9,
+      "change": 0
+    },
+    "arroyo_elijah": {
+      "adp": 210.6,
+      "pickCount": 31,
+      "highPick": 204,
+      "lowPick": 215,
+      "stdDev": 3.7,
+      "change": 0
+    },
+    "brown_dyami": {
+      "adp": 213.7,
+      "pickCount": 29,
+      "highPick": 206,
+      "lowPick": 216,
+      "stdDev": 3,
+      "change": 0
+    },
+    "lockett_tyler": {
+      "adp": 213.4,
+      "pickCount": 26,
+      "highPick": 206,
+      "lowPick": 216,
+      "stdDev": 2.9,
+      "change": 0
+    },
+    "tucker_sean": {
+      "adp": 217.6,
+      "pickCount": 6,
+      "highPick": 212,
+      "lowPick": 216,
+      "stdDev": 1.5,
+      "change": 0
+    },
+    "hunter_jarquez": {
+      "adp": 218,
+      "pickCount": 6,
+      "highPick": 211,
+      "lowPick": 216,
+      "stdDev": 1.6,
+      "change": 0
+    },
+    "austin_calvin": {
+      "adp": 213.1,
+      "pickCount": 19,
+      "highPick": 206,
+      "lowPick": 216,
+      "stdDev": 2.8,
+      "change": 0
+    },
+    "lloyd_marshawn": {
+      "adp": 216.1,
+      "pickCount": 10,
+      "highPick": 210,
+      "lowPick": 216,
+      "stdDev": 1.6,
+      "change": 0
+    },
+    "smith_brashard": {
+      "adp": 215.8,
+      "pickCount": 18,
+      "highPick": 211,
+      "lowPick": 216,
+      "stdDev": 1.3,
+      "change": 0
+    },
+    "wilson_roman": {
+      "adp": 219.7,
+      "pickCount": 5,
+      "highPick": 214,
+      "lowPick": 216,
+      "stdDev": 0.9,
+      "change": 0
+    },
+    "wicks_dontayvion": {
+      "adp": 217.5,
+      "pickCount": 9,
+      "highPick": 212,
+      "lowPick": 216,
+      "stdDev": 1.5,
+      "change": 0
+    },
+    "wilson_russell": {
+      "adp": 219.4,
+      "pickCount": 1,
+      "highPick": 215,
+      "lowPick": 215,
+      "stdDev": 0,
+      "change": 0
+    },
+    "fannin_harold": {
+      "adp": 221.9,
+      "pickCount": 1,
+      "highPick": 216,
+      "lowPick": 216,
+      "stdDev": 0,
+      "change": 0
+    },
+    "mostert_raheem": {
+      "adp": 226,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "johnson_theo": {
+      "adp": 227,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "washington_malik": {
+      "adp": 229,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "flacco_joe": {
+      "adp": 230,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "kmet_cole": {
+      "adp": 231,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "gainwell_kenneth": {
+      "adp": 232,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "royals_jalen": {
+      "adp": 233,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "neal_devin": {
+      "adp": 234,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "vele_devaughn": {
+      "adp": 235,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "johnson_ty": {
+      "adp": 236,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "mcmillan_jalen": {
+      "adp": 237,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "boutte_kayshon": {
+      "adp": 238,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "mclaughlin_jaleel": {
+      "adp": 239,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "etienne_trevor": {
+      "adp": 240,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "mitchell_elijah": {
+      "adp": 241,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "richardson_anthony": {
+      "adp": 242,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "gray_noah": {
+      "adp": 243,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "tolbert_jalen": {
+      "adp": 244,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "cooks_brandin": {
+      "adp": 245,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "davis_isaiah": {
+      "adp": 246,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "singletary_devin": {
+      "adp": 247,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "westbrookikhine_nick": {
+      "adp": 248,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "waller_darren": {
+      "adp": 249,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "gibson_antonio": {
+      "adp": 250,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "tucker_tre": {
+      "adp": 251,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "dart_jaxson": {
+      "adp": 252,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "moore_elijah": {
+      "adp": 253,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "nailor_jalen": {
+      "adp": 254,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "wilson_emanuel": {
+      "adp": 255,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "washington_parker": {
+      "adp": 256,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "brooks_chris": {
+      "adp": 257,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "franklin_troy": {
+      "adp": 258,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "shough_tyler": {
+      "adp": 259,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "watson_christian": {
+      "adp": 260,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "james_jordan": {
+      "adp": 261,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "mccloud_rayray": {
+      "adp": 262,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "patrick_tim": {
+      "adp": 263,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "rattler_spencer": {
+      "adp": 264,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "perine_samaje": {
+      "adp": 265,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "white_zamir": {
+      "adp": 266,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "mccaffrey_luke": {
+      "adp": 267,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "ferguson_terrance": {
+      "adp": 268,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "chandler_ty": {
+      "adp": 269,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "burton_jermaine": {
+      "adp": 270,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "higbee_tyler": {
+      "adp": 271,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "atwell_tutu": {
+      "adp": 272,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "mafah_phil": {
+      "adp": 273,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "fant_noah": {
+      "adp": 274,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "vidal_kimani": {
+      "adp": 275,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "hill_taysom": {
+      "adp": 276,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "sanders_raheim": {
+      "adp": 277,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "reynolds_josh": {
+      "adp": 278,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "johnson_tez": {
+      "adp": 279,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "estime_audric": {
+      "adp": 280,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "restrepo_xavier": {
+      "adp": 281,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "dillon_aj": {
+      "adp": 282,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "gadsden_oronde": {
+      "adp": 283,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "conklin_tyler": {
+      "adp": 284,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "martinez_damien": {
+      "adp": 285,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "whittington_jordan": {
+      "adp": 286,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "mccormick_sincere": {
+      "adp": 287,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "dissly_will": {
+      "adp": 288,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "herbert_khalil": {
+      "adp": 289,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "turpin_kavontae": {
+      "adp": 290,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "lane_jaylin": {
+      "adp": 291,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "sinnott_ben": {
+      "adp": 292,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "sanders_shedeur": {
+      "adp": 293,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "barner_aj": {
+      "adp": 294,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "brown_noah": {
+      "adp": 295,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "zaccheaus_olamide": {
+      "adp": 296,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "lambertsmith_keandre": {
+      "adp": 297,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "mayer_michael": {
+      "adp": 298,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "knox_dawson": {
+      "adp": 299,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "bond_isaiah": {
+      "adp": 300,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "davis_gabe": {
+      "adp": 301,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "johnson_diontae": {
+      "adp": 302,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "robinson_demarcus": {
+      "adp": 303,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "musgrave_luke": {
+      "adp": 304,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "mullings_kalel": {
+      "adp": 305,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "milroe_jalen": {
+      "adp": 306,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "helm_gunnar": {
+      "adp": 307,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "hooper_austin": {
+      "adp": 308,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "metchie_john": {
+      "adp": 309,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "renfrow_hunter": {
+      "adp": 310,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "samuel_curtis": {
+      "adp": 311,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "hollins_mack": {
+      "adp": 312,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "mcnichols_jeremy": {
+      "adp": 313,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "demercado_emari": {
+      "adp": 314,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "dotson_jahan": {
+      "adp": 315,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "dike_chimere": {
+      "adp": 316,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "felton_tai": {
+      "adp": 317,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "allen_lequint": {
+      "adp": 318,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "gabriel_dillon": {
+      "adp": 319,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "tremble_tommy": {
+      "adp": 320,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "stover_cade": {
+      "adp": 321,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "lazard_allen": {
+      "adp": 322,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "jones_zay": {
+      "adp": 323,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "moss_zack": {
+      "adp": 324,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "cousins_kirk": {
+      "adp": 325,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "williams_savion": {
+      "adp": 326,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "dortch_greg": {
+      "adp": 327,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "smithschuster_juju": {
+      "adp": 328,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "garoppolo_jimmy": {
+      "adp": 329,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "jefferson_van": {
+      "adp": 330,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "thrash_jamari": {
+      "adp": 331,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "valdesscantling_marquez": {
+      "adp": 332,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "chestnut_julius": {
+      "adp": 333,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "schoonmaker_luke": {
+      "adp": 334,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "winston_jameis": {
+      "adp": 335,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "moreau_foster": {
+      "adp": 336,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "oliver_josh": {
+      "adp": 337,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "reynolds_craig": {
+      "adp": 338,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "ogunbowale_dare": {
+      "adp": 339,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "juszczyk_kyle": {
+      "adp": 340,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "edwards_gus": {
+      "adp": 341,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "tucker_justin": {
+      "adp": 342,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "smith_arian": {
+      "adp": 343,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "calcaterra_grant": {
+      "adp": 344,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "ruckert_jeremy": {
+      "adp": 345,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "hyatt_jalin": {
+      "adp": 346,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "goodson_tyler": {
+      "adp": 347,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "smartt_stone": {
+      "adp": 348,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "raymond_kalif": {
+      "adp": 349,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "thornton_tyquan": {
+      "adp": 350,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "evans_mitchell": {
+      "adp": 351,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "washington_darnell": {
+      "adp": 352,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "higgins_elijah": {
+      "adp": 353,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "chism_efton": {
+      "adp": 354,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "haskins_hassan": {
+      "adp": 355,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "holani_george": {
+      "adp": 356,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "taylor_tyrod": {
+      "adp": 357,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "badie_tyler": {
+      "adp": 358,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "edwards_donovan": {
+      "adp": 359,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "shepard_sterling": {
+      "adp": 360,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "hutchinson_xavier": {
+      "adp": 361,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "cowing_jacob": {
+      "adp": 362,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "akers_cam": {
+      "adp": 363,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "sermon_trey": {
+      "adp": 364,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "watkins_jordan": {
+      "adp": 365,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "milton_joe": {
+      "adp": 366,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "dell_tank": {
+      "adp": 367,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "ingold_alec": {
+      "adp": 368,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "walker_devontez": {
+      "adp": 369,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "hill_julian": {
+      "adp": 370,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "parkinson_colby": {
+      "adp": 371,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "hodge_khadarel": {
+      "adp": 372,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "pickett_kenny": {
+      "adp": 373,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "horn_jimmy": {
+      "adp": 374,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "rudolph_mason": {
+      "adp": 375,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "ali_rasheen": {
+      "adp": 376,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "willis_malik": {
+      "adp": 377,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "bobo_jake": {
+      "adp": 378,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "wright_brock": {
+      "adp": 379,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "mingo_jonathan": {
+      "adp": 380,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "mariota_marcus": {
+      "adp": 381,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "edwardshelaire_clyde": {
+      "adp": 382,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "moore_skyy": {
+      "adp": 383,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "vaki_sione": {
+      "adp": 384,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "wease_theo": {
+      "adp": 385,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "corley_malachi": {
+      "adp": 386,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "jackson_jaquinden": {
+      "adp": 387,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "trautman_adam": {
+      "adp": 388,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "wells_antwane": {
+      "adp": 389,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "laube_dylan": {
+      "adp": 390,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "hudson_tanner": {
+      "adp": 391,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "bellinger_daniel": {
+      "adp": 392,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "brooks_jonathon": {
+      "adp": 393,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "johnson_tyler": {
+      "adp": 394,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "dulcich_greg": {
+      "adp": 395,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "washington_casey": {
+      "adp": 396,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "carter_michael": {
+      "adp": 397,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "wilson_jeff": {
+      "adp": 398,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "browning_jake": {
+      "adp": 399,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "baker_javon": {
+      "adp": 400,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "wilson_zach": {
+      "adp": 401,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "carter_nathan": {
+      "adp": 402,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "woods_robert": {
+      "adp": 403,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "bates_john": {
+      "adp": 404,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "bourne_kendrick": {
+      "adp": 405,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "moore_david": {
+      "adp": 406,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "bryant_harrison": {
+      "adp": 407,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "oconnell_aidan": {
+      "adp": 408,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "long_hunter": {
+      "adp": 409,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "mundt_johnny": {
+      "adp": 410,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "steele_carson": {
+      "adp": 411,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "luepke_hunter": {
+      "adp": 412,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "patterson_cordarrelle": {
+      "adp": 413,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "woerner_charlie": {
+      "adp": 414,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "gage_russell": {
+      "adp": 415,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "durham_payne": {
+      "adp": 416,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "wiley_jared": {
+      "adp": 417,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "lance_trey": {
+      "adp": 418,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "sample_drew": {
+      "adp": 419,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "williams_jamaal": {
+      "adp": 420,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "tinsley_mitch": {
+      "adp": 421,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "davis_derius": {
+      "adp": 422,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "johnson_dernest": {
+      "adp": 423,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "granson_kylen": {
+      "adp": 424,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "knight_zonovan": {
+      "adp": 425,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "tyree_chris": {
+      "adp": 426,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "shavers_tyrell": {
+      "adp": 427,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "kolar_charlie": {
+      "adp": 428,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "culp_devin": {
+      "adp": 429,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "strong_pierre": {
+      "adp": 430,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "ham_cj": {
+      "adp": 431,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "krull_lucas": {
+      "adp": 432,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "wentz_carson": {
+      "adp": 433,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "homer_travis": {
+      "adp": 434,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "whyle_josh": {
+      "adp": 435,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "brooks_jalen": {
+      "adp": 436,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "farrell_luke": {
+      "adp": 437,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "williams_josh": {
+      "adp": 438,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "johnson_montrell": {
+      "adp": 439,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "miller_scotty": {
+      "adp": 440,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "watson_deshaun": {
+      "adp": 441,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "scott_zavier": {
+      "adp": 442,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "rush_cooper": {
+      "adp": 443,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "abanikanda_israel": {
+      "adp": 444,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "lachey_luke": {
+      "adp": 445,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "aliecox_mo": {
+      "adp": 446,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "mumpfield_konata": {
+      "adp": 447,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "yarns_marcus": {
+      "adp": 448,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "larvadain_gage": {
+      "adp": 449,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "bell_david": {
+      "adp": 450,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "jackson_lucky": {
+      "adp": 451,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "dalton_andy": {
+      "adp": 452,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "carter_deandre": {
+      "adp": 453,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "ewers_quinn": {
+      "adp": 454,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "sherfield_trent": {
+      "adp": 455,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "fidone_thomas": {
+      "adp": 456,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "ricard_patrick": {
+      "adp": 457,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "collins_beaux": {
+      "adp": 458,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "vaughn_deuce": {
+      "adp": 459,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "jones_mac": {
+      "adp": 460,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "elliott_ezekiel": {
+      "adp": 461,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "tipton_mason": {
+      "adp": 462,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "bagent_tyson": {
+      "adp": 463,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "scott_charles": {
+      "adp": 464,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "mims_jordan": {
+      "adp": 465,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "hawes_jackson": {
+      "adp": 466,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "hardman_mecole": {
+      "adp": 467,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "bell_jaheim": {
+      "adp": 468,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "gray_eric": {
+      "adp": 469,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "brissett_jacoby": {
+      "adp": 470,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "conner_tanner": {
+      "adp": 471,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "gipson_xavier": {
+      "adp": 472,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "nwangwu_kene": {
+      "adp": 473,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "woods_jelani": {
+      "adp": 474,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "chark_dj": {
+      "adp": 475,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "minshew_gardner": {
+      "adp": 476,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "washington_carlos": {
+      "adp": 477,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "woods_michael": {
+      "adp": 478,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "howell_sam": {
+      "adp": 479,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "mullens_nick": {
+      "adp": 480,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "burton_michael": {
+      "adp": 481,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "jones_charlie": {
+      "adp": 482,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "wallace_tylan": {
+      "adp": 483,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "mills_davis": {
+      "adp": 484,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "leonard_riley": {
+      "adp": 485,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "mcclellan_jase": {
+      "adp": 486,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "brown_pharaoh": {
+      "adp": 487,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "dobbs_joshua": {
+      "adp": 488,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "ogletree_drew": {
+      "adp": 489,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "allen_kyle": {
+      "adp": 490,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "trubisky_mitchell": {
+      "adp": 491,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "jones_velus": {
+      "adp": 492,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "abdullah_ameer": {
+      "adp": 493,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "bridgewater_teddy": {
+      "adp": 494,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "smith_ainias": {
+      "adp": 495,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "thomas_ian": {
+      "adp": 496,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "hairston_troy": {
+      "adp": 497,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "ouzts_robbie": {
+      "adp": 498,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "mallory_will": {
+      "adp": 499,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "watson_justin": {
+      "adp": 500,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "smythe_durham": {
+      "adp": 501,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "reiman_tip": {
+      "adp": 502,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "matavao_moliki": {
+      "adp": 503,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "lohner_caleb": {
+      "adp": 504,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "dallas_deejay": {
+      "adp": 505,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "nash_nick": {
+      "adp": 506,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "dulin_ashton": {
+      "adp": 507,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "saubert_eric": {
+      "adp": 508,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "bartholomew_gavin": {
+      "adp": 509,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "allen_davis": {
+      "adp": 510,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "wilson_cedrick": {
+      "adp": 511,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "gallup_michael": {
+      "adp": 512,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "adkins_nate": {
+      "adp": 513,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "briningstool_jake": {
+      "adp": 514,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "skowronek_ben": {
+      "adp": 515,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "spannford_brevyn": {
+      "adp": 516,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "cook_dalvin": {
+      "adp": 517,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "heinicke_taylor": {
+      "adp": 518,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "trask_kyle": {
+      "adp": 519,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "flournoy_ryan": {
+      "adp": 520,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "lovett_dominic": {
+      "adp": 521,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "heyward_connor": {
+      "adp": 522,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "tonyan_robert": {
+      "adp": 523,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "dwelley_ross": {
+      "adp": 524,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "howard_will": {
+      "adp": 525,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "gore_frank": {
+      "adp": 526,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "davisprice_tyrion": {
+      "adp": 527,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "johnson_jakob": {
+      "adp": 528,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "everett_gerald": {
+      "adp": 529,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "white_ricky": {
+      "adp": 530,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "osborn_kj": {
+      "adp": 531,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "weaver_xavier": {
+      "adp": 532,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "heath_malik": {
+      "adp": 533,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "prather_kaden": {
+      "adp": 534,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "gould_anthony": {
+      "adp": 535,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "palmer_trey": {
+      "adp": 536,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "mellott_tommy": {
+      "adp": 537,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "mccord_kyle": {
+      "adp": 538,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "fehoko_simi": {
+      "adp": 539,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "blair_chris": {
+      "adp": 540,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "means_bub": {
+      "adp": 541,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "turner_cole": {
+      "adp": 542,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "stidham_jarrett": {
+      "adp": 543,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "haener_jake": {
+      "adp": 544,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "wester_lajohntay": {
+      "adp": 545,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "quitoriano_teagan": {
+      "adp": 546,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "allen_brandon": {
+      "adp": 547,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "melton_bo": {
+      "adp": 548,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "jordan_jawhar": {
+      "adp": 549,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "hooker_hendon": {
+      "adp": 550,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "berrios_braxton": {
+      "adp": 551,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "rivers_ronnie": {
+      "adp": 552,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "jarrett_rakim": {
+      "adp": 553,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    },
+    "jones_tim": {
+      "adp": 554,
+      "pickCount": 0,
+      "highPick": 0,
+      "lowPick": 0,
+      "stdDev": 0,
+      "change": 0
+    }
+  }
+}

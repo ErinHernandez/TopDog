@@ -1,0 +1,437 @@
+{
+  "metadata": {
+    "description": "Historical season stats - append new seasons at year end",
+    "playerCount": 10,
+    "lastUpdated": "2025-12-06T10:31:04.391Z"
+  },
+  "players": {
+    "allen_josh": {
+      "2018": {
+        "games": 12,
+        "passYards": 2074,
+        "passTd": 10,
+        "int": 12,
+        "rushYards": 631,
+        "rushTd": 8,
+        "fantasyPts": 232.1
+      },
+      "2019": {
+        "games": 16,
+        "passYards": 3089,
+        "passTd": 20,
+        "int": 9,
+        "rushYards": 510,
+        "rushTd": 9,
+        "fantasyPts": 291.4
+      },
+      "2020": {
+        "games": 16,
+        "passYards": 4544,
+        "passTd": 37,
+        "int": 10,
+        "rushYards": 421,
+        "rushTd": 8,
+        "fantasyPts": 400.2
+      },
+      "2021": {
+        "games": 17,
+        "passYards": 4407,
+        "passTd": 36,
+        "int": 15,
+        "rushYards": 763,
+        "rushTd": 6,
+        "fantasyPts": 398.8
+      },
+      "2022": {
+        "games": 16,
+        "passYards": 4283,
+        "passTd": 35,
+        "int": 14,
+        "rushYards": 762,
+        "rushTd": 7,
+        "fantasyPts": 394.5
+      },
+      "2023": {
+        "games": 17,
+        "passYards": 4306,
+        "passTd": 29,
+        "int": 18,
+        "rushYards": 524,
+        "rushTd": 15,
+        "fantasyPts": 382.6
+      },
+      "2024": {
+        "games": 17,
+        "passYards": 3731,
+        "passTd": 28,
+        "int": 6,
+        "rushYards": 531,
+        "rushTd": 12,
+        "fantasyPts": 358.2
+      }
+    },
+    "mahomes_patrick": {
+      "2018": {
+        "games": 16,
+        "passYards": 5097,
+        "passTd": 50,
+        "int": 12,
+        "rushYards": 272,
+        "rushTd": 2,
+        "fantasyPts": 417.4
+      },
+      "2019": {
+        "games": 14,
+        "passYards": 4031,
+        "passTd": 26,
+        "int": 5,
+        "rushYards": 218,
+        "rushTd": 2,
+        "fantasyPts": 294.5
+      },
+      "2020": {
+        "games": 16,
+        "passYards": 4740,
+        "passTd": 38,
+        "int": 6,
+        "rushYards": 308,
+        "rushTd": 2,
+        "fantasyPts": 378.2
+      },
+      "2021": {
+        "games": 17,
+        "passYards": 4839,
+        "passTd": 37,
+        "int": 13,
+        "rushYards": 381,
+        "rushTd": 2,
+        "fantasyPts": 378.8
+      },
+      "2022": {
+        "games": 17,
+        "passYards": 5250,
+        "passTd": 41,
+        "int": 12,
+        "rushYards": 358,
+        "rushTd": 4,
+        "fantasyPts": 405.2
+      },
+      "2023": {
+        "games": 16,
+        "passYards": 4183,
+        "passTd": 27,
+        "int": 14,
+        "rushYards": 389,
+        "rushTd": 0,
+        "fantasyPts": 302.5
+      },
+      "2024": {
+        "games": 16,
+        "passYards": 3928,
+        "passTd": 26,
+        "int": 11,
+        "rushYards": 347,
+        "rushTd": 0,
+        "fantasyPts": 285.4
+      }
+    },
+    "chase_jamarr": {
+      "2021": {
+        "games": 17,
+        "rec": 81,
+        "recYards": 1455,
+        "recTd": 13,
+        "fantasyPts": 265.5
+      },
+      "2022": {
+        "games": 16,
+        "rec": 87,
+        "recYards": 1046,
+        "recTd": 9,
+        "fantasyPts": 212.6
+      },
+      "2023": {
+        "games": 16,
+        "rec": 100,
+        "recYards": 1216,
+        "recTd": 7,
+        "fantasyPts": 228.6
+      },
+      "2024": {
+        "games": 17,
+        "rec": 127,
+        "recYards": 1708,
+        "recTd": 17,
+        "fantasyPts": 358.8
+      }
+    },
+    "jefferson_justin": {
+      "2020": {
+        "games": 16,
+        "rec": 88,
+        "recYards": 1400,
+        "recTd": 7,
+        "fantasyPts": 228
+      },
+      "2021": {
+        "games": 17,
+        "rec": 108,
+        "recYards": 1616,
+        "recTd": 10,
+        "fantasyPts": 277.6
+      },
+      "2022": {
+        "games": 17,
+        "rec": 128,
+        "recYards": 1809,
+        "recTd": 8,
+        "fantasyPts": 296.9
+      },
+      "2023": {
+        "games": 10,
+        "rec": 68,
+        "recYards": 1074,
+        "recTd": 5,
+        "fantasyPts": 177.4
+      },
+      "2024": {
+        "games": 17,
+        "rec": 103,
+        "recYards": 1533,
+        "recTd": 10,
+        "fantasyPts": 268.3
+      }
+    },
+    "lamb_ceedee": {
+      "2020": {
+        "games": 16,
+        "rec": 74,
+        "recYards": 935,
+        "recTd": 5,
+        "fantasyPts": 168.5
+      },
+      "2021": {
+        "games": 17,
+        "rec": 79,
+        "recYards": 1102,
+        "recTd": 6,
+        "fantasyPts": 190.2
+      },
+      "2022": {
+        "games": 17,
+        "rec": 107,
+        "recYards": 1359,
+        "recTd": 9,
+        "fantasyPts": 248.9
+      },
+      "2023": {
+        "games": 17,
+        "rec": 135,
+        "recYards": 1749,
+        "recTd": 12,
+        "fantasyPts": 310.9
+      },
+      "2024": {
+        "games": 15,
+        "rec": 101,
+        "recYards": 1194,
+        "recTd": 8,
+        "fantasyPts": 218.4
+      }
+    },
+    "robinson_bijan": {
+      "2023": {
+        "games": 16,
+        "rushYards": 976,
+        "rushTd": 4,
+        "rec": 58,
+        "recYards": 487,
+        "recTd": 4,
+        "fantasyPts": 232.3
+      },
+      "2024": {
+        "games": 16,
+        "rushYards": 1139,
+        "rushTd": 11,
+        "rec": 54,
+        "recYards": 495,
+        "recTd": 2,
+        "fantasyPts": 278.4
+      }
+    },
+    "barkley_saquon": {
+      "2018": {
+        "games": 16,
+        "rushYards": 1307,
+        "rushTd": 11,
+        "rec": 91,
+        "recYards": 721,
+        "recTd": 4,
+        "fantasyPts": 352.8
+      },
+      "2019": {
+        "games": 13,
+        "rushYards": 1003,
+        "rushTd": 6,
+        "rec": 52,
+        "recYards": 438,
+        "recTd": 2,
+        "fantasyPts": 217.1
+      },
+      "2020": {
+        "games": 2,
+        "rushYards": 34,
+        "rushTd": 0,
+        "rec": 6,
+        "recYards": 60,
+        "recTd": 0,
+        "fantasyPts": 15.4
+      },
+      "2021": {
+        "games": 13,
+        "rushYards": 593,
+        "rushTd": 2,
+        "rec": 41,
+        "recYards": 263,
+        "recTd": 2,
+        "fantasyPts": 140.6
+      },
+      "2022": {
+        "games": 16,
+        "rushYards": 1312,
+        "rushTd": 10,
+        "rec": 57,
+        "recYards": 338,
+        "recTd": 0,
+        "fantasyPts": 257
+      },
+      "2023": {
+        "games": 14,
+        "rushYards": 962,
+        "rushTd": 6,
+        "rec": 41,
+        "recYards": 280,
+        "recTd": 4,
+        "fantasyPts": 210.2
+      },
+      "2024": {
+        "games": 16,
+        "rushYards": 2005,
+        "rushTd": 13,
+        "rec": 33,
+        "recYards": 278,
+        "recTd": 2,
+        "fantasyPts": 338.3
+      }
+    },
+    "henry_derrick": {
+      "2019": {
+        "games": 16,
+        "rushYards": 1540,
+        "rushTd": 16,
+        "rec": 18,
+        "recYards": 206,
+        "recTd": 2,
+        "fantasyPts": 294.6
+      },
+      "2020": {
+        "games": 16,
+        "rushYards": 2027,
+        "rushTd": 17,
+        "rec": 19,
+        "recYards": 114,
+        "recTd": 0,
+        "fantasyPts": 331.1
+      },
+      "2021": {
+        "games": 8,
+        "rushYards": 937,
+        "rushTd": 10,
+        "rec": 6,
+        "recYards": 21,
+        "recTd": 0,
+        "fantasyPts": 159.8
+      },
+      "2022": {
+        "games": 16,
+        "rushYards": 1538,
+        "rushTd": 13,
+        "rec": 33,
+        "recYards": 398,
+        "recTd": 1,
+        "fantasyPts": 286.6
+      },
+      "2023": {
+        "games": 17,
+        "rushYards": 1167,
+        "rushTd": 12,
+        "rec": 21,
+        "recYards": 215,
+        "recTd": 1,
+        "fantasyPts": 232.2
+      },
+      "2024": {
+        "games": 17,
+        "rushYards": 1921,
+        "rushTd": 16,
+        "rec": 16,
+        "recYards": 96,
+        "recTd": 1,
+        "fantasyPts": 318.7
+      }
+    },
+    "kelce_travis": {
+      "2020": {
+        "games": 15,
+        "rec": 105,
+        "recYards": 1416,
+        "recTd": 11,
+        "fantasyPts": 269.6
+      },
+      "2021": {
+        "games": 17,
+        "rec": 92,
+        "recYards": 1125,
+        "recTd": 9,
+        "fantasyPts": 223.5
+      },
+      "2022": {
+        "games": 17,
+        "rec": 110,
+        "recYards": 1338,
+        "recTd": 12,
+        "fantasyPts": 265.8
+      },
+      "2023": {
+        "games": 15,
+        "rec": 93,
+        "recYards": 984,
+        "recTd": 5,
+        "fantasyPts": 183.4
+      },
+      "2024": {
+        "games": 16,
+        "rec": 97,
+        "recYards": 823,
+        "recTd": 3,
+        "fantasyPts": 155.3
+      }
+    },
+    "laporta_sam": {
+      "2023": {
+        "games": 17,
+        "rec": 86,
+        "recYards": 889,
+        "recTd": 10,
+        "fantasyPts": 208.9
+      },
+      "2024": {
+        "games": 15,
+        "rec": 67,
+        "recYards": 790,
+        "recTd": 5,
+        "fantasyPts": 154
+      }
+    }
+  }
+}

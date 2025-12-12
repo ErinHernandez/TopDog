@@ -1,0 +1,5983 @@
+{
+  "season": 2021,
+  "players": {
+    "collins_nico": {
+      "playerId": "collins_nico",
+      "espnId": "4258173",
+      "season": 2021,
+      "position": "WR",
+      "team": "HOU",
+      "gamesPlayed": 14,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 60,
+        "receptions": 33,
+        "yards": 446,
+        "touchdowns": 1,
+        "yardsPerReception": 13.515000343322754,
+        "catchRate": 55
+      },
+      "fantasy": {
+        "halfPprPoints": 67.1,
+        "halfPprPpg": 4.8
+      }
+    },
+    "mccaffrey_christian": {
+      "playerId": "mccaffrey_christian",
+      "espnId": "3117251",
+      "season": 2021,
+      "position": "RB",
+      "team": "SF",
+      "gamesPlayed": 7,
+      "passing": null,
+      "rushing": {
+        "attempts": 99,
+        "yards": 442,
+        "touchdowns": 1,
+        "yardsPerAttempt": 4.465000152587891,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 41,
+        "receptions": 37,
+        "yards": 343,
+        "touchdowns": 1,
+        "yardsPerReception": 9.270000457763672,
+        "catchRate": 90.2
+      },
+      "fantasy": {
+        "halfPprPoints": 109,
+        "halfPprPpg": 15.6
+      }
+    },
+    "barkley_saquon": {
+      "playerId": "barkley_saquon",
+      "espnId": "3929630",
+      "season": 2021,
+      "position": "RB",
+      "team": "PHI",
+      "gamesPlayed": 13,
+      "passing": null,
+      "rushing": {
+        "attempts": 162,
+        "yards": 593,
+        "touchdowns": 2,
+        "yardsPerAttempt": 3.6600000858306885,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 57,
+        "receptions": 41,
+        "yards": 263,
+        "touchdowns": 2,
+        "yardsPerReception": 6.414999961853027,
+        "catchRate": 71.9
+      },
+      "fantasy": {
+        "halfPprPoints": 130.1,
+        "halfPprPpg": 10
+      }
+    },
+    "lamb_ceedee": {
+      "playerId": "lamb_ceedee",
+      "espnId": "4241389",
+      "season": 2021,
+      "position": "WR",
+      "team": "DAL",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 9,
+        "yards": 76,
+        "touchdowns": 0,
+        "yardsPerAttempt": 8.444000244140625,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 120,
+        "receptions": 79,
+        "yards": 1102,
+        "touchdowns": 6,
+        "yardsPerReception": 13.949000358581543,
+        "catchRate": 65.8
+      },
+      "fantasy": {
+        "halfPprPoints": 193.3,
+        "halfPprPpg": 12.1
+      }
+    },
+    "brown_amonra": {
+      "playerId": "brown_amonra",
+      "espnId": "4374302",
+      "season": 2021,
+      "position": "WR",
+      "team": "DET",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 7,
+        "yards": 61,
+        "touchdowns": 1,
+        "yardsPerAttempt": 8.71399974822998,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 119,
+        "receptions": 90,
+        "yards": 912,
+        "touchdowns": 5,
+        "yardsPerReception": 10.133000373840332,
+        "catchRate": 75.6
+      },
+      "fantasy": {
+        "halfPprPoints": 178.3,
+        "halfPprPpg": 10.5
+      }
+    },
+    "chase_jamarr": {
+      "playerId": "chase_jamarr",
+      "espnId": "4362628",
+      "season": 2021,
+      "position": "WR",
+      "team": "CIN",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 7,
+        "yards": 21,
+        "touchdowns": 0,
+        "yardsPerAttempt": 3,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 128,
+        "receptions": 81,
+        "yards": 1455,
+        "touchdowns": 13,
+        "yardsPerReception": 17.96299934387207,
+        "catchRate": 63.3
+      },
+      "fantasy": {
+        "halfPprPoints": 266.1,
+        "halfPprPpg": 15.7
+      }
+    },
+    "jefferson_justin": {
+      "playerId": "jefferson_justin",
+      "espnId": "4262921",
+      "season": 2021,
+      "position": "WR",
+      "team": "MIN",
+      "gamesPlayed": 17,
+      "passing": {
+        "completions": 2,
+        "attempts": 4,
+        "yards": 35,
+        "touchdowns": 0,
+        "interceptions": 0,
+        "completionPct": 50,
+        "yardsPerAttempt": 8.75
+      },
+      "rushing": {
+        "attempts": 6,
+        "yards": 14,
+        "touchdowns": 0,
+        "yardsPerAttempt": 2.3329999446868896,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 167,
+        "receptions": 108,
+        "yards": 1616,
+        "touchdowns": 10,
+        "yardsPerReception": 14.963000297546387,
+        "catchRate": 64.7
+      },
+      "fantasy": {
+        "halfPprPoints": 278.4,
+        "halfPprPpg": 16.4
+      }
+    },
+    "jacobs_josh": {
+      "playerId": "jacobs_josh",
+      "espnId": "4047365",
+      "season": 2021,
+      "position": "RB",
+      "team": "GB",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": {
+        "attempts": 217,
+        "yards": 872,
+        "touchdowns": 9,
+        "yardsPerAttempt": 4.01800012588501,
+        "fumbles": 2
+      },
+      "receiving": {
+        "targets": 64,
+        "receptions": 54,
+        "yards": 348,
+        "touchdowns": 0,
+        "yardsPerReception": 6.443999767303467,
+        "catchRate": 84.4
+      },
+      "fantasy": {
+        "halfPprPoints": 203,
+        "halfPprPpg": 13.5
+      }
+    },
+    "henry_derrick": {
+      "playerId": "henry_derrick",
+      "espnId": "3043078",
+      "season": 2021,
+      "position": "RB",
+      "team": "BAL",
+      "gamesPlayed": 8,
+      "passing": {
+        "completions": 1,
+        "attempts": 1,
+        "yards": 5,
+        "touchdowns": 1,
+        "interceptions": 0,
+        "completionPct": 100,
+        "yardsPerAttempt": 5
+      },
+      "rushing": {
+        "attempts": 219,
+        "yards": 937,
+        "touchdowns": 10,
+        "yardsPerAttempt": 4.2789998054504395,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 20,
+        "receptions": 18,
+        "yards": 154,
+        "touchdowns": 0,
+        "yardsPerReception": 8.555999755859375,
+        "catchRate": 90
+      },
+      "fantasy": {
+        "halfPprPoints": 182.3,
+        "halfPprPpg": 22.8
+      }
+    },
+    "brown_aj": {
+      "playerId": "brown_aj",
+      "espnId": "4047646",
+      "season": 2021,
+      "position": "WR",
+      "team": "PHI",
+      "gamesPlayed": 13,
+      "passing": {
+        "completions": 0,
+        "attempts": 2,
+        "yards": 0,
+        "touchdowns": 0,
+        "interceptions": 0,
+        "completionPct": 0,
+        "yardsPerAttempt": 0
+      },
+      "rushing": {
+        "attempts": 2,
+        "yards": 10,
+        "touchdowns": 0,
+        "yardsPerAttempt": 5,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 105,
+        "receptions": 63,
+        "yards": 869,
+        "touchdowns": 5,
+        "yardsPerReception": 13.793999671936035,
+        "catchRate": 60
+      },
+      "fantasy": {
+        "halfPprPoints": 149.4,
+        "halfPprPpg": 11.5
+      }
+    },
+    "taylor_jonathan": {
+      "playerId": "taylor_jonathan",
+      "espnId": "4242335",
+      "season": 2021,
+      "position": "RB",
+      "team": "IND",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 332,
+        "yards": 1811,
+        "touchdowns": 18,
+        "yardsPerAttempt": 5.454999923706055,
+        "fumbles": 3
+      },
+      "receiving": {
+        "targets": 51,
+        "receptions": 40,
+        "yards": 360,
+        "touchdowns": 2,
+        "yardsPerReception": 9,
+        "catchRate": 78.4
+      },
+      "fantasy": {
+        "halfPprPoints": 357.1,
+        "halfPprPpg": 21
+      }
+    },
+    "jackson_lamar": {
+      "playerId": "jackson_lamar",
+      "espnId": "3916387",
+      "season": 2021,
+      "position": "QB",
+      "team": "BAL",
+      "gamesPlayed": 12,
+      "passing": {
+        "completions": 246,
+        "attempts": 382,
+        "yards": 2882,
+        "touchdowns": 16,
+        "interceptions": 13,
+        "completionPct": 64.39800262451172,
+        "yardsPerAttempt": 7.545000076293945
+      },
+      "rushing": {
+        "attempts": 133,
+        "yards": 767,
+        "touchdowns": 2,
+        "yardsPerAttempt": 5.767000198364258,
+        "fumbles": 4
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 255,
+        "halfPprPpg": 21.3
+      }
+    },
+    "kittle_george": {
+      "playerId": "kittle_george",
+      "espnId": "3040151",
+      "season": 2021,
+      "position": "TE",
+      "team": "SF",
+      "gamesPlayed": 14,
+      "passing": null,
+      "rushing": {
+        "attempts": 3,
+        "yards": 20,
+        "touchdowns": 0,
+        "yardsPerAttempt": 6.666999816894531,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 94,
+        "receptions": 71,
+        "yards": 910,
+        "touchdowns": 6,
+        "yardsPerReception": 12.817000389099121,
+        "catchRate": 75.5
+      },
+      "fantasy": {
+        "halfPprPoints": 164.5,
+        "halfPprPpg": 11.8
+      }
+    },
+    "higgins_tee": {
+      "playerId": "higgins_tee",
+      "espnId": "4239993",
+      "season": 2021,
+      "position": "WR",
+      "team": "CIN",
+      "gamesPlayed": 14,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 110,
+        "receptions": 74,
+        "yards": 1091,
+        "touchdowns": 6,
+        "yardsPerReception": 14.743000030517578,
+        "catchRate": 67.3
+      },
+      "fantasy": {
+        "halfPprPoints": 182.1,
+        "halfPprPpg": 13
+      }
+    },
+    "allen_josh": {
+      "playerId": "allen_josh",
+      "espnId": "3918298",
+      "season": 2021,
+      "position": "QB",
+      "team": "BUF",
+      "gamesPlayed": 17,
+      "passing": {
+        "completions": 409,
+        "attempts": 646,
+        "yards": 4407,
+        "touchdowns": 36,
+        "interceptions": 15,
+        "completionPct": 63.3129997253418,
+        "yardsPerAttempt": 6.822000026702881
+      },
+      "rushing": {
+        "attempts": 122,
+        "yards": 763,
+        "touchdowns": 6,
+        "yardsPerAttempt": 6.254000186920166,
+        "fumbles": 5
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 417.6,
+        "halfPprPpg": 24.6
+      }
+    },
+    "hurts_jalen": {
+      "playerId": "hurts_jalen",
+      "espnId": "4040715",
+      "season": 2021,
+      "position": "QB",
+      "team": "PHI",
+      "gamesPlayed": 15,
+      "passing": {
+        "completions": 265,
+        "attempts": 432,
+        "yards": 3144,
+        "touchdowns": 16,
+        "interceptions": 9,
+        "completionPct": 61.34299850463867,
+        "yardsPerAttempt": 7.2779998779296875
+      },
+      "rushing": {
+        "attempts": 139,
+        "yards": 784,
+        "touchdowns": 10,
+        "yardsPerAttempt": 5.639999866485596,
+        "fumbles": 4
+      },
+      "receiving": {
+        "targets": 1,
+        "receptions": 0,
+        "yards": 0,
+        "touchdowns": 0,
+        "yardsPerReception": 0,
+        "catchRate": 0
+      },
+      "fantasy": {
+        "halfPprPoints": 319.2,
+        "halfPprPpg": 21.3
+      }
+    },
+    "adams_davante": {
+      "playerId": "adams_davante",
+      "espnId": "16800",
+      "season": 2021,
+      "position": "WR",
+      "team": "LAR",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 169,
+        "receptions": 123,
+        "yards": 1553,
+        "touchdowns": 11,
+        "yardsPerReception": 12.62600040435791,
+        "catchRate": 72.8
+      },
+      "fantasy": {
+        "halfPprPoints": 282.8,
+        "halfPprPpg": 17.7
+      }
+    },
+    "hill_tyreek": {
+      "playerId": "hill_tyreek",
+      "espnId": "3116406",
+      "season": 2021,
+      "position": "WR",
+      "team": "MIA",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 9,
+        "yards": 96,
+        "touchdowns": 0,
+        "yardsPerAttempt": 10.666999816894531,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 159,
+        "receptions": 111,
+        "yards": 1239,
+        "touchdowns": 9,
+        "yardsPerReception": 11.161999702453613,
+        "catchRate": 69.8
+      },
+      "fantasy": {
+        "halfPprPoints": 243,
+        "halfPprPpg": 14.3
+      }
+    },
+    "evans_mike": {
+      "playerId": "evans_mike",
+      "espnId": "16737",
+      "season": 2021,
+      "position": "WR",
+      "team": "TB",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": 10,
+        "touchdowns": 0,
+        "yardsPerAttempt": 10,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 114,
+        "receptions": 74,
+        "yards": 1035,
+        "touchdowns": 14,
+        "yardsPerReception": 13.986000061035156,
+        "catchRate": 64.9
+      },
+      "fantasy": {
+        "halfPprPoints": 225.5,
+        "halfPprPpg": 14.1
+      }
+    },
+    "mclaurin_terry": {
+      "playerId": "mclaurin_terry",
+      "espnId": "3121422",
+      "season": 2021,
+      "position": "WR",
+      "team": "WAS",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": 12,
+        "touchdowns": 0,
+        "yardsPerAttempt": 12,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 130,
+        "receptions": 77,
+        "yards": 1053,
+        "touchdowns": 5,
+        "yardsPerReception": 13.675000190734863,
+        "catchRate": 59.2
+      },
+      "fantasy": {
+        "halfPprPoints": 175,
+        "halfPprPpg": 10.3
+      }
+    },
+    "sutton_courtland": {
+      "playerId": "sutton_courtland",
+      "espnId": "3128429",
+      "season": 2021,
+      "position": "WR",
+      "team": "DEN",
+      "gamesPlayed": 17,
+      "passing": {
+        "completions": 1,
+        "attempts": 1,
+        "yards": 16,
+        "touchdowns": 0,
+        "interceptions": 0,
+        "completionPct": 100,
+        "yardsPerAttempt": 16
+      },
+      "rushing": null,
+      "receiving": {
+        "targets": 98,
+        "receptions": 58,
+        "yards": 776,
+        "touchdowns": 2,
+        "yardsPerReception": 13.378999710083008,
+        "catchRate": 59.2
+      },
+      "fantasy": {
+        "halfPprPoints": 119.2,
+        "halfPprPpg": 7
+      }
+    },
+    "hubbard_chuba": {
+      "playerId": "hubbard_chuba",
+      "espnId": "4241416",
+      "season": 2021,
+      "position": "RB",
+      "team": "CAR",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 172,
+        "yards": 612,
+        "touchdowns": 5,
+        "yardsPerAttempt": 3.558000087738037,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 37,
+        "receptions": 25,
+        "yards": 174,
+        "touchdowns": 1,
+        "yardsPerReception": 6.960000038146973,
+        "catchRate": 67.6
+      },
+      "fantasy": {
+        "halfPprPoints": 127.1,
+        "halfPprPpg": 7.5
+      }
+    },
+    "kamara_alvin": {
+      "playerId": "kamara_alvin",
+      "espnId": "3054850",
+      "season": 2021,
+      "position": "RB",
+      "team": "NO",
+      "gamesPlayed": 13,
+      "passing": null,
+      "rushing": {
+        "attempts": 240,
+        "yards": 898,
+        "touchdowns": 4,
+        "yardsPerAttempt": 3.742000102996826,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 67,
+        "receptions": 47,
+        "yards": 439,
+        "touchdowns": 5,
+        "yardsPerReception": 9.34000015258789,
+        "catchRate": 70.1
+      },
+      "fantasy": {
+        "halfPprPoints": 211.2,
+        "halfPprPpg": 16.2
+      }
+    },
+    "conner_james": {
+      "playerId": "conner_james",
+      "espnId": "3045147",
+      "season": 2021,
+      "position": "RB",
+      "team": "ARI",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": {
+        "attempts": 202,
+        "yards": 752,
+        "touchdowns": 15,
+        "yardsPerAttempt": 3.7230000495910645,
+        "fumbles": 2
+      },
+      "receiving": {
+        "targets": 39,
+        "receptions": 37,
+        "yards": 375,
+        "touchdowns": 3,
+        "yardsPerReception": 10.135000228881836,
+        "catchRate": 94.9
+      },
+      "fantasy": {
+        "halfPprPoints": 239.2,
+        "halfPprPpg": 15.9
+      }
+    },
+    "burrow_joe": {
+      "playerId": "burrow_joe",
+      "espnId": "3915511",
+      "season": 2021,
+      "position": "QB",
+      "team": "CIN",
+      "gamesPlayed": 16,
+      "passing": {
+        "completions": 366,
+        "attempts": 520,
+        "yards": 4611,
+        "touchdowns": 34,
+        "interceptions": 14,
+        "completionPct": 70.38500213623047,
+        "yardsPerAttempt": 8.866999626159668
+      },
+      "rushing": {
+        "attempts": 40,
+        "yards": 118,
+        "touchdowns": 2,
+        "yardsPerAttempt": 2.950000047683716,
+        "fumbles": 1
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 330.2,
+        "halfPprPpg": 20.6
+      }
+    },
+    "metcalf_dk": {
+      "playerId": "metcalf_dk",
+      "espnId": "4047650",
+      "season": 2021,
+      "position": "WR",
+      "team": "PIT",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": 6,
+        "touchdowns": 0,
+        "yardsPerAttempt": 6,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 129,
+        "receptions": 75,
+        "yards": 967,
+        "touchdowns": 12,
+        "yardsPerReception": 12.892999649047852,
+        "catchRate": 58.1
+      },
+      "fantasy": {
+        "halfPprPoints": 206.8,
+        "halfPprPpg": 12.2
+      }
+    },
+    "pollard_tony": {
+      "playerId": "pollard_tony",
+      "espnId": "3916148",
+      "season": 2021,
+      "position": "RB",
+      "team": "TEN",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": {
+        "attempts": 130,
+        "yards": 719,
+        "touchdowns": 2,
+        "yardsPerAttempt": 5.531000137329102,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 46,
+        "receptions": 39,
+        "yards": 337,
+        "touchdowns": 0,
+        "yardsPerReception": 8.640999794006348,
+        "catchRate": 84.8
+      },
+      "fantasy": {
+        "halfPprPoints": 137.1,
+        "halfPprPpg": 9.1
+      }
+    },
+    "swift_dandre": {
+      "playerId": "swift_dandre",
+      "espnId": "4259545",
+      "season": 2021,
+      "position": "RB",
+      "team": "CHI",
+      "gamesPlayed": 13,
+      "passing": {
+        "completions": 0,
+        "attempts": 1,
+        "yards": 0,
+        "touchdowns": 0,
+        "interceptions": 0,
+        "completionPct": 0,
+        "yardsPerAttempt": 0
+      },
+      "rushing": {
+        "attempts": 151,
+        "yards": 617,
+        "touchdowns": 5,
+        "yardsPerAttempt": 4.085999965667725,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 78,
+        "receptions": 62,
+        "yards": 452,
+        "touchdowns": 2,
+        "yardsPerReception": 7.289999961853027,
+        "catchRate": 79.5
+      },
+      "fantasy": {
+        "halfPprPoints": 179.9,
+        "halfPprPpg": 13.8
+      }
+    },
+    "waddle_jaylen": {
+      "playerId": "waddle_jaylen",
+      "espnId": "4372016",
+      "season": 2021,
+      "position": "WR",
+      "team": "MIA",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 2,
+        "yards": 3,
+        "touchdowns": 1,
+        "yardsPerAttempt": 1.5,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 140,
+        "receptions": 104,
+        "yards": 1015,
+        "touchdowns": 6,
+        "yardsPerReception": 9.760000228881836,
+        "catchRate": 74.3
+      },
+      "fantasy": {
+        "halfPprPoints": 195.8,
+        "halfPprPpg": 12.2
+      }
+    },
+    "moore_dj": {
+      "playerId": "moore_dj",
+      "espnId": "3915416",
+      "season": 2021,
+      "position": "WR",
+      "team": "CHI",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 8,
+        "yards": 48,
+        "touchdowns": 0,
+        "yardsPerAttempt": 6,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 163,
+        "receptions": 93,
+        "yards": 1157,
+        "touchdowns": 4,
+        "yardsPerReception": 12.440999984741211,
+        "catchRate": 57.1
+      },
+      "fantasy": {
+        "halfPprPoints": 191,
+        "halfPprPpg": 11.2
+      }
+    },
+    "smith_devonta": {
+      "playerId": "smith_devonta",
+      "espnId": "4241478",
+      "season": 2021,
+      "position": "WR",
+      "team": "PHI",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 104,
+        "receptions": 64,
+        "yards": 916,
+        "touchdowns": 5,
+        "yardsPerReception": 14.312999725341797,
+        "catchRate": 61.5
+      },
+      "fantasy": {
+        "halfPprPoints": 153.6,
+        "halfPprPpg": 9
+      }
+    },
+    "ridley_calvin": {
+      "playerId": "ridley_calvin",
+      "espnId": "3925357",
+      "season": 2021,
+      "position": "WR",
+      "team": "TEN",
+      "gamesPlayed": 5,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 52,
+        "receptions": 31,
+        "yards": 281,
+        "touchdowns": 2,
+        "yardsPerReception": 9.0649995803833,
+        "catchRate": 59.6
+      },
+      "fantasy": {
+        "halfPprPoints": 55.6,
+        "halfPprPpg": 11.1
+      }
+    },
+    "montgomery_david": {
+      "playerId": "montgomery_david",
+      "espnId": "4035538",
+      "season": 2021,
+      "position": "RB",
+      "team": "DET",
+      "gamesPlayed": 13,
+      "passing": {
+        "completions": 0,
+        "attempts": 1,
+        "yards": 0,
+        "touchdowns": 0,
+        "interceptions": 1,
+        "completionPct": 0,
+        "yardsPerAttempt": 0
+      },
+      "rushing": {
+        "attempts": 225,
+        "yards": 849,
+        "touchdowns": 7,
+        "yardsPerAttempt": 3.7730000019073486,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 51,
+        "receptions": 42,
+        "yards": 301,
+        "touchdowns": 0,
+        "yardsPerReception": 7.166999816894531,
+        "catchRate": 82.4
+      },
+      "fantasy": {
+        "halfPprPoints": 177,
+        "halfPprPpg": 13.6
+      }
+    },
+    "jones_aaron": {
+      "playerId": "jones_aaron",
+      "espnId": "3042519",
+      "season": 2021,
+      "position": "RB",
+      "team": "MIN",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": {
+        "attempts": 171,
+        "yards": 799,
+        "touchdowns": 4,
+        "yardsPerAttempt": 4.672999858856201,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 65,
+        "receptions": 52,
+        "yards": 391,
+        "touchdowns": 6,
+        "yardsPerReception": 7.519000053405762,
+        "catchRate": 80
+      },
+      "fantasy": {
+        "halfPprPoints": 205,
+        "halfPprPpg": 13.7
+      }
+    },
+    "mahomes_patrick": {
+      "playerId": "mahomes_patrick",
+      "espnId": "3139477",
+      "season": 2021,
+      "position": "QB",
+      "team": "KC",
+      "gamesPlayed": 17,
+      "passing": {
+        "completions": 436,
+        "attempts": 658,
+        "yards": 4839,
+        "touchdowns": 37,
+        "interceptions": 13,
+        "completionPct": 66.26100158691406,
+        "yardsPerAttempt": 7.354000091552734
+      },
+      "rushing": {
+        "attempts": 66,
+        "yards": 381,
+        "touchdowns": 2,
+        "yardsPerAttempt": 5.7729997634887695,
+        "fumbles": 4
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 378.7,
+        "halfPprPpg": 22.3
+      }
+    },
+    "hockenson_tj": {
+      "playerId": "hockenson_tj",
+      "espnId": "4036133",
+      "season": 2021,
+      "position": "TE",
+      "team": "MIN",
+      "gamesPlayed": 12,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 84,
+        "receptions": 61,
+        "yards": 583,
+        "touchdowns": 4,
+        "yardsPerReception": 9.557000160217285,
+        "catchRate": 72.6
+      },
+      "fantasy": {
+        "halfPprPoints": 112.8,
+        "halfPprPpg": 9.4
+      }
+    },
+    "mayfield_baker": {
+      "playerId": "mayfield_baker",
+      "espnId": "3052587",
+      "season": 2021,
+      "position": "QB",
+      "team": "TB",
+      "gamesPlayed": 14,
+      "passing": {
+        "completions": 253,
+        "attempts": 418,
+        "yards": 3010,
+        "touchdowns": 17,
+        "interceptions": 13,
+        "completionPct": 60.5260009765625,
+        "yardsPerAttempt": 7.201000213623047
+      },
+      "rushing": {
+        "attempts": 37,
+        "yards": 134,
+        "touchdowns": 1,
+        "yardsPerAttempt": 3.621999979019165,
+        "fumbles": 1
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 194.8,
+        "halfPprPpg": 13.9
+      }
+    },
+    "andrews_mark": {
+      "playerId": "andrews_mark",
+      "espnId": "3116365",
+      "season": 2021,
+      "position": "TE",
+      "team": "BAL",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": 0,
+        "touchdowns": 0,
+        "yardsPerAttempt": 0,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 153,
+        "receptions": 107,
+        "yards": 1361,
+        "touchdowns": 9,
+        "yardsPerReception": 12.720000267028809,
+        "catchRate": 69.9
+      },
+      "fantasy": {
+        "halfPprPoints": 243.6,
+        "halfPprPpg": 14.3
+      }
+    },
+    "jeudy_jerry": {
+      "playerId": "jeudy_jerry",
+      "espnId": "4241463",
+      "season": 2021,
+      "position": "WR",
+      "team": "CLE",
+      "gamesPlayed": 10,
+      "passing": null,
+      "rushing": {
+        "attempts": 2,
+        "yards": 3,
+        "touchdowns": 0,
+        "yardsPerAttempt": 1.5,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 56,
+        "receptions": 38,
+        "yards": 467,
+        "touchdowns": 0,
+        "yardsPerReception": 12.288999557495117,
+        "catchRate": 67.9
+      },
+      "fantasy": {
+        "halfPprPoints": 66,
+        "halfPprPpg": 6.6
+      }
+    },
+    "kelce_travis": {
+      "playerId": "kelce_travis",
+      "espnId": "15847",
+      "season": 2021,
+      "position": "TE",
+      "team": "KC",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 2,
+        "yards": 3,
+        "touchdowns": 1,
+        "yardsPerAttempt": 1.5,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 134,
+        "receptions": 92,
+        "yards": 1125,
+        "touchdowns": 9,
+        "yardsPerReception": 12.227999687194824,
+        "catchRate": 68.7
+      },
+      "fantasy": {
+        "halfPprPoints": 218.8,
+        "halfPprPpg": 13.7
+      }
+    },
+    "murray_kyler": {
+      "playerId": "murray_kyler",
+      "espnId": "3917315",
+      "season": 2021,
+      "position": "QB",
+      "team": "ARI",
+      "gamesPlayed": 14,
+      "passing": {
+        "completions": 333,
+        "attempts": 481,
+        "yards": 3787,
+        "touchdowns": 24,
+        "interceptions": 10,
+        "completionPct": 69.23100280761719,
+        "yardsPerAttempt": 7.873000144958496
+      },
+      "rushing": {
+        "attempts": 88,
+        "yards": 423,
+        "touchdowns": 5,
+        "yardsPerAttempt": 4.807000160217285,
+        "fumbles": 12
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 309.8,
+        "halfPprPpg": 22.1
+      }
+    },
+    "meyers_jakobi": {
+      "playerId": "meyers_jakobi",
+      "espnId": "3916433",
+      "season": 2021,
+      "position": "WR",
+      "team": "JAC",
+      "gamesPlayed": 17,
+      "passing": {
+        "completions": 2,
+        "attempts": 2,
+        "yards": 45,
+        "touchdowns": 0,
+        "interceptions": 0,
+        "completionPct": 100,
+        "yardsPerAttempt": 22.5
+      },
+      "rushing": {
+        "attempts": 1,
+        "yards": 9,
+        "touchdowns": 0,
+        "yardsPerAttempt": 9,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 126,
+        "receptions": 83,
+        "yards": 866,
+        "touchdowns": 2,
+        "yardsPerReception": 10.434000015258789,
+        "catchRate": 65.9
+      },
+      "fantasy": {
+        "halfPprPoints": 142.8,
+        "halfPprPpg": 8.4
+      }
+    },
+    "njoku_david": {
+      "playerId": "njoku_david",
+      "espnId": "3123076",
+      "season": 2021,
+      "position": "TE",
+      "team": "CLE",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": 1,
+        "touchdowns": 0,
+        "yardsPerAttempt": 1,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 53,
+        "receptions": 36,
+        "yards": 475,
+        "touchdowns": 4,
+        "yardsPerReception": 13.194000244140625,
+        "catchRate": 67.9
+      },
+      "fantasy": {
+        "halfPprPoints": 89.6,
+        "halfPprPpg": 5.6
+      }
+    },
+    "diggs_stefon": {
+      "playerId": "diggs_stefon",
+      "espnId": "2976212",
+      "season": 2021,
+      "position": "WR",
+      "team": "NE",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 164,
+        "receptions": 103,
+        "yards": 1225,
+        "touchdowns": 10,
+        "yardsPerReception": 11.892999649047852,
+        "catchRate": 62.8
+      },
+      "fantasy": {
+        "halfPprPoints": 234,
+        "halfPprPpg": 13.8
+      }
+    },
+    "prescott_dak": {
+      "playerId": "prescott_dak",
+      "espnId": "2577417",
+      "season": 2021,
+      "position": "QB",
+      "team": "DAL",
+      "gamesPlayed": 16,
+      "passing": {
+        "completions": 410,
+        "attempts": 596,
+        "yards": 4449,
+        "touchdowns": 37,
+        "interceptions": 10,
+        "completionPct": 68.79199981689453,
+        "yardsPerAttempt": 7.465000152587891
+      },
+      "rushing": {
+        "attempts": 48,
+        "yards": 146,
+        "touchdowns": 1,
+        "yardsPerAttempt": 3.0420000553131104,
+        "fumbles": 9
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 336.6,
+        "halfPprPpg": 21
+      }
+    },
+    "samuel_deebo": {
+      "playerId": "samuel_deebo",
+      "espnId": "3126486",
+      "season": 2021,
+      "position": "WR",
+      "team": "WAS",
+      "gamesPlayed": 16,
+      "passing": {
+        "completions": 1,
+        "attempts": 2,
+        "yards": 24,
+        "touchdowns": 1,
+        "interceptions": 0,
+        "completionPct": 50,
+        "yardsPerAttempt": 12
+      },
+      "rushing": {
+        "attempts": 59,
+        "yards": 365,
+        "touchdowns": 8,
+        "yardsPerAttempt": 6.185999870300293,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 121,
+        "receptions": 77,
+        "yards": 1405,
+        "touchdowns": 6,
+        "yardsPerReception": 18.246999740600586,
+        "catchRate": 63.6
+      },
+      "fantasy": {
+        "halfPprPoints": 304.5,
+        "halfPprPpg": 19
+      }
+    },
+    "jennings_jauan": {
+      "playerId": "jennings_jauan",
+      "espnId": "3886598",
+      "season": 2021,
+      "position": "WR",
+      "team": "SF",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 38,
+        "receptions": 24,
+        "yards": 282,
+        "touchdowns": 5,
+        "yardsPerReception": 11.75,
+        "catchRate": 63.2
+      },
+      "fantasy": {
+        "halfPprPoints": 70.2,
+        "halfPprPpg": 4.4
+      }
+    },
+    "engram_evan": {
+      "playerId": "engram_evan",
+      "espnId": "3051876",
+      "season": 2021,
+      "position": "TE",
+      "team": "DEN",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": -3,
+        "touchdowns": 0,
+        "yardsPerAttempt": -3,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 73,
+        "receptions": 46,
+        "yards": 408,
+        "touchdowns": 3,
+        "yardsPerReception": 8.869999885559082,
+        "catchRate": 63
+      },
+      "fantasy": {
+        "halfPprPoints": 81.5,
+        "halfPprPpg": 5.4
+      }
+    },
+    "fields_justin": {
+      "playerId": "fields_justin",
+      "espnId": "4362887",
+      "season": 2021,
+      "position": "QB",
+      "team": "NYJ",
+      "gamesPlayed": 12,
+      "passing": {
+        "completions": 159,
+        "attempts": 270,
+        "yards": 1870,
+        "touchdowns": 7,
+        "interceptions": 10,
+        "completionPct": 58.888999938964844,
+        "yardsPerAttempt": 6.926000118255615
+      },
+      "rushing": {
+        "attempts": 72,
+        "yards": 420,
+        "touchdowns": 2,
+        "yardsPerAttempt": 5.833000183105469,
+        "fumbles": 4
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 146.8,
+        "halfPprPpg": 12.2
+      }
+    },
+    "williams_javonte": {
+      "playerId": "williams_javonte",
+      "espnId": "4361579",
+      "season": 2021,
+      "position": "RB",
+      "team": "DAL",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 203,
+        "yards": 903,
+        "touchdowns": 4,
+        "yardsPerAttempt": 4.447999954223633,
+        "fumbles": 2
+      },
+      "receiving": {
+        "targets": 53,
+        "receptions": 43,
+        "yards": 316,
+        "touchdowns": 3,
+        "yardsPerReception": 7.348999977111816,
+        "catchRate": 81.1
+      },
+      "fantasy": {
+        "halfPprPoints": 185.4,
+        "halfPprPpg": 10.9
+      }
+    },
+    "goff_jared": {
+      "playerId": "goff_jared",
+      "espnId": "3046779",
+      "season": 2021,
+      "position": "QB",
+      "team": "DET",
+      "gamesPlayed": 14,
+      "passing": {
+        "completions": 332,
+        "attempts": 494,
+        "yards": 3245,
+        "touchdowns": 19,
+        "interceptions": 8,
+        "completionPct": 67.20600128173828,
+        "yardsPerAttempt": 6.568999767303467
+      },
+      "rushing": {
+        "attempts": 17,
+        "yards": 87,
+        "touchdowns": 0,
+        "yardsPerAttempt": 5.118000030517578,
+        "fumbles": 3
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 206.5,
+        "halfPprPpg": 14.8
+      }
+    },
+    "ekeler_austin": {
+      "playerId": "ekeler_austin",
+      "espnId": "3068267",
+      "season": 2021,
+      "position": "RB",
+      "team": "WAS",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 206,
+        "yards": 911,
+        "touchdowns": 12,
+        "yardsPerAttempt": 4.421999931335449,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 94,
+        "receptions": 70,
+        "yards": 647,
+        "touchdowns": 8,
+        "yardsPerReception": 9.243000030517578,
+        "catchRate": 74.5
+      },
+      "fantasy": {
+        "halfPprPoints": 310.8,
+        "halfPprPpg": 19.4
+      }
+    },
+    "stevenson_rhamondre": {
+      "playerId": "stevenson_rhamondre",
+      "espnId": "4569173",
+      "season": 2021,
+      "position": "RB",
+      "team": "NE",
+      "gamesPlayed": 12,
+      "passing": null,
+      "rushing": {
+        "attempts": 133,
+        "yards": 606,
+        "touchdowns": 5,
+        "yardsPerAttempt": 4.556000232696533,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 18,
+        "receptions": 14,
+        "yards": 123,
+        "touchdowns": 0,
+        "yardsPerReception": 8.78600025177002,
+        "catchRate": 77.8
+      },
+      "fantasy": {
+        "halfPprPoints": 109.9,
+        "halfPprPpg": 9.2
+      }
+    },
+    "herbert_justin": {
+      "playerId": "herbert_justin",
+      "espnId": "4038941",
+      "season": 2021,
+      "position": "QB",
+      "team": "LAC",
+      "gamesPlayed": 17,
+      "passing": {
+        "completions": 443,
+        "attempts": 672,
+        "yards": 5014,
+        "touchdowns": 38,
+        "interceptions": 15,
+        "completionPct": 65.9229965209961,
+        "yardsPerAttempt": 7.460999965667725
+      },
+      "rushing": {
+        "attempts": 63,
+        "yards": 302,
+        "touchdowns": 3,
+        "yardsPerAttempt": 4.794000148773193,
+        "fumbles": 0
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 385.8,
+        "halfPprPpg": 22.7
+      }
+    },
+    "pittman_michael": {
+      "playerId": "pittman_michael",
+      "espnId": "4035687",
+      "season": 2021,
+      "position": "WR",
+      "team": "IND",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 5,
+        "yards": 44,
+        "touchdowns": 0,
+        "yardsPerAttempt": 8.800000190734863,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 129,
+        "receptions": 88,
+        "yards": 1082,
+        "touchdowns": 6,
+        "yardsPerReception": 12.295000076293945,
+        "catchRate": 68.2
+      },
+      "fantasy": {
+        "halfPprPoints": 192.6,
+        "halfPprPpg": 11.3
+      }
+    },
+    "kupp_cooper": {
+      "playerId": "kupp_cooper",
+      "espnId": "2977187",
+      "season": 2021,
+      "position": "WR",
+      "team": "SEA",
+      "gamesPlayed": 17,
+      "passing": {
+        "completions": 0,
+        "attempts": 1,
+        "yards": 0,
+        "touchdowns": 0,
+        "interceptions": 0,
+        "completionPct": 0,
+        "yardsPerAttempt": 0
+      },
+      "rushing": {
+        "attempts": 4,
+        "yards": 18,
+        "touchdowns": 0,
+        "yardsPerAttempt": 4.5,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 191,
+        "receptions": 145,
+        "yards": 1947,
+        "touchdowns": 16,
+        "yardsPerReception": 13.428000450134277,
+        "catchRate": 75.9
+      },
+      "fantasy": {
+        "halfPprPoints": 365,
+        "halfPprPpg": 21.5
+      }
+    },
+    "love_jordan": {
+      "playerId": "love_jordan",
+      "espnId": "4036378",
+      "season": 2021,
+      "position": "QB",
+      "team": "GB",
+      "gamesPlayed": 6,
+      "passing": {
+        "completions": 36,
+        "attempts": 62,
+        "yards": 411,
+        "touchdowns": 2,
+        "interceptions": 3,
+        "completionPct": 58.064998626708984,
+        "yardsPerAttempt": 6.629000186920166
+      },
+      "rushing": {
+        "attempts": 12,
+        "yards": 27,
+        "touchdowns": 0,
+        "yardsPerAttempt": 2.25,
+        "fumbles": 1
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 24.1,
+        "halfPprPpg": 4
+      }
+    },
+    "lawrence_trevor": {
+      "playerId": "lawrence_trevor",
+      "espnId": "4360310",
+      "season": 2021,
+      "position": "QB",
+      "team": "JAC",
+      "gamesPlayed": 17,
+      "passing": {
+        "completions": 359,
+        "attempts": 602,
+        "yards": 3641,
+        "touchdowns": 12,
+        "interceptions": 17,
+        "completionPct": 59.6349983215332,
+        "yardsPerAttempt": 6.047999858856201
+      },
+      "rushing": {
+        "attempts": 73,
+        "yards": 334,
+        "touchdowns": 2,
+        "yardsPerAttempt": 4.574999809265137,
+        "fumbles": 3
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 222,
+        "halfPprPpg": 13.1
+      }
+    },
+    "mooney_darnell": {
+      "playerId": "mooney_darnell",
+      "espnId": "4040655",
+      "season": 2021,
+      "position": "WR",
+      "team": "ATL",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 6,
+        "yards": 32,
+        "touchdowns": 1,
+        "yardsPerAttempt": 5.333000183105469,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 140,
+        "receptions": 81,
+        "yards": 1055,
+        "touchdowns": 4,
+        "yardsPerReception": 13.024999618530273,
+        "catchRate": 57.9
+      },
+      "fantasy": {
+        "halfPprPoints": 179.2,
+        "halfPprPpg": 10.5
+      }
+    },
+    "goedert_dallas": {
+      "playerId": "goedert_dallas",
+      "espnId": "3121023",
+      "season": 2021,
+      "position": "TE",
+      "team": "PHI",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 76,
+        "receptions": 56,
+        "yards": 830,
+        "touchdowns": 4,
+        "yardsPerReception": 14.821000099182129,
+        "catchRate": 73.7
+      },
+      "fantasy": {
+        "halfPprPoints": 135,
+        "halfPprPpg": 9
+      }
+    },
+    "godwin_chris": {
+      "playerId": "godwin_chris",
+      "espnId": "3116165",
+      "season": 2021,
+      "position": "WR",
+      "team": "TB",
+      "gamesPlayed": 14,
+      "passing": null,
+      "rushing": {
+        "attempts": 4,
+        "yards": 21,
+        "touchdowns": 1,
+        "yardsPerAttempt": 5.25,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 127,
+        "receptions": 98,
+        "yards": 1103,
+        "touchdowns": 5,
+        "yardsPerReception": 11.255000114440918,
+        "catchRate": 77.2
+      },
+      "fantasy": {
+        "halfPprPoints": 197.4,
+        "halfPprPpg": 14.1
+      }
+    },
+    "harris_najee": {
+      "playerId": "harris_najee",
+      "espnId": "4241457",
+      "season": 2021,
+      "position": "RB",
+      "team": "LAC",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 307,
+        "yards": 1200,
+        "touchdowns": 7,
+        "yardsPerAttempt": 3.9089999198913574,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 94,
+        "receptions": 74,
+        "yards": 467,
+        "touchdowns": 3,
+        "yardsPerReception": 6.310999870300293,
+        "catchRate": 78.7
+      },
+      "fantasy": {
+        "halfPprPoints": 263.7,
+        "halfPprPpg": 15.5
+      }
+    },
+    "chubb_nick": {
+      "playerId": "chubb_nick",
+      "espnId": "3128720",
+      "season": 2021,
+      "position": "RB",
+      "team": "HOU",
+      "gamesPlayed": 14,
+      "passing": null,
+      "rushing": {
+        "attempts": 228,
+        "yards": 1259,
+        "touchdowns": 8,
+        "yardsPerAttempt": 5.521999835968018,
+        "fumbles": 2
+      },
+      "receiving": {
+        "targets": 25,
+        "receptions": 20,
+        "yards": 174,
+        "touchdowns": 1,
+        "yardsPerReception": 8.699999809265137,
+        "catchRate": 80
+      },
+      "fantasy": {
+        "halfPprPoints": 207.3,
+        "halfPprPpg": 14.8
+      }
+    },
+    "bateman_rashod": {
+      "playerId": "bateman_rashod",
+      "espnId": "4360939",
+      "season": 2021,
+      "position": "WR",
+      "team": "BAL",
+      "gamesPlayed": 12,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 68,
+        "receptions": 46,
+        "yards": 515,
+        "touchdowns": 1,
+        "yardsPerReception": 11.196000099182129,
+        "catchRate": 67.6
+      },
+      "fantasy": {
+        "halfPprPoints": 80.5,
+        "halfPprPpg": 6.7
+      }
+    },
+    "tagovailoa_tua": {
+      "playerId": "tagovailoa_tua",
+      "espnId": "4241479",
+      "season": 2021,
+      "position": "QB",
+      "team": "MIA",
+      "gamesPlayed": 13,
+      "passing": {
+        "completions": 263,
+        "attempts": 388,
+        "yards": 2653,
+        "touchdowns": 16,
+        "interceptions": 10,
+        "completionPct": 67.78399658203125,
+        "yardsPerAttempt": 6.8379998207092285
+      },
+      "rushing": {
+        "attempts": 42,
+        "yards": 128,
+        "touchdowns": 3,
+        "yardsPerAttempt": 3.0480000972747803,
+        "fumbles": 3
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 190.9,
+        "halfPprPpg": 14.7
+      }
+    },
+    "pitts_kyle": {
+      "playerId": "pitts_kyle",
+      "espnId": "4360248",
+      "season": 2021,
+      "position": "TE",
+      "team": "ATL",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 110,
+        "receptions": 68,
+        "yards": 1026,
+        "touchdowns": 1,
+        "yardsPerReception": 15.088000297546387,
+        "catchRate": 61.8
+      },
+      "fantasy": {
+        "halfPprPoints": 142.6,
+        "halfPprPpg": 8.4
+      }
+    },
+    "kirk_christian": {
+      "playerId": "kirk_christian",
+      "espnId": "3895856",
+      "season": 2021,
+      "position": "WR",
+      "team": "HOU",
+      "gamesPlayed": 17,
+      "passing": {
+        "completions": 1,
+        "attempts": 1,
+        "yards": 33,
+        "touchdowns": 0,
+        "interceptions": 0,
+        "completionPct": 100,
+        "yardsPerAttempt": 33
+      },
+      "rushing": {
+        "attempts": 1,
+        "yards": 11,
+        "touchdowns": 0,
+        "yardsPerAttempt": 11,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 103,
+        "receptions": 77,
+        "yards": 982,
+        "touchdowns": 5,
+        "yardsPerReception": 12.753000259399414,
+        "catchRate": 74.8
+      },
+      "fantasy": {
+        "halfPprPoints": 169.1,
+        "halfPprPpg": 9.9
+      }
+    },
+    "allen_keenan": {
+      "playerId": "allen_keenan",
+      "espnId": "15818",
+      "season": 2021,
+      "position": "WR",
+      "team": "LAC",
+      "gamesPlayed": 16,
+      "passing": {
+        "completions": 0,
+        "attempts": 1,
+        "yards": 0,
+        "touchdowns": 0,
+        "interceptions": 0,
+        "completionPct": 0,
+        "yardsPerAttempt": 0
+      },
+      "rushing": null,
+      "receiving": {
+        "targets": 157,
+        "receptions": 106,
+        "yards": 1138,
+        "touchdowns": 6,
+        "yardsPerReception": 10.736000061035156,
+        "catchRate": 67.5
+      },
+      "fantasy": {
+        "halfPprPoints": 202.8,
+        "halfPprPpg": 12.7
+      }
+    },
+    "henry_hunter": {
+      "playerId": "henry_hunter",
+      "espnId": "3046439",
+      "season": 2021,
+      "position": "TE",
+      "team": "NE",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 75,
+        "receptions": 50,
+        "yards": 603,
+        "touchdowns": 9,
+        "yardsPerReception": 12.0600004196167,
+        "catchRate": 66.7
+      },
+      "fantasy": {
+        "halfPprPoints": 139.3,
+        "halfPprPpg": 8.2
+      }
+    },
+    "aiyuk_brandon": {
+      "playerId": "aiyuk_brandon",
+      "espnId": "4360438",
+      "season": 2021,
+      "position": "WR",
+      "team": "SF",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 5,
+        "yards": 17,
+        "touchdowns": 0,
+        "yardsPerAttempt": 3.4000000953674316,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 84,
+        "receptions": 56,
+        "yards": 826,
+        "touchdowns": 5,
+        "yardsPerReception": 14.75,
+        "catchRate": 66.7
+      },
+      "fantasy": {
+        "halfPprPoints": 142.3,
+        "halfPprPpg": 8.4
+      }
+    },
+    "ertz_zach": {
+      "playerId": "ertz_zach",
+      "espnId": "15835",
+      "season": 2021,
+      "position": "TE",
+      "team": "WAS",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": 4,
+        "touchdowns": 0,
+        "yardsPerAttempt": 4,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 112,
+        "receptions": 74,
+        "yards": 763,
+        "touchdowns": 5,
+        "yardsPerReception": 10.310999870300293,
+        "catchRate": 66.1
+      },
+      "fantasy": {
+        "halfPprPoints": 143.7,
+        "halfPprPpg": 8.5
+      }
+    },
+    "smith_jonnu": {
+      "playerId": "smith_jonnu",
+      "espnId": "3054212",
+      "season": 2021,
+      "position": "TE",
+      "team": "PIT",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 9,
+        "yards": 40,
+        "touchdowns": 0,
+        "yardsPerAttempt": 4.443999767303467,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 45,
+        "receptions": 28,
+        "yards": 294,
+        "touchdowns": 1,
+        "yardsPerReception": 10.5,
+        "catchRate": 62.2
+      },
+      "fantasy": {
+        "halfPprPoints": 53.4,
+        "halfPprPpg": 3.3
+      }
+    },
+    "brown_marquise": {
+      "playerId": "brown_marquise",
+      "espnId": "4241372",
+      "season": 2021,
+      "position": "WR",
+      "team": "KC",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": 5,
+        "touchdowns": 0,
+        "yardsPerAttempt": 5,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 146,
+        "receptions": 91,
+        "yards": 1008,
+        "touchdowns": 6,
+        "yardsPerReception": 11.07699966430664,
+        "catchRate": 62.3
+      },
+      "fantasy": {
+        "halfPprPoints": 182.8,
+        "halfPprPpg": 11.4
+      }
+    },
+    "smith_geno": {
+      "playerId": "smith_geno",
+      "espnId": "15864",
+      "season": 2021,
+      "position": "QB",
+      "team": "LV",
+      "gamesPlayed": 4,
+      "passing": {
+        "completions": 65,
+        "attempts": 95,
+        "yards": 702,
+        "touchdowns": 5,
+        "interceptions": 1,
+        "completionPct": 68.4209976196289,
+        "yardsPerAttempt": 7.388999938964844
+      },
+      "rushing": {
+        "attempts": 9,
+        "yards": 42,
+        "touchdowns": 1,
+        "yardsPerAttempt": 4.666999816894531,
+        "fumbles": 0
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 57.3,
+        "halfPprPpg": 14.3
+      }
+    },
+    "mixon_joe": {
+      "playerId": "mixon_joe",
+      "espnId": "3116385",
+      "season": 2021,
+      "position": "RB",
+      "team": "HOU",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 292,
+        "yards": 1205,
+        "touchdowns": 13,
+        "yardsPerAttempt": 4.126999855041504,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 48,
+        "receptions": 42,
+        "yards": 314,
+        "touchdowns": 3,
+        "yardsPerReception": 7.47599983215332,
+        "catchRate": 87.5
+      },
+      "fantasy": {
+        "halfPprPoints": 268.9,
+        "halfPprPpg": 16.8
+      }
+    },
+    "palmer_joshua": {
+      "playerId": "palmer_joshua",
+      "espnId": "4242433",
+      "season": 2021,
+      "position": "WR",
+      "team": "BUF",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": 6,
+        "touchdowns": 0,
+        "yardsPerAttempt": 6,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 49,
+        "receptions": 33,
+        "yards": 353,
+        "touchdowns": 4,
+        "yardsPerReception": 10.696999549865723,
+        "catchRate": 67.3
+      },
+      "fantasy": {
+        "halfPprPoints": 76.4,
+        "halfPprPpg": 4.5
+      }
+    },
+    "stafford_matthew": {
+      "playerId": "stafford_matthew",
+      "espnId": "12483",
+      "season": 2021,
+      "position": "QB",
+      "team": "LAR",
+      "gamesPlayed": 17,
+      "passing": {
+        "completions": 404,
+        "attempts": 601,
+        "yards": 4886,
+        "touchdowns": 41,
+        "interceptions": 17,
+        "completionPct": 67.22100067138672,
+        "yardsPerAttempt": 8.130000114440918
+      },
+      "rushing": {
+        "attempts": 32,
+        "yards": 43,
+        "touchdowns": 0,
+        "yardsPerAttempt": 1.343999981880188,
+        "fumbles": 2
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 346.7,
+        "halfPprPpg": 20.4
+      }
+    },
+    "thielen_adam": {
+      "playerId": "thielen_adam",
+      "espnId": "16460",
+      "season": 2021,
+      "position": "WR",
+      "team": "PIT",
+      "gamesPlayed": 13,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": 2,
+        "touchdowns": 0,
+        "yardsPerAttempt": 2,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 95,
+        "receptions": 67,
+        "yards": 726,
+        "touchdowns": 10,
+        "yardsPerReception": 10.836000442504883,
+        "catchRate": 70.5
+      },
+      "fantasy": {
+        "halfPprPoints": 166.3,
+        "halfPprPpg": 12.8
+      }
+    },
+    "darnold_sam": {
+      "playerId": "darnold_sam",
+      "espnId": "3912547",
+      "season": 2021,
+      "position": "QB",
+      "team": "SEA",
+      "gamesPlayed": 12,
+      "passing": {
+        "completions": 243,
+        "attempts": 406,
+        "yards": 2527,
+        "touchdowns": 9,
+        "interceptions": 13,
+        "completionPct": 59.85200119018555,
+        "yardsPerAttempt": 6.223999977111816
+      },
+      "rushing": {
+        "attempts": 48,
+        "yards": 222,
+        "touchdowns": 5,
+        "yardsPerAttempt": 4.625,
+        "fumbles": 4
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 176.3,
+        "halfPprPpg": 14.7
+      }
+    },
+    "hopkins_deandre": {
+      "playerId": "hopkins_deandre",
+      "espnId": "15795",
+      "season": 2021,
+      "position": "WR",
+      "team": "BAL",
+      "gamesPlayed": 10,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 64,
+        "receptions": 42,
+        "yards": 572,
+        "touchdowns": 8,
+        "yardsPerReception": 13.619000434875488,
+        "catchRate": 65.6
+      },
+      "fantasy": {
+        "halfPprPoints": 126.2,
+        "halfPprPpg": 12.6
+      }
+    },
+    "rodgers_aaron": {
+      "playerId": "rodgers_aaron",
+      "espnId": "8439",
+      "season": 2021,
+      "position": "QB",
+      "team": "PIT",
+      "gamesPlayed": 16,
+      "passing": {
+        "completions": 366,
+        "attempts": 531,
+        "yards": 4115,
+        "touchdowns": 37,
+        "interceptions": 4,
+        "completionPct": 68.927001953125,
+        "yardsPerAttempt": 7.75
+      },
+      "rushing": {
+        "attempts": 33,
+        "yards": 101,
+        "touchdowns": 3,
+        "yardsPerAttempt": 3.061000108718872,
+        "fumbles": 2
+      },
+      "receiving": {
+        "targets": 1,
+        "receptions": 1,
+        "yards": -4,
+        "touchdowns": 0,
+        "yardsPerReception": -4,
+        "catchRate": 100
+      },
+      "fantasy": {
+        "halfPprPoints": 336.8,
+        "halfPprPpg": 21.1
+      }
+    },
+    "gesicki_mike": {
+      "playerId": "gesicki_mike",
+      "espnId": "3116164",
+      "season": 2021,
+      "position": "TE",
+      "team": "CIN",
+      "gamesPlayed": 17,
+      "passing": {
+        "completions": 0,
+        "attempts": 1,
+        "yards": 0,
+        "touchdowns": 0,
+        "interceptions": 0,
+        "completionPct": 0,
+        "yardsPerAttempt": 0
+      },
+      "rushing": null,
+      "receiving": {
+        "targets": 112,
+        "receptions": 73,
+        "yards": 780,
+        "touchdowns": 2,
+        "yardsPerReception": 10.6850004196167,
+        "catchRate": 65.2
+      },
+      "fantasy": {
+        "halfPprPoints": 126.5,
+        "halfPprPpg": 7.4
+      }
+    },
+    "slayton_darius": {
+      "playerId": "slayton_darius",
+      "espnId": "3916945",
+      "season": 2021,
+      "position": "WR",
+      "team": "NYG",
+      "gamesPlayed": 13,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": -13,
+        "touchdowns": 0,
+        "yardsPerAttempt": -13,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 58,
+        "receptions": 26,
+        "yards": 339,
+        "touchdowns": 2,
+        "yardsPerReception": 13.038000106811523,
+        "catchRate": 44.8
+      },
+      "fantasy": {
+        "halfPprPoints": 57.6,
+        "halfPprPpg": 4.4
+      }
+    },
+    "hunt_kareem": {
+      "playerId": "hunt_kareem",
+      "espnId": "3059915",
+      "season": 2021,
+      "position": "RB",
+      "team": "KC",
+      "gamesPlayed": 8,
+      "passing": null,
+      "rushing": {
+        "attempts": 78,
+        "yards": 386,
+        "touchdowns": 5,
+        "yardsPerAttempt": 4.948999881744385,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 27,
+        "receptions": 22,
+        "yards": 174,
+        "touchdowns": 0,
+        "yardsPerReception": 7.908999919891357,
+        "catchRate": 81.5
+      },
+      "fantasy": {
+        "halfPprPoints": 97,
+        "halfPprPpg": 12.1
+      }
+    },
+    "freiermuth_pat": {
+      "playerId": "freiermuth_pat",
+      "espnId": "4361411",
+      "season": 2021,
+      "position": "TE",
+      "team": "PIT",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 79,
+        "receptions": 60,
+        "yards": 497,
+        "touchdowns": 7,
+        "yardsPerReception": 8.282999992370605,
+        "catchRate": 75.9
+      },
+      "fantasy": {
+        "halfPprPoints": 121.7,
+        "halfPprPpg": 7.6
+      }
+    },
+    "schultz_dalton": {
+      "playerId": "schultz_dalton",
+      "espnId": "3117256",
+      "season": 2021,
+      "position": "TE",
+      "team": "HOU",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 104,
+        "receptions": 78,
+        "yards": 808,
+        "touchdowns": 8,
+        "yardsPerReception": 10.359000205993652,
+        "catchRate": 75
+      },
+      "fantasy": {
+        "halfPprPoints": 167.8,
+        "halfPprPpg": 9.9
+      }
+    },
+    "sanders_miles": {
+      "playerId": "sanders_miles",
+      "espnId": "4045163",
+      "season": 2021,
+      "position": "RB",
+      "team": "DAL",
+      "gamesPlayed": 12,
+      "passing": null,
+      "rushing": {
+        "attempts": 137,
+        "yards": 754,
+        "touchdowns": 0,
+        "yardsPerAttempt": 5.504000186920166,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 34,
+        "receptions": 26,
+        "yards": 158,
+        "touchdowns": 0,
+        "yardsPerReception": 6.077000141143799,
+        "catchRate": 76.5
+      },
+      "fantasy": {
+        "halfPprPoints": 104.2,
+        "halfPprPpg": 8.7
+      }
+    },
+    "jones_daniel": {
+      "playerId": "jones_daniel",
+      "espnId": "3917792",
+      "season": 2021,
+      "position": "QB",
+      "team": "IND",
+      "gamesPlayed": 11,
+      "passing": {
+        "completions": 232,
+        "attempts": 361,
+        "yards": 2428,
+        "touchdowns": 10,
+        "interceptions": 7,
+        "completionPct": 64.26599884033203,
+        "yardsPerAttempt": 6.72599983215332
+      },
+      "rushing": {
+        "attempts": 62,
+        "yards": 298,
+        "touchdowns": 2,
+        "yardsPerAttempt": 4.806000232696533,
+        "fumbles": 2
+      },
+      "receiving": {
+        "targets": 1,
+        "receptions": 1,
+        "yards": 16,
+        "touchdowns": 0,
+        "yardsPerReception": 16,
+        "catchRate": 100
+      },
+      "fantasy": {
+        "halfPprPoints": 174,
+        "halfPprPpg": 15.8
+      }
+    },
+    "johnson_juwan": {
+      "playerId": "johnson_juwan",
+      "espnId": "3929645",
+      "season": 2021,
+      "position": "TE",
+      "team": "NO",
+      "gamesPlayed": 14,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 22,
+        "receptions": 13,
+        "yards": 159,
+        "touchdowns": 4,
+        "yardsPerReception": 12.230999946594238,
+        "catchRate": 59.1
+      },
+      "fantasy": {
+        "halfPprPoints": 46.4,
+        "halfPprPpg": 3.3
+      }
+    },
+    "lockett_tyler": {
+      "playerId": "lockett_tyler",
+      "espnId": "2577327",
+      "season": 2021,
+      "position": "WR",
+      "team": "LV",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 2,
+        "yards": 9,
+        "touchdowns": 0,
+        "yardsPerAttempt": 4.5,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 107,
+        "receptions": 73,
+        "yards": 1175,
+        "touchdowns": 8,
+        "yardsPerReception": 16.09600067138672,
+        "catchRate": 68.2
+      },
+      "fantasy": {
+        "halfPprPoints": 202.9,
+        "halfPprPpg": 12.7
+      }
+    },
+    "brown_dyami": {
+      "playerId": "brown_dyami",
+      "espnId": "4361577",
+      "season": 2021,
+      "position": "WR",
+      "team": "JAC",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": -4,
+        "touchdowns": 0,
+        "yardsPerAttempt": -4,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 25,
+        "receptions": 12,
+        "yards": 165,
+        "touchdowns": 0,
+        "yardsPerReception": 13.75,
+        "catchRate": 48
+      },
+      "fantasy": {
+        "halfPprPoints": 22.1,
+        "halfPprPpg": 1.5
+      }
+    },
+    "flacco_joe": {
+      "playerId": "flacco_joe",
+      "espnId": "11252",
+      "season": 2021,
+      "position": "QB",
+      "team": "CIN",
+      "gamesPlayed": 2,
+      "passing": {
+        "completions": 27,
+        "attempts": 42,
+        "yards": 338,
+        "touchdowns": 3,
+        "interceptions": 0,
+        "completionPct": 64.28600311279297,
+        "yardsPerAttempt": 8.04800033569336
+      },
+      "rushing": {
+        "attempts": 2,
+        "yards": 3,
+        "touchdowns": 0,
+        "yardsPerAttempt": 1.5,
+        "fumbles": 0
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 25.8,
+        "halfPprPpg": 12.9
+      }
+    },
+    "mostert_raheem": {
+      "playerId": "mostert_raheem",
+      "espnId": "2576414",
+      "season": 2021,
+      "position": "RB",
+      "team": "LV",
+      "gamesPlayed": 1,
+      "passing": null,
+      "rushing": {
+        "attempts": 2,
+        "yards": 20,
+        "touchdowns": 0,
+        "yardsPerAttempt": 10,
+        "fumbles": 0
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 2,
+        "halfPprPpg": 2
+      }
+    },
+    "wilson_russell": {
+      "playerId": "wilson_russell",
+      "espnId": "14881",
+      "season": 2021,
+      "position": "QB",
+      "team": "NYG",
+      "gamesPlayed": 14,
+      "passing": {
+        "completions": 259,
+        "attempts": 400,
+        "yards": 3113,
+        "touchdowns": 25,
+        "interceptions": 6,
+        "completionPct": 64.75,
+        "yardsPerAttempt": 7.7829999923706055
+      },
+      "rushing": {
+        "attempts": 43,
+        "yards": 183,
+        "touchdowns": 2,
+        "yardsPerAttempt": 4.25600004196167,
+        "fumbles": 2
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 248.8,
+        "halfPprPpg": 17.8
+      }
+    },
+    "gainwell_kenneth": {
+      "playerId": "gainwell_kenneth",
+      "espnId": "4371733",
+      "season": 2021,
+      "position": "RB",
+      "team": "PIT",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 68,
+        "yards": 291,
+        "touchdowns": 5,
+        "yardsPerAttempt": 4.2789998054504395,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 50,
+        "receptions": 33,
+        "yards": 253,
+        "touchdowns": 1,
+        "yardsPerReception": 7.666999816894531,
+        "catchRate": 66
+      },
+      "fantasy": {
+        "halfPprPoints": 106.9,
+        "halfPprPpg": 6.7
+      }
+    },
+    "kmet_cole": {
+      "playerId": "kmet_cole",
+      "espnId": "4258595",
+      "season": 2021,
+      "position": "TE",
+      "team": "CHI",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": 0,
+        "touchdowns": 0,
+        "yardsPerAttempt": 0,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 93,
+        "receptions": 60,
+        "yards": 612,
+        "touchdowns": 0,
+        "yardsPerReception": 10.199999809265137,
+        "catchRate": 64.5
+      },
+      "fantasy": {
+        "halfPprPoints": 91.2,
+        "halfPprPpg": 5.4
+      }
+    },
+    "johnson_ty": {
+      "playerId": "johnson_ty",
+      "espnId": "3915411",
+      "season": 2021,
+      "position": "RB",
+      "team": "BUF",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 61,
+        "yards": 238,
+        "touchdowns": 2,
+        "yardsPerAttempt": 3.9019999504089355,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 55,
+        "receptions": 34,
+        "yards": 372,
+        "touchdowns": 2,
+        "yardsPerReception": 10.940999984741211,
+        "catchRate": 61.8
+      },
+      "fantasy": {
+        "halfPprPoints": 102,
+        "halfPprPpg": 6.4
+      }
+    },
+    "gibson_antonio": {
+      "playerId": "gibson_antonio",
+      "espnId": "4360294",
+      "season": 2021,
+      "position": "RB",
+      "team": "NE",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 258,
+        "yards": 1037,
+        "touchdowns": 7,
+        "yardsPerAttempt": 4.019000053405762,
+        "fumbles": 5
+      },
+      "receiving": {
+        "targets": 52,
+        "receptions": 42,
+        "yards": 294,
+        "touchdowns": 3,
+        "yardsPerReception": 7,
+        "catchRate": 80.8
+      },
+      "fantasy": {
+        "halfPprPoints": 214.1,
+        "halfPprPpg": 13.4
+      }
+    },
+    "cooks_brandin": {
+      "playerId": "cooks_brandin",
+      "espnId": "16731",
+      "season": 2021,
+      "position": "WR",
+      "team": "BUF",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 2,
+        "yards": 21,
+        "touchdowns": 0,
+        "yardsPerAttempt": 10.5,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 134,
+        "receptions": 90,
+        "yards": 1037,
+        "touchdowns": 6,
+        "yardsPerReception": 11.522000312805176,
+        "catchRate": 67.2
+      },
+      "fantasy": {
+        "halfPprPoints": 186.8,
+        "halfPprPpg": 11.7
+      }
+    },
+    "singletary_devin": {
+      "playerId": "singletary_devin",
+      "espnId": "4040761",
+      "season": 2021,
+      "position": "RB",
+      "team": "NYG",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 188,
+        "yards": 870,
+        "touchdowns": 7,
+        "yardsPerAttempt": 4.627999782562256,
+        "fumbles": 2
+      },
+      "receiving": {
+        "targets": 50,
+        "receptions": 40,
+        "yards": 228,
+        "touchdowns": 1,
+        "yardsPerReception": 5.699999809265137,
+        "catchRate": 80
+      },
+      "fantasy": {
+        "halfPprPoints": 177.8,
+        "halfPprPpg": 10.5
+      }
+    },
+    "gray_noah": {
+      "playerId": "gray_noah",
+      "espnId": "4240472",
+      "season": 2021,
+      "position": "TE",
+      "team": "KC",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 10,
+        "receptions": 7,
+        "yards": 36,
+        "touchdowns": 1,
+        "yardsPerReception": 5.14300012588501,
+        "catchRate": 70
+      },
+      "fantasy": {
+        "halfPprPoints": 13.1,
+        "halfPprPpg": 0.8
+      }
+    },
+    "mitchell_elijah": {
+      "playerId": "mitchell_elijah",
+      "espnId": "4241555",
+      "season": 2021,
+      "position": "RB",
+      "team": "KC",
+      "gamesPlayed": 11,
+      "passing": null,
+      "rushing": {
+        "attempts": 207,
+        "yards": 963,
+        "touchdowns": 5,
+        "yardsPerAttempt": 4.6519999504089355,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 20,
+        "receptions": 19,
+        "yards": 137,
+        "touchdowns": 1,
+        "yardsPerReception": 7.210999965667725,
+        "catchRate": 95
+      },
+      "fantasy": {
+        "halfPprPoints": 155.5,
+        "halfPprPpg": 14.1
+      }
+    },
+    "waller_darren": {
+      "playerId": "waller_darren",
+      "espnId": "2576925",
+      "season": 2021,
+      "position": "WR",
+      "team": "MIA",
+      "gamesPlayed": 11,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 93,
+        "receptions": 55,
+        "yards": 665,
+        "touchdowns": 2,
+        "yardsPerReception": 12.090999603271484,
+        "catchRate": 59.1
+      },
+      "fantasy": {
+        "halfPprPoints": 106,
+        "halfPprPpg": 9.6
+      }
+    },
+    "westbrookikhine_nick": {
+      "playerId": "westbrookikhine_nick",
+      "espnId": "3929785",
+      "season": 2021,
+      "position": "WR",
+      "team": "MIA",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 57,
+        "receptions": 38,
+        "yards": 476,
+        "touchdowns": 4,
+        "yardsPerReception": 12.526000022888184,
+        "catchRate": 66.7
+      },
+      "fantasy": {
+        "halfPprPoints": 90.6,
+        "halfPprPpg": 5.7
+      }
+    },
+    "moore_elijah": {
+      "playerId": "moore_elijah",
+      "espnId": "4372414",
+      "season": 2021,
+      "position": "WR",
+      "team": "DEN",
+      "gamesPlayed": 11,
+      "passing": null,
+      "rushing": {
+        "attempts": 5,
+        "yards": 54,
+        "touchdowns": 1,
+        "yardsPerAttempt": 10.800000190734863,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 77,
+        "receptions": 43,
+        "yards": 538,
+        "touchdowns": 5,
+        "yardsPerReception": 12.51200008392334,
+        "catchRate": 55.8
+      },
+      "fantasy": {
+        "halfPprPoints": 116.7,
+        "halfPprPpg": 10.6
+      }
+    },
+    "perine_samaje": {
+      "playerId": "perine_samaje",
+      "espnId": "3116389",
+      "season": 2021,
+      "position": "WR",
+      "team": "CIN",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 55,
+        "yards": 246,
+        "touchdowns": 1,
+        "yardsPerAttempt": 4.4730000495910645,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 31,
+        "receptions": 27,
+        "yards": 196,
+        "touchdowns": 1,
+        "yardsPerReception": 7.258999824523926,
+        "catchRate": 87.1
+      },
+      "fantasy": {
+        "halfPprPoints": 69.7,
+        "halfPprPpg": 4.4
+      }
+    },
+    "mccloud_rayray": {
+      "playerId": "mccloud_rayray",
+      "espnId": "3728262",
+      "season": 2021,
+      "position": "WR",
+      "team": "NYG",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 2,
+        "yards": 15,
+        "touchdowns": 0,
+        "yardsPerAttempt": 7.5,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 66,
+        "receptions": 39,
+        "yards": 277,
+        "touchdowns": 0,
+        "yardsPerReception": 7.103000164031982,
+        "catchRate": 59.1
+      },
+      "fantasy": {
+        "halfPprPoints": 48.7,
+        "halfPprPpg": 3
+      }
+    },
+    "patrick_tim": {
+      "playerId": "patrick_tim",
+      "espnId": "3134353",
+      "season": 2021,
+      "position": "WR",
+      "team": "JAC",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 85,
+        "receptions": 53,
+        "yards": 734,
+        "touchdowns": 5,
+        "yardsPerReception": 13.848999977111816,
+        "catchRate": 62.4
+      },
+      "fantasy": {
+        "halfPprPoints": 129.9,
+        "halfPprPpg": 8.1
+      }
+    },
+    "atwell_tutu": {
+      "playerId": "atwell_tutu",
+      "espnId": "4360797",
+      "season": 2021,
+      "position": "WR",
+      "team": "LAR",
+      "gamesPlayed": 8,
+      "passing": null,
+      "rushing": null,
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 0,
+        "halfPprPpg": 0
+      }
+    },
+    "reynolds_josh": {
+      "playerId": "reynolds_josh",
+      "espnId": "3115306",
+      "season": 2021,
+      "position": "WR",
+      "team": "NYJ",
+      "gamesPlayed": 12,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 49,
+        "receptions": 29,
+        "yards": 396,
+        "touchdowns": 2,
+        "yardsPerReception": 13.654999732971191,
+        "catchRate": 59.2
+      },
+      "fantasy": {
+        "halfPprPoints": 66.1,
+        "halfPprPpg": 5.5
+      }
+    },
+    "fant_noah": {
+      "playerId": "fant_noah",
+      "espnId": "4036131",
+      "season": 2021,
+      "position": "TE",
+      "team": "CIN",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 90,
+        "receptions": 68,
+        "yards": 670,
+        "touchdowns": 4,
+        "yardsPerReception": 9.852999687194824,
+        "catchRate": 75.6
+      },
+      "fantasy": {
+        "halfPprPoints": 125,
+        "halfPprPpg": 7.8
+      }
+    },
+    "higbee_tyler": {
+      "playerId": "higbee_tyler",
+      "espnId": "2573401",
+      "season": 2021,
+      "position": "TE",
+      "team": "LAR",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 85,
+        "receptions": 61,
+        "yards": 560,
+        "touchdowns": 5,
+        "yardsPerReception": 9.180000305175781,
+        "catchRate": 71.8
+      },
+      "fantasy": {
+        "halfPprPoints": 116.5,
+        "halfPprPpg": 7.8
+      }
+    },
+    "hill_taysom": {
+      "playerId": "hill_taysom",
+      "espnId": "2468609",
+      "season": 2021,
+      "position": "TE",
+      "team": "NO",
+      "gamesPlayed": 12,
+      "passing": {
+        "completions": 78,
+        "attempts": 134,
+        "yards": 978,
+        "touchdowns": 4,
+        "interceptions": 5,
+        "completionPct": 58.20899963378906,
+        "yardsPerAttempt": 7.298999786376953
+      },
+      "rushing": {
+        "attempts": 70,
+        "yards": 374,
+        "touchdowns": 5,
+        "yardsPerAttempt": 5.3429999351501465,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 6,
+        "receptions": 4,
+        "yards": 52,
+        "touchdowns": 0,
+        "yardsPerReception": 13,
+        "catchRate": 66.7
+      },
+      "fantasy": {
+        "halfPprPoints": 124.7,
+        "halfPprPpg": 10.4
+      }
+    },
+    "dissly_will": {
+      "playerId": "dissly_will",
+      "espnId": "3127292",
+      "season": 2021,
+      "position": "TE",
+      "team": "LAC",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 26,
+        "receptions": 21,
+        "yards": 231,
+        "touchdowns": 1,
+        "yardsPerReception": 11,
+        "catchRate": 80.8
+      },
+      "fantasy": {
+        "halfPprPoints": 39.6,
+        "halfPprPpg": 2.6
+      }
+    },
+    "herbert_khalil": {
+      "playerId": "herbert_khalil",
+      "espnId": "4035886",
+      "season": 2021,
+      "position": "RB",
+      "team": "NYJ",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 103,
+        "yards": 433,
+        "touchdowns": 2,
+        "yardsPerAttempt": 4.203999996185303,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 16,
+        "receptions": 14,
+        "yards": 96,
+        "touchdowns": 0,
+        "yardsPerReception": 6.85699987411499,
+        "catchRate": 87.5
+      },
+      "fantasy": {
+        "halfPprPoints": 71.9,
+        "halfPprPpg": 4.2
+      }
+    },
+    "dillon_aj": {
+      "playerId": "dillon_aj",
+      "espnId": "4239934",
+      "season": 2021,
+      "position": "RB",
+      "team": "PHI",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 187,
+        "yards": 803,
+        "touchdowns": 5,
+        "yardsPerAttempt": 4.294000148773193,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 37,
+        "receptions": 34,
+        "yards": 313,
+        "touchdowns": 2,
+        "yardsPerReception": 9.206000328063965,
+        "catchRate": 91.9
+      },
+      "fantasy": {
+        "halfPprPoints": 170.6,
+        "halfPprPpg": 10
+      }
+    },
+    "conklin_tyler": {
+      "playerId": "conklin_tyler",
+      "espnId": "3915486",
+      "season": 2021,
+      "position": "TE",
+      "team": "LAC",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 87,
+        "receptions": 61,
+        "yards": 593,
+        "touchdowns": 3,
+        "yardsPerReception": 9.720999717712402,
+        "catchRate": 70.1
+      },
+      "fantasy": {
+        "halfPprPoints": 107.8,
+        "halfPprPpg": 6.3
+      }
+    },
+    "knox_dawson": {
+      "playerId": "knox_dawson",
+      "espnId": "3930086",
+      "season": 2021,
+      "position": "TE",
+      "team": "BUF",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 71,
+        "receptions": 49,
+        "yards": 587,
+        "touchdowns": 9,
+        "yardsPerReception": 11.979999542236328,
+        "catchRate": 69
+      },
+      "fantasy": {
+        "halfPprPoints": 137.2,
+        "halfPprPpg": 9.1
+      }
+    },
+    "zaccheaus_olamide": {
+      "playerId": "zaccheaus_olamide",
+      "espnId": "3917914",
+      "season": 2021,
+      "position": "WR",
+      "team": "CHI",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": 2,
+        "touchdowns": 0,
+        "yardsPerAttempt": 2,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 53,
+        "receptions": 31,
+        "yards": 406,
+        "touchdowns": 3,
+        "yardsPerReception": 13.097000122070312,
+        "catchRate": 58.5
+      },
+      "fantasy": {
+        "halfPprPoints": 74.3,
+        "halfPprPpg": 4.4
+      }
+    },
+    "brown_noah": {
+      "playerId": "brown_noah",
+      "espnId": "3121409",
+      "season": 2021,
+      "position": "WR",
+      "team": "WAS",
+      "gamesPlayed": 13,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 25,
+        "receptions": 16,
+        "yards": 184,
+        "touchdowns": 0,
+        "yardsPerReception": 11.5,
+        "catchRate": 64
+      },
+      "fantasy": {
+        "halfPprPoints": 26.4,
+        "halfPprPpg": 2
+      }
+    },
+    "hooper_austin": {
+      "playerId": "hooper_austin",
+      "espnId": "3043275",
+      "season": 2021,
+      "position": "TE",
+      "team": "NE",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 61,
+        "receptions": 38,
+        "yards": 345,
+        "touchdowns": 3,
+        "yardsPerReception": 9.079000473022461,
+        "catchRate": 62.3
+      },
+      "fantasy": {
+        "halfPprPoints": 71.5,
+        "halfPprPpg": 4.5
+      }
+    },
+    "renfrow_hunter": {
+      "playerId": "renfrow_hunter",
+      "espnId": "3135321",
+      "season": 2021,
+      "position": "WR",
+      "team": "CAR",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 3,
+        "yards": 3,
+        "touchdowns": 0,
+        "yardsPerAttempt": 1,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 128,
+        "receptions": 103,
+        "yards": 1038,
+        "touchdowns": 9,
+        "yardsPerReception": 10.07800006866455,
+        "catchRate": 80.5
+      },
+      "fantasy": {
+        "halfPprPoints": 209.6,
+        "halfPprPpg": 12.3
+      }
+    },
+    "johnson_diontae": {
+      "playerId": "johnson_diontae",
+      "espnId": "3932905",
+      "season": 2021,
+      "position": "WR",
+      "team": "FA",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 5,
+        "yards": 53,
+        "touchdowns": 0,
+        "yardsPerAttempt": 10.600000381469727,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 169,
+        "receptions": 107,
+        "yards": 1161,
+        "touchdowns": 8,
+        "yardsPerReception": 10.850000381469727,
+        "catchRate": 63.3
+      },
+      "fantasy": {
+        "halfPprPoints": 222.9,
+        "halfPprPpg": 13.9
+      }
+    },
+    "robinson_demarcus": {
+      "playerId": "robinson_demarcus",
+      "espnId": "3043116",
+      "season": 2021,
+      "position": "WR",
+      "team": "SF",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 41,
+        "receptions": 25,
+        "yards": 264,
+        "touchdowns": 3,
+        "yardsPerReception": 10.5600004196167,
+        "catchRate": 61
+      },
+      "fantasy": {
+        "halfPprPoints": 56.9,
+        "halfPprPpg": 3.3
+      }
+    },
+    "davis_gabe": {
+      "playerId": "davis_gabe",
+      "espnId": "4243537",
+      "season": 2021,
+      "position": "WR",
+      "team": "BUF",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 63,
+        "receptions": 35,
+        "yards": 549,
+        "touchdowns": 6,
+        "yardsPerReception": 15.685999870300293,
+        "catchRate": 55.6
+      },
+      "fantasy": {
+        "halfPprPoints": 108.4,
+        "halfPprPpg": 6.8
+      }
+    },
+    "hollins_mack": {
+      "playerId": "hollins_mack",
+      "espnId": "2991662",
+      "season": 2021,
+      "position": "WR",
+      "team": "NE",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 28,
+        "receptions": 14,
+        "yards": 223,
+        "touchdowns": 4,
+        "yardsPerReception": 15.928999900817871,
+        "catchRate": 50
+      },
+      "fantasy": {
+        "halfPprPoints": 53.3,
+        "halfPprPpg": 3.1
+      }
+    },
+    "samuel_curtis": {
+      "playerId": "samuel_curtis",
+      "espnId": "3121427",
+      "season": 2021,
+      "position": "WR",
+      "team": "BUF",
+      "gamesPlayed": 5,
+      "passing": null,
+      "rushing": {
+        "attempts": 4,
+        "yards": 11,
+        "touchdowns": 0,
+        "yardsPerAttempt": 2.75,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 9,
+        "receptions": 6,
+        "yards": 27,
+        "touchdowns": 0,
+        "yardsPerReception": 4.5,
+        "catchRate": 66.7
+      },
+      "fantasy": {
+        "halfPprPoints": 6.8,
+        "halfPprPpg": 1.4
+      }
+    },
+    "mcnichols_jeremy": {
+      "playerId": "mcnichols_jeremy",
+      "espnId": "3127586",
+      "season": 2021,
+      "position": "RB",
+      "team": "WAS",
+      "gamesPlayed": 14,
+      "passing": null,
+      "rushing": {
+        "attempts": 41,
+        "yards": 156,
+        "touchdowns": 0,
+        "yardsPerAttempt": 3.805000066757202,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 38,
+        "receptions": 28,
+        "yards": 240,
+        "touchdowns": 1,
+        "yardsPerReception": 8.571000099182129,
+        "catchRate": 73.7
+      },
+      "fantasy": {
+        "halfPprPoints": 59.6,
+        "halfPprPpg": 4.3
+      }
+    },
+    "tremble_tommy": {
+      "playerId": "tremble_tommy",
+      "espnId": "4372780",
+      "season": 2021,
+      "position": "TE",
+      "team": "CAR",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 3,
+        "yards": 11,
+        "touchdowns": 1,
+        "yardsPerAttempt": 3.6670000553131104,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 35,
+        "receptions": 20,
+        "yards": 180,
+        "touchdowns": 1,
+        "yardsPerReception": 9,
+        "catchRate": 57.1
+      },
+      "fantasy": {
+        "halfPprPoints": 41.1,
+        "halfPprPpg": 2.6
+      }
+    },
+    "jones_zay": {
+      "playerId": "jones_zay",
+      "espnId": "3059722",
+      "season": 2021,
+      "position": "WR",
+      "team": "ARI",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 2,
+        "yards": 3,
+        "touchdowns": 0,
+        "yardsPerAttempt": 1.5,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 70,
+        "receptions": 47,
+        "yards": 546,
+        "touchdowns": 1,
+        "yardsPerReception": 11.616999626159668,
+        "catchRate": 67.1
+      },
+      "fantasy": {
+        "halfPprPoints": 84.4,
+        "halfPprPpg": 5
+      }
+    },
+    "cousins_kirk": {
+      "playerId": "cousins_kirk",
+      "espnId": "14880",
+      "season": 2021,
+      "position": "QB",
+      "team": "ATL",
+      "gamesPlayed": 16,
+      "passing": {
+        "completions": 372,
+        "attempts": 561,
+        "yards": 4221,
+        "touchdowns": 33,
+        "interceptions": 7,
+        "completionPct": 66.30999755859375,
+        "yardsPerAttempt": 7.52400016784668
+      },
+      "rushing": {
+        "attempts": 29,
+        "yards": 115,
+        "touchdowns": 1,
+        "yardsPerAttempt": 3.9660000801086426,
+        "fumbles": 2
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 311.3,
+        "halfPprPpg": 19.5
+      }
+    },
+    "moss_zack": {
+      "playerId": "moss_zack",
+      "espnId": "4035676",
+      "season": 2021,
+      "position": "RB",
+      "team": "FA",
+      "gamesPlayed": 13,
+      "passing": null,
+      "rushing": {
+        "attempts": 96,
+        "yards": 345,
+        "touchdowns": 4,
+        "yardsPerAttempt": 3.5940001010894775,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 32,
+        "receptions": 23,
+        "yards": 197,
+        "touchdowns": 1,
+        "yardsPerReception": 8.5649995803833,
+        "catchRate": 71.9
+      },
+      "fantasy": {
+        "halfPprPoints": 95.7,
+        "halfPprPpg": 7.4
+      }
+    },
+    "jefferson_van": {
+      "playerId": "jefferson_van",
+      "espnId": "3930066",
+      "season": 2021,
+      "position": "WR",
+      "team": "TEN",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 2,
+        "yards": 20,
+        "touchdowns": 0,
+        "yardsPerAttempt": 10,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 89,
+        "receptions": 50,
+        "yards": 802,
+        "touchdowns": 6,
+        "yardsPerReception": 16.040000915527344,
+        "catchRate": 56.2
+      },
+      "fantasy": {
+        "halfPprPoints": 143.2,
+        "halfPprPpg": 8.4
+      }
+    },
+    "lazard_allen": {
+      "playerId": "lazard_allen",
+      "espnId": "3128390",
+      "season": 2021,
+      "position": "WR",
+      "team": "NYJ",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": {
+        "attempts": 3,
+        "yards": 32,
+        "touchdowns": 0,
+        "yardsPerAttempt": 10.666999816894531,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 60,
+        "receptions": 40,
+        "yards": 513,
+        "touchdowns": 8,
+        "yardsPerReception": 12.824999809265137,
+        "catchRate": 66.7
+      },
+      "fantasy": {
+        "halfPprPoints": 122.5,
+        "halfPprPpg": 8.2
+      }
+    },
+    "dortch_greg": {
+      "playerId": "dortch_greg",
+      "espnId": "4037235",
+      "season": 2021,
+      "position": "WR",
+      "team": "ARI",
+      "gamesPlayed": 5,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": 24,
+        "touchdowns": 0,
+        "yardsPerAttempt": 24,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 3,
+        "receptions": 3,
+        "yards": 15,
+        "touchdowns": 0,
+        "yardsPerReception": 5,
+        "catchRate": 100
+      },
+      "fantasy": {
+        "halfPprPoints": 5.4,
+        "halfPprPpg": 1.1
+      }
+    },
+    "garoppolo_jimmy": {
+      "playerId": "garoppolo_jimmy",
+      "espnId": "16760",
+      "season": 2021,
+      "position": "QB",
+      "team": "LAR",
+      "gamesPlayed": 15,
+      "passing": {
+        "completions": 301,
+        "attempts": 441,
+        "yards": 3810,
+        "touchdowns": 20,
+        "interceptions": 12,
+        "completionPct": 68.25399780273438,
+        "yardsPerAttempt": 8.638999938964844
+      },
+      "rushing": {
+        "attempts": 38,
+        "yards": 51,
+        "touchdowns": 3,
+        "yardsPerAttempt": 1.3420000076293945,
+        "fumbles": 4
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 243.5,
+        "halfPprPpg": 16.2
+      }
+    },
+    "smithschuster_juju": {
+      "playerId": "smithschuster_juju",
+      "espnId": "3120348",
+      "season": 2021,
+      "position": "WR",
+      "team": "KC",
+      "gamesPlayed": 5,
+      "passing": null,
+      "rushing": {
+        "attempts": 3,
+        "yards": 9,
+        "touchdowns": 1,
+        "yardsPerAttempt": 3,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 28,
+        "receptions": 15,
+        "yards": 129,
+        "touchdowns": 0,
+        "yardsPerReception": 8.600000381469727,
+        "catchRate": 53.6
+      },
+      "fantasy": {
+        "halfPprPoints": 27.3,
+        "halfPprPpg": 5.5
+      }
+    },
+    "reynolds_craig": {
+      "playerId": "reynolds_craig",
+      "espnId": "4421446",
+      "season": 2021,
+      "position": "RB",
+      "team": "NE",
+      "gamesPlayed": 5,
+      "passing": null,
+      "rushing": {
+        "attempts": 55,
+        "yards": 230,
+        "touchdowns": 0,
+        "yardsPerAttempt": 4.182000160217285,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 8,
+        "receptions": 7,
+        "yards": 52,
+        "touchdowns": 0,
+        "yardsPerReception": 7.428999900817871,
+        "catchRate": 87.5
+      },
+      "fantasy": {
+        "halfPprPoints": 31.7,
+        "halfPprPpg": 6.3
+      }
+    },
+    "oliver_josh": {
+      "playerId": "oliver_josh",
+      "espnId": "3921690",
+      "season": 2021,
+      "position": "TE",
+      "team": "MIN",
+      "gamesPlayed": 14,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 15,
+        "receptions": 9,
+        "yards": 66,
+        "touchdowns": 0,
+        "yardsPerReception": 7.333000183105469,
+        "catchRate": 60
+      },
+      "fantasy": {
+        "halfPprPoints": 11.1,
+        "halfPprPpg": 0.8
+      }
+    },
+    "ogunbowale_dare": {
+      "playerId": "ogunbowale_dare",
+      "espnId": "2983509",
+      "season": 2021,
+      "position": "RB",
+      "team": "HOU",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 43,
+        "yards": 137,
+        "touchdowns": 1,
+        "yardsPerAttempt": 3.186000108718872,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 21,
+        "receptions": 13,
+        "yards": 114,
+        "touchdowns": 1,
+        "yardsPerReception": 8.769000053405762,
+        "catchRate": 61.9
+      },
+      "fantasy": {
+        "halfPprPoints": 43.6,
+        "halfPprPpg": 2.6
+      }
+    },
+    "moreau_foster": {
+      "playerId": "moreau_foster",
+      "espnId": "3843945",
+      "season": 2021,
+      "position": "TE",
+      "team": "NO",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 44,
+        "receptions": 30,
+        "yards": 373,
+        "touchdowns": 3,
+        "yardsPerReception": 12.432999610900879,
+        "catchRate": 68.2
+      },
+      "fantasy": {
+        "halfPprPoints": 70.3,
+        "halfPprPpg": 4.1
+      }
+    },
+    "valdesscantling_marquez": {
+      "playerId": "valdesscantling_marquez",
+      "espnId": "3051738",
+      "season": 2021,
+      "position": "WR",
+      "team": "PIT",
+      "gamesPlayed": 11,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 55,
+        "receptions": 26,
+        "yards": 430,
+        "touchdowns": 3,
+        "yardsPerReception": 16.538000106811523,
+        "catchRate": 47.3
+      },
+      "fantasy": {
+        "halfPprPoints": 74,
+        "halfPprPpg": 6.7
+      }
+    },
+    "winston_jameis": {
+      "playerId": "winston_jameis",
+      "espnId": "2969939",
+      "season": 2021,
+      "position": "QB",
+      "team": "NYG",
+      "gamesPlayed": 7,
+      "passing": {
+        "completions": 95,
+        "attempts": 161,
+        "yards": 1170,
+        "touchdowns": 14,
+        "interceptions": 3,
+        "completionPct": 59.00600051879883,
+        "yardsPerAttempt": 7.267000198364258
+      },
+      "rushing": {
+        "attempts": 32,
+        "yards": 166,
+        "touchdowns": 1,
+        "yardsPerAttempt": 5.188000202178955,
+        "fumbles": 1
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 122.4,
+        "halfPprPpg": 17.5
+      }
+    },
+    "juszczyk_kyle": {
+      "playerId": "juszczyk_kyle",
+      "espnId": "16002",
+      "season": 2021,
+      "position": "RB",
+      "team": "SF",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 8,
+        "yards": 22,
+        "touchdowns": 1,
+        "yardsPerAttempt": 2.75,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 38,
+        "receptions": 30,
+        "yards": 296,
+        "touchdowns": 1,
+        "yardsPerReception": 9.866999626159668,
+        "catchRate": 78.9
+      },
+      "fantasy": {
+        "halfPprPoints": 58.8,
+        "halfPprPpg": 3.5
+      }
+    },
+    "raymond_kalif": {
+      "playerId": "raymond_kalif",
+      "espnId": "2973405",
+      "season": 2021,
+      "position": "WR",
+      "team": "DET",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 4,
+        "yards": 28,
+        "touchdowns": 0,
+        "yardsPerAttempt": 7,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 71,
+        "receptions": 48,
+        "yards": 576,
+        "touchdowns": 4,
+        "yardsPerReception": 12,
+        "catchRate": 67.6
+      },
+      "fantasy": {
+        "halfPprPoints": 108.4,
+        "halfPprPpg": 6.8
+      }
+    },
+    "tucker_justin": {
+      "playerId": "tucker_justin",
+      "espnId": "15683",
+      "season": 2021,
+      "position": "WR",
+      "team": "FA",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 0,
+        "halfPprPpg": 0
+      }
+    },
+    "taylor_tyrod": {
+      "playerId": "taylor_tyrod",
+      "espnId": "14163",
+      "season": 2021,
+      "position": "QB",
+      "team": "NYJ",
+      "gamesPlayed": 6,
+      "passing": {
+        "completions": 91,
+        "attempts": 150,
+        "yards": 966,
+        "touchdowns": 5,
+        "interceptions": 5,
+        "completionPct": 60.66699981689453,
+        "yardsPerAttempt": 6.440000057220459
+      },
+      "rushing": {
+        "attempts": 19,
+        "yards": 151,
+        "touchdowns": 3,
+        "yardsPerAttempt": 7.947000026702881,
+        "fumbles": 3
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 86.7,
+        "halfPprPpg": 14.5
+      }
+    },
+    "shepard_sterling": {
+      "playerId": "shepard_sterling",
+      "espnId": "2976592",
+      "season": 2021,
+      "position": "WR",
+      "team": "TB",
+      "gamesPlayed": 7,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": -9,
+        "touchdowns": 0,
+        "yardsPerAttempt": -9,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 53,
+        "receptions": 36,
+        "yards": 366,
+        "touchdowns": 1,
+        "yardsPerReception": 10.166999816894531,
+        "catchRate": 67.9
+      },
+      "fantasy": {
+        "halfPprPoints": 59.7,
+        "halfPprPpg": 8.5
+      }
+    },
+    "akers_cam": {
+      "playerId": "akers_cam",
+      "espnId": "4240021",
+      "season": 2021,
+      "position": "RB",
+      "team": "SEA",
+      "gamesPlayed": 1,
+      "passing": null,
+      "rushing": {
+        "attempts": 5,
+        "yards": 3,
+        "touchdowns": 0,
+        "yardsPerAttempt": 0.6000000238418579,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 3,
+        "receptions": 3,
+        "yards": 10,
+        "touchdowns": 0,
+        "yardsPerReception": 3.3329999446868896,
+        "catchRate": 100
+      },
+      "fantasy": {
+        "halfPprPoints": 2.8,
+        "halfPprPpg": 2.8
+      }
+    },
+    "ingold_alec": {
+      "playerId": "ingold_alec",
+      "espnId": "3917668",
+      "season": 2021,
+      "position": "RB",
+      "team": "MIA",
+      "gamesPlayed": 9,
+      "passing": null,
+      "rushing": {
+        "attempts": 2,
+        "yards": 1,
+        "touchdowns": 0,
+        "yardsPerAttempt": 0.5,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 12,
+        "receptions": 10,
+        "yards": 85,
+        "touchdowns": 1,
+        "yardsPerReception": 8.5,
+        "catchRate": 83.3
+      },
+      "fantasy": {
+        "halfPprPoints": 19.6,
+        "halfPprPpg": 2.2
+      }
+    },
+    "sermon_trey": {
+      "playerId": "sermon_trey",
+      "espnId": "4241401",
+      "season": 2021,
+      "position": "RB",
+      "team": "PIT",
+      "gamesPlayed": 9,
+      "passing": null,
+      "rushing": {
+        "attempts": 41,
+        "yards": 167,
+        "touchdowns": 1,
+        "yardsPerAttempt": 4.072999954223633,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 4,
+        "receptions": 3,
+        "yards": 26,
+        "touchdowns": 0,
+        "yardsPerReception": 8.666999816894531,
+        "catchRate": 75
+      },
+      "fantasy": {
+        "halfPprPoints": 26.8,
+        "halfPprPpg": 3
+      }
+    },
+    "rudolph_mason": {
+      "playerId": "rudolph_mason",
+      "espnId": "3116407",
+      "season": 2021,
+      "position": "QB",
+      "team": "PIT",
+      "gamesPlayed": 2,
+      "passing": {
+        "completions": 35,
+        "attempts": 58,
+        "yards": 277,
+        "touchdowns": 1,
+        "interceptions": 1,
+        "completionPct": 60.345001220703125,
+        "yardsPerAttempt": 4.776000022888184
+      },
+      "rushing": {
+        "attempts": 5,
+        "yards": 53,
+        "touchdowns": 0,
+        "yardsPerAttempt": 10.600000381469727,
+        "fumbles": 0
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 19.4,
+        "halfPprPpg": 9.7
+      }
+    },
+    "parkinson_colby": {
+      "playerId": "parkinson_colby",
+      "espnId": "4242557",
+      "season": 2021,
+      "position": "TE",
+      "team": "LAR",
+      "gamesPlayed": 14,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 8,
+        "receptions": 5,
+        "yards": 33,
+        "touchdowns": 0,
+        "yardsPerReception": 6.599999904632568,
+        "catchRate": 62.5
+      },
+      "fantasy": {
+        "halfPprPoints": 5.8,
+        "halfPprPpg": 0.4
+      }
+    },
+    "wright_brock": {
+      "playerId": "wright_brock",
+      "espnId": "4242392",
+      "season": 2021,
+      "position": "TE",
+      "team": "DET",
+      "gamesPlayed": 10,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 17,
+        "receptions": 12,
+        "yards": 117,
+        "touchdowns": 2,
+        "yardsPerReception": 9.75,
+        "catchRate": 70.6
+      },
+      "fantasy": {
+        "halfPprPoints": 29.7,
+        "halfPprPpg": 3
+      }
+    },
+    "hodge_khadarel": {
+      "playerId": "hodge_khadarel",
+      "espnId": "3047876",
+      "season": 2021,
+      "position": "WR",
+      "team": "ATL",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 27,
+        "receptions": 13,
+        "yards": 157,
+        "touchdowns": 0,
+        "yardsPerReception": 12.07699966430664,
+        "catchRate": 48.1
+      },
+      "fantasy": {
+        "halfPprPoints": 22.2,
+        "halfPprPpg": 1.4
+      }
+    },
+    "trautman_adam": {
+      "playerId": "trautman_adam",
+      "espnId": "3911853",
+      "season": 2021,
+      "position": "TE",
+      "team": "DEN",
+      "gamesPlayed": 13,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 43,
+        "receptions": 27,
+        "yards": 263,
+        "touchdowns": 2,
+        "yardsPerReception": 9.741000175476074,
+        "catchRate": 62.8
+      },
+      "fantasy": {
+        "halfPprPoints": 51.8,
+        "halfPprPpg": 4
+      }
+    },
+    "mariota_marcus": {
+      "playerId": "mariota_marcus",
+      "espnId": "2576980",
+      "season": 2021,
+      "position": "QB",
+      "team": "WAS",
+      "gamesPlayed": 10,
+      "passing": {
+        "completions": 1,
+        "attempts": 2,
+        "yards": 4,
+        "touchdowns": 0,
+        "interceptions": 0,
+        "completionPct": 50,
+        "yardsPerAttempt": 2
+      },
+      "rushing": {
+        "attempts": 13,
+        "yards": 87,
+        "touchdowns": 1,
+        "yardsPerAttempt": 6.691999912261963,
+        "fumbles": 1
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 14.9,
+        "halfPprPpg": 1.5
+      }
+    },
+    "edwardshelaire_clyde": {
+      "playerId": "edwardshelaire_clyde",
+      "espnId": "4242214",
+      "season": 2021,
+      "position": "WR",
+      "team": "KC",
+      "gamesPlayed": 10,
+      "passing": null,
+      "rushing": {
+        "attempts": 119,
+        "yards": 517,
+        "touchdowns": 4,
+        "yardsPerAttempt": 4.34499979019165,
+        "fumbles": 2
+      },
+      "receiving": {
+        "targets": 23,
+        "receptions": 19,
+        "yards": 129,
+        "touchdowns": 2,
+        "yardsPerReception": 6.789000034332275,
+        "catchRate": 82.6
+      },
+      "fantasy": {
+        "halfPprPoints": 110.1,
+        "halfPprPpg": 11
+      }
+    },
+    "johnson_tyler": {
+      "playerId": "johnson_tyler",
+      "espnId": "2310331",
+      "season": 2021,
+      "position": "WR",
+      "team": "NYJ",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 55,
+        "receptions": 36,
+        "yards": 360,
+        "touchdowns": 0,
+        "yardsPerReception": 10,
+        "catchRate": 65.5
+      },
+      "fantasy": {
+        "halfPprPoints": 54,
+        "halfPprPpg": 3.2
+      }
+    },
+    "wilson_jeff": {
+      "playerId": "wilson_jeff",
+      "espnId": "3122976",
+      "season": 2021,
+      "position": "WR",
+      "team": "MIA",
+      "gamesPlayed": 9,
+      "passing": null,
+      "rushing": {
+        "attempts": 79,
+        "yards": 294,
+        "touchdowns": 2,
+        "yardsPerAttempt": 3.7219998836517334,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 8,
+        "receptions": 7,
+        "yards": 31,
+        "touchdowns": 0,
+        "yardsPerReception": 4.428999900817871,
+        "catchRate": 87.5
+      },
+      "fantasy": {
+        "halfPprPoints": 48,
+        "halfPprPpg": 5.3
+      }
+    },
+    "carter_michael": {
+      "playerId": "carter_michael",
+      "espnId": "4240657",
+      "season": 2021,
+      "position": "WR",
+      "team": "ARI",
+      "gamesPlayed": 14,
+      "passing": null,
+      "rushing": {
+        "attempts": 147,
+        "yards": 639,
+        "touchdowns": 4,
+        "yardsPerAttempt": 4.3470001220703125,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 55,
+        "receptions": 36,
+        "yards": 325,
+        "touchdowns": 0,
+        "yardsPerReception": 9.027999877929688,
+        "catchRate": 65.5
+      },
+      "fantasy": {
+        "halfPprPoints": 138.4,
+        "halfPprPpg": 9.9
+      }
+    },
+    "bourne_kendrick": {
+      "playerId": "bourne_kendrick",
+      "espnId": "3045523",
+      "season": 2021,
+      "position": "WR",
+      "team": "SF",
+      "gamesPlayed": 17,
+      "passing": {
+        "completions": 1,
+        "attempts": 1,
+        "yards": 25,
+        "touchdowns": 1,
+        "interceptions": 0,
+        "completionPct": 100,
+        "yardsPerAttempt": 25
+      },
+      "rushing": {
+        "attempts": 12,
+        "yards": 125,
+        "touchdowns": 0,
+        "yardsPerAttempt": 10.416999816894531,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 70,
+        "receptions": 55,
+        "yards": 800,
+        "touchdowns": 5,
+        "yardsPerReception": 14.545000076293945,
+        "catchRate": 78.6
+      },
+      "fantasy": {
+        "halfPprPoints": 155,
+        "halfPprPpg": 9.1
+      }
+    },
+    "mundt_johnny": {
+      "playerId": "mundt_johnny",
+      "espnId": "3052096",
+      "season": 2021,
+      "position": "TE",
+      "team": "JAC",
+      "gamesPlayed": 6,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 1,
+        "receptions": 1,
+        "yards": 9,
+        "touchdowns": 0,
+        "yardsPerReception": 9,
+        "catchRate": 100
+      },
+      "fantasy": {
+        "halfPprPoints": 1.4,
+        "halfPprPpg": 0.2
+      }
+    },
+    "bryant_harrison": {
+      "playerId": "bryant_harrison",
+      "espnId": "4040774",
+      "season": 2021,
+      "position": "TE",
+      "team": "HOU",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 28,
+        "receptions": 21,
+        "yards": 233,
+        "touchdowns": 3,
+        "yardsPerReception": 11.095000267028809,
+        "catchRate": 75
+      },
+      "fantasy": {
+        "halfPprPoints": 51.8,
+        "halfPprPpg": 3.2
+      }
+    },
+    "woods_robert": {
+      "playerId": "woods_robert",
+      "espnId": "15880",
+      "season": 2021,
+      "position": "WR",
+      "team": "FA",
+      "gamesPlayed": 9,
+      "passing": null,
+      "rushing": {
+        "attempts": 8,
+        "yards": 46,
+        "touchdowns": 1,
+        "yardsPerAttempt": 5.75,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 69,
+        "receptions": 45,
+        "yards": 556,
+        "touchdowns": 4,
+        "yardsPerReception": 12.355999946594238,
+        "catchRate": 65.2
+      },
+      "fantasy": {
+        "halfPprPoints": 112.7,
+        "halfPprPpg": 12.5
+      }
+    },
+    "long_hunter": {
+      "playerId": "long_hunter",
+      "espnId": "4239944",
+      "season": 2021,
+      "position": "TE",
+      "team": "JAC",
+      "gamesPlayed": 7,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 3,
+        "receptions": 1,
+        "yards": 8,
+        "touchdowns": 0,
+        "yardsPerReception": 8,
+        "catchRate": 33.3
+      },
+      "fantasy": {
+        "halfPprPoints": 1.3,
+        "halfPprPpg": 0.2
+      }
+    },
+    "wilson_zach": {
+      "playerId": "wilson_zach",
+      "espnId": "4361259",
+      "season": 2021,
+      "position": "QB",
+      "team": "MIA",
+      "gamesPlayed": 13,
+      "passing": {
+        "completions": 213,
+        "attempts": 383,
+        "yards": 2334,
+        "touchdowns": 9,
+        "interceptions": 11,
+        "completionPct": 55.61399841308594,
+        "yardsPerAttempt": 6.093999862670898
+      },
+      "rushing": {
+        "attempts": 29,
+        "yards": 185,
+        "touchdowns": 4,
+        "yardsPerAttempt": 6.379000186920166,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 1,
+        "receptions": 0,
+        "yards": 0,
+        "touchdowns": 0,
+        "yardsPerReception": 0,
+        "catchRate": 0
+      },
+      "fantasy": {
+        "halfPprPoints": 160.9,
+        "halfPprPpg": 12.4
+      }
+    },
+    "moore_david": {
+      "playerId": "moore_david",
+      "espnId": "4212909",
+      "season": 2021,
+      "position": "WR",
+      "team": "CAR",
+      "gamesPlayed": 3,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 2,
+        "receptions": 0,
+        "yards": 0,
+        "touchdowns": 0,
+        "yardsPerReception": 0,
+        "catchRate": 0
+      },
+      "fantasy": {
+        "halfPprPoints": 0,
+        "halfPprPpg": 0
+      }
+    },
+    "bates_john": {
+      "playerId": "bates_john",
+      "espnId": "4048228",
+      "season": 2021,
+      "position": "TE",
+      "team": "WAS",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 25,
+        "receptions": 20,
+        "yards": 249,
+        "touchdowns": 1,
+        "yardsPerReception": 12.449999809265137,
+        "catchRate": 80
+      },
+      "fantasy": {
+        "halfPprPoints": 40.9,
+        "halfPprPpg": 2.4
+      }
+    },
+    "williams_jamaal": {
+      "playerId": "williams_jamaal",
+      "espnId": "2980453",
+      "season": 2021,
+      "position": "RB",
+      "team": "FA",
+      "gamesPlayed": 13,
+      "passing": null,
+      "rushing": {
+        "attempts": 153,
+        "yards": 601,
+        "touchdowns": 3,
+        "yardsPerAttempt": 3.927999973297119,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 28,
+        "receptions": 26,
+        "yards": 157,
+        "touchdowns": 0,
+        "yardsPerReception": 6.038000106811523,
+        "catchRate": 92.9
+      },
+      "fantasy": {
+        "halfPprPoints": 106.8,
+        "halfPprPpg": 8.2
+      }
+    },
+    "gage_russell": {
+      "playerId": "gage_russell",
+      "espnId": "3115378",
+      "season": 2021,
+      "position": "WR",
+      "team": "FA",
+      "gamesPlayed": 14,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 94,
+        "receptions": 66,
+        "yards": 770,
+        "touchdowns": 4,
+        "yardsPerReception": 11.666999816894531,
+        "catchRate": 70.2
+      },
+      "fantasy": {
+        "halfPprPoints": 134,
+        "halfPprPpg": 9.6
+      }
+    },
+    "lance_trey": {
+      "playerId": "lance_trey",
+      "espnId": "4383351",
+      "season": 2021,
+      "position": "QB",
+      "team": "LAC",
+      "gamesPlayed": 6,
+      "passing": {
+        "completions": 41,
+        "attempts": 71,
+        "yards": 603,
+        "touchdowns": 5,
+        "interceptions": 2,
+        "completionPct": 57.74599838256836,
+        "yardsPerAttempt": 8.493000030517578
+      },
+      "rushing": {
+        "attempts": 38,
+        "yards": 168,
+        "touchdowns": 1,
+        "yardsPerAttempt": 4.421000003814697,
+        "fumbles": 0
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 64.9,
+        "halfPprPpg": 10.8
+      }
+    },
+    "sample_drew": {
+      "playerId": "sample_drew",
+      "espnId": "3127310",
+      "season": 2021,
+      "position": "TE",
+      "team": "CIN",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 15,
+        "receptions": 11,
+        "yards": 81,
+        "touchdowns": 0,
+        "yardsPerReception": 7.363999843597412,
+        "catchRate": 73.3
+      },
+      "fantasy": {
+        "halfPprPoints": 13.6,
+        "halfPprPpg": 0.8
+      }
+    },
+    "woerner_charlie": {
+      "playerId": "woerner_charlie",
+      "espnId": "4035020",
+      "season": 2021,
+      "position": "TE",
+      "team": "ATL",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 6,
+        "receptions": 5,
+        "yards": 52,
+        "touchdowns": 0,
+        "yardsPerReception": 10.399999618530273,
+        "catchRate": 83.3
+      },
+      "fantasy": {
+        "halfPprPoints": 7.7,
+        "halfPprPpg": 0.5
+      }
+    },
+    "patterson_cordarrelle": {
+      "playerId": "patterson_cordarrelle",
+      "espnId": "15807",
+      "season": 2021,
+      "position": "RB",
+      "team": "FA",
+      "gamesPlayed": 16,
+      "passing": {
+        "completions": 0,
+        "attempts": 1,
+        "yards": 0,
+        "touchdowns": 0,
+        "interceptions": 0,
+        "completionPct": 0,
+        "yardsPerAttempt": 0
+      },
+      "rushing": {
+        "attempts": 153,
+        "yards": 618,
+        "touchdowns": 6,
+        "yardsPerAttempt": 4.039000034332275,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 69,
+        "receptions": 52,
+        "yards": 548,
+        "touchdowns": 5,
+        "yardsPerReception": 10.538000106811523,
+        "catchRate": 75.4
+      },
+      "fantasy": {
+        "halfPprPoints": 208.6,
+        "halfPprPpg": 13
+      }
+    },
+    "johnson_dernest": {
+      "playerId": "johnson_dernest",
+      "espnId": "3139602",
+      "season": 2021,
+      "position": "RB",
+      "team": "NE",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 100,
+        "yards": 534,
+        "touchdowns": 3,
+        "yardsPerAttempt": 5.340000152587891,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 25,
+        "receptions": 19,
+        "yards": 137,
+        "touchdowns": 0,
+        "yardsPerReception": 7.210999965667725,
+        "catchRate": 76
+      },
+      "fantasy": {
+        "halfPprPoints": 94.6,
+        "halfPprPpg": 5.6
+      }
+    },
+    "granson_kylen": {
+      "playerId": "granson_kylen",
+      "espnId": "4039160",
+      "season": 2021,
+      "position": "TE",
+      "team": "PHI",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 15,
+        "receptions": 11,
+        "yards": 106,
+        "touchdowns": 0,
+        "yardsPerReception": 9.63599967956543,
+        "catchRate": 73.3
+      },
+      "fantasy": {
+        "halfPprPoints": 16.1,
+        "halfPprPpg": 0.9
+      }
+    },
+    "farrell_luke": {
+      "playerId": "farrell_luke",
+      "espnId": "4040612",
+      "season": 2021,
+      "position": "TE",
+      "team": "SF",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 11,
+        "receptions": 7,
+        "yards": 56,
+        "touchdowns": 0,
+        "yardsPerReception": 8,
+        "catchRate": 63.6
+      },
+      "fantasy": {
+        "halfPprPoints": 9.1,
+        "halfPprPpg": 0.6
+      }
+    },
+    "miller_scotty": {
+      "playerId": "miller_scotty",
+      "espnId": "3914397",
+      "season": 2021,
+      "position": "WR",
+      "team": "PIT",
+      "gamesPlayed": 9,
+      "passing": null,
+      "rushing": {
+        "attempts": 2,
+        "yards": 43,
+        "touchdowns": 1,
+        "yardsPerAttempt": 21.5,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 9,
+        "receptions": 5,
+        "yards": 38,
+        "touchdowns": 0,
+        "yardsPerReception": 7.599999904632568,
+        "catchRate": 55.6
+      },
+      "fantasy": {
+        "halfPprPoints": 16.6,
+        "halfPprPpg": 1.8
+      }
+    },
+    "homer_travis": {
+      "playerId": "homer_travis",
+      "espnId": "4037457",
+      "season": 2021,
+      "position": "RB",
+      "team": "CHI",
+      "gamesPlayed": 14,
+      "passing": null,
+      "rushing": {
+        "attempts": 21,
+        "yards": 177,
+        "touchdowns": 1,
+        "yardsPerAttempt": 8.428999900817871,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 20,
+        "receptions": 16,
+        "yards": 161,
+        "touchdowns": 0,
+        "yardsPerReception": 10.062999725341797,
+        "catchRate": 80
+      },
+      "fantasy": {
+        "halfPprPoints": 47.8,
+        "halfPprPpg": 3.4
+      }
+    },
+    "wentz_carson": {
+      "playerId": "wentz_carson",
+      "espnId": "2573079",
+      "season": 2021,
+      "position": "QB",
+      "team": "MIN",
+      "gamesPlayed": 17,
+      "passing": {
+        "completions": 322,
+        "attempts": 516,
+        "yards": 3563,
+        "touchdowns": 27,
+        "interceptions": 7,
+        "completionPct": 62.40299987792969,
+        "yardsPerAttempt": 6.90500020980835
+      },
+      "rushing": {
+        "attempts": 57,
+        "yards": 215,
+        "touchdowns": 1,
+        "yardsPerAttempt": 3.7720000743865967,
+        "fumbles": 4
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 271,
+        "halfPprPpg": 15.9
+      }
+    },
+    "ham_cj": {
+      "playerId": "ham_cj",
+      "espnId": "4012556",
+      "season": 2021,
+      "position": "RB",
+      "team": "MIN",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 7,
+        "yards": 34,
+        "touchdowns": 0,
+        "yardsPerAttempt": 4.85699987411499,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 18,
+        "receptions": 17,
+        "yards": 125,
+        "touchdowns": 0,
+        "yardsPerReception": 7.353000164031982,
+        "catchRate": 94.4
+      },
+      "fantasy": {
+        "halfPprPoints": 24.4,
+        "halfPprPpg": 1.4
+      }
+    },
+    "aliecox_mo": {
+      "playerId": "aliecox_mo",
+      "espnId": "2998565",
+      "season": 2021,
+      "position": "TE",
+      "team": "IND",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 45,
+        "receptions": 24,
+        "yards": 316,
+        "touchdowns": 4,
+        "yardsPerReception": 13.166999816894531,
+        "catchRate": 53.3
+      },
+      "fantasy": {
+        "halfPprPoints": 67.6,
+        "halfPprPpg": 4
+      }
+    },
+    "rush_cooper": {
+      "playerId": "rush_cooper",
+      "espnId": "2972515",
+      "season": 2021,
+      "position": "QB",
+      "team": "BAL",
+      "gamesPlayed": 5,
+      "passing": {
+        "completions": 30,
+        "attempts": 47,
+        "yards": 422,
+        "touchdowns": 3,
+        "interceptions": 1,
+        "completionPct": 63.83000183105469,
+        "yardsPerAttempt": 8.979000091552734
+      },
+      "rushing": {
+        "attempts": 9,
+        "yards": -8,
+        "touchdowns": 0,
+        "yardsPerAttempt": -0.8889999985694885,
+        "fumbles": 0
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 27.1,
+        "halfPprPpg": 5.4
+      }
+    },
+    "carter_deandre": {
+      "playerId": "carter_deandre",
+      "espnId": "2580216",
+      "season": 2021,
+      "position": "WR",
+      "team": "CLE",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 10,
+        "yards": 89,
+        "touchdowns": 0,
+        "yardsPerAttempt": 8.899999618530273,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 44,
+        "receptions": 24,
+        "yards": 296,
+        "touchdowns": 3,
+        "yardsPerReception": 12.333000183105469,
+        "catchRate": 54.5
+      },
+      "fantasy": {
+        "halfPprPoints": 68.5,
+        "halfPprPpg": 4
+      }
+    },
+    "dalton_andy": {
+      "playerId": "dalton_andy",
+      "espnId": "14012",
+      "season": 2021,
+      "position": "QB",
+      "team": "CAR",
+      "gamesPlayed": 8,
+      "passing": {
+        "completions": 149,
+        "attempts": 236,
+        "yards": 1515,
+        "touchdowns": 8,
+        "interceptions": 9,
+        "completionPct": 63.13600158691406,
+        "yardsPerAttempt": 6.419000148773193
+      },
+      "rushing": {
+        "attempts": 16,
+        "yards": 76,
+        "touchdowns": 0,
+        "yardsPerAttempt": 4.75,
+        "fumbles": 0
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 91.2,
+        "halfPprPpg": 11.4
+      }
+    },
+    "jones_mac": {
+      "playerId": "jones_mac",
+      "espnId": "4241464",
+      "season": 2021,
+      "position": "QB",
+      "team": "SF",
+      "gamesPlayed": 17,
+      "passing": {
+        "completions": 352,
+        "attempts": 521,
+        "yards": 3801,
+        "touchdowns": 22,
+        "interceptions": 13,
+        "completionPct": 67.56199645996094,
+        "yardsPerAttempt": 7.296000003814697
+      },
+      "rushing": {
+        "attempts": 44,
+        "yards": 129,
+        "touchdowns": 0,
+        "yardsPerAttempt": 2.931999921798706,
+        "fumbles": 3
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 239.9,
+        "halfPprPpg": 14.1
+      }
+    },
+    "sherfield_trent": {
+      "playerId": "sherfield_trent",
+      "espnId": "3122168",
+      "season": 2021,
+      "position": "WR",
+      "team": "ARI",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 20,
+        "receptions": 9,
+        "yards": 87,
+        "touchdowns": 1,
+        "yardsPerReception": 9.666999816894531,
+        "catchRate": 45
+      },
+      "fantasy": {
+        "halfPprPoints": 19.2,
+        "halfPprPpg": 1.1
+      }
+    },
+    "ricard_patrick": {
+      "playerId": "ricard_patrick",
+      "espnId": "2975417",
+      "season": 2021,
+      "position": "WR",
+      "team": "BAL",
+      "gamesPlayed": 13,
+      "passing": null,
+      "rushing": {
+        "attempts": 2,
+        "yards": 4,
+        "touchdowns": 0,
+        "yardsPerAttempt": 2,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 13,
+        "receptions": 8,
+        "yards": 63,
+        "touchdowns": 1,
+        "yardsPerReception": 7.875,
+        "catchRate": 61.5
+      },
+      "fantasy": {
+        "halfPprPoints": 16.7,
+        "halfPprPpg": 1.3
+      }
+    },
+    "elliott_ezekiel": {
+      "playerId": "elliott_ezekiel",
+      "espnId": "3051392",
+      "season": 2021,
+      "position": "WR",
+      "team": "FA",
+      "gamesPlayed": 17,
+      "passing": {
+        "completions": 1,
+        "attempts": 1,
+        "yards": 4,
+        "touchdowns": 0,
+        "interceptions": 0,
+        "completionPct": 100,
+        "yardsPerAttempt": 4
+      },
+      "rushing": {
+        "attempts": 237,
+        "yards": 1002,
+        "touchdowns": 10,
+        "yardsPerAttempt": 4.228000164031982,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 65,
+        "receptions": 47,
+        "yards": 287,
+        "touchdowns": 2,
+        "yardsPerReception": 6.105999946594238,
+        "catchRate": 72.3
+      },
+      "fantasy": {
+        "halfPprPoints": 224.6,
+        "halfPprPpg": 13.2
+      }
+    },
+    "brissett_jacoby": {
+      "playerId": "brissett_jacoby",
+      "espnId": "2578570",
+      "season": 2021,
+      "position": "QB",
+      "team": "ARI",
+      "gamesPlayed": 11,
+      "passing": {
+        "completions": 141,
+        "attempts": 225,
+        "yards": 1283,
+        "touchdowns": 5,
+        "interceptions": 4,
+        "completionPct": 62.66699981689453,
+        "yardsPerAttempt": 5.702000141143799
+      },
+      "rushing": {
+        "attempts": 19,
+        "yards": 70,
+        "touchdowns": 1,
+        "yardsPerAttempt": 3.684000015258789,
+        "fumbles": 2
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 80.3,
+        "halfPprPpg": 7.3
+      }
+    },
+    "hardman_mecole": {
+      "playerId": "hardman_mecole",
+      "espnId": "4035004",
+      "season": 2021,
+      "position": "WR",
+      "team": "BUF",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 8,
+        "yards": 46,
+        "touchdowns": 0,
+        "yardsPerAttempt": 5.75,
+        "fumbles": 1
+      },
+      "receiving": {
+        "targets": 83,
+        "receptions": 59,
+        "yards": 693,
+        "touchdowns": 2,
+        "yardsPerReception": 11.746000289916992,
+        "catchRate": 71.1
+      },
+      "fantasy": {
+        "halfPprPoints": 115.4,
+        "halfPprPpg": 6.8
+      }
+    },
+    "mullens_nick": {
+      "playerId": "mullens_nick",
+      "espnId": "3059989",
+      "season": 2021,
+      "position": "QB",
+      "team": "JAC",
+      "gamesPlayed": 1,
+      "passing": {
+        "completions": 20,
+        "attempts": 30,
+        "yards": 147,
+        "touchdowns": 1,
+        "interceptions": 0,
+        "completionPct": 66.66699981689453,
+        "yardsPerAttempt": 4.900000095367432
+      },
+      "rushing": null,
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 9.9,
+        "halfPprPpg": 9.9
+      }
+    },
+    "nwangwu_kene": {
+      "playerId": "nwangwu_kene",
+      "espnId": "4035537",
+      "season": 2021,
+      "position": "RB",
+      "team": "NYJ",
+      "gamesPlayed": 11,
+      "passing": null,
+      "rushing": {
+        "attempts": 13,
+        "yards": 61,
+        "touchdowns": 0,
+        "yardsPerAttempt": 4.691999912261963,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 5,
+        "receptions": 4,
+        "yards": 9,
+        "touchdowns": 0,
+        "yardsPerReception": 2.25,
+        "catchRate": 80
+      },
+      "fantasy": {
+        "halfPprPoints": 9,
+        "halfPprPpg": 0.8
+      }
+    },
+    "chark_dj": {
+      "playerId": "chark_dj",
+      "espnId": "3115394",
+      "season": 2021,
+      "position": "WR",
+      "team": "FA",
+      "gamesPlayed": 4,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 22,
+        "receptions": 7,
+        "yards": 154,
+        "touchdowns": 2,
+        "yardsPerReception": 22,
+        "catchRate": 31.8
+      },
+      "fantasy": {
+        "halfPprPoints": 30.9,
+        "halfPprPpg": 7.7
+      }
+    },
+    "minshew_gardner": {
+      "playerId": "minshew_gardner",
+      "espnId": "4038524",
+      "season": 2021,
+      "position": "QB",
+      "team": "KC",
+      "gamesPlayed": 4,
+      "passing": {
+        "completions": 41,
+        "attempts": 60,
+        "yards": 439,
+        "touchdowns": 4,
+        "interceptions": 1,
+        "completionPct": 68.33300018310547,
+        "yardsPerAttempt": 7.316999912261963
+      },
+      "rushing": {
+        "attempts": 9,
+        "yards": 21,
+        "touchdowns": 0,
+        "yardsPerAttempt": 2.3329999446868896,
+        "fumbles": 0
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 34.7,
+        "halfPprPpg": 8.7
+      }
+    },
+    "wallace_tylan": {
+      "playerId": "wallace_tylan",
+      "espnId": "4241424",
+      "season": 2021,
+      "position": "WR",
+      "team": "BAL",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 6,
+        "receptions": 2,
+        "yards": 23,
+        "touchdowns": 0,
+        "yardsPerReception": 11.5,
+        "catchRate": 33.3
+      },
+      "fantasy": {
+        "halfPprPoints": 3.3,
+        "halfPprPpg": 0.2
+      }
+    },
+    "mills_davis": {
+      "playerId": "mills_davis",
+      "espnId": "4242546",
+      "season": 2021,
+      "position": "QB",
+      "team": "HOU",
+      "gamesPlayed": 13,
+      "passing": {
+        "completions": 263,
+        "attempts": 394,
+        "yards": 2664,
+        "touchdowns": 16,
+        "interceptions": 10,
+        "completionPct": 66.7509994506836,
+        "yardsPerAttempt": 6.761000156402588
+      },
+      "rushing": {
+        "attempts": 18,
+        "yards": 44,
+        "touchdowns": 0,
+        "yardsPerAttempt": 2.444000005722046,
+        "fumbles": 1
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 165,
+        "halfPprPpg": 12.7
+      }
+    },
+    "allen_kyle": {
+      "playerId": "allen_kyle",
+      "espnId": "3115293",
+      "season": 2021,
+      "position": "QB",
+      "team": "DET",
+      "gamesPlayed": 2,
+      "passing": {
+        "completions": 12,
+        "attempts": 19,
+        "yards": 120,
+        "touchdowns": 1,
+        "interceptions": 0,
+        "completionPct": 63.15800094604492,
+        "yardsPerAttempt": 6.315999984741211
+      },
+      "rushing": {
+        "attempts": 2,
+        "yards": 11,
+        "touchdowns": 0,
+        "yardsPerAttempt": 5.5,
+        "fumbles": 0
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 9.9,
+        "halfPprPpg": 5
+      }
+    },
+    "brown_pharaoh": {
+      "playerId": "brown_pharaoh",
+      "espnId": "2971281",
+      "season": 2021,
+      "position": "TE",
+      "team": "ARI",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 34,
+        "receptions": 23,
+        "yards": 171,
+        "touchdowns": 0,
+        "yardsPerReception": 7.434999942779541,
+        "catchRate": 67.6
+      },
+      "fantasy": {
+        "halfPprPoints": 28.6,
+        "halfPprPpg": 1.9
+      }
+    },
+    "burton_michael": {
+      "playerId": "burton_michael",
+      "espnId": "2515270",
+      "season": 2021,
+      "position": "RB",
+      "team": "DEN",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 8,
+        "yards": 26,
+        "touchdowns": 1,
+        "yardsPerAttempt": 3.25,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 3,
+        "receptions": 3,
+        "yards": 31,
+        "touchdowns": 0,
+        "yardsPerReception": 10.333000183105469,
+        "catchRate": 100
+      },
+      "fantasy": {
+        "halfPprPoints": 13.2,
+        "halfPprPpg": 0.8
+      }
+    },
+    "trubisky_mitchell": {
+      "playerId": "trubisky_mitchell",
+      "espnId": "3039707",
+      "season": 2021,
+      "position": "QB",
+      "team": "BUF",
+      "gamesPlayed": 6,
+      "passing": {
+        "completions": 6,
+        "attempts": 8,
+        "yards": 43,
+        "touchdowns": 0,
+        "interceptions": 1,
+        "completionPct": 75,
+        "yardsPerAttempt": 5.375
+      },
+      "rushing": {
+        "attempts": 13,
+        "yards": 24,
+        "touchdowns": 1,
+        "yardsPerAttempt": 1.8459999561309814,
+        "fumbles": 0
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 9.1,
+        "halfPprPpg": 1.5
+      }
+    },
+    "abdullah_ameer": {
+      "playerId": "abdullah_ameer",
+      "espnId": "2576336",
+      "season": 2021,
+      "position": "RB",
+      "team": "IND",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 51,
+        "yards": 166,
+        "touchdowns": 0,
+        "yardsPerAttempt": 3.255000114440918,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 53,
+        "receptions": 38,
+        "yards": 289,
+        "touchdowns": 1,
+        "yardsPerReception": 7.605000019073486,
+        "catchRate": 71.7
+      },
+      "fantasy": {
+        "halfPprPoints": 70.5,
+        "halfPprPpg": 4.1
+      }
+    },
+    "bridgewater_teddy": {
+      "playerId": "bridgewater_teddy",
+      "espnId": "16728",
+      "season": 2021,
+      "position": "QB",
+      "team": "TB",
+      "gamesPlayed": 14,
+      "passing": {
+        "completions": 285,
+        "attempts": 426,
+        "yards": 3052,
+        "touchdowns": 18,
+        "interceptions": 7,
+        "completionPct": 66.9010009765625,
+        "yardsPerAttempt": 7.164000034332275
+      },
+      "rushing": {
+        "attempts": 30,
+        "yards": 106,
+        "touchdowns": 2,
+        "yardsPerAttempt": 3.5329999923706055,
+        "fumbles": 1
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 209.7,
+        "halfPprPpg": 15
+      }
+    },
+    "thomas_ian": {
+      "playerId": "thomas_ian",
+      "espnId": "4045305",
+      "season": 2021,
+      "position": "TE",
+      "team": "LV",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 30,
+        "receptions": 18,
+        "yards": 188,
+        "touchdowns": 0,
+        "yardsPerReception": 10.444000244140625,
+        "catchRate": 60
+      },
+      "fantasy": {
+        "halfPprPoints": 27.8,
+        "halfPprPpg": 1.6
+      }
+    },
+    "smythe_durham": {
+      "playerId": "smythe_durham",
+      "espnId": "3052897",
+      "season": 2021,
+      "position": "TE",
+      "team": "CHI",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 2,
+        "yards": 3,
+        "touchdowns": 0,
+        "yardsPerAttempt": 1.5,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 41,
+        "receptions": 34,
+        "yards": 357,
+        "touchdowns": 0,
+        "yardsPerReception": 10.5,
+        "catchRate": 82.9
+      },
+      "fantasy": {
+        "halfPprPoints": 53,
+        "halfPprPpg": 3.1
+      }
+    },
+    "dallas_deejay": {
+      "playerId": "dallas_deejay",
+      "espnId": "4240631",
+      "season": 2021,
+      "position": "RB",
+      "team": "CAR",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 33,
+        "yards": 138,
+        "touchdowns": 2,
+        "yardsPerAttempt": 4.182000160217285,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 23,
+        "receptions": 21,
+        "yards": 133,
+        "touchdowns": 0,
+        "yardsPerReception": 6.333000183105469,
+        "catchRate": 91.3
+      },
+      "fantasy": {
+        "halfPprPoints": 49.6,
+        "halfPprPpg": 2.9
+      }
+    },
+    "saubert_eric": {
+      "playerId": "saubert_eric",
+      "espnId": "2975863",
+      "season": 2021,
+      "position": "TE",
+      "team": "SEA",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 12,
+        "receptions": 8,
+        "yards": 47,
+        "touchdowns": 1,
+        "yardsPerReception": 5.875,
+        "catchRate": 66.7
+      },
+      "fantasy": {
+        "halfPprPoints": 14.7,
+        "halfPprPpg": 0.9
+      }
+    },
+    "dulin_ashton": {
+      "playerId": "dulin_ashton",
+      "espnId": "4061956",
+      "season": 2021,
+      "position": "WR",
+      "team": "IND",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 3,
+        "yards": 32,
+        "touchdowns": 0,
+        "yardsPerAttempt": 10.666999816894531,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 22,
+        "receptions": 13,
+        "yards": 173,
+        "touchdowns": 2,
+        "yardsPerReception": 13.307999610900879,
+        "catchRate": 59.1
+      },
+      "fantasy": {
+        "halfPprPoints": 39,
+        "halfPprPpg": 2.3
+      }
+    },
+    "gallup_michael": {
+      "playerId": "gallup_michael",
+      "espnId": "4036348",
+      "season": 2021,
+      "position": "WR",
+      "team": "FA",
+      "gamesPlayed": 9,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 62,
+        "receptions": 35,
+        "yards": 445,
+        "touchdowns": 2,
+        "yardsPerReception": 12.71399974822998,
+        "catchRate": 56.5
+      },
+      "fantasy": {
+        "halfPprPoints": 74,
+        "halfPprPpg": 8.2
+      }
+    },
+    "wilson_cedrick": {
+      "playerId": "wilson_cedrick",
+      "espnId": "4036335",
+      "season": 2021,
+      "position": "WR",
+      "team": "MIA",
+      "gamesPlayed": 16,
+      "passing": {
+        "completions": 3,
+        "attempts": 3,
+        "yards": 88,
+        "touchdowns": 0,
+        "interceptions": 0,
+        "completionPct": 100,
+        "yardsPerAttempt": 29.33300018310547
+      },
+      "rushing": {
+        "attempts": 2,
+        "yards": 11,
+        "touchdowns": 0,
+        "yardsPerAttempt": 5.5,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 61,
+        "receptions": 45,
+        "yards": 602,
+        "touchdowns": 6,
+        "yardsPerReception": 13.378000259399414,
+        "catchRate": 73.8
+      },
+      "fantasy": {
+        "halfPprPoints": 123.3,
+        "halfPprPpg": 7.7
+      }
+    },
+    "heinicke_taylor": {
+      "playerId": "heinicke_taylor",
+      "espnId": "2565969",
+      "season": 2021,
+      "position": "QB",
+      "team": "FA",
+      "gamesPlayed": 16,
+      "passing": {
+        "completions": 321,
+        "attempts": 494,
+        "yards": 3419,
+        "touchdowns": 20,
+        "interceptions": 15,
+        "completionPct": 64.9800033569336,
+        "yardsPerAttempt": 6.921000003814697
+      },
+      "rushing": {
+        "attempts": 60,
+        "yards": 313,
+        "touchdowns": 1,
+        "yardsPerAttempt": 5.2170000076293945,
+        "fumbles": 4
+      },
+      "receiving": {
+        "targets": 1,
+        "receptions": 1,
+        "yards": -2,
+        "touchdowns": 0,
+        "yardsPerReception": -2,
+        "catchRate": 100
+      },
+      "fantasy": {
+        "halfPprPoints": 239.4,
+        "halfPprPpg": 15
+      }
+    },
+    "cook_dalvin": {
+      "playerId": "cook_dalvin",
+      "espnId": "3116593",
+      "season": 2021,
+      "position": "RB",
+      "team": "FA",
+      "gamesPlayed": 13,
+      "passing": null,
+      "rushing": {
+        "attempts": 249,
+        "yards": 1159,
+        "touchdowns": 6,
+        "yardsPerAttempt": 4.65500020980835,
+        "fumbles": 3
+      },
+      "receiving": {
+        "targets": 49,
+        "receptions": 34,
+        "yards": 224,
+        "touchdowns": 0,
+        "yardsPerReception": 6.5879998207092285,
+        "catchRate": 69.4
+      },
+      "fantasy": {
+        "halfPprPoints": 191.3,
+        "halfPprPpg": 14.7
+      }
+    },
+    "skowronek_ben": {
+      "playerId": "skowronek_ben",
+      "espnId": "4035656",
+      "season": 2021,
+      "position": "WR",
+      "team": "PIT",
+      "gamesPlayed": 14,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 20,
+        "receptions": 11,
+        "yards": 133,
+        "touchdowns": 0,
+        "yardsPerReception": 12.090999603271484,
+        "catchRate": 55
+      },
+      "fantasy": {
+        "halfPprPoints": 18.8,
+        "halfPprPpg": 1.3
+      }
+    },
+    "everett_gerald": {
+      "playerId": "everett_gerald",
+      "espnId": "3918639",
+      "season": 2021,
+      "position": "TE",
+      "team": "FA",
+      "gamesPlayed": 15,
+      "passing": null,
+      "rushing": {
+        "attempts": 3,
+        "yards": 20,
+        "touchdowns": 0,
+        "yardsPerAttempt": 6.666999816894531,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 63,
+        "receptions": 48,
+        "yards": 478,
+        "touchdowns": 4,
+        "yardsPerReception": 9.958000183105469,
+        "catchRate": 76.2
+      },
+      "fantasy": {
+        "halfPprPoints": 97.8,
+        "halfPprPpg": 6.5
+      }
+    },
+    "tonyan_robert": {
+      "playerId": "tonyan_robert",
+      "espnId": "2975674",
+      "season": 2021,
+      "position": "TE",
+      "team": "KC",
+      "gamesPlayed": 8,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 29,
+        "receptions": 18,
+        "yards": 204,
+        "touchdowns": 2,
+        "yardsPerReception": 11.333000183105469,
+        "catchRate": 62.1
+      },
+      "fantasy": {
+        "halfPprPoints": 41.4,
+        "halfPprPpg": 5.2
+      }
+    },
+    "dwelley_ross": {
+      "playerId": "dwelley_ross",
+      "espnId": "3120303",
+      "season": 2021,
+      "position": "TE",
+      "team": "DET",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 5,
+        "receptions": 4,
+        "yards": 51,
+        "touchdowns": 1,
+        "yardsPerReception": 12.75,
+        "catchRate": 80
+      },
+      "fantasy": {
+        "halfPprPoints": 13.1,
+        "halfPprPpg": 0.8
+      }
+    },
+    "johnson_jakob": {
+      "playerId": "johnson_jakob",
+      "espnId": "3115349",
+      "season": 2021,
+      "position": "RB",
+      "team": "HOU",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": null,
+      "receiving": {
+        "targets": 5,
+        "receptions": 4,
+        "yards": 43,
+        "touchdowns": 0,
+        "yardsPerReception": 10.75,
+        "catchRate": 80
+      },
+      "fantasy": {
+        "halfPprPoints": 6.3,
+        "halfPprPpg": 0.4
+      }
+    },
+    "osborn_kj": {
+      "playerId": "osborn_kj",
+      "espnId": "3916566",
+      "season": 2021,
+      "position": "WR",
+      "team": "ATL",
+      "gamesPlayed": 17,
+      "passing": null,
+      "rushing": {
+        "attempts": 1,
+        "yards": 10,
+        "touchdowns": 0,
+        "yardsPerAttempt": 10,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 82,
+        "receptions": 50,
+        "yards": 655,
+        "touchdowns": 7,
+        "yardsPerReception": 13.100000381469727,
+        "catchRate": 61
+      },
+      "fantasy": {
+        "halfPprPoints": 133.5,
+        "halfPprPpg": 7.9
+      }
+    },
+    "allen_brandon": {
+      "playerId": "allen_brandon",
+      "espnId": "2574511",
+      "season": 2021,
+      "position": "QB",
+      "team": "TEN",
+      "gamesPlayed": 6,
+      "passing": {
+        "completions": 17,
+        "attempts": 34,
+        "yards": 149,
+        "touchdowns": 2,
+        "interceptions": 0,
+        "completionPct": 50,
+        "yardsPerAttempt": 4.381999969482422
+      },
+      "rushing": {
+        "attempts": 7,
+        "yards": -1,
+        "touchdowns": 0,
+        "yardsPerAttempt": -0.14300000667572021,
+        "fumbles": 0
+      },
+      "receiving": null,
+      "fantasy": {
+        "halfPprPoints": 13.9,
+        "halfPprPpg": 2.3
+      }
+    },
+    "berrios_braxton": {
+      "playerId": "berrios_braxton",
+      "espnId": "3123075",
+      "season": 2021,
+      "position": "WR",
+      "team": "HOU",
+      "gamesPlayed": 16,
+      "passing": null,
+      "rushing": {
+        "attempts": 7,
+        "yards": 40,
+        "touchdowns": 2,
+        "yardsPerAttempt": 5.714000225067139,
+        "fumbles": 0
+      },
+      "receiving": {
+        "targets": 65,
+        "receptions": 46,
+        "yards": 431,
+        "touchdowns": 2,
+        "yardsPerReception": 9.369999885559082,
+        "catchRate": 70.8
+      },
+      "fantasy": {
+        "halfPprPoints": 94.1,
+        "halfPprPpg": 5.9
+      }
+    }
+  }
+}

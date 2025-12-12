@@ -1,0 +1,1 @@
+export { DraftStats as default } from './stubs';

@@ -1,0 +1,1 @@
+export { DraftBoard as default } from './stubs';
