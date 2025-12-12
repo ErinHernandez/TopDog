@@ -359,67 +359,67 @@ export default function Rankings() {
                       }}
                       style={{ minHeight: '200px' }}
                     >
-                                              {limits.map((player, index) => (
-                          <div key={`${player.id}-${index}`}>
-                            {/* Drop line above item */}
-                            <div 
-                              className={`h-1 rounded transition-all ${
-                                dragOverIndex === `before-${index}` ? 'bg-[#3B82F6]' : 'bg-transparent'
-                              }`}
-                              onDragOver={(e) => handleDragOver(e, `before-${index}`)}
-                              onDragLeave={() => setDragOverIndex(null)}
-                              onDrop={(e) => {
-                                handleDrop(e, 'limits', index);
-                                setDragOverIndex(null);
-                              }}
-                            />
-                            
-                            <div
-                              draggable
-                              onDragStart={(e) => handleDragStart(e, { ...player, sourceList: 'limits', sourceIndex: index })}
-                              onDragOver={(e) => handleDragOver(e, index)}
-                              onDragLeave={() => setDragOverIndex(null)}
-                              onDrop={(e) => {
-                                handleDrop(e, 'limits', index);
-                                setDragOverIndex(null);
-                              }}
-                              className={`flex items-center justify-between p-3 rounded-lg border cursor-move transition-all ${
-                                dragOverIndex === index 
-                                  ? 'bg-blue-600 border-[#3B82F6] scale-105' 
-                                  : 'bg-gray-700 border-transparent hover:border-[#3B82F6]'
-                              }`}
-                              style={{ userSelect: 'none' }}
-                            >
-                          <div className="flex items-center space-x-3">
-                            <div className="flex items-center space-x-2">
-                              <div className="font-semibold text-white">{player.name}</div>
-                              <div className="text-sm text-gray-300">
-                                {player.position} • {player.team}
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex items-center space-x-4">
+                      {limits.map((player, index) => (
+                        <div key={`${player.id}-${index}`}>
+                          {/* Drop line above item */}
+                          <div 
+                            className={`h-1 rounded transition-all ${
+                              dragOverIndex === `before-${index}` ? 'bg-[#3B82F6]' : 'bg-transparent'
+                            }`}
+                            onDragOver={(e) => handleDragOver(e, `before-${index}`)}
+                            onDragLeave={() => setDragOverIndex(null)}
+                            onDrop={(e) => {
+                              handleDrop(e, 'limits', index);
+                              setDragOverIndex(null);
+                            }}
+                          />
+                          
+                          <div
+                            draggable
+                            onDragStart={(e) => handleDragStart(e, { ...player, sourceList: 'limits', sourceIndex: index })}
+                            onDragOver={(e) => handleDragOver(e, index)}
+                            onDragLeave={() => setDragOverIndex(null)}
+                            onDrop={(e) => {
+                              handleDrop(e, 'limits', index);
+                              setDragOverIndex(null);
+                            }}
+                            className={`flex items-center justify-between p-3 rounded-lg border cursor-move transition-all ${
+                              dragOverIndex === index 
+                                ? 'bg-blue-600 border-[#3B82F6] scale-105' 
+                                : 'bg-gray-700 border-transparent hover:border-[#3B82F6]'
+                            }`}
+                            style={{ userSelect: 'none' }}
+                          >
                             <div className="flex items-center space-x-3">
-                              <div className="text-right">
-                                <div className="text-sm text-gray-400">ADP</div>
-                                <div className="font-semibold text-white">{player.adp}</div>
-                              </div>
-                              <div className="text-right">
-                                <div className="text-sm text-gray-400">Proj</div>
-                                <div className="font-semibold text-white">{player.proj}</div>
+                              <div className="flex items-center space-x-2">
+                                <div className="font-semibold text-white">{player.name}</div>
+                                <div className="text-sm text-gray-300">
+                                  {player.position} • {player.team}
+                                </div>
                               </div>
                             </div>
-                            <button
-                              onClick={() => handleRemoveFromLimits(index)}
-                              className="text-red-400 hover:text-red-300"
-                            >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                              </svg>
-                            </button>
+                            <div className="flex items-center space-x-4">
+                              <div className="flex items-center space-x-3">
+                                <div className="text-right">
+                                  <div className="text-sm text-gray-400">ADP</div>
+                                  <div className="font-semibold text-white">{player.adp}</div>
+                                </div>
+                                <div className="text-right">
+                                  <div className="text-sm text-gray-400">Proj</div>
+                                  <div className="font-semibold text-white">{player.proj}</div>
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => handleRemoveFromLimits(index)}
+                                className="text-red-400 hover:text-red-300"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                              </button>
+                            </div>
                           </div>
                         </div>
-                      </div>
                       ))}
                       {limits.length === 0 && (
                         <div 
