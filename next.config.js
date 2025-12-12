@@ -96,3 +96,4 @@ const nextConfig = {
 };
 
 module.exports = withPWA(nextConfig);
+// Force rebuild Fri Dec 12 03:54:11 EST 2025
