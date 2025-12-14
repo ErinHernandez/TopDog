@@ -10,14 +10,17 @@ const iconSizes = [72, 96, 128, 144, 152, 180, 192, 384, 512];
 async function generateIcons() {
   console.log('Generating PWA icons...\n');
   console.log('Background: wr_blue.png');
-  console.log('Overlay: logo.png (already white)\n');
+  console.log('Overlay: logo.png (bigger, rounded corners)\n');
 
   for (const size of iconSizes) {
     const outputPath = path.join(publicDir, `icon-${size}x${size}.png`);
     
     try {
-      // Calculate logo size (60% of icon size for nice padding)
-      const logoSize = Math.round(size * 0.6);
+      // Calculate logo size (75% of icon size - bigger than before)
+      const logoSize = Math.round(size * 0.75);
+      
+      // Corner radius - iOS uses about 22% of the icon size
+      const cornerRadius = Math.round(size * 0.22);
       
       // Get the logo resized
       const logoBuffer = await sharp(logoImage)
@@ -35,13 +38,29 @@ async function generateIcons() {
       const left = Math.round((size - logoMeta.width) / 2);
       const top = Math.round((size - logoMeta.height) / 2);
 
-      // Resize background and composite logo on top
-      await sharp(backgroundImage)
+      // Create rounded rectangle mask
+      const roundedMask = Buffer.from(
+        `<svg width="${size}" height="${size}">
+          <rect x="0" y="0" width="${size}" height="${size}" rx="${cornerRadius}" ry="${cornerRadius}" fill="white"/>
+        </svg>`
+      );
+
+      // Resize background, composite logo, then apply rounded corners
+      const composited = await sharp(backgroundImage)
         .resize(size, size, { fit: 'cover' })
         .composite([{
           input: logoBuffer,
           left: left,
           top: top,
+        }])
+        .png()
+        .toBuffer();
+
+      // Apply rounded corners mask
+      await sharp(composited)
+        .composite([{
+          input: roundedMask,
+          blend: 'dest-in'
         }])
         .png()
         .toFile(outputPath);
