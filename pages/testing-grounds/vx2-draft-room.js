@@ -26,6 +26,7 @@ export default function VX2DraftRoomPage() {
   }, []);
   
   const handleLeaveDraft = useCallback(() => {
+    console.log('[VX2DraftRoomPage] handleLeaveDraft called! Navigating to lobby...');
     router.push('/testing-grounds/vx2-mobile-app-demo');
   }, [router]);
   
