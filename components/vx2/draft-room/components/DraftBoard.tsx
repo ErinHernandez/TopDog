@@ -140,6 +140,7 @@ interface TeamHeaderProps {
   isUser: boolean;
   userBorderColor: string;
   positionCounts: Record<Position, number>;
+  isOnTheClock: boolean;
 }
 
 function TeamHeader({ 
@@ -147,9 +148,10 @@ function TeamHeader({
   index, 
   isUser, 
   userBorderColor, 
-  positionCounts 
+  positionCounts,
+  isOnTheClock,
 }: TeamHeaderProps): React.ReactElement {
-  const borderColor = isUser ? userBorderColor : '#6B7280';
+  const borderColor = isUser ? userBorderColor : (isOnTheClock ? '#6B7280' : '#6B7280');
   const totalPicks = Object.values(positionCounts).reduce((sum, count) => sum + count, 0);
   const displayName = participant.name?.length > BOARD_PX.headerMaxChars
     ? participant.name.substring(0, BOARD_PX.headerMaxChars)
@@ -201,6 +203,22 @@ function TeamHeader({
           minHeight: BOARD_PX.contentMinHeight,
         }}
       >
+        {/* On The Clock text */}
+        {isOnTheClock && (
+          <div
+            style={{
+              fontWeight: 600,
+              color: '#FFFFFF',
+              fontSize: 11,
+              lineHeight: 1.2,
+              textAlign: 'center',
+              marginBottom: 8,
+            }}
+          >
+            On The<br />Clock
+          </div>
+        )}
+        
         {/* Position Tracker Bar */}
         <div
           style={{
@@ -461,8 +479,11 @@ export default function DraftBoard({
     : pickIndexInRound;
   const isUserOnClock = isDraftActive && currentParticipantIndex === userParticipantIndex;
   
-  // User border color: red when on the clock, blue otherwise
-  const userBorderColor = isUserOnClock 
+  // Urgent mode when user is on the clock and timer <= 9s
+  const isUrgent = isUserOnClock && timer <= 9;
+  
+  // User border color: red when urgent (on clock + timer <= 9s), blue otherwise
+  const userBorderColor = isUrgent 
     ? BOARD_COLORS.cellBorderUserOnClock 
     : BOARD_COLORS.cellBorderUser;
   
@@ -601,6 +622,7 @@ export default function DraftBoard({
                 isUser={index === userParticipantIndex}
                 userBorderColor={userBorderColor}
                 positionCounts={getPositionCounts(index)}
+                isOnTheClock={isDraftActive && index === currentParticipantIndex}
               />
             ))}
           </div>
