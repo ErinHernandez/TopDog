@@ -26,9 +26,9 @@ export default function VX2DraftRoomPage() {
   }, []);
   
   const handleLeaveDraft = useCallback(() => {
-    console.log('[VX2DraftRoomPage] handleLeaveDraft called! Navigating to lobby...');
-    router.push('/testing-grounds/vx2-mobile-app-demo');
-  }, [router]);
+    // Use window.location for reliable navigation from within phone frame
+    window.location.href = '/testing-grounds/vx2-mobile-app-demo';
+  }, []);
   
   const handleDevToolsReady = useCallback((tools) => {
     devToolsRef.current = tools;
