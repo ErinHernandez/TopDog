@@ -19,6 +19,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { DraftPick, Participant, Position, DraftPlayer } from '../types';
 import { POSITION_COLORS } from '../constants';
 import { BG_COLORS, TEXT_COLORS } from '../../core/constants/colors';
+import PlayerExpandedCard from './PlayerExpandedCard';
 
 // ============================================================================
 // PIXEL-PERFECT CONSTANTS (matched from VX RosterPanelVX.tsx)
@@ -319,97 +320,121 @@ interface RosterRowProps {
   player: DraftPlayer | null;
   isStarter: boolean;
   showTopBorder?: boolean;
+  isExpanded?: boolean;
+  onToggleExpand?: () => void;
 }
 
-function RosterRow({ position, player, isStarter, showTopBorder = false }: RosterRowProps): React.ReactElement {
+function RosterRow({ position, player, isStarter, showTopBorder = false, isExpanded = false, onToggleExpand }: RosterRowProps): React.ReactElement {
   const badgeSize: 'sm' | 'md' | 'lg' | 'xl' = (isStarter || !player) ? 'lg' : 'md';
   const displayPosition = player ? player.position : position;
   
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        position: 'relative',
-        overflow: 'hidden',
-        height: ROSTER_PX.rowHeight,
-        backgroundColor: ROSTER_COLORS.rowBackground,
-        borderBottom: `${ROSTER_PX.rowBorderWidth}px solid ${ROSTER_COLORS.rowBorder}`,
-        borderTop: showTopBorder ? `${ROSTER_PX.rowBorderWidth}px solid ${ROSTER_COLORS.rowBorder}` : 'none',
-      }}
-    >
-      {/* Gradient overlay for filled bench slots */}
-      {!isStarter && player && (
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            pointerEvents: 'none',
-            background: createRosterGradient(player.position),
-            zIndex: 1,
-          }}
-        />
-      )}
-      
-      {/* Position Badge Column */}
+    <div>
       <div
+        onClick={player ? onToggleExpand : undefined}
         style={{
-          flexShrink: 0,
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
-          width: ROSTER_PX.badgeColumnWidth,
-          paddingLeft: ROSTER_PX.badgeColumnPaddingLeft,
-          zIndex: 10,
+          position: 'relative',
+          overflow: 'hidden',
+          height: ROSTER_PX.rowHeight,
+          backgroundColor: ROSTER_COLORS.rowBackground,
+          borderBottom: isExpanded ? 'none' : `${ROSTER_PX.rowBorderWidth}px solid ${ROSTER_COLORS.rowBorder}`,
+          borderTop: showTopBorder ? `${ROSTER_PX.rowBorderWidth}px solid ${ROSTER_COLORS.rowBorder}` : 'none',
+          cursor: player ? 'pointer' : 'default',
         }}
       >
-        <PositionBadge position={displayPosition} size={badgeSize} />
-      </div>
-      
-      {/* Player Content */}
-      {player ? (
+        {/* Gradient overlay for filled bench slots */}
+        {!isStarter && player && (
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              pointerEvents: 'none',
+              background: createRosterGradient(player.position),
+              zIndex: 1,
+            }}
+          />
+        )}
+        
+        {/* Position Badge Column */}
         <div
           style={{
-            flex: 1,
+            flexShrink: 0,
             display: 'flex',
             alignItems: 'center',
-            paddingLeft: ROSTER_PX.playerContentPaddingX,
-            paddingRight: ROSTER_PX.playerContentPaddingX,
+            justifyContent: 'center',
+            width: ROSTER_PX.badgeColumnWidth,
+            paddingLeft: ROSTER_PX.badgeColumnPaddingLeft,
             zIndex: 10,
           }}
         >
-          {/* Player Name */}
+          <PositionBadge position={displayPosition} size={badgeSize} />
+        </div>
+        
+        {/* Player Content */}
+        {player ? (
           <div
             style={{
               flex: 1,
-              fontWeight: 500,
-              fontSize: ROSTER_PX.playerNameFontSize,
-              color: ROSTER_COLORS.textPrimary,
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
+              display: 'flex',
+              alignItems: 'center',
+              paddingLeft: ROSTER_PX.playerContentPaddingX,
+              paddingRight: ROSTER_PX.playerContentPaddingX,
+              zIndex: 10,
             }}
           >
-            {player.name}
+            {/* Player Name */}
+            <div
+              style={{
+                flex: 1,
+                fontWeight: 500,
+                fontSize: ROSTER_PX.playerNameFontSize,
+                color: ROSTER_COLORS.textPrimary,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {player.name}
+            </div>
+            
+            {/* Team (Bye) */}
+            <div
+              style={{
+                flexShrink: 0,
+                textAlign: 'right',
+                fontSize: ROSTER_PX.teamByeFontSize,
+                minWidth: ROSTER_PX.teamByeMinWidth,
+                marginLeft: ROSTER_PX.teamByeMarginLeft,
+                marginRight: ROSTER_PX.teamByeMarginRight,
+                color: ROSTER_COLORS.textSecondary,
+              }}
+            >
+              {player.team} ({getByeWeek(player.team) || 'TBD'})
+            </div>
           </div>
-          
-          {/* Team (Bye) */}
-          <div
-            style={{
-              flexShrink: 0,
-              textAlign: 'right',
-              fontSize: ROSTER_PX.teamByeFontSize,
-              minWidth: ROSTER_PX.teamByeMinWidth,
-              marginLeft: ROSTER_PX.teamByeMarginLeft,
-              marginRight: ROSTER_PX.teamByeMarginRight,
-              color: ROSTER_COLORS.textSecondary,
+        ) : (
+          <div style={{ flex: 1, zIndex: 10 }} />
+        )}
+      </div>
+      
+      {/* Expanded Stats Card */}
+      {isExpanded && player && (
+        <div style={{ borderBottom: `${ROSTER_PX.rowBorderWidth}px solid ${ROSTER_COLORS.rowBorder}` }}>
+          <PlayerExpandedCard
+            player={{
+              id: player.id,
+              name: player.name,
+              team: player.team,
+              position: player.position,
+              adp: player.adp,
+              projectedPoints: player.projectedPoints,
             }}
-          >
-            {player.team} ({getByeWeek(player.team) || 'TBD'})
-          </div>
+            isMyTurn={false}
+            onClose={onToggleExpand}
+          />
         </div>
-      ) : (
-        <div style={{ flex: 1, zIndex: 10 }} />
       )}
     </div>
   );
@@ -638,7 +663,17 @@ export default function RosterView({
   onScrollPositionChange,
 }: RosterViewProps): React.ReactElement {
   const [selectedIndex, setSelectedIndex] = useState(userParticipantIndex);
+  const [expandedPlayerId, setExpandedPlayerId] = useState<string | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  
+  // Collapse expanded card when switching teams
+  useEffect(() => {
+    setExpandedPlayerId(null);
+  }, [selectedIndex]);
+  
+  const handleToggleExpand = useCallback((playerId: string) => {
+    setExpandedPlayerId(prev => prev === playerId ? null : playerId);
+  }, []);
   
   // Restore scroll position on mount
   useEffect(() => {
@@ -708,14 +743,19 @@ export default function RosterView({
         }}
       >
         {/* Starting Lineup */}
-        {STARTING_POSITIONS.map((position, index) => (
-          <RosterRow
-            key={`start-${index}`}
-            position={position}
-            player={getPlayerForSlot(team, position, index, STARTING_POSITIONS)}
-            isStarter={true}
-          />
-        ))}
+        {STARTING_POSITIONS.map((position, index) => {
+          const player = getPlayerForSlot(team, position, index, STARTING_POSITIONS);
+          return (
+            <RosterRow
+              key={`start-${index}`}
+              position={position}
+              player={player}
+              isStarter={true}
+              isExpanded={player ? expandedPlayerId === player.id : false}
+              onToggleExpand={player ? () => handleToggleExpand(player.id) : undefined}
+            />
+          );
+        })}
         
         {/* Bench Header */}
         <div
@@ -745,6 +785,8 @@ export default function RosterView({
               player={benchPlayer}
               isStarter={false}
               showTopBorder={index === 0}
+              isExpanded={benchPlayer ? expandedPlayerId === benchPlayer.id : false}
+              onToggleExpand={benchPlayer ? () => handleToggleExpand(benchPlayer.id) : undefined}
             />
           );
         })}
