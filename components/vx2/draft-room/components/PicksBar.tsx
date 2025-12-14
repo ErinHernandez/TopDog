@@ -666,7 +666,20 @@ const BlankCard = React.forwardRef<HTMLDivElement, BlankCardProps>(
                   justifyContent: 'center',
                 }}
               >
-                {picksAway !== undefined && picksAway > 0 ? (
+                {isCurrent ? (
+                  <div
+                    style={{
+                      fontWeight: 600,
+                      color: '#FFFFFF',
+                      fontSize: 11,
+                      lineHeight: 1.2,
+                      textAlign: 'center',
+                      marginTop: 6,
+                    }}
+                  >
+                    On The<br />Clock
+                  </div>
+                ) : picksAway !== undefined && picksAway > 0 ? (
                   <div
                     style={{
                       color: '#FFFFFF',
