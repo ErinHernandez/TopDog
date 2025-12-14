@@ -6,13 +6,21 @@ import {
 } from 'firebase/firestore';
 import Link from 'next/link';
 import React from 'react';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { DragDropContext, Draggable } from 'react-beautiful-dnd';
+import StrictModeDroppable from '../../../components/StrictModeDroppable';
 import { PLAYER_POOL, groupPicksByPosition } from '../../../lib/playerPool';
 import { getRandomMockDrafters } from '../../../lib/mockDrafters';
 import FullDraftBoard from '../../../components/FullDraftBoard';
 import { logoOptions } from '../../../components/team-logos';
-import dynamic from 'next/dynamic';
-const SevenSegmentCountdown = dynamic(() => import('../../../components/SevenSegmentCountdown'), { ssr: false });
+import SevenSegmentCountdown from '../../../components/SevenSegmentCountdown';
+import PicksAwayCalendar from '../../../components/PicksAwayCalendar';
+import { getCustomPlayerRanking, loadCustomRankings } from '../../../lib/customRankings';
+// Static player stats data (pre-downloaded)
+import { getPlayerStats, hasPlayerStats, getStatsMetadata } from '../../../lib/staticPlayerStats';
+import { createPositionGradient, createQueueGradient, createPickedPlayerGradient } from '../../../lib/gradientUtils';
+import RippleEffect from '../../../components/draft/v3/mobile/apple/components/RippleEffect';
+import DraftNavbar from '../../../components/draft/v2/ui/DraftNavbar';
+import { POSITION_COLORS, FLEX_POSITIONS } from '../../../components/draft/v3/constants/positions';
 
 // Team colors (from FullDraftBoard)
 const TEAM_COLORS = [
@@ -31,11 +39,30 @@ const TEAM_COLORS = [
 ];
 
 function getRandomName() {
-  return 'Not Todd Middleton';
+  const adjectives = ['Swift', 'Mighty', 'Brave', 'Clever', 'Fierce', 'Noble', 'Wild', 'Bold', 'Sharp', 'Quick'];
+  const nouns = ['Wolf', 'Eagle', 'Lion', 'Tiger', 'Bear', 'Hawk', 'Fox', 'Panther', 'Falcon', 'Jaguar'];
+  const adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
+  const noun = nouns[Math.floor(Math.random() * nouns.length)];
+  return `${adjective} ${noun}`;
 }
 
 export default function DraftRoom() {
   const router = useRouter();
+
+  // Custom ADP formatting function
+  const formatADP = (adp) => {
+    if (!adp || adp <= 0) return '-';
+    const formatted = adp.toFixed(1);
+    // If ADP is under 10.0, replace leading zero with 2 spaces
+    if (adp < 10.0) {
+      return formatted.replace(/^0/, '  ');
+    }
+    return formatted;
+  };
+
+
+
+
   const { roomId } = router.query;
   const [room, setRoom] = useState(null);
   const [participants, setParticipants] = useState([]);
@@ -44,10 +71,17 @@ export default function DraftRoom() {
   const [availablePlayers, setAvailablePlayers] = useState(PLAYER_POOL);
   const [pickLoading, setPickLoading] = useState(false);
   const [timer, setTimer] = useState(30);
+  const [isInGracePeriod, setIsInGracePeriod] = useState(false);
+  const [showRipple, setShowRipple] = useState(false);
   const timerRef = useRef();
+  const graceTimeoutRef = useRef();
   const prevPickLength = useRef(0);
-  const [rankings, setRankings] = useState([]);
   const [rankingsText, setRankingsText] = useState('');
+  const [rankings, setRankings] = useState(['Ja\'Marr Chase', 'Justin Jefferson', 'Bijan Robinson', 'Saquon Barkley', 'CeeDee Lamb']);
+  const [customRankings, setCustomRankings] = useState([]);
+  
+  // Temporary debug log
+  console.log('Current rankings:', rankings);
   const [queue, setQueue] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showTeamModal, setShowTeamModal] = useState(false);
@@ -56,7 +90,7 @@ export default function DraftRoom() {
   const [draftOrder, setDraftOrder] = useState([]);
   const [isRoomOwner, setIsRoomOwner] = useState(false);
   const [playerSearch, setPlayerSearch] = useState('');
-  const [positionFilter, setPositionFilter] = useState('ALL');
+  const [positionFilters, setPositionFilters] = useState(['ALL']);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [draftSettings, setDraftSettings] = useState({
     timerSeconds: 30,
@@ -66,13 +100,24 @@ export default function DraftRoom() {
   const [draftOrderTimestamp, setDraftOrderTimestamp] = useState(null);
   const [preDraftCountdown, setPreDraftCountdown] = useState(60);
   const [sortBy, setSortBy] = useState('adp'); // 'adp' or 'rankings'
+  const [adpSortDirection, setAdpSortDirection] = useState('asc'); // 'asc' or 'desc'
+  const [rankingSortDirection, setRankingSortDirection] = useState('asc'); // 'asc' or 'desc'
   const [queueSortBy, setQueueSortBy] = useState('manual'); // 'manual', 'adp', or 'rankings'
   const picksScrollRef = useRef(null);
   const [showTeamDropdown, setShowTeamDropdown] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [mockDraftSpeed, setMockDraftSpeed] = useState(false);
+  const [showOverallPickNumbers, setShowOverallPickNumbers] = useState(false);
   const lastPickTimestampRef = useRef(0);
   const pickInProgressRef = useRef(false);
+  const [rankingsModalOpen, setRankingsModalOpen] = useState(false);
+  const [showPlayerModal, setShowPlayerModal] = useState(false);
+  const [selectedPlayerForModal, setSelectedPlayerForModal] = useState(null);
+  const [playerStatsLoading, setPlayerStatsLoading] = useState(false);
+  const [playerStatsData, setPlayerStatsData] = useState(null);
+
+  // Derived state - computed from room status
+  const isDraftActive = room?.status === 'active';
 
   // Auto-scroll to show only one completed pick at a time, positioned as far left as possible
   useEffect(() => {
@@ -83,10 +128,10 @@ export default function DraftRoom() {
         const currentPickIndex = completedPicksCount - 1; // Index of the last completed pick
         const currentPickElement = picksScrollRef.current.children[currentPickIndex];
         if (currentPickElement) {
-          console.log(`Auto-scrolling to show only completed pick #${completedPicksCount} as far left as possible`);
+          console.log(`Scrolling to pick #${currentPickIndex + 1}`);
           currentPickElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
         } else {
-          console.log(`Could not find element for completed pick #${completedPicksCount}`);
+          console.log(`Could not find element for pick #${currentPickIndex + 1}`);
         }
       }, 300);
     }
@@ -137,14 +182,14 @@ export default function DraftRoom() {
   // Join room as a participant
   useEffect(() => {
     if (!roomId) return;
-    const joinRoom = async () => {
-      // Force the user to be "Not Todd Middleton" regardless of what's in localStorage
-      const name = 'Not Todd Middleton';
-      localStorage.setItem('draftUserName', name);
-      setUserName(name);
-      
-      const userRef = doc(db, 'draftRooms', roomId);
-      const docSnap = await getDoc(userRef);
+    // Get username from localStorage or generate a random one
+    const storedName = localStorage.getItem('draftUserName');
+    const name = storedName || getRandomName();
+    localStorage.setItem('draftUserName', name);
+    setUserName(name);
+    
+    const userRef = doc(db, 'draftRooms', roomId);
+    getDoc(userRef).then(docSnap => {
       if (docSnap.exists()) {
         const data = docSnap.data();
         setIsRoomOwner(data.createdBy === name);
@@ -167,21 +212,27 @@ export default function DraftRoom() {
         if (oldUsernames.length > 0) {
           // Remove old usernames
           updatedParticipants = currentParticipants.filter(p => !p.startsWith('User-'));
-          await updateDoc(userRef, { participants: updatedParticipants });
+          updateDoc(userRef, { participants: updatedParticipants });
         }
         
         // Add the new username if not already present
         if (!updatedParticipants.includes(name)) {
-          await updateDoc(userRef, { participants: arrayUnion(name) });
+          updateDoc(userRef, { participants: arrayUnion(name) });
         }
       }
-    };
-    joinRoom();
+    });
   }, [roomId, router]);
 
   // Listen for room data
   useEffect(() => {
     if (!roomId) return;
+    
+    // Add timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      console.error(`[ROOM ${roomId}] Timeout loading room data`);
+      alert('Failed to load room data. Please check if the room exists and try again.');
+    }, 10000); // 10 second timeout
+    
     const unsub = onSnapshot(doc(db, 'draftRooms', roomId), (docSnap) => {
       const roomData = { id: docSnap.id, ...docSnap.data() };
       const previousStatus = room?.status;
@@ -208,13 +259,20 @@ export default function DraftRoom() {
       
       // Verify picks belong to this room
       verifyAndCleanPicks();
+      
+      // Clear timeout since room data loaded successfully
+      clearTimeout(timeoutId);
     }, (error) => {
       console.error(`[ROOM ${roomId}] Error listening to room data:`, error);
+      clearTimeout(timeoutId);
       if (error.code === 'failed-precondition') {
         alert('Firebase connection error. Please check your internet connection and try again.');
       }
     });
-    return () => unsub();
+    return () => {
+      unsub();
+      clearTimeout(timeoutId);
+    };
   }, [roomId]);
 
   // Periodic verification that no drafted players are in available list
@@ -222,15 +280,31 @@ export default function DraftRoom() {
     if (!isDraftActive && room?.status !== 'waiting') return;
     
     const verificationInterval = setInterval(() => {
-      const pickedNames = picks.map(p => p.player);
-      const invalidAvailablePlayers = availablePlayers.filter(p => pickedNames.includes(p.name));
+      const pickedNames = picks
+        .filter(p => p && p.player && typeof p.player === 'string')
+        .map(p => p.player);
+      const invalidAvailablePlayers = availablePlayers.filter(p => {
+        // Validate player object before checking
+        if (!p || typeof p !== 'object' || typeof p.name !== 'string') {
+          console.error(`[VERIFY] Invalid player object found in availablePlayers:`, p);
+          return false;
+        }
+        return pickedNames.includes(p.name);
+      });
       
       if (invalidAvailablePlayers.length > 0) {
         console.error(`🚨 PERIODIC CHECK: Found ${invalidAvailablePlayers.length} drafted players in available list:`, 
           invalidAvailablePlayers.map(p => p.name));
         
         // Force refresh available players
-        const cleanAvailablePlayers = PLAYER_POOL.filter(p => !pickedNames.includes(p.name));
+        const cleanAvailablePlayers = PLAYER_POOL.filter(p => {
+          // Validate player object before filtering
+          if (!p || typeof p !== 'object' || typeof p.name !== 'string') {
+            console.error(`[VERIFY] Invalid player object found in PLAYER_POOL:`, p);
+            return false;
+          }
+          return !pickedNames.includes(p.name);
+        });
         setAvailablePlayers(cleanAvailablePlayers);
         console.log(`[ROOM ${roomId}] Forced refresh of available players`);
       } else {
@@ -244,21 +318,150 @@ export default function DraftRoom() {
   // Force update available players whenever picks change
   useEffect(() => {
     const pickedNames = picks.map(p => p.player);
-    const filteredAvailable = PLAYER_POOL.filter(p => !pickedNames.includes(p.name));
+    const filteredAvailable = PLAYER_POOL.filter(p => {
+      // Validate player object before filtering
+      if (!p || typeof p !== 'object' || typeof p.name !== 'string') {
+        console.error(`[AVAILABLE] Invalid player object found in PLAYER_POOL:`, p);
+        return false;
+      }
+      return !pickedNames.includes(p.name);
+    });
     setAvailablePlayers(filteredAvailable);
   }, [picks]);
+
+  // Function to repair pick gaps and ensure proper sequencing
+  const repairPickGaps = async () => {
+    if (picks.length === 0) return;
+    
+    try {
+      // Sort picks by pickNumber
+      const sortedPicks = [...picks].sort((a, b) => a.pickNumber - b.pickNumber);
+      let needsRepair = false;
+      const repairs = [];
+      
+      // Check for gaps and create repair plan
+      for (let i = 0; i < sortedPicks.length; i++) {
+        const expectedPickNumber = i + 1;
+        const actualPickNumber = sortedPicks[i].pickNumber;
+        
+        if (actualPickNumber !== expectedPickNumber) {
+          console.warn(`[ROOM ${roomId}] Found pick gap: expected ${expectedPickNumber}, got ${actualPickNumber}`);
+          needsRepair = true;
+          repairs.push({
+            oldPickNumber: actualPickNumber,
+            newPickNumber: expectedPickNumber,
+            pickData: sortedPicks[i]
+          });
+        }
+      }
+      
+      // Execute repairs if needed
+      if (needsRepair) {
+        console.log(`[ROOM ${roomId}] Repairing ${repairs.length} pick gaps...`);
+        
+        for (const repair of repairs) {
+          // Delete the old pick
+          const oldPickRef = doc(db, 'draftRooms', roomId, 'picks', String(repair.oldPickNumber));
+          await deleteDoc(oldPickRef);
+          
+          // Create the new pick with correct number
+          const newPickRef = doc(db, 'draftRooms', roomId, 'picks', String(repair.newPickNumber));
+          await setDoc(newPickRef, {
+            ...repair.pickData,
+            pickNumber: repair.newPickNumber
+          });
+          
+          console.log(`[ROOM ${roomId}] Repaired pick ${repair.oldPickNumber} -> ${repair.newPickNumber}`);
+        }
+        
+        console.log(`[ROOM ${roomId}] Pick repair completed`);
+      }
+    } catch (error) {
+      console.error(`[ROOM ${roomId}] Error repairing pick gaps:`, error);
+    }
+  };
+
+  // Manual repair function that can be called from UI
+  const manualRepairPicks = async () => {
+    console.log(`[ROOM ${roomId}] Manual pick repair initiated...`);
+    await repairPickGaps();
+  };
+
+  // Debug function to log current pick state
+  const logPickState = () => {
+    console.log(`[ROOM ${roomId}] Current pick state:`, {
+      totalPicks,
+      currentPickNumber,
+      currentRound,
+      picksLength: picks.length,
+      picks: picks.map(p => ({ pickNumber: p.pickNumber, player: p.player, user: p.user })),
+      sortedPicks: [...picks].sort((a, b) => a.pickNumber - b.pickNumber).map(p => ({ pickNumber: p.pickNumber, player: p.player, user: p.user }))
+    });
+  };
 
   // Listen for picks
   useEffect(() => {
     if (!roomId) return;
     const picksQuery = query(collection(db, 'draftRooms', roomId, 'picks'), orderBy('pickNumber'));
     const unsub = onSnapshot(picksQuery, (snap) => {
-      const picksArr = snap.docs.map(doc => doc.data());
+      // Normalize picks so player is always a string (player name)
+      const picksArr = snap.docs.map(doc => {
+        const data = doc.data();
+        const playerField = data.player;
+        
+        // Handle all possible cases where player might be an object
+        let normalizedPlayer;
+        if (typeof playerField === 'string') {
+          normalizedPlayer = playerField;
+        } else if (typeof playerField === 'object' && playerField !== null) {
+          // If it's an object, try to extract the name
+          if (playerField.name && typeof playerField.name === 'string') {
+            normalizedPlayer = playerField.name;
+          } else if (playerField.player && typeof playerField.player === 'string') {
+            normalizedPlayer = playerField.player;
+          } else {
+            console.error(`[PICKS] Player object has no valid name field:`, playerField);
+            normalizedPlayer = '';
+          }
+        } else {
+          console.error(`[PICKS] Invalid player field type:`, typeof playerField, playerField);
+          normalizedPlayer = '';
+        }
+        
+        // Validate the normalized pick data
+        if (!normalizedPlayer || typeof normalizedPlayer !== 'string') {
+          console.error(`[PICKS] Invalid player data in pick:`, data);
+          return null;
+        }
+        
+        return { ...data, player: normalizedPlayer };
+      }).filter(pick => pick !== null); // Remove invalid picks
+      
       setPicks(picksArr);
+      
       // Remove picked players from available
-      const pickedNames = picksArr.map(p => p.player);
-      const filteredAvailable = PLAYER_POOL.filter(p => !pickedNames.includes(p.name));
+      const pickedNames = picksArr
+        .filter(p => p && p.player && typeof p.player === 'string')
+        .map(p => p.player);
+      const filteredAvailable = PLAYER_POOL.filter(p => {
+        // Validate player object before filtering
+        if (!p || typeof p !== 'object' || typeof p.name !== 'string') {
+          console.error(`[PICKS] Invalid player object found in PLAYER_POOL:`, p);
+          return false;
+        }
+        return !pickedNames.includes(p.name);
+      });
       setAvailablePlayers(filteredAvailable);
+      
+      // Remove picked players from queue
+      setQueue(prevQueue => prevQueue.filter(player => {
+        // Validate player object before filtering
+        if (!player || typeof player !== 'object' || typeof player.name !== 'string') {
+          console.error(`[PICKS] Invalid player object found in queue:`, player);
+          return false;
+        }
+        return !pickedNames.includes(player.name);
+      }));
       
       // Debug logging
       console.log(`[ROOM ${roomId}] Picks updated:`, picksArr.length, 'picks');
@@ -282,65 +485,131 @@ export default function DraftRoom() {
     return () => unsub();
   }, [roomId]);
 
-  // Load rankings from localStorage
+  // Separate effect to repair pick gaps when picks change
+  useEffect(() => {
+    if (picks.length > 0) {
+      // Only repair if there are actual gaps
+      const sortedPicks = [...picks].sort((a, b) => a.pickNumber - b.pickNumber);
+      const hasGaps = sortedPicks.some((pick, index) => pick.pickNumber !== index + 1);
+      
+      if (hasGaps) {
+        console.log(`[ROOM ${roomId}] Detected pick gaps, initiating repair...`);
+        repairPickGaps();
+      }
+    }
+  }, [picks.length]); // Only depend on picks.length to avoid infinite loops
+
+  // Load rankings from localStorage and set sorting
   useEffect(() => {
     const stored = localStorage.getItem('draftRankings');
+    console.log('Loading rankings from localStorage:', stored);
     if (stored) {
-      setRankings(JSON.parse(stored));
+      const parsedRankings = JSON.parse(stored);
+      console.log('Parsed rankings:', parsedRankings);
+      setRankings(parsedRankings);
+      
+      if (parsedRankings.length > 0) {
+        // If custom rankings exist, use them for sorting
+        console.log('Setting sortBy to rankings');
+        setSortBy('rankings');
+      } else {
+        // If no custom rankings, use ADP
+        console.log('Setting sortBy to adp');
+        setSortBy('adp');
+      }
+    } else {
+      // No stored rankings, use ADP
+      console.log('No stored rankings, setting sortBy to adp');
+      setSortBy('adp');
     }
   }, []);
 
   // Load queue from localStorage
+
+
   useEffect(() => {
     const stored = localStorage.getItem('draftQueue');
     if (stored) {
-      setQueue(JSON.parse(stored));
+      try {
+        const parsedQueue = JSON.parse(stored);
+        // Validate that the parsed data is an array of player objects
+        if (Array.isArray(parsedQueue) && parsedQueue.every(player => 
+          player && typeof player === 'object' && typeof player.name === 'string'
+        )) {
+          setQueue(parsedQueue);
+        } else {
+          console.warn('Invalid queue data in localStorage, clearing queue');
+          localStorage.removeItem('draftQueue');
+          setQueue([]);
+        }
+      } catch (error) {
+        console.error('Error parsing queue from localStorage:', error);
+        localStorage.removeItem('draftQueue');
+        setQueue([]);
+      }
+    }
+    
+    // Clean up any corrupted data in localStorage
+    const cleanupLocalStorage = () => {
+      try {
+        const stored = localStorage.getItem('draftQueue');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (!Array.isArray(parsed)) {
+            localStorage.removeItem('draftQueue');
+          }
+        }
+      } catch (error) {
+        localStorage.removeItem('draftQueue');
+      }
+    };
+    
+    cleanupLocalStorage();
+  }, []);
+
+  // Load rankings from localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem('draftRankings');
+    if (stored) {
+      try {
+        const parsedRankings = JSON.parse(stored);
+        setRankings(parsedRankings);
+      } catch (error) {
+        console.error('Error parsing rankings:', error);
+      }
     }
   }, []);
 
-  // Save rankings to localStorage
-  const handleRankingsUpload = (e) => {
-    e.preventDefault();
-    const lines = rankingsText
-      .split(/\n|,/)
-      .map(l => l.trim())
-      .filter(Boolean);
-    setRankings(lines);
-    localStorage.setItem('draftRankings', JSON.stringify(lines));
-    setRankingsText('');
-  };
+  // Load custom rankings
+  useEffect(() => {
+    const loadedRankings = loadCustomRankings();
+    setCustomRankings(loadedRankings);
+  }, []);
 
-  // Handle CSV file upload
-  const handleCSVUpload = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const text = event.target.result;
-      const lines = text
-        .split(/\n|,/)
-        .map(l => l.trim())
-        .filter(Boolean);
-      setRankings(lines);
-      localStorage.setItem('draftRankings', JSON.stringify(lines));
-    };
-    reader.readAsText(file);
-  };
 
-  // Clear/reset rankings
-  const clearRankings = () => {
-    setRankings([]);
-    localStorage.removeItem('draftRankings');
-  };
+
+
 
   // Save queue to localStorage
   useEffect(() => {
-    localStorage.setItem('draftQueue', JSON.stringify(queue));
+    // Only save if queue is a valid array of player objects
+    if (Array.isArray(queue) && queue.every(player => 
+      player && typeof player === 'object' && typeof player.name === 'string'
+    )) {
+      localStorage.setItem('draftQueue', JSON.stringify(queue));
+    } else {
+      console.warn('Invalid queue data detected, not saving to localStorage:', queue);
+    }
   }, [queue]);
 
   // Add to queue
   const addToQueue = (player) => {
     console.log('Adding player to queue:', player);
+    // Validate that player is a valid object with a name property
+    if (!player || typeof player !== 'object' || typeof player.name !== 'string') {
+      console.error('Invalid player object passed to addToQueue:', player);
+      return;
+    }
     if (!queue.find(p => p.name === player.name)) {
       const newQueue = [...queue, player];
       console.log('New queue:', newQueue);
@@ -350,7 +619,59 @@ export default function DraftRoom() {
   
   // Remove from queue
   const removeFromQueue = (player) => {
+    // Validate that player is a valid object with a name property
+    if (!player || typeof player !== 'object' || typeof player.name !== 'string') {
+      console.error('Invalid player object passed to removeFromQueue:', player);
+      return;
+    }
     setQueue(queue.filter(p => p.name !== player.name));
+  };
+
+
+
+  const handleRankingsUpload = (e) => {
+    e.preventDefault();
+    const lines = rankingsText
+      .split(/\n|,/)
+      .map(l => l.trim())
+      .filter(Boolean);
+    
+    console.log('Uploading new rankings:', lines);
+    setRankings(lines);
+    localStorage.setItem('draftRankings', JSON.stringify(lines));
+    console.log('Saved rankings to localStorage:', lines);
+    setRankingsText('');
+    setRankingsModalOpen(false);
+  };
+
+  const handleCSVUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target.result;
+      const lines = text
+        .split(/\n|,/)
+        .map(l => l.trim())
+        .filter(Boolean);
+      
+      console.log('Uploading CSV rankings:', lines);
+      setRankings(lines);
+      localStorage.setItem('draftRankings', JSON.stringify(lines));
+    };
+    reader.readAsText(file);
+  };
+
+  const clearRankings = () => {
+    setRankings([]);
+    localStorage.removeItem('draftRankings');
+  };
+
+  const getPlayerRanking = (playerName) => {
+    const index = rankings.indexOf(playerName);
+    const rank = index !== -1 ? index + 1 : null;
+    return rank ? rank.toString() : '';
   };
 
   // Draft order management
@@ -378,7 +699,30 @@ export default function DraftRoom() {
   const totalRounds = room?.settings?.totalRounds || 18;
   const effectiveDraftOrder = draftOrder.length > 0 ? draftOrder : participants;
   const totalPicks = totalRounds * effectiveDraftOrder.length;
-  const currentPickNumber = picks.length + 1;
+  
+  // More robust currentPickNumber calculation that checks for gaps
+  const calculateCurrentPickNumber = () => {
+    if (picks.length === 0) return 1;
+    
+    // Sort picks by pickNumber to ensure proper order
+    const sortedPicks = [...picks].sort((a, b) => a.pickNumber - b.pickNumber);
+    
+    // Check for gaps in pick numbers
+    for (let i = 0; i < sortedPicks.length; i++) {
+      const expectedPickNumber = i + 1;
+      const actualPickNumber = sortedPicks[i].pickNumber;
+      
+      if (actualPickNumber !== expectedPickNumber) {
+        console.warn(`[ROOM ${roomId}] Found gap in picks: expected ${expectedPickNumber}, got ${actualPickNumber}`);
+        return expectedPickNumber;
+      }
+    }
+    
+    // If no gaps found, return the next pick number
+    return picks.length + 1;
+  };
+  
+  const currentPickNumber = calculateCurrentPickNumber();
   const currentRound = Math.ceil(currentPickNumber / effectiveDraftOrder.length);
   
   // Snake draft logic: odd rounds go forward, even rounds go backward
@@ -387,13 +731,15 @@ export default function DraftRoom() {
   const currentPicker = isSnakeRound
     ? effectiveDraftOrder[effectiveDraftOrder.length - 1 - pickIndex]
     : effectiveDraftOrder[pickIndex];
-  const isMyTurn = 'Not Todd Middleton' === currentPicker;
-  const isDraftActive = room?.status === 'active';
+  const isMyTurn = userName === currentPicker;
+  const isOnTheClock = currentPickNumber === picks.length + 1;
 
   // Timer logic
   useEffect(() => {
     if (!isDraftActive || picks.length >= totalPicks) {
-      setTimer(room?.settings?.timerSeconds || 30);
+      // Use room timer setting for mock drafts, fallback to 10 seconds for quick mock drafts
+      const timerDuration = room?.mockDrafters?.length > 0 ? (room?.settings?.timerSeconds || 10) : (room?.settings?.timerSeconds || 30);
+      setTimer(timerDuration);
       clearInterval(timerRef.current);
       return;
     }
@@ -403,76 +749,238 @@ export default function DraftRoom() {
     const mockDrafterNames = room?.mockDrafters || [];
     const isMockDrafter = currentPicker && currentPicker !== userName && mockDrafterNames.includes(currentPicker);
     
-    console.log('⏰ TIMER LOGIC:', {
-      isMyTurn,
-      isMockDrafter,
-      currentPicker,
-      userName,
-      timer,
-      isDraftActive,
-      picksLength: picks.length,
-      totalPicks
-    });
+    // Use room timer setting for mock drafts, fallback to 10 seconds for quick mock drafts
+    const timerDuration = room?.mockDrafters?.length > 0 ? (room?.settings?.timerSeconds || 10) : (room?.settings?.timerSeconds || 30);
     
-    // Timer should count down for both current user and mock drafters
-    if (isMyTurn || isMockDrafter) {
-      setTimer(room?.settings?.timerSeconds || 30);
-      clearInterval(timerRef.current);
-      timerRef.current = setInterval(() => {
-        setTimer((t) => {
-          if (t <= 1) {
-            clearInterval(timerRef.current);
-            return 0;
-          }
-          return t - 1;
-        });
-      }, 1000);
-      return () => clearInterval(timerRef.current);
-    } else {
-      // Reset timer when it's not our turn
-      setTimer(room?.settings?.timerSeconds || 30);
-      clearInterval(timerRef.current);
-    }
-  }, [isMyTurn, isDraftActive, picks.length, totalPicks, room?.settings?.timerSeconds, currentPicker, room?.mockDrafters, userName]);
-
-  // Skip pick if timer runs out
-  useEffect(() => {
-    if (timer === 0 && isMyTurn && isDraftActive && availablePlayers.length > 0) {
-      console.log('🚨 TIMER EXPIRED - TRIGGERING AUTO-PICK:', {
-        timer,
-        isMyTurn,
-        isDraftActive,
-        availablePlayersLength: availablePlayers.length,
-        currentPickNumber,
-        currentRound
+      // Timer should count down for both current user and mock drafters
+  if ((isMyTurn || isMockDrafter) && room?.status !== 'paused') {
+    setTimer(timerDuration);
+    clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setTimer((t) => {
+        if (t <= 1) {
+          clearInterval(timerRef.current);
+          // Start grace period when timer hits 0
+          setIsInGracePeriod(true);
+          return 0;
+        }
+        return t - 1;
       });
+    }, 1000);
+    return () => clearInterval(timerRef.current);
+  } else {
+    // Reset timer when it's not our turn or draft is paused
+    setTimer(timerDuration);
+    clearInterval(timerRef.current);
+  }
+  }, [isMyTurn, isDraftActive, picks.length, totalPicks, room?.settings?.timerSeconds, currentPicker, room?.mockDrafters, userName, room?.status]);
+
+  // Ripple effect trigger when user is on the clock and timer reaches 10 seconds
+  useEffect(() => {
+    if (isMyTurn && timer === 10 && isDraftActive && room?.status !== 'paused') {
+      setShowRipple(true);
+    }
+  }, [isMyTurn, timer, isDraftActive, room?.status]);
+
+  // Handle grace period timeout
+  useEffect(() => {
+    if (isInGracePeriod) {
+      // Clear any existing grace timeout
+      if (graceTimeoutRef.current) {
+        clearTimeout(graceTimeoutRef.current);
+      }
       
-      const autoPick = getAutoPickPlayer();
+      // Set 1-second grace period timeout
+      graceTimeoutRef.current = setTimeout(() => {
+        setIsInGracePeriod(false);
+        // Trigger autopick after grace period
+        if (isDraftActive && room?.status !== 'paused' && availablePlayers.length > 0) {
+          const currentPicker = effectiveDraftOrder[pickIndex];
+          const mockDrafterNames = room?.mockDrafters || [];
+          const isMockDrafter = currentPicker && currentPicker !== userName && mockDrafterNames.includes(currentPicker);
+          
+          if (isMyTurn) {
+            // User autopick logic (same as before)
+            const getAutoPickPlayerNow = () => {
+              const userPicks = picks.filter(pick => pick.user === userName);
+              const userRoster = userPicks.map(pick => {
+                const playerData = PLAYER_POOL.find(p => p.name === pick.player);
+                return playerData?.position || 'UNK';
+              });
+              
+              const positionCounts = {
+                QB: userRoster.filter(pos => pos === 'QB').length,
+                RB: userRoster.filter(pos => pos === 'RB').length,
+                WR: userRoster.filter(pos => pos === 'WR').length,
+                TE: userRoster.filter(pos => pos === 'TE').length
+              };
+              
+              const AUTODRAFT_LIMITS = {
+                QB: 3,
+                RB: 6,
+                WR: 7,
+                TE: 3
+              };
+              
+              let draftablePlayers = availablePlayers.filter(player => {
+                const currentCount = positionCounts[player.position] || 0;
+                const limit = AUTODRAFT_LIMITS[player.position];
+                return currentCount < limit;
+              });
+              
+              if (draftablePlayers.length === 0) {
+                draftablePlayers = availablePlayers.filter(player => canDraftPlayer(player.name));
+              }
+              
+              if (draftablePlayers.length === 0) {
+                return null;
+              }
+              
+              draftablePlayers.sort((a, b) => (a.adp || 999) - (b.adp || 999));
+              
+              const queued = queue.find(p => draftablePlayers.find(ap => ap.name === p.name));
+              if (queued) return queued;
+              
+              if (rankings.length > 0) {
+                const rankedPlayer = draftablePlayers.find(p => rankings.includes(p.name));
+                if (rankedPlayer) return rankedPlayer;
+              }
+              
+              return draftablePlayers[0];
+            };
+
+            const autoPick = getAutoPickPlayerNow();
+          
+            if (!autoPick) {
+              console.error(`[ROOM ${roomId}] No valid auto-pick available for ${userName} - autodraft limits reached`);
+              alert(`No valid players available for autodraft. You have reached autodraft position limits (3QB, 6RB, 7WR, 3TE). Please manually select a player.`);
+              const timerDuration = room?.mockDrafters?.length > 0 ? 10 : 30;
+              setTimer(timerDuration);
+              return;
+            }
+            
+            console.log(`[ROOM ${roomId}] Grace period expired for ${userName}, auto-picking: ${autoPick.name}`);
+            makePick(autoPick.name);
+          } else if (isMockDrafter) {
+            const mockAutoPick = availablePlayers[0];
+            if (mockAutoPick) {
+              console.log(`[ROOM ${roomId}] Grace period expired for mock drafter ${currentPicker}, auto-picking: ${mockAutoPick.name}`);
+              makeAutoPick(mockAutoPick.name);
+            }
+          }
+        }
+      }, 1000); // 1 second grace period
+    }
+    
+    return () => {
+      if (graceTimeoutRef.current) {
+        clearTimeout(graceTimeoutRef.current);
+      }
+    };
+  }, [isInGracePeriod, isDraftActive, room?.status, availablePlayers, effectiveDraftOrder, pickIndex, room?.mockDrafters, userName, isMyTurn, picks, queue, rankings]);
+
+  // Reset grace period when turn changes or pick is made
+  useEffect(() => {
+    setIsInGracePeriod(false);
+    if (graceTimeoutRef.current) {
+      clearTimeout(graceTimeoutRef.current);
+    }
+  }, [isMyTurn, picks.length]);
+
+  // Old autopick logic (disabled - now handled by grace period)
+  useEffect(() => {
+    if (false) { // Disabled - grace period handles autopick now
+      // Get current picker
+      const currentPicker = effectiveDraftOrder[pickIndex];
+      const mockDrafterNames = room?.mockDrafters || [];
+      const isMockDrafter = currentPicker && currentPicker !== userName && mockDrafterNames.includes(currentPicker);
+      
+      if (isMyTurn) {
+        // Determine who would be auto-picked (using current state values)
+        const getAutoPickPlayerNow = () => {
+          // Get current user's roster to check position counts
+          const userPicks = picks.filter(pick => pick.user === userName);
+          const userRoster = userPicks.map(pick => {
+            const playerData = PLAYER_POOL.find(p => p.name === pick.player);
+            return playerData?.position || 'UNK';
+          });
+          
+          const positionCounts = {
+            QB: userRoster.filter(pos => pos === 'QB').length,
+            RB: userRoster.filter(pos => pos === 'RB').length,
+            WR: userRoster.filter(pos => pos === 'WR').length,
+            TE: userRoster.filter(pos => pos === 'TE').length
+          };
+          
+          // Autodraft position maximums
+          const AUTODRAFT_LIMITS = {
+            QB: 3,
+            RB: 6,
+            WR: 7,
+            TE: 3
+          };
+          
+          // Filter available players to only those that can be drafted within autodraft limits
+          let draftablePlayers = availablePlayers.filter(player => {
+            const currentCount = positionCounts[player.position] || 0;
+            const limit = AUTODRAFT_LIMITS[player.position];
+            return currentCount < limit;
+          });
+          
+          // If no players within autodraft limits, fall back to regular draftable players
+          if (draftablePlayers.length === 0) {
+            draftablePlayers = availablePlayers.filter(player => canDraftPlayer(player.name));
+          }
+          
+          if (draftablePlayers.length === 0) {
+            return null; // Only return null if truly no players can be drafted
+          }
+          
+          // Sort draftable players by ADP (lowest ADP first)
+          draftablePlayers.sort((a, b) => (a.adp || 999) - (b.adp || 999));
+          
+          // 1. From queue (if draftable) - still respect queue priority
+          const queued = queue.find(p => draftablePlayers.find(ap => ap.name === p.name));
+          if (queued) return queued;
+          
+          // 2. From rankings (if draftable) - still respect rankings priority
+          if (rankings.length > 0) {
+            const rankedPlayer = draftablePlayers.find(p => rankings.includes(p.name));
+            if (rankedPlayer) return rankedPlayer;
+          }
+          
+          // 3. Best available player by ADP
+          return draftablePlayers[0];
+        };
+
+        const autoPick = getAutoPickPlayerNow();
       
       if (!autoPick) {
         console.error(`[ROOM ${roomId}] No valid auto-pick available for ${userName} - autodraft limits reached`);
         // Alert the user and extend timer by 30 seconds
         alert(`No valid players available for autodraft. You have reached autodraft position limits (3QB, 6RB, 7WR, 3TE). Please manually select a player.`);
-        setTimer(30); // Give 30 more seconds
+        // Use 10 seconds for mock drafts, 30 seconds for regular drafts
+        const timerDuration = room?.mockDrafters?.length > 0 ? 10 : 30;
+        setTimer(timerDuration); // Give more seconds based on draft type
         return;
       }
       
       console.log(`[ROOM ${roomId}] Timer expired for ${userName}, auto-picking: ${autoPick.name}`);
-      makeAutoPick(autoPick.name);
+      makePick(autoPick.name);
+      } else if (isMockDrafter) {
+        // Handle mock drafter autopick
+        const mockAutoPick = availablePlayers[0]; // Simple autopick for mock drafters
+        if (mockAutoPick) {
+          console.log(`[ROOM ${roomId}] Timer expired for mock drafter ${currentPicker}, auto-picking: ${mockAutoPick.name}`);
+          makeAutoPick(mockAutoPick.name);
+        }
+      }
     }
-  }, [timer, isMyTurn, isDraftActive, availablePlayers, rankings, queue]);
+  }, [timer, isMyTurn, isDraftActive, availablePlayers, rankings, queue, effectiveDraftOrder, pickIndex, room?.mockDrafters, userName, room?.status]);
 
   // Check for draft completion
   useEffect(() => {
-    if (picks.length >= totalPicks && isDraftActive) {
-      console.log('🏁 DRAFT COMPLETION DETECTED:', {
-        picksLength: picks.length,
-        totalPicks,
-        isDraftActive,
-        isRoomOwner,
-        roomId
-      });
-      
+    if (picks.length >= totalPicks && isDraftActive && isRoomOwner) {
       // Mark draft as completed and clear picks to prevent reuse
       const completeDraft = async () => {
         try {
@@ -482,34 +990,27 @@ export default function DraftRoom() {
             completedAt: new Date()
           });
 
-          console.log(`✅ Draft marked as completed for room ${roomId}`);
-
-          // Only room owner should save team and clear picks
-          if (isRoomOwner) {
-            // Save user's drafted team to Firestore
-            const userId = 'Not Todd Middleton';
-            const userPicks = picks.filter(p => p.user === userId);
-            const players = userPicks.map(p => p.player);
-            // Optionally, group by position for easier display
-            const playerDetails = userPicks.map(p => {
-              const playerObj = PLAYER_POOL.find(pl => pl.name === p.player);
-              return playerObj ? { name: playerObj.name, position: playerObj.position, team: playerObj.team, pickNumber: p.pickNumber } : { name: p.player };
-            });
-            await addDoc(collection(db, 'teams'), {
-              userId,
-              name: room?.name || 'My Team',
-              tournament: 'Top Dog',
-              players: playerDetails,
-              createdAt: new Date(),
+          // Save user's drafted team to Firestore
+          const userId = userName;
+          const userPicks = picks.filter(p => p.user === userId);
+          const playerDetails = userPicks.map(p => {
+            const playerObj = PLAYER_POOL.find(pl => pl.name === p.player);
+            return playerObj ? { name: playerObj.name, position: playerObj.position, team: playerObj.team, pickNumber: p.pickNumber } : { name: p.player };
+          });
+          await addDoc(collection(db, 'teams'), {
+            userId,
+            name: room?.name || 'My Team',
+            tournament: 'Top Dog',
+            players: playerDetails,
+            createdAt: new Date(),
           });
           
           // Then clear picks to prevent them from appearing in future drafts
           await clearPicksForRoom();
           
-            console.log(`✅ Draft completed, team saved, and picks cleared for room ${roomId}`);
-          }
+          console.log(`Draft completed, team saved, and picks cleared for room ${roomId}`);
         } catch (error) {
-          console.error('❌ Error completing draft:', error);
+          console.error('Error completing draft:', error);
         }
       };
       
@@ -539,6 +1040,39 @@ export default function DraftRoom() {
     return currentCount < limit;
   };
 
+  // Function to handle opening player modal
+  const openPlayerModal = (player) => {
+    setSelectedPlayerForModal(player);
+    setShowPlayerModal(true);
+    
+    // Get pre-downloaded stats from static JavaScript module
+    const playerStats = getPlayerStats(player.name);
+    if (playerStats) {
+      setPlayerStatsData(playerStats);
+      setPlayerStatsLoading(false);
+      console.log(`✅ Loaded stats for ${player.name}`);
+    } else {
+      console.warn(`No static stats found for player: ${player.name}, creating basic playerStatsData for projections`);
+      // Create basic playerStatsData structure so projections can still display
+      const basicPlayerData = {
+        name: player.name,
+        position: player.position,
+        team: player.team || 'FA',
+        seasons: [] // Empty seasons array - projections will still work
+      };
+      setPlayerStatsData(basicPlayerData);
+      setPlayerStatsLoading(false);
+    }
+  };
+
+  // Function to close player modal
+  const closePlayerModal = () => {
+    setShowPlayerModal(false);
+    setSelectedPlayerForModal(null);
+    setPlayerStatsData(null);
+    setPlayerStatsLoading(false);
+  };
+
   const makePick = async (player) => {
     console.log('🎯 MAKE PICK CALLED:', {
       player,
@@ -560,16 +1094,19 @@ export default function DraftRoom() {
       return;
     }
     
+    // Check positional limits
     if (!canDraftPlayer(player)) {
       const playerData = PLAYER_POOL.find(p => p.name === player);
       const limit = POSITIONAL_LIMITS[playerData.position];
-      alert(`Cannot draft ${player}. You already have ${limit} ${playerData.position}s. Maximum allowed: ${limit}.`);
+      alert(`You can only draft ${limit} ${playerData.position}s. You already have ${getTeamRoster(userName).filter(p => p.position === playerData.position).length}.`);
       return;
     }
     
     try {
       pickInProgressRef.current = true;
       setPickLoading(true);
+      
+      // Use the calculated currentPickNumber to ensure proper sequencing
       const pickRef = doc(db, 'draftRooms', roomId, 'picks', String(currentPickNumber));
       await setDoc(pickRef, {
         pickNumber: currentPickNumber,
@@ -579,7 +1116,7 @@ export default function DraftRoom() {
         roomId: roomId,
         timestamp: Date.now(),
       });
-      console.log(`[ROOM ${roomId}] Made pick: ${player} by ${userName} (pick #${currentPickNumber})`);
+      console.log(`[ROOM ${roomId}] Pick made: ${player} by ${userName} (pick #${currentPickNumber})`);
     } catch (error) {
       console.error(`[ROOM ${roomId}] Error making pick:`, error);
       alert('Error making pick. Please try again.');
@@ -590,9 +1127,10 @@ export default function DraftRoom() {
   };
 
   // Auto-pick function that bypasses turn checks
-  const makeAutoPick = async (player) => {
+  const makeAutoPick = async (player, picker = null, pickNumber = null) => {
     console.log('🤖 AUTO PICK CALLED:', {
       player,
+      picker,
       pickLoading,
       pickInProgress: pickInProgressRef.current,
       isDraftActive,
@@ -613,16 +1151,25 @@ export default function DraftRoom() {
     try {
       pickInProgressRef.current = true;
       setPickLoading(true);
-      const pickRef = doc(db, 'draftRooms', roomId, 'picks', String(currentPickNumber));
+      
+      // Use the provided picker or fall back to currentPicker if available
+      const actualPicker = picker || currentPicker;
+      
+      // Use the provided pick number or calculate from picks length
+      const actualPickNumber = pickNumber || (picks.length + 1);
+      const actualRound = Math.ceil(actualPickNumber / draftOrder.length);
+      
+      // Use the calculated pick number to ensure proper sequencing
+      const pickRef = doc(db, 'draftRooms', roomId, 'picks', String(actualPickNumber));
       await setDoc(pickRef, {
-        pickNumber: currentPickNumber,
-        round: currentRound,
-        user: userName,
+        pickNumber: actualPickNumber,
+        round: actualRound,
+        user: actualPicker,
         player,
         roomId: roomId,
         timestamp: Date.now(),
       });
-      console.log(`[ROOM ${roomId}] Auto-pick made: ${player} by ${userName} (pick #${currentPickNumber})`);
+      console.log(`[ROOM ${roomId}] Auto-pick made: ${player} by ${actualPicker} (pick #${actualPickNumber})`);
     } catch (error) {
       console.error(`[ROOM ${roomId}] Error making auto-pick:`, error);
     } finally {
@@ -631,8 +1178,8 @@ export default function DraftRoom() {
     }
   };
 
-  // Determine who would be auto-picked
-  const getAutoPickPlayer = () => {
+  // Get current autopick player for display purposes (using current render state)
+  const getCurrentAutoPickPlayer = () => {
     // Get current user's roster to check position counts
     const userPicks = picks.filter(pick => pick.user === userName);
     const userRoster = userPicks.map(pick => {
@@ -688,7 +1235,7 @@ export default function DraftRoom() {
     return draftablePlayers[0];
   };
   
-  const autoPickPlayer = getAutoPickPlayer();
+  const autoPickPlayer = getCurrentAutoPickPlayer();
 
   // Handle drag end for queue
   const onDragEnd = (result) => {
@@ -718,6 +1265,64 @@ export default function DraftRoom() {
     newQueue.splice(result.destination.index, 0, removed);
     setQueue(newQueue);
     console.log('New queue after drag:', newQueue);
+  };
+
+  // Helper function to get position color (uses centralized constants)
+  const getPositionColor = (position) => {
+    return POSITION_COLORS[position]?.primary || '#808080';
+  };
+
+  // Helper function to get drag styles that prevent jumping
+  const getDragItemStyle = (isDragging, draggableStyle, index) => ({
+    // Apply the draggable styles but prevent jumping
+    ...draggableStyle,
+    paddingTop: index === 0 ? '8px' : '4px',
+    paddingBottom: '4px',
+    marginBottom: '4px',
+    // Keep the item visible during drag with proper opacity and scaling
+    opacity: isDragging ? 0.8 : 1,
+    transform: draggableStyle?.transform || 'none',
+    position: 'relative',
+    zIndex: isDragging ? 1000 : 'auto',
+    // Maintain box sizing to prevent layout shift
+    boxSizing: 'border-box'
+  });
+
+  // Universal drag handler for both available players and queue
+  const onUniversalDragEnd = (result) => {
+    console.log('Universal drag end result:', result);
+    const { source, destination } = result;
+    
+    if (!destination) {
+      console.log('No destination, returning');
+      return;
+    }
+
+    // Handle dragging from available players to queue
+    if (source.droppableId === 'available-players' && destination.droppableId === 'player-queue') {
+      console.log('Dragging from available players to queue');
+      const draggedPlayer = filteredPlayers[source.index];
+      if (draggedPlayer && !queue.find(p => p.name === draggedPlayer.name)) {
+        addToQueue(draggedPlayer);
+      }
+      return;
+    }
+
+    // Handle reordering within queue
+    if (source.droppableId === 'player-queue' && destination.droppableId === 'player-queue') {
+      console.log('Reordering within queue');
+      const newQueue = Array.from(queue);
+      const [removed] = newQueue.splice(source.index, 1);
+      newQueue.splice(destination.index, 0, removed);
+      setQueue(newQueue);
+      return;
+    }
+
+    // Handle reordering within available players (no effect, just for visual feedback)
+    if (source.droppableId === 'available-players' && destination.droppableId === 'available-players') {
+      console.log('Reordering within available players - no action needed');
+      return;
+    }
   };
 
   // Handle drag end for draft order
@@ -897,8 +1502,8 @@ export default function DraftRoom() {
       } else if (player.position === 'TE' && lineup.TE.length < 1) {
         assignPlayer(player, 'TE');
       }
-      // If position-specific spots are full or player is RB/WR/TE, try FLEX
-      else if (['RB', 'WR', 'TE'].includes(player.position) && lineup.FLEX.length < 2) {
+      // Assign to FLEX if position-specific spots are full and FLEX has room
+      else if (FLEX_POSITIONS.includes(player.position) && lineup.FLEX.length < 2) {
         assignPlayer(player, 'FLEX');
       }
     });
@@ -914,6 +1519,47 @@ export default function DraftRoom() {
   // Get current user's roster
   const myRoster = getTeamRoster(userName);
   const myRosterGrouped = getTeamRosterGrouped(userName);
+
+  // NEW: Calculate position percentages for any team
+  const getTeamPositionPercentages = (teamName) => {
+    const teamPicks = picks.filter(pick => pick.user === teamName);
+    
+
+    
+    if (teamPicks.length === 0) {
+      return { qb: 0, rb: 0, wr: 0, te: 0 };
+    }
+    
+    const qbCount = teamPicks.filter(pick => {
+      const player = PLAYER_POOL.find(p => p.name === pick.player);
+      return player?.position === 'QB';
+    }).length;
+    
+    const rbCount = teamPicks.filter(pick => {
+      const player = PLAYER_POOL.find(p => p.name === pick.player);
+
+      return player?.position === 'RB';
+    }).length;
+    
+    const wrCount = teamPicks.filter(pick => {
+      const player = PLAYER_POOL.find(p => p.name === pick.player);
+      return player?.position === 'WR';
+    }).length;
+    
+    const teCount = teamPicks.filter(pick => {
+      const player = PLAYER_POOL.find(p => p.name === pick.player);
+      return player?.position === 'TE';
+    }).length;
+    
+    const totalPicks = teamPicks.length;
+    
+    return {
+      qb: totalPicks > 0 ? (qbCount / totalPicks) * 100 : 0,
+      rb: totalPicks > 0 ? (rbCount / totalPicks) * 100 : 0,
+      wr: totalPicks > 0 ? (wrCount / totalPicks) * 100 : 0,
+      te: totalPicks > 0 ? (teCount / totalPicks) * 100 : 0
+    };
+  };
 
   // Function to assign players to starting lineup positions without duplication
   const getStartingLineup = () => {
@@ -960,8 +1606,8 @@ export default function DraftRoom() {
       } else if (player.position === 'TE' && lineup.TE.length < 1) {
         assignPlayer(player, 'TE');
       }
-      // If position-specific spots are full or player is RB/WR/TE, try FLEX
-      else if (['RB', 'WR', 'TE'].includes(player.position) && lineup.FLEX.length < 2) {
+      // Assign to FLEX if position-specific spots are full and FLEX has room
+      else if (FLEX_POSITIONS.includes(player.position) && lineup.FLEX.length < 2) {
         assignPlayer(player, 'FLEX');
       }
     });
@@ -1045,80 +1691,147 @@ export default function DraftRoom() {
   const upcomingPicks = getUpcomingPicks();
 
   // Filter available players based on search and position
-  const pickedPlayerNames = picks.map(p => p.player);
+  const pickedPlayerNames = picks
+    .filter(p => p && p.player && typeof p.player === 'string')
+    .map(p => p.player);
   
   // Get truly available players (not drafted) - MULTIPLE LAYERS OF PROTECTION
   const trulyAvailablePlayers = PLAYER_POOL.filter(p => {
+    // Layer 0: Basic object validation
+    if (!p || typeof p !== 'object' || typeof p.name !== 'string') {
+      console.error(`[FILTER] Invalid player object found in PLAYER_POOL:`, p);
+      return false;
+    }
+    
     // Layer 1: Check against current picks
     if (pickedPlayerNames.includes(p.name)) {
       console.warn(`[FILTER] Player ${p.name} found in picks - removing from available`);
       return false;
     }
+    
     // Layer 2: Double-check against availablePlayers state
     const isInAvailablePlayers = availablePlayers.find(ap => ap.name === p.name);
     if (!isInAvailablePlayers) {
       console.warn(`[FILTER] Player ${p.name} not in availablePlayers state - removing from available`);
       return false;
     }
+    
     return true;
   });
   
-  let finalFilteredPlayers = trulyAvailablePlayers.filter(player => {
+  let filteredPlayers = trulyAvailablePlayers.filter(player => {
+    // Layer 0: Basic object validation
+    if (!player || typeof player !== 'object' || typeof player.name !== 'string') {
+      console.error(`[FILTER] Invalid player object found in trulyAvailablePlayers:`, player);
+      return false;
+    }
+    
     // Layer 3: Final safety check in filtered list
     if (pickedPlayerNames.includes(player.name)) {
       console.error(`[FILTER] CRITICAL ERROR: Drafted player ${player.name} found in filtered list`);
       return false;
     }
+    
     const matchesSearch = player.name.toLowerCase().includes(playerSearch.toLowerCase()) ||
                          player.team.toLowerCase().includes(playerSearch.toLowerCase());
-    const matchesPosition = positionFilter === 'ALL' || player.position === positionFilter;
+    // Debug logging for search filtering
+    if (!matchesSearch && playerSearch) {
+      console.log(`[SEARCH FILTER] Player ${player.name} (${player.team}) filtered out by search term: "${playerSearch}"`);
+    }
+    // Safeguard: if no position filters are selected, show all players
+    const effectivePositionFilters = positionFilters.length === 0 ? ['ALL'] : positionFilters;
+    const matchesPosition = effectivePositionFilters.includes('ALL') || effectivePositionFilters.includes(player.position);
+    // Debug logging for position filtering
+    if (!matchesPosition) {
+      console.log(`[POSITION FILTER] Player ${player.name} (${player.position}) filtered out. Current filters:`, positionFilters, 'Effective filters:', effectivePositionFilters);
+    }
+    // Debug logging for all players to see what's happening
+    if (player.name && player.name.includes('Josh Allen')) {
+      console.log(`[DEBUG] Josh Allen - position: ${player.position}, filters: ${positionFilters}, effective filters: ${effectivePositionFilters}, includes ALL: ${effectivePositionFilters.includes('ALL')}, includes position: ${effectivePositionFilters.includes(player.position)}, matchesPosition: ${matchesPosition}`);
+    }
     return matchesSearch && matchesPosition;
   }).sort((a, b) => {
     if (sortBy === 'adp') {
-      return (a.adp || 999) - (b.adp || 999);
+      const adpA = a.adp || 999;
+      const adpB = b.adp || 999;
+      return adpSortDirection === 'asc' ? adpA - adpB : adpB - adpA;
     } else if (sortBy === 'rankings') {
-      const aRank = rankings.indexOf(a.name);
-      const bRank = rankings.indexOf(b.name);
-      // If both players are in rankings, sort by ranking position
-      if (aRank !== -1 && bRank !== -1) {
-        return aRank - bRank;
+      // Convert -1 (not found) to 9999 for unranked players
+      const aRank = customRankings.indexOf(a.name) !== -1 ? customRankings.indexOf(a.name) : 9999;
+      const bRank = customRankings.indexOf(b.name) !== -1 ? customRankings.indexOf(b.name) : 9999;
+      
+      // If both players have ranks (including 9999 for unranked), sort by rank
+      if (aRank !== bRank) {
+        return rankingSortDirection === 'asc' ? aRank - bRank : bRank - aRank;
       }
-      // If only one player is in rankings, prioritize ranked players
-      if (aRank !== -1 && bRank === -1) return -1;
-      if (aRank === -1 && bRank !== -1) return 1;
-      // If neither player is in rankings, fall back to ADP
-      return (a.adp || 999) - (b.adp || 999);
+      
+      // If ranks are equal (both unranked with rank 9999), sort by ADP high to low
+      const adpA = a.adp && a.adp > 0 ? a.adp : 9999;
+      const adpB = b.adp && b.adp > 0 ? b.adp : 9999;
+      return adpB - adpA; // Sort by ADP high to low for unranked players
     }
     return 0;
   });
 
-  // Enhanced debug logging
-  console.log('=== PLAYER FILTERING DEBUG ===');
-  console.log('Total PLAYER_POOL size:', PLAYER_POOL.length);
-  console.log('Current picks count:', picks.length);
-  console.log('Picked player names:', pickedPlayerNames);
-  console.log('Available players state count:', availablePlayers.length);
-  console.log('Truly available players count:', trulyAvailablePlayers.length);
-  console.log('Filtered players count:', finalFilteredPlayers.length);
+  // Enhanced debug logging (disabled for performance)
+  if (process.env.NODE_ENV === 'development') {
+    console.log('=== PLAYER FILTERING DEBUG ===');
+    console.log('Current position filters:', positionFilters);
+    console.log('Player search term:', playerSearch);
+    console.log('Total PLAYER_POOL size:', PLAYER_POOL.length);
+    
+    // Check what positions are in PLAYER_POOL
+    const positionsInPool = [...new Set(PLAYER_POOL.map(p => p.position))];
+    console.log('Positions in PLAYER_POOL:', positionsInPool);
+    console.log('Current picks count:', picks.length);
+    console.log('Picked player names:', pickedPlayerNames);
+    console.log('Available players state count:', availablePlayers.length);
+    console.log('Truly available players count:', trulyAvailablePlayers.length);
+    console.log('Filtered players count:', filteredPlayers.length);
+  }
   
   // Check for any drafted players in the filtered list
-  const draftedInFiltered = finalFilteredPlayers.filter(player => pickedPlayerNames.includes(player.name));
+  const draftedInFiltered = filteredPlayers.filter(player => {
+    // Validate player object before checking
+    if (!player || typeof player !== 'object' || typeof player.name !== 'string') {
+      console.error(`[FILTER] Invalid player object found in filteredPlayers:`, player);
+      return false;
+    }
+    return pickedPlayerNames.includes(player.name);
+  });
+  
+  let finalFilteredPlayers = filteredPlayers;
+  
   if (draftedInFiltered.length > 0) {
     console.error('🚨 CRITICAL ERROR: Found drafted players in filtered list:', draftedInFiltered.map(p => p.name));
     // Force remove them from the filtered list
-    finalFilteredPlayers = finalFilteredPlayers.filter(player => !pickedPlayerNames.includes(player.name));
+    finalFilteredPlayers = filteredPlayers.filter(player => {
+      // Validate player object before filtering
+      if (!player || typeof player !== 'object' || typeof player.name !== 'string') {
+        console.error(`[FILTER] Invalid player object found in filteredPlayers:`, player);
+        return false;
+      }
+      return !pickedPlayerNames.includes(player.name);
+    });
     console.log('Cleaned filtered players count:', finalFilteredPlayers.length);
   } else {
     console.log('✅ No drafted players found in filtered list');
   }
   
   // Additional safety check: verify no duplicates
-  const playerNames = finalFilteredPlayers.map(p => p.name);
+  const playerNames = finalFilteredPlayers
+    .filter(player => player && typeof player === 'object' && typeof player.name === 'string')
+    .map(p => p.name);
   const uniqueNames = new Set(playerNames);
   if (playerNames.length !== uniqueNames.size) {
     console.warn('⚠️ Duplicate players found in filtered list, removing duplicates');
     const seen = new Set();
     finalFilteredPlayers = finalFilteredPlayers.filter(player => {
+      // Validate player object before checking
+      if (!player || typeof player !== 'object' || typeof player.name !== 'string') {
+        console.error(`[FILTER] Invalid player object found in filteredPlayers:`, player);
+        return false;
+      }
       if (seen.has(player.name)) {
         return false;
       }
@@ -1127,19 +1840,57 @@ export default function DraftRoom() {
     });
   }
   
-  console.log('Sample available player:', availablePlayers[0]);
-  console.log('Sample truly available player:', trulyAvailablePlayers[0]);
-  console.log('Sample filtered player:', finalFilteredPlayers[0]);
-  console.log('Rankings count:', rankings.length);
-  console.log('Sample player with ADP:', finalFilteredPlayers[0]);
-  console.log('Sample rankings:', rankings.slice(0, 5));
-  console.log('Queue count:', queue.length);
-  console.log('Queue data:', queue);
-  console.log('=== END PLAYER FILTERING DEBUG ===');
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Sample available player:', availablePlayers[0] && typeof availablePlayers[0] === 'object' ? availablePlayers[0] : 'No valid players');
+    console.log('Sample truly available player:', trulyAvailablePlayers[0] && typeof trulyAvailablePlayers[0] === 'object' ? trulyAvailablePlayers[0] : 'No valid players');
+    console.log('Sample filtered player:', finalFilteredPlayers[0] && typeof finalFilteredPlayers[0] === 'object' ? finalFilteredPlayers[0] : 'No valid players');
+    console.log('Rankings count:', rankings.length);
+    console.log('Sample player with ADP:', finalFilteredPlayers[0] && typeof finalFilteredPlayers[0] === 'object' ? finalFilteredPlayers[0] : 'No valid players');
+    console.log('Sample rankings:', rankings.slice(0, 5));
+    console.log('Queue count:', queue.length);
+    console.log('Queue data:', queue.filter(player => player && typeof player === 'object' && typeof player.name === 'string'));
+    console.log('=== END PLAYER FILTERING DEBUG ===');
+  }
+  
+  // Assign the final result back to filteredPlayers
+  filteredPlayers = finalFilteredPlayers;
+
+
+
+  // Start draft function
+  const startDraft = async () => {
+    try {
+      if (!isRoomOwner) {
+        alert('Only the room owner can start the draft.');
+        return;
+      }
+
+      // Check if we have enough participants
+      if (effectiveDraftOrder.length < 2) {
+        alert('Need at least 2 participants to start the draft.');
+        return;
+      }
+
+      // Update room status to waiting to trigger countdown
+      await updateDoc(doc(db, 'draftRooms', roomId), {
+        status: 'waiting',
+        startedAt: null // Will be set when countdown completes
+      });
+
+      // Set local state to trigger countdown
+      setPreDraftCountdown(60);
+      
+      console.log('Draft started with countdown - participants:', effectiveDraftOrder);
+      console.log('Draft will start in 60 seconds...');
+      
+    } catch (error) {
+      console.error('Error starting draft:', error);
+      alert('Error starting draft. Please try again.');
+    }
+  };
 
   // Mock draft function
   const startMockDraft = async () => {
-    setMockDraftSpeed(true);
     try {
       // Get 11 simulated drafter names from the index
       const mockDrafters = getRandomMockDrafters();
@@ -1149,8 +1900,8 @@ export default function DraftRoom() {
         return;
       }
       
-      // Add current user (as "Not Todd Middleton") and mock drafters to participants
-      const allParticipants = ['Not Todd Middleton', ...mockDrafters];
+      // Add current user and mock drafters to participants
+      const allParticipants = [userName, ...mockDrafters];
       
       // Randomize draft order
       const shuffledOrder = [...allParticipants].sort(() => Math.random() - 0.5);
@@ -1180,6 +1931,66 @@ export default function DraftRoom() {
       alert('Error starting mock draft. Please try again.');
     }
   };
+
+  // Pause draft function
+  const pauseDraft = async () => {
+    try {
+      // Allow anyone to pause mock drafts, but only room owner for regular drafts
+      const isMockDraft = room?.mockDrafters?.length > 0;
+      if (!isRoomOwner && !isMockDraft) {
+        alert('Only the room owner can pause the draft.');
+        return;
+      }
+
+      if (!isDraftActive) {
+        alert('Draft is not currently active.');
+        return;
+      }
+
+      // Update room status to paused
+      await updateDoc(doc(db, 'draftRooms', roomId), {
+        status: 'paused',
+        pausedAt: new Date()
+      });
+
+      console.log('Draft paused');
+      
+    } catch (error) {
+      console.error('Error pausing draft:', error);
+      alert('Error pausing draft. Please try again.');
+    }
+  };
+
+  // Resume draft function
+  const resumeDraft = async () => {
+    try {
+      // Allow anyone to resume mock drafts, but only room owner for regular drafts
+      const isMockDraft = room?.mockDrafters?.length > 0;
+      if (!isRoomOwner && !isMockDraft) {
+        alert('Only the room owner can resume the draft.');
+        return;
+      }
+
+      if (room?.status !== 'paused') {
+        alert('Draft is not currently paused.');
+        return;
+      }
+
+      // Update room status back to active
+      await updateDoc(doc(db, 'draftRooms', roomId), {
+        status: 'active',
+        pausedAt: null
+      });
+
+      console.log('Draft resumed');
+      
+    } catch (error) {
+      console.error('Error resuming draft:', error);
+      alert('Error resuming draft. Please try again.');
+    }
+  };
+
+
 
   // Auto-pick for mock drafters
   const makeMockPick = async (mockDrafter, pickNumber, round) => {
@@ -1235,32 +2046,51 @@ export default function DraftRoom() {
         return;
       }
       
-      // Simple mock draft strategy: pick best available by ADP
-      const bestAvailable = availableForMock.sort((a, b) => (a.adp || 999) - (b.adp || 999))[0];
+      // Realistic mock draft strategy with QB delay
+      let bestAvailable;
+      
+      // Check if we should delay QB picks based on current round and available QBs
+      const currentRound = Math.ceil(pickNumber / effectiveDraftOrder.length);
+      const qbsAvailable = availableForMock.filter(p => p.position === 'QB');
+      const nonQbsAvailable = availableForMock.filter(p => p.position !== 'QB');
+      
+      // QB strategy: Delay QBs until round 4+ unless it's a top-tier QB (ADP < 50)
+      const shouldDelayQBs = currentRound < 4 && qbsAvailable.length > 0;
+      const topTierQBs = qbsAvailable.filter(qb => (qb.adp || 999) < 50);
+      
+      if (shouldDelayQBs && topTierQBs.length === 0 && nonQbsAvailable.length > 0) {
+        // Delay QB picks - pick best non-QB available
+        bestAvailable = nonQbsAvailable.sort((a, b) => (a.adp || 999) - (b.adp || 999))[0];
+        console.log('🎯 QB DELAY STRATEGY: Picking non-QB to delay QB selection');
+      } else {
+        // Normal strategy: pick best available by ADP
+        bestAvailable = availableForMock.sort((a, b) => (a.adp || 999) - (b.adp || 999))[0];
+      }
       
       console.log('🎯 SELECTED PLAYER FOR MOCK PICK:', {
         player: bestAvailable.name,
         position: bestAvailable.position,
-        team: bestAvailable.team,
-        adp: bestAvailable.adp
+        adp: bestAvailable.adp,
+        pickNumber,
+        timestamp: new Date().toISOString()
       });
       
-      const pickRef = doc(db, 'draftRooms', roomId, 'picks', String(pickNumber));
+      // Add a small delay to make it feel more realistic
+      await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
+      
+      // Use the calculated currentPickNumber to ensure proper sequencing
+      const actualPickNumber = currentPickNumber;
+      const pickRef = doc(db, 'draftRooms', roomId, 'picks', String(actualPickNumber));
       await setDoc(pickRef, {
-        pickNumber: pickNumber,
-        round: round,
+        pickNumber: actualPickNumber,
+        round: currentRound,
         user: mockDrafter,
         player: bestAvailable.name,
         roomId: roomId,
         timestamp: Date.now(),
       });
       
-      console.log('✅ MOCK PICK COMPLETED:', {
-        mockDrafter,
-        player: bestAvailable.name,
-        pickNumber,
-        timestamp: new Date().toISOString()
-      });
+      console.log(`[ROOM ${roomId}] Mock pick made: ${bestAvailable.name} by ${mockDrafter} (pick #${actualPickNumber})`);
       
     } catch (error) {
       console.error('❌ ERROR MAKING MOCK PICK:', error);
@@ -1338,7 +2168,7 @@ export default function DraftRoom() {
       // Update timestamp and trigger pick
       lastPickTimestampRef.current = now;
       setTimeout(() => {
-          makeMockPick(currentPicker, currentPickNumber, currentRound);
+        makeMockPick(currentPicker, currentPickNumber, currentRound);
       }, 2000); // 2 second delay for autodraft speed
     } else if (isMockDrafter && (pickLoading || pickInProgressRef.current)) {
       console.log('⏳ MOCK DRAFTER ON CLOCK BUT PICK IN PROGRESS:', {
@@ -1415,29 +2245,67 @@ export default function DraftRoom() {
     if (isUserTurn && !pickLoading) {
       console.log('👤 USER TURN STALL DETECTION: User on clock, setting up stall monitor');
       
-      const userStallTimeout = setTimeout(() => {
-        console.log('🚨 USER TURN STALL DETECTED: User has been on clock for 15+ seconds');
-        console.log('🔄 FORCING AUTO-PICK FOR USER');
-        
-        const autoPick = getAutoPickPlayer();
-        if (autoPick) {
-          console.log('🔄 USER STALL RECOVERY: Auto-picking for user:', autoPick.name);
-          makeAutoPick(autoPick.name);
-        } else {
-          console.log('❌ USER STALL RECOVERY: No valid auto-pick available');
-        }
-      }, 15000); // 15 second stall threshold for user
+      const stallTimeout = setTimeout(() => {
+        console.log('🚨 USER TURN STALL DETECTED: User has been on clock for 10+ seconds');
+        console.log('🔄 FORCING PICK LOADING RESET');
+        setPickLoading(false);
+        pickInProgressRef.current = false;
+      }, 10000); // 10 second stall threshold
 
-      return () => clearTimeout(userStallTimeout);
+      return () => clearTimeout(stallTimeout);
     }
   }, [isDraftActive, picks.length, totalPicks, room?.status, effectiveDraftOrder, pickIndex, pickLoading]);
 
-  // Auto-switch to user's team when it's their turn
+  // Cleanup effect to reset pick progress when draft status changes
+  useEffect(() => {
+    // Reset pick progress when draft status changes
+    if (room?.status === 'completed' || !isDraftActive) {
+      console.log('🧹 CLEANUP: Resetting pick progress due to status change');
+      pickInProgressRef.current = false;
+    }
+    
+    // Cleanup function for component unmount
+    return () => {
+      console.log('🧹 CLEANUP: Component unmounting, resetting pick progress');
+      pickInProgressRef.current = false;
+    };
+  }, [room?.status, isDraftActive]);
+
+  // Pre-draft countdown effect
+  useEffect(() => {
+    if (room?.status === 'waiting' && preDraftCountdown > 0) {
+      const countdownInterval = setInterval(() => {
+        setPreDraftCountdown((prev) => {
+          if (prev <= 1) {
+            // Countdown finished, start the draft
+            clearInterval(countdownInterval);
+            updateDoc(doc(db, 'draftRooms', roomId), {
+              status: 'active',
+              startedAt: new Date()
+            });
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(countdownInterval);
+    }
+  }, [room?.status, preDraftCountdown, roomId]);
+
+  // Auto-switch to user's team when it's their turn or when page loads
   useEffect(() => {
     if (isMyTurn && isDraftActive) {
-      setSelectedTeam('Not Todd Middleton');
+      setSelectedTeam(userName);
     }
-  }, [isMyTurn, isDraftActive]);
+  }, [isMyTurn, isDraftActive, userName]);
+
+  // Set selected team to current user when page loads
+  useEffect(() => {
+    if (userName && !selectedTeam) {
+      setSelectedTeam(userName);
+    }
+  }, [userName, selectedTeam]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -1458,101 +2326,92 @@ export default function DraftRoom() {
     return '#C4b5fe';
   };
 
-  // Cleanup effect to reset pick progress when draft status changes
-  useEffect(() => {
-    // Reset pick progress when draft status changes
-    if (room?.status === 'completed' || !isDraftActive) {
-      console.log('🧹 CLEANUP: Resetting pick progress due to status change');
-      pickInProgressRef.current = false;
-    }
-    
-    // Cleanup function for component unmount
-    return () => {
-      console.log('🧹 CLEANUP: Component unmounting, resetting pick progress');
-      pickInProgressRef.current = false;
-    };
-  }, [room?.status, isDraftActive]);
-
-  // Early return for loading state - MUST be after all hooks
-  if (!room) {
-    // Check if we're still loading or if the room doesn't exist
-    if (roomId) {
-      return (
-        <div className="min-h-screen bg-[#000F55] text-white flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold mb-4">Room Not Found</h1>
-            <p className="text-lg mb-4">The draft room "{roomId}" does not exist.</p>
-            <p className="text-sm text-gray-300 mb-6">Please check the URL or create a new room.</p>
-            <Link 
-              href="/tournaments/topdog"
-              className="bg-[#c4b5fd] text-[#000F55] px-6 py-3 rounded-lg font-bold hover:bg-[#2DE2C5] transition-colors"
-            >
-              Back to Tournaments
-            </Link>
-          </div>
-        </div>
-      );
-    }
-    return <div className="min-h-screen bg-[#000F55] text-white flex items-center justify-center">Loading...</div>;
-  }
-
-  // Get current team's data
+  // Get current team's data for dropdown viewing
   const currentTeamRoster = getTeamRoster(selectedTeam);
   const currentTeamRosterGrouped = getTeamRosterGrouped(selectedTeam);
   const currentTeamStartingLineup = getTeamStartingLineup(selectedTeam);
+  
+  // Get user's team data for roster display (always shows user's picks)
+  const userTeamRoster = getTeamRoster(userName);
+  const userTeamRosterGrouped = getTeamRosterGrouped(userName);
+  const userTeamStartingLineup = getTeamStartingLineup(userName);
 
-  // Debug rendering
-  console.log('=== RENDERING DEBUG ===');
-  console.log('Room:', room);
-  console.log('Is draft active:', isDraftActive);
-  console.log('Available players count:', availablePlayers.length);
-  console.log('Filtered players count:', finalFilteredPlayers.length);
-  console.log('Picks count:', picks.length);
-  console.log('Room status:', room?.status);
-  console.log('======================');
+  // Current turn variables are already calculated above
+
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Draft room render - roomId:', roomId, 'room:', room);
+  }
+  
+  if (!room) return <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+    <div className="text-center">
+      <div className="text-xl mb-4">Loading room data...</div>
+      <div className="text-sm text-gray-400">If this takes too long, please refresh the page</div>
+    </div>
+  </div>;
+
+  // Debug rendering (disabled for performance)
+  if (process.env.NODE_ENV === 'development') {
+    console.log('=== RENDERING DEBUG ===');
+    console.log('Room:', room);
+    console.log('Is draft active:', isDraftActive);
+    console.log('Available players count:', availablePlayers.length);
+    console.log('Picks count:', picks.length);
+    console.log('Room status:', room?.status);
+    console.log('RoomId:', roomId);
+    console.log('Router query:', router.query);
+    console.log('======================');
+  }
+
+      return (
+    <div className="min-h-screen bg-[#101927] text-white overflow-x-auto zoom-resistant" style={{ minHeight: '1500px' }}>
+      <DraftNavbar />
+      <div className="zoom-stable" style={{ width: '1391px', minWidth: '1391px', maxWidth: '1391px' }}>
 
 
-
-  return (
-    <div className="min-h-screen bg-[#18181A] text-white">
-      {/* Removed header with Room Name and Full Board Link */}
-
-      {/* Draft Completion Message */}
-      {room?.status === 'completed' && (
-        <>
-          <div className="px-8 pb-4">
-            <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg p-6 shadow-lg">
-              <div className="text-center">
-                <h2 className="text-3xl font-bold mb-4">🎉 Draft Complete!</h2>
-                <p className="text-xl mb-4">
-                  Congratulations! Your TopDog draft has finished successfully.
-                </p>
-                <p className="text-lg opacity-90">
-                  Your team has been saved and you can view your roster below.
-                </p>
-          </div>
-          </div>
-        </div>
-          <div className="px-8 pb-4">
-            <FullDraftBoard
-              room={room}
-              picks={picks}
-              participants={participants}
-              draftOrder={draftOrder}
-              PLAYER_POOL={PLAYER_POOL}
-            />
-      </div>
-        </>
-      )}
-
-      {/* All Picks Display - Full Width */}
-      {(isDraftActive || room?.status === 'waiting') && room?.status !== 'completed' && (
-        <div className="pt-8 pb-0 bg-[#18181A]">
-          <div ref={picksScrollRef} className="flex overflow-x-auto pb-0 hide-scrollbar" style={{ 
-            scrollbarWidth: 'none', 
-            msOverflowStyle: 'none',
-            height: 'calc(198px + 40px)'
-          }}>
+      {/* New Horizontal Scrolling Bar - Migrated from Testing Grounds */}
+      {(
+        <div className="zoom-resistant" style={{ 
+          position: 'relative',
+          width: '100vw',
+          left: '0',
+          right: '0',
+          marginLeft: '0',
+          marginRight: '0',
+          transform: 'translateZ(0)',
+          paddingTop: '30px',
+          paddingBottom: '30px',
+          paddingLeft: '0',
+          paddingRight: '0',
+          backgroundColor: '#101927'
+        }}>
+          <div className="relative zoom-resistant" style={{ position: 'relative', transform: 'translateZ(0)', overflow: 'visible', minWidth: '100%', width: '100%' }}>
+            <div 
+              ref={picksScrollRef}
+              className="flex overflow-x-auto custom-scrollbar zoom-resistant"
+              style={{ 
+                height: '256px',
+                position: 'relative',
+                gap: '4.5px',
+                paddingRight: '0',
+                paddingBottom: '0',
+                transform: 'translateZ(0)',
+                minWidth: '100%',
+                paddingLeft: '0',
+                overflowX: 'auto',
+                overflowY: 'visible',
+                scrollSnapType: 'x mandatory',
+                scrollPaddingLeft: '0',
+                scrollPaddingRight: '0',
+                scrollPaddingTop: '0',
+                scrollPaddingBottom: '0',
+                scrollBehavior: 'smooth',
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'flex-start',
+                justifyContent: 'flex-start',
+                width: '100%'
+              }}
+            >
             {Array.from({ length: draftSettings.totalRounds * 12 }, (_, i) => {
               const pickNumber = i + 1;
               const round = Math.ceil(pickNumber / 12);
@@ -1560,610 +2419,481 @@ export default function DraftRoom() {
               const isSnakeRound = round % 2 === 0;
               const teamIndex = isSnakeRound ? 12 - 1 - pickIndex : pickIndex;
               const team = effectiveDraftOrder[teamIndex] || `Team ${teamIndex + 1}`;
+              const isMyPick = team === userName;
               const isCompleted = picks.length >= pickNumber;
-              
-
               const isOnTheClock = pickNumber === picks.length + 1;
-              // Robust player lookup (from FullDraftBoard)
-              const findPlayerInPool = (playerName) => {
-                if (!playerName || !PLAYER_POOL) return null;
-                
-                // Try exact match first
-                let player = PLAYER_POOL.find(p => p.name === playerName);
-                if (player) return player;
-                
-                // Try case-insensitive match
-                player = PLAYER_POOL.find(p => p.name.toLowerCase() === playerName.toLowerCase());
-                if (player) return player;
-                
-                // Try matching by last name (common format: "McBride" vs "Trey McBride")
-                const lastName = playerName.split(' ').pop();
-                if (lastName && lastName.length > 2) {
-                  player = PLAYER_POOL.find(p => p.name.toLowerCase().includes(lastName.toLowerCase()));
-                  if (player) return player;
-                }
-                
-                // Try matching by first name + last name variations
-                const nameParts = playerName.split(' ');
-                if (nameParts.length >= 2) {
-                  const firstName = nameParts[0];
-                  const lastName = nameParts.slice(1).join(' ');
-                  
-                  // Try "First Last" format
-                  player = PLAYER_POOL.find(p => {
-                    const poolNameParts = p.name.split(' ');
-                    if (poolNameParts.length >= 2) {
-                      const poolFirstName = poolNameParts[0];
-                      const poolLastName = poolNameParts.slice(1).join(' ');
-                      return poolFirstName.toLowerCase() === firstName.toLowerCase() && 
-                             poolLastName.toLowerCase() === lastName.toLowerCase();
-                    }
-                    return false;
-                  });
-                  if (player) return player;
-                }
-                
-                // If still no match, try partial matching
-                const normalizedPlayerName = playerName.toLowerCase().replace(/[^a-z\s]/g, '');
-                player = PLAYER_POOL.find(p => {
-                  const normalizedPoolName = p.name.toLowerCase().replace(/[^a-z\s]/g, '');
-                  return normalizedPoolName.includes(normalizedPlayerName) || 
-                         normalizedPlayerName.includes(normalizedPoolName);
-                });
-                if (player) return player;
-                
-                // Debug: log when player is not found
-                console.warn(`Player not found: "${playerName}"`);
-                return null;
-              };
-              const completedPick = picks[pickNumber - 1];
-              const playerData = completedPick ? findPlayerInPool(completedPick.player) : null;
               
-              // Debug logging for first few picks
-              if (pickNumber <= 3) {
-                console.log(`Pick ${pickNumber}:`, {
-                  completedPick,
-                  playerName: completedPick?.player,
-                  playerData,
-                  picksLength: picks.length,
-                  isCompleted: picks.length >= pickNumber
-                });
-              }
-
-              // Position color logic (from FullDraftBoard)
-              const getPositionColor = (position) => {
-                switch (position) {
-                  case 'QB': return '#ef4444';
-                  case 'RB': return '#8b5cf6';
-                  case 'WR': return '#10b981';
-                  case 'TE': return '#3b82f6';
-                  default: return '#6b7280';
-                }
+              // Get the player data for completed picks to determine position color
+              const completedPick = picks[pickNumber - 1];
+              const playerData = completedPick ? PLAYER_POOL.find(p => p.name === completedPick.player) : null;
+              
+              // Function to get username for the current pick - STATIC VERSION
+              const getStaticUsernameForPick = () => {
+                // Use the same logic as the On the Clock display
+                const round = Math.ceil(pickNumber / effectiveDraftOrder.length);
+                const isSnakeRound = round % 2 === 0;
+                const pickIndex = (pickNumber - 1) % effectiveDraftOrder.length;
+                const currentPicker = isSnakeRound
+                  ? effectiveDraftOrder[effectiveDraftOrder.length - 1 - pickIndex]
+                  : effectiveDraftOrder[pickIndex];
+                return currentPicker || team;
               };
-              // Team color bar logic (from FullDraftBoard)
-              const getTeamPositionProportions = (teamIdx) => {
-                // Get the team name for this team index
-                const teamName = effectiveDraftOrder[teamIdx];
-                const teamPicks = picks.filter(p => {
-                  // Find all picks for this team by name
-                  return p.user === teamName;
-                });
-                const positionCounts = {};
-                let totalPicks = 0;
-                teamPicks.forEach(pick => {
-                  const pdata = findPlayerInPool(pick.player);
-                  if (pdata && pdata.position) {
-                    positionCounts[pdata.position] = (positionCounts[pdata.position] || 0) + 1;
-                    totalPicks++;
-                  } else {
-                    console.warn(`Could not find position for player: ${pick.player}`);
-                  }
-                });
-                
-                // If no picks, show equal distribution for all positions
-                if (totalPicks === 0) {
-                  const positions = ['QB', 'RB', 'WR', 'TE'];
-                  return positions.map(position => ({
-                    position,
-                    proportion: 0.25, // Equal 25% for each position
-                    color: getPositionColor(position)
-                  }));
-                }
-                
-                const positions = ['QB', 'RB', 'WR', 'TE'];
-                return positions.map(position => ({
-                  position,
-                  proportion: (positionCounts[position] || 0) / totalPicks,
-                  color: getPositionColor(position)
-                })).filter(prop => prop.proportion > 0);
+              
+              // Store the username statically - this will never change
+              const staticUsername = getStaticUsernameForPick();
+              
+              // Function to get username for the current pick (for other uses)
+              const getUsernameForPick = () => {
+                // Use the same logic as the On the Clock display
+                const round = Math.ceil(pickNumber / effectiveDraftOrder.length);
+                const isSnakeRound = round % 2 === 0;
+                const pickIndex = (pickNumber - 1) % effectiveDraftOrder.length;
+                const currentPicker = isSnakeRound
+                  ? effectiveDraftOrder[effectiveDraftOrder.length - 1 - pickIndex]
+                  : effectiveDraftOrder[pickIndex];
+                return currentPicker || team;
               };
-              // Team logo
-              const logoIndex = teamIndex % logoOptions.length;
-              const LogoComponent = logoOptions[logoIndex]?.component;
-              const bgColor = logoOptions[logoIndex]?.bgColor;
+              
               return (
                 <div
-                  key={i}
-                  className="flex-shrink-0 text-center font-bold"
+                  key={pickNumber}
+                  className="flex-shrink-0 text-sm font-medium h-56 flex flex-col border-6 zoom-resistant"
                   style={{
-                    background: '#18181b',
-                    color: '#fff',
-                                            border: '6px solid #18181b',
-                    padding: 0,
-                    width: 168,
-                    minWidth: 168,
-                    maxWidth: 168,
-                    height: 198,
-                    minHeight: 198,
-                    maxHeight: 198,
-                    boxSizing: 'border-box',
+                    width: '158px',
+                    borderWidth: '6px',
                     position: 'relative',
+                    borderColor: isOnTheClock ? '#EF4444' : isCompleted ? (POSITION_COLORS[playerData?.position]?.primary || '#2DE2C5') : '#808080',
+                    borderTopWidth: '42px',
+                    backgroundColor: '#0a0a0a',
+                    borderRadius: '11px',
+                    overflow: 'visible',
+                    transform: 'translateZ(0)',
+                    minWidth: '174px',
+                    flexShrink: 0,
+                    scrollSnapAlign: pickNumber === 1 ? 'start' : 'center',
+                    marginLeft: pickNumber === 1 ? '0' : 'auto',
+                    zIndex: pickNumber === 1 ? 9999 : 'auto',
+                    left: pickNumber === 1 ? '0' : 'auto',
+                    top: pickNumber === 1 ? '0' : 'auto',
+                    visibility: 'visible',
+                    opacity: 1,
+                    display: 'flex'
+                  }}
+                  onClick={() => {
+                    setSelectedTeam(staticUsername);
                   }}
                 >
-                  <div className="min-h-full flex items-center justify-center w-full h-full">
-                    {playerData ? (
-                      // AFTER PICK: Player card style
-                      <div
-                        className="text-sm rounded w-full h-full flex flex-col justify-center items-center"
-                        style={{
-                          position: 'relative',
-                          overflow: 'visible',
-                          background: 'transparent',
-                          height: '100%',
-                          width: '100%',
-                          boxSizing: 'border-box',
-                          borderTop: `27px solid ${getPositionColor(playerData.position)}`,
-                          borderLeft: `4px solid ${getPositionColor(playerData.position)}`,
-                          borderRight: `4px solid ${getPositionColor(playerData.position)}`,
-                          borderBottom: `4px solid ${getPositionColor(playerData.position)}`,
-                          borderRadius: 8,
-                          margin: 0,
-                          padding: 0,
-                          textAlign: 'left',
-                          alignItems: 'flex-start',
-                        }}
-                      >
-                        {/* Team name label at the top */}
-                        <div style={{
-                            position: 'absolute',
-                            top: -22,
-                            left: 0,
-                            right: 0,
-                            height: 16,
-                            display: 'flex',
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontWeight: 700,
-                            fontSize: 13,
-                            color: isOnTheClock ? '#000' : '#fff',
-                            zIndex: 4,
-                            pointerEvents: 'none',
-                        }}>
-                          <span>{(team.length > 18 ? team.slice(0, 17) + '…' : team).toUpperCase().replace(/\s/g, '')}</span>
+
+                  {/* Drafting team username positioned in yellow border area */}
+                  <div 
+                    className="absolute left-0 right-0 font-bold text-center zoom-resistant"
+                    style={{ 
+                      fontSize: '16px', 
+                      color: isOnTheClock ? 'black' : 'white',
+                      backgroundColor: 'transparent',
+                      zIndex: 9999,
+                      padding: '2px',
+                      top: '-20px',
+                      transform: 'translateY(-50%) translateZ(0)'
+                    }}
+                  >
+                    {(() => {
+                      if (isOnTheClock) {
+                        // Always show static username, never "Your Turn"
+                        const cleanUsername = staticUsername.replace(/[,\s]/g, '').toUpperCase().substring(0, 18);
+                        return cleanUsername;
+                      } else {
+                        const cleanUsername = staticUsername.replace(/[,\s]/g, '').toUpperCase().substring(0, 18);
+                        return cleanUsername;
+                      }
+                    })()}
+                  </div>
+
+                  {/* Pick number positioned at top left */}
+                  <div 
+                    className="absolute text-sm zoom-resistant cursor-pointer rounded px-1"
+                    style={{ 
+                      top: '5px',
+                      left: '9px',
+                      color: 'white',
+                      zIndex: 9999,
+                      transform: 'translateZ(0)'
+                    }}
+                    onClick={() => {
+                      setShowOverallPickNumbers(!showOverallPickNumbers);
+                    }}
+                  >
+                    {(() => {
+                      if (showOverallPickNumbers) {
+                        return pickNumber;
+                      } else {
+                        const pickInRound = ((pickNumber - 1) % 12) + 1;
+                        return `${round}.${String(pickInRound).padStart(2, '0')}`;
+                      }
+                    })()}
+                  </div>
+
+                  {/* User logo placeholder in top right corner */}
+                  <div 
+                    className="absolute zoom-resistant"
+                    style={{ 
+                      top: '15px',
+                      left: '50%',
+                      transform: 'translateX(-50%) translateZ(0)',
+                      width: '70.875px',
+                      height: '70.875px',
+                      borderRadius: '50%',
+                      border: '2px dotted #808080',
+                      zIndex: 9999,
+                      marginBottom: '12px'
+                    }}
+                  ></div>
+
+                  <div className="text-sm w-full text-center leading-tight flex-1 flex items-end justify-center" style={{ paddingBottom: '20px', position: 'relative' }}>
+                    <div className="w-full">
+                      {isOnTheClock ? (
+                        <div className="flex items-center justify-center" style={{ transform: 'scale(0.9)', position: 'absolute', bottom: '28px', left: '50%', marginLeft: '2.5px', transform: 'translateX(-50%) scale(0.9)' }}>
+                          <SevenSegmentCountdown initialSeconds={isDraftActive ? timer : preDraftCountdown} useMonocraft={true} isUserOnClock={isMyTurn && isDraftActive} />
                         </div>
-                        {/* Pick number label below colored bar, top left */}
-                        <div style={{
-                          position: 'absolute',
-                          top: 4,
-                          left: 0,
-                          right: 0,
-                          width: '100%',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          fontWeight: 700,
-                          fontSize: 12,
-                          color: '#fff',
-                          fontFamily: 'Arial, Helvetica, sans-serif',
-                          zIndex: 4,
-                          pointerEvents: 'none',
-                          marginBottom: '4px',
-                          paddingLeft: '8px',
-                          paddingRight: '8px',
-                        }}>
-                          <span>{`${round}.${String(pickIndex + 1).padStart(2, '0')}`}</span>
-                          <span>{pickNumber}</span>
-                        </div>
-                        {/* Logo for completed pick */}
-                        <div style={{
-                          position: 'absolute',
-                          top: 10,
-                          left: 0,
-                          right: 0,
-                          height: 52,
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          zIndex: 3,
-                        }}>
-                          {(() => {
-                            if (!team || team === '---') return null;
-                            const logoIndex = teamIndex % logoOptions.length;
-                            const LogoComponent = logoOptions[logoIndex].component;
-                            const bgColor = logoOptions[logoIndex].bgColor;
-                                                          return <LogoComponent size={43} bgColor={bgColor} />;
-                          })()}
-                        </div>
-                        {/* Player info for completed pick - positioned under logo */}
-                                <div style={{ 
-                          position: 'absolute',
-                          top: 79,
-                          left: 4,
-                          right: 4,
-                          fontSize: 12, 
-                                    letterSpacing: 0.5, 
-                          color: '#fff', 
-                                    fontFamily: 'Arial, Helvetica, sans-serif',
-                          textAlign: 'center',
-                          zIndex: 3,
-                        }}>
-                          {(() => {
-                            if (!playerData.name) return null;
-                            const nameParts = playerData.name.split(' ');
-                            if (nameParts.length === 1) {
-                              return <span>{playerData.name}</span>;
-                            }
-                            const firstName = nameParts[0];
-                            const lastName = nameParts.slice(1).join(' ');
-                            return <>
-                              <span style={{ display: 'block', marginBottom: 0, lineHeight: 1, marginTop: 0 }}>{firstName}</span>
-                              <span style={{ display: 'block', lineHeight: 1, marginBottom: 2 }}>{lastName}</span>
-                            </>;
-                          })()}
-                        </div>
-                        <div className="text-xs" style={{ 
-                          position: 'absolute',
-                          top: 110,
-                          left: 4,
-                          right: 4,
-                          color: '#fff', 
-                          fontWeight: 500, 
-                          fontSize: 10, 
-                          fontFamily: 'Futura, Helvetica, Arial, sans-serif',
-                          textAlign: 'center',
-                          zIndex: 3,
-                        }}>
-                          {playerData ? `${playerData.position} • ${playerData.team}` : ''}
-                        </div>
-                        {/* Colored position tracker bar */}
-                        <div style={{ 
-                          position: 'absolute',
-                          bottom: 9,
-                          left: '50%',
-                          transform: 'translateX(-50%)',
-                          width: '141.2px',
-                          maxWidth: '141.2px',
-                          minWidth: '141.2px',
-                          height: 10.56,
-                          display: 'flex',
-                          borderRadius: 5.28,
-                          overflow: 'hidden',
-                          zIndex: 3,
-                        }}>
-                          {(() => {
-                            const proportions = getTeamPositionProportions(teamIndex);
-                            // Debug logging for position tracker
-                            if (pickNumber <= 3) {
-                              const teamName = effectiveDraftOrder[teamIndex];
-                              console.log(`Position tracker for pick ${pickNumber}, team ${teamIndex} (${teamName}):`, {
-                                proportions,
-                                teamPicks: picks.filter(p => p.user === teamName),
-                                effectiveDraftOrder,
-                                team
-                              });
-                            }
-                            if (proportions.length === 0) {
-                              return <div style={{ height: 10.56, width: '100%', background: '#6b7280', borderRadius: 5.28 }} />;
-                            }
-                            return proportions.map((prop, idx) => (
-                              <div
-                                key={prop.position}
-                                style={{
-                                  height: 10.56,
-                                  width: `${prop.proportion * 100}%`,
-                                  background: prop.color,
-                                  borderRadius: idx === 0 ? '5px 0 0 5px' : idx === proportions.length - 1 ? '0 5px 5px 0' : '0',
+                      ) : (
+                        <div className="font-bold text-xs h-4 flex items-center justify-center"></div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Player name positioned absolutely */}
+                  {isCompleted && completedPick && (
+                    <div 
+                      className="absolute text-center zoom-resistant"
+                      style={{ 
+                        bottom: '0px',
+                        left: '50%',
+                        transform: 'translateX(-50%) translateZ(0)',
+                        zIndex: 9999,
+                        padding: '36px'
+                      }}
+                    >
+                      <div className="font-bold text-sm" style={{ 
+                        marginTop: '4px',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        maxWidth: '140px',
+                        lineHeight: '1.2'
+                      }}>{typeof completedPick.player === 'string' ? completedPick.player : (completedPick.player?.name || 'Unknown Player')}</div>
+                      <div className="text-sm text-gray-400 mt-1" style={{ marginTop: '4px', whiteSpace: 'nowrap' }}>{playerData?.position} - {playerData?.team}</div>
+                    </div>
+                  )}
+
+
+
+                  {/* NEW POSITION PERCENTAGE TRACKER */}
+                  <div 
+                    className="absolute zoom-resistant"
+                    style={{ 
+                      bottom: '8px',
+                      left: '8px',
+                      right: '8px',
+                      height: '16px',
+                      zIndex: 9999,
+                      transform: 'translateZ(0)'
+                    }}
+                  >
+                    <div style={{ display: 'flex', height: '100%', width: '100%' }}>
+                      {(() => {
+                        // Get position percentages for the team in this card's border
+                        const teamInCard = team;
+                        const percentages = getTeamPositionPercentages(teamInCard);
+                        const teamPicksCount = picks.filter(pick => pick.user === teamInCard).length;
+                        
+
+                        
+                        // If team has no picks, show transparent bar
+                        if (teamPicksCount === 0) {
+                          return <div style={{ height: '100%', width: '100%', background: 'transparent' }}></div>;
+                        }
+                        
+                        // Create colored segments for each position
+                        const hasAnyPercentage = percentages.qb > 0 || percentages.rb > 0 || percentages.wr > 0 || percentages.te > 0;
+                        
+
+                        
+                        return (
+                          <>
+                            {percentages.qb > 0 && (
+                              <div 
+                                style={{ 
+                                  height: '100%', 
+                                  width: `${percentages.qb}%`, 
+                                  background: POSITION_COLORS.QB.primary 
                                 }}
-                              />
-                            ));
-                          })()}
-                        </div>
-                      </div>
-                    ) : (
-                      // FUTURE PICK: Grey outline style matching completed picks
-                      <div
-                        className="text-sm rounded w-full h-full flex flex-col justify-center items-center"
-                        style={{
-                          position: 'relative',
-                          overflow: 'visible',
-                          background: 'transparent',
-                          height: '100%',
-                          width: '100%',
-                          boxSizing: 'border-box',
-                          borderTop: `27px solid ${isOnTheClock ? '#fbbf24' : '#6b7280'}`,
-                          borderLeft: `4px solid ${isOnTheClock ? '#fbbf24' : '#6b7280'}`,
-                          borderRight: `4px solid ${isOnTheClock ? '#fbbf24' : '#6b7280'}`,
-                          borderBottom: `4px solid ${isOnTheClock ? '#fbbf24' : '#6b7280'}`,
-                          borderRadius: 8,
-                          margin: 0,
-                          padding: 0,
-                          textAlign: 'left',
-                          alignItems: 'flex-start',
-                        }}
-                      >
-                        {/* User name and round.pickInRound at the top border */}
-                        {/* Team name label at the top */}
-                        <div style={{
-                            position: 'absolute',
-                            top: -22,
-                            left: 0,
-                            right: 0,
-                            height: 16,
-                            display: 'flex',
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontWeight: 700,
-                            fontSize: 13,
-                            color: isOnTheClock ? '#000' : '#fff',
-                            zIndex: 4,
-                            pointerEvents: 'none',
-                        }}>
-                          <span>{(team.length > 18 ? team.slice(0, 17) + '…' : team).toUpperCase().replace(/\s/g, '')}</span>
-                        </div>
-                        {/* Pick number label below colored bar, top left */}
-                        <div style={{
-                          position: 'absolute',
-                          top: 4,
-                          left: 0,
-                          right: 0,
-                          width: '100%',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          fontWeight: 700,
-                          fontSize: 12,
-                          color: '#fff',
-                          fontFamily: 'Arial, Helvetica, sans-serif',
-                          zIndex: 4,
-                          pointerEvents: 'none',
-                          marginBottom: '4px',
-                          paddingLeft: '8px',
-                          paddingRight: '8px',
-                        }}>
-                          <span>{`${round}.${String(pickIndex + 1).padStart(2, '0')}`}</span>
-                          <span>{pickNumber}</span>
-                        </div>
-                        {/* Team card for unpicked slot */}
-                        <div style={{ 
-                          display: 'flex', 
-                          flexDirection: 'column', 
-                          alignItems: 'center', 
-                          justifyContent: 'flex-start', 
-                          height: '100%', 
-                          width: '100%',
-                          padding: '8px 4px',
-                          boxSizing: 'border-box',
-                          background: 'transparent'
-                        }}>
-                        {/* Logo for future pick */}
-                        <div style={{
-                          position: 'absolute',
-                          top: 10,
-                          left: 0,
-                          right: 0,
-                          height: 52,
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          zIndex: 3,
-                        }}>
-                          {(() => {
-                            if (typeof team !== 'string' || team === '---') return null;
-                            const logoIndex = teamIndex % logoOptions.length;
-                            const LogoComponent = logoOptions[logoIndex].component;
-                            const bgColor = logoOptions[logoIndex].bgColor;
-                            return <LogoComponent size={43} bgColor={bgColor} />;
-                          })()}
-                        </div>
-                          <div style={{ 
-                            height: '20px',
-                            width: '100%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            marginBottom: 'auto'
-                          }}>
-                          </div>
-                        {/* Colored position tracker bar for future picks */}
-                        <div style={{ 
-                          position: 'absolute',
-                          bottom: 9,
-                          left: '50%',
-                          transform: 'translateX(-50%)',
-                          width: '141.2px',
-                          maxWidth: '141.2px',
-                          minWidth: '141.2px',
-                          height: 10.56,
-                          display: 'flex',
-                          borderRadius: 5.28,
-                          overflow: 'hidden',
-                          zIndex: 3,
-                        }}>
-                              {(() => {
-                                const proportions = getTeamPositionProportions(teamIndex);
-                                // Debug logging for position tracker rendering
-                                if (pickNumber <= 5) {
-                                  console.log(`Rendering position tracker for pick ${pickNumber}, team ${teamIndex}:`, {
-                                    proportions,
-                                    proportionsLength: proportions.length,
-                                    teamName: effectiveDraftOrder[teamIndex]
-                                  });
-                                }
-                                if (proportions.length === 0) {
-                                  return <div style={{ height: 10.56, width: '100%', background: '#6b7280', borderRadius: 5.28 }} />;
-                                }
-                                return proportions.map((prop, idx) => (
-                                  <div
-                                    key={prop.position}
-                                    style={{
-                                      height: 10.56,
-                                      width: `${prop.proportion * 100}%`,
-                                      background: prop.color,
-                                      borderRadius: idx === 0 ? '5px 0 0 5px' : idx === proportions.length - 1 ? '0 5px 5px 0' : '0',
-                                    }}
-                                  />
-                                ));
-                              })()}
-                            </div>
-                        </div>
-                      </div>
-                    )}
+                              ></div>
+                            )}
+                            {percentages.rb > 0 && (
+                              <div 
+                                style={{ 
+                                  height: '100%', 
+                                  width: `${percentages.rb}%`, 
+                                  background: POSITION_COLORS.RB.primary 
+                                }}
+                              ></div>
+                            )}
+                            {percentages.wr > 0 && (
+                              <div 
+                                style={{ 
+                                  height: '100%', 
+                                  width: `${percentages.wr}%`, 
+                                  background: POSITION_COLORS.WR.primary
+                                }}
+                              ></div>
+                            )}
+                            {percentages.te > 0 && (
+                              <div 
+                                style={{ 
+                                  height: '100%', 
+                                  width: `${percentages.te}%`, 
+                                  background: POSITION_COLORS.TE.primary 
+                                }}
+                              ></div>
+                            )}
+                          </>
+                        );
+                      })()}
+                    </div>
                   </div>
                 </div>
               );
             })}
+            </div>
           </div>
-          {/* Info Button Under Scrolling Bar */}
-          
         </div>
       )}
 
+      {/* Main Content Container - Everything below horizontal scrolling bar */}
+                           <div className="main-content-container" style={{ 
+          position: 'fixed',
+          left: '0px',
+          top: '380px',
+          width: '100vw',
+          bottom: '0px',
+          paddingLeft: '20px'
+        }}>
 
+      {/* On the Clock Container */}
+      {(
+        <div className="pb-4" style={{ position: 'absolute', top: '0px', left: '45.5px' }}>
+          <div 
+            className="inline-block rounded-lg p-4 shadow-lg transition-all duration-1000 bg-white/10"
+            style={{
+              opacity: 1,
+              position: 'relative',
+              width: 288,
+              minWidth: 288,
+              maxWidth: 288,
+              height: '100px',
+              minHeight: '100px',
+              maxHeight: '100px',
+              border: '2px solid #EF4444'
+            }}
+          >
+            <div className="flex justify-between items-center h-full">
+              <div className="flex flex-col justify-center h-full" style={{ marginLeft: '-4px' }}>
+                <div className="text-xl font-bold text-white mb-3" style={{ marginTop: '-0.5em' }}>
+                  {isDraftActive ? 'ON THE CLOCK:' : 'DRAFT STARTING'}
+                </div>
+                <div className="text-2xl font-semibold text-white">
+                  {isDraftActive ? (() => {
+                    if (!currentPicker || currentPicker === 'Waiting...') return 'Waiting...';
+                    if (currentPicker === 'Not Todd Middleton') return currentPicker;
+                    
+                    // Check if this is a mock drafter and show animal logo
+                    const mockDrafterNames = room?.mockDrafters || [];
+                    const isMockDrafter = mockDrafterNames.includes(currentPicker);
+                    
+                    const cleanPicker = currentPicker.replace(/[,\s]/g, '').toUpperCase().substring(0, 18);
+                    return cleanPicker;
+                  })() : 'Get Ready!'}
+                </div>
 
-      {/* Three Column Layout */}
-      <div className="flex">
-        {/* Left Sidebar: On the Clock Container and Your Queue */}
-        <div className="w-80 flex flex-col">
-          {/* Full Draft Board Button, Info Button, Timer, and Autodraft */}
-          <div className="px-4 mb-4">
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => {
-                    console.log('Info button clicked!');
-                    setShowInfoModal(true);
-                  }}
-                  className="w-7 h-7 text-[#3B82F6] rounded-full flex items-center justify-center hover:text-[#1d4ed8] transition-colors font-bold text-base border-2 border-[#3B82F6]"
-                  title="Tournament Info"
-                >
-                  i
-                </button>
-                <Link 
-                  href={`/draft/topdog/${roomId}/full-board`}
-                  className="inline-block px-4 py-2 bg-[#3B82F6] font-bold rounded-lg hover:bg-[#1d4ed8] transition-colors text-sm text-center"
-                  style={{
-                    width: 240,
-                    minWidth: 240,
-                    maxWidth: 240,
-                    color: '#ffffff',
-                  }}
-                >
-                  Full Draft Board
-                </Link>
               </div>
-              <div className="flex items-center gap-4">
-                {/* Autodraft Would Be Container */}
-                {autoPickPlayer && (
-                  <div className="rounded p-3 border-l-4 border-[#3B82F6]" style={{ backgroundColor: '#1e40af', minWidth: 180 }}>
-                    <div className="text-xs font-bold text-white mb-1">Autodraft Would Be:</div>
-                    <div className="flex items-center gap-3">
-                      <div className="flex-1">
-                        <div className="font-bold text-white text-sm">{autoPickPlayer.name}</div>
-                        <div className="text-xs text-white opacity-75">{autoPickPlayer.position} • {autoPickPlayer.team}</div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                <div className="bg-black pt-1 pr-1 pl-1 rounded" style={{ display: 'inline-block', transform: 'scale(1.0)', marginTop: '0px' }}>
-                  <SevenSegmentCountdown initialSeconds={isDraftActive ? timer : preDraftCountdown} />
+
+              <div className="flex items-center gap-6" style={{ backgroundColor: 'transparent' }}>
+                <div className="text-right">
+                  {/* Timer moved to horizontal scrolling card */}
                 </div>
               </div>
             </div>
           </div>
-          
-          {/* Your Queue */}
-          <div className="px-4 mt-0">
-            <div className="bg-white/10 p-4 z-30 flex flex-col rounded-lg w-80">
-              <h2 className="text-xl font-bold mb-2" style={{ color: '#3B82F6' }}>Your Queue</h2>
-              
-              {queue.length === 0 && (
-                <div className="text-gray-300 mb-2">
-                  No players in queue.
-                  <button 
-                    onClick={() => addToQueue(finalFilteredPlayers[0])} 
-                    className="ml-2 px-2 py-1 bg-[#3B82F6] text-white rounded text-xs font-bold hover:bg-[#1d4ed8]"
-                  >
-                    Add Player
-                  </button>
-                </div>
-              )}
-              
-              {queue.length > 0 && (
-                <DragDropContext onDragEnd={onQueueDragEnd}>
-                  <Droppable droppableId="player-queue">
-                    {(provided) => (
-                      <div
-                        {...provided.droppableProps}
-                        ref={provided.innerRef}
-                        className="flex flex-col gap-2"
-                      >
-                        {/* Queue Column Headers */}
-                        <div className="flex items-center justify-between bg-white/10 rounded p-2 font-bold text-xs">
-                          <div className="flex-1">Player</div>
-                          <div className="flex items-center gap-3">
-                            <div className="w-12 text-center text-gray-300">ADP</div>
-                            <div className="w-12 text-center text-gray-300">Rank</div>
-                            <div className="w-4"></div>
-                          </div>
-                        </div>
+        </div>
+      )}
 
-                        {queue.map((player, index) => (
-                          <Draggable key={`queue-${player.name}-${index}`} draggableId={`queue-${player.name}-${index}`} index={index}>
-                            {(provided) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                                className="bg-white/5 p-3 rounded cursor-move hover:bg-white/10 transition-all"
+      {/* Full Draft Board Button */}
+      <div style={{ position: 'absolute', top: '118px', left: '45.5px', marginBottom: '18px' }}>
+        <div className="flex gap-2">
+          <Link 
+            href={`/draft/topdog/${roomId}/full-board`}
+            className="px-4 py-3 font-bold rounded-lg transition-colors text-sm text-center block"
+            style={{ 
+              width: '288px',
+              backgroundColor: '#6b7280',
+              border: '1px solid rgba(128, 128, 128, 0.4)',
+              color: '#fff'
+            }}
+          >
+            Full Draft Board
+          </Link>
+
+        </div>
+      </div>
+
+      {/* Autodraft Would Be Container */}
+      {autoPickPlayer && (
+        <div style={{ position: 'absolute', top: '182px', left: '45.5px' }}>
+          <div className="rounded-lg border-l-4 border-[#2DE2C5] bg-white/10 flex flex-col" style={{ width: '174px', height: '90px', minHeight: '90px', maxHeight: '90px', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
+            <div className="text-sm font-bold text-[#60A5FA] mb-1" style={{ marginTop: '8px', marginLeft: '12px' }}>Autodraft Would Be:</div>
+            <div className="flex items-center justify-between gap-3 flex-1" style={{ marginTop: '8px', marginLeft: '12px', marginRight: '12px' }}>
+              <div className="flex-1">
+                <div className="font-bold text-white text-sm whitespace-nowrap overflow-hidden text-ellipsis" style={{ marginTop: '-12px' }}>{autoPickPlayer.name}</div>
+                <div className="text-sm text-gray-300 opacity-75">{autoPickPlayer.position} • {autoPickPlayer.team}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Picks Away Calendar Container - Now separate from autodraft container */}
+      <div style={{ paddingLeft: '16px', paddingRight: '32px', position: 'absolute', top: '182px', left: '215.5px' }}>
+        <PicksAwayCalendar 
+          picksAway={(() => {
+            // If it's user's turn, show 0 (which displays "ON THE CLOCK")
+            if (isMyTurn && isDraftActive) {
+              return 0;
+            }
+            
+            // Calculate picks until next user pick
+            let picksUntilUserTurn = 0;
+            let checkingPickNumber = currentPickNumber;
+            
+            // Look ahead to find when it's the user's turn
+            while (checkingPickNumber <= totalPicks) {
+              const checkRound = Math.ceil(checkingPickNumber / effectiveDraftOrder.length);
+              const checkIsSnakeRound = checkRound % 2 === 0;
+              const checkPickIndex = (checkingPickNumber - 1) % effectiveDraftOrder.length;
+              const checkPicker = checkIsSnakeRound
+                ? effectiveDraftOrder[effectiveDraftOrder.length - 1 - checkPickIndex]
+                : effectiveDraftOrder[checkPickIndex];
+              
+              if (checkPicker === userName) {
+                break;
+              }
+              
+              picksUntilUserTurn++;
+              checkingPickNumber++;
+            }
+            
+            return picksUntilUserTurn;
+          })()}
+        />
+      </div>
+
+      {/* Three Column Layout */}
+      <DragDropContext onDragEnd={onUniversalDragEnd}>
+        <div className="flex w-[1400px]" style={{ marginLeft: '36px', marginTop: '18px' }}>
+          {/* Left Sidebar: Your Queue */}
+          <div className="w-80 flex flex-col flex-shrink-0">
+            {/* Your Queue */}
+            <div className="px-4" style={{ position: 'absolute', top: '290px', left: '45.5px', marginLeft: '-17px' }}>
+              <div className="bg-white/10 p-4 z-30 flex flex-col rounded-lg" style={{ width: '288px', height: '797px', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
+
+                
+                {queue.length === 0 && (
+                  <div className="text-gray-300 mb-2">
+                    Click "Queue" on players to add them here.
+                    <button 
+                      onClick={() => addToQueue(filteredPlayers[0])} 
+                      className="ml-2 px-2 py-1 bg-[#60A5FA] text-[#000F55] rounded text-xs font-bold hover:bg-[#2DE2C5]"
+                    >
+                      Add Player
+                    </button>
+                  </div>
+                )}
+                
+                <StrictModeDroppable droppableId="player-queue">
+                  {(provided) => (
+                    <div
+                      {...provided.droppableProps}
+                      ref={provided.innerRef}
+                      className="flex flex-col custom-scrollbar flex-1"
+                      style={{ 
+                        overflowY: 'auto', 
+                        minHeight: '60px',
+                        // Prevent jumping by maintaining consistent positioning
+                        position: 'relative'
+                      }}
+                    >
+                      {/* Queue Column Headers */}
+                      {queue.length > 0 && (
+                        <div className="flex items-center justify-between bg-white/10 rounded font-bold text-xs mb-2 px-3">
+                          <div className="w-8 text-center text-gray-300 text-xs" style={{ fontSize: '12px' }}>ADP</div>
+                          <div className="flex-1" style={{ paddingLeft: '32px' }}>Player</div>
+                          <div className="w-4"></div>
+                        </div>
+                      )}
+
+                      {queue.filter(player => player && typeof player === 'object' && typeof player.name === 'string').map((player, index) => (
+                        <Draggable key={`queue-${player.name}-${index}`} draggableId={`queue-${player.name}-${index}`} index={index}>
+                          {(provided, snapshot) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              className="rounded cursor-move hover:bg-white/10 transition-all relative overflow-hidden"
+                              style={{
+                                ...getDragItemStyle(snapshot.isDragging, provided.draggableProps.style, index),
+                                backgroundColor: `rgba(${player.position === 'QB' ? '124, 58, 237' : player.position === 'RB' ? '15, 186, 128' : player.position === 'WR' ? '66, 133, 244' : player.position === 'TE' ? '244, 114, 182' : '128, 128, 128'}, 0.3)`,
+                                minHeight: '45px',
+                                height: '50px',
+                                border: '1px solid rgba(255, 255, 255, 0.1)'
+                              }}
+                            >
+                              {/* Position color gradient overlay */}
+                              <div 
                                 style={{
-                                  ...provided.draggableProps.style,
-                                  transform: provided.draggableProps.style?.transform
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: 0,
+                                  right: 0,
+                                  height: '100%',
+                                  background: createQueueGradient(player.position).firstGradient,
+                                  zIndex: 1,
+                                  pointerEvents: 'none'
                                 }}
-                              >
-                                <div className="flex items-center justify-between">
-                                  <div className="flex-1">
-                                    <div className="font-bold text-white">{player.name}</div>
-                                    <div className="text-sm text-gray-300">{player.position} • {player.team}</div>
-                                  </div>
-                                  <div className="flex items-center gap-3">
-                                    <div className="w-12 text-center text-xs font-bold text-[#3B82F6]">
-                                      {player.adp || 'N/A'}
-                                    </div>
-                                    <div className="w-12 text-center text-xs font-bold text-[#3B82F6]">
-                                      {rankings.indexOf(player.name) !== -1 ? `#${rankings.indexOf(player.name) + 1}` : 'N/A'}
-                                    </div>
-                                    <button
-                                      onClick={() => removeFromQueue(player)}
-                                      className="text-red-400 hover:text-red-300 text-sm"
-                                    >
-                                      ×
-                                    </button>
-                                  </div>
+                              />
+                              <div className="flex items-center h-full" style={{ position: 'relative', zIndex: 2 }}>
+                                <div className="w-8 text-center text-xs font-bold text-white" style={{ marginLeft: '12px' }}>
+                                  {formatADP(player.adp)}
+                                </div>
+                                <div className="flex-1 flex flex-col justify-center" style={{ paddingLeft: '13px' }}>
+                                  <div className="font-bold text-white whitespace-nowrap overflow-hidden text-ellipsis cursor-pointer hover:text-gray-300 transition-colors" onClick={() => openPlayerModal(player)}>{player.name}</div>
+                                  <div className="text-sm text-gray-300" style={{ marginTop: '-2px' }}>    {player.position} • {player.team} • Bye <span style={{ transform: 'translateX(-4px)' }}>{player.bye}</span></div>
                                 </div>
                               </div>
-                            )}
-                          </Draggable>
-                        ))}
-                        {provided.placeholder}
-                      </div>
-                    )}
-                  </Droppable>
-                </DragDropContext>
-              )}
+                              <div className="absolute top-0.5 right-0.5" style={{ zIndex: 3 }}>
+                                  <button
+                                    onClick={() => removeFromQueue(player)}
+                                  className="text-white hover:text-gray-300 text-base font-bold bg-black/20 rounded-full w-6 h-6 flex items-center justify-center"
+                                  >
+                                    ×
+                                  </button>
+                              </div>
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </StrictModeDroppable>
             </div>
           </div>
         </div>
@@ -2171,72 +2901,181 @@ export default function DraftRoom() {
         {/* Autodraft Would Be Container - HIDDEN */}
 
         {/* Center Column: Available Players */}
-        <div className="flex-1 ml-8 mr-8">
-          {room && (
-            <div className="bg-[#18181A] rounded pt-4 pb-4 pl-4 pr-4 mb-2 border-4 border-white/20" style={{ marginBottom: '2px', marginTop: 'auto' }}>
+        <div className="min-w-0" style={{ 
+          position: 'absolute',
+          top: '0px',
+          left: '365.5px',
+          width: '720px' 
+        }}>
+          {(
+            <div className="bg-white/10 rounded-lg flex flex-col zoom-resistant" style={{ height: '1087px', overflowY: 'auto', paddingLeft: '24px', paddingRight: '24px', paddingTop: '24px', border: '1px solid rgba(255, 255, 255, 0.1)', transform: 'translateZ(0)' }}>
               
-              {/* Search and Filter Controls */}
-              <div className="mb-4 flex flex-col sm:flex-row gap-2">
-                <input
-                  type="text"
-                  id="player-search-input"
-                  name="playerSearch"
-                  placeholder="Search players or teams..."
-                  value={playerSearch}
-                  onChange={(e) => setPlayerSearch(e.target.value)}
-                  className="px-3 py-2 rounded text-black flex-1"
-                />
-                <select
-                  value={positionFilter}
-                  onChange={(e) => setPositionFilter(e.target.value)}
-                  className="px-3 py-2 rounded text-black bg-white"
-                >
-                  <option value="ALL">All Positions</option>
-                  <option value="QB">QB</option>
-                  <option value="RB">RB</option>
-                  <option value="WR">WR</option>
-                  <option value="TE">TE</option>
-                </select>
-              </div>
-              
-              <div className="text-sm text-gray-300 mb-3">
-                Showing {finalFilteredPlayers.length} of {availablePlayers.length} available players
-              </div>
-              
-              {/* Single Column Player List */}
-              <div className="overflow-y-auto" style={{ height: '1095px' }}>
-                <div className="space-y-2">
-                  {/* Column Headers */}
-                  <div className="flex items-center justify-between bg-white/10 rounded p-3 font-bold text-xs">
-                    <div className="flex items-center gap-3 flex-1">
-                      <button 
-                        onClick={() => setSortBy('adp')}
-                        className={`w-16 text-center hover:text-[#3B82F6] hover:bg-white/5 transition-all cursor-pointer rounded px-1 py-1 ${
-                          sortBy === 'adp' ? 'text-[#3B82F6] bg-white/10' : 'text-gray-300'
+              {/* Search and Filter Controls - New Top Container */}
+              <div className="bg-white/10 rounded-lg p-4 mb-4">
+                <div className="flex flex-row gap-2 flex-shrink-0 justify-center items-center">
+                  {/* Search and Filter Buttons */}
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        placeholder="Search players or teams..."
+                        value={playerSearch}
+                        onChange={(e) => setPlayerSearch(e.target.value)}
+                      className="px-2 py-2 rounded text-black text-sm"
+                    style={{ width: '208px' }}
+                      />
+                      <button
+                        onClick={() => {
+                          setPositionFilters(['ALL']);
+                          setPlayerSearch('');
+                        }}
+                      className={`px-4 py-2 rounded font-bold transition-colors text-sm ${
+                          positionFilters.includes('ALL') 
+                            ? 'bg-white/20 text-white' 
+                            : 'bg-white/10 text-white hover:bg-white/20'
                         }`}
-                        title="Click to sort by ADP"
+                     style={{ width: '80px', minHeight: '32px' }}
                       >
-                        ADP {sortBy === 'adp' && '↓'}
+                        Clear
                       </button>
-                      <button 
-                        onClick={() => setSortBy('rankings')}
-                        className={`w-16 text-center hover:text-[#3B82F6] hover:bg-white/5 transition-all cursor-pointer rounded px-1 py-1 ${
-                          sortBy === 'rankings' ? 'text-[#3B82F6] bg-white/10' : 'text-gray-300'
+                      <button
+                        onClick={() => {
+                          if (positionFilters.includes('QB')) {
+                            const newFilters = positionFilters.filter(p => p !== 'QB');
+                            // If removing QB would leave no filters, default to ALL
+                            setPositionFilters(newFilters.length > 0 ? newFilters : ['ALL']);
+                          } else {
+                            setPositionFilters([...positionFilters.filter(p => p !== 'ALL'), 'QB']);
+                          }
+                        }}
+                      className={`px-4 py-2 rounded font-bold text-sm text-white ${
+                          !positionFilters.includes('QB') ? 'hover:bg-white/20' : ''
                         }`}
-                        title="Click to sort by Rankings"
+                        style={{ 
+                          backgroundColor: positionFilters.includes('QB') ? POSITION_COLORS.QB.primary : POSITION_COLORS.QB.rgba,
+                          borderColor: positionFilters.includes('QB') ? POSITION_COLORS.QB.primary : 'transparent', 
+                          borderWidth: '1px',
+                         width: '80px',
+                          minHeight: '32px'
+                        }}
                       >
-                        Rank {sortBy === 'rankings' && '↓'}
+                        QB
                       </button>
-                      <div className="w-32 text-center text-gray-300">Name</div>
-                      <div className="w-12 text-center text-gray-300">Pos</div>
-                      <div className="w-16 text-center text-gray-300">Team</div>
-                      <div className="w-12 text-center text-gray-300">Bye</div>
-                      <div className="flex-1"></div>
-                    </div>
-                    <div className="w-32 text-center">Actions</div>
+                      <button
+                        onClick={() => {
+                          if (positionFilters.includes('RB')) {
+                            const newFilters = positionFilters.filter(p => p !== 'RB');
+                            // If removing RB would leave no filters, default to ALL
+                            setPositionFilters(newFilters.length > 0 ? newFilters : ['ALL']);
+                          } else {
+                            setPositionFilters([...positionFilters.filter(p => p !== 'ALL'), 'RB']);
+                          }
+                        }}
+                      className={`px-4 py-2 rounded font-bold text-sm text-white ${
+                          !positionFilters.includes('RB') ? 'hover:bg-white/20' : ''
+                        }`}
+                        style={{ 
+                          backgroundColor: positionFilters.includes('RB') ? POSITION_COLORS.RB.primary : POSITION_COLORS.RB.rgba,
+                          borderColor: positionFilters.includes('RB') ? POSITION_COLORS.RB.primary : 'transparent', 
+                          borderWidth: '1px',
+                         width: '80px',
+                          minHeight: '32px'
+                        }}
+                      >
+                        RB
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (positionFilters.includes('WR')) {
+                            const newFilters = positionFilters.filter(p => p !== 'WR');
+                            // If removing WR would leave no filters, default to ALL
+                            setPositionFilters(newFilters.length > 0 ? newFilters : ['ALL']);
+                          } else {
+                            setPositionFilters([...positionFilters.filter(p => p !== 'ALL'), 'WR']);
+                          }
+                        }}
+                      className={`px-4 py-2 rounded font-bold text-sm text-white ${
+                          !positionFilters.includes('WR') ? 'hover:bg-white/20' : ''
+                        }`}
+                        style={{ 
+                          backgroundColor: positionFilters.includes('WR') ? POSITION_COLORS.WR.primary : POSITION_COLORS.WR.rgba,
+                          borderColor: positionFilters.includes('WR') ? POSITION_COLORS.WR.primary : 'transparent', 
+                          borderWidth: '1px',
+                         width: '80px',
+                          minHeight: '32px'
+                        }}
+                      >
+                        WR
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (positionFilters.includes('TE')) {
+                            const newFilters = positionFilters.filter(p => p !== 'TE');
+                            // If removing TE would leave no filters, default to ALL
+                            setPositionFilters(newFilters.length > 0 ? newFilters : ['ALL']);
+                          } else {
+                            setPositionFilters([...positionFilters.filter(p => p !== 'ALL'), 'TE']);
+                          }
+                        }}
+                      className={`px-4 py-2 rounded font-bold text-sm text-white ${
+                          !positionFilters.includes('TE') ? 'hover:bg-white/20' : ''
+                        }`}
+                        style={{ 
+                          backgroundColor: positionFilters.includes('TE') ? POSITION_COLORS.TE.primary : POSITION_COLORS.TE.rgba,
+                          borderColor: positionFilters.includes('TE') ? POSITION_COLORS.TE.primary : 'transparent', 
+                          borderWidth: '1px',
+                         width: '80px',
+                          minHeight: '32px'
+                        }}
+                      >
+                        TE
+                      </button>
                   </div>
-                  
-                  {finalFilteredPlayers.map(player => {
+                </div>
+              </div>
+
+              {/* All buttons positioned at same height */}
+              <div className="flex mb-2">
+                <div style={{ marginLeft: '15px' }}>
+                  <button 
+                    className="px-0 py-0 rounded font-bold text-base text-white hover:bg-white/20 transition-colors" 
+                    style={{ width: '40px', minHeight: '32px' }}
+                    onClick={() => {
+                      if (sortBy === 'adp') {
+                        setAdpSortDirection(adpSortDirection === 'asc' ? 'desc' : 'asc');
+                      } else {
+                        setSortBy('adp');
+                        setAdpSortDirection('asc');
+                      }
+                    }}
+                  >
+                    ADP
+                  </button>
+                </div>
+
+                <div style={{ marginLeft: '30px' }}>
+                  <button 
+                    className="px-0 py-0 rounded font-bold text-base text-white hover:bg-white/20 transition-colors" 
+                    style={{ width: '40px', minHeight: '32px', color: customRankings.length > 0 ? 'white' : 'transparent' }}
+                    onClick={() => {
+                      if (sortBy === 'rankings') {
+                        setRankingSortDirection(rankingSortDirection === 'asc' ? 'desc' : 'asc');
+                      } else {
+                        setSortBy('rankings');
+                        setRankingSortDirection('asc');
+                      }
+                    }}
+                  >
+                    Rank
+                  </button>
+                </div>
+
+
+              </div>
+
+              {/* Single Column Player List */}
+              <div className="flex-1 overflow-y-auto custom-scrollbar">
+                <div className="space-y-1.5" style={{ marginTop: '8px' }}>
+                  {filteredPlayers.filter(player => player && typeof player === 'object' && typeof player.name === 'string').map((player, index) => {
                     const canDraft = canDraftPlayer(player.name);
                     const playerData = PLAYER_POOL.find(p => p.name === player.name);
                     const currentCount = picks.filter(pick => pick.user === userName)
@@ -2244,46 +3083,204 @@ export default function DraftRoom() {
                       .filter(p => p?.position === playerData?.position).length;
                     const limit = POSITIONAL_LIMITS[playerData?.position];
                     
+                    // Get position color
+                    // Uses outer getPositionColor with centralized POSITION_COLORS
+                    const positionColor = getPositionColor(playerData?.position);
+                    
+                    // Create gradient with 1% every 0.2px - split into two elements
+                    const createGradient = (startColor, endColor) => {
+                      const gradientStops = [];
+                      gradientStops.push(`${startColor} 0px`);
+                      gradientStops.push(`${startColor} 1px`);
+                      
+                      // Add color stops for each 0.2px from 1px to 148.5px (10% wider)
+                      for (let i = 1; i <= 742; i++) {
+                        const percent = i / 742; // 1% per stop (742 stops = 0.2px each)
+                        const r1 = parseInt(startColor.slice(1, 3), 16);
+                        const g1 = parseInt(startColor.slice(3, 5), 16);
+                        const b1 = parseInt(startColor.slice(5, 7), 16);
+                        
+                        // End color is #1f2833
+                        const r2 = 0x3B;
+                        const g2 = 0x43;
+                        const b2 = 0x4D;
+                        
+                        const r = Math.round(r1 + (r2 - r1) * percent);
+                        const g = Math.round(g1 + (g2 - g1) * percent);
+                        const b = Math.round(b1 + (b2 - b1) * percent);
+                        
+                        const color = `rgb(${r}, ${g}, ${b})`;
+                        gradientStops.push(`${color} ${i * 0.2 + 1}px`);
+                      }
+                      
+                      return `linear-gradient(to right, ${gradientStops.join(', ')})`;
+                    };
+                    
+                    // Create separate gradients for first 128px and last 32px (20% faster)
+                    const createFirstGradient = (startColor, endColor) => {
+                      const gradientStops = [];
+                      gradientStops.push(`${startColor} 0px`);
+                      gradientStops.push(`${startColor} 1px`);
+                      
+                      // Add color stops for each 0.2px from 1px to 179.3px (20% wider than original)
+                      for (let i = 1; i <= 892; i++) {
+                        const percent = i / 892; // 1% per stop (892 stops = 0.2px each)
+                        const r1 = parseInt(startColor.slice(1, 3), 16);
+                        const g1 = parseInt(startColor.slice(3, 5), 16);
+                        const b1 = parseInt(startColor.slice(5, 7), 16);
+                        
+                        // Use the provided end color
+                        const r2 = parseInt(endColor.slice(1, 3), 16);
+                        const g2 = parseInt(endColor.slice(3, 5), 16);
+                        const b2 = parseInt(endColor.slice(5, 7), 16);
+                        
+                        const r = Math.round(r1 + (r2 - r1) * percent);
+                        const g = Math.round(g1 + (g2 - g1) * percent);
+                        const b = Math.round(b1 + (b2 - b1) * percent);
+                        
+                        const color = `rgb(${r}, ${g}, ${b})`;
+                        gradientStops.push(`${color} ${i * 0.2 + 1}px`);
+                      }
+                      
+                      return `linear-gradient(to right, ${gradientStops.join(', ')})`;
+                    };
+                    
+                    const createSecondGradient = (startColor, endColor) => {
+                      const gradientStops = [];
+                      
+                      // Calculate the exact color at 135px (where first gradient ends)
+                      const r1 = parseInt(startColor.slice(1, 3), 16);
+                      const g1 = parseInt(startColor.slice(3, 5), 16);
+                      const b1 = parseInt(startColor.slice(5, 7), 16);
+                      const r2 = 0x3B;
+                      const g2 = 0x43;
+                      const b2 = 0x4D;
+                      
+                      // At 135px, we're 80% through the total 169px gradient
+                      const startPercent = 0.8;
+                      const startR = Math.round(r1 + (r2 - r1) * startPercent);
+                      const startG = Math.round(g1 + (g2 - g1) * startPercent);
+                      const startB = Math.round(b1 + (b2 - b1) * startPercent);
+                      const startColorRGB = `rgb(${startR}, ${startG}, ${startB})`;
+                      
+                      gradientStops.push(`${startColorRGB} 0px`);
+                      
+                      // Add color stops for each 0.2px from 0px to 40px
+                      // This should complete the remaining 20% of the transition
+                      for (let i = 1; i <= 200; i++) {
+                        const localPercent = i / 200; // 0 to 1 within this 40px segment
+                        const globalPercent = startPercent + localPercent * 0.2; // 80% to 100%
+                        
+                        const r = Math.round(r1 + (r2 - r1) * globalPercent);
+                        const g = Math.round(g1 + (g2 - g1) * globalPercent);
+                        const b = Math.round(b1 + (b2 - b1) * globalPercent);
+                        
+                        const color = `rgb(${r}, ${g}, ${b})`;
+                        gradientStops.push(`${color} ${i * 0.2}px`);
+                      }
+                      
+                      return `linear-gradient(to right, ${gradientStops.join(', ')})`;
+                    };
+                    
+                    const positionEndColor = getPositionEndColor(playerData?.position);
+                    const firstGradientBackground = createFirstGradient(positionColor, positionEndColor);
+                    const secondGradientBackground = createSecondGradient(positionColor, '#1f2833');
+                    
                     return (
-                      <div key={player.name} className={`flex items-center justify-between rounded p-3 transition-colors ${
-                        canDraft ? 'bg-white/5 hover:bg-white/10' : 'bg-red-500/20 opacity-60'
-                      }`}>
-                        <div className="flex items-center gap-3 flex-1">
-                          <div className="w-16 text-center text-xs font-bold text-[#3B82F6]">
-                            {player.adp || 'N/A'}
+                      <div 
+                        key={`available-${player.name}`}
+                        className={`flex items-center justify-between rounded p-2.5 transition-colors player-row ${
+                          canDraft ? 'hover:bg-white/10' : 'bg-red-500/20 opacity-60'
+                        } position-${playerData?.position?.toLowerCase() || 'unknown'}`}
+                        style={{ 
+                          position: 'relative',
+                          overflow: 'hidden',
+                          border: '1px solid transparent',
+                          transition: 'border-color 0.2s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                          if (canDraft) {
+                            e.currentTarget.style.borderColor = positionColor;
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.borderColor = 'transparent';
+                        }}
+                                              >
+                        {/* Position color gradient overlay - No width limit */}
+                        <div 
+                          style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            height: '100%',
+                            background: firstGradientBackground,
+                            zIndex: 1,
+                            pointerEvents: 'none'
+                          }}
+                        />
+                        
+                        <div className="flex items-center flex-1" style={{ position: 'relative', zIndex: 2 }}>
+                          <div className="w-16 text-center font-bold flex items-center justify-center font-mono text-sm text-white" style={{ height: '100%', margin: '-20px -12px -20px -8px', padding: '0' }}>
+                            {formatADP(playerData?.adp)}
                           </div>
-                          <div className="w-16 text-center text-xs font-bold text-[#3B82F6]">
-                            {rankings.indexOf(player.name) !== -1 ? `#${rankings.indexOf(player.name) + 1}` : 'N/A'}
+
+                          {/* Vertical divider line */}
+                          <div className="w-1" style={{ 
+                            height: '130%', 
+                            position: 'absolute', 
+                            left: '61px', 
+                            top: '-15%', 
+                            zIndex: 100,
+                            backgroundColor: positionColor
+                          }}></div>
+
+                          <div className="w-10 text-center font-bold flex items-center justify-center font-mono text-sm text-white" style={{ height: '100%', margin: '-20px -12px -20px 30px', padding: '0' }}>
+                            <span style={{ color: customRankings.length > 0 ? 'white' : 'transparent', transform: 'translateX(1px)' }}>
+                            {getCustomPlayerRanking(player.name, customRankings)}
+                            </span>
                           </div>
-                          <div className="w-32 text-center text-white font-medium text-sm">
-                            <div className="truncate overflow-hidden text-ellipsis whitespace-nowrap" title={player.name}>
+
+                          <div className="flex-1">
+                            <div 
+                              className="font-bold text-white text-left cursor-pointer transition-colors" 
+                              style={{ marginBottom: '1px', paddingLeft: '57px' }}
+                              onClick={() => openPlayerModal(player)}
+                            >
                               {player.name}
                             </div>
                           </div>
-                          <div className="w-12 text-center text-white text-sm">
-                            {player.position}
-                          </div>
-                          <div className="w-16 text-center text-white text-sm">
-                            {player.team}
-                          </div>
-                          <div className="w-12 text-center text-white text-sm">
-                            {player.bye}
-                          </div>
-                          {!canDraft && (
-                            <div className="text-red-400 text-xs">
-                              ({currentCount}/{limit})
+
+
+
+                          <div className="text-sm text-gray-300" style={{ width: '120px', marginRight: '18px' }}>
+                            <div className="flex items-center justify-between">
+                              <span>{player.position}</span>
+                              <span>•</span>
+                              <span>{player.team || 'FA'}</span>
+                              <span>•</span>
+                              <span>Bye <span style={{ transform: 'translateX(-4px)' }}>{player.bye}</span></span>
                             </div>
-                          )}
+                            {!canDraft && (
+                              <div className="text-red-400 text-center">
+                                ({currentCount}/{limit} {player.position}s)
+                              </div>
+                            )}
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2 w-32 justify-center">
+                        <div className="flex items-center gap-1.5 w-40 justify-center" style={{ position: 'relative', zIndex: 2 }}>
                           <button
-                            className={`px-3 py-1 rounded font-bold transition-colors text-sm ${
+                            className={`w-24 h-9 px-2 py-1 rounded font-bold transition-colors text-sm ${
                               canDraft && isDraftActive
-                                ? 'bg-green-500 text-white hover:bg-green-600 disabled:opacity-50'
+                                ? 'text-[#000F55] hover:bg-yellow-400 disabled:opacity-50' 
                                 : canDraft && !isDraftActive
-                                ? 'bg-yellow-500 text-[#000F55] hover:bg-yellow-400'
+                                ? 'bg-yellow-500 text-[#000F55] hover:bg-yellow-400 opacity-50'
                                 : 'bg-gray-500 text-gray-300 cursor-not-allowed'
                             }`}
+                            style={{
+                              backgroundColor: canDraft && isDraftActive ? 'rgba(251, 191, 36, 0.7)' : undefined
+                            }}
                             disabled={!isMyTurn || pickLoading || !canDraft || !isDraftActive}
                             onClick={() => canDraft && isDraftActive ? makePick(player.name) : null}
                             title={
@@ -2294,22 +3291,31 @@ export default function DraftRoom() {
                                 : 'Draft this player'
                             }
                           >
-                            {canDraft && isDraftActive ? 'Draft' : canDraft && !isDraftActive ? 'Ready' : 'Limit'}
+                            {canDraft && isDraftActive ? 'Draft' : canDraft && !isDraftActive ? 'Draft' : 'Limit'}
                           </button>
                           {queue.find(q => q.name === player.name) ? (
                             <button 
                               onClick={() => removeFromQueue(player)} 
-                              className="px-2 py-1 rounded bg-red-500 text-white text-xs font-bold hover:bg-red-600 transition-colors"
+                              className="w-24 h-9 px-2 py-1 rounded bg-red-500 text-white text-sm font-bold hover:bg-red-600"
+                              style={{ 
+                                border: '1px solid rgba(255, 255, 255, 0.1)',
+                                opacity: 0.6
+                              }}
                             >
                               Remove
                             </button>
                           ) : (
-                            <button 
-                              onClick={() => addToQueue(player)} 
-                              className="px-2 py-1 rounded bg-[#c4b5fd] text-gray-900 text-xs font-bold hover:bg-[#a78bfa] transition-colors"
-                            >
-                              Queue
-                            </button>
+                                                          <button 
+                                onClick={() => addToQueue(player)} 
+                                className="w-24 h-9 px-2 py-1 rounded text-white text-sm font-bold hover:bg-[#60A5FA]"
+                                style={{ 
+                                  backgroundColor: 'rgba(128, 128, 128, 0.7)',
+                                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                                  opacity: 0.8
+                                }}
+                              >
+                                Queue
+                              </button>
                           )}
                         </div>
                       </div>
@@ -2321,239 +3327,467 @@ export default function DraftRoom() {
           )}
         </div>
 
-        {/* Team Roster Container */}
-                  <div className="w-80 bg-white/10 p-4 pr-6 z-30 flex flex-col overflow-y-auto pt-4 -ml-4 mr-4 mb-2">
-          {/* Team Selection Dropdown */}
-          <div className="mb-4 team-dropdown">
-            <div className="relative">
-              <button
-                onClick={() => setShowTeamDropdown(!showTeamDropdown)}
-                className="w-full flex items-center justify-between bg-white/10 rounded p-3 text-left hover:bg-white/20 transition-colors"
-              >
-                <div>
-                  <h2 className="text-xl font-bold" style={{ color: '#3B82F6' }}>
-                    {selectedTeam === userName ? 'Your Team' : selectedTeam}
-                  </h2>
-                  <div className="text-sm text-gray-300">
-                    {currentTeamRoster.length === 0 ? 'My Team' : ''}
+        {/* Right Sidebar: Team Roster */}
+        <div style={{ 
+          position: 'absolute',
+          top: '0px',
+          left: '1115.5px',
+          paddingLeft: '0px', 
+          paddingRight: '0px', 
+          paddingBottom: '24px' 
+        }}>
+          <div className="bg-white/10 z-30 flex flex-col custom-scrollbar team-roster flex-shrink-0 rounded-lg" style={{ width: '272px', height: '1081px', padding: '18px' }}>
+            {/* Team Selection Dropdown */}
+            <div className="mb-4 team-dropdown" style={{ marginTop: '0px', marginBottom: '4px' }}>
+              <div className="relative">
+                <button
+                  onClick={() => setShowTeamDropdown(!showTeamDropdown)}
+                  className="w-full flex items-center justify-between bg-white/10 rounded px-3 py-2 text-left hover:bg-white/20 transition-colors"
+                  style={{ height: '39px', minHeight: '39px' }}
+                >
+                  <div>
+                    <h2 className="font-bold" style={{ color: 'white', fontSize: '16px' }}>
+                      {selectedTeam.replace(/[,\s]/g, '').toUpperCase().substring(0, 18)}
+                    </h2>
+
                   </div>
+                  <div className="text-white text-sm" style={{ fontSize: '16px', transform: 'scaleY(0.8)' }}>▼</div>
+                </button>
+                
+                {showTeamDropdown && (
+                  <div className="absolute top-full left-0 right-0 bg-gray-900 border border-gray-600 rounded mt-1 z-50 max-h-60 overflow-y-auto">
+                    {effectiveDraftOrder.map((team, index) => (
+                      <button
+                        key={team}
+                        onClick={() => {
+                          setSelectedTeam(team);
+                          setShowTeamDropdown(false);
+                        }}
+                        className={`w-full p-3 text-left hover:bg-gray-800 transition-colors ${
+                          selectedTeam === team ? 'bg-[#3c3c3c] text-[#c7c7c7]' : 'text-gray-300'
+                        }`}
+                      >
+                        <div className="font-medium" style={{ fontSize: '20px' }}>{team.replace(/[,\s]/g, '').toUpperCase().substring(0, 18)}</div>
+                        <div className="text-xs opacity-75">
+                          
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            {/* Positional Count Display - Shows selected team's picks */}
+            <div className="mb-2 p-2 bg-white/5 rounded" style={{ border: '1px solid rgba(128, 128, 128, 0.6)', marginTop: '4px', marginBottom: '12px' }}>
+              <div className="flex justify-between text-sm">
+                <div className="flex items-center gap-1">
+                  <span className="font-bold" style={{ color: POSITION_COLORS.QB.primary }}>QB:</span>
+                  <span className="text-white">{currentTeamRosterGrouped.QB?.length || 0}</span>
                 </div>
-                <div className="text-white">▼</div>
-              </button>
-              
-              {showTeamDropdown && (
-                <div className="absolute top-full left-0 right-0 bg-[#000F55] border border-white/20 rounded mt-1 z-50 max-h-60 overflow-y-auto">
-                  {effectiveDraftOrder.map((team, index) => (
-                    <button
-                      key={team}
-                      onClick={() => {
-                        setSelectedTeam(team);
-                        setShowTeamDropdown(false);
+                <div className="flex items-center gap-1">
+                  <span className="font-bold" style={{ color: POSITION_COLORS.RB.primary }}>RB:</span>
+                  <span className="text-white">{currentTeamRosterGrouped.RB?.length || 0}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="font-bold" style={{ color: POSITION_COLORS.WR.primary }}>WR:</span>
+                  <span className="text-white">{currentTeamRosterGrouped.WR?.length || 0}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="font-bold" style={{ color: POSITION_COLORS.TE.primary }}>TE:</span>
+                  <span className="text-white">{currentTeamRosterGrouped.TE?.length || 0}</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Starting Lineup Section */}
+            <div className="mb-6" style={{ marginTop: '4px', marginBottom: '4px' }}>
+              <div>
+                {/* QB Spot */}
+                {currentTeamStartingLineup.QB?.slice(0, 1).map((player, idx) => {
+                  const { firstGradient } = createPickedPlayerGradient('QB');
+                  return (
+                    <div key={player.name} className="text-sm rounded team-roster-section relative overflow-hidden" style={{ 
+                    marginBottom: '4px', 
+                    padding: '0px',
+                    height: '45px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    border: '1px solid rgba(128, 128, 128, 0.4)',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
+                      {/* Position color gradient overlay */}
+                      <div 
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          height: '100%',
+                          background: firstGradient,
+                          zIndex: 1,
+                          pointerEvents: 'none'
+                        }}
+                      />
+                      <div className="flex justify-between items-center w-full" style={{ position: 'relative', zIndex: 2 }}>
+                      <div className="font-bold text-white text-base flex-1 cursor-pointer hover:text-gray-300 transition-colors" style={{ paddingLeft: '32px', whiteSpace: 'normal', overflow: 'visible', wordWrap: 'break-word' }} onClick={() => openPlayerModal(player)}>{player.name}</div>
+                      <div className="text-sm text-gray-300" style={{ marginRight: '8px' }}>
+                        {player.bye}
+                      </div>
+                    </div>
+                  </div>
+                  );
+                })}
+                {(!currentTeamStartingLineup.QB || currentTeamStartingLineup.QB.length === 0) && (
+                  <div className="flex items-center" style={{ marginBottom: '4px' }}>
+                    <div className="text-sm rounded w-full relative overflow-hidden" style={{ 
+                      padding: '0px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                      border: '1px solid rgba(128, 128, 128, 0.4)',
+                      height: '45px',
+                      width: '100%',
+                      position: 'relative',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'flex-end'
+                    }}>
+                      <div className="text-gray-500 italic text-right" style={{ position: 'relative', zIndex: 2, paddingRight: '10px' }}>Empty QB Spot</div>
+                    </div>
+                  </div>
+                )}
+                
+                {/* RB Spots */}
+                {currentTeamStartingLineup.RB?.slice(0, 2).map((player, idx) => {
+                  const { firstGradient } = createPickedPlayerGradient('RB');
+                  return (
+                    <div key={player.name} className="text-sm rounded team-roster-section relative overflow-hidden" style={{ 
+                    marginBottom: '4px', 
+                    padding: '0px',
+                    height: '45px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    border: '1px solid rgba(128, 128, 128, 0.4)',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
+                      {/* Position color gradient overlay */}
+                      <div 
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          height: '100%',
+                          background: firstGradient,
+                          zIndex: 1,
+                          pointerEvents: 'none'
+                        }}
+                      />
+                      <div className="flex justify-between items-center w-full" style={{ position: 'relative', zIndex: 2 }}>
+                      <div className="font-bold text-white text-base flex-1 cursor-pointer hover:text-gray-300 transition-colors" style={{ paddingLeft: '32px', whiteSpace: 'normal', overflow: 'visible', wordWrap: 'break-word' }} onClick={() => openPlayerModal(player)}>{player.name}</div>
+                      <div className="text-sm text-gray-300" style={{ marginRight: '8px' }}>
+                        {player.bye}
+                      </div>
+                    </div>
+                  </div>
+                  );
+                })}
+                {Array.from({ length: Math.max(0, 2 - (currentTeamStartingLineup.RB?.slice(0, 2).length || 0)) }, (_, i) => (
+                  <div key={`rb-empty-${i}`} className="flex items-center" style={{ marginBottom: '4px' }}>
+                    <div className="text-sm rounded w-full relative overflow-hidden" style={{ 
+                      padding: '0px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                      border: '1px solid rgba(128, 128, 128, 0.4)',
+                      height: '45px',
+                      width: '100%',
+                      position: 'relative',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'flex-end'
+                    }}>
+                      <div className="text-gray-500 italic text-right" style={{ position: 'relative', zIndex: 2, paddingRight: '10px' }}>Empty RB Spot</div>
+                    </div>
+                  </div>
+                ))}
+                
+                {/* WR Spots */}
+                {currentTeamStartingLineup.WR?.slice(0, 3).map((player, idx) => {
+                  const { firstGradient } = createPickedPlayerGradient('WR');
+                  return (
+                    <div key={player.name} className="text-sm rounded team-roster-section relative overflow-hidden" style={{ 
+                    marginBottom: '4px', 
+                    padding: '0px',
+                    height: '45px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    border: '1px solid rgba(128, 128, 128, 0.4)',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
+                      {/* Position color gradient overlay */}
+                      <div 
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          height: '100%',
+                          background: firstGradient,
+                          zIndex: 1,
+                          pointerEvents: 'none'
+                        }}
+                      />
+                                            <div className="flex justify-between items-center w-full" style={{ position: 'relative', zIndex: 2 }}>
+                      <div className="font-bold text-white text-base flex-1 cursor-pointer hover:text-gray-300 transition-colors" style={{ paddingLeft: '32px', whiteSpace: 'normal', overflow: 'visible', wordWrap: 'break-word' }} onClick={() => openPlayerModal(player)}>{player.name}</div>
+                      <div className="text-sm text-gray-300" style={{ marginRight: '8px' }}>
+                        {player.bye}
+                      </div>
+                    </div>
+                  </div>
+                  );
+                })}
+                {Array.from({ length: Math.max(0, 3 - (currentTeamStartingLineup.WR?.slice(0, 3).length || 0)) }, (_, i) => (
+                  <div key={`wr-empty-${i}`} className="flex items-center" style={{ marginBottom: '4px' }}>
+                    <div className="text-sm rounded w-full relative overflow-hidden" style={{ 
+                      padding: '0px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                      border: '1px solid rgba(128, 128, 128, 0.4)',
+                      height: '45px',
+                      width: '100%',
+                      position: 'relative',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'flex-end'
+                    }}>
+                      <div className="text-gray-500 italic text-right" style={{ position: 'relative', zIndex: 2, paddingRight: '10px' }}>Empty WR Spot</div>
+                    </div>
+                  </div>
+                ))}
+                
+                {/* TE Spot */}
+                {currentTeamStartingLineup.TE?.slice(0, 1).map((player, idx) => {
+                  const { firstGradient } = createPickedPlayerGradient('TE');
+                  return (
+                    <div key={player.name} className="text-sm rounded team-roster-section relative overflow-hidden" style={{ 
+                    marginBottom: '4px', 
+                    padding: '0px',
+                    height: '45px',
+                    border: '1px solid rgba(128, 128, 128, 0.4)',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
+                      {/* Position color gradient overlay */}
+                      <div 
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          height: '100%',
+                          background: firstGradient,
+                          zIndex: 1,
+                          pointerEvents: 'none'
+                        }}
+                      />
+                      <div className="flex justify-between items-center w-full" style={{ position: 'relative', zIndex: 2 }}>
+                      <div className="font-bold text-white text-base flex-1 cursor-pointer hover:text-gray-300 transition-colors" style={{ paddingLeft: '32px', whiteSpace: 'normal', overflow: 'visible', wordWrap: 'break-word' }} onClick={() => openPlayerModal(player)}>{player.name}</div>
+                      <div className="text-sm text-gray-300 w-24 text-right" style={{ marginRight: '8px' }}>
+                        {player.bye}
+                      </div>
+                    </div>
+                  </div>
+                  );
+                })}
+                {(!currentTeamStartingLineup.TE || currentTeamStartingLineup.TE.length === 0) && (
+                  <div className="flex items-center" style={{ marginBottom: '4px' }}>
+                    <div className="text-sm rounded p-1 w-full relative overflow-hidden" style={{ 
+                      border: '1px solid rgba(128, 128, 128, 0.4)',
+                      height: '45px',
+                      width: '100%',
+                      position: 'relative',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'flex-end'
+                    }}>
+                      <div className="text-gray-500 italic text-right" style={{ position: 'relative', zIndex: 2, paddingRight: '10px' }}>Empty TE Spot</div>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Flex Spots */}
+                {currentTeamStartingLineup.FLEX?.slice(0, 2).map((player, idx) => (
+                  <div key={player.name} className="text-sm rounded team-roster-section relative overflow-hidden" style={{ 
+                    marginBottom: '4px', 
+                    padding: '0px',
+                    height: '45px',
+                    border: '1px solid rgba(128, 128, 128, 0.4)',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
+                    {/* Position color gradient overlay - Use three separate sections with 60% completion */}
+                    <div 
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0, // Full width
+                        height: '100%',
+                        zIndex: 1,
+                        pointerEvents: 'none',
+                        display: 'flex',
+                        flexDirection: 'column'
                       }}
-                      className={`w-full p-3 text-left hover:bg-white/10 transition-colors ${
-                        selectedTeam === team ? 'bg-[#60A5FA] text-[#000F55]' : 'text-white'
-                      }`}
                     >
-                      <div className="font-medium">{team === userName ? 'Your Team' : team}</div>
-                      <div className="text-xs opacity-75">
-                        
+                      {/* Top section (33.33%) - RB gradient at 60% completion */}
+                      <div style={{
+                        height: '33.33%',
+                        background: createPickedPlayerGradient('RB').firstGradient
+                      }}></div>
+                      
+                      {/* Middle section (33.33%) - WR gradient at 60% completion */}
+                      <div style={{
+                        height: '33.33%',
+                        background: createPickedPlayerGradient('WR').firstGradient
+                      }}></div>
+                      
+                      {/* Bottom section (33.33%) - TE gradient at 60% completion */}
+                      <div style={{
+                        height: '33.33%',
+                        background: createPickedPlayerGradient('TE').firstGradient
+                      }}></div>
+                    </div>
+                    <div className="flex justify-between items-center w-full" style={{ position: 'relative', zIndex: 2 }}>
+                      <div className="font-bold text-white text-base flex-1 cursor-pointer hover:text-gray-300 transition-colors" style={{ paddingLeft: '32px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} onClick={() => openPlayerModal(player)}>{player.name}</div>
+                      <div className="text-sm text-gray-300 w-16 text-right" style={{ marginRight: '8px' }}>
+                        {player.bye}
                       </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-          
-          {/* Positional Count Display */}
-          <div className="mb-4 p-3 bg-white/5 rounded">
-            <div className="flex justify-between text-xs">
-              <div className="flex items-center gap-1">
-                <span className="text-[#3B82F6] font-bold">QB:</span> {currentTeamRosterGrouped.QB?.length || 0} &nbsp;
-                <span className="text-[#3B82F6] font-bold">RB:</span> {currentTeamRosterGrouped.RB?.length || 0} &nbsp;
-                <span className="text-[#3B82F6] font-bold">WR:</span> {currentTeamRosterGrouped.WR?.length || 0} &nbsp;
-                <span className="text-[#3B82F6] font-bold">TE:</span> {currentTeamRosterGrouped.TE?.length || 0}
-              </div>
-            </div>
-          </div>
-          
-          {/* Starting Lineup Section */}
-          <div className="mb-6">
-            <div className="space-y-3">
-              {/* QB - 1 spot */}
-              <div>
-                <h4 className="font-bold text-sm mb-1" style={{ color: '#3B82F6' }}>
-                  QB
-                </h4>
-                <div className="space-y-1">
-                  {currentTeamStartingLineup.QB?.slice(0, 1).map((player, idx) => (
-                    <div key={player.name} className="text-sm bg-white/5 rounded p-2">
-                      <div className="font-medium">{player.name}</div>
-                      <div className="text-xs text-gray-300">
-                        {player.team} • Bye {player.bye} • ADP {player.adp}
-                      </div>
-                    </div>
-                  ))}
-                  {(!currentTeamStartingLineup.QB || currentTeamStartingLineup.QB.length === 0) && (
-                    <div className="text-sm bg-white/5 rounded p-2 border border-dashed border-gray-600">
-                      <div className="text-gray-500 italic">Empty QB Spot</div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* RB - 2 spots */}
-              <div>
-                <h4 className="font-bold text-sm mb-1" style={{ color: '#3B82F6' }}>
-                  RB
-                </h4>
-                <div className="space-y-1">
-                  {currentTeamStartingLineup.RB?.slice(0, 2).map((player, idx) => (
-                    <div key={player.name} className="text-sm bg-white/5 rounded p-2">
-                      <div className="font-medium">{player.name}</div>
-                      <div className="text-xs text-gray-300">
-                        {player.team} • Bye {player.bye} • ADP {player.adp}
-                      </div>
-                    </div>
-                  ))}
-                  {Array.from({ length: Math.max(0, 2 - (currentTeamStartingLineup.RB?.slice(0, 2).length || 0)) }, (_, i) => (
-                    <div key={`rb-starter-empty-${i}`} className="text-sm bg-white/5 rounded p-2 border border-dashed border-gray-600">
-                      <div className="text-gray-500 italic">Empty RB Spot</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* WR - 3 spots */}
-              <div>
-                <h4 className="font-bold text-sm mb-1" style={{ color: '#3B82F6' }}>
-                  WR
-                </h4>
-                <div className="space-y-1">
-                  {currentTeamStartingLineup.WR?.slice(0, 3).map((player, idx) => (
-                    <div key={player.name} className="text-sm bg-white/5 rounded p-2">
-                      <div className="font-medium">{player.name}</div>
-                      <div className="text-xs text-gray-300">
-                        {player.team} • Bye {player.bye} • ADP {player.adp}
-                      </div>
-                    </div>
-                  ))}
-                  {Array.from({ length: Math.max(0, 3 - (currentTeamStartingLineup.WR?.slice(0, 3).length || 0)) }, (_, i) => (
-                    <div key={`wr-starter-empty-${i}`} className="text-sm bg-white/5 rounded p-2 border border-dashed border-gray-600">
-                      <div className="text-gray-500 italic">Empty WR Spot</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* TE - 1 spot */}
-              <div>
-                <h4 className="font-bold text-sm mb-1" style={{ color: '#3B82F6' }}>
-                  TE
-                </h4>
-                <div className="space-y-1">
-                  {currentTeamStartingLineup.TE?.slice(0, 1).map((player, idx) => (
-                    <div key={player.name} className="text-sm bg-white/5 rounded p-2">
-                      <div className="font-medium">{player.name}</div>
-                      <div className="text-xs text-gray-300">
-                        {player.team} • Bye {player.bye} • ADP {player.adp}
-                      </div>
-                    </div>
-                  ))}
-                  {(!currentTeamStartingLineup.TE || currentTeamStartingLineup.TE.length === 0) && (
-                    <div className="text-sm bg-white/5 rounded p-2 border border-dashed border-gray-600">
-                      <div className="text-gray-500 italic">Empty TE Spot</div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* FLEX - 2 spots */}
-              <div>
-                <h4 className="font-bold text-sm mb-1" style={{ color: '#3B82F6' }}>
-                  FLEX
-                </h4>
-                <div className="space-y-1">
-                  {currentTeamStartingLineup.FLEX?.slice(0, 2).map((player, idx) => (
-                    <div key={player.name} className="text-sm bg-white/5 rounded p-2">
-                      <div className="font-medium">{player.name}</div>
-                      <div className="text-xs text-gray-300">
-                        {player.team} • Bye {player.bye} • ADP {player.adp}
-                      </div>
-                    </div>
-                  ))}
-                  {Array.from({ length: Math.max(0, 2 - (currentTeamStartingLineup.FLEX?.slice(0, 2).length || 0)) }, (_, i) => (
-                    <div key={`flex-starter-empty-${i}`} className="text-sm bg-white/5 rounded p-2 border border-dashed border-gray-600">
-                      <div className="text-gray-500 italic">Empty FLEX Spot</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Bench Section */}
-          <div>
-            <h3 className="font-bold text-lg mb-3" style={{ color: '#c4b5fd' }}>Bench</h3>
-            <div className="space-y-1">
-              {/* Show all bench players organized by draft order */}
-              {(() => {
-                // Get all players in draft order for selected team
-                const teamPicks = picks.filter(pick => pick.user === selectedTeam);
-                
-                // Get starting lineup players to exclude from bench
-                const startingLineupPlayers = new Set();
-                Object.values(currentTeamStartingLineup).forEach(positionPlayers => {
-                  positionPlayers.forEach(player => {
-                    startingLineupPlayers.add(player.name);
-                  });
-                });
-                
-                // Get bench players (players not in starting lineup)
-                const benchPlayers = teamPicks.filter(pick => !startingLineupPlayers.has(pick.player));
-                
-                // Create bench player objects with draft order info
-                const benchPlayerObjects = benchPlayers.map((pick, index) => {
-                  const playerData = PLAYER_POOL.find(p => p.name === pick.player);
-                  return {
-                    name: pick.player,
-                    position: playerData?.position || 'UNK',
-                    team: playerData?.team || 'FA',
-                    bye: playerData?.bye || 0,
-                    adp: playerData?.adp || 999,
-                    draftOrder: teamPicks.indexOf(pick) + 1
-                  };
-                });
-                
-                return benchPlayerObjects.map((player, idx) => (
-                  <div key={player.name} className="text-sm bg-white/5 rounded p-2">
-                    <div className="font-medium">{player.name}</div>
-                    <div className="text-xs text-gray-300">
-                      {player.position} {player.team} • Bye {player.bye} • ADP {player.adp} • Pick #{player.draftOrder}
                     </div>
                   </div>
-                ));
-              })()}
-              
-              {/* Add empty bench spots to fill remaining space */}
-              {(() => {
-                const teamPicks = picks.filter(pick => pick.user === selectedTeam);
-                const startingLineupPlayers = new Set();
-                Object.values(currentTeamStartingLineup).forEach(positionPlayers => {
-                  positionPlayers.forEach(player => {
-                    startingLineupPlayers.add(player.name);
-                  });
-                });
-                const benchPlayers = teamPicks.filter(pick => !startingLineupPlayers.has(pick.player));
-                const totalBenchSpots = 10;
-                const emptySpots = Math.max(0, totalBenchSpots - benchPlayers.length);
-                
-                return Array.from({ length: emptySpots }, (_, i) => (
-                  <div key={`bench-empty-${i}`} className="text-sm bg-white/5 rounded p-2 border border-dashed border-gray-600">
-                    <div className="text-gray-500 italic">Empty Bench Spot</div>
+                ))}
+                                {Array.from({ length: Math.max(0, 2 - (currentTeamStartingLineup.FLEX?.slice(0, 2).length || 0)) }, (_, i) => {
+                  return (
+                  <div key={`flex-empty-${i}`} className="flex items-center" style={{ margin: '0', padding: '0', marginBottom: i === 1 ? '8px' : '4px' }}>
+                      <div className="text-sm rounded team-roster-section w-full" style={{ 
+                        border: '1px solid rgba(128, 128, 128, 0.4)',
+                        height: '45px',
+                        width: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        padding: '0',
+                        margin: '0',
+                        overflow: 'hidden'
+                    }}>
+                      <div className="text-gray-500 italic text-right" style={{ position: 'relative', zIndex: 2, paddingRight: '10px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', height: '100%' }}>Empty Flex Spot</div>
+                    </div>
                   </div>
-                ));
-              })()}
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Horizontal divider between flex and bench */}
+            <div className="w-4/5 h-0.5 bg-gray-600 mx-auto" style={{ 
+              borderTop: '2px solid rgba(255, 255, 255, 0.2)',
+              marginTop: '0px',
+              marginBottom: '4px'
+            }}></div>
+
+            {/* Bench Section */}
+            <div className="flex-1" style={{ marginTop: '4px', marginBottom: '4px' }}>
+              <div>
+                {/* Show all bench players organized by draft order */}
+                {(() => {
+                  // Get all players in draft order for the selected team
+                  const teamPicks = picks.filter(pick => pick.user === selectedTeam);
+                  
+
+                  
+                  // Get starting lineup players to exclude from bench
+                  const startingLineupPlayers = new Set();
+                  Object.values(currentTeamStartingLineup).forEach(positionPlayers => {
+                    positionPlayers.forEach(player => {
+                      startingLineupPlayers.add(player.name);
+                    });
+                  });
+                  
+                  // Get bench players (players not in starting lineup)
+                  const benchPlayers = teamPicks.filter(pick => !startingLineupPlayers.has(pick.player));
+                  
+                  // Create bench player objects with draft order info
+                  const benchPlayerObjects = benchPlayers.map((pick, index) => {
+                    const playerData = PLAYER_POOL.find(p => p.name === pick.player);
+                    return {
+                      name: pick.player,
+                      position: playerData?.position || 'UNK',
+                      team: playerData?.team || 'FA',
+                      bye: playerData?.bye || 0,
+                      adp: playerData?.adp || 999,
+                      draftOrder: teamPicks.indexOf(pick) + 1
+                    };
+                  });
+                  
+                  return benchPlayerObjects.map((player, idx) => (
+                    <div key={player.name} className="text-sm rounded team-roster-section relative overflow-hidden" style={{ 
+                      padding: '4px', 
+                      marginTop: '4px',
+                      marginBottom: '4px',
+                      height: '45px',
+                      minHeight: '45px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                      border: '1px solid rgba(128, 128, 128, 0.4)'
+                    }}>
+                      {/* Position color gradient overlay */}
+                      <div 
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          height: '100%',
+                          background: createPickedPlayerGradient(player.position).firstGradient,
+                          zIndex: 1,
+                          pointerEvents: 'none'
+                        }}
+                      />
+                      <div className="flex justify-between items-center" style={{ position: 'relative', zIndex: 2 }}>
+                        <div className="font-bold text-white text-base cursor-pointer hover:text-gray-300 transition-colors" style={{ paddingLeft: '32px' }} onClick={() => openPlayerModal(player)}>{player.name}</div>
+                                                                      <div className="text-sm text-gray-300 w-24 text-right" style={{ marginRight: '8px' }}>
+                          {player.bye}
+                        </div>
+                      </div>
+                    </div>
+                  ));
+                })()}
+                
+                {/* Add empty bench spots to fill remaining space */}
+                {(() => {
+                  const teamPicks = picks.filter(pick => pick.user === selectedTeam);
+                  const startingLineupPlayers = new Set();
+                  Object.values(currentTeamStartingLineup).forEach(positionPlayers => {
+                    positionPlayers.forEach(player => {
+                      startingLineupPlayers.add(player.name);
+                    });
+                  });
+                  const benchPlayers = teamPicks.filter(pick => !startingLineupPlayers.has(pick.player));
+                  const totalBenchSpots = 10;
+                  const emptySpots = Math.max(0, totalBenchSpots - benchPlayers.length);
+                  
+                  return Array.from({ length: emptySpots }, (_, i) => (
+                    <div key={`bench-empty-${i}`} className="flex items-center" style={{ marginTop: '4px', marginBottom: '4px' }}>
+                      <div className="text-sm rounded p-1 w-full" style={{ 
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                        border: '1px solid rgba(128, 128, 128, 0.4)',
+                        height: '45px',
+                        width: '100%',
+                        position: 'relative',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'flex-end'
+                      }}>
+                        <div className="text-gray-500 italic text-right" style={{ paddingRight: '10px' }}>Empty Bench Spot</div>
+                      </div>
+                    </div>
+                  ));
+                })()}
+              </div>
             </div>
           </div>
         </div>
@@ -2582,19 +3816,32 @@ export default function DraftRoom() {
                 });
               }
             }}
-            className="bg-gradient-to-r from-[#60A5FA] to-[#2DE2C5] text-[#000F55] px-6 py-3 rounded-lg font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+            className="bg-gradient-to-r from-[#60A5FA] to-[#2DE2C5] text-[#000F55] px-6 py-3 rounded-lg font-bold text-lg transition-all duration-200"
           >
             {draftOrder.length === 0 ? 'Randomize & Launch Draft' : 'Launch Draft Now'}
           </button>
         </div>
       )}
 
+      {/* Start Draft Button */}
+      {!isDraftActive && room?.status !== 'waiting' && room?.status !== 'completed' && isRoomOwner && (
+        <div className="fixed bottom-4 right-4 z-50">
+          <button
+            onClick={startDraft}
+            className="bg-gradient-to-r from-[#2DE2C5] to-[#60A5FA] text-[#000F55] px-6 py-3 rounded-lg font-bold text-lg transition-all duration-200"
+            title="Start the draft with a 60-second countdown"
+          >
+            🚀 Start Draft
+          </button>
+        </div>
+      )}
+
       {/* Mock Draft Button */}
-      {room?.status === 'waiting' && (
+      {(
         <div className="fixed bottom-4 right-4 z-50">
           <button
             onClick={startMockDraft}
-            className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-lg font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+            className="bg-black border border-[#60A5FA] text-white px-6 py-3 rounded-lg font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
             title="Start a mock draft with 11 simulated drafters"
           >
             🎯 Mock Draft
@@ -2602,9 +3849,100 @@ export default function DraftRoom() {
         </div>
       )}
 
+      {/* Mock Draft Speed Toggle */}
+      {isDraftActive && mockDraftSpeed && room?.status !== 'completed' && (
+        <div className="fixed bottom-4 right-4 z-50">
+          <button
+            onClick={() => setMockDraftSpeed(!mockDraftSpeed)}
+            className="bg-red-500 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-lg hover:bg-red-600 transition-all"
+            title="Toggle mock draft speed"
+          >
+            {mockDraftSpeed ? '🚀 Speed ON' : '⏸️ Speed OFF'}
+          </button>
+        </div>
+      )}
+
+      {/* Pause/Resume Draft Button */}
+      {isDraftActive && room?.status !== 'completed' && (
+        <div className="fixed bottom-4 left-4 z-50">
+          <button
+            onClick={room?.status === 'paused' ? resumeDraft : pauseDraft}
+            className={`px-6 py-3 rounded-lg font-bold text-lg shadow-lg transition-all ${
+              room?.status === 'paused' 
+                ? 'bg-green-500 text-white hover:bg-green-600' 
+                : 'bg-yellow-500 text-white hover:bg-yellow-600'
+            }`}
+            title={room?.status === 'paused' ? 'Resume draft' : 'Pause draft'}
+            style={{ minWidth: '120px', minHeight: '48px' }}
+          >
+            {room?.status === 'paused' ? '▶️ Resume' : '⏸️ Pause'}
+          </button>
+        </div>
+      )}
+
+
+
+
+
+      {/* Force Pick Button */}
+      {isDraftActive && room?.status !== 'completed' && (
+        <div className="fixed bottom-4 right-48 z-50">
+          <button
+            onClick={() => {
+              console.log('🔧 FORCE PICK TRIGGER');
+              
+              // Calculate current picker using same logic as the draft logic
+              const round = Math.ceil(currentPickNumber / effectiveDraftOrder.length);
+              const isSnakeRound = round % 2 === 0;
+              const pickIndex = (currentPickNumber - 1) % effectiveDraftOrder.length;
+              const forceCurrentPicker = isSnakeRound
+                ? effectiveDraftOrder[effectiveDraftOrder.length - 1 - pickIndex]
+                : effectiveDraftOrder[pickIndex];
+              
+              const mockDrafterNames = room?.mockDrafters || [];
+              const isMockDrafter = forceCurrentPicker && forceCurrentPicker !== userName && mockDrafterNames.includes(forceCurrentPicker);
+              const isUserTurn = forceCurrentPicker === userName;
+              
+              console.log('Force pick state:', {
+                currentPickNumber,
+                currentRound,
+                round,
+                isSnakeRound,
+                pickIndex,
+                forceCurrentPicker,
+                isMockDrafter,
+                isUserTurn,
+                pickLoading,
+                pickInProgress: pickInProgressRef.current,
+                isDraftActive,
+                effectiveDraftOrder
+              });
+              
+              if (isMockDrafter && !pickLoading && !pickInProgressRef.current) {
+                console.log('🔧 FORCING MOCK PICK for:', forceCurrentPicker);
+                makeMockPick(forceCurrentPicker, currentPickNumber, currentRound);
+              } else if (isUserTurn && !pickLoading) {
+                console.log('🔧 FORCING USER PICK RESET');
+                setPickLoading(false);
+                pickInProgressRef.current = false;
+              } else {
+                console.log('🔧 FORCING PICK PROGRESS RESET');
+                setPickLoading(false);
+                pickInProgressRef.current = false;
+              }
+            }}
+            className="bg-orange-500 text-white px-6 py-3 rounded-lg font-bold text-lg shadow-lg hover:bg-orange-600 transition-all"
+            style={{ minWidth: '120px', minHeight: '48px' }}
+            title="Force next pick if draft is stalled"
+          >
+            ⚡ Force Pick
+          </button>
+        </div>
+      )}
+
       {/* Debug Button for Stalled Drafts */}
       {isDraftActive && mockDraftSpeed && room?.status !== 'completed' && (
-        <div className="fixed bottom-4 left-4 z-50">
+        <div className="fixed bottom-4 right-96 z-50">
           <button
             onClick={() => {
               console.log('🔧 MANUAL DEBUG TRIGGER');
@@ -2615,32 +3953,25 @@ export default function DraftRoom() {
               
               console.log('Manual trigger state:', {
                 currentPicker,
-                mockDrafterNames,
                 isMockDrafter,
                 isUserTurn,
                 pickLoading,
-                currentPickNumber,
-                currentRound
+                pickInProgress: pickInProgressRef.current,
+                isDraftActive,
+                mockDraftSpeed
               });
               
-              if (isMockDrafter) {
-                console.log('🔧 MANUALLY TRIGGERING MOCK PICK');
+              if (isMockDrafter && !pickLoading && !pickInProgressRef.current) {
+                console.log('🔧 FORCING MOCK PICK');
+                makeMockPick(currentPicker, currentPickNumber, currentRound);
+              } else if (isUserTurn && !pickLoading) {
+                console.log('🔧 FORCING USER PICK RESET');
                 setPickLoading(false);
-                setTimeout(() => {
-                  makeMockPick(currentPicker, currentPickNumber, currentRound);
-                }, 100);
-              } else if (isUserTurn) {
-                console.log('🔧 MANUALLY TRIGGERING USER AUTO-PICK');
-                const autoPick = getAutoPickPlayer();
-                if (autoPick) {
-                  console.log('🔧 MANUALLY AUTO-PICKING FOR USER:', autoPick.name);
-                  makeAutoPick(autoPick.name);
-                } else {
-                  console.log('❌ MANUAL AUTO-PICK: No valid player available');
-                }
+                pickInProgressRef.current = false;
               }
             }}
-            className="bg-red-500 text-white px-4 py-2 rounded-lg font-bold text-sm shadow-lg hover:bg-red-600 transition-all"
+            className="bg-red-500 text-white px-8 py-4 rounded-lg font-bold text-lg shadow-lg hover:bg-red-600 transition-all"
+            style={{ minWidth: '120px', minHeight: '48px' }}
             title="Force next pick if draft is stalled"
           >
             🔧 Force Pick
@@ -2651,14 +3982,69 @@ export default function DraftRoom() {
       {/* Info Modal */}
       {showInfoModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-[#000F55] border border-[#60A5FA] rounded-lg p-8 max-w-md w-full mx-4">
+          <div className="bg-gray-900 border border-blue-500 rounded-lg p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div className="text-center">
               <h2 className="text-2xl font-bold mb-4" style={{ color: '#60A5FA' }}>
-                Tournament Info
+                Tournament Info & Rankings
               </h2>
               <div className="text-white text-lg mb-6">
                 <strong>TopDog</strong>
               </div>
+              
+              {/* Rankings Upload Section */}
+              <div className="text-left mb-6">
+                <h3 className="text-xl font-bold mb-3" style={{ color: '#2DE2C5' }}>
+                  Custom Rankings
+                </h3>
+                <p className="text-gray-300 mb-4">
+                  Upload your custom player rankings (one player name per line or comma-separated):
+                </p>
+                
+                <textarea
+                  value={rankingsText}
+                  onChange={(e) => setRankingsText(e.target.value)}
+                  placeholder="Ja'Marr Chase&#10;Justin Jefferson&#10;Saquon Barkley&#10;..."
+                  className="w-full h-32 p-3 rounded text-black mb-3"
+                />
+                
+                <div className="flex gap-2 mb-3">
+                  <button
+                    onClick={handleRankingsUpload}
+                    className="bg-[#2DE2C5] text-[#000F55] px-4 py-2 rounded font-bold hover:bg-[#60A5FA] transition-colors"
+                  >
+                    Upload Rankings
+                  </button>
+                  <button
+                    onClick={clearRankings}
+                    className="bg-red-500 text-white px-4 py-2 rounded font-bold hover:bg-red-600 transition-colors"
+                  >
+                    Clear Rankings
+                  </button>
+                </div>
+                
+                <div className="mb-3">
+                  <label className="block text-gray-300 mb-2">Or upload CSV file:</label>
+                  <input
+                    type="file"
+                    accept=".csv,.txt"
+                    onChange={handleCSVUpload}
+                    className="text-gray-300"
+                  />
+                </div>
+                
+                {rankings.length > 0 && (
+                  <div className="bg-white/10 rounded p-3">
+                    <p className="text-gray-300 mb-2">
+                      <strong>Current Rankings ({rankings.length} players):</strong>
+                    </p>
+                    <p className="text-sm text-gray-400">
+                      {rankings.slice(0, 5).join(', ')}
+                      {rankings.length > 5 && ` ... and ${rankings.length - 5} more`}
+                    </p>
+                  </div>
+                )}
+              </div>
+              
               <button
                 onClick={() => setShowInfoModal(false)}
                 className="bg-[#60A5FA] text-[#000F55] px-6 py-2 rounded-lg font-bold hover:bg-[#2DE2C5] transition-colors"
@@ -2669,6 +4055,633 @@ export default function DraftRoom() {
           </div>
         </div>
       )}
-    </div>
+
+      {/* New Rankings Modal */}
+      {rankingsModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-900 border border-purple-500 rounded-lg p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold mb-4" style={{ color: '#7C3AED' }}>
+                Custom Player Rankings
+              </h2>
+              
+              {/* Rankings Upload Section */}
+              <div className="text-left mb-6">
+                <h3 className="text-xl font-bold mb-3" style={{ color: '#2DE2C5' }}>
+                  Upload Your Rankings
+                </h3>
+                <p className="text-gray-300 mb-4">
+                  Upload your custom player rankings (one player name per line or comma-separated):
+                </p>
+                
+                <textarea
+                  value={rankingsText}
+                  onChange={(e) => setRankingsText(e.target.value)}
+                  placeholder="Ja'Marr Chase&#10;Justin Jefferson&#10;Saquon Barkley&#10;..."
+                  className="w-full h-32 p-3 rounded text-black mb-3"
+                />
+                
+                <div className="flex gap-2 mb-3">
+                  <button
+                    onClick={handleRankingsUpload}
+                    className="bg-[#2DE2C5] text-[#000F55] px-4 py-2 rounded font-bold hover:bg-[#60A5FA] transition-colors"
+                  >
+                    Upload Rankings
+                  </button>
+                  <button
+                    onClick={clearRankings}
+                    className="bg-red-500 text-white px-4 py-2 rounded font-bold hover:bg-red-600 transition-colors"
+                  >
+                    Clear Rankings
+                  </button>
+                </div>
+                
+                <div className="mb-3">
+                  <label className="block text-gray-300 mb-2">Or upload CSV file:</label>
+                  <input
+                    type="file"
+                    accept=".csv,.txt"
+                    onChange={handleCSVUpload}
+                    className="text-gray-300"
+                  />
+                </div>
+                
+                {customRankings.length > 0 && (
+                  <div className="bg-white/10 rounded p-3">
+                    <p className="text-gray-300 mb-2">
+                      <strong>Current Rankings ({customRankings.length} players):</strong>
+                    </p>
+                    <p className="text-sm text-gray-400">
+                      {customRankings.slice(0, 5).join(', ')}
+                      {customRankings.length > 5 && ` ... and ${customRankings.length - 5} more`}
+                    </p>
+                  </div>
+                )}
+              </div>
+              
+              <button
+                onClick={() => setRankingsModalOpen(false)}
+                className="bg-[#7C3AED] text-white px-6 py-2 rounded-lg font-bold hover:bg-[#6D28D9] transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Player Details Modal */}
+      {showPlayerModal && selectedPlayerForModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-900 rounded-lg p-6 max-w-7xl w-full mx-4 max-h-[90vh] overflow-y-auto" style={{ border: `2px solid ${getPositionColor(selectedPlayerForModal.position)}` }}>
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold mb-2" style={{ color: getPositionColor(selectedPlayerForModal.position) }}>
+                {selectedPlayerForModal.name}
+              </h2>
+              <p className="text-gray-300">
+                {selectedPlayerForModal.position} &nbsp;&nbsp;|&nbsp;&nbsp; {selectedPlayerForModal.team}
+              </p>
+            </div>
+            
+            {/* Loading State */}
+            {playerStatsLoading && (
+              <div className="text-center py-8">
+                <div className="animate-spin inline-block w-8 h-8 border-4 border-pink-400 border-t-transparent rounded-full mb-4"></div>
+                <p className="text-gray-300">Loading player statistics...</p>
+              </div>
+            )}
+            
+            {/* Career Stats Table */}
+            {!playerStatsLoading && playerStatsData && (
+              <div className="overflow-x-auto mb-6">
+                <table className="w-full text-sm border-collapse">
+                  <thead>
+                    <tr className="border-b border-gray-600">
+                      <th className="text-left p-2 text-white font-bold"></th>
+                      <th className="text-left p-2 text-white font-bold"></th>
+                      <th className="text-left p-2 text-white font-bold"></th>
+                      
+                      {/* Fantasy Points Column for all positions */}
+                      <th className="text-center p-2 text-white font-bold border-l border-gray-600"></th>
+                      
+                      {/* QB Specific Stats */}
+                      {playerStatsData.position === 'QB' && (
+                        <>
+                          <th className="text-center p-2 font-bold border-l border-gray-600" style={{ color: getPositionColor(playerStatsData.position) }} colSpan="6">Passing</th>
+                          <th className="text-center p-2 font-bold border-l border-gray-600" style={{ color: getPositionColor(playerStatsData.position) }} colSpan="8">Rushing</th>
+                        </>
+                      )}
+                      
+                      {/* RB Specific Stats */}
+                      {playerStatsData.position === 'RB' && (
+                        <>
+                          <th className="text-center p-2 font-bold border-l border-gray-600" style={{ color: getPositionColor(playerStatsData.position) }} colSpan="8">Rushing</th>
+                          <th className="text-center p-2 font-bold border-l border-gray-600" style={{ color: getPositionColor(playerStatsData.position) }} colSpan="9">Receiving</th>
+                        </>
+                      )}
+                      
+                      {/* WR/TE Specific Stats */}
+                      {(playerStatsData.position === 'WR' || playerStatsData.position === 'TE') && (
+                        <>
+                          <th className="text-center p-2 font-bold border-l border-gray-600" style={{ color: getPositionColor(playerStatsData.position) }} colSpan="9">Receiving</th>
+                          <th className="text-center p-2 font-bold border-l border-gray-600" style={{ color: getPositionColor(playerStatsData.position) }} colSpan="8">Rushing</th>
+                        </>
+                      )}
+                    </tr>
+                    <tr className="border-b border-gray-600 text-xs">
+                      <th className="p-2"></th>
+                      <th className="p-2"></th>
+                      <th className="p-2 text-gray-300 text-center cursor-help" title="Games Played">G</th>
+                      
+                      {/* Fantasy Points Header for all positions */}
+                      <th className="p-2 text-gray-300 text-center border-l border-gray-600 cursor-help" title="Fantasy Points">FPts</th>
+                      
+                      {/* QB Headers */}
+                      {playerStatsData.position === 'QB' && (
+                        <>
+                          {/* Passing Headers */}
+                          <th className="p-2 text-gray-300 text-center border-l border-gray-600 cursor-help" title="Completions">Cmp</th>
+                          <th className="p-2 text-gray-300 text-center cursor-help" title="Attempts">Att</th>
+                          <th className="p-2 text-gray-300 text-center cursor-help" title="Yards">Yds</th>
+                          <th className="p-2 text-gray-300 text-center cursor-help" title="Touchdowns">TD</th>
+                          <th className="p-2 text-gray-300 text-center cursor-help" title="Interceptions">Int</th>
+                          <th className="p-2 text-gray-300 text-center cursor-help" title="Quarterback Rating">QBR</th>
+                          
+                          {/* Rushing Headers */}
+                          <th className="p-2 text-gray-300 text-center border-l border-gray-600 cursor-help" title="Attempts">Att</th>
+                          <th className="p-2 text-gray-300 text-center cursor-help" title="Yards">Yds</th>
+                          <th className="p-2 text-gray-300 text-center cursor-help" title="Touchdowns">TD</th>
+                          <th className="p-2 text-gray-300 text-center cursor-help" title="Yards Per Attempt">Y/A</th>
+                          <th className="p-2 text-gray-300 text-center cursor-help" title="Fumbles">Fmb</th>
+                          
+                          {/* Fantasy Headers */}
+                          <th className="p-2 text-gray-300 text-center border-l border-gray-600 cursor-help" title="Fantasy Points">FPts</th>
+                          <th className="p-2 text-gray-300 text-center cursor-help" title="Passing Touchdowns">PassTD</th>
+                          <th className="p-2 text-gray-300 text-center cursor-help" title="Rushing Touchdowns">RushTD</th>
+                          <th className="p-2 text-gray-300 text-center cursor-help" title="Total Touchdowns">TotTD</th>
+                        </>
+                      )}
+                      
+                      {/* RB Headers */}
+                      {playerStatsData.position === 'RB' && (
+                        <>
+                          {/* Rushing Headers */}
+                          <th className="p-2 text-gray-300 text-center border-l border-gray-600 cursor-help" title="Attempts">Att</th>
+                          <th className="p-2 text-gray-300 text-center cursor-help" title="Yards">Yds</th>
+                          <th className="p-2 text-gray-300 text-center cursor-help" title="Touchdowns">TD</th>
+                          <th className="p-2 text-gray-300 text-center cursor-help" title="Yards Per Attempt">Y/A</th>
+                          <th className="p-2 text-gray-300 text-center cursor-help" title="Fumbles">Fmb</th>
+                          
+                          {/* Receiving Headers */}
+                          <th className="p-2 text-gray-300 text-center border-l border-gray-600 cursor-help" title="Targets">Tgt</th>
+                          <th className="p-2 text-gray-300 text-center cursor-help" title="Receptions">Rec</th>
+                          <th className="p-2 text-gray-300 text-center cursor-help" title="Yards">Yds</th>
+                          <th className="p-2 text-gray-300 text-center cursor-help" title="Touchdowns">TD</th>
+
+                        </>
+                      )}
+                      
+                      {/* WR/TE Headers */}
+                      {(playerStatsData.position === 'WR' || playerStatsData.position === 'TE') && (
+                        <>
+                          {/* Receiving Headers */}
+                          <th className="p-2 text-gray-300 text-center border-l border-gray-600 cursor-help" title="Targets">Tgt</th>
+                          <th className="p-2 text-gray-300 text-center cursor-help" title="Receptions">Rec</th>
+                          <th className="p-2 text-gray-300 text-center cursor-help" title="Yards">Yds</th>
+                          <th className="p-2 text-gray-300 text-center cursor-help" title="Touchdowns">TD</th>
+
+                          
+                          {/* Rushing Headers */}
+                          <th className="p-2 text-gray-300 text-center border-l border-gray-600 cursor-help" title="Attempts">Att</th>
+                          <th className="p-2 text-gray-300 text-center cursor-help" title="Yards">Yds</th>
+                          <th className="p-2 text-gray-300 text-center cursor-help" title="Touchdowns">TD</th>
+                          <th className="p-2 text-gray-300 text-center cursor-help" title="Yards Per Attempt">Y/A</th>
+                          <th className="p-2 text-gray-300 text-center cursor-help" title="Fumbles">Fmb</th>
+                        </>
+                      )}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {/* 2025 Projections Row */}
+                    <tr className="border-b border-gray-700 hover:bg-white/5 bg-white/5">
+                      <td className="p-2 text-white font-bold">2025 (proj.)</td>
+                      <td className="p-2 text-white">{playerStatsData.team}</td>
+                      <td className="p-2 text-gray-300 text-center">17</td>
+                      
+                      {/* Fantasy Points for all positions */}
+                      <td className="p-2 text-white border-l border-gray-600 text-center">
+                        xx
+                      </td>
+                      
+                      {/* QB Projections */}
+                      {playerStatsData.position === 'QB' && (
+                        <>
+                          {/* Passing Projections */}
+                          <td className="p-2 text-gray-300 text-center border-l border-gray-600">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                          
+                          {/* Rushing Projections */}
+                          <td className="p-2 text-gray-300 text-center border-l border-gray-600">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                        </>
+                      )}
+                      
+                      {/* RB Projections */}
+                      {playerStatsData.position === 'RB' && (
+                        <>
+                          {/* Rushing Projections */}
+                          <td className="p-2 text-gray-300 text-center border-l border-gray-600">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                          
+                          {/* Receiving Projections */}
+                          <td className="p-2 text-gray-300 text-center border-l border-gray-600">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                        </>
+                      )}
+                      
+                      {/* WR/TE Projections */}
+                      {(playerStatsData.position === 'WR' || playerStatsData.position === 'TE') && (
+                        <>
+                          {/* Receiving Projections */}
+                          <td className="p-2 text-gray-300 text-center border-l border-gray-600">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            xx
+                          </td>
+                          
+                          {/* Rushing Projections */}
+                          <td className="p-2 text-gray-300 text-center border-l border-gray-600">
+                            {(() => {
+                              const player = PLAYER_POOL.find(p => p.name === selectedPlayerForModal.name);
+                              return player?.clayProjections?.rushing?.attempts || "";
+                            })()}
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            {(() => {
+                              const player = PLAYER_POOL.find(p => p.name === selectedPlayerForModal.name);
+                              return player?.clayProjections?.rushing?.yards || "";
+                            })()}
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            {(() => {
+                              const player = PLAYER_POOL.find(p => p.name === selectedPlayerForModal.name);
+                              return player?.clayProjections?.rushing?.touchdowns || "";
+                            })()}
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            {(() => {
+                              const player = PLAYER_POOL.find(p => p.name === selectedPlayerForModal.name);
+                            })()}
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            {(() => {
+                              const player = PLAYER_POOL.find(p => p.name === selectedPlayerForModal.name);
+                              return player?.clayProjections?.rushing?.yardsPerAttempt || "";
+                            })()}
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            {(() => {
+                              const player = PLAYER_POOL.find(p => p.name === selectedPlayerForModal.name);
+                              return player?.clayProjections?.rushing?.yardsPerGame || "";
+                            })()}
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            {(() => {
+                              const player = PLAYER_POOL.find(p => p.name === selectedPlayerForModal.name);
+                            })()}
+                          </td>
+                          <td className="p-2 text-gray-300 text-center">
+                            {(() => {
+                              const player = PLAYER_POOL.find(p => p.name === selectedPlayerForModal.name);
+                              return player?.clayProjections?.rushing?.fumbles || "";
+                            })()}
+                          </td>
+                        </>
+                      )}
+                    </tr>
+                    
+                    {/* Current and Previous Season Data */}
+                    {playerStatsData.seasons.map((season, index) => (
+                      <tr key={season.year} className="border-b border-gray-700 hover:bg-white/5">
+                        <td className="p-2 text-white">{season.year}</td>
+                        <td className="p-2 text-white">{playerStatsData.team}</td>
+                        <td className="p-2 text-gray-300 text-center">{season.games}</td>
+                        
+                        {/* Fantasy Points for all positions */}
+                        <td className="p-2 text-white border-l border-gray-600 text-center">
+                          {season.fantasy?.points?.toFixed(1) || '0.0'}
+                        </td>
+                        
+                        {/* QB Stats */}
+                        {playerStatsData.position === 'QB' && (
+                          <>
+                            {/* Passing Stats */}
+                            <td className="p-2 text-gray-300 text-center border-l border-gray-600">
+                              {Math.floor((season.passing?.attempts || 450) * 0.65)}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {season.passing?.attempts || 450}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {season.passing?.yards || 3200}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {season.passing?.touchdowns || 22}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {season.passing?.interceptions || 8}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {season.passing?.qbr || 88.5}
+                            </td>
+                            
+                            {/* Rushing Stats */}
+                            <td className="p-2 text-gray-300 text-center border-l border-gray-600">
+                              {season.rushing.attempts || 85}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {season.rushing.yards || 420}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {season.rushing.touchdowns || 6}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {season.rushing.yardsPerAttempt?.toFixed(1) || '4.9'}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {((season.rushing.yards || 420) / season.games).toFixed(1)}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {Math.floor((season.rushing.attempts || 85) * 0.35)}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {Math.floor(Math.random() * 8 + 3)}
+                            </td>
+                          </>
+                        )}
+                        
+                        {/* RB Stats */}
+                        {playerStatsData.position === 'RB' && (
+                          <>
+                            {/* Rushing Stats */}
+                            <td className="p-2 text-gray-300 text-center border-l border-gray-600">
+                              {season.rushing.attempts || 0}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {season.rushing.yards || 0}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {season.rushing.touchdowns || 0}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {season.rushing.yardsPerAttempt?.toFixed(1) || '0.0'}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {((season.rushing.yards || 0) / season.games).toFixed(1)}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {Math.floor((season.rushing.attempts || 0) * 0.3)}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {Math.floor(Math.random() * 3)}
+                            </td>
+                            
+                            {/* Receiving Stats */}
+                            <td className="p-2 text-gray-300 text-center border-l border-gray-600">
+                              {season.receiving.targets || 0}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {season.receiving.receptions || 0}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {season.receiving.yards || 0}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {season.receiving.touchdowns || 0}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {((season.receiving.receptions || 0) / season.games).toFixed(1)}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {Math.floor((season.receiving.receptions || 0) * 0.6)}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {Math.floor((season.receiving.yards || 0) * 0.4)}
+                            </td>
+                          </>
+                        )}
+                        
+                        {/* WR/TE Stats */}
+                        {(playerStatsData.position === 'WR' || playerStatsData.position === 'TE') && (
+                          <>
+                            {/* Receiving Stats */}
+                            <td className="p-2 text-gray-300 text-center border-l border-gray-600">
+                              {season.receiving.targets || 0}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {season.receiving.receptions || 0}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {season.receiving.yards || 0}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {season.receiving.touchdowns || 0}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {((season.receiving.receptions || 0) / season.games).toFixed(1)}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {Math.floor((season.receiving.receptions || 0) * 0.6)}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {Math.floor((season.receiving.yards || 0) * 0.4)}
+                            </td>
+                            
+                            {/* Rushing Stats */}
+                            <td className="p-2 text-gray-300 text-center border-l border-gray-600">
+                              {season.rushing.attempts || 0}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {season.rushing.yards || 0}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {season.rushing.touchdowns || 0}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {season.rushing.yardsPerAttempt?.toFixed(1) || '0.0'}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {((season.rushing.yards || 0) / season.games).toFixed(1)}
+                            </td>
+                            <td className="p-2 text-gray-300 text-center">
+                              {Math.floor((season.rushing.attempts || 0) * 0.3)}
+                            </td>
+
+                          </>
+                        )}
+                      </tr>
+                    ))}
+                    
+
+                  </tbody>
+                </table>
+              </div>
+            )}
+            
+            {/* Error State */}
+            {!playerStatsLoading && !playerStatsData && (
+              <div className="text-center py-8">
+                <p className="text-gray-300 mb-4">Unable to load player statistics</p>
+                <p className="text-gray-500 text-sm">ESPN ID not found for {selectedPlayerForModal.name}. Please add to player database.</p>
+              </div>
+            )}
+            
+            <div className="text-center">
+              <button
+                onClick={closePlayerModal}
+                className="bg-gray-800 border border-gray-700 text-white px-6 py-2 rounded-lg font-bold hover:bg-gray-700 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      </DragDropContext>
+
+      </div> {/* Close main-content-container */}
+
+      {/* Ripple Effect - positioned to radiate from center */}
+      <RippleEffect 
+        isActive={showRipple}
+        centerX="50%"
+        centerY="50%"
+        onComplete={() => setShowRipple(false)}
+      />
+
+        </div>
+      </div>
   );
-} 
+}

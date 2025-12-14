@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { logoOptions } from './team-logos';
+import { getPlayerPhotoUrl, getPlayerInitials, getPositionColor as getPositionPhotoColor } from '../lib/playerPhotos';
+import { POSITION_HELPERS, POSITIONS } from './draft/v3/constants/positions';
 
 // Team colors (keep as before)
 const TEAM_COLORS = [
@@ -17,13 +19,7 @@ const TEAM_COLORS = [
   '#6366f1', // indigo
 ];
 
-// Exact Underdog-style position colors
-const POSITION_COLORS = {
-  QB: '#7C3AED', // deep purple
-  RB: '#008C47', // darker green
-  WR: '#F59E42', // bright orange
-  TE: '#F472B6', // hot pink
-};
+// Using established position colors from constants
 
 // SVG checkered flag overlay
 const CheckeredFlag = () => (
@@ -34,7 +30,48 @@ const CheckeredFlag = () => (
   </svg>
 );
 
+// Player Photo Component with fallback handling
+const PlayerPhoto = ({ playerName, teamCode, position, size = 32 }) => {
+  const [imageError, setImageError] = React.useState(false);
+  const photoUrl = getPlayerPhotoUrl(playerName, teamCode, position, size);
+  const initials = getPlayerInitials(playerName);
+  const bgColor = getPositionPhotoColor(position);
+
+  if (imageError || !photoUrl) {
+    // Fallback to initials with position-based background
+    return (
+      <div 
+        className="flex items-center justify-center text-white font-bold rounded-full"
+        style={{ 
+          width: size, 
+          height: size, 
+          backgroundColor: bgColor,
+          fontSize: size * 0.35,
+          minWidth: size,
+          minHeight: size
+        }}
+      >
+        {initials}
+      </div>
+    );
+  }
+
+  return (
+    <img 
+      src={photoUrl}
+      alt={playerName}
+      className="rounded-full object-cover"
+      style={{ width: size, height: size, minWidth: size, minHeight: size }}
+      onError={() => setImageError(true)}
+    />
+  );
+};
+
 export default function FullDraftBoard({ room, picks, participants, draftOrder, PLAYER_POOL }) {
+  const [hasVisitedBoard, setHasVisitedBoard] = useState(false);
+  const [savedScrollPosition, setSavedScrollPosition] = useState(null);
+  const tableRef = useRef(null);
+  
   if (!room) return null;
 
   const totalRounds = room?.settings?.totalRounds || 18;
@@ -61,13 +98,7 @@ export default function FullDraftBoard({ room, picks, participants, draftOrder, 
   );
 
   const getPositionColor = (position) => {
-    switch (position) {
-      case 'QB': return '#ff6b5a';
-      case 'RB': return '#c4b5fd';
-      case 'WR': return '#13b8a6';
-      case 'TE': return '#6366f1';
-      default: return '#6b7280';
-    }
+    return POSITION_HELPERS.getPositionColor(position);
   };
 
   // Robust player name matching function
@@ -140,28 +171,111 @@ export default function FullDraftBoard({ room, picks, participants, draftOrder, 
     });
     if (totalPicks === 0) return [];
     // Always return in order: QB, RB, WR, TE
-    const positions = ['QB', 'RB', 'WR', 'TE'];
-    return positions.map(position => ({
+    return POSITIONS.map(position => ({
       position,
       proportion: (positionCounts[position] || 0) / totalPicks,
       color: getPositionColor(position)
     })).filter(prop => prop.proportion > 0); // Optionally, keep this filter to skip zero-width bars
   };
 
+  // Handle first visit navigation to username
+  useEffect(() => {
+    if (!hasVisitedBoard && tableRef.current) {
+      // Get username from localStorage (same as draft room)
+      const userName = localStorage.getItem('draftUserName');
+      
+      if (userName) {
+        // Find the user's column index
+        const userIndex = effectiveDraftOrder.findIndex(participant => participant === userName);
+        
+        if (userIndex !== -1) {
+          // Calculate the horizontal scroll position to center the user's column
+          const tableElement = tableRef.current;
+          const columnWidth = 72 + 12; // 72px column width + 12px for borders/spacing
+          const viewportWidth = window.innerWidth;
+          const targetScrollLeft = Math.max(0, (userIndex * columnWidth) - (viewportWidth / 2) + (columnWidth / 2));
+          
+          // Scroll to the user's column
+          tableElement.scrollLeft = targetScrollLeft;
+          
+          // Mark as visited and save the position
+          setHasVisitedBoard(true);
+          setSavedScrollPosition(targetScrollLeft);
+        }
+      }
+    }
+  }, [hasVisitedBoard, effectiveDraftOrder]);
+
+  // Restore saved scroll position on subsequent visits
+  useEffect(() => {
+    if (hasVisitedBoard && savedScrollPosition !== null && tableRef.current) {
+      tableRef.current.scrollLeft = savedScrollPosition;
+    }
+  }, [hasVisitedBoard, savedScrollPosition]);
+
+  // Save scroll position when user scrolls manually
+  const handleScroll = (e) => {
+    if (hasVisitedBoard) {
+      setSavedScrollPosition(e.target.scrollLeft);
+    }
+  };
+
   return (
-    <div className="mb-8">
-      <div className="overflow-x-auto w-full">
-        <table className="w-full max-w-none border-collapse text-sm" style={{ border: '6px solid #18181b' }}>
+    <div className="mb-8 overflow-hidden">
+      <div className="w-full overflow-x-auto" ref={tableRef} onScroll={handleScroll}>
+        <table className="w-full max-w-none border-collapse text-sm" style={{ border: '6px solid #18181b', tableLayout: 'fixed' }}>
           <thead>
             <tr>
-              <th className="p-3 font-bold text-lg" style={{ background: '#18181b', color: '#fff', border: '6px solid #18181b', width: 10, minWidth: 10, maxWidth: 10, height: 80 }}></th>
+              <th className="p-3 font-bold text-lg" style={{ background: '#18181b', color: '#fff', border: '6px solid #18181b', width: 10, minWidth: 10, maxWidth: 10, height: 80, boxSizing: 'border-box' }}>
+                <div className="flex flex-col items-center">
+                  <div className="text-xs" style={{ color: '#fff' }}>RND</div>
+                </div>
+              </th>
               {gridParticipants.map((team, idx) => (
                 <th
                   key={team + idx}
-                  className="p-0 border-2 font-bold text-lg"
-                  style={{ background: '#18181b', color: '#fff', border: '6px solid #18181b', padding: 0, width: 72, minWidth: 72, maxWidth: 72, height: 80 }}
+                  className="p-0 border-2 font-bold text-lg relative"
+                  style={{ 
+                    background: '#18181b', 
+                    color: '#fff', 
+                    border: '6px solid #18181b', 
+                    padding: 0, 
+                    width: 72, 
+                    minWidth: 72, 
+                    maxWidth: 72, 
+                    height: 80,
+                    boxSizing: 'border-box'
+                  }}
                 >
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', marginTop: 8, height: '100%' }}>
+                  {/* Username positioned in the colored top border */}
+                  <div 
+                    style={{
+                      position: 'absolute',
+                      top: '0',
+                      left: '0',
+                      right: '0',
+                      height: '16px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '11px',
+                      fontWeight: 'bold',
+                      color: '#ffffff',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                      zIndex: 10,
+                      backgroundColor: idx === 0 
+                        ? '#FBBF25' // Yellow background for user (first team)
+                        : '#6B7280' // Gray background for others
+                    }}
+                  >
+                    {team && typeof team === 'string' && team !== '---' 
+                      ? (team.length > 8 ? team.substring(0, 8) + '...' : team)
+                      : `Team ${idx + 1}`
+                    }
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', marginTop: 20, height: 'calc(100% - 16px)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 4 }}>
                       {(() => {
                         if (typeof team !== 'string' || team === '---') return '';
@@ -169,11 +283,8 @@ export default function FullDraftBoard({ room, picks, participants, draftOrder, 
                         const logoIndex = idx % logoOptions.length;
                         const LogoComponent = logoOptions[logoIndex].component;
                         const bgColor = logoOptions[logoIndex].bgColor;
-                        return <LogoComponent size={36} bgColor={bgColor} />;
+                        return <LogoComponent size={32} bgColor={bgColor} />;
                       })()}
-                    </div>
-                    <div className="text-xs text-center w-full break-words leading-tight" style={{ color: '#fff', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5, fontSize: 10, fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                      {team}
                     </div>
                     <div style={{ height: 6, width: 90, borderRadius: 3, marginTop: 2, marginBottom: 18, display: 'flex', overflow: 'hidden' }}>
                       {(() => {
@@ -203,14 +314,14 @@ export default function FullDraftBoard({ room, picks, participants, draftOrder, 
           <tbody>
             {rounds.map((round, rIdx) => (
               <tr key={round}>
-                <td className="p-3 font-bold text-lg" style={{ background: '#18181b', color: '#fff', border: '6px solid #18181b', width: 10, minWidth: 10, maxWidth: 10, height: 80 }}>
+                <td className="p-3 font-bold text-lg" style={{ background: '#18181b', color: '#fff', border: '6px solid #18181b', width: 10, minWidth: 10, maxWidth: 10, height: 80, boxSizing: 'border-box' }}>
                   <div className="flex flex-col items-center">
                     <div className="text-xs" style={{ color: '#fff' }}>{round}</div>
                   </div>
                 </td>
                 {gridParticipants.map((team, tIdx) => {
                   const playerName = picksByTeam[tIdx][rIdx];
-                  let cellStyle = { background: '#18181b', color: '#fff', border: '6px solid #18181b', padding: 0, width: 72, minWidth: 72, maxWidth: 72, height: 80, minHeight: 80, maxHeight: 80 };
+                  let cellStyle = { background: '#18181b', color: '#fff', border: '6px solid #18181b', padding: 0, width: 72, minWidth: 72, maxWidth: 72, height: 80, minHeight: 80, maxHeight: 80, boxSizing: 'border-box' };
                   let playerData = null;
                   let innerBorderColor = null;
                   if (playerName) {
@@ -243,9 +354,10 @@ export default function FullDraftBoard({ room, picks, participants, draftOrder, 
                               borderRadius: 8,
                               margin: 0,
                               padding: 0,
-                              textAlign: 'left',
-                              alignItems: 'flex-start',
-                              paddingLeft: 8,
+                              textAlign: 'center',
+                              alignItems: 'center',
+                              paddingLeft: 4,
+                              paddingRight: 4,
                             }}
                           >
                             {/* Pick number and round.pickInRound at the top border */}
@@ -283,22 +395,67 @@ export default function FullDraftBoard({ room, picks, participants, draftOrder, 
                                 </>;
                               })()}
                             </span>
-                            <div style={{ fontSize: 12, letterSpacing: 0.5, color: '#fff', marginTop: 4, fontFamily: 'Arial, Helvetica, sans-serif' }}>
-                              {(() => {
-                                if (!playerName) return null;
-                                const nameParts = playerName.split(' ');
-                                if (nameParts.length === 1) {
-                                  return <span>{playerName}</span>;
-                                }
-                                const firstName = nameParts[0];
-                                const lastName = nameParts.slice(1).join(' ');
-                                return <>
-                                  <span style={{ display: 'block', marginBottom: 0, lineHeight: 1, marginTop: 5 }}>{firstName}</span>
-                                  <span style={{ display: 'block', lineHeight: 1, marginBottom: 2 }}>{lastName}</span>
-                                </>;
-                              })()}
+                            {/* NFL Team Logo */}
+                            {playerData?.team && (
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 2, marginBottom: 2 }}>
+                                <img 
+                                  src={`/logos/nfl/${playerData.team.toLowerCase()}.png`}
+                                  alt={playerData.team}
+                                  style={{
+                                    width: '20px',
+                                    height: '20px',
+                                    objectFit: 'contain',
+                                    display: 'block'
+                                  }}
+                                  onError={(e) => {
+                                    console.log('Logo failed to load:', `/logos/nfl/${playerData.team.toLowerCase()}.png`);
+                                    // Fallback to text if logo fails to load
+                                    e.target.style.display = 'none';
+                                    e.target.nextSibling.style.display = 'inline-block';
+                                  }}
+                                  onLoad={() => {
+                                    console.log('Logo loaded successfully:', `/logos/nfl/${playerData.team.toLowerCase()}.png`);
+                                  }}
+                                />
+                                <span 
+                                  className="text-gray-300"
+                                  style={{ 
+                                    display: 'none', 
+                                    fontSize: '8px',
+                                    color: '#fff',
+                                    fontWeight: 'bold'
+                                  }}
+                                >
+                                  {playerData.team}
+                                </span>
+                              </div>
+                            )}
+
+                            {/* Player Photo */}
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 0, marginBottom: 2 }}>
+                              <PlayerPhoto 
+                                playerName={playerName}
+                                teamCode={playerData?.team}
+                                position={playerData?.position}
+                                size={20}
+                              />
                             </div>
-                            <div className="text-xs" style={{ color: '#fff', fontWeight: 500, marginBottom: 8, fontSize: 10, fontFamily: 'Futura, Helvetica, Arial, sans-serif' }}>
+                            
+                            <div style={{ fontSize: 9, letterSpacing: 0.3, color: '#fff', marginTop: 2, fontFamily: 'Arial, Helvetica, sans-serif', lineHeight: 1.0, textAlign: 'center', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%', padding: '0 2px' }}>
+                              {playerName || null}
+                            </div>
+                            <div className="text-xs" style={{ 
+                              color: '#fff', 
+                              fontWeight: 500, 
+                              fontSize: 8, 
+                              fontFamily: 'Futura, Helvetica, Arial, sans-serif', 
+                              textAlign: 'center',
+                              position: 'absolute',
+                              bottom: '2px',
+                              left: '50%',
+                              transform: 'translateX(-50%)',
+                              width: '100%'
+                            }}>
                               {playerData ? `${playerData.position} • ${playerData.team}` : ''}
                             </div>
                           </div>
@@ -320,9 +477,10 @@ export default function FullDraftBoard({ room, picks, participants, draftOrder, 
                               borderRadius: 8,
                               margin: 0,
                               padding: 0,
-                              textAlign: 'left',
-                              alignItems: 'flex-start',
-                              paddingLeft: 8,
+                              textAlign: 'center',
+                              alignItems: 'center',
+                              paddingLeft: 4,
+                              paddingRight: 4,
                             }}
                           >
                             {/* Pick number and round.pickInRound at the top border */}

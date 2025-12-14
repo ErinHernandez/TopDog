@@ -3,7 +3,7 @@
  * Accessible export interface for all users
  */
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function ExportModal({ 
   isOpen, 

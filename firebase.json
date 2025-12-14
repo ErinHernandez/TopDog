@@ -9,6 +9,5 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
-    ]
-  }
+nce  }
 } 

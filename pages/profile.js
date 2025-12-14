@@ -3,14 +3,12 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { db } from '../lib/firebase';
 import { collection, query, where, orderBy, getDocs, doc, getDoc } from 'firebase/firestore';
-import DepositModal from '../components/DepositModal';
 
 export default function Profile() {
   const [userBalance, setUserBalance] = useState(0);
   const [transactions, setTransactions] = useState([]);
-  const [showDepositModal, setShowDepositModal] = useState(false);
   const [loading, setLoading] = useState(true);
-  const userId = 'Not Todd Middleton'; // In production, this would come from authentication
+  const userId = 'NEWUSERNAME'; // In production, this would come from authentication
 
   useEffect(() => {
     fetchUserData();
@@ -58,37 +56,38 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'url(/wr_blue.png) repeat-y', backgroundSize: 'auto 100%', backgroundPosition: 'center center' }}>
         <div className="text-white text-xl">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen text-white overflow-x-auto" style={{ background: 'url(/wr_blue.png) repeat-y', backgroundSize: 'auto 100%', backgroundPosition: 'center center' }}>
       <Head>
         <title>Profile - TopDog.dog</title>
         <meta name="description" content="Your TopDog.dog profile and account information" />
       </Head>
       
+      <div className="min-w-[1400px]">
       {/* Subheader Navigation */}
-      <section className="bg-gray-900 border-b border-gray-700">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-start space-x-8 h-14 items-center">
-            <Link href="/" className="text-gray-300 hover:text-white transition-colors font-medium text-base pb-1">
+      <section className="border-b border-gray-700 bg-white">
+        <div className="container mx-auto px-4" style={{ minWidth: '1400px' }}>
+          <div className="flex justify-start space-x-8 items-center" style={{ marginTop: '0px', marginBottom: '0px', height: '54px' }}>
+            <Link href="/" className="font-medium text-base pb-1 transition-colors" style={{ fontSize: '0.95rem', WebkitTextStroke: '0.12px #18181b', color: '#ffffff', background: 'url(/wr_blue.png) no-repeat center center', backgroundSize: 'cover', WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               Draft Lobby
             </Link>
-            <Link href="/my-teams" className="text-gray-300 hover:text-white transition-colors font-medium text-base pb-1">
+            <Link href="/my-teams" className="font-medium text-base pb-1 transition-colors" style={{ fontSize: '0.95rem', WebkitTextStroke: '0.12px #18181b', color: '#ffffff', background: 'url(/wr_blue.png) no-repeat center center', backgroundSize: 'cover', WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               My Teams
             </Link>
-            <Link href="/exposure" className="text-gray-300 hover:text-white transition-colors font-medium text-base pb-1">
+            <Link href="/exposure" className="font-medium text-base pb-1 transition-colors" style={{ fontSize: '0.95rem', WebkitTextStroke: '0.12px #18181b', color: '#ffffff', background: 'url(/wr_blue.png) no-repeat center center', backgroundSize: 'cover', WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               Exposure Report
             </Link>
           </div>
         </div>
       </section>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8" style={{ minWidth: '1400px' }}>
         <h1 className="text-4xl font-bold mb-8" style={{ color: '#3B82F6' }}>
           Profile
         </h1>
@@ -105,8 +104,7 @@ export default function Profile() {
               </p>
             </div>
             <button
-              onClick={() => setShowDepositModal(true)}
-              className="bg-[#3B82F6] text-gray-900 px-6 py-3 rounded-lg font-bold hover:bg-[#1d4ed8] transition-colors"
+              className="bg-[#111827] text-white px-6 py-3 rounded-lg font-bold hover:bg-[#1f2937] transition-colors"
             >
               Deposit Funds
             </button>
@@ -155,14 +153,7 @@ export default function Profile() {
         </div>
       </div>
 
-      <DepositModal 
-        open={showDepositModal}
-        onClose={() => {
-          setShowDepositModal(false);
-          fetchUserData(); // Refresh data after deposit
-        }}
-        userId={userId}
-      />
-    </div>
+        </div>
+      </div>
   );
 } 

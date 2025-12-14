@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { getUserStats, calculateUserRank } from '../lib/userStats';
+import { POSITIONS } from '../components/draft/v3/constants/positions';
 
 export default function Statistics() {
   const [userStats, setUserStats] = useState(null);
   const [userRank, setUserRank] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
-  const userId = 'Not Todd Middleton'; // Replace with real user ID in production
+  const userId = 'NEWUSERNAME'; // Replace with real user ID in production
 
   useEffect(() => {
     fetchUserStats();
@@ -59,8 +60,7 @@ export default function Statistics() {
 
   const getTopPositions = () => {
     if (!userStats?.playersDrafted) return [];
-    const positions = ['QB', 'RB', 'WR', 'TE'];
-    return positions
+    return POSITIONS
       .map(pos => ({
         position: pos,
         count: userStats.playersDrafted[pos] || 0
@@ -70,7 +70,7 @@ export default function Statistics() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'url(/wr_blue.png) repeat-y', backgroundSize: 'auto 100%', backgroundPosition: 'center center' }}>
         <div className="text-white text-xl">Loading statistics...</div>
       </div>
     );
@@ -78,37 +78,38 @@ export default function Statistics() {
 
   if (!userStats) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'url(/wr_blue.png) repeat-y', backgroundSize: 'auto 100%', backgroundPosition: 'center center' }}>
         <div className="text-white text-xl">No statistics available</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen text-white overflow-x-auto" style={{ background: 'url(/wr_blue.png) repeat-y', backgroundSize: 'auto 100%', backgroundPosition: 'center center' }}>
       <Head>
         <title>Statistics - TopDog.dog</title>
         <meta name="description" content="Your comprehensive TopDog.dog statistics" />
       </Head>
       
+      <div className="min-w-[1400px]">
       {/* Subheader Navigation */}
-      <section className="bg-gray-900 border-b border-gray-700">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-start space-x-8 h-14 items-center">
-            <Link href="/" className="text-gray-300 hover:text-white transition-colors font-medium text-base pb-1">
+      <section className="border-b border-gray-700 bg-white">
+        <div className="container mx-auto px-4" style={{ minWidth: '1400px' }}>
+          <div className="flex justify-start space-x-8 items-center" style={{ marginTop: '0px', marginBottom: '0px', height: '54px' }}>
+            <Link href="/" className="font-medium text-base pb-1 transition-colors" style={{ fontSize: '0.95rem', WebkitTextStroke: '0.12px #18181b', color: '#ffffff', background: 'url(/wr_blue.png) no-repeat center center', backgroundSize: 'cover', WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               Draft Lobby
             </Link>
-            <Link href="/my-teams" className="text-gray-300 hover:text-white transition-colors font-medium text-base pb-1">
+            <Link href="/my-teams" className="font-medium text-base pb-1 transition-colors" style={{ fontSize: '0.95rem', WebkitTextStroke: '0.12px #18181b', color: '#ffffff', background: 'url(/wr_blue.png) no-repeat center center', backgroundSize: 'cover', WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               My Teams
             </Link>
-            <Link href="/exposure" className="text-gray-300 hover:text-white transition-colors font-medium text-base pb-1">
+            <Link href="/exposure" className="font-medium text-base pb-1 transition-colors" style={{ fontSize: '0.95rem', WebkitTextStroke: '0.12px #18181b', color: '#ffffff', background: 'url(/wr_blue.png) no-repeat center center', backgroundSize: 'cover', WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               Exposure Report
             </Link>
           </div>
         </div>
       </section>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8" style={{ minWidth: '1400px' }}>
 
         {/* Tab Navigation */}
         <div className="flex space-x-4 mb-8 border-b border-gray-600">
@@ -129,7 +130,7 @@ export default function Statistics() {
 
         {/* Overview Tab */}
         {activeTab === 'overview' && (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-3 gap-6" style={{ minWidth: '1400px' }}>
             {/* Financial Overview */}
                             <div className="bg-white/10 rounded-xl p-6 border border-[#59c5bf]">
                   <h3 className="text-xl font-bold mb-4" style={{ color: '#59c5bf' }}>Financial</h3>
@@ -561,6 +562,7 @@ export default function Statistics() {
             </div>
           </div>
         )}
+        </div>
       </div>
     </div>
   );

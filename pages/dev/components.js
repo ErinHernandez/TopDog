@@ -9,7 +9,7 @@
  * URL: /dev/components
  */
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import PlayerExpandedCard from '../../components/shared/PlayerExpandedCard';
 
 // Position colors for reference

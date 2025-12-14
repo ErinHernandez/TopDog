@@ -88,13 +88,13 @@ export default function DepositHistory() {
       <section className="bg-gray-900 border-b border-gray-700">
         <div className="container mx-auto px-4">
           <div className="flex justify-start space-x-8 h-14 items-center">
-            <Link href="/" className="text-gray-300 hover:text-white transition-colors font-medium text-base pb-1">
+            <Link href="/" className="font-medium text-base pb-1 transition-colors" style={{ fontSize: '1.07rem', WebkitTextStroke: '0.12px #18181b', background: 'url(/wr_blue.png) no-repeat center center', backgroundSize: 'cover', WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               Draft Lobby
             </Link>
-            <Link href="/my-teams" className="text-gray-300 hover:text-white transition-colors font-medium text-base pb-1">
+            <Link href="/my-teams" className="font-medium text-base pb-1 transition-colors" style={{ fontSize: '1.07rem', WebkitTextStroke: '0.12px #18181b', background: 'url(/wr_blue.png) no-repeat center center', backgroundSize: 'cover', WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               My Teams
             </Link>
-            <Link href="/exposure" className="text-gray-300 hover:text-white transition-colors font-medium text-base pb-1">
+            <Link href="/exposure" className="font-medium text-base pb-1 transition-colors" style={{ fontSize: '1.07rem', WebkitTextStroke: '0.12px #18181b', background: 'url(/wr_blue.png) no-repeat center center', backgroundSize: 'cover', WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               Exposure Report
             </Link>
           </div>

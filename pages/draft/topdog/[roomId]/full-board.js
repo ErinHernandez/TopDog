@@ -48,7 +48,7 @@ export default function FullDraftBoardPage() {
 
   return (
     <div className="min-h-screen text-white" style={{ background: '#18181b' }}>
-      <div className="py-8 pl-1 pr-6">
+      <div className="py-8 pl-1" style={{ paddingRight: '4px' }}>
         {/* Header */}
         <div className="mb-6 flex items-center">
           <Link 

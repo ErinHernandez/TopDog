@@ -1,7 +1,13 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Head from 'next/head'
+import JoinTournamentModal from '../../components/JoinTournamentModal'
 
 export default function TopDogTournament() {
+  const [showModal, setShowModal] = useState(false);
+
+  const handleJoinTournament = () => {
+    setShowModal(true);
+  };
   return (
     <>
       <Head>
@@ -9,7 +15,7 @@ export default function TopDogTournament() {
         <meta name="description" content="Join the TopDog tournament with massive payouts" />
       </Head>
 
-      <div className="min-h-screen bg-gray-900">
+      <div className="min-h-screen" style={{ background: 'url(/wr_blue.png) repeat-y', backgroundSize: 'auto 100%', backgroundPosition: 'center center' }}>
         <div className="container mx-auto px-4 py-12">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
@@ -50,16 +56,23 @@ export default function TopDogTournament() {
               
               <div className="text-center mt-8">
                 <button 
+                  onClick={handleJoinTournament}
                   className="px-8 py-4 rounded-lg font-bold text-xl transition-colors"
                   style={{ backgroundColor: '#59c5bf', color: '#111827' }}
                 >
-                  Join Tournament
+                  Enter Tournament
                 </button>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      <JoinTournamentModal
+        open={showModal}
+        onClose={() => setShowModal(false)}
+        tournamentType="topdog"
+      />
     </>
   )
 } 

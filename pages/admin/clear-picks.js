@@ -76,7 +76,7 @@ export default function ClearPicksAdmin() {
             Clear Picks for All Completed Rooms
           </h2>
           <p className="text-gray-300 mb-4">
-            This will clear picks for all rooms with status 'completed'
+            This will clear picks for all rooms with status &apos;completed&apos;
           </p>
           <button
             onClick={handleClearCompletedRooms}

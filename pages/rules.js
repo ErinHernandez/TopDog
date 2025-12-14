@@ -9,12 +9,12 @@ export default function Rules() {
         <h2 className="text-2xl font-bold mb-2" style={{ color: '#2DE2C5' }}>General Contest Information</h2>
         <ul className="list-disc ml-6 mb-2 text-gray-200">
           <li>Entrants select players through a snake draft. In a snake draft, the pick order is reversed each round.</li>
-          <li>Entrants are required to pay an entry fee of $25 per entry to enter Best Ball Mania VI (the "Tournament").</li>
+          <li>Entrants are required to pay an entry fee of $25 per entry to enter Best Ball Mania VI (the &quot;Tournament&quot;).</li>
           <li>Entry to the Tournament will be closed prior to the 1st game of the 2025 season.</li>
           <li>Entrants draft a team of players who accumulate points throughout the duration of the contest period.</li>
           <li>Once entrants draft, their rosters are set—there are no waivers, substitutions, or trades during the contest period.</li>
-          <li>At the end of each NFL week, TopDog automatically selects the entrant's highest scoring players at the designated positions to be "starters" and only those players' statistics over that week are counted toward the entrant's accumulated score.</li>
-          <li>Entrants compete in groups ("Groups") over the course of multiple rounds ("Rounds").</li>
+          <li>At the end of each NFL week, TopDog automatically selects the entrant&apos;s highest scoring players at the designated positions to be &quot;starters&quot; and only those players&apos; statistics over that week are counted toward the entrant&apos;s accumulated score.</li>
+          <li>Entrants compete in groups (&quot;Groups&quot;) over the course of multiple rounds (&quot;Rounds&quot;).</li>
         </ul>
         <p className="mb-2 text-gray-200">The Tournament will have 4 rounds, with each round consisting of player groups as seen below:</p>
         <ul className="list-disc ml-6 mb-2 text-gray-200">
@@ -73,7 +73,7 @@ export default function Rules() {
         </ul>
       </section>
       <section className="mb-8">
-        <h2 className="text-2xl font-bold mb-2" style={{ color: '#2DE2C5' }}>Ties & Advancement</h2>
+        <h2 className="text-2xl font-bold mb-2" style={{ color: '#2DE2C5' }}>Ties &amp; Advancement</h2>
         <p className="mb-2 text-gray-200">Ties in advancement rounds are broken by highest scoring player, then second highest, and so on. If still tied, the entrant who entered first advances. Finals/prizes ties split the combined prize for the finishing spots.</p>
         <p className="mb-2 text-gray-200">Wild card advancements may occur if the tournament does not fill. Highest scoring lineups will advance as wild cards if needed.</p>
       </section>

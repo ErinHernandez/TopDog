@@ -15,18 +15,29 @@ export {
 } from './layout';
 
 // Position system - Colors, gradients, and position logic
-export {
-  POSITIONS,
-  FLEX_POSITIONS,
-  isValidPosition,
-  isFlexEligible,
-  POSITION_COLORS,
-  POSITION_END_COLORS,
-  POSITION_FILTER_STYLES,
-  GRADIENT_FUNCTIONS,
-  QUEUE_GRADIENTS,
-  POSITION_HELPERS
+import {
+  POSITIONS as _POSITIONS,
+  FLEX_POSITIONS as _FLEX_POSITIONS,
+  isValidPosition as _isValidPosition,
+  isFlexEligible as _isFlexEligible,
+  POSITION_COLORS as _POSITION_COLORS,
+  POSITION_END_COLORS as _POSITION_END_COLORS,
+  POSITION_FILTER_STYLES as _POSITION_FILTER_STYLES,
+  GRADIENT_FUNCTIONS as _GRADIENT_FUNCTIONS,
+  QUEUE_GRADIENTS as _QUEUE_GRADIENTS,
+  POSITION_HELPERS as _POSITION_HELPERS
 } from './positions';
+
+export const POSITIONS = _POSITIONS;
+export const FLEX_POSITIONS = _FLEX_POSITIONS;
+export const isValidPosition = _isValidPosition;
+export const isFlexEligible = _isFlexEligible;
+export const POSITION_COLORS = _POSITION_COLORS;
+export const POSITION_END_COLORS = _POSITION_END_COLORS;
+export const POSITION_FILTER_STYLES = _POSITION_FILTER_STYLES;
+export const GRADIENT_FUNCTIONS = _GRADIENT_FUNCTIONS;
+export const QUEUE_GRADIENTS = _QUEUE_GRADIENTS;
+export const POSITION_HELPERS = _POSITION_HELPERS;
 
 // Style constants - CSS classes, animations, styling
 export {
@@ -100,7 +111,7 @@ export const VALIDATION = {
   /**
    * Validates that a position is valid (uses centralized POSITIONS)
    */
-  isValidPosition,
+  isValidPosition: (position) => _POSITIONS.includes(position),
   
   /**
    * Validates that measurements match expected format

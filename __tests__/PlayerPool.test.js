@@ -6,7 +6,9 @@ function PlayerPool({ players }) {
   return (
     <ul>
       {players.map(player => (
-        <li key={player}>{player}</li>
+        <li key={typeof player === 'string' ? player : player.name}>
+          {typeof player === 'string' ? player : player.name}
+        </li>
       ))}
     </ul>
   );
