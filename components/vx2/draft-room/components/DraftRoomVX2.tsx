@@ -320,15 +320,9 @@ export default function DraftRoomVX2({
   
   // Confirm leaving
   const handleLeaveConfirm = useCallback(() => {
-    console.log('[DraftRoomVX2] handleLeaveConfirm called, onLeave:', typeof onLeave);
     setShowLeaveModal(false);
     draftRoom.leaveDraft();
-    if (onLeave) {
-      console.log('[DraftRoomVX2] Calling onLeave...');
-      onLeave();
-    } else {
-      console.log('[DraftRoomVX2] onLeave is not defined!');
-    }
+    onLeave?.();
   }, [draftRoom, onLeave]);
   
   // Cancel leaving

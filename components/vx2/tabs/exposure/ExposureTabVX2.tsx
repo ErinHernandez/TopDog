@@ -33,8 +33,8 @@ const EXPOSURE_PX = {
   filterGap: SPACING.sm,
   filterButtonPadding: SPACING.sm,
   rowPaddingX: SPACING.md,
-  rowPaddingY: SPACING.sm,
-  rowMinHeight: 56,
+  rowPaddingY: 6,
+  rowMinHeight: 44,
 } as const;
 
 type PositionFilter = 'QB' | 'RB' | 'WR' | 'TE';
