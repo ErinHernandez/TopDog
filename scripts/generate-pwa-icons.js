@@ -43,8 +43,8 @@ async function generateIcons() {
       .resize(size, size, { fit: 'cover' })
       .toBuffer();
     
-    // Calculate logo size (60% of icon size for good visibility)
-    const logoSize = Math.floor(size * 0.6);
+    // Calculate logo size (85% of icon size to match original)
+    const logoSize = Math.floor(size * 0.85);
     
     // Resize logo
     const logo = await sharp(LOGO)
