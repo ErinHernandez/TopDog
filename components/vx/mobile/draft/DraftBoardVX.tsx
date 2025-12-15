@@ -429,12 +429,12 @@ const PickCell = React.memo(function PickCell({ pickData, totalTeams, timer, use
               </div>
             </>
           ) : isCurrentPick ? (
-            // Current pick - show timer
-            <div 
-              className="font-bold text-white"
-              style={{ fontSize: '26px', marginTop: '-6px' }}
+            // Current pick - show "On The Clock"
+            <div
+              className="font-semibold text-white text-center"
+              style={{ fontSize: '11px', lineHeight: 1.2, marginTop: '-2px' }}
             >
-              {timer}
+              On The<br />Clock
             </div>
           ) : isNextUserPick ? (
             // Next user pick only
