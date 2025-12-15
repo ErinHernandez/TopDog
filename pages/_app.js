@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { SWRConfig } from 'swr';
 import '../styles/globals.css'
@@ -13,6 +13,21 @@ import exposurePreloader from '../lib/exposurePreloader'
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
+  const [isMobileDevice, setIsMobileDevice] = useState(false);
+  
+  // Detect mobile device for hiding dev nav
+  useEffect(() => {
+    const checkMobile = () => {
+      const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+      const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+      const isIPadOS = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+      const isAndroid = /android/i.test(userAgent);
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+                          window.navigator.standalone === true;
+      setIsMobileDevice(isIOS || isIPadOS || isAndroid || isStandalone);
+    };
+    checkMobile();
+  }, []);
   
   // Check if we're in a draft room, dev navbar, or mobile demo page to hide navbar
   const isDraftRoom = router.pathname.startsWith('/draft/');
@@ -71,7 +86,7 @@ function MyApp({ Component, pageProps }) {
               <Component {...pageProps} />
             </div>
             {!isDraftRoom && !isDevDraftNavbar && !isMobileDemo && !isTestingGrounds && <Footer />}
-            {isTestingGrounds && <DevNav />}
+            {isTestingGrounds && !isMobileDevice && <DevNav />}
           </div>
         </PlayerDataProvider>
       </UserProvider>
