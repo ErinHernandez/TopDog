@@ -2,18 +2,18 @@
  * VX2 Draft Room Test Page
  * 
  * Test page for the VX2 mobile draft room implementation.
- * Shows inside phone frame for desktop preview.
- * Includes dev tools for testing draft functionality.
+ * 
+ * On mobile devices (iPhone/iPad): Shows fullscreen draft room like real app.
+ * On desktop: Shows phone frame with dev controls for testing.
  */
 
 import React, { useState, useCallback, useRef } from 'react';
 import Head from 'next/head';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
 import { DraftRoomVX2 } from '../../components/vx2/draft-room';
+import { useIsMobileDevice } from '../../hooks/useIsMobileDevice';
 
 export default function VX2DraftRoomPage() {
-  const router = useRouter();
+  const { isMobile, isLoaded } = useIsMobileDevice();
   const [draftKey, setDraftKey] = useState(0);
   const [fastMode, setFastMode] = useState(false);
   // Use ref instead of state to avoid infinite loops
@@ -42,6 +42,57 @@ export default function VX2DraftRoomPage() {
     setDraftKey(prev => prev + 1);
   }, []);
 
+  // Show loading state until device detection is complete
+  if (!isLoaded) {
+    return (
+      <div 
+        style={{ 
+          minHeight: '100vh', 
+          backgroundColor: '#101927',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <div style={{ color: '#6B7280', fontSize: 14 }}>Loading...</div>
+      </div>
+    );
+  }
+
+  // ============================================================================
+  // MOBILE VIEW - Fullscreen draft room (no phone frame, no dev controls)
+  // ============================================================================
+  if (isMobile) {
+    return (
+      <>
+        <Head>
+          <title>Draft Room | TopDog</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+          <meta name="apple-mobile-web-app-capable" content="yes" />
+          <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        </Head>
+        
+        <div style={{ 
+          position: 'fixed', 
+          inset: 0, 
+          backgroundColor: '#101927',
+          overflow: 'hidden',
+        }}>
+          <DraftRoomVX2
+            key={draftKey}
+            roomId="test-room-123"
+            useAbsolutePosition={true}
+            onLeave={handleLeaveDraft}
+            fastMode={false}
+          />
+        </div>
+      </>
+    );
+  }
+
+  // ============================================================================
+  // DESKTOP VIEW - Phone frame with dev controls panel
+  // ============================================================================
   return (
     <>
       <Head>
