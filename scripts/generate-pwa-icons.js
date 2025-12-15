@@ -1,77 +1,84 @@
+/**
+ * PWA Icon Generator
+ * 
+ * Generates app icons using wr_blue.png as background and logo.png overlaid.
+ * Run: node scripts/generate-pwa-icons.js
+ */
+
 const sharp = require('sharp');
+const fs = require('fs');
 const path = require('path');
 
-const publicDir = path.join(__dirname, '../public');
-const backgroundImage = path.join(publicDir, 'wr_blue.png');
-const logoImage = path.join(publicDir, 'logo.png');
+const PUBLIC_DIR = path.join(__dirname, '../public');
+const ICONS_DIR = path.join(PUBLIC_DIR, 'icons');
+const BACKGROUND = path.join(PUBLIC_DIR, 'wr_blue.png');
+const LOGO = path.join(PUBLIC_DIR, 'logo.png');
 
-const iconSizes = [72, 96, 128, 144, 152, 180, 192, 384, 512];
+// Icon sizes needed for PWA
+const ICON_SIZES = [72, 96, 128, 144, 152, 180, 192, 384, 512];
 
-async function generateIcons() {
-  console.log('Generating PWA icons...\n');
-  console.log('Background: wr_blue.png');
-  console.log('Overlay: logo.png (bigger, rounded corners)\n');
-
-  for (const size of iconSizes) {
-    const outputPath = path.join(publicDir, `icon-${size}x${size}.png`);
-    
-    try {
-      // Calculate logo size (75% of icon size - bigger than before)
-      const logoSize = Math.round(size * 0.75);
-      
-      // Corner radius - iOS uses about 22% of the icon size
-      const cornerRadius = Math.round(size * 0.22);
-      
-      // Get the logo resized
-      const logoBuffer = await sharp(logoImage)
-        .resize(logoSize, logoSize, { 
-          fit: 'contain', 
-          background: { r: 0, g: 0, b: 0, alpha: 0 } 
-        })
-        .png()
-        .toBuffer();
-      
-      // Get metadata to know the actual dimensions after resize
-      const logoMeta = await sharp(logoBuffer).metadata();
-
-      // Calculate position to center the logo
-      const left = Math.round((size - logoMeta.width) / 2);
-      const top = Math.round((size - logoMeta.height) / 2);
-
-      // Create rounded rectangle mask
-      const roundedMask = Buffer.from(
-        `<svg width="${size}" height="${size}">
-          <rect x="0" y="0" width="${size}" height="${size}" rx="${cornerRadius}" ry="${cornerRadius}" fill="white"/>
-        </svg>`
-      );
-
-      // Resize background, composite logo, then apply rounded corners
-      const composited = await sharp(backgroundImage)
-        .resize(size, size, { fit: 'cover' })
-        .composite([{
-          input: logoBuffer,
-          left: left,
-          top: top,
-        }])
-        .png()
-        .toBuffer();
-
-      // Apply rounded corners mask
-      await sharp(composited)
-        .composite([{
-          input: roundedMask,
-          blend: 'dest-in'
-        }])
-        .png()
-        .toFile(outputPath);
-
-      console.log(`  ✓ Generated: icon-${size}x${size}.png`);
-    } catch (error) {
-      console.error(`  ✗ Error generating icon-${size}x${size}.png:`, error.message);
-    }
+async function ensureDir(dir) {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+    console.log(`Created directory: ${dir}`);
   }
-  
-  console.log('\nDone! PWA icons generated successfully.');
 }
 
-generateIcons();
+async function generateIcons() {
+  await ensureDir(ICONS_DIR);
+  
+  // Get background image info
+  const bgInfo = await sharp(BACKGROUND).metadata();
+  console.log(`Background: ${bgInfo.width}x${bgInfo.height}`);
+  
+  // Get logo info
+  const logoInfo = await sharp(LOGO).metadata();
+  console.log(`Logo: ${logoInfo.width}x${logoInfo.height}`);
+  
+  for (const size of ICON_SIZES) {
+    const outputPath = path.join(ICONS_DIR, `icon-${size}x${size}.png`);
+    
+    // Resize background to target size
+    const background = await sharp(BACKGROUND)
+      .resize(size, size, { fit: 'cover' })
+      .toBuffer();
+    
+    // Calculate logo size (60% of icon size for good visibility)
+    const logoSize = Math.floor(size * 0.6);
+    
+    // Resize logo
+    const logo = await sharp(LOGO)
+      .resize(logoSize, logoSize, { fit: 'contain' })
+      .toBuffer();
+    
+    // Composite logo on background (centered)
+    await sharp(background)
+      .composite([{
+        input: logo,
+        gravity: 'center',
+      }])
+      .png()
+      .toFile(outputPath);
+    
+    console.log(`Generated: icon-${size}x${size}.png`);
+  }
+  
+  // Also copy to root public for apple-touch-icon
+  const appleIcon = path.join(PUBLIC_DIR, 'apple-touch-icon.png');
+  fs.copyFileSync(path.join(ICONS_DIR, 'icon-180x180.png'), appleIcon);
+  console.log('Generated: apple-touch-icon.png');
+}
+
+async function main() {
+  console.log('Generating PWA icons with wr_blue background...\n');
+  
+  try {
+    await generateIcons();
+    console.log('\nDone! PWA icons generated successfully.');
+  } catch (error) {
+    console.error('Error generating icons:', error);
+    process.exit(1);
+  }
+}
+
+main();
