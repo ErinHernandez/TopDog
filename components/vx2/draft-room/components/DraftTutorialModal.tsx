@@ -43,6 +43,10 @@ export interface DraftTutorialModalProps {
   onRules?: () => void;
   /** Draft format for title */
   format?: string;
+  /** Whether to show the "don't show again" checkbox */
+  showDontShowAgain?: boolean;
+  /** Callback when "don't show again" is changed */
+  onDontShowAgainChange?: (checked: boolean) => void;
 }
 
 interface TutorialPage {
@@ -556,10 +560,18 @@ export default function DraftTutorialModal({
   onClose,
   onRules,
   format = 'Snake',
+  showDontShowAgain = false,
+  onDontShowAgainChange,
 }: DraftTutorialModalProps): React.ReactElement | null {
   const [currentPage, setCurrentPage] = useState(0);
+  const [dontShowAgain, setDontShowAgain] = useState(false);
   
   const isLastPage = currentPage === TUTORIAL_PAGES.length - 1;
+  
+  const handleDontShowAgainChange = useCallback((checked: boolean) => {
+    setDontShowAgain(checked);
+    onDontShowAgainChange?.(checked);
+  }, [onDontShowAgainChange]);
   
   const handleNext = useCallback(() => {
     if (isLastPage) {
@@ -745,6 +757,35 @@ export default function DraftTutorialModal({
             onSelect={setCurrentPage}
           />
         </div>
+        
+        {/* Don't show again checkbox - only on last page when enabled */}
+        {showDontShowAgain && isLastPage && (
+          <label
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 10,
+              marginBottom: 16,
+              cursor: 'pointer',
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={dontShowAgain}
+              onChange={(e) => handleDontShowAgainChange(e.target.checked)}
+              style={{
+                width: 20,
+                height: 20,
+                accentColor: COLORS.accent,
+                cursor: 'pointer',
+              }}
+            />
+            <span style={{ color: COLORS.textMuted, fontSize: 14 }}>
+              Don't show this tutorial again
+            </span>
+          </label>
+        )}
         
         {/* Next Button */}
           <button

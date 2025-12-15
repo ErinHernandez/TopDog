@@ -2,7 +2,7 @@
   "name": "TopDog Best Ball",
   "short_name": "TopDog",
   "description": "Best Ball Draft Platform",
-  "start_url": "/testing-grounds/vx2-draft-room",
+  "start_url": "/testing-grounds/vx2-mobile-app-demo",
   "display": "standalone",
   "background_color": "#101927",
   "theme_color": "#1DA1F2",

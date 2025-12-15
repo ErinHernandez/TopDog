@@ -11,11 +11,18 @@
  * - Loading/Error/Empty states: Proper handling
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import type { DraftTab } from '../types';
 import { DRAFT_LAYOUT } from '../constants';
 import { BG_COLORS, TEXT_COLORS } from '../../core/constants/colors';
 import { SPACING, TYPOGRAPHY, RADIUS } from '../../core/constants/sizes';
+
+// ============================================================================
+// TUTORIAL STORAGE KEYS
+// ============================================================================
+
+const TUTORIAL_DISABLED_KEY = 'topdog_tutorial_disabled';
+const TUTORIAL_SHOWN_PREFIX = 'topdog_tutorial_shown_';
 
 // Hooks
 import { useDraftRoom } from '../hooks/useDraftRoom';
@@ -313,6 +320,38 @@ export default function DraftRoomVX2({
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [showTutorialModal, setShowTutorialModal] = useState(false);
   
+  // Track if we've already auto-shown tutorial for this draft session
+  const hasAutoShownTutorial = useRef(false);
+  
+  // Auto-show tutorial when draft becomes active (first time only per draft)
+  useEffect(() => {
+    // Only proceed if draft just became active and we haven't shown tutorial yet
+    if (draftRoom.status !== 'active' || hasAutoShownTutorial.current) return;
+    
+    // Check if user has disabled tutorials
+    const tutorialDisabled = localStorage.getItem(TUTORIAL_DISABLED_KEY) === 'true';
+    if (tutorialDisabled) return;
+    
+    // Check if tutorial was already shown for this specific draft room
+    const tutorialShownKey = `${TUTORIAL_SHOWN_PREFIX}${roomId}`;
+    const alreadyShownForRoom = localStorage.getItem(tutorialShownKey) === 'true';
+    if (alreadyShownForRoom) return;
+    
+    // Mark that we've shown the tutorial for this draft room
+    localStorage.setItem(tutorialShownKey, 'true');
+    hasAutoShownTutorial.current = true;
+    
+    // Show the tutorial with a small delay to let the UI settle
+    setTimeout(() => {
+      setShowTutorialModal(true);
+    }, 300);
+  }, [draftRoom.status, roomId]);
+  
+  // Handle "don't show again" checkbox
+  const handleDontShowAgainChange = useCallback((checked: boolean) => {
+    localStorage.setItem(TUTORIAL_DISABLED_KEY, checked ? 'true' : 'false');
+  }, []);
+  
   // Show leave confirmation modal
   const handleLeaveClick = useCallback(() => {
     setShowLeaveModal(true);
@@ -460,6 +499,8 @@ export default function DraftRoomVX2({
         onClose={() => setShowTutorialModal(false)}
         onRules={() => console.log('Rules clicked')}
         format="Snake"
+        showDontShowAgain={true}
+        onDontShowAgainChange={handleDontShowAgainChange}
       />
     </div>
   );
