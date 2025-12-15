@@ -29,7 +29,8 @@ export default function VX2DraftRoomPage() {
   
   const handleLeaveDraft = useCallback(() => {
     // Use window.location for reliable navigation from within phone frame
-    window.location.href = '/testing-grounds/vx2-mobile-app-demo';
+    // Navigate to live-drafts tab instead of lobby
+    window.location.href = '/testing-grounds/vx2-mobile-app-demo?tab=live-drafts';
   }, []);
   
   // Desktop: just store tools for manual control

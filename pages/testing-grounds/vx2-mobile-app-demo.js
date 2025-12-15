@@ -10,11 +10,16 @@
 
 import React from 'react';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import { AppShellVX2 } from '../../components/vx2';
 import { useIsMobileDevice } from '../../hooks/useIsMobileDevice';
 
 export default function VX2MobileAppDemo() {
+  const router = useRouter();
   const { isMobile, isLoaded } = useIsMobileDevice();
+  
+  // Get initial tab from query parameter (e.g., ?tab=live-drafts)
+  const initialTab = router.query.tab || 'lobby';
   
   // Track tab changes for debugging
   const handleTabChange = (fromTab, toTab) => {
@@ -60,7 +65,7 @@ export default function VX2MobileAppDemo() {
           overflow: 'hidden',
         }}>
           <AppShellVX2
-            initialTab="lobby"
+            initialTab={initialTab}
             showPhoneFrame={false}
             onTabChange={handleTabChange}
             badgeOverrides={{
@@ -70,7 +75,7 @@ export default function VX2MobileAppDemo() {
         </div>
       ) : (
         <AppShellVX2
-          initialTab="lobby"
+          initialTab={initialTab}
           showPhoneFrame={true}
           onTabChange={handleTabChange}
           badgeOverrides={{
