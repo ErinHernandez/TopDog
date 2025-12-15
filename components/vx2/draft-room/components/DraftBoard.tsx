@@ -408,17 +408,18 @@ function PickCell({
               </div>
             </>
           ) : isCurrentPick ? (
-            // Current pick - show timer (matches navbar timer style)
+            // Current pick - show "On The Clock"
             <div
               style={{
-                fontWeight: 700,
+                fontWeight: 600,
                 color: '#FFFFFF',
-                fontSize: BOARD_PX.timerFontSize,
-                fontVariantNumeric: 'tabular-nums',
-                marginTop: BOARD_PX.timerMarginTop,
+                fontSize: 11,
+                lineHeight: 1.2,
+                textAlign: 'center',
+                marginTop: -2,
               }}
             >
-              {timer}
+              On The<br />Clock
             </div>
           ) : isNextUserPick ? (
             // Next user pick - show "X away"
