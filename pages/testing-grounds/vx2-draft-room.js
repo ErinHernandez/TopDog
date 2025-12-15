@@ -18,6 +18,8 @@ export default function VX2DraftRoomPage() {
   const [fastMode, setFastMode] = useState(false);
   // Use ref instead of state to avoid infinite loops
   const devToolsRef = useRef(null);
+  // Track if we've auto-started on mobile
+  const hasAutoStarted = useRef(false);
   // Force re-render manually when needed
   const [, forceUpdate] = useState({});
   
@@ -30,10 +32,22 @@ export default function VX2DraftRoomPage() {
     window.location.href = '/testing-grounds/vx2-mobile-app-demo';
   }, []);
   
+  // Desktop: just store tools for manual control
   const handleDevToolsReady = useCallback((tools) => {
     devToolsRef.current = tools;
     // Single force update after tools are ready
     forceUpdate({});
+  }, []);
+  
+  // Mobile: auto-start draft when tools are ready
+  const handleMobileDevToolsReady = useCallback((tools) => {
+    if (!hasAutoStarted.current && tools?.startDraft) {
+      hasAutoStarted.current = true;
+      // Small delay to ensure UI is fully rendered
+      setTimeout(() => {
+        tools.startDraft();
+      }, 500);
+    }
   }, []);
   
   const handleToggleFastMode = useCallback(() => {
@@ -84,6 +98,7 @@ export default function VX2DraftRoomPage() {
             useAbsolutePosition={true}
             onLeave={handleLeaveDraft}
             fastMode={false}
+            onDevToolsReady={handleMobileDevToolsReady}
           />
         </div>
       </>
