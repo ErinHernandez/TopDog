@@ -50,7 +50,8 @@ const CARD_PX = {
 } as const;
 
 const CARD_COLORS = {
-  background: '#191932',  // Matches globe_tournament.png background
+  background: 'url(/tournament_card_background.png)',
+  backgroundFallback: '#191932',
   border: 'rgba(75, 85, 99, 0.5)',
   text: TEXT_COLORS.primary,
   textMuted: TEXT_COLORS.secondary,
@@ -125,7 +126,11 @@ export function TournamentCard({
     <div 
       className={`relative ${className}`}
       style={{
-        backgroundColor: CARD_COLORS.background,
+        backgroundImage: CARD_COLORS.background,
+        backgroundColor: CARD_COLORS.backgroundFallback,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
         borderRadius: `${CARD_PX.borderRadius}px`,
         border: featured 
           ? `3px solid ${CARD_COLORS.accent}` 
