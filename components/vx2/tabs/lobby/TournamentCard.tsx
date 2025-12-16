@@ -188,7 +188,7 @@ export function TournamentCard({
           </div>
           <ProgressBar 
             value={fillPercentage} 
-            color="#1E3A5F"
+            fillBackgroundImage="url(/wr_blue.png)"
             backgroundColor={CARD_COLORS.progressBg}
             size="md"
           />

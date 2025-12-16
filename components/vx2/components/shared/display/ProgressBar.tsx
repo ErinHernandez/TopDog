@@ -21,6 +21,8 @@ export interface ProgressBarProps {
   value: number;
   /** Bar color */
   color?: string;
+  /** Background image for fill (overrides color) */
+  fillBackgroundImage?: string;
   /** Background color */
   backgroundColor?: string;
   /** Bar size */
@@ -52,6 +54,7 @@ const SIZE_CONFIG = {
 export function ProgressBar({
   value,
   color = STATE_COLORS.active,
+  fillBackgroundImage,
   backgroundColor = 'rgba(255, 255, 255, 0.1)',
   size = 'md',
   showLabel = false,
@@ -62,6 +65,20 @@ export function ProgressBar({
   // Clamp value between 0 and 100
   const clampedValue = Math.max(0, Math.min(100, value));
   const config = SIZE_CONFIG[size];
+  
+  // Build fill style - use background image if provided, otherwise solid color
+  const fillStyle: React.CSSProperties = {
+    width: `${clampedValue}%`,
+    borderRadius: `${config.borderRadius}px`,
+  };
+  
+  if (fillBackgroundImage) {
+    fillStyle.backgroundImage = fillBackgroundImage;
+    fillStyle.backgroundSize = 'cover';
+    fillStyle.backgroundPosition = 'center';
+  } else {
+    fillStyle.backgroundColor = color;
+  }
   
   const progressBar = (
     <div
@@ -81,11 +98,7 @@ export function ProgressBar({
       {/* Progress fill */}
       <div
         className="absolute inset-y-0 left-0 transition-all duration-300 ease-out"
-        style={{
-          width: `${clampedValue}%`,
-          backgroundColor: color,
-          borderRadius: `${config.borderRadius}px`,
-        }}
+        style={fillStyle}
       />
       
       {/* Inside label */}
