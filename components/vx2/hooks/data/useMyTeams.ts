@@ -112,6 +112,10 @@ const MOCK_TEAMS: MyTeam[] = [
       { name: 'Alec Pierce', team: 'IND', bye: 11, adp: 170.8, pick: 168, projectedPoints: 95, position: 'WR' },
       { name: 'George Kittle', team: 'SF', bye: 14, adp: 51.6, pick: 49, projectedPoints: 175, position: 'TE' },
       { name: 'Zach Ertz', team: 'WAS', bye: 12, adp: 166.2, pick: 144, projectedPoints: 110, position: 'TE' },
+      { name: 'Tyler Lockett', team: 'SEA', bye: 11, adp: 88.3, pick: 97, projectedPoints: 150, position: 'WR' },
+      { name: 'Marquise Brown', team: 'KC', bye: 10, adp: 95.1, pick: 120, projectedPoints: 140, position: 'WR' },
+      { name: 'Khalil Herbert', team: 'CHI', bye: 7, adp: 108.4, pick: 145, projectedPoints: 100, position: 'RB' },
+      { name: 'Tyler Higbee', team: 'LAR', bye: 6, adp: 152.7, pick: 192, projectedPoints: 90, position: 'TE' },
     ],
   },
   {
@@ -135,6 +139,11 @@ const MOCK_TEAMS: MyTeam[] = [
       { name: 'Darnell Mooney', team: 'ATL', bye: 5, adp: 85.1, pick: 75, projectedPoints: 145, position: 'WR' },
       { name: 'Isaiah Likely', team: 'BAL', bye: 7, adp: 144.9, pick: 142, projectedPoints: 130, position: 'TE' },
       { name: 'Dallas Goedert', team: 'PHI', bye: 9, adp: 142.1, pick: 166, projectedPoints: 125, position: 'TE' },
+      { name: 'Tyler Lockett', team: 'SEA', bye: 11, adp: 88.3, pick: 97, projectedPoints: 150, position: 'WR' },
+      { name: 'Marquise Brown', team: 'KC', bye: 10, adp: 95.1, pick: 120, projectedPoints: 140, position: 'WR' },
+      { name: 'Khalil Herbert', team: 'CHI', bye: 7, adp: 108.4, pick: 145, projectedPoints: 100, position: 'RB' },
+      { name: 'Tyler Higbee', team: 'LAR', bye: 6, adp: 152.7, pick: 192, projectedPoints: 90, position: 'TE' },
+      { name: 'Gus Edwards', team: 'LAC', bye: 5, adp: 134.6, pick: 168, projectedPoints: 85, position: 'RB' },
     ],
   },
   {
@@ -154,6 +163,14 @@ const MOCK_TEAMS: MyTeam[] = [
       { name: 'Malik Nabers', team: 'NYG', bye: 14, adp: 21.8, pick: 19, projectedPoints: 235, position: 'WR' },
       { name: 'Nico Collins', team: 'HOU', bye: 6, adp: 25.9, pick: 30, projectedPoints: 220, position: 'WR' },
       { name: 'Jonnu Smith', team: 'MIA', bye: 5, adp: 120.1, pick: 126, projectedPoints: 115, position: 'TE' },
+      { name: 'Tyler Lockett', team: 'SEA', bye: 11, adp: 88.3, pick: 97, projectedPoints: 150, position: 'WR' },
+      { name: 'Marquise Brown', team: 'KC', bye: 10, adp: 95.1, pick: 120, projectedPoints: 140, position: 'WR' },
+      { name: 'Khalil Herbert', team: 'CHI', bye: 7, adp: 108.4, pick: 145, projectedPoints: 100, position: 'RB' },
+      { name: 'Tyler Higbee', team: 'LAR', bye: 6, adp: 152.7, pick: 192, projectedPoints: 90, position: 'TE' },
+      { name: 'Gus Edwards', team: 'LAC', bye: 5, adp: 134.6, pick: 168, projectedPoints: 85, position: 'RB' },
+      { name: 'Diontae Johnson', team: 'CAR', bye: 11, adp: 76.2, pick: 95, projectedPoints: 160, position: 'WR' },
+      { name: 'Rhamondre Stevenson', team: 'NE', bye: 14, adp: 39.4, pick: 48, projectedPoints: 200, position: 'RB' },
+      { name: 'David Njoku', team: 'CLE', bye: 9, adp: 98.5, pick: 112, projectedPoints: 135, position: 'TE' },
     ],
   },
   {
@@ -172,6 +189,18 @@ const MOCK_TEAMS: MyTeam[] = [
       { name: 'CeeDee Lamb', team: 'DAL', bye: 7, adp: 3.4, pick: 4, projectedPoints: 280, position: 'WR' },
       { name: 'Amon-Ra St. Brown', team: 'DET', bye: 8, adp: 4.8, pick: 8, projectedPoints: 265, position: 'WR' },
       { name: 'Travis Kelce', team: 'KC', bye: 10, adp: 18.5, pick: 17, projectedPoints: 190, position: 'TE' },
+      { name: 'Tyler Lockett', team: 'SEA', bye: 11, adp: 88.3, pick: 97, projectedPoints: 150, position: 'WR' },
+      { name: 'Marquise Brown', team: 'KC', bye: 10, adp: 95.1, pick: 120, projectedPoints: 140, position: 'WR' },
+      { name: 'Khalil Herbert', team: 'CHI', bye: 7, adp: 108.4, pick: 145, projectedPoints: 100, position: 'RB' },
+      { name: 'Tyler Higbee', team: 'LAR', bye: 6, adp: 152.7, pick: 192, projectedPoints: 90, position: 'TE' },
+      { name: 'Gus Edwards', team: 'LAC', bye: 5, adp: 134.6, pick: 168, projectedPoints: 85, position: 'RB' },
+      { name: 'Diontae Johnson', team: 'CAR', bye: 11, adp: 76.2, pick: 95, projectedPoints: 160, position: 'WR' },
+      { name: 'Rhamondre Stevenson', team: 'NE', bye: 14, adp: 39.4, pick: 48, projectedPoints: 200, position: 'RB' },
+      { name: 'David Njoku', team: 'CLE', bye: 9, adp: 98.5, pick: 112, projectedPoints: 135, position: 'TE' },
+      { name: 'Jaylen Warren', team: 'PIT', bye: 9, adp: 61.3, pick: 72, projectedPoints: 175, position: 'RB' },
+      { name: 'Courtland Sutton', team: 'DEN', bye: 6, adp: 82.7, pick: 96, projectedPoints: 155, position: 'WR' },
+      { name: 'Trey McBride', team: 'ARI', bye: 14, adp: 70.8, pick: 84, projectedPoints: 165, position: 'TE' },
+      { name: 'Jalen Hurts', team: 'PHI', bye: 9, adp: 45.2, pick: 52, projectedPoints: 300, position: 'QB' },
     ],
   },
 ];
@@ -182,7 +211,8 @@ const MOCK_TEAMS: MyTeam[] = [
 
 async function fetchMyTeams(): Promise<MyTeam[]> {
   await new Promise(resolve => setTimeout(resolve, 200 + Math.random() * 200));
-  return MOCK_TEAMS;
+  // Only return teams with exactly 18 players (complete drafts)
+  return MOCK_TEAMS.filter(team => team.players.length === 18);
 }
 
 // ============================================================================
