@@ -98,17 +98,10 @@ function DraftCard({ draft, onEnter }: DraftCardProps): React.ReactElement {
       
       {/* Info Row */}
       <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <span style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
-            Pick {draft.pickNumber} of {draft.totalPicks}
-          </span>
-          {!isYourTurn && picksAway > 0 && (
-            <span style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>
-              • {picksAway} pick{picksAway !== 1 ? 's' : ''} away
-            </span>
-          )}
-        </div>
-        {isYourTurn && draft.timeLeftSeconds && (
+        <span style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+          Pick {draft.pickNumber} of {draft.totalPicks}
+        </span>
+        {isYourTurn && draft.timeLeftSeconds ? (
           <span 
             className="font-mono font-bold"
             style={{ 
@@ -118,7 +111,17 @@ function DraftCard({ draft, onEnter }: DraftCardProps): React.ReactElement {
           >
             {formatTime(draft.timeLeftSeconds)}
           </span>
-        )}
+        ) : picksAway > 0 ? (
+          <span 
+            className="font-bold"
+            style={{ 
+              color: TEXT_COLORS.secondary,
+              fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
+            }}
+          >
+            {picksAway} pick{picksAway !== 1 ? 's' : ''} away
+          </span>
+        ) : null}
       </div>
       
       {/* Progress Bar */}
