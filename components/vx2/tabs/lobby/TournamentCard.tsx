@@ -144,7 +144,10 @@ export function TournamentCard({
       <h2 
         className="text-center font-bold leading-tight"
         style={{ 
-          fontSize: `${CARD_PX.titleFontSize}px`, 
+          fontSize: '22px',
+          fontFamily: "'Anton SC', sans-serif",
+          textTransform: 'uppercase',
+          letterSpacing: '1px',
           color: CARD_COLORS.text,
           marginBottom: `${CARD_PX.titleMarginBottom}px`,
         }}
