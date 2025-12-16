@@ -278,7 +278,7 @@ export default function ExposureTabVX2(_props: ExposureTabVX2Props): React.React
         <SearchInput
           value={searchQuery}
           onChange={setSearchQuery}
-          placeholder="Search players..."
+          placeholder="Search..."
         />
         
         {!searchQuery && (
