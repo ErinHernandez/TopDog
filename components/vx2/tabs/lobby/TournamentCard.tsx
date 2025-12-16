@@ -22,33 +22,32 @@ import { TILED_BG_STYLE } from '../../draft-room/constants';
 
 const CARD_PX = {
   // Main card
-  padding: 20,
-  paddingBottom: 16,
+  padding: 24,
   borderRadius: RADIUS.xl,
   
   // Title
-  titleFontSize: TYPOGRAPHY.fontSize.xl,
-  titleMarginBottom: SPACING.md,
+  titleFontSize: TYPOGRAPHY.fontSize['2xl'],
+  titleMarginBottom: SPACING.lg,
   
-  // Logo - now responsive, these are max values
-  logoMaxSize: 280,
+  // Logo - responsive, these are max values
+  logoMaxSize: 324,
   logoMinSize: 100,
-  logoMarginBottom: SPACING.md,
+  logoMarginBottom: SPACING.lg,
   
   // Progress
-  progressMarginBottom: SPACING.md,
-  progressLabelFontSize: TYPOGRAPHY.fontSize.xs,
-  progressLabelMarginBottom: SPACING.xs,
+  progressMarginBottom: SPACING.lg,
+  progressLabelFontSize: TYPOGRAPHY.fontSize.sm,
+  progressLabelMarginBottom: SPACING.sm,
   
   // Button
-  buttonHeight: 44,
-  buttonFontSize: TYPOGRAPHY.fontSize.sm,
-  buttonMarginBottom: SPACING.md,
+  buttonHeight: 48,
+  buttonFontSize: TYPOGRAPHY.fontSize.base,
+  buttonMarginBottom: SPACING.xl,
   
   // Stats
-  statsGap: SPACING.md,
-  statsValueFontSize: TYPOGRAPHY.fontSize.lg,
-  statsLabelFontSize: TYPOGRAPHY.fontSize.xs,
+  statsGap: SPACING.lg,
+  statsValueFontSize: TYPOGRAPHY.fontSize.xl,
+  statsLabelFontSize: TYPOGRAPHY.fontSize.sm,
 } as const;
 
 const CARD_COLORS = {
@@ -141,7 +140,6 @@ export function TournamentCard({
           ? `3px solid ${CARD_COLORS.accent}` 
           : `1px solid ${CARD_COLORS.border}`,
         padding: `${CARD_PX.padding}px`,
-        paddingBottom: `${CARD_PX.paddingBottom}px`,
         // Full height mode uses flexbox to distribute space
         ...(fullHeight && {
           height: '100%',
