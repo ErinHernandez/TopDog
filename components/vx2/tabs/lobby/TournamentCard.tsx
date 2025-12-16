@@ -49,7 +49,7 @@ const CARD_PX = {
 } as const;
 
 const CARD_COLORS = {
-  background: BG_COLORS.card,
+  background: '#191932',  // Matches globe_tournament.png background
   border: 'rgba(75, 85, 99, 0.5)',
   text: TEXT_COLORS.primary,
   textMuted: TEXT_COLORS.secondary,
