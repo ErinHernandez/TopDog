@@ -81,6 +81,9 @@ export function useDraftTimer({
   const hasExpiredRef = useRef(false);
   // Track the expiration delay timeout
   const expireTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Store onExpire in ref to avoid effect cleanup when callback changes
+  const onExpireRef = useRef(onExpire);
+  onExpireRef.current = onExpire;
   
   // Delay before auto-pick after timer hits 0 (in milliseconds)
   const EXPIRE_DELAY_MS = 1200;
@@ -121,18 +124,19 @@ export function useDraftTimer({
       }
       
       // Wait 1.2 seconds at 0 before triggering auto-pick
+      // Use ref to avoid cleanup when callback identity changes
       expireTimeoutRef.current = setTimeout(() => {
-        onExpire?.();
+        onExpireRef.current?.();
       }, EXPIRE_DELAY_MS);
     }
     
-    // Cleanup timeout on unmount or when dependencies change
+    // Cleanup timeout on unmount
     return () => {
       if (expireTimeoutRef.current) {
         clearTimeout(expireTimeoutRef.current);
       }
     };
-  }, [isExpired, isActive, onExpire]);
+  }, [isExpired, isActive]); // Removed onExpire - using ref instead
   
   // Reset expired ref when timer is reset
   useEffect(() => {
