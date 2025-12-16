@@ -571,7 +571,30 @@ export default function LiveDraftsTabVX2({
       <div 
         className="flex-1 flex flex-col"
         style={{ backgroundColor: BG_COLORS.primary }}
+        role="main"
+        aria-label="Fast drafts"
       >
+        {/* Header */}
+        <div
+          className="flex-shrink-0"
+          style={{
+            position: 'sticky',
+            top: 0,
+            zIndex: 10,
+            backgroundColor: BG_COLORS.primary,
+            paddingLeft: `${LIVE_DRAFTS_PX.headerPaddingX}px`,
+            paddingRight: `${LIVE_DRAFTS_PX.headerPaddingX}px`,
+            paddingTop: `${LIVE_DRAFTS_PX.headerPaddingY}px`,
+            paddingBottom: `${LIVE_DRAFTS_PX.headerPaddingY}px`,
+            borderBottom: '1px solid rgba(255,255,255,0.1)',
+          }}
+        >
+          <TabSwitcher selected={draftType} onSelect={setDraftType} />
+          <p style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px`, marginTop: `${SPACING.xs}px` }}>
+            {filteredDrafts.length} active drafts
+          </p>
+        </div>
+        
         <div className="flex-1 flex items-center justify-center" style={{ padding: SPACING.xl }}>
           <EmptyState
             title="No Active Drafts"
@@ -598,6 +621,10 @@ export default function LiveDraftsTabVX2({
       <div
         className="flex-shrink-0"
         style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 10,
+          backgroundColor: BG_COLORS.primary,
           paddingLeft: `${LIVE_DRAFTS_PX.headerPaddingX}px`,
           paddingRight: `${LIVE_DRAFTS_PX.headerPaddingX}px`,
           paddingTop: `${LIVE_DRAFTS_PX.headerPaddingY}px`,
