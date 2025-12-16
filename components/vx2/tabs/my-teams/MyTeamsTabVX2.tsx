@@ -10,7 +10,7 @@
  * - Accessibility: ARIA labels
  */
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { useMyTeams, type MyTeam, type TeamPlayer } from '../../hooks/data';
 import { BG_COLORS, TEXT_COLORS, POSITION_COLORS } from '../../core/constants/colors';
 import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
@@ -29,7 +29,7 @@ import { ChevronRight, Edit, Share } from '../../components/icons';
 
 const MYTEAMS_PX = {
   listPadding: SPACING.lg,
-  cardPadding: SPACING.md,
+  cardPadding: SPACING.sm,
   cardGap: SPACING.md,
   headerPadding: SPACING.lg,
   rowPaddingX: SPACING.lg,
@@ -57,15 +57,58 @@ export interface MyTeamsTabVX2Props {
 interface TeamCardProps {
   team: MyTeam;
   onSelect: () => void;
+  onNameChange?: (teamId: string, newName: string) => void;
 }
 
-function TeamCard({ team, onSelect }: TeamCardProps): React.ReactElement {
-  const playerCount = team.players.length;
+function TeamCard({ team, onSelect, onNameChange }: TeamCardProps): React.ReactElement {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedName, setEditedName] = useState(team.name);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [isEditing]);
+  
+  useEffect(() => {
+    setEditedName(team.name);
+  }, [team.name]);
+
+  const handleDoubleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsEditing(true);
+  };
+
+  const handleBlur = () => {
+    if (editedName.trim() && editedName !== team.name && onNameChange) {
+      onNameChange(team.id, editedName.trim());
+    } else {
+      setEditedName(team.name);
+    }
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleBlur();
+    } else if (e.key === 'Escape') {
+      setEditedName(team.name);
+      setIsEditing(false);
+    }
+  };
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (!isEditing) {
+      onSelect();
+    }
+  };
   
   return (
-    <button
-      onClick={onSelect}
-      className="w-full flex items-center justify-between transition-all active:scale-[0.98]"
+    <div
+      onClick={handleClick}
+      className="w-full flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
       style={{
         padding: `${MYTEAMS_PX.cardPadding}px`,
         backgroundColor: BG_COLORS.secondary,
@@ -74,19 +117,35 @@ function TeamCard({ team, onSelect }: TeamCardProps): React.ReactElement {
       }}
       aria-label={`View ${team.name}`}
     >
-      <div className="flex-1 text-left">
-        <h3 
-          className="font-medium"
-          style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
-        >
-          {team.name}
-        </h3>
-        <p style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>
-          {playerCount} players
-        </p>
+      <div className="flex-1 text-left min-w-0">
+        {isEditing ? (
+          <input
+            ref={inputRef}
+            type="text"
+            value={editedName}
+            onChange={(e) => setEditedName(e.target.value)}
+            onBlur={handleBlur}
+            onKeyDown={handleKeyDown}
+            className="w-full font-medium bg-transparent border-none outline-none"
+            style={{ 
+              color: TEXT_COLORS.primary, 
+              fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
+              borderBottom: `1px solid ${TEXT_COLORS.primary}`,
+            }}
+            onClick={(e) => e.stopPropagation()}
+          />
+        ) : (
+          <h3 
+            className="font-medium"
+            style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
+            onDoubleClick={handleDoubleClick}
+          >
+            {team.name}
+          </h3>
+        )}
       </div>
       <ChevronRight size={20} color={TEXT_COLORS.muted} />
-    </button>
+    </div>
   );
 }
 
@@ -100,9 +159,6 @@ function TeamCardSkeleton(): React.ReactElement {
       }}
     >
       <Skeleton width={150} height={18} />
-      <div className="mt-1">
-        <Skeleton width={80} height={14} />
-      </div>
     </div>
   );
 }
@@ -111,9 +167,10 @@ interface TeamListViewProps {
   teams: MyTeam[];
   isLoading: boolean;
   onSelect: (team: MyTeam) => void;
+  onNameChange?: (teamId: string, newName: string) => void;
 }
 
-function TeamListView({ teams, isLoading, onSelect }: TeamListViewProps): React.ReactElement {
+function TeamListView({ teams, isLoading, onSelect, onNameChange }: TeamListViewProps): React.ReactElement {
   const [searchQuery, setSearchQuery] = useState('');
   
   const filteredTeams = useMemo(() => {
@@ -162,7 +219,12 @@ function TeamListView({ teams, isLoading, onSelect }: TeamListViewProps): React.
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: `${MYTEAMS_PX.cardGap}px` }}>
             {filteredTeams.map(team => (
-              <TeamCard key={team.id} team={team} onSelect={() => onSelect(team)} />
+              <TeamCard 
+                key={team.id} 
+                team={team} 
+                onSelect={() => onSelect(team)}
+                onNameChange={onNameChange}
+              />
             ))}
           </div>
         )}
@@ -335,8 +397,14 @@ export default function MyTeamsTabVX2({
   onSelectTeam,
   onViewDraftBoard,
 }: MyTeamsTabVX2Props): React.ReactElement {
-  const { teams, isLoading, error, refetch } = useMyTeams();
+  const { teams: initialTeams, isLoading, error, refetch } = useMyTeams();
   const [internalSelectedTeam, setInternalSelectedTeam] = useState<MyTeam | null>(null);
+  const [teams, setTeams] = useState<MyTeam[]>(initialTeams);
+  
+  // Update teams when initialTeams changes
+  useEffect(() => {
+    setTeams(initialTeams);
+  }, [initialTeams]);
   
   // Use external or internal state
   const selectedTeam = externalSelectedTeam !== undefined ? externalSelectedTeam : internalSelectedTeam;
@@ -348,6 +416,23 @@ export default function MyTeamsTabVX2({
       setInternalSelectedTeam(team);
     }
   }, [onSelectTeam]);
+  
+  const handleNameChange = useCallback((teamId: string, newName: string) => {
+    setTeams(prevTeams => 
+      prevTeams.map(team => 
+        team.id === teamId ? { ...team, name: newName } : team
+      )
+    );
+    // Update selected team if it's the one being edited
+    if (selectedTeam?.id === teamId) {
+      const updatedTeam = { ...selectedTeam, name: newName };
+      if (onSelectTeam) {
+        onSelectTeam(updatedTeam);
+      } else {
+        setInternalSelectedTeam(updatedTeam);
+      }
+    }
+  }, [selectedTeam, onSelectTeam]);
   
   const handleViewDraftBoard = useCallback(() => {
     if (selectedTeam && onViewDraftBoard) {
@@ -387,6 +472,7 @@ export default function MyTeamsTabVX2({
       teams={teams}
       isLoading={isLoading}
       onSelect={handleSelectTeam}
+      onNameChange={handleNameChange}
     />
   );
 }
