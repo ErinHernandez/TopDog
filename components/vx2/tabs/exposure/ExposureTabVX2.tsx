@@ -11,7 +11,7 @@
  * - Accessibility: ARIA labels, roles
  */
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useExposure, type ExposurePlayer } from '../../hooks/data';
 import { BG_COLORS, TEXT_COLORS, POSITION_COLORS } from '../../core/constants/colors';
 import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
@@ -214,6 +214,15 @@ export default function ExposureTabVX2(_props: ExposureTabVX2Props): React.React
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPositions, setSelectedPositions] = useState<PositionFilter[]>([]);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  
+  // Auto-reset when all positions are selected
+  useEffect(() => {
+    const allPositions: PositionFilter[] = ['QB', 'RB', 'WR', 'TE'];
+    if (selectedPositions.length === allPositions.length && 
+        allPositions.every(pos => selectedPositions.includes(pos))) {
+      setSelectedPositions([]);
+    }
+  }, [selectedPositions]);
   
   // Filter and sort players
   const filteredPlayers = useMemo(() => {
