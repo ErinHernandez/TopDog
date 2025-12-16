@@ -117,32 +117,49 @@ function TeamCard({ team, onSelect, onNameChange }: TeamCardProps): React.ReactE
       }}
       aria-label={`View ${team.name}`}
     >
-      <div className="flex-1 text-left min-w-0">
-        {isEditing ? (
-          <input
-            ref={inputRef}
-            type="text"
-            value={editedName}
-            onChange={(e) => setEditedName(e.target.value)}
-            onBlur={handleBlur}
-            onKeyDown={handleKeyDown}
-            className="w-full font-medium bg-transparent border-none outline-none"
-            style={{ 
-              color: TEXT_COLORS.primary, 
-              fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-              borderBottom: `1px solid ${TEXT_COLORS.primary}`,
+      <div className="flex items-center flex-1 min-w-0">
+        {!isEditing && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDoubleClick(e);
             }}
-            onClick={(e) => e.stopPropagation()}
-          />
-        ) : (
-          <h3 
-            className="font-medium"
-            style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
-            onDoubleClick={handleDoubleClick}
+            className="p-1 mr-2 flex items-center justify-center transition-all active:scale-95"
+            aria-label="Edit team name"
+            style={{
+              borderRadius: `${RADIUS.md}px`,
+            }}
           >
-            {team.name}
-          </h3>
+            <Edit size={18} color={TEXT_COLORS.muted} />
+          </button>
         )}
+        <div className="flex-1 text-left min-w-0">
+          {isEditing ? (
+            <input
+              ref={inputRef}
+              type="text"
+              value={editedName}
+              onChange={(e) => setEditedName(e.target.value)}
+              onBlur={handleBlur}
+              onKeyDown={handleKeyDown}
+              className="w-full font-medium bg-transparent border-none outline-none"
+              style={{ 
+                color: TEXT_COLORS.primary, 
+                fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
+                borderBottom: `1px solid ${TEXT_COLORS.primary}`,
+              }}
+              onClick={(e) => e.stopPropagation()}
+            />
+          ) : (
+            <h3 
+              className="font-medium"
+              style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
+              onDoubleClick={handleDoubleClick}
+            >
+              {team.name}
+            </h3>
+          )}
+        </div>
       </div>
       <ChevronRight size={20} color={TEXT_COLORS.muted} />
     </div>
