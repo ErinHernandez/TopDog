@@ -144,6 +144,8 @@ const MOCK_TEAMS: MyTeam[] = [
       { name: 'Khalil Herbert', team: 'CHI', bye: 7, adp: 108.4, pick: 145, projectedPoints: 100, position: 'RB' },
       { name: 'Tyler Higbee', team: 'LAR', bye: 6, adp: 152.7, pick: 192, projectedPoints: 90, position: 'TE' },
       { name: 'Gus Edwards', team: 'LAC', bye: 5, adp: 134.6, pick: 168, projectedPoints: 85, position: 'RB' },
+      { name: 'Alec Pierce', team: 'IND', bye: 11, adp: 170.8, pick: 168, projectedPoints: 95, position: 'WR' },
+      { name: 'Jaylen Warren', team: 'PIT', bye: 9, adp: 61.3, pick: 72, projectedPoints: 175, position: 'RB' },
     ],
   },
   {
@@ -171,6 +173,9 @@ const MOCK_TEAMS: MyTeam[] = [
       { name: 'Diontae Johnson', team: 'CAR', bye: 11, adp: 76.2, pick: 95, projectedPoints: 160, position: 'WR' },
       { name: 'Rhamondre Stevenson', team: 'NE', bye: 14, adp: 39.4, pick: 48, projectedPoints: 200, position: 'RB' },
       { name: 'David Njoku', team: 'CLE', bye: 9, adp: 98.5, pick: 112, projectedPoints: 135, position: 'TE' },
+      { name: 'Courtland Sutton', team: 'DEN', bye: 6, adp: 82.7, pick: 96, projectedPoints: 155, position: 'WR' },
+      { name: 'Trey McBride', team: 'ARI', bye: 14, adp: 70.8, pick: 84, projectedPoints: 165, position: 'TE' },
+      { name: 'Alec Pierce', team: 'IND', bye: 11, adp: 170.8, pick: 168, projectedPoints: 95, position: 'WR' },
     ],
   },
   {
