@@ -359,9 +359,11 @@ export default function DraftRoomVX2({
   
   // Confirm leaving
   const handleLeaveConfirm = useCallback(() => {
-    setShowLeaveModal(false);
-    draftRoom.leaveDraft();
+    // Call onLeave first to ensure navigation happens
     onLeave?.();
+    draftRoom.leaveDraft();
+    // Close modal after navigation is triggered
+    setShowLeaveModal(false);
   }, [draftRoom, onLeave]);
   
   // Cancel leaving
