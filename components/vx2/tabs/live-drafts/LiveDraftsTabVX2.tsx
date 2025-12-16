@@ -590,9 +590,6 @@ export default function LiveDraftsTabVX2({
           }}
         >
           <TabSwitcher selected={draftType} onSelect={setDraftType} />
-          <p style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px`, marginTop: `${SPACING.xs}px` }}>
-            {filteredDrafts.length} active drafts
-          </p>
         </div>
         
         <div className="flex-1 flex items-center justify-center" style={{ padding: SPACING.xl }}>
@@ -631,11 +628,8 @@ export default function LiveDraftsTabVX2({
           paddingBottom: `${LIVE_DRAFTS_PX.headerPaddingY}px`,
           borderBottom: '1px solid rgba(255,255,255,0.1)',
         }}
-      >
+        >
         <TabSwitcher selected={draftType} onSelect={setDraftType} />
-        <p style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px`, marginTop: `${SPACING.xs}px` }}>
-          {filteredDrafts.length} active draft{filteredDrafts.length !== 1 ? 's' : ''}
-        </p>
       </div>
       
       {/* Drafts List */}
