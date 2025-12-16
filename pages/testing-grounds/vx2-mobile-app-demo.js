@@ -18,9 +18,31 @@ export default function VX2MobileAppDemo() {
   const router = useRouter();
   const { isMobile, isLoaded } = useIsMobileDevice();
   
-  // Get initial tab from query parameter (e.g., ?tab=live-drafts)
-  // Must wait for router.isReady to ensure query params are parsed
-  const initialTab = router.isReady ? (router.query.tab || 'lobby') : null;
+  // Determine initial tab:
+  // - If coming from draft room (session flag), go to live-drafts
+  // - Otherwise, always default to lobby (even on refresh)
+  const [initialTab, setInitialTab] = React.useState(null);
+  
+  React.useEffect(() => {
+    if (!router.isReady) return;
+    
+    // Check if user just came from draft room
+    const cameFromDraft = sessionStorage.getItem('topdog_came_from_draft');
+    
+    if (cameFromDraft) {
+      // Clear the flag so refresh goes to lobby
+      sessionStorage.removeItem('topdog_came_from_draft');
+      setInitialTab('live-drafts');
+    } else {
+      // Default to lobby on fresh load or refresh
+      setInitialTab('lobby');
+    }
+    
+    // Clean up URL query param if present
+    if (router.query.tab) {
+      router.replace('/testing-grounds/vx2-mobile-app-demo', undefined, { shallow: true });
+    }
+  }, [router.isReady, router.query.tab]);
   
   // Track tab changes for debugging
   const handleTabChange = (fromTab, toTab) => {

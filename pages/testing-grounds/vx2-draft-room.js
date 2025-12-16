@@ -56,8 +56,10 @@ export default function VX2DraftRoomPage() {
   }, []);
   
   const handleLeaveDraft = useCallback(() => {
-    // Navigate to live-drafts tab (shows active drafts after leaving)
-    router.push('/testing-grounds/vx2-mobile-app-demo?tab=live-drafts');
+    // Set flag so app knows to open live-drafts tab
+    sessionStorage.setItem('topdog_came_from_draft', 'true');
+    // Navigate to app (will read flag and go to live-drafts)
+    router.push('/testing-grounds/vx2-mobile-app-demo');
   }, [router]);
   
   // Desktop: just store tools for manual control
