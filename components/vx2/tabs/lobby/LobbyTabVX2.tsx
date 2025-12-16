@@ -317,39 +317,29 @@ export default function LobbyTabVX2({
     );
   }
   
-  // Success state
+  // Success state - single featured tournament fills the screen
+  const featuredTournament = tournaments.find(t => t.isFeatured) || tournaments[0];
+  
   return (
     <div 
-      className="flex-1 overflow-y-auto relative"
+      className="flex-1 relative"
       style={{ 
         padding: `${LOBBY_PX.containerPaddingY}px ${LOBBY_PX.containerPaddingX}px`,
         backgroundColor: BG_COLORS.primary,
-        scrollbarWidth: 'none',
-        msOverflowStyle: 'none',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
       }}
       role="main"
       aria-label="Tournament lobby"
     >
-      {/* Tournament List */}
-      <div 
-        style={{ 
-          display: 'flex',
-          flexDirection: 'column',
-          gap: `${LOBBY_PX.listGap}px`,
-        }}
-      >
-        {tournaments.map((tournament, index) => (
-          <TournamentCard
-            key={tournament.id}
-            tournament={tournament}
-            onJoinClick={() => handleJoinClick(tournament.id)}
-            featured={index === 0 && tournament.isFeatured}
-          />
-        ))}
-      </div>
-      
-      {/* Bottom padding for scroll */}
-      <div style={{ height: `${SPACING['2xl']}px`, flexShrink: 0 }} />
+      {/* Featured Tournament Card - fills available space */}
+      <TournamentCard
+        tournament={featuredTournament}
+        onJoinClick={() => handleJoinClick(featuredTournament.id)}
+        featured={true}
+        fullHeight={true}
+      />
 
       {/* Join Modal */}
       {selectedTournament && (

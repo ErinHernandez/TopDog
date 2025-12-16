@@ -22,31 +22,33 @@ import { TILED_BG_STYLE } from '../../draft-room/constants';
 
 const CARD_PX = {
   // Main card
-  padding: 24,
+  padding: 20,
+  paddingBottom: 16,
   borderRadius: RADIUS.xl,
   
   // Title
-  titleFontSize: TYPOGRAPHY.fontSize['2xl'],
-  titleMarginBottom: SPACING.lg,
+  titleFontSize: TYPOGRAPHY.fontSize.xl,
+  titleMarginBottom: SPACING.md,
   
-  // Logo
-  logoSize: 324,  // 360px reduced by 10%
-  logoMarginBottom: SPACING.lg,
+  // Logo - now responsive, these are max values
+  logoMaxSize: 280,
+  logoMinSize: 100,
+  logoMarginBottom: SPACING.md,
   
   // Progress
-  progressMarginBottom: SPACING.lg,
-  progressLabelFontSize: TYPOGRAPHY.fontSize.sm,
-  progressLabelMarginBottom: SPACING.sm,
+  progressMarginBottom: SPACING.md,
+  progressLabelFontSize: TYPOGRAPHY.fontSize.xs,
+  progressLabelMarginBottom: SPACING.xs,
   
   // Button
-  buttonHeight: 48,
-  buttonFontSize: TYPOGRAPHY.fontSize.base,
-  buttonMarginBottom: SPACING.xl,
+  buttonHeight: 44,
+  buttonFontSize: TYPOGRAPHY.fontSize.sm,
+  buttonMarginBottom: SPACING.md,
   
   // Stats
-  statsGap: SPACING.lg,
-  statsValueFontSize: TYPOGRAPHY.fontSize.xl,
-  statsLabelFontSize: TYPOGRAPHY.fontSize.sm,
+  statsGap: SPACING.md,
+  statsValueFontSize: TYPOGRAPHY.fontSize.lg,
+  statsLabelFontSize: TYPOGRAPHY.fontSize.xs,
 } as const;
 
 const CARD_COLORS = {
@@ -71,6 +73,8 @@ export interface TournamentCardProps {
   onJoinClick?: () => void;
   /** Whether to show featured styling */
   featured?: boolean;
+  /** Whether card should fill available height */
+  fullHeight?: boolean;
   /** Additional className */
   className?: string;
 }
@@ -116,6 +120,7 @@ export function TournamentCard({
   tournament,
   onJoinClick,
   featured = false,
+  fullHeight = false,
   className = '',
 }: TournamentCardProps): React.ReactElement {
   const fillPercentage = tournament.maxEntries 
@@ -136,35 +141,50 @@ export function TournamentCard({
           ? `3px solid ${CARD_COLORS.accent}` 
           : `1px solid ${CARD_COLORS.border}`,
         padding: `${CARD_PX.padding}px`,
+        paddingBottom: `${CARD_PX.paddingBottom}px`,
+        // Full height mode uses flexbox to distribute space
+        ...(fullHeight && {
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column' as const,
+        }),
       }}
       role="article"
       aria-label={`${tournament.title} tournament`}
     >
-      {/* Tournament Title */}
+      {/* Tournament Title - Fixed */}
       <h2 
         className="text-center font-bold leading-tight"
         style={{ 
           fontSize: `${CARD_PX.titleFontSize}px`, 
           color: CARD_COLORS.text,
           marginBottom: `${CARD_PX.titleMarginBottom}px`,
+          flexShrink: 0,
         }}
       >
         {tournament.title}
       </h2>
 
-      {/* Tournament Logo/Image */}
+      {/* Tournament Logo/Image - Flexible, takes remaining space */}
       {featured && (
         <div 
-          className="flex justify-center"
-          style={{ marginBottom: `${CARD_PX.logoMarginBottom}px` }}
+          className="flex justify-center items-center"
+          style={{ 
+            marginBottom: `${CARD_PX.logoMarginBottom}px`,
+            flex: fullHeight ? 1 : undefined,
+            minHeight: fullHeight ? `${CARD_PX.logoMinSize}px` : undefined,
+            overflow: 'hidden',
+          }}
         >
           <img 
             src="/globe_tournament.png" 
             alt=""
             aria-hidden="true"
             style={{ 
-              width: `${CARD_PX.logoSize}px`, 
-              height: `${CARD_PX.logoSize}px`, 
+              maxWidth: `${CARD_PX.logoMaxSize}px`,
+              maxHeight: fullHeight ? '100%' : `${CARD_PX.logoMaxSize}px`,
+              width: 'auto',
+              height: fullHeight ? '100%' : 'auto',
               objectFit: 'contain',
               borderRadius: `${RADIUS.lg}px`,
             }}
@@ -172,9 +192,9 @@ export function TournamentCard({
         </div>
       )}
 
-      {/* Progress Bar */}
+      {/* Progress Bar - Fixed */}
       {tournament.maxEntries && (
-        <div style={{ marginBottom: `${CARD_PX.progressMarginBottom}px` }}>
+        <div style={{ marginBottom: `${CARD_PX.progressMarginBottom}px`, flexShrink: 0 }}>
           <div 
             className="flex justify-between"
             style={{ 
@@ -195,7 +215,7 @@ export function TournamentCard({
         </div>
       )}
 
-      {/* Join Button */}
+      {/* Join Button - Fixed */}
       <button
         onClick={onJoinClick}
         className="w-full font-semibold transition-colors duration-200 active:scale-[0.98]"
@@ -208,18 +228,20 @@ export function TournamentCard({
           marginBottom: `${CARD_PX.buttonMarginBottom}px`,
           border: 'none',
           cursor: 'pointer',
+          flexShrink: 0,
         }}
         aria-label={`Join ${tournament.title} for ${tournament.entryFee}`}
       >
         Join Tournament
       </button>
 
-      {/* Stats Grid */}
+      {/* Stats Grid - Fixed */}
       <div 
         style={{ 
           display: 'grid', 
           gridTemplateColumns: '1fr 1fr 1fr', 
           gap: `${CARD_PX.statsGap}px`,
+          flexShrink: 0,
         }}
       >
         <StatItem value={tournament.entryFee} label="Entry" />
