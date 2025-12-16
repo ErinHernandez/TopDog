@@ -18,7 +18,7 @@ export default function TournamentCardMobile({
   style = {}
 }) {
   return (
-    <div className={`bg-gray-800/90 rounded-2xl border border-gray-600/50 relative ${className}`} style={{ width: '320px', height: '522px', marginLeft: 'auto', marginRight: 'auto', ...style }}>
+    <div className={`bg-gray-800/90 rounded-2xl border border-gray-600/50 relative ${className}`} style={{ width: '320px', height: '471px', marginLeft: 'auto', marginRight: 'auto', ...style }}>
       {/* Tournament Title - Curved to match image below (two lines) */}
       <div className="absolute text-center" style={{ top: '114px', left: '50%', transform: 'translateX(-50%)' }}>
         <svg width="260" height="100" viewBox="0 0 260 100" style={{ overflow: 'visible' }}>

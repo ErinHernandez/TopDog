@@ -374,13 +374,18 @@ export default function DraftRoomVX2({
   
   // Confirm leaving
   const handleLeaveConfirm = useCallback(() => {
-    // Set flag to trigger navigation after modal closes
-    shouldLeaveRef.current = true;
     // Call leave draft cleanup
     draftRoom.leaveDraft();
-    // Close modal - navigation will trigger in useEffect when modal closes
+    // Close modal first
     setShowLeaveModal(false);
-  }, [draftRoom]);
+    // Then trigger navigation
+    if (onLeave) {
+      // Small delay to ensure modal closes smoothly
+      setTimeout(() => {
+        onLeave();
+      }, 100);
+    }
+  }, [draftRoom, onLeave]);
   
   // Cancel leaving
   const handleLeaveCancel = useCallback(() => {

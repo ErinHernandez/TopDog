@@ -24,6 +24,7 @@ import {
 import { SearchInput } from '../../components/shared/inputs';
 import { ChevronRight, ChevronLeft, Edit, Share, Close } from '../../components/icons';
 import { usePlayerPool } from '../../../../lib/playerPool/usePlayerPool';
+import { getPlayerPhotoUrl, getPlayerId } from '../../../../lib/playerPhotos';
 
 // ============================================================================
 // CONSTANTS
@@ -482,6 +483,19 @@ interface PlayerRowProps {
 }
 
 function PlayerRow({ player, onClick, isExpanded }: PlayerRowProps): React.ReactElement {
+  const [imageError, setImageError] = React.useState(false);
+  
+  // Get player ID for image path
+  const playerId = (player as any).id || getPlayerId(player.name);
+  const photoUrl = getPlayerPhotoUrl(
+    player.name,
+    player.team,
+    player.position,
+    MYTEAMS_PX.photoSize,
+    playerId,
+    (player as any).photoUrl
+  );
+
   return (
     <div
       onClick={onClick}
@@ -497,20 +511,34 @@ function PlayerRow({ player, onClick, isExpanded }: PlayerRowProps): React.React
     >
       {/* Player Info */}
       <div className="flex items-center flex-1 min-w-0">
-        {/* Photo placeholder */}
+        {/* Player Photo */}
         <div
-          className="flex-shrink-0 rounded-full flex items-center justify-center"
+          className="flex-shrink-0 rounded-full overflow-hidden flex items-center justify-center"
           style={{
             width: `${MYTEAMS_PX.photoSize}px`,
             height: `${MYTEAMS_PX.photoSize}px`,
-            backgroundColor: BG_COLORS.tertiary,
+            backgroundColor: imageError ? BG_COLORS.tertiary : 'transparent',
             marginRight: `${SPACING.sm}px`,
           }}
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill={TEXT_COLORS.muted}>
-            <circle cx="12" cy="8" r="4" />
-            <path d="M20 21c0-4.418-3.582-7-8-7s-8 2.582-8 7" />
-          </svg>
+          {!imageError && photoUrl ? (
+            <img
+              src={photoUrl}
+              alt={player.name}
+              className="w-full h-full object-cover"
+              onError={() => setImageError(true)}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+              }}
+            />
+          ) : (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill={TEXT_COLORS.muted}>
+              <circle cx="12" cy="8" r="4" />
+              <path d="M20 21c0-4.418-3.582-7-8-7s-8 2.582-8 7" />
+            </svg>
+          )}
         </div>
         
         <div className="min-w-0">

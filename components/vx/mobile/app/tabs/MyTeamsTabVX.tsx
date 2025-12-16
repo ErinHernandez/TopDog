@@ -8,6 +8,7 @@
 
 import React, { useState, useRef } from 'react';
 import { POSITION_COLORS } from '../../../constants/colors';
+import { getPlayerPhotoUrl, getPlayerId } from '../../../../lib/playerPhotos';
 
 // ============================================================================
 // PIXEL-PERFECT CONSTANTS
@@ -515,6 +516,18 @@ interface PlayerRowProps {
 
 function PlayerRow({ player, isLast }: PlayerRowProps): React.ReactElement {
   const positionColor = POSITION_COLORS[player.position];
+  const [imageError, setImageError] = React.useState(false);
+  
+  // Get player ID for image path
+  const playerId = (player as any).id || getPlayerId(player.name);
+  const photoUrl = getPlayerPhotoUrl(
+    player.name,
+    player.team,
+    player.position,
+    MYTEAMS_PX.photoSize,
+    playerId,
+    (player as any).photoUrl
+  );
 
   return (
     <div
@@ -532,20 +545,41 @@ function PlayerRow({ player, isLast }: PlayerRowProps): React.ReactElement {
       <div className="flex items-center justify-between">
         {/* Left Side - Photo and Info */}
         <div className="flex items-center flex-1 min-w-0">
-          {/* Player Photo placeholder */}
+          {/* Player Photo */}
           <div
             className="flex-shrink-0 rounded-full overflow-hidden flex items-center justify-center"
             style={{
               width: `${MYTEAMS_PX.photoSize}px`,
               height: `${MYTEAMS_PX.photoSize}px`,
               marginRight: `${MYTEAMS_PX.photoMarginRight}px`,
-              backgroundColor: '#4b5563',
+              backgroundColor: imageError || !photoUrl ? '#4b5563' : 'transparent',
             }}
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="8" r="4" fill="#9ca3af" />
-              <path d="M20 21c0-4.418-3.582-7-8-7s-8 2.582-8 7" fill="#9ca3af" />
-            </svg>
+            {photoUrl && !imageError ? (
+              <img
+                src={photoUrl}
+                alt={player.name}
+                className="w-full h-full object-cover rounded-full"
+                onError={(e) => {
+                  console.log('Image failed to load:', photoUrl, 'for player:', player.name);
+                  setImageError(true);
+                }}
+                onLoad={() => {
+                  // Image loaded successfully
+                }}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  display: 'block',
+                }}
+              />
+            ) : (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="8" r="4" fill="#9ca3af" />
+                <path d="M20 21c0-4.418-3.582-7-8-7s-8 2.582-8 7" fill="#9ca3af" />
+              </svg>
+            )}
           </div>
 
           {/* Player Info */}

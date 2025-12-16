@@ -15,7 +15,7 @@ import React from 'react';
 const CARD_PX = {
   // Main card dimensions
   width: 320,
-  height: 522,
+  height: 471, // Reduced by 5% from 496 (10% total from original 522)
   borderRadius: 16,
   borderWidth: 1,
   

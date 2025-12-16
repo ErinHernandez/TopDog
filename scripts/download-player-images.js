@@ -39,6 +39,7 @@ const CONFIG = {
   // API keys (from environment or defaults)
   thesportsdbApiKey: process.env.THESPORTSDB_API_KEY || '1', // Demo key
   fantasynerdsApiKey: process.env.FANTASYNERDS_API_KEY || null,
+  sportsdataioApiKey: process.env.SPORTSDATAIO_API_KEY || null,
   
   // Sources to try (in priority order)
   sources: ['sportsdataio', 'thesportsdb', 'fantasynerds', 'espn'],
@@ -165,23 +166,54 @@ async function fetchFromTheSportsDB(playerName) {
  * Best quality, comprehensive coverage
  */
 async function fetchFromSportsDataIO(playerName, playerId) {
-  const sportsDataIOKey = process.env.SPORTSDATAIO_API_KEY;
+  const sportsDataIOKey = CONFIG.sportsdataioApiKey || process.env.SPORTSDATAIO_API_KEY;
   if (!sportsDataIOKey) {
     throw new Error('SportsDataIO API key not configured');
   }
   
-  // Use existing SportsDataIO integration
-  const { getPlayerHeadshot } = require('../lib/sportsdataio');
+  // Fetch all players first to find matching player
+  const playersUrl = `https://api.sportsdata.io/v3/nfl/scores/json/Players?key=${sportsDataIOKey}`;
   
-  try {
-    const player = await getPlayerHeadshot(sportsDataIOKey, playerName, false);
-    if (player && player.headshotUrl) {
-      return player.headshotUrl;
-    }
-    throw new Error('No headshot URL in response');
-  } catch (error) {
-    throw new Error(`SportsDataIO error: ${error.message}`);
-  }
+  return new Promise((resolve, reject) => {
+    https.get(playersUrl, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          if (res.statusCode !== 200) {
+            reject(new Error(`SportsDataIO API error: ${res.statusCode}`));
+            return;
+          }
+          
+          const players = JSON.parse(data);
+          
+          // Try exact match first
+          let player = players.find(p => p.Name === playerName);
+          
+          // Try case-insensitive match
+          if (!player) {
+            const nameLower = playerName.toLowerCase();
+            player = players.find(p => p.Name && p.Name.toLowerCase() === nameLower);
+          }
+          
+          // Try partial match (last name)
+          if (!player) {
+            const lastName = playerName.split(' ').pop().toLowerCase();
+            player = players.find(p => p.Name && p.Name.toLowerCase().includes(lastName));
+          }
+          
+          if (!player || !player.PhotoUrl) {
+            reject(new Error('Player not found or no photo URL'));
+            return;
+          }
+          
+          resolve(player.PhotoUrl);
+        } catch (e) {
+          reject(new Error(`Parse error: ${e.message}`));
+        }
+      });
+    }).on('error', reject);
+  });
 }
 
 /**

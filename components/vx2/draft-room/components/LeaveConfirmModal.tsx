@@ -101,12 +101,15 @@ export default function LeaveConfirmModal({
       {/* Modal Content */}
       <div
         onClick={(e) => e.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
         style={{
           width: '100%',
           maxWidth: 340,
           backgroundColor: MODAL_COLORS.background,
           borderRadius: 20,
           padding: 24,
+          position: 'relative',
+          zIndex: 1001,
         }}
       >
         {/* Warning Icon */}
@@ -184,7 +187,12 @@ export default function LeaveConfirmModal({
         >
           {/* Primary: Leave Button */}
           <button
-            onClick={onConfirm}
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onConfirm();
+            }}
             style={{
               width: '100%',
               height: 52,
@@ -195,6 +203,8 @@ export default function LeaveConfirmModal({
               fontSize: 16,
               fontWeight: 600,
               cursor: 'pointer',
+              pointerEvents: 'auto',
+              zIndex: 1001,
             }}
           >
             Yes, Leave Draft Room

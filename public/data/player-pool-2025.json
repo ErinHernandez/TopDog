@@ -1,8 +1,8 @@
 {
   "metadata": {
     "version": "2025-topdog-full-v1",
-    "generatedAt": "2025-12-07T08:32:39.224Z",
-    "checksum": "503dc7ed0f51984ac4f0b98cdf23754bfd968fcb2ad456c165c4d848a48b0794",
+    "generatedAt": "2025-12-16T10:22:42.318Z",
+    "checksum": "b96a49fba39debbeefe9aedaea9198a442b94ff79a6cd62cd57c32b143cf4be0",
     "playerCount": 554,
     "positionCounts": {
       "WR": 237,
@@ -11,7 +11,9 @@
       "QB": 75
     },
     "source": "TopDog Preliminary ADP - Full Rankings",
-    "note": "Teams reflect 2025 projected rosters"
+    "note": "Teams reflect 2025 projected rosters",
+    "imagesUpdatedAt": "2025-12-16T10:22:42.323Z",
+    "imagesCount": 397
   },
   "players": [
     {
@@ -30,7 +32,8 @@
       "position": "RB",
       "adp": 2,
       "byeWeek": 13,
-      "projection": 299
+      "projection": 299,
+      "photoUrl": "/players/robinson_bijan.webp"
     },
     {
       "id": "gibbs_jahmyr",
@@ -39,7 +42,8 @@
       "position": "RB",
       "adp": 3,
       "byeWeek": 13,
-      "projection": 299
+      "projection": 299,
+      "photoUrl": "/players/gibbs_jahmyr.webp"
     },
     {
       "id": "lamb_ceedee",
@@ -48,7 +52,8 @@
       "position": "WR",
       "adp": 4,
       "byeWeek": 14,
-      "projection": 318
+      "projection": 318,
+      "photoUrl": "/players/lamb_ceedee.webp"
     },
     {
       "id": "barkley_saquon",
@@ -57,7 +62,8 @@
       "position": "RB",
       "adp": 5,
       "byeWeek": 14,
-      "projection": 298
+      "projection": 298,
+      "photoUrl": "/players/barkley_saquon.webp"
     },
     {
       "id": "jefferson_justin",
@@ -66,7 +72,8 @@
       "position": "WR",
       "adp": 6,
       "byeWeek": 6,
-      "projection": 317
+      "projection": 317,
+      "photoUrl": "/players/jefferson_justin.webp"
     },
     {
       "id": "nabers_malik",
@@ -75,7 +82,8 @@
       "position": "WR",
       "adp": 7,
       "byeWeek": 7,
-      "projection": 317
+      "projection": 317,
+      "photoUrl": "/players/nabers_malik.webp"
     },
     {
       "id": "collins_nico",
@@ -84,7 +92,8 @@
       "position": "WR",
       "adp": 8,
       "byeWeek": 11,
-      "projection": 316
+      "projection": 316,
+      "photoUrl": "/players/collins_nico.webp"
     },
     {
       "id": "mccaffrey_christian",
@@ -93,7 +102,8 @@
       "position": "RB",
       "adp": 9,
       "byeWeek": 11,
-      "projection": 296
+      "projection": 296,
+      "photoUrl": "/players/mccaffrey_christian.webp"
     },
     {
       "id": "brown_amonra",
@@ -1506,7 +1516,8 @@
       "position": "WR",
       "adp": 166,
       "byeWeek": 7,
-      "projection": 240
+      "projection": 240,
+      "photoUrl": "/players/robinson_wandale.webp"
     },
     {
       "id": "strange_brenton",
@@ -1515,7 +1526,8 @@
       "position": "TE",
       "adp": 167,
       "byeWeek": 10,
-      "projection": 153
+      "projection": 153,
+      "photoUrl": "/players/strange_brenton.webp"
     },
     {
       "id": "ward_cam",
@@ -1524,7 +1536,8 @@
       "position": "QB",
       "adp": 168,
       "byeWeek": 9,
-      "projection": 319
+      "projection": 319,
+      "photoUrl": "/players/ward_cam.webp"
     },
     {
       "id": "thielen_adam",
@@ -1533,7 +1546,8 @@
       "position": "WR",
       "adp": 169,
       "byeWeek": 11,
-      "projection": 239
+      "projection": 239,
+      "photoUrl": "/players/thielen_adam.webp"
     },
     {
       "id": "okonkwo_chig",
@@ -1542,7 +1556,8 @@
       "position": "TE",
       "adp": 170,
       "byeWeek": 9,
-      "projection": 152
+      "projection": 152,
+      "photoUrl": "/players/okonkwo_chig.webp"
     },
     {
       "id": "williams_kyle",
@@ -1551,7 +1566,8 @@
       "position": "WR",
       "adp": 171,
       "byeWeek": 10,
-      "projection": 238
+      "projection": 238,
+      "photoUrl": "/players/williams_kyle.webp"
     },
     {
       "id": "johnston_quentin",
@@ -1560,7 +1576,8 @@
       "position": "WR",
       "adp": 172,
       "byeWeek": 5,
-      "projection": 237
+      "projection": 237,
+      "photoUrl": "/players/johnston_quentin.webp"
     },
     {
       "id": "darnold_sam",
@@ -1569,7 +1586,8 @@
       "position": "QB",
       "adp": 173,
       "byeWeek": 9,
-      "projection": 316
+      "projection": 316,
+      "photoUrl": "/players/darnold_sam.webp"
     },
     {
       "id": "corum_blake",
@@ -1578,7 +1596,8 @@
       "position": "RB",
       "adp": 174,
       "byeWeek": 6,
-      "projection": 221
+      "projection": 221,
+      "photoUrl": "/players/corum_blake.webp"
     },
     {
       "id": "harris_tre",
@@ -1587,7 +1606,8 @@
       "position": "WR",
       "adp": 175,
       "byeWeek": 5,
-      "projection": 236
+      "projection": 236,
+      "photoUrl": "/players/harris_tre.webp"
     },
     {
       "id": "likely_isaiah",
@@ -1596,7 +1616,8 @@
       "position": "TE",
       "adp": 176,
       "byeWeek": 10,
-      "projection": 150
+      "projection": 150,
+      "photoUrl": "/players/likely_isaiah.webp"
     },
     {
       "id": "shipley_will",
@@ -1605,7 +1626,8 @@
       "position": "RB",
       "adp": 177,
       "byeWeek": 14,
-      "projection": 220
+      "projection": 220,
+      "photoUrl": "/players/shipley_will.webp"
     },
     {
       "id": "marks_woody",
@@ -1614,7 +1636,8 @@
       "position": "RB",
       "adp": 178,
       "byeWeek": 11,
-      "projection": 219
+      "projection": 219,
+      "photoUrl": "/players/marks_woody.webp"
     },
     {
       "id": "johnson_roschon",
@@ -1623,7 +1646,8 @@
       "position": "RB",
       "adp": 179,
       "byeWeek": 13,
-      "projection": 219
+      "projection": 219,
+      "photoUrl": "/players/johnson_roschon.webp"
     },
     {
       "id": "monangai_kyle",
@@ -1632,7 +1656,8 @@
       "position": "RB",
       "adp": 180,
       "byeWeek": 13,
-      "projection": 218
+      "projection": 218,
+      "photoUrl": "/players/monangai_kyle.webp"
     },
     {
       "id": "otton_cade",
@@ -1641,7 +1666,8 @@
       "position": "TE",
       "adp": 181,
       "byeWeek": 7,
-      "projection": 148
+      "projection": 148,
+      "photoUrl": "/players/otton_cade.webp"
     },
     {
       "id": "taylor_mason",
@@ -1650,7 +1676,8 @@
       "position": "TE",
       "adp": 182,
       "byeWeek": 5,
-      "projection": 148
+      "projection": 148,
+      "photoUrl": "/players/taylor_mason.webp"
     },
     {
       "id": "coker_jalen",
@@ -1659,7 +1686,8 @@
       "position": "WR",
       "adp": 183,
       "byeWeek": 7,
-      "projection": 230
+      "projection": 230,
+      "photoUrl": "/players/coker_jalen.webp"
     },
     {
       "id": "hopkins_deandre",
@@ -1668,7 +1696,8 @@
       "position": "WR",
       "adp": 184,
       "byeWeek": 10,
-      "projection": 229
+      "projection": 229,
+      "photoUrl": "/players/hopkins_deandre.webp"
     },
     {
       "id": "ayomanor_elic",
@@ -1677,7 +1706,8 @@
       "position": "WR",
       "adp": 185,
       "byeWeek": 9,
-      "projection": 229
+      "projection": 229,
+      "photoUrl": "/players/ayomanor_elic.webp"
     },
     {
       "id": "gesicki_mike",
@@ -1686,7 +1716,8 @@
       "position": "TE",
       "adp": 186,
       "byeWeek": 10,
-      "projection": 146
+      "projection": 146,
+      "photoUrl": "/players/gesicki_mike.webp"
     },
     {
       "id": "rodgers_aaron",
@@ -1695,7 +1726,8 @@
       "position": "QB",
       "adp": 187,
       "byeWeek": 11,
-      "projection": 304
+      "projection": 304,
+      "photoUrl": "/players/rodgers_aaron.webp"
     },
     {
       "id": "slayton_darius",
@@ -1704,7 +1736,8 @@
       "position": "WR",
       "adp": 188,
       "byeWeek": 7,
-      "projection": 226
+      "projection": 226,
+      "photoUrl": "/players/slayton_darius.webp"
     },
     {
       "id": "pierce_alec",
@@ -1713,7 +1746,8 @@
       "position": "WR",
       "adp": 189,
       "byeWeek": 12,
-      "projection": 226
+      "projection": 226,
+      "photoUrl": "/players/pierce_alec.webp"
     },
     {
       "id": "hill_justice",
@@ -1722,7 +1756,8 @@
       "position": "RB",
       "adp": 190,
       "byeWeek": 10,
-      "projection": 211
+      "projection": 211,
+      "photoUrl": "/players/hill_justice.webp"
     },
     {
       "id": "rodriguez_chris",
@@ -1731,7 +1766,8 @@
       "position": "RB",
       "adp": 191,
       "byeWeek": 14,
-      "projection": 211
+      "projection": 211,
+      "photoUrl": "/players/rodriguez_chris.webp"
     },
     {
       "id": "freiermuth_pat",
@@ -1740,7 +1776,8 @@
       "position": "TE",
       "adp": 192,
       "byeWeek": 11,
-      "projection": 144
+      "projection": 144,
+      "photoUrl": "/players/freiermuth_pat.webp"
     },
     {
       "id": "guerendo_isaac",
@@ -1749,7 +1786,8 @@
       "position": "RB",
       "adp": 193,
       "byeWeek": 11,
-      "projection": 209
+      "projection": 209,
+      "photoUrl": "/players/guerendo_isaac.webp"
     },
     {
       "id": "wilson_michael",
@@ -1758,7 +1796,8 @@
       "position": "WR",
       "adp": 194,
       "byeWeek": 7,
-      "projection": 222
+      "projection": 222,
+      "photoUrl": "/players/wilson_michael.webp"
     },
     {
       "id": "giddens_dj",
@@ -1767,7 +1806,8 @@
       "position": "RB",
       "adp": 195,
       "byeWeek": 12,
-      "projection": 207
+      "projection": 207,
+      "photoUrl": "/players/giddens_dj.webp"
     },
     {
       "id": "hunt_kareem",
@@ -1776,7 +1816,8 @@
       "position": "RB",
       "adp": 196,
       "byeWeek": 6,
-      "projection": 206
+      "projection": 206,
+      "photoUrl": "/players/hunt_kareem.webp"
     },
     {
       "id": "miller_kendre",
@@ -1785,7 +1826,8 @@
       "position": "RB",
       "adp": 197,
       "byeWeek": 12,
-      "projection": 206
+      "projection": 206,
+      "photoUrl": "/players/miller_kendre.webp"
     },
     {
       "id": "bryant_pat",
@@ -1794,7 +1836,8 @@
       "position": "WR",
       "adp": 198,
       "byeWeek": 11,
-      "projection": 219
+      "projection": 219,
+      "photoUrl": "/players/bryant_pat.webp"
     },
     {
       "id": "wright_jaylen",
@@ -1803,7 +1846,8 @@
       "position": "RB",
       "adp": 199,
       "byeWeek": 6,
-      "projection": 204
+      "projection": 204,
+      "photoUrl": "/players/wright_jaylen.webp"
     },
     {
       "id": "mitchell_keaton",
@@ -1812,7 +1856,8 @@
       "position": "RB",
       "adp": 200,
       "byeWeek": 10,
-      "projection": 203
+      "projection": 203,
+      "photoUrl": "/players/mitchell_keaton.webp"
     },
     {
       "id": "schultz_dalton",
@@ -1821,7 +1866,8 @@
       "position": "TE",
       "adp": 201,
       "byeWeek": 11,
-      "projection": 139
+      "projection": 139,
+      "photoUrl": "/players/schultz_dalton.webp"
     },
     {
       "id": "sanders_jatavion",
@@ -1830,7 +1876,8 @@
       "position": "TE",
       "adp": 202,
       "byeWeek": 7,
-      "projection": 138
+      "projection": 138,
+      "photoUrl": "/players/sanders_jatavion.webp"
     },
     {
       "id": "mitchell_adonai",
@@ -1839,7 +1886,8 @@
       "position": "WR",
       "adp": 203,
       "byeWeek": 5,
-      "projection": 213
+      "projection": 213,
+      "photoUrl": "/players/mitchell_adonai.webp"
     },
     {
       "id": "jones_daniel",
@@ -1848,7 +1896,8 @@
       "position": "QB",
       "adp": 204,
       "byeWeek": 12,
-      "projection": 286
+      "projection": 286,
+      "photoUrl": "/players/jones_daniel.webp"
     },
     {
       "id": "noel_jaylin",
@@ -1857,7 +1906,8 @@
       "position": "WR",
       "adp": 205,
       "byeWeek": 11,
-      "projection": 212
+      "projection": 212,
+      "photoUrl": "/players/noel_jaylin.webp"
     },
     {
       "id": "johnson_juwan",
@@ -1866,7 +1916,8 @@
       "position": "TE",
       "adp": 206,
       "byeWeek": 12,
-      "projection": 136
+      "projection": 136,
+      "photoUrl": "/players/johnson_juwan.webp"
     },
     {
       "id": "iosivas_andrei",
@@ -1875,7 +1926,8 @@
       "position": "WR",
       "adp": 207,
       "byeWeek": 10,
-      "projection": 210
+      "projection": 210,
+      "photoUrl": "/players/iosivas_andrei.webp"
     },
     {
       "id": "brooks_tahj",
@@ -1884,7 +1936,8 @@
       "position": "RB",
       "adp": 208,
       "byeWeek": 10,
-      "projection": 197
+      "projection": 197,
+      "photoUrl": "/players/brooks_tahj.webp"
     },
     {
       "id": "sanders_miles",
@@ -1893,7 +1946,8 @@
       "position": "RB",
       "adp": 209,
       "byeWeek": 14,
-      "projection": 196
+      "projection": 196,
+      "photoUrl": "/players/sanders_miles.webp"
     },
     {
       "id": "teslaa_isaac",
@@ -1902,7 +1956,8 @@
       "position": "WR",
       "adp": 210,
       "byeWeek": 13,
-      "projection": 208
+      "projection": 208,
+      "photoUrl": "/players/teslaa_isaac.webp"
     },
     {
       "id": "horton_tory",
@@ -1911,7 +1966,8 @@
       "position": "WR",
       "adp": 211,
       "byeWeek": 9,
-      "projection": 208
+      "projection": 208,
+      "photoUrl": "/players/horton_tory.webp"
     },
     {
       "id": "pierce_dameon",
@@ -1920,7 +1976,8 @@
       "position": "RB",
       "adp": 212,
       "byeWeek": 6,
-      "projection": 194
+      "projection": 194,
+      "photoUrl": "/players/pierce_dameon.webp"
     },
     {
       "id": "thornton_donte",
@@ -1929,7 +1986,8 @@
       "position": "WR",
       "adp": 213,
       "byeWeek": 9,
-      "projection": 206
+      "projection": 206,
+      "photoUrl": "/players/thornton_donte.webp"
     },
     {
       "id": "arroyo_elijah",
@@ -1938,7 +1996,8 @@
       "position": "TE",
       "adp": 214,
       "byeWeek": 9,
-      "projection": 133
+      "projection": 133,
+      "photoUrl": "/players/arroyo_elijah.webp"
     },
     {
       "id": "lockett_tyler",
@@ -1947,7 +2006,8 @@
       "position": "WR",
       "adp": 215,
       "byeWeek": 9,
-      "projection": 205
+      "projection": 205,
+      "photoUrl": "/players/lockett_tyler.webp"
     },
     {
       "id": "austin_calvin",
@@ -1956,7 +2016,8 @@
       "position": "WR",
       "adp": 216,
       "byeWeek": 11,
-      "projection": 204
+      "projection": 204,
+      "photoUrl": "/players/austin_calvin.webp"
     },
     {
       "id": "brown_dyami",
@@ -1965,7 +2026,8 @@
       "position": "WR",
       "adp": 217,
       "byeWeek": 10,
-      "projection": 204
+      "projection": 204,
+      "photoUrl": "/players/brown_dyami.webp"
     },
     {
       "id": "bech_jack",
@@ -1974,7 +2036,8 @@
       "position": "WR",
       "adp": 218,
       "byeWeek": 9,
-      "projection": 203
+      "projection": 203,
+      "photoUrl": "/players/bech_jack.webp"
     },
     {
       "id": "smith_brashard",
@@ -1983,7 +2046,8 @@
       "position": "WR",
       "adp": 219,
       "byeWeek": 6,
-      "projection": 202
+      "projection": 202,
+      "photoUrl": "/players/smith_brashard.webp"
     },
     {
       "id": "lloyd_marshawn",
@@ -1992,7 +2056,8 @@
       "position": "RB",
       "adp": 220,
       "byeWeek": 14,
-      "projection": 189
+      "projection": 189,
+      "photoUrl": "/players/lloyd_marshawn.webp"
     },
     {
       "id": "wicks_dontayvion",
@@ -2001,7 +2066,8 @@
       "position": "WR",
       "adp": 221,
       "byeWeek": 14,
-      "projection": 201
+      "projection": 201,
+      "photoUrl": "/players/wicks_dontayvion.webp"
     },
     {
       "id": "tucker_sean",
@@ -2010,7 +2076,8 @@
       "position": "RB",
       "adp": 222,
       "byeWeek": 7,
-      "projection": 188
+      "projection": 188,
+      "photoUrl": "/players/tucker_sean.webp"
     },
     {
       "id": "hunter_jarquez",
@@ -2019,7 +2086,8 @@
       "position": "RB",
       "adp": 223,
       "byeWeek": 6,
-      "projection": 188
+      "projection": 188,
+      "photoUrl": "/players/hunter_jarquez.webp"
     },
     {
       "id": "wilson_russell",
@@ -2028,7 +2096,8 @@
       "position": "QB",
       "adp": 224,
       "byeWeek": 7,
-      "projection": 269
+      "projection": 269,
+      "photoUrl": "/players/wilson_russell.webp"
     },
     {
       "id": "wilson_roman",
@@ -2037,7 +2106,8 @@
       "position": "WR",
       "adp": 225,
       "byeWeek": 11,
-      "projection": 199
+      "projection": 199,
+      "photoUrl": "/players/wilson_roman.webp"
     },
     {
       "id": "mostert_raheem",
@@ -2046,7 +2116,8 @@
       "position": "RB",
       "adp": 226,
       "byeWeek": 9,
-      "projection": 186
+      "projection": 186,
+      "photoUrl": "/players/mostert_raheem.webp"
     },
     {
       "id": "johnson_theo",
@@ -2055,7 +2126,8 @@
       "position": "WR",
       "adp": 227,
       "byeWeek": 7,
-      "projection": 198
+      "projection": 198,
+      "photoUrl": "/players/johnson_theo.webp"
     },
     {
       "id": "fannin_harold",
@@ -2064,7 +2136,8 @@
       "position": "TE",
       "adp": 228,
       "byeWeek": 9,
-      "projection": 128
+      "projection": 128,
+      "photoUrl": "/players/fannin_harold.webp"
     },
     {
       "id": "washington_malik",
@@ -2073,7 +2146,8 @@
       "position": "WR",
       "adp": 229,
       "byeWeek": 6,
-      "projection": 197
+      "projection": 197,
+      "photoUrl": "/players/washington_malik.webp"
     },
     {
       "id": "flacco_joe",
@@ -2082,7 +2156,8 @@
       "position": "QB",
       "adp": 230,
       "byeWeek": 10,
-      "projection": 265
+      "projection": 265,
+      "photoUrl": "/players/flacco_joe.webp"
     },
     {
       "id": "kmet_cole",
@@ -2091,7 +2166,8 @@
       "position": "TE",
       "adp": 231,
       "byeWeek": 13,
-      "projection": 127
+      "projection": 127,
+      "photoUrl": "/players/kmet_cole.webp"
     },
     {
       "id": "gainwell_kenneth",
@@ -2100,7 +2176,8 @@
       "position": "RB",
       "adp": 232,
       "byeWeek": 11,
-      "projection": 183
+      "projection": 183,
+      "photoUrl": "/players/gainwell_kenneth.webp"
     },
     {
       "id": "royals_jalen",
@@ -2109,7 +2186,8 @@
       "position": "WR",
       "adp": 233,
       "byeWeek": 6,
-      "projection": 195
+      "projection": 195,
+      "photoUrl": "/players/royals_jalen.webp"
     },
     {
       "id": "neal_devin",
@@ -2118,7 +2196,8 @@
       "position": "RB",
       "adp": 234,
       "byeWeek": 12,
-      "projection": 182
+      "projection": 182,
+      "photoUrl": "/players/neal_devin.webp"
     },
     {
       "id": "vele_devaughn",
@@ -2127,7 +2206,8 @@
       "position": "WR",
       "adp": 235,
       "byeWeek": 12,
-      "projection": 193
+      "projection": 193,
+      "photoUrl": "/players/vele_devaughn.webp"
     },
     {
       "id": "johnson_ty",
@@ -2136,7 +2216,8 @@
       "position": "RB",
       "adp": 236,
       "byeWeek": 13,
-      "projection": 181
+      "projection": 181,
+      "photoUrl": "/players/johnson_ty.webp"
     },
     {
       "id": "mcmillan_jalen",
@@ -2145,7 +2226,8 @@
       "position": "WR",
       "adp": 237,
       "byeWeek": 7,
-      "projection": 192
+      "projection": 192,
+      "photoUrl": "/players/mcmillan_jalen.webp"
     },
     {
       "id": "boutte_kayshon",
@@ -2154,7 +2236,8 @@
       "position": "WR",
       "adp": 238,
       "byeWeek": 10,
-      "projection": 192
+      "projection": 192,
+      "photoUrl": "/players/boutte_kayshon.webp"
     },
     {
       "id": "mclaughlin_jaleel",
@@ -2163,7 +2246,8 @@
       "position": "RB",
       "adp": 239,
       "byeWeek": 11,
-      "projection": 179
+      "projection": 179,
+      "photoUrl": "/players/mclaughlin_jaleel.webp"
     },
     {
       "id": "etienne_trevor",
@@ -2172,7 +2256,8 @@
       "position": "RB",
       "adp": 240,
       "byeWeek": 7,
-      "projection": 179
+      "projection": 179,
+      "photoUrl": "/players/etienne_trevor.webp"
     },
     {
       "id": "mitchell_elijah",
@@ -2181,7 +2266,8 @@
       "position": "RB",
       "adp": 241,
       "byeWeek": 6,
-      "projection": 179
+      "projection": 179,
+      "photoUrl": "/players/mitchell_elijah.webp"
     },
     {
       "id": "richardson_anthony",
@@ -2190,7 +2276,8 @@
       "position": "QB",
       "adp": 242,
       "byeWeek": 12,
-      "projection": 257
+      "projection": 257,
+      "photoUrl": "/players/richardson_anthony.webp"
     },
     {
       "id": "gray_noah",
@@ -2199,7 +2286,8 @@
       "position": "TE",
       "adp": 243,
       "byeWeek": 6,
-      "projection": 124
+      "projection": 124,
+      "photoUrl": "/players/gray_noah.webp"
     },
     {
       "id": "tolbert_jalen",
@@ -2208,7 +2296,8 @@
       "position": "WR",
       "adp": 244,
       "byeWeek": 14,
-      "projection": 189
+      "projection": 189,
+      "photoUrl": "/players/tolbert_jalen.webp"
     },
     {
       "id": "cooks_brandin",
@@ -2217,7 +2306,8 @@
       "position": "WR",
       "adp": 245,
       "byeWeek": 13,
-      "projection": 188
+      "projection": 188,
+      "photoUrl": "/players/cooks_brandin.webp"
     },
     {
       "id": "davis_isaiah",
@@ -2226,7 +2316,8 @@
       "position": "RB",
       "adp": 246,
       "byeWeek": 5,
-      "projection": 176
+      "projection": 176,
+      "photoUrl": "/players/davis_isaiah.webp"
     },
     {
       "id": "singletary_devin",
@@ -2235,7 +2326,8 @@
       "position": "RB",
       "adp": 247,
       "byeWeek": 7,
-      "projection": 175
+      "projection": 175,
+      "photoUrl": "/players/singletary_devin.webp"
     },
     {
       "id": "westbrookikhine_nick",
@@ -2244,7 +2336,8 @@
       "position": "WR",
       "adp": 248,
       "byeWeek": 6,
-      "projection": 187
+      "projection": 187,
+      "photoUrl": "/players/westbrookikhine_nick.webp"
     },
     {
       "id": "waller_darren",
@@ -2253,7 +2346,8 @@
       "position": "WR",
       "adp": 249,
       "byeWeek": 6,
-      "projection": 186
+      "projection": 186,
+      "photoUrl": "/players/waller_darren.webp"
     },
     {
       "id": "gibson_antonio",
@@ -2262,7 +2356,8 @@
       "position": "RB",
       "adp": 250,
       "byeWeek": 10,
-      "projection": 174
+      "projection": 174,
+      "photoUrl": "/players/gibson_antonio.webp"
     },
     {
       "id": "tucker_tre",
@@ -2271,7 +2366,8 @@
       "position": "WR",
       "adp": 251,
       "byeWeek": 9,
-      "projection": 185
+      "projection": 185,
+      "photoUrl": "/players/tucker_tre.webp"
     },
     {
       "id": "dart_jaxson",
@@ -2280,7 +2376,8 @@
       "position": "WR",
       "adp": 252,
       "byeWeek": 7,
-      "projection": 184
+      "projection": 184,
+      "photoUrl": "/players/dart_jaxson.webp"
     },
     {
       "id": "moore_elijah",
@@ -2289,7 +2386,8 @@
       "position": "WR",
       "adp": 253,
       "byeWeek": 11,
-      "projection": 184
+      "projection": 184,
+      "photoUrl": "/players/moore_elijah.webp"
     },
     {
       "id": "nailor_jalen",
@@ -2298,7 +2396,8 @@
       "position": "WR",
       "adp": 254,
       "byeWeek": 6,
-      "projection": 183
+      "projection": 183,
+      "photoUrl": "/players/nailor_jalen.webp"
     },
     {
       "id": "wilson_emanuel",
@@ -2307,7 +2406,8 @@
       "position": "RB",
       "adp": 255,
       "byeWeek": 14,
-      "projection": 170
+      "projection": 170,
+      "photoUrl": "/players/wilson_emanuel.webp"
     },
     {
       "id": "washington_parker",
@@ -2316,7 +2416,8 @@
       "position": "WR",
       "adp": 256,
       "byeWeek": 10,
-      "projection": 180
+      "projection": 180,
+      "photoUrl": "/players/washington_parker.webp"
     },
     {
       "id": "brooks_chris",
@@ -2325,7 +2426,8 @@
       "position": "RB",
       "adp": 257,
       "byeWeek": 14,
-      "projection": 168
+      "projection": 168,
+      "photoUrl": "/players/brooks_chris.webp"
     },
     {
       "id": "franklin_troy",
@@ -2334,7 +2436,8 @@
       "position": "WR",
       "adp": 258,
       "byeWeek": 11,
-      "projection": 178
+      "projection": 178,
+      "photoUrl": "/players/franklin_troy.webp"
     },
     {
       "id": "shough_tyler",
@@ -2343,7 +2446,8 @@
       "position": "QB",
       "adp": 259,
       "byeWeek": 12,
-      "projection": 242
+      "projection": 242,
+      "photoUrl": "/players/shough_tyler.webp"
     },
     {
       "id": "watson_christian",
@@ -2352,7 +2456,8 @@
       "position": "WR",
       "adp": 260,
       "byeWeek": 14,
-      "projection": 177
+      "projection": 177,
+      "photoUrl": "/players/watson_christian.webp"
     },
     {
       "id": "james_jordan",
@@ -2361,7 +2466,8 @@
       "position": "RB",
       "adp": 261,
       "byeWeek": 11,
-      "projection": 166
+      "projection": 166,
+      "photoUrl": "/players/james_jordan.webp"
     },
     {
       "id": "mccloud_rayray",
@@ -2370,7 +2476,8 @@
       "position": "WR",
       "adp": 262,
       "byeWeek": 7,
-      "projection": 176
+      "projection": 176,
+      "photoUrl": "/players/mccloud_rayray.webp"
     },
     {
       "id": "patrick_tim",
@@ -2379,7 +2486,8 @@
       "position": "WR",
       "adp": 263,
       "byeWeek": 10,
-      "projection": 176
+      "projection": 176,
+      "photoUrl": "/players/patrick_tim.webp"
     },
     {
       "id": "rattler_spencer",
@@ -2388,7 +2496,8 @@
       "position": "QB",
       "adp": 264,
       "byeWeek": 12,
-      "projection": 239
+      "projection": 239,
+      "photoUrl": "/players/rattler_spencer.webp"
     },
     {
       "id": "perine_samaje",
@@ -2397,7 +2506,8 @@
       "position": "WR",
       "adp": 265,
       "byeWeek": 10,
-      "projection": 175
+      "projection": 175,
+      "photoUrl": "/players/perine_samaje.webp"
     },
     {
       "id": "white_zamir",
@@ -2406,7 +2516,8 @@
       "position": "WR",
       "adp": 266,
       "byeWeek": 9,
-      "projection": 175
+      "projection": 175,
+      "photoUrl": "/players/white_zamir.webp"
     },
     {
       "id": "mccaffrey_luke",
@@ -2415,7 +2526,8 @@
       "position": "WR",
       "adp": 267,
       "byeWeek": 14,
-      "projection": 174
+      "projection": 174,
+      "photoUrl": "/players/mccaffrey_luke.webp"
     },
     {
       "id": "ferguson_terrance",
@@ -2424,7 +2536,8 @@
       "position": "TE",
       "adp": 268,
       "byeWeek": 6,
-      "projection": 114
+      "projection": 114,
+      "photoUrl": "/players/ferguson_terrance.webp"
     },
     {
       "id": "chandler_ty",
@@ -2433,7 +2546,8 @@
       "position": "RB",
       "adp": 269,
       "byeWeek": 6,
-      "projection": 161
+      "projection": 161,
+      "photoUrl": "/players/chandler_ty.webp"
     },
     {
       "id": "burton_jermaine",
@@ -2442,7 +2556,8 @@
       "position": "WR",
       "adp": 270,
       "byeWeek": 10,
-      "projection": 172
+      "projection": 172,
+      "photoUrl": "/players/burton_jermaine.webp"
     },
     {
       "id": "higbee_tyler",
@@ -2451,7 +2566,8 @@
       "position": "TE",
       "adp": 271,
       "byeWeek": 6,
-      "projection": 113
+      "projection": 113,
+      "photoUrl": "/players/higbee_tyler.webp"
     },
     {
       "id": "atwell_tutu",
@@ -2460,7 +2576,8 @@
       "position": "WR",
       "adp": 272,
       "byeWeek": 6,
-      "projection": 171
+      "projection": 171,
+      "photoUrl": "/players/atwell_tutu.webp"
     },
     {
       "id": "mafah_phil",
@@ -2469,7 +2586,8 @@
       "position": "RB",
       "adp": 273,
       "byeWeek": 14,
-      "projection": 160
+      "projection": 160,
+      "photoUrl": "/players/mafah_phil.webp"
     },
     {
       "id": "fant_noah",
@@ -2478,7 +2596,8 @@
       "position": "TE",
       "adp": 274,
       "byeWeek": 10,
-      "projection": 112
+      "projection": 112,
+      "photoUrl": "/players/fant_noah.webp"
     },
     {
       "id": "vidal_kimani",
@@ -2487,7 +2606,8 @@
       "position": "RB",
       "adp": 275,
       "byeWeek": 5,
-      "projection": 159
+      "projection": 159,
+      "photoUrl": "/players/vidal_kimani.webp"
     },
     {
       "id": "hill_taysom",
@@ -2496,7 +2616,8 @@
       "position": "TE",
       "adp": 276,
       "byeWeek": 12,
-      "projection": 112
+      "projection": 112,
+      "photoUrl": "/players/hill_taysom.webp"
     },
     {
       "id": "sanders_raheim",
@@ -2505,7 +2626,8 @@
       "position": "RB",
       "adp": 277,
       "byeWeek": 9,
-      "projection": 158
+      "projection": 158,
+      "photoUrl": "/players/sanders_raheim.webp"
     },
     {
       "id": "reynolds_josh",
@@ -2514,7 +2636,8 @@
       "position": "WR",
       "adp": 278,
       "byeWeek": 5,
-      "projection": 168
+      "projection": 168,
+      "photoUrl": "/players/reynolds_josh.webp"
     },
     {
       "id": "johnson_tez",
@@ -2523,7 +2646,8 @@
       "position": "WR",
       "adp": 279,
       "byeWeek": 7,
-      "projection": 167
+      "projection": 167,
+      "photoUrl": "/players/johnson_tez.webp"
     },
     {
       "id": "estime_audric",
@@ -2532,7 +2656,8 @@
       "position": "RB",
       "adp": 280,
       "byeWeek": 12,
-      "projection": 156
+      "projection": 156,
+      "photoUrl": "/players/estime_audric.webp"
     },
     {
       "id": "restrepo_xavier",
@@ -2541,7 +2666,8 @@
       "position": "WR",
       "adp": 281,
       "byeWeek": 9,
-      "projection": 165
+      "projection": 165,
+      "photoUrl": "/players/restrepo_xavier.webp"
     },
     {
       "id": "dillon_aj",
@@ -2550,7 +2676,8 @@
       "position": "RB",
       "adp": 282,
       "byeWeek": 14,
-      "projection": 155
+      "projection": 155,
+      "photoUrl": "/players/dillon_aj.webp"
     },
     {
       "id": "gadsden_oronde",
@@ -2559,7 +2686,8 @@
       "position": "TE",
       "adp": 283,
       "byeWeek": 5,
-      "projection": 109
+      "projection": 109,
+      "photoUrl": "/players/gadsden_oronde.webp"
     },
     {
       "id": "conklin_tyler",
@@ -2568,7 +2696,8 @@
       "position": "TE",
       "adp": 284,
       "byeWeek": 5,
-      "projection": 109
+      "projection": 109,
+      "photoUrl": "/players/conklin_tyler.webp"
     },
     {
       "id": "martinez_damien",
@@ -2577,7 +2706,8 @@
       "position": "RB",
       "adp": 285,
       "byeWeek": 0,
-      "projection": 153
+      "projection": 153,
+      "photoUrl": "/players/martinez_damien.webp"
     },
     {
       "id": "whittington_jordan",
@@ -2586,7 +2716,8 @@
       "position": "WR",
       "adp": 286,
       "byeWeek": 6,
-      "projection": 163
+      "projection": 163,
+      "photoUrl": "/players/whittington_jordan.webp"
     },
     {
       "id": "mccormick_sincere",
@@ -2595,7 +2726,8 @@
       "position": "RB",
       "adp": 287,
       "byeWeek": 0,
-      "projection": 152
+      "projection": 152,
+      "photoUrl": "/players/mccormick_sincere.webp"
     },
     {
       "id": "dissly_will",
@@ -2604,7 +2736,8 @@
       "position": "TE",
       "adp": 288,
       "byeWeek": 5,
-      "projection": 108
+      "projection": 108,
+      "photoUrl": "/players/dissly_will.webp"
     },
     {
       "id": "herbert_khalil",
@@ -2613,7 +2746,8 @@
       "position": "RB",
       "adp": 289,
       "byeWeek": 5,
-      "projection": 152
+      "projection": 152,
+      "photoUrl": "/players/herbert_khalil.webp"
     },
     {
       "id": "turpin_kavontae",
@@ -2622,7 +2756,8 @@
       "position": "WR",
       "adp": 290,
       "byeWeek": 14,
-      "projection": 161
+      "projection": 161,
+      "photoUrl": "/players/turpin_kavontae.webp"
     },
     {
       "id": "lane_jaylin",
@@ -2631,7 +2766,8 @@
       "position": "WR",
       "adp": 291,
       "byeWeek": 14,
-      "projection": 161
+      "projection": 161,
+      "photoUrl": "/players/lane_jaylin.webp"
     },
     {
       "id": "sinnott_ben",
@@ -2640,7 +2776,8 @@
       "position": "TE",
       "adp": 292,
       "byeWeek": 14,
-      "projection": 106
+      "projection": 106,
+      "photoUrl": "/players/sinnott_ben.webp"
     },
     {
       "id": "sanders_shedeur",
@@ -2649,7 +2786,8 @@
       "position": "QB",
       "adp": 293,
       "byeWeek": 9,
-      "projection": 219
+      "projection": 219,
+      "photoUrl": "/players/sanders_shedeur.webp"
     },
     {
       "id": "barner_aj",
@@ -2658,7 +2796,8 @@
       "position": "TE",
       "adp": 294,
       "byeWeek": 9,
-      "projection": 106
+      "projection": 106,
+      "photoUrl": "/players/barner_aj.webp"
     },
     {
       "id": "brown_noah",
@@ -2667,7 +2806,8 @@
       "position": "WR",
       "adp": 295,
       "byeWeek": 14,
-      "projection": 158
+      "projection": 158,
+      "photoUrl": "/players/brown_noah.webp"
     },
     {
       "id": "zaccheaus_olamide",
@@ -2676,7 +2816,8 @@
       "position": "WR",
       "adp": 296,
       "byeWeek": 13,
-      "projection": 158
+      "projection": 158,
+      "photoUrl": "/players/zaccheaus_olamide.webp"
     },
     {
       "id": "lambertsmith_keandre",
@@ -2685,7 +2826,8 @@
       "position": "WR",
       "adp": 297,
       "byeWeek": 5,
-      "projection": 157
+      "projection": 157,
+      "photoUrl": "/players/lambertsmith_keandre.webp"
     },
     {
       "id": "mayer_michael",
@@ -2694,7 +2836,8 @@
       "position": "WR",
       "adp": 298,
       "byeWeek": 9,
-      "projection": 156
+      "projection": 156,
+      "photoUrl": "/players/mayer_michael.webp"
     },
     {
       "id": "knox_dawson",
@@ -2703,7 +2846,8 @@
       "position": "TE",
       "adp": 299,
       "byeWeek": 13,
-      "projection": 104
+      "projection": 104,
+      "photoUrl": "/players/knox_dawson.webp"
     },
     {
       "id": "bond_isaiah",
@@ -2712,7 +2856,8 @@
       "position": "WR",
       "adp": 300,
       "byeWeek": 9,
-      "projection": 155
+      "projection": 155,
+      "photoUrl": "/players/bond_isaiah.webp"
     },
     {
       "id": "davis_gabe",
@@ -2721,7 +2866,8 @@
       "position": "WR",
       "adp": 301,
       "byeWeek": 13,
-      "projection": 155
+      "projection": 155,
+      "photoUrl": "/players/davis_gabe.webp"
     },
     {
       "id": "johnson_diontae",
@@ -2730,7 +2876,8 @@
       "position": "WR",
       "adp": 302,
       "byeWeek": 0,
-      "projection": 154
+      "projection": 154,
+      "photoUrl": "/players/johnson_diontae.webp"
     },
     {
       "id": "robinson_demarcus",
@@ -2739,7 +2886,8 @@
       "position": "WR",
       "adp": 303,
       "byeWeek": 11,
-      "projection": 152
+      "projection": 152,
+      "photoUrl": "/players/robinson_demarcus.webp"
     },
     {
       "id": "musgrave_luke",
@@ -2748,7 +2896,8 @@
       "position": "TE",
       "adp": 304,
       "byeWeek": 14,
-      "projection": 102
+      "projection": 102,
+      "photoUrl": "/players/musgrave_luke.webp"
     },
     {
       "id": "mullings_kalel",
@@ -2757,7 +2906,8 @@
       "position": "RB",
       "adp": 305,
       "byeWeek": 9,
-      "projection": 142
+      "projection": 142,
+      "photoUrl": "/players/mullings_kalel.webp"
     },
     {
       "id": "milroe_jalen",
@@ -2766,7 +2916,8 @@
       "position": "QB",
       "adp": 306,
       "byeWeek": 9,
-      "projection": 209
+      "projection": 209,
+      "photoUrl": "/players/milroe_jalen.webp"
     },
     {
       "id": "helm_gunnar",
@@ -2775,7 +2926,8 @@
       "position": "TE",
       "adp": 307,
       "byeWeek": 9,
-      "projection": 101
+      "projection": 101,
+      "photoUrl": "/players/helm_gunnar.webp"
     },
     {
       "id": "hooper_austin",
@@ -2784,7 +2936,8 @@
       "position": "TE",
       "adp": 308,
       "byeWeek": 10,
-      "projection": 101
+      "projection": 101,
+      "photoUrl": "/players/hooper_austin.webp"
     },
     {
       "id": "metchie_john",
@@ -2793,7 +2946,8 @@
       "position": "WR",
       "adp": 309,
       "byeWeek": 5,
-      "projection": 150
+      "projection": 150,
+      "photoUrl": "/players/metchie_john.webp"
     },
     {
       "id": "renfrow_hunter",
@@ -2802,7 +2956,8 @@
       "position": "WR",
       "adp": 310,
       "byeWeek": 7,
-      "projection": 149
+      "projection": 149,
+      "photoUrl": "/players/renfrow_hunter.webp"
     },
     {
       "id": "samuel_curtis",
@@ -2811,7 +2966,8 @@
       "position": "WR",
       "adp": 311,
       "byeWeek": 13,
-      "projection": 149
+      "projection": 149,
+      "photoUrl": "/players/samuel_curtis.webp"
     },
     {
       "id": "hollins_mack",
@@ -2820,7 +2976,8 @@
       "position": "WR",
       "adp": 312,
       "byeWeek": 10,
-      "projection": 148
+      "projection": 148,
+      "photoUrl": "/players/hollins_mack.webp"
     },
     {
       "id": "mcnichols_jeremy",
@@ -2829,7 +2986,8 @@
       "position": "RB",
       "adp": 313,
       "byeWeek": 14,
-      "projection": 138
+      "projection": 138,
+      "photoUrl": "/players/mcnichols_jeremy.webp"
     },
     {
       "id": "demercado_emari",
@@ -2838,7 +2996,8 @@
       "position": "RB",
       "adp": 314,
       "byeWeek": 7,
-      "projection": 138
+      "projection": 138,
+      "photoUrl": "/players/demercado_emari.webp"
     },
     {
       "id": "dotson_jahan",
@@ -2847,7 +3006,8 @@
       "position": "WR",
       "adp": 315,
       "byeWeek": 14,
-      "projection": 147
+      "projection": 147,
+      "photoUrl": "/players/dotson_jahan.webp"
     },
     {
       "id": "dike_chimere",
@@ -2856,7 +3016,8 @@
       "position": "WR",
       "adp": 316,
       "byeWeek": 9,
-      "projection": 146
+      "projection": 146,
+      "photoUrl": "/players/dike_chimere.webp"
     },
     {
       "id": "felton_tai",
@@ -2865,7 +3026,8 @@
       "position": "WR",
       "adp": 317,
       "byeWeek": 6,
-      "projection": 146
+      "projection": 146,
+      "photoUrl": "/players/felton_tai.webp"
     },
     {
       "id": "allen_lequint",
@@ -2874,7 +3036,8 @@
       "position": "RB",
       "adp": 318,
       "byeWeek": 10,
-      "projection": 136
+      "projection": 136,
+      "photoUrl": "/players/allen_lequint.webp"
     },
     {
       "id": "gabriel_dillon",
@@ -2883,7 +3046,8 @@
       "position": "QB",
       "adp": 319,
       "byeWeek": 9,
-      "projection": 201
+      "projection": 201,
+      "photoUrl": "/players/gabriel_dillon.webp"
     },
     {
       "id": "tremble_tommy",
@@ -2892,7 +3056,8 @@
       "position": "TE",
       "adp": 320,
       "byeWeek": 7,
-      "projection": 98
+      "projection": 98,
+      "photoUrl": "/players/tremble_tommy.webp"
     },
     {
       "id": "stover_cade",
@@ -2901,7 +3066,8 @@
       "position": "TE",
       "adp": 321,
       "byeWeek": 11,
-      "projection": 97
+      "projection": 97,
+      "photoUrl": "/players/stover_cade.webp"
     },
     {
       "id": "lazard_allen",
@@ -2910,7 +3076,8 @@
       "position": "WR",
       "adp": 322,
       "byeWeek": 5,
-      "projection": 143
+      "projection": 143,
+      "photoUrl": "/players/lazard_allen.webp"
     },
     {
       "id": "jones_zay",
@@ -2919,7 +3086,8 @@
       "position": "WR",
       "adp": 323,
       "byeWeek": 7,
-      "projection": 143
+      "projection": 143,
+      "photoUrl": "/players/jones_zay.webp"
     },
     {
       "id": "moss_zack",
@@ -2928,7 +3096,8 @@
       "position": "RB",
       "adp": 324,
       "byeWeek": 0,
-      "projection": 134
+      "projection": 134,
+      "photoUrl": "/players/moss_zack.webp"
     },
     {
       "id": "cousins_kirk",
@@ -2937,7 +3106,8 @@
       "position": "QB",
       "adp": 325,
       "byeWeek": 13,
-      "projection": 197
+      "projection": 197,
+      "photoUrl": "/players/cousins_kirk.webp"
     },
     {
       "id": "williams_savion",
@@ -2946,7 +3116,8 @@
       "position": "WR",
       "adp": 326,
       "byeWeek": 14,
-      "projection": 141
+      "projection": 141,
+      "photoUrl": "/players/williams_savion.webp"
     },
     {
       "id": "dortch_greg",
@@ -2955,7 +3126,8 @@
       "position": "WR",
       "adp": 327,
       "byeWeek": 7,
-      "projection": 141
+      "projection": 141,
+      "photoUrl": "/players/dortch_greg.webp"
     },
     {
       "id": "smithschuster_juju",
@@ -2964,7 +3136,8 @@
       "position": "WR",
       "adp": 328,
       "byeWeek": 6,
-      "projection": 140
+      "projection": 140,
+      "photoUrl": "/players/smithschuster_juju.webp"
     },
     {
       "id": "garoppolo_jimmy",
@@ -2973,7 +3146,8 @@
       "position": "QB",
       "adp": 329,
       "byeWeek": 6,
-      "projection": 194
+      "projection": 194,
+      "photoUrl": "/players/garoppolo_jimmy.webp"
     },
     {
       "id": "jefferson_van",
@@ -2982,7 +3156,8 @@
       "position": "WR",
       "adp": 330,
       "byeWeek": 9,
-      "projection": 139
+      "projection": 139,
+      "photoUrl": "/players/jefferson_van.webp"
     },
     {
       "id": "thrash_jamari",
@@ -2991,7 +3166,8 @@
       "position": "WR",
       "adp": 331,
       "byeWeek": 9,
-      "projection": 138
+      "projection": 138,
+      "photoUrl": "/players/thrash_jamari.webp"
     },
     {
       "id": "valdesscantling_marquez",
@@ -3000,7 +3176,8 @@
       "position": "WR",
       "adp": 332,
       "byeWeek": 11,
-      "projection": 138
+      "projection": 138,
+      "photoUrl": "/players/valdesscantling_marquez.webp"
     },
     {
       "id": "chestnut_julius",
@@ -3009,7 +3186,8 @@
       "position": "WR",
       "adp": 333,
       "byeWeek": 9,
-      "projection": 137
+      "projection": 137,
+      "photoUrl": "/players/chestnut_julius.webp"
     },
     {
       "id": "schoonmaker_luke",
@@ -3018,7 +3196,8 @@
       "position": "TE",
       "adp": 334,
       "byeWeek": 14,
-      "projection": 93
+      "projection": 93,
+      "photoUrl": "/players/schoonmaker_luke.webp"
     },
     {
       "id": "winston_jameis",
@@ -3027,7 +3206,8 @@
       "position": "QB",
       "adp": 335,
       "byeWeek": 7,
-      "projection": 189
+      "projection": 189,
+      "photoUrl": "/players/winston_jameis.webp"
     },
     {
       "id": "moreau_foster",
@@ -3036,7 +3216,8 @@
       "position": "TE",
       "adp": 336,
       "byeWeek": 12,
-      "projection": 92
+      "projection": 92,
+      "photoUrl": "/players/moreau_foster.webp"
     },
     {
       "id": "oliver_josh",
@@ -3045,7 +3226,8 @@
       "position": "TE",
       "adp": 337,
       "byeWeek": 6,
-      "projection": 92
+      "projection": 92,
+      "photoUrl": "/players/oliver_josh.webp"
     },
     {
       "id": "reynolds_craig",
@@ -3054,7 +3236,8 @@
       "position": "RB",
       "adp": 338,
       "byeWeek": 10,
-      "projection": 125
+      "projection": 125,
+      "photoUrl": "/players/reynolds_craig.webp"
     },
     {
       "id": "ogunbowale_dare",
@@ -3063,7 +3246,8 @@
       "position": "RB",
       "adp": 339,
       "byeWeek": 11,
-      "projection": 125
+      "projection": 125,
+      "photoUrl": "/players/ogunbowale_dare.webp"
     },
     {
       "id": "juszczyk_kyle",
@@ -3072,7 +3256,8 @@
       "position": "RB",
       "adp": 340,
       "byeWeek": 11,
-      "projection": 124
+      "projection": 124,
+      "photoUrl": "/players/juszczyk_kyle.webp"
     },
     {
       "id": "edwards_gus",
@@ -3081,7 +3266,8 @@
       "position": "RB",
       "adp": 341,
       "byeWeek": 0,
-      "projection": 124
+      "projection": 124,
+      "photoUrl": "/players/edwards_gus.webp"
     },
     {
       "id": "tucker_justin",
@@ -3090,7 +3276,8 @@
       "position": "WR",
       "adp": 342,
       "byeWeek": 0,
-      "projection": 131
+      "projection": 131,
+      "photoUrl": "/players/tucker_justin.webp"
     },
     {
       "id": "smith_arian",
@@ -3099,7 +3286,8 @@
       "position": "WR",
       "adp": 343,
       "byeWeek": 5,
-      "projection": 131
+      "projection": 131,
+      "photoUrl": "/players/smith_arian.webp"
     },
     {
       "id": "calcaterra_grant",
@@ -3108,7 +3296,8 @@
       "position": "TE",
       "adp": 344,
       "byeWeek": 14,
-      "projection": 89
+      "projection": 89,
+      "photoUrl": "/players/calcaterra_grant.webp"
     },
     {
       "id": "ruckert_jeremy",
@@ -3117,7 +3306,8 @@
       "position": "TE",
       "adp": 345,
       "byeWeek": 5,
-      "projection": 89
+      "projection": 89,
+      "photoUrl": "/players/ruckert_jeremy.webp"
     },
     {
       "id": "hyatt_jalin",
@@ -3126,7 +3316,8 @@
       "position": "WR",
       "adp": 346,
       "byeWeek": 7,
-      "projection": 129
+      "projection": 129,
+      "photoUrl": "/players/hyatt_jalin.webp"
     },
     {
       "id": "goodson_tyler",
@@ -3135,7 +3326,8 @@
       "position": "RB",
       "adp": 347,
       "byeWeek": 12,
-      "projection": 121
+      "projection": 121,
+      "photoUrl": "/players/goodson_tyler.webp"
     },
     {
       "id": "smartt_stone",
@@ -3144,7 +3336,8 @@
       "position": "WR",
       "adp": 348,
       "byeWeek": 5,
-      "projection": 128
+      "projection": 128,
+      "photoUrl": "/players/smartt_stone.webp"
     },
     {
       "id": "raymond_kalif",
@@ -3153,7 +3346,8 @@
       "position": "WR",
       "adp": 349,
       "byeWeek": 13,
-      "projection": 128
+      "projection": 128,
+      "photoUrl": "/players/raymond_kalif.webp"
     },
     {
       "id": "thornton_tyquan",
@@ -3162,7 +3356,8 @@
       "position": "WR",
       "adp": 350,
       "byeWeek": 6,
-      "projection": 128
+      "projection": 128,
+      "photoUrl": "/players/thornton_tyquan.webp"
     },
     {
       "id": "evans_mitchell",
@@ -3171,7 +3366,8 @@
       "position": "WR",
       "adp": 351,
       "byeWeek": 7,
-      "projection": 127
+      "projection": 127,
+      "photoUrl": "/players/evans_mitchell.webp"
     },
     {
       "id": "washington_darnell",
@@ -3180,7 +3376,8 @@
       "position": "TE",
       "adp": 352,
       "byeWeek": 11,
-      "projection": 87
+      "projection": 87,
+      "photoUrl": "/players/washington_darnell.webp"
     },
     {
       "id": "higgins_elijah",
@@ -3189,7 +3386,8 @@
       "position": "TE",
       "adp": 353,
       "byeWeek": 7,
-      "projection": 87
+      "projection": 87,
+      "photoUrl": "/players/higgins_elijah.webp"
     },
     {
       "id": "chism_efton",
@@ -3198,7 +3396,8 @@
       "position": "WR",
       "adp": 354,
       "byeWeek": 10,
-      "projection": 126
+      "projection": 126,
+      "photoUrl": "/players/chism_efton.webp"
     },
     {
       "id": "haskins_hassan",
@@ -3207,7 +3406,8 @@
       "position": "RB",
       "adp": 355,
       "byeWeek": 5,
-      "projection": 117
+      "projection": 117,
+      "photoUrl": "/players/haskins_hassan.webp"
     },
     {
       "id": "holani_george",
@@ -3216,7 +3416,8 @@
       "position": "RB",
       "adp": 356,
       "byeWeek": 9,
-      "projection": 117
+      "projection": 117,
+      "photoUrl": "/players/holani_george.webp"
     },
     {
       "id": "taylor_tyrod",
@@ -3225,7 +3426,8 @@
       "position": "QB",
       "adp": 357,
       "byeWeek": 5,
-      "projection": 175
+      "projection": 175,
+      "photoUrl": "/players/taylor_tyrod.webp"
     },
     {
       "id": "badie_tyler",
@@ -3234,7 +3436,8 @@
       "position": "RB",
       "adp": 358,
       "byeWeek": 11,
-      "projection": 115
+      "projection": 115,
+      "photoUrl": "/players/badie_tyler.webp"
     },
     {
       "id": "edwards_donovan",
@@ -3243,7 +3446,8 @@
       "position": "RB",
       "adp": 359,
       "byeWeek": 14,
-      "projection": 114
+      "projection": 114,
+      "photoUrl": "/players/edwards_donovan.webp"
     },
     {
       "id": "shepard_sterling",
@@ -3252,7 +3456,8 @@
       "position": "WR",
       "adp": 360,
       "byeWeek": 7,
-      "projection": 121
+      "projection": 121,
+      "photoUrl": "/players/shepard_sterling.webp"
     },
     {
       "id": "hutchinson_xavier",
@@ -3261,7 +3466,8 @@
       "position": "WR",
       "adp": 361,
       "byeWeek": 11,
-      "projection": 121
+      "projection": 121,
+      "photoUrl": "/players/hutchinson_xavier.webp"
     },
     {
       "id": "cowing_jacob",
@@ -3270,7 +3476,8 @@
       "position": "WR",
       "adp": 362,
       "byeWeek": 11,
-      "projection": 120
+      "projection": 120,
+      "photoUrl": "/players/cowing_jacob.webp"
     },
     {
       "id": "akers_cam",
@@ -3279,7 +3486,8 @@
       "position": "RB",
       "adp": 363,
       "byeWeek": 9,
-      "projection": 112
+      "projection": 112,
+      "photoUrl": "/players/akers_cam.webp"
     },
     {
       "id": "sermon_trey",
@@ -3288,7 +3496,8 @@
       "position": "RB",
       "adp": 364,
       "byeWeek": 11,
-      "projection": 111
+      "projection": 111,
+      "photoUrl": "/players/sermon_trey.webp"
     },
     {
       "id": "watkins_jordan",
@@ -3297,7 +3506,8 @@
       "position": "WR",
       "adp": 365,
       "byeWeek": 11,
-      "projection": 118
+      "projection": 118,
+      "photoUrl": "/players/watkins_jordan.webp"
     },
     {
       "id": "milton_joe",
@@ -3306,7 +3516,8 @@
       "position": "QB",
       "adp": 366,
       "byeWeek": 14,
-      "projection": 167
+      "projection": 167,
+      "photoUrl": "/players/milton_joe.webp"
     },
     {
       "id": "dell_tank",
@@ -3315,7 +3526,8 @@
       "position": "WR",
       "adp": 367,
       "byeWeek": 11,
-      "projection": 117
+      "projection": 117,
+      "photoUrl": "/players/dell_tank.webp"
     },
     {
       "id": "ingold_alec",
@@ -3324,7 +3536,8 @@
       "position": "RB",
       "adp": 368,
       "byeWeek": 6,
-      "projection": 109
+      "projection": 109,
+      "photoUrl": "/players/ingold_alec.webp"
     },
     {
       "id": "walker_devontez",
@@ -3333,7 +3546,8 @@
       "position": "WR",
       "adp": 369,
       "byeWeek": 10,
-      "projection": 116
+      "projection": 116,
+      "photoUrl": "/players/walker_devontez.webp"
     },
     {
       "id": "hill_julian",
@@ -3342,7 +3556,8 @@
       "position": "WR",
       "adp": 370,
       "byeWeek": 6,
-      "projection": 115
+      "projection": 115,
+      "photoUrl": "/players/hill_julian.webp"
     },
     {
       "id": "parkinson_colby",
@@ -3351,7 +3566,8 @@
       "position": "TE",
       "adp": 371,
       "byeWeek": 6,
-      "projection": 80
+      "projection": 80,
+      "photoUrl": "/players/parkinson_colby.webp"
     },
     {
       "id": "hodge_khadarel",
@@ -3360,7 +3576,8 @@
       "position": "WR",
       "adp": 372,
       "byeWeek": 13,
-      "projection": 114
+      "projection": 114,
+      "photoUrl": "/players/hodge_khadarel.webp"
     },
     {
       "id": "pickett_kenny",
@@ -3369,7 +3586,8 @@
       "position": "QB",
       "adp": 373,
       "byeWeek": 9,
-      "projection": 161
+      "projection": 161,
+      "photoUrl": "/players/pickett_kenny.webp"
     },
     {
       "id": "horn_jimmy",
@@ -3378,7 +3596,8 @@
       "position": "WR",
       "adp": 374,
       "byeWeek": 7,
-      "projection": 112
+      "projection": 112,
+      "photoUrl": "/players/horn_jimmy.webp"
     },
     {
       "id": "rudolph_mason",
@@ -3387,7 +3606,8 @@
       "position": "QB",
       "adp": 375,
       "byeWeek": 11,
-      "projection": 160
+      "projection": 160,
+      "photoUrl": "/players/rudolph_mason.webp"
     },
     {
       "id": "ali_rasheen",
@@ -3396,7 +3616,8 @@
       "position": "WR",
       "adp": 376,
       "byeWeek": 10,
-      "projection": 111
+      "projection": 111,
+      "photoUrl": "/players/ali_rasheen.webp"
     },
     {
       "id": "willis_malik",
@@ -3405,7 +3626,8 @@
       "position": "QB",
       "adp": 377,
       "byeWeek": 14,
-      "projection": 157
+      "projection": 157,
+      "photoUrl": "/players/willis_malik.webp"
     },
     {
       "id": "bobo_jake",
@@ -3414,7 +3636,8 @@
       "position": "WR",
       "adp": 378,
       "byeWeek": 9,
-      "projection": 109
+      "projection": 109,
+      "photoUrl": "/players/bobo_jake.webp"
     },
     {
       "id": "wright_brock",
@@ -3423,7 +3646,8 @@
       "position": "TE",
       "adp": 379,
       "byeWeek": 13,
-      "projection": 77
+      "projection": 77,
+      "photoUrl": "/players/wright_brock.webp"
     },
     {
       "id": "mingo_jonathan",
@@ -3432,7 +3656,8 @@
       "position": "WR",
       "adp": 380,
       "byeWeek": 14,
-      "projection": 108
+      "projection": 108,
+      "photoUrl": "/players/mingo_jonathan.webp"
     },
     {
       "id": "mariota_marcus",
@@ -3441,7 +3666,8 @@
       "position": "QB",
       "adp": 381,
       "byeWeek": 14,
-      "projection": 155
+      "projection": 155,
+      "photoUrl": "/players/mariota_marcus.webp"
     },
     {
       "id": "edwardshelaire_clyde",
@@ -3450,7 +3676,8 @@
       "position": "WR",
       "adp": 382,
       "byeWeek": 6,
-      "projection": 107
+      "projection": 107,
+      "photoUrl": "/players/edwardshelaire_clyde.webp"
     },
     {
       "id": "moore_skyy",
@@ -3459,7 +3686,8 @@
       "position": "WR",
       "adp": 383,
       "byeWeek": 11,
-      "projection": 107
+      "projection": 107,
+      "photoUrl": "/players/moore_skyy.webp"
     },
     {
       "id": "vaki_sione",
@@ -3468,7 +3696,8 @@
       "position": "WR",
       "adp": 384,
       "byeWeek": 13,
-      "projection": 106
+      "projection": 106,
+      "photoUrl": "/players/vaki_sione.webp"
     },
     {
       "id": "wease_theo",
@@ -3477,7 +3706,8 @@
       "position": "WR",
       "adp": 385,
       "byeWeek": 6,
-      "projection": 106
+      "projection": 106,
+      "photoUrl": "/players/wease_theo.webp"
     },
     {
       "id": "corley_malachi",
@@ -3486,7 +3716,8 @@
       "position": "WR",
       "adp": 386,
       "byeWeek": 9,
-      "projection": 105
+      "projection": 105,
+      "photoUrl": "/players/corley_malachi.webp"
     },
     {
       "id": "jackson_jaquinden",
@@ -3495,7 +3726,8 @@
       "position": "RB",
       "adp": 387,
       "byeWeek": 10,
-      "projection": 98
+      "projection": 98,
+      "photoUrl": "/players/jackson_jaquinden.webp"
     },
     {
       "id": "trautman_adam",
@@ -3504,7 +3736,8 @@
       "position": "TE",
       "adp": 388,
       "byeWeek": 11,
-      "projection": 74
+      "projection": 74,
+      "photoUrl": "/players/trautman_adam.webp"
     },
     {
       "id": "wells_antwane",
@@ -3513,7 +3746,8 @@
       "position": "WR",
       "adp": 389,
       "byeWeek": 0,
-      "projection": 104
+      "projection": 104,
+      "photoUrl": "/players/wells_antwane.webp"
     },
     {
       "id": "laube_dylan",
@@ -3522,7 +3756,8 @@
       "position": "RB",
       "adp": 390,
       "byeWeek": 9,
-      "projection": 97
+      "projection": 97,
+      "photoUrl": "/players/laube_dylan.webp"
     },
     {
       "id": "hudson_tanner",
@@ -3531,7 +3766,8 @@
       "position": "TE",
       "adp": 391,
       "byeWeek": 10,
-      "projection": 73
+      "projection": 73,
+      "photoUrl": "/players/hudson_tanner.webp"
     },
     {
       "id": "bellinger_daniel",
@@ -3540,7 +3776,8 @@
       "position": "TE",
       "adp": 392,
       "byeWeek": 7,
-      "projection": 73
+      "projection": 73,
+      "photoUrl": "/players/bellinger_daniel.webp"
     },
     {
       "id": "brooks_jonathon",
@@ -3549,7 +3786,8 @@
       "position": "RB",
       "adp": 393,
       "byeWeek": 7,
-      "projection": 95
+      "projection": 95,
+      "photoUrl": "/players/brooks_jonathon.webp"
     },
     {
       "id": "johnson_tyler",
@@ -3558,7 +3796,8 @@
       "position": "WR",
       "adp": 394,
       "byeWeek": 5,
-      "projection": 101
+      "projection": 101,
+      "photoUrl": "/players/johnson_tyler.webp"
     },
     {
       "id": "dulcich_greg",
@@ -3567,7 +3806,8 @@
       "position": "TE",
       "adp": 395,
       "byeWeek": 6,
-      "projection": 72
+      "projection": 72,
+      "photoUrl": "/players/dulcich_greg.webp"
     },
     {
       "id": "washington_casey",
@@ -3576,7 +3816,8 @@
       "position": "WR",
       "adp": 396,
       "byeWeek": 13,
-      "projection": 100
+      "projection": 100,
+      "photoUrl": "/players/washington_casey.webp"
     },
     {
       "id": "carter_michael",
@@ -3585,7 +3826,8 @@
       "position": "WR",
       "adp": 397,
       "byeWeek": 7,
-      "projection": 100
+      "projection": 100,
+      "photoUrl": "/players/carter_michael.webp"
     },
     {
       "id": "wilson_jeff",
@@ -3594,7 +3836,8 @@
       "position": "WR",
       "adp": 398,
       "byeWeek": 6,
-      "projection": 99
+      "projection": 99,
+      "photoUrl": "/players/wilson_jeff.webp"
     },
     {
       "id": "browning_jake",
@@ -3603,7 +3846,8 @@
       "position": "QB",
       "adp": 399,
       "byeWeek": 10,
-      "projection": 143
+      "projection": 143,
+      "photoUrl": "/players/browning_jake.webp"
     },
     {
       "id": "baker_javon",
@@ -3612,7 +3856,8 @@
       "position": "WR",
       "adp": 400,
       "byeWeek": 0,
-      "projection": 98
+      "projection": 98,
+      "photoUrl": "/players/baker_javon.webp"
     },
     {
       "id": "wilson_zach",
@@ -3621,7 +3866,8 @@
       "position": "QB",
       "adp": 401,
       "byeWeek": 6,
-      "projection": 142
+      "projection": 142,
+      "photoUrl": "/players/wilson_zach.webp"
     },
     {
       "id": "carter_nathan",
@@ -3630,7 +3876,8 @@
       "position": "RB",
       "adp": 402,
       "byeWeek": 13,
-      "projection": 91
+      "projection": 91,
+      "photoUrl": "/players/carter_nathan.webp"
     },
     {
       "id": "woods_robert",
@@ -3639,7 +3886,8 @@
       "position": "WR",
       "adp": 403,
       "byeWeek": 0,
-      "projection": 97
+      "projection": 97,
+      "photoUrl": "/players/woods_robert.webp"
     },
     {
       "id": "bates_john",
@@ -3648,7 +3896,8 @@
       "position": "TE",
       "adp": 404,
       "byeWeek": 14,
-      "projection": 70
+      "projection": 70,
+      "photoUrl": "/players/bates_john.webp"
     },
     {
       "id": "bourne_kendrick",
@@ -3657,7 +3906,8 @@
       "position": "WR",
       "adp": 405,
       "byeWeek": 11,
-      "projection": 96
+      "projection": 96,
+      "photoUrl": "/players/bourne_kendrick.webp"
     },
     {
       "id": "moore_david",
@@ -3666,7 +3916,8 @@
       "position": "WR",
       "adp": 406,
       "byeWeek": 7,
-      "projection": 95
+      "projection": 95,
+      "photoUrl": "/players/moore_david.webp"
     },
     {
       "id": "bryant_harrison",
@@ -3675,7 +3926,8 @@
       "position": "TE",
       "adp": 407,
       "byeWeek": 11,
-      "projection": 69
+      "projection": 69,
+      "photoUrl": "/players/bryant_harrison.webp"
     },
     {
       "id": "oconnell_aidan",
@@ -3684,7 +3936,8 @@
       "position": "QB",
       "adp": 408,
       "byeWeek": 9,
-      "projection": 137
+      "projection": 137,
+      "photoUrl": "/players/oconnell_aidan.webp"
     },
     {
       "id": "long_hunter",
@@ -3693,7 +3946,8 @@
       "position": "TE",
       "adp": 409,
       "byeWeek": 10,
-      "projection": 68
+      "projection": 68,
+      "photoUrl": "/players/long_hunter.webp"
     },
     {
       "id": "mundt_johnny",
@@ -3702,7 +3956,8 @@
       "position": "TE",
       "adp": 410,
       "byeWeek": 10,
-      "projection": 68
+      "projection": 68,
+      "photoUrl": "/players/mundt_johnny.webp"
     },
     {
       "id": "steele_carson",
@@ -3711,7 +3966,8 @@
       "position": "RB",
       "adp": 411,
       "byeWeek": 6,
-      "projection": 87
+      "projection": 87,
+      "photoUrl": "/players/steele_carson.webp"
     },
     {
       "id": "luepke_hunter",
@@ -3720,7 +3976,8 @@
       "position": "RB",
       "adp": 412,
       "byeWeek": 14,
-      "projection": 86
+      "projection": 86,
+      "photoUrl": "/players/luepke_hunter.webp"
     },
     {
       "id": "patterson_cordarrelle",
@@ -3729,7 +3986,8 @@
       "position": "RB",
       "adp": 413,
       "byeWeek": 0,
-      "projection": 85
+      "projection": 85,
+      "photoUrl": "/players/patterson_cordarrelle.webp"
     },
     {
       "id": "woerner_charlie",
@@ -3738,7 +3996,8 @@
       "position": "TE",
       "adp": 414,
       "byeWeek": 13,
-      "projection": 66
+      "projection": 66,
+      "photoUrl": "/players/woerner_charlie.webp"
     },
     {
       "id": "gage_russell",
@@ -3747,7 +4006,8 @@
       "position": "WR",
       "adp": 415,
       "byeWeek": 0,
-      "projection": 90
+      "projection": 90,
+      "photoUrl": "/players/gage_russell.webp"
     },
     {
       "id": "durham_payne",
@@ -3756,7 +4016,8 @@
       "position": "TE",
       "adp": 416,
       "byeWeek": 7,
-      "projection": 66
+      "projection": 66,
+      "photoUrl": "/players/durham_payne.webp"
     },
     {
       "id": "wiley_jared",
@@ -3765,7 +4026,8 @@
       "position": "TE",
       "adp": 417,
       "byeWeek": 6,
-      "projection": 65
+      "projection": 65,
+      "photoUrl": "/players/wiley_jared.webp"
     },
     {
       "id": "lance_trey",
@@ -3774,7 +4036,8 @@
       "position": "QB",
       "adp": 418,
       "byeWeek": 5,
-      "projection": 130
+      "projection": 130,
+      "photoUrl": "/players/lance_trey.webp"
     },
     {
       "id": "sample_drew",
@@ -3783,7 +4046,8 @@
       "position": "TE",
       "adp": 419,
       "byeWeek": 10,
-      "projection": 64
+      "projection": 64,
+      "photoUrl": "/players/sample_drew.webp"
     },
     {
       "id": "williams_jamaal",
@@ -3792,7 +4056,8 @@
       "position": "RB",
       "adp": 420,
       "byeWeek": 0,
-      "projection": 82
+      "projection": 82,
+      "photoUrl": "/players/williams_jamaal.webp"
     },
     {
       "id": "tinsley_mitch",
@@ -3801,7 +4066,8 @@
       "position": "WR",
       "adp": 421,
       "byeWeek": 10,
-      "projection": 87
+      "projection": 87,
+      "photoUrl": "/players/tinsley_mitch.webp"
     },
     {
       "id": "davis_derius",
@@ -3810,7 +4076,8 @@
       "position": "WR",
       "adp": 422,
       "byeWeek": 5,
-      "projection": 86
+      "projection": 86,
+      "photoUrl": "/players/davis_derius.webp"
     },
     {
       "id": "johnson_dernest",
@@ -3819,7 +4086,8 @@
       "position": "RB",
       "adp": 423,
       "byeWeek": 10,
-      "projection": 80
+      "projection": 80,
+      "photoUrl": "/players/johnson_dernest.webp"
     },
     {
       "id": "granson_kylen",
@@ -3828,7 +4096,8 @@
       "position": "TE",
       "adp": 424,
       "byeWeek": 14,
-      "projection": 63
+      "projection": 63,
+      "photoUrl": "/players/granson_kylen.webp"
     },
     {
       "id": "knight_zonovan",
@@ -3837,7 +4106,8 @@
       "position": "RB",
       "adp": 425,
       "byeWeek": 7,
-      "projection": 80
+      "projection": 80,
+      "photoUrl": "/players/knight_zonovan.webp"
     },
     {
       "id": "tyree_chris",
@@ -3846,7 +4116,8 @@
       "position": "RB",
       "adp": 426,
       "byeWeek": 12,
-      "projection": 79
+      "projection": 79,
+      "photoUrl": "/players/tyree_chris.webp"
     },
     {
       "id": "shavers_tyrell",
@@ -3855,7 +4126,8 @@
       "position": "WR",
       "adp": 427,
       "byeWeek": 13,
-      "projection": 84
+      "projection": 84,
+      "photoUrl": "/players/shavers_tyrell.webp"
     },
     {
       "id": "kolar_charlie",
@@ -3864,7 +4136,8 @@
       "position": "TE",
       "adp": 428,
       "byeWeek": 10,
-      "projection": 62
+      "projection": 62,
+      "photoUrl": "/players/kolar_charlie.webp"
     },
     {
       "id": "culp_devin",
@@ -3873,7 +4146,8 @@
       "position": "TE",
       "adp": 429,
       "byeWeek": 7,
-      "projection": 61
+      "projection": 61,
+      "photoUrl": "/players/culp_devin.webp"
     },
     {
       "id": "strong_pierre",
@@ -3882,7 +4156,8 @@
       "position": "RB",
       "adp": 430,
       "byeWeek": 14,
-      "projection": 77
+      "projection": 77,
+      "photoUrl": "/players/strong_pierre.webp"
     },
     {
       "id": "ham_cj",
@@ -3891,7 +4166,8 @@
       "position": "RB",
       "adp": 431,
       "byeWeek": 6,
-      "projection": 76
+      "projection": 76,
+      "photoUrl": "/players/ham_cj.webp"
     },
     {
       "id": "krull_lucas",
@@ -3900,7 +4176,8 @@
       "position": "TE",
       "adp": 432,
       "byeWeek": 11,
-      "projection": 61
+      "projection": 61,
+      "photoUrl": "/players/krull_lucas.webp"
     },
     {
       "id": "wentz_carson",
@@ -3909,7 +4186,8 @@
       "position": "QB",
       "adp": 433,
       "byeWeek": 6,
-      "projection": 121
+      "projection": 121,
+      "photoUrl": "/players/wentz_carson.webp"
     },
     {
       "id": "homer_travis",
@@ -3918,7 +4196,8 @@
       "position": "RB",
       "adp": 434,
       "byeWeek": 13,
-      "projection": 75
+      "projection": 75,
+      "photoUrl": "/players/homer_travis.webp"
     },
     {
       "id": "whyle_josh",
@@ -3927,7 +4206,8 @@
       "position": "TE",
       "adp": 435,
       "byeWeek": 14,
-      "projection": 60
+      "projection": 60,
+      "photoUrl": "/players/whyle_josh.webp"
     },
     {
       "id": "brooks_jalen",
@@ -3936,7 +4216,8 @@
       "position": "WR",
       "adp": 436,
       "byeWeek": 7,
-      "projection": 79
+      "projection": 79,
+      "photoUrl": "/players/brooks_jalen.webp"
     },
     {
       "id": "farrell_luke",
@@ -3945,7 +4226,8 @@
       "position": "TE",
       "adp": 437,
       "byeWeek": 11,
-      "projection": 59
+      "projection": 59,
+      "photoUrl": "/players/farrell_luke.webp"
     },
     {
       "id": "williams_josh",
@@ -3954,7 +4236,8 @@
       "position": "WR",
       "adp": 438,
       "byeWeek": 7,
-      "projection": 78
+      "projection": 78,
+      "photoUrl": "/players/williams_josh.webp"
     },
     {
       "id": "johnson_montrell",
@@ -3963,7 +4246,8 @@
       "position": "RB",
       "adp": 439,
       "byeWeek": 0,
-      "projection": 73
+      "projection": 73,
+      "photoUrl": "/players/johnson_montrell.webp"
     },
     {
       "id": "miller_scotty",
@@ -3972,7 +4256,8 @@
       "position": "WR",
       "adp": 440,
       "byeWeek": 11,
-      "projection": 77
+      "projection": 77,
+      "photoUrl": "/players/miller_scotty.webp"
     },
     {
       "id": "watson_deshaun",
@@ -3981,7 +4266,8 @@
       "position": "QB",
       "adp": 441,
       "byeWeek": 9,
-      "projection": 115
+      "projection": 115,
+      "photoUrl": "/players/watson_deshaun.webp"
     },
     {
       "id": "scott_zavier",
@@ -3990,7 +4276,8 @@
       "position": "WR",
       "adp": 442,
       "byeWeek": 6,
-      "projection": 76
+      "projection": 76,
+      "photoUrl": "/players/scott_zavier.webp"
     },
     {
       "id": "rush_cooper",
@@ -3999,7 +4286,8 @@
       "position": "QB",
       "adp": 443,
       "byeWeek": 10,
-      "projection": 114
+      "projection": 114,
+      "photoUrl": "/players/rush_cooper.webp"
     },
     {
       "id": "abanikanda_israel",
@@ -4008,7 +4296,8 @@
       "position": "RB",
       "adp": 444,
       "byeWeek": 14,
-      "projection": 70
+      "projection": 70,
+      "photoUrl": "/players/abanikanda_israel.webp"
     },
     {
       "id": "lachey_luke",
@@ -4017,7 +4306,8 @@
       "position": "TE",
       "adp": 445,
       "byeWeek": 11,
-      "projection": 57
+      "projection": 57,
+      "photoUrl": "/players/lachey_luke.webp"
     },
     {
       "id": "aliecox_mo",
@@ -4026,7 +4316,8 @@
       "position": "TE",
       "adp": 446,
       "byeWeek": 12,
-      "projection": 56
+      "projection": 56,
+      "photoUrl": "/players/aliecox_mo.webp"
     },
     {
       "id": "mumpfield_konata",
@@ -4035,7 +4326,8 @@
       "position": "WR",
       "adp": 447,
       "byeWeek": 6,
-      "projection": 73
+      "projection": 73,
+      "photoUrl": "/players/mumpfield_konata.webp"
     },
     {
       "id": "yarns_marcus",
@@ -4044,7 +4336,8 @@
       "position": "WR",
       "adp": 448,
       "byeWeek": 0,
-      "projection": 73
+      "projection": 73,
+      "photoUrl": "/players/yarns_marcus.webp"
     },
     {
       "id": "larvadain_gage",
@@ -4053,7 +4346,8 @@
       "position": "RB",
       "adp": 449,
       "byeWeek": 9,
-      "projection": 68
+      "projection": 68,
+      "photoUrl": "/players/larvadain_gage.webp"
     },
     {
       "id": "bell_david",
@@ -4062,7 +4356,8 @@
       "position": "WR",
       "adp": 450,
       "byeWeek": 0,
-      "projection": 72
+      "projection": 72,
+      "photoUrl": "/players/bell_david.webp"
     },
     {
       "id": "jackson_lucky",
@@ -4071,7 +4366,8 @@
       "position": "WR",
       "adp": 451,
       "byeWeek": 0,
-      "projection": 71
+      "projection": 71,
+      "photoUrl": "/players/jackson_lucky.webp"
     },
     {
       "id": "dalton_andy",
@@ -4080,7 +4376,8 @@
       "position": "QB",
       "adp": 452,
       "byeWeek": 7,
-      "projection": 109
+      "projection": 109,
+      "photoUrl": "/players/dalton_andy.webp"
     },
     {
       "id": "carter_deandre",
@@ -4089,7 +4386,8 @@
       "position": "WR",
       "adp": 453,
       "byeWeek": 9,
-      "projection": 70
+      "projection": 70,
+      "photoUrl": "/players/carter_deandre.webp"
     },
     {
       "id": "ewers_quinn",
@@ -4098,7 +4396,8 @@
       "position": "QB",
       "adp": 454,
       "byeWeek": 6,
-      "projection": 107
+      "projection": 107,
+      "photoUrl": "/players/ewers_quinn.webp"
     },
     {
       "id": "sherfield_trent",
@@ -4107,7 +4406,8 @@
       "position": "WR",
       "adp": 455,
       "byeWeek": 7,
-      "projection": 69
+      "projection": 69,
+      "photoUrl": "/players/sherfield_trent.webp"
     },
     {
       "id": "fidone_thomas",
@@ -4116,7 +4416,8 @@
       "position": "TE",
       "adp": 456,
       "byeWeek": 7,
-      "projection": 54
+      "projection": 54,
+      "photoUrl": "/players/fidone_thomas.webp"
     },
     {
       "id": "ricard_patrick",
@@ -4125,7 +4426,8 @@
       "position": "WR",
       "adp": 457,
       "byeWeek": 10,
-      "projection": 68
+      "projection": 68,
+      "photoUrl": "/players/ricard_patrick.webp"
     },
     {
       "id": "collins_beaux",
@@ -4134,7 +4436,8 @@
       "position": "WR",
       "adp": 458,
       "byeWeek": 7,
-      "projection": 68
+      "projection": 68,
+      "photoUrl": "/players/collins_beaux.webp"
     },
     {
       "id": "vaughn_deuce",
@@ -4143,7 +4446,8 @@
       "position": "RB",
       "adp": 459,
       "byeWeek": 11,
-      "projection": 63
+      "projection": 63,
+      "photoUrl": "/players/vaughn_deuce.webp"
     },
     {
       "id": "jones_mac",
@@ -4152,7 +4456,8 @@
       "position": "QB",
       "adp": 460,
       "byeWeek": 11,
-      "projection": 104
+      "projection": 104,
+      "photoUrl": "/players/jones_mac.webp"
     },
     {
       "id": "elliott_ezekiel",
@@ -4161,7 +4466,8 @@
       "position": "WR",
       "adp": 461,
       "byeWeek": 0,
-      "projection": 67
+      "projection": 67,
+      "photoUrl": "/players/elliott_ezekiel.webp"
     },
     {
       "id": "tipton_mason",
@@ -4170,7 +4476,8 @@
       "position": "WR",
       "adp": 462,
       "byeWeek": 12,
-      "projection": 66
+      "projection": 66,
+      "photoUrl": "/players/tipton_mason.webp"
     },
     {
       "id": "bagent_tyson",
@@ -4179,7 +4486,8 @@
       "position": "QB",
       "adp": 463,
       "byeWeek": 13,
-      "projection": 102
+      "projection": 102,
+      "photoUrl": "/players/bagent_tyson.webp"
     },
     {
       "id": "scott_charles",
@@ -4188,7 +4496,8 @@
       "position": "WR",
       "adp": 464,
       "byeWeek": 0,
-      "projection": 65
+      "projection": 65,
+      "photoUrl": "/players/scott_charles.webp"
     },
     {
       "id": "mims_jordan",
@@ -4197,7 +4506,8 @@
       "position": "RB",
       "adp": 465,
       "byeWeek": 9,
-      "projection": 61
+      "projection": 61,
+      "photoUrl": "/players/mims_jordan.webp"
     },
     {
       "id": "hawes_jackson",
@@ -4206,7 +4516,8 @@
       "position": "TE",
       "adp": 466,
       "byeWeek": 13,
-      "projection": 51
+      "projection": 51,
+      "photoUrl": "/players/hawes_jackson.webp"
     },
     {
       "id": "hardman_mecole",
@@ -4215,7 +4526,8 @@
       "position": "WR",
       "adp": 467,
       "byeWeek": 13,
-      "projection": 64
+      "projection": 64,
+      "photoUrl": "/players/hardman_mecole.webp"
     },
     {
       "id": "bell_jaheim",
@@ -4224,7 +4536,8 @@
       "position": "WR",
       "adp": 468,
       "byeWeek": 0,
-      "projection": 63
+      "projection": 63,
+      "photoUrl": "/players/bell_jaheim.webp"
     },
     {
       "id": "gray_eric",
@@ -4233,7 +4546,8 @@
       "position": "RB",
       "adp": 469,
       "byeWeek": 7,
-      "projection": 59
+      "projection": 59,
+      "photoUrl": "/players/gray_eric.webp"
     },
     {
       "id": "brissett_jacoby",
@@ -4242,7 +4556,8 @@
       "position": "QB",
       "adp": 470,
       "byeWeek": 7,
-      "projection": 98
+      "projection": 98,
+      "photoUrl": "/players/brissett_jacoby.webp"
     },
     {
       "id": "conner_tanner",
@@ -4251,7 +4566,8 @@
       "position": "WR",
       "adp": 471,
       "byeWeek": 6,
-      "projection": 62
+      "projection": 62,
+      "photoUrl": "/players/conner_tanner.webp"
     },
     {
       "id": "gipson_xavier",
@@ -4260,7 +4576,8 @@
       "position": "WR",
       "adp": 472,
       "byeWeek": 14,
-      "projection": 61
+      "projection": 61,
+      "photoUrl": "/players/gipson_xavier.webp"
     },
     {
       "id": "nwangwu_kene",
@@ -4269,7 +4586,8 @@
       "position": "RB",
       "adp": 473,
       "byeWeek": 5,
-      "projection": 57
+      "projection": 57,
+      "photoUrl": "/players/nwangwu_kene.webp"
     },
     {
       "id": "woods_jelani",
@@ -4278,7 +4596,8 @@
       "position": "TE",
       "adp": 474,
       "byeWeek": 5,
-      "projection": 48
+      "projection": 48,
+      "photoUrl": "/players/woods_jelani.webp"
     },
     {
       "id": "chark_dj",
@@ -4287,7 +4606,8 @@
       "position": "WR",
       "adp": 475,
       "byeWeek": 0,
-      "projection": 59
+      "projection": 59,
+      "photoUrl": "/players/chark_dj.webp"
     },
     {
       "id": "minshew_gardner",
@@ -4296,7 +4616,8 @@
       "position": "QB",
       "adp": 476,
       "byeWeek": 6,
-      "projection": 94
+      "projection": 94,
+      "photoUrl": "/players/minshew_gardner.webp"
     },
     {
       "id": "washington_carlos",
@@ -4305,7 +4626,8 @@
       "position": "RB",
       "adp": 477,
       "byeWeek": 13,
-      "projection": 55
+      "projection": 55,
+      "photoUrl": "/players/washington_carlos.webp"
     },
     {
       "id": "woods_michael",
@@ -4314,7 +4636,8 @@
       "position": "WR",
       "adp": 478,
       "byeWeek": 0,
-      "projection": 58
+      "projection": 58,
+      "photoUrl": "/players/woods_michael.webp"
     },
     {
       "id": "howell_sam",
@@ -4323,7 +4646,8 @@
       "position": "QB",
       "adp": 479,
       "byeWeek": 14,
-      "projection": 92
+      "projection": 92,
+      "photoUrl": "/players/howell_sam.webp"
     },
     {
       "id": "mullens_nick",
@@ -4332,7 +4656,8 @@
       "position": "QB",
       "adp": 480,
       "byeWeek": 10,
-      "projection": 91
+      "projection": 91,
+      "photoUrl": "/players/mullens_nick.webp"
     },
     {
       "id": "burton_michael",
@@ -4341,7 +4666,8 @@
       "position": "RB",
       "adp": 481,
       "byeWeek": 11,
-      "projection": 53
+      "projection": 53,
+      "photoUrl": "/players/burton_michael.webp"
     },
     {
       "id": "jones_charlie",
@@ -4350,7 +4676,8 @@
       "position": "WR",
       "adp": 482,
       "byeWeek": 10,
-      "projection": 56
+      "projection": 56,
+      "photoUrl": "/players/jones_charlie.webp"
     },
     {
       "id": "wallace_tylan",
@@ -4359,7 +4686,8 @@
       "position": "WR",
       "adp": 483,
       "byeWeek": 10,
-      "projection": 56
+      "projection": 56,
+      "photoUrl": "/players/wallace_tylan.webp"
     },
     {
       "id": "mills_davis",
@@ -4368,7 +4696,8 @@
       "position": "QB",
       "adp": 484,
       "byeWeek": 11,
-      "projection": 89
+      "projection": 89,
+      "photoUrl": "/players/mills_davis.webp"
     },
     {
       "id": "leonard_riley",
@@ -4377,7 +4706,8 @@
       "position": "QB",
       "adp": 485,
       "byeWeek": 12,
-      "projection": 88
+      "projection": 88,
+      "photoUrl": "/players/leonard_riley.webp"
     },
     {
       "id": "mcclellan_jase",
@@ -4386,7 +4716,8 @@
       "position": "RB",
       "adp": 486,
       "byeWeek": 0,
-      "projection": 51
+      "projection": 51,
+      "photoUrl": "/players/mcclellan_jase.webp"
     },
     {
       "id": "brown_pharaoh",
@@ -4395,7 +4726,8 @@
       "position": "TE",
       "adp": 487,
       "byeWeek": 7,
-      "projection": 45
+      "projection": 45,
+      "photoUrl": "/players/brown_pharaoh.webp"
     },
     {
       "id": "dobbs_joshua",
@@ -4404,7 +4736,8 @@
       "position": "QB",
       "adp": 488,
       "byeWeek": 10,
-      "projection": 86
+      "projection": 86,
+      "photoUrl": "/players/dobbs_joshua.webp"
     },
     {
       "id": "ogletree_drew",
@@ -4413,7 +4746,8 @@
       "position": "TE",
       "adp": 489,
       "byeWeek": 12,
-      "projection": 44
+      "projection": 44,
+      "photoUrl": "/players/ogletree_drew.webp"
     },
     {
       "id": "allen_kyle",
@@ -4422,7 +4756,8 @@
       "position": "QB",
       "adp": 490,
       "byeWeek": 13,
-      "projection": 85
+      "projection": 85,
+      "photoUrl": "/players/allen_kyle.webp"
     },
     {
       "id": "trubisky_mitchell",
@@ -4431,7 +4766,8 @@
       "position": "QB",
       "adp": 491,
       "byeWeek": 13,
-      "projection": 85
+      "projection": 85,
+      "photoUrl": "/players/trubisky_mitchell.webp"
     },
     {
       "id": "jones_velus",
@@ -4440,7 +4776,8 @@
       "position": "WR",
       "adp": 492,
       "byeWeek": 9,
-      "projection": 51
+      "projection": 51,
+      "photoUrl": "/players/jones_velus.webp"
     },
     {
       "id": "abdullah_ameer",
@@ -4449,7 +4786,8 @@
       "position": "RB",
       "adp": 493,
       "byeWeek": 12,
-      "projection": 48
+      "projection": 48,
+      "photoUrl": "/players/abdullah_ameer.webp"
     },
     {
       "id": "bridgewater_teddy",
@@ -4458,7 +4796,8 @@
       "position": "QB",
       "adp": 494,
       "byeWeek": 7,
-      "projection": 83
+      "projection": 83,
+      "photoUrl": "/players/bridgewater_teddy.webp"
     },
     {
       "id": "smith_ainias",
@@ -4467,7 +4806,8 @@
       "position": "WR",
       "adp": 495,
       "byeWeek": 7,
-      "projection": 50
+      "projection": 50,
+      "photoUrl": "/players/smith_ainias.webp"
     },
     {
       "id": "thomas_ian",
@@ -4476,7 +4816,8 @@
       "position": "TE",
       "adp": 496,
       "byeWeek": 9,
-      "projection": 42
+      "projection": 42,
+      "photoUrl": "/players/thomas_ian.webp"
     },
     {
       "id": "hairston_troy",
@@ -4485,7 +4826,8 @@
       "position": "WR",
       "adp": 497,
       "byeWeek": 0,
-      "projection": 49
+      "projection": 49,
+      "photoUrl": "/players/hairston_troy.webp"
     },
     {
       "id": "ouzts_robbie",
@@ -4494,7 +4836,8 @@
       "position": "TE",
       "adp": 498,
       "byeWeek": 9,
-      "projection": 42
+      "projection": 42,
+      "photoUrl": "/players/ouzts_robbie.webp"
     },
     {
       "id": "mallory_will",
@@ -4503,7 +4846,8 @@
       "position": "TE",
       "adp": 499,
       "byeWeek": 12,
-      "projection": 41
+      "projection": 41,
+      "photoUrl": "/players/mallory_will.webp"
     },
     {
       "id": "watson_justin",
@@ -4512,7 +4856,8 @@
       "position": "WR",
       "adp": 500,
       "byeWeek": 11,
-      "projection": 47
+      "projection": 47,
+      "photoUrl": "/players/watson_justin.webp"
     },
     {
       "id": "smythe_durham",
@@ -4521,7 +4866,8 @@
       "position": "TE",
       "adp": 501,
       "byeWeek": 13,
-      "projection": 41
+      "projection": 41,
+      "photoUrl": "/players/smythe_durham.webp"
     },
     {
       "id": "reiman_tip",
@@ -4530,7 +4876,8 @@
       "position": "TE",
       "adp": 502,
       "byeWeek": 7,
-      "projection": 40
+      "projection": 40,
+      "photoUrl": "/players/reiman_tip.webp"
     },
     {
       "id": "matavao_moliki",
@@ -4539,7 +4886,8 @@
       "position": "TE",
       "adp": 503,
       "byeWeek": 12,
-      "projection": 40
+      "projection": 40,
+      "photoUrl": "/players/matavao_moliki.webp"
     },
     {
       "id": "lohner_caleb",
@@ -4548,7 +4896,8 @@
       "position": "TE",
       "adp": 504,
       "byeWeek": 11,
-      "projection": 40
+      "projection": 40,
+      "photoUrl": "/players/lohner_caleb.webp"
     },
     {
       "id": "dallas_deejay",
@@ -4557,7 +4906,8 @@
       "position": "RB",
       "adp": 505,
       "byeWeek": 7,
-      "projection": 42
+      "projection": 42,
+      "photoUrl": "/players/dallas_deejay.webp"
     },
     {
       "id": "nash_nick",
@@ -4566,7 +4916,8 @@
       "position": "WR",
       "adp": 506,
       "byeWeek": 13,
-      "projection": 44
+      "projection": 44,
+      "photoUrl": "/players/nash_nick.webp"
     },
     {
       "id": "dulin_ashton",
@@ -4575,7 +4926,8 @@
       "position": "WR",
       "adp": 507,
       "byeWeek": 12,
-      "projection": 44
+      "projection": 44,
+      "photoUrl": "/players/dulin_ashton.webp"
     },
     {
       "id": "saubert_eric",
@@ -4584,7 +4936,8 @@
       "position": "TE",
       "adp": 508,
       "byeWeek": 9,
-      "projection": 39
+      "projection": 39,
+      "photoUrl": "/players/saubert_eric.webp"
     },
     {
       "id": "bartholomew_gavin",
@@ -4593,7 +4946,8 @@
       "position": "TE",
       "adp": 509,
       "byeWeek": 6,
-      "projection": 38
+      "projection": 38,
+      "photoUrl": "/players/bartholomew_gavin.webp"
     },
     {
       "id": "allen_davis",
@@ -4602,7 +4956,8 @@
       "position": "TE",
       "adp": 510,
       "byeWeek": 6,
-      "projection": 38
+      "projection": 38,
+      "photoUrl": "/players/allen_davis.webp"
     },
     {
       "id": "wilson_cedrick",
@@ -4611,7 +4966,8 @@
       "position": "WR",
       "adp": 511,
       "byeWeek": 6,
-      "projection": 42
+      "projection": 42,
+      "photoUrl": "/players/wilson_cedrick.webp"
     },
     {
       "id": "gallup_michael",
@@ -4620,7 +4976,8 @@
       "position": "WR",
       "adp": 512,
       "byeWeek": 0,
-      "projection": 42
+      "projection": 42,
+      "photoUrl": "/players/gallup_michael.webp"
     },
     {
       "id": "adkins_nate",
@@ -4629,7 +4986,8 @@
       "position": "TE",
       "adp": 513,
       "byeWeek": 11,
-      "projection": 37
+      "projection": 37,
+      "photoUrl": "/players/adkins_nate.webp"
     },
     {
       "id": "briningstool_jake",
@@ -4638,7 +4996,8 @@
       "position": "TE",
       "adp": 514,
       "byeWeek": 6,
-      "projection": 37
+      "projection": 37,
+      "photoUrl": "/players/briningstool_jake.webp"
     },
     {
       "id": "skowronek_ben",
@@ -4647,7 +5006,8 @@
       "position": "WR",
       "adp": 515,
       "byeWeek": 11,
-      "projection": 40
+      "projection": 40,
+      "photoUrl": "/players/skowronek_ben.webp"
     },
     {
       "id": "spannford_brevyn",
@@ -4656,7 +5016,8 @@
       "position": "TE",
       "adp": 516,
       "byeWeek": 14,
-      "projection": 36
+      "projection": 36,
+      "photoUrl": "/players/spannford_brevyn.webp"
     },
     {
       "id": "cook_dalvin",
@@ -4665,7 +5026,8 @@
       "position": "RB",
       "adp": 517,
       "byeWeek": 0,
-      "projection": 37
+      "projection": 37,
+      "photoUrl": "/players/cook_dalvin.webp"
     },
     {
       "id": "heinicke_taylor",
@@ -4674,7 +5036,8 @@
       "position": "QB",
       "adp": 518,
       "byeWeek": 0,
-      "projection": 68
+      "projection": 68,
+      "photoUrl": "/players/heinicke_taylor.webp"
     },
     {
       "id": "trask_kyle",
@@ -4683,7 +5046,8 @@
       "position": "QB",
       "adp": 519,
       "byeWeek": 13,
-      "projection": 68
+      "projection": 68,
+      "photoUrl": "/players/trask_kyle.webp"
     },
     {
       "id": "flournoy_ryan",
@@ -4692,7 +5056,8 @@
       "position": "WR",
       "adp": 520,
       "byeWeek": 14,
-      "projection": 38
+      "projection": 38,
+      "photoUrl": "/players/flournoy_ryan.webp"
     },
     {
       "id": "lovett_dominic",
@@ -4701,7 +5066,8 @@
       "position": "WR",
       "adp": 521,
       "byeWeek": 13,
-      "projection": 37
+      "projection": 37,
+      "photoUrl": "/players/lovett_dominic.webp"
     },
     {
       "id": "heyward_connor",
@@ -4710,7 +5076,8 @@
       "position": "TE",
       "adp": 522,
       "byeWeek": 11,
-      "projection": 35
+      "projection": 35,
+      "photoUrl": "/players/heyward_connor.webp"
     },
     {
       "id": "tonyan_robert",
@@ -4719,7 +5086,8 @@
       "position": "TE",
       "adp": 523,
       "byeWeek": 6,
-      "projection": 35
+      "projection": 35,
+      "photoUrl": "/players/tonyan_robert.webp"
     },
     {
       "id": "dwelley_ross",
@@ -4728,7 +5096,8 @@
       "position": "TE",
       "adp": 524,
       "byeWeek": 13,
-      "projection": 34
+      "projection": 34,
+      "photoUrl": "/players/dwelley_ross.webp"
     },
     {
       "id": "howard_will",
@@ -4737,7 +5106,8 @@
       "position": "QB",
       "adp": 525,
       "byeWeek": 11,
-      "projection": 64
+      "projection": 64,
+      "photoUrl": "/players/howard_will.webp"
     },
     {
       "id": "gore_frank",
@@ -4746,7 +5116,8 @@
       "position": "RB",
       "adp": 526,
       "byeWeek": 13,
-      "projection": 33
+      "projection": 33,
+      "photoUrl": "/players/gore_frank.webp"
     },
     {
       "id": "davisprice_tyrion",
@@ -4755,7 +5126,8 @@
       "position": "RB",
       "adp": 527,
       "byeWeek": 0,
-      "projection": 32
+      "projection": 32,
+      "photoUrl": "/players/davisprice_tyrion.webp"
     },
     {
       "id": "johnson_jakob",
@@ -4764,7 +5136,8 @@
       "position": "RB",
       "adp": 528,
       "byeWeek": 11,
-      "projection": 32
+      "projection": 32,
+      "photoUrl": "/players/johnson_jakob.webp"
     },
     {
       "id": "everett_gerald",
@@ -4773,7 +5146,8 @@
       "position": "TE",
       "adp": 529,
       "byeWeek": 0,
-      "projection": 33
+      "projection": 33,
+      "photoUrl": "/players/everett_gerald.webp"
     },
     {
       "id": "white_ricky",
@@ -4782,7 +5156,8 @@
       "position": "WR",
       "adp": 530,
       "byeWeek": 9,
-      "projection": 33
+      "projection": 33,
+      "photoUrl": "/players/white_ricky.webp"
     },
     {
       "id": "osborn_kj",
@@ -4791,7 +5166,8 @@
       "position": "WR",
       "adp": 531,
       "byeWeek": 13,
-      "projection": 32
+      "projection": 32,
+      "photoUrl": "/players/osborn_kj.webp"
     },
     {
       "id": "weaver_xavier",
@@ -4800,7 +5176,8 @@
       "position": "WR",
       "adp": 532,
       "byeWeek": 7,
-      "projection": 32
+      "projection": 32,
+      "photoUrl": "/players/weaver_xavier.webp"
     },
     {
       "id": "heath_malik",
@@ -4809,7 +5186,8 @@
       "position": "WR",
       "adp": 533,
       "byeWeek": 0,
-      "projection": 32
+      "projection": 32,
+      "photoUrl": "/players/heath_malik.webp"
     },
     {
       "id": "prather_kaden",
@@ -4818,7 +5196,8 @@
       "position": "WR",
       "adp": 534,
       "byeWeek": 0,
-      "projection": 31
+      "projection": 31,
+      "photoUrl": "/players/prather_kaden.webp"
     },
     {
       "id": "gould_anthony",
@@ -4827,7 +5206,8 @@
       "position": "WR",
       "adp": 535,
       "byeWeek": 12,
-      "projection": 31
+      "projection": 31,
+      "photoUrl": "/players/gould_anthony.webp"
     },
     {
       "id": "palmer_trey",
@@ -4836,7 +5216,8 @@
       "position": "WR",
       "adp": 536,
       "byeWeek": 12,
-      "projection": 30
+      "projection": 30,
+      "photoUrl": "/players/palmer_trey.webp"
     },
     {
       "id": "mellott_tommy",
@@ -4845,7 +5226,8 @@
       "position": "WR",
       "adp": 537,
       "byeWeek": 0,
-      "projection": 30
+      "projection": 30,
+      "photoUrl": "/players/mellott_tommy.webp"
     },
     {
       "id": "mccord_kyle",
@@ -4854,7 +5236,8 @@
       "position": "QB",
       "adp": 538,
       "byeWeek": 14,
-      "projection": 56
+      "projection": 56,
+      "photoUrl": "/players/mccord_kyle.webp"
     },
     {
       "id": "fehoko_simi",
@@ -4863,7 +5246,8 @@
       "position": "WR",
       "adp": 539,
       "byeWeek": 7,
-      "projection": 29
+      "projection": 29,
+      "photoUrl": "/players/fehoko_simi.webp"
     },
     {
       "id": "blair_chris",
@@ -4872,7 +5256,8 @@
       "position": "WR",
       "adp": 540,
       "byeWeek": 13,
-      "projection": 28
+      "projection": 28,
+      "photoUrl": "/players/blair_chris.webp"
     },
     {
       "id": "means_bub",
@@ -4881,7 +5266,8 @@
       "position": "WR",
       "adp": 541,
       "byeWeek": 12,
-      "projection": 28
+      "projection": 28,
+      "photoUrl": "/players/means_bub.webp"
     },
     {
       "id": "turner_cole",
@@ -4890,7 +5276,8 @@
       "position": "WR",
       "adp": 542,
       "byeWeek": 0,
-      "projection": 27
+      "projection": 27,
+      "photoUrl": "/players/turner_cole.webp"
     },
     {
       "id": "stidham_jarrett",
@@ -4899,7 +5286,8 @@
       "position": "QB",
       "adp": 543,
       "byeWeek": 11,
-      "projection": 53
+      "projection": 53,
+      "photoUrl": "/players/stidham_jarrett.webp"
     },
     {
       "id": "haener_jake",
@@ -4908,7 +5296,8 @@
       "position": "QB",
       "adp": 544,
       "byeWeek": 12,
-      "projection": 53
+      "projection": 53,
+      "photoUrl": "/players/haener_jake.webp"
     },
     {
       "id": "wester_lajohntay",
@@ -4917,7 +5306,8 @@
       "position": "WR",
       "adp": 545,
       "byeWeek": 10,
-      "projection": 26
+      "projection": 26,
+      "photoUrl": "/players/wester_lajohntay.webp"
     },
     {
       "id": "quitoriano_teagan",
@@ -4926,7 +5316,8 @@
       "position": "TE",
       "adp": 546,
       "byeWeek": 13,
-      "projection": 28
+      "projection": 28,
+      "photoUrl": "/players/quitoriano_teagan.webp"
     },
     {
       "id": "allen_brandon",
@@ -4935,7 +5326,8 @@
       "position": "QB",
       "adp": 547,
       "byeWeek": 9,
-      "projection": 51
+      "projection": 51,
+      "photoUrl": "/players/allen_brandon.webp"
     },
     {
       "id": "melton_bo",
@@ -4944,7 +5336,8 @@
       "position": "WR",
       "adp": 548,
       "byeWeek": 14,
-      "projection": 24
+      "projection": 24,
+      "photoUrl": "/players/melton_bo.webp"
     },
     {
       "id": "jordan_jawhar",
@@ -4953,7 +5346,8 @@
       "position": "WR",
       "adp": 549,
       "byeWeek": 11,
-      "projection": 24
+      "projection": 24,
+      "photoUrl": "/players/jordan_jawhar.webp"
     },
     {
       "id": "hooker_hendon",
@@ -4962,7 +5356,8 @@
       "position": "QB",
       "adp": 550,
       "byeWeek": 0,
-      "projection": 49
+      "projection": 49,
+      "photoUrl": "/players/hooker_hendon.webp"
     },
     {
       "id": "berrios_braxton",
@@ -4971,7 +5366,8 @@
       "position": "WR",
       "adp": 551,
       "byeWeek": 11,
-      "projection": 23
+      "projection": 23,
+      "photoUrl": "/players/berrios_braxton.webp"
     },
     {
       "id": "rivers_ronnie",
@@ -4980,7 +5376,8 @@
       "position": "WR",
       "adp": 552,
       "byeWeek": 6,
-      "projection": 22
+      "projection": 22,
+      "photoUrl": "/players/rivers_ronnie.webp"
     },
     {
       "id": "jarrett_rakim",
@@ -4989,7 +5386,8 @@
       "position": "WR",
       "adp": 553,
       "byeWeek": 0,
-      "projection": 22
+      "projection": 22,
+      "photoUrl": "/players/jarrett_rakim.webp"
     },
     {
       "id": "jones_tim",
@@ -4998,7 +5396,8 @@
       "position": "WR",
       "adp": 554,
       "byeWeek": 10,
-      "projection": 21
+      "projection": 21,
+      "photoUrl": "/players/jones_tim.webp"
     }
   ]
 }
