@@ -208,10 +208,25 @@ function DraftCard({ draft, onEnter }: DraftCardProps): React.ReactElement {
         />
       )}
       <div className="relative z-10">
-      {/* Header Row - Only show YOUR TURN badge */}
+      {/* Header Row - Only show On the Clock badge */}
       {isYourTurn && (
         <div className="flex items-center justify-end mb-2">
-          <StatusBadge status="success" label="YOUR TURN" />
+          <span
+            className="inline-flex items-center font-semibold uppercase tracking-wide"
+            style={{
+              backgroundColor: 'rgba(16, 185, 129, 0.2)',
+              color: '#FFFFFF',
+              paddingLeft: `${SPACING.sm}px`,
+              paddingRight: `${SPACING.sm}px`,
+              paddingTop: '2px',
+              paddingBottom: '2px',
+              borderRadius: `${RADIUS.sm}px`,
+              fontSize: `${TYPOGRAPHY.fontSize.xs - 1}px`,
+              lineHeight: 1.2,
+            }}
+          >
+            On the Clock
+          </span>
         </div>
       )}
       
