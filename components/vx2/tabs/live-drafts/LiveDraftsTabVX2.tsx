@@ -71,6 +71,7 @@ interface DraftCardProps {
 function DraftCard({ draft, onEnter }: DraftCardProps): React.ReactElement {
   const isYourTurn = draft.status === 'your-turn';
   const progress = (draft.pickNumber / draft.totalPicks) * 100;
+  const picksAway = calculatePicksAway(draft);
   
   return (
     <button
@@ -103,9 +104,16 @@ function DraftCard({ draft, onEnter }: DraftCardProps): React.ReactElement {
       
       {/* Info Row */}
       <div className="flex items-center justify-between mb-3">
-        <span style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
-          Pick {draft.pickNumber} of {draft.totalPicks}
-        </span>
+        <div className="flex items-center gap-2">
+          <span style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+            Pick {draft.pickNumber} of {draft.totalPicks}
+          </span>
+          {!isYourTurn && picksAway > 0 && (
+            <span style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>
+              • {picksAway} pick{picksAway !== 1 ? 's' : ''} away
+            </span>
+          )}
+        </div>
         {isYourTurn && draft.timeLeftSeconds && (
           <span 
             className="font-mono font-bold"
@@ -183,6 +191,47 @@ function formatTime(seconds: number): string {
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
   return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
+/**
+ * Calculate picks away until user's turn in a snake draft
+ */
+function calculatePicksAway(draft: LiveDraft): number {
+  if (draft.status === 'your-turn') {
+    return 0;
+  }
+  
+  const { pickNumber, draftPosition, teamCount } = draft;
+  const roundNumber = Math.ceil(pickNumber / teamCount);
+  const positionInRound = ((pickNumber - 1) % teamCount) + 1;
+  const isOddRound = roundNumber % 2 === 1;
+  
+  // Calculate which pick number in the round corresponds to each position
+  let currentPickInRound: number;
+  if (isOddRound) {
+    // Odd rounds: position 1 = pick 1, position 2 = pick 2, etc.
+    currentPickInRound = positionInRound;
+  } else {
+    // Even rounds: position 1 = pick 12, position 2 = pick 11, etc.
+    currentPickInRound = teamCount - positionInRound + 1;
+  }
+  
+  // Calculate user's pick number in the round
+  let userPickInRound: number;
+  if (isOddRound) {
+    userPickInRound = draftPosition;
+  } else {
+    userPickInRound = teamCount - draftPosition + 1;
+  }
+  
+  // Calculate picks away
+  if (currentPickInRound < userPickInRound) {
+    // User's turn is later in this round
+    return userPickInRound - currentPickInRound;
+  } else {
+    // User's turn is in the next round
+    return (teamCount - currentPickInRound) + userPickInRound;
+  }
 }
 
 // ============================================================================
