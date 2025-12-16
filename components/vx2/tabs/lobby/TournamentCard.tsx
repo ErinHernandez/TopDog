@@ -153,13 +153,13 @@ export function TournamentCard({
           style={{ marginBottom: `${CARD_PX.logoMarginBottom}px` }}
         >
           <img 
-            src="/Teal_Earth_irelandcenter.png" 
+            src="/globe_tournament.png" 
             alt=""
             aria-hidden="true"
             style={{ 
               width: `${CARD_PX.logoSize}px`, 
               height: `${CARD_PX.logoSize}px`, 
-              objectFit: 'cover',
+              objectFit: 'contain',
               borderRadius: `${RADIUS.lg}px`,
             }}
           />
