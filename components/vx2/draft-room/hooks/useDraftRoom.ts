@@ -274,20 +274,27 @@ export function useDraftRoom({
   }, [isMyTurn, picksHook, availablePlayersHook.filteredPlayers, currentParticipantIndex, participants]);
   
   // Initialize timer hook
-  const timerSeconds = fastMode ? 3 : (room?.settings.pickTimeSeconds ?? DRAFT_DEFAULTS.pickTimeSeconds);
+  // Non-user picks (mock opponents) always get 3 seconds
+  // User picks get full time unless fastMode is enabled
+  const normalUserPickTime = room?.settings.pickTimeSeconds ?? DRAFT_DEFAULTS.pickTimeSeconds;
+  const mockOpponentPickTime = DRAFT_DEFAULTS.fastModeSeconds; // 3 seconds for mock opponents
+  const userPickTime = fastMode ? mockOpponentPickTime : normalUserPickTime;
+  const initialTimerSeconds = isMyTurn ? userPickTime : mockOpponentPickTime;
+  
   const timerHook = useDraftTimer({
-    initialSeconds: timerSeconds,
+    initialSeconds: initialTimerSeconds,
     isActive: status === 'active' && !isPaused,
     isPaused: isPaused,
     onExpire: handleTimerExpire,
   });
   
-  // Reset timer when pick changes
+  // Reset timer when pick changes - user gets configured time, mock opponents always get 3s
   useEffect(() => {
     if (status === 'active') {
-      timerHook.reset();
+      const newTimerSeconds = isMyTurn ? userPickTime : mockOpponentPickTime;
+      timerHook.reset(newTimerSeconds);
     }
-  }, [currentPickNumber, status]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentPickNumber, status, isMyTurn, userPickTime, mockOpponentPickTime]); // eslint-disable-line react-hooks/exhaustive-deps
   
   // Actions
   const draftPlayer = useCallback(async (player: DraftPlayer): Promise<boolean> => {

@@ -247,6 +247,9 @@ export default function LobbyTabVX2({
       // Simulate API call to join tournament
       await new Promise(r => setTimeout(r, 1000));
       
+      // Set session flag so draft room knows user came from app
+      sessionStorage.setItem('topdog_joined_draft', 'true');
+      
       // Navigate to VX2 Draft Room
       router.push('/testing-grounds/vx2-draft-room');
     } catch (e) {

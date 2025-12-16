@@ -23,6 +23,8 @@
 import React, { useRef, useEffect, useMemo, useState, useCallback } from 'react';
 import type { DraftPick, DraftPlayer, Participant, Position, DraftStatus } from '../types';
 import { POSITION_COLORS, DRAFT_DEFAULTS, TILED_BG_STYLE } from '../constants';
+import { useImageShare } from '../hooks/useImageShare';
+import { Share } from '../../components/icons/actions/Share';
 
 // ============================================================================
 // SCROLLING USERNAME COMPONENT
@@ -200,6 +202,8 @@ export interface PicksBarProps {
   onPickClick?: (pick: DraftPick) => void;
   /** Callback when a blank card is clicked */
   onBlankClick?: (pickNumber: number) => void;
+  /** Enable image share functionality */
+  enableShare?: boolean;
 }
 
 interface PickSlot {
@@ -928,13 +932,31 @@ export default function PicksBar({
   status = 'active',
   onPickClick,
   onBlankClick,
+  enableShare = false,
 }: PicksBarProps): React.ReactElement {
   const scrollRef = useRef<HTMLDivElement>(null);
   const currentPickRef = useRef<HTMLDivElement>(null);
+  const picksContentRef = useRef<HTMLDivElement>(null);
   
   const teamCount = participants.length || DRAFT_DEFAULTS.teamCount;
   const rosterSize = DRAFT_DEFAULTS.rosterSize;
   const totalPicks = teamCount * rosterSize;
+  
+  // Image share hook
+  const { captureAndShare, isCapturing } = useImageShare({
+    onSuccess: (method) => {
+      console.log(`[PicksBar] Share successful via ${method}`);
+    },
+    onError: (error) => {
+      console.error('[PicksBar] Share failed:', error);
+    },
+  });
+  
+  // Handle share button click
+  const handleShare = useCallback(() => {
+    const userName = participants[userParticipantIndex]?.name || 'My Team';
+    captureAndShare(picksContentRef.current, 'picks', userName);
+  }, [captureAndShare, participants, userParticipantIndex]);
   
   // Build picks map for quick lookup
   const picksMap = useMemo(() => {
@@ -1006,6 +1028,7 @@ export default function PicksBar({
         paddingBottom: PICKS_BAR_PX.containerPaddingBottom,
         paddingLeft: 0,
         paddingRight: 0,
+        position: 'relative',
       }}
     >
       {/* Scrollable Container */}
@@ -1032,11 +1055,15 @@ export default function PicksBar({
             height: 0px !important;
             display: none !important;
           }
+          @keyframes spin {
+            to { transform: rotate(360deg); }
+          }
         `}</style>
         
-        {/* Inner flex container */}
+        {/* Inner flex container (capturable) */}
         {/* Padding allows first/last cards to be centered */}
         <div
+          ref={picksContentRef}
           style={{
             display: 'flex',
             alignItems: 'flex-start',
@@ -1044,6 +1071,7 @@ export default function PicksBar({
             gap: PICKS_BAR_PX.cardGap,
             paddingLeft: `calc(50% - ${PICKS_BAR_PX.cardWidth / 2}px)`,
             paddingRight: `calc(50% - ${PICKS_BAR_PX.cardWidth / 2}px)`,
+            backgroundColor: PICKS_BAR_PX.containerBg,
           }}
         >
           {pickSlots.map(({ pickNumber, pick, participantIndex }) => {
@@ -1088,6 +1116,48 @@ export default function PicksBar({
           })}
         </div>
       </div>
+      
+      {/* Floating Share Button */}
+      {enableShare && (
+        <button
+          onClick={handleShare}
+          disabled={isCapturing}
+          aria-label="Share picks bar as image"
+          style={{
+            position: 'absolute',
+            bottom: 8,
+            right: 8,
+            width: 36,
+            height: 36,
+            borderRadius: 18,
+            backgroundColor: '#3B82F6',
+            border: 'none',
+            cursor: isCapturing ? 'wait' : 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+            opacity: isCapturing ? 0.7 : 1,
+            transition: 'opacity 0.2s, transform 0.2s',
+            zIndex: 20,
+          }}
+        >
+          {isCapturing ? (
+            <div
+              style={{
+                width: 16,
+                height: 16,
+                border: '2px solid #FFFFFF',
+                borderTopColor: 'transparent',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite',
+              }}
+            />
+          ) : (
+            <Share size={18} color="#FFFFFF" strokeWidth={2} aria-hidden />
+          )}
+        </button>
+      )}
     </div>
   );
 }

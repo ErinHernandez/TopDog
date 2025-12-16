@@ -20,6 +20,8 @@ import type { DraftPick, Participant, Position, DraftPlayer } from '../types';
 import { POSITION_COLORS } from '../constants';
 import { BG_COLORS, TEXT_COLORS } from '../../core/constants/colors';
 import PlayerExpandedCard from './PlayerExpandedCard';
+import { useImageShare } from '../hooks/useImageShare';
+import { Share } from '../../components/icons/actions/Share';
 
 // ============================================================================
 // PIXEL-PERFECT CONSTANTS (matched from VX RosterPanelVX.tsx)
@@ -665,6 +667,24 @@ export default function RosterView({
   const [selectedIndex, setSelectedIndex] = useState(userParticipantIndex);
   const [expandedPlayerId, setExpandedPlayerId] = useState<string | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const rosterContentRef = useRef<HTMLDivElement>(null);
+  
+  // Image share hook
+  const { captureAndShare, isCapturing } = useImageShare({
+    onSuccess: (method) => {
+      console.log(`[RosterView] Share successful via ${method}`);
+    },
+    onError: (error) => {
+      console.error('[RosterView] Share failed:', error);
+    },
+  });
+  
+  // Handle share button click
+  const handleShare = useCallback(() => {
+    const selectedParticipant = participants[selectedIndex];
+    const teamName = selectedParticipant?.name || 'My Team';
+    captureAndShare(rosterContentRef.current, 'roster', teamName);
+  }, [captureAndShare, participants, selectedIndex]);
   
   // Collapse expanded card when switching teams
   useEffect(() => {
@@ -716,81 +736,132 @@ export default function RosterView({
         overflow: 'hidden',
         backgroundColor: ROSTER_COLORS.background,
         color: ROSTER_COLORS.textPrimary,
+        position: 'relative',
       }}
     >
-      {/* Header with Dropdown */}
-      <TeamSelector
-        participants={participants}
-        selectedIndex={selectedIndex}
-        onSelect={setSelectedIndex}
-        onTheClockIndex={onTheClockIndex}
-        draftDirectionUp={draftDirectionUp}
-      />
-      
-      {/* Roster List - Scrollable */}
-      <div
-        ref={scrollContainerRef}
-        onScroll={handleScroll}
-        style={{
-          flex: 1,
-          overflowY: 'auto',
-          WebkitOverflowScrolling: 'touch',
-          overscrollBehavior: 'contain',
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-          borderTop: `2px solid ${ROSTER_COLORS.headerBorder}`,
-          paddingBottom: 24,
-        }}
-      >
-        {/* Starting Lineup */}
-        {STARTING_POSITIONS.map((position, index) => {
-          const player = getPlayerForSlot(team, position, index, STARTING_POSITIONS);
-          return (
-            <RosterRow
-              key={`start-${index}`}
-              position={position}
-              player={player}
-              isStarter={true}
-              isExpanded={player ? expandedPlayerId === player.id : false}
-              onToggleExpand={player ? () => handleToggleExpand(player.id) : undefined}
-            />
-          );
-        })}
+      {/* Capturable Roster Content */}
+      <div ref={rosterContentRef}>
+        {/* Header with Dropdown */}
+        <TeamSelector
+          participants={participants}
+          selectedIndex={selectedIndex}
+          onSelect={setSelectedIndex}
+          onTheClockIndex={onTheClockIndex}
+          draftDirectionUp={draftDirectionUp}
+        />
         
-        {/* Bench Header */}
+        {/* Roster List - Scrollable */}
         <div
+          ref={scrollContainerRef}
+          onScroll={handleScroll}
           style={{
-            fontWeight: 500,
-            paddingLeft: ROSTER_PX.benchHeaderPaddingX,
-            paddingRight: ROSTER_PX.benchHeaderPaddingX,
-            paddingTop: ROSTER_PX.benchHeaderPaddingTop,
-            paddingBottom: ROSTER_PX.benchHeaderPaddingBottom,
-            fontSize: ROSTER_PX.benchHeaderFontSize,
-            transform: `translateY(${ROSTER_PX.benchHeaderTranslateY}px)`,
-            color: ROSTER_COLORS.textSecondary,
+            flex: 1,
+            overflowY: 'auto',
+            WebkitOverflowScrolling: 'touch',
+            overscrollBehavior: 'contain',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            borderTop: `2px solid ${ROSTER_COLORS.headerBorder}`,
+            paddingBottom: 24,
           }}
         >
-          BENCH
-        </div>
-        
-        {/* Bench Slots */}
-        {[...Array(ROSTER_PX.benchSlots)].map((_, index) => {
-          const benchPlayers = team.slice(ROSTER_PX.startingSlots);
-          const benchPlayer = benchPlayers[index] || null;
+          {/* Starting Lineup */}
+          {STARTING_POSITIONS.map((position, index) => {
+            const player = getPlayerForSlot(team, position, index, STARTING_POSITIONS);
+            return (
+              <RosterRow
+                key={`start-${index}`}
+                position={position}
+                player={player}
+                isStarter={true}
+                isExpanded={player ? expandedPlayerId === player.id : false}
+                onToggleExpand={player ? () => handleToggleExpand(player.id) : undefined}
+              />
+            );
+          })}
           
-          return (
-            <RosterRow
-              key={`bench-${index}`}
-              position={benchPlayer?.position as RosterPosition || 'BN'}
-              player={benchPlayer}
-              isStarter={false}
-              showTopBorder={index === 0}
-              isExpanded={benchPlayer ? expandedPlayerId === benchPlayer.id : false}
-              onToggleExpand={benchPlayer ? () => handleToggleExpand(benchPlayer.id) : undefined}
-            />
-          );
-        })}
+          {/* Bench Header */}
+          <div
+            style={{
+              fontWeight: 500,
+              paddingLeft: ROSTER_PX.benchHeaderPaddingX,
+              paddingRight: ROSTER_PX.benchHeaderPaddingX,
+              paddingTop: ROSTER_PX.benchHeaderPaddingTop,
+              paddingBottom: ROSTER_PX.benchHeaderPaddingBottom,
+              fontSize: ROSTER_PX.benchHeaderFontSize,
+              transform: `translateY(${ROSTER_PX.benchHeaderTranslateY}px)`,
+              color: ROSTER_COLORS.textSecondary,
+            }}
+          >
+            BENCH
+          </div>
+          
+          {/* Bench Slots */}
+          {[...Array(ROSTER_PX.benchSlots)].map((_, index) => {
+            const benchPlayers = team.slice(ROSTER_PX.startingSlots);
+            const benchPlayer = benchPlayers[index] || null;
+            
+            return (
+              <RosterRow
+                key={`bench-${index}`}
+                position={benchPlayer?.position as RosterPosition || 'BN'}
+                player={benchPlayer}
+                isStarter={false}
+                showTopBorder={index === 0}
+                isExpanded={benchPlayer ? expandedPlayerId === benchPlayer.id : false}
+                onToggleExpand={benchPlayer ? () => handleToggleExpand(benchPlayer.id) : undefined}
+              />
+            );
+          })}
+        </div>
       </div>
+      
+      {/* Floating Share Button */}
+      <button
+        onClick={handleShare}
+        disabled={isCapturing}
+        aria-label="Share roster as image"
+        style={{
+          position: 'absolute',
+          bottom: 16,
+          right: 16,
+          width: 48,
+          height: 48,
+          borderRadius: 24,
+          backgroundColor: '#3B82F6',
+          border: 'none',
+          cursor: isCapturing ? 'wait' : 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+          opacity: isCapturing ? 0.7 : 1,
+          transition: 'opacity 0.2s, transform 0.2s',
+          zIndex: 20,
+        }}
+      >
+        {isCapturing ? (
+          <div
+            style={{
+              width: 20,
+              height: 20,
+              border: '2px solid #FFFFFF',
+              borderTopColor: 'transparent',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+            }}
+          />
+        ) : (
+          <Share size={24} color="#FFFFFF" strokeWidth={2} aria-hidden />
+        )}
+      </button>
+      
+      {/* Spinner animation */}
+      <style>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }

@@ -16,10 +16,12 @@
  * - Co-located sub-components
  */
 
-import React, { useRef, useEffect, useMemo, useCallback } from 'react';
+import React, { useRef, useEffect, useMemo, useCallback, useState } from 'react';
 import type { DraftPick, Participant, Position } from '../types';
 import { POSITION_COLORS } from '../constants';
 import { BG_COLORS, TEXT_COLORS } from '../../core/constants/colors';
+import { useImageShare } from '../hooks/useImageShare';
+import { Share } from '../../components/icons/actions/Share';
 
 // ============================================================================
 // PIXEL-PERFECT CONSTANTS (matched from VX DraftBoardVX.tsx)
@@ -455,7 +457,24 @@ export default function DraftBoard({
   onScrollPositionChange,
 }: DraftBoardProps): React.ReactElement {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const boardContentRef = useRef<HTMLDivElement>(null);
   const teamCount = participants.length || 12;
+  
+  // Image share hook
+  const { captureAndShare, isCapturing } = useImageShare({
+    onSuccess: (method) => {
+      console.log(`[DraftBoard] Share successful via ${method}`);
+    },
+    onError: (error) => {
+      console.error('[DraftBoard] Share failed:', error);
+    },
+  });
+  
+  // Handle share button click
+  const handleShare = useCallback(() => {
+    const userName = participants[userParticipantIndex]?.name || 'My Team';
+    captureAndShare(boardContentRef.current, 'draft-board', userName);
+  }, [captureAndShare, participants, userParticipantIndex]);
   
   // Restore scroll position on mount
   useEffect(() => {
@@ -577,6 +596,7 @@ export default function DraftBoard({
         display: 'flex',
         flexDirection: 'column',
         backgroundColor: BOARD_COLORS.background,
+        position: 'relative',
       }}
     >
       {/* Scrollable Grid */}
@@ -598,64 +618,114 @@ export default function DraftBoard({
           }
         `}</style>
         
-        {/* Team Headers - Sticky */}
-        <div
-          style={{
-            position: 'sticky',
-            top: 0,
-            zIndex: 10,
-            backgroundColor: BOARD_COLORS.background,
-            paddingTop: 16,
-          }}
-        >
+        {/* Capturable Board Content */}
+        <div ref={boardContentRef}>
+          {/* Team Headers - Sticky */}
           <div
             style={{
-              display: 'flex',
-              minWidth: gridMinWidth,
-              width: 'max-content',
+              position: 'sticky',
+              top: 0,
+              zIndex: 10,
+              backgroundColor: BOARD_COLORS.background,
+              paddingTop: 16,
             }}
           >
-            {participants.map((participant, index) => (
-              <TeamHeader
-                key={participant.id || index}
-                participant={participant}
-                index={index}
-                isUser={index === userParticipantIndex}
-                userBorderColor={userBorderColor}
-                positionCounts={getPositionCounts(index)}
-                isOnTheClock={isDraftActive && index === currentParticipantIndex}
-              />
-            ))}
-          </div>
-        </div>
-        
-        {/* Draft Grid Rows */}
-        <div style={{ paddingBottom: 24 }}>
-          {draftGrid.map((roundData) => (
             <div
-              key={roundData.round}
-              data-round={roundData.round}
               style={{
                 display: 'flex',
                 minWidth: gridMinWidth,
                 width: 'max-content',
               }}
             >
-              {roundData.picks.map((pickData) => (
-                <PickCell
-                  key={pickData.pickNumber}
-                  pickData={pickData}
-                  teamCount={teamCount}
-                  timer={timer}
+              {participants.map((participant, index) => (
+                <TeamHeader
+                  key={participant.id || index}
+                  participant={participant}
+                  index={index}
+                  isUser={index === userParticipantIndex}
                   userBorderColor={userBorderColor}
-                  picksAway={getPicksAway(pickData.pickNumber)}
-                  isNextUserPick={pickData.pickNumber === nextUserPickNumber}
+                  positionCounts={getPositionCounts(index)}
+                  isOnTheClock={isDraftActive && index === currentParticipantIndex}
                 />
               ))}
             </div>
-          ))}
+          </div>
+          
+          {/* Draft Grid Rows */}
+          <div style={{ paddingBottom: 24 }}>
+            {draftGrid.map((roundData) => (
+              <div
+                key={roundData.round}
+                data-round={roundData.round}
+                style={{
+                  display: 'flex',
+                  minWidth: gridMinWidth,
+                  width: 'max-content',
+                }}
+              >
+                {roundData.picks.map((pickData) => (
+                  <PickCell
+                    key={pickData.pickNumber}
+                    pickData={pickData}
+                    teamCount={teamCount}
+                    timer={timer}
+                    userBorderColor={userBorderColor}
+                    picksAway={getPicksAway(pickData.pickNumber)}
+                    isNextUserPick={pickData.pickNumber === nextUserPickNumber}
+                  />
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
+      
+      {/* Floating Share Button */}
+      <button
+        onClick={handleShare}
+        disabled={isCapturing}
+        aria-label="Share draft board as image"
+        style={{
+          position: 'absolute',
+          bottom: 16,
+          right: 16,
+          width: 48,
+          height: 48,
+          borderRadius: 24,
+          backgroundColor: '#3B82F6',
+          border: 'none',
+          cursor: isCapturing ? 'wait' : 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+          opacity: isCapturing ? 0.7 : 1,
+          transition: 'opacity 0.2s, transform 0.2s',
+          zIndex: 20,
+        }}
+      >
+        {isCapturing ? (
+          <div
+            style={{
+              width: 20,
+              height: 20,
+              border: '2px solid #FFFFFF',
+              borderTopColor: 'transparent',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+            }}
+          />
+        ) : (
+          <Share size={24} color="#FFFFFF" strokeWidth={2} aria-hidden />
+        )}
+      </button>
+      
+      {/* Spinner animation */}
+      <style>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }

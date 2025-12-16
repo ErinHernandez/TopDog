@@ -19,15 +19,16 @@ export default function VX2MobileAppDemo() {
   const { isMobile, isLoaded } = useIsMobileDevice();
   
   // Get initial tab from query parameter (e.g., ?tab=live-drafts)
-  const initialTab = router.query.tab || 'lobby';
+  // Must wait for router.isReady to ensure query params are parsed
+  const initialTab = router.isReady ? (router.query.tab || 'lobby') : null;
   
   // Track tab changes for debugging
   const handleTabChange = (fromTab, toTab) => {
     console.log(`[VX2] Tab changed: ${fromTab || 'initial'} -> ${toTab}`);
   };
 
-  // Show nothing until we've detected device type to prevent flash
-  if (!isLoaded) {
+  // Show nothing until we've detected device type AND router is ready to prevent flash
+  if (!isLoaded || !router.isReady) {
     return (
       <div 
         style={{ 

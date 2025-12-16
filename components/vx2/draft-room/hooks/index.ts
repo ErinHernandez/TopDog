@@ -19,3 +19,6 @@ export type { UseDraftPicksOptions, UseDraftPicksResult } from './useDraftPicks'
 
 export { useDraftRoom } from './useDraftRoom';
 export type { UseDraftRoomOptions, UseDraftRoomResult } from './useDraftRoom';
+
+export { useImageShare } from './useImageShare';
+export type { UseImageShareOptions, UseImageShareResult, ShareableView } from './useImageShare';

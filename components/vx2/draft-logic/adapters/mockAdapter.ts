@@ -300,3 +300,4 @@ export function createMockAdapter(): DraftAdapter {
 
 export default MockAdapter;
 
+

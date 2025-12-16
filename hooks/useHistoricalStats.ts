@@ -338,3 +338,4 @@ function calculateCareerTotals(seasons: SeasonStats[]): CareerTotals {
   return totals;
 }
 
+

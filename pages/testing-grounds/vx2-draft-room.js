@@ -9,13 +9,17 @@
 
 import React, { useState, useCallback, useRef } from 'react';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import { DraftRoomVX2 } from '../../components/vx2/draft-room';
 import { useIsMobileDevice } from '../../hooks/useIsMobileDevice';
 
 export default function VX2DraftRoomPage() {
+  const router = useRouter();
   const { isMobile, isLoaded } = useIsMobileDevice();
   const [draftKey, setDraftKey] = useState(0);
   const [fastMode, setFastMode] = useState(false);
+  // Track if we've verified the user can access the draft room
+  const [isAuthorized, setIsAuthorized] = useState(false);
   // Use ref instead of state to avoid infinite loops
   const devToolsRef = useRef(null);
   // Track if we've auto-started on mobile
@@ -23,15 +27,38 @@ export default function VX2DraftRoomPage() {
   // Force re-render manually when needed
   const [, forceUpdate] = useState({});
   
+  // Check if mobile user is authorized to access draft room
+  // (must come from clicking "Join Tournament" which sets the session flag)
+  React.useEffect(() => {
+    if (!isLoaded || !router.isReady) return;
+    
+    // Desktop users are always authorized
+    if (!isMobile) {
+      setIsAuthorized(true);
+      return;
+    }
+    
+    // On mobile, check if user came from the app (has session flag)
+    const cameFromApp = sessionStorage.getItem('topdog_joined_draft');
+    if (!cameFromApp) {
+      // Direct access on mobile - redirect to app demo (lobby)
+      router.replace('/testing-grounds/vx2-mobile-app-demo');
+      return;
+    }
+    
+    // Clear the flag so refreshing the page will redirect
+    sessionStorage.removeItem('topdog_joined_draft');
+    setIsAuthorized(true);
+  }, [isMobile, isLoaded, router]);
+  
   const handleRestart = useCallback(() => {
     setDraftKey(prev => prev + 1);
   }, []);
   
   const handleLeaveDraft = useCallback(() => {
-    // Use window.location for reliable navigation from within phone frame
-    // Navigate to live-drafts tab instead of lobby
-    window.location.href = '/testing-grounds/vx2-mobile-app-demo?tab=live-drafts';
-  }, []);
+    // Navigate to live-drafts tab (shows active drafts after leaving)
+    router.push('/testing-grounds/vx2-mobile-app-demo?tab=live-drafts');
+  }, [router]);
   
   // Desktop: just store tools for manual control
   const handleDevToolsReady = useCallback((tools) => {
@@ -57,8 +84,9 @@ export default function VX2DraftRoomPage() {
     setDraftKey(prev => prev + 1);
   }, []);
 
-  // Show loading state until device detection is complete
-  if (!isLoaded) {
+  // Show loading state until device detection AND authorization check are complete
+  // This prevents the draft room from flashing before redirect on mobile
+  if (!isLoaded || !isAuthorized) {
     return (
       <div 
         style={{ 
