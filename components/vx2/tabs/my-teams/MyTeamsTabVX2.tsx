@@ -619,27 +619,40 @@ function TeamDetailsView({ team, onBack, onViewDraftBoard }: TeamDetailsViewProp
           msOverflowStyle: 'none',
         }}
       >
-        {groupedPlayers.map(([position, players], groupIndex) => (
-          <React.Fragment key={position}>
-            {/* Position Divider */}
-            {groupIndex > 0 && (
+        {groupedPlayers.map(([position, players], groupIndex) => {
+          const positionColor = POSITION_COLORS[position.toUpperCase() as keyof typeof POSITION_COLORS] || TEXT_COLORS.muted;
+          
+          return (
+            <React.Fragment key={position}>
+              {/* Position Divider Above */}
               <div
                 style={{
-                  height: '1px',
-                  backgroundColor: 'rgba(255,255,255,0.1)',
+                  height: '2px',
+                  backgroundColor: positionColor,
                   marginLeft: `${MYTEAMS_PX.rowPaddingX}px`,
                   marginRight: `${MYTEAMS_PX.rowPaddingX}px`,
-                  marginTop: `${SPACING.xs}px`,
+                  marginTop: groupIndex > 0 ? `${SPACING.sm}px` : '0',
                   marginBottom: `${SPACING.xs}px`,
                 }}
               />
-            )}
-            {/* Players in this position group */}
-            {players.map((player, index) => (
-              <PlayerRow key={`${player.name}-${index}`} player={player} />
-            ))}
-          </React.Fragment>
-        ))}
+              {/* Players in this position group */}
+              {players.map((player, index) => (
+                <PlayerRow key={`${player.name}-${index}`} player={player} />
+              ))}
+              {/* Position Divider Below */}
+              <div
+                style={{
+                  height: '2px',
+                  backgroundColor: positionColor,
+                  marginLeft: `${MYTEAMS_PX.rowPaddingX}px`,
+                  marginRight: `${MYTEAMS_PX.rowPaddingX}px`,
+                  marginTop: `${SPACING.xs}px`,
+                  marginBottom: groupIndex < groupedPlayers.length - 1 ? `${SPACING.sm}px` : '0',
+                }}
+              />
+            </React.Fragment>
+          );
+        })}
         
         {/* Bottom padding */}
         <div style={{ height: '100px' }} />
