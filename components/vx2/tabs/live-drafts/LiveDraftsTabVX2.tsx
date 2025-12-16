@@ -91,7 +91,7 @@ function DraftProgressBar({ value, totalRounds, currentRound, color }: DraftProg
         className="absolute inset-y-0 left-0 transition-all duration-300 ease-out"
         style={{
           width: `${clampedValue}%`,
-          backgroundColor: color,
+          backgroundColor: 'rgba(200, 200, 200, 0.5)',
           borderRadius: '2px',
         }}
       />
@@ -112,8 +112,8 @@ function DraftProgressBar({ value, totalRounds, currentRound, color }: DraftProg
               width: '6px',
               height: '6px',
               borderRadius: '50%',
-              backgroundColor: isPastRound || isCurrentRound ? color : 'rgba(255, 255, 255, 0.3)',
-              border: `1px solid ${isPastRound || isCurrentRound ? color : 'rgba(255, 255, 255, 0.5)'}`,
+              backgroundColor: isPastRound || isCurrentRound ? 'rgba(200, 200, 200, 0.5)' : 'rgba(255, 255, 255, 0.3)',
+              border: `1px solid ${isPastRound || isCurrentRound ? 'rgba(200, 200, 200, 0.7)' : 'rgba(255, 255, 255, 0.5)'}`,
               zIndex: 1,
             }}
           />
