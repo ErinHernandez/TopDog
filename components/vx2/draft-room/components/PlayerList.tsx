@@ -17,7 +17,7 @@ import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react'
 import type { DraftPlayer, Position, PlayerSortOption } from '../types';
 import { POSITION_COLORS } from '../constants';
 import { BG_COLORS, TEXT_COLORS } from '../../core/constants/colors';
-import { TOUCH_TARGETS } from '../../core/constants/sizes';
+import { TOUCH_TARGETS, SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
 import PlayerExpandedCard from './PlayerExpandedCard';
 
 // ============================================================================
@@ -142,38 +142,17 @@ function FilterButton({ position, count, isActive, onToggle }: FilterButtonProps
       onClick={onToggle}
       aria-label={`Filter by ${position}, ${count} drafted`}
       aria-pressed={isActive}
+      className="flex-1 py-2.5 px-3 font-bold transition-all"
       style={{
-        flex: 1,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 6,
-        height: 36,
-        margin: '0 3px',
-        borderRadius: 8,
-        border: `2px solid ${color}`,
-        backgroundColor: isActive ? `${color}30` : 'transparent',
+        fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
+        backgroundColor: isActive ? 'rgba(255,255,255,0.1)' : 'transparent',
+        color: isActive ? color : TEXT_COLORS.muted,
+        borderBottom: `2px solid ${color}`,
+        opacity: isActive ? 1 : 0.4,
         cursor: 'pointer',
-        transition: 'all 0.15s ease',
       }}
     >
-      <span style={{ 
-        fontSize: 13, 
-        fontWeight: 600,
-        color: isActive ? '#FFFFFF' : color,
-        letterSpacing: '0.5px',
-      }}>
-        {position}
-      </span>
-      <span
-        style={{
-          fontSize: 13,
-          fontWeight: 500,
-          color: isActive ? '#FFFFFF' : '#9CA3AF',
-        }}
-      >
-        {count}
-      </span>
+      {position} {count}
     </button>
   );
 }
@@ -475,18 +454,23 @@ export default function PlayerList({
       }}
     >
       {/* Position Filter Buttons */}
-      <div style={{ marginTop: PLAYER_LIST_PX.filterMarginTop }}>
-        <div style={{ display: 'flex', width: '100%' }}>
-          {POSITIONS.map(position => (
-            <FilterButton
-              key={position}
-              position={position}
-              count={draftedCounts[position] || 0}
-              isActive={positionFilters.includes(position)}
-              onToggle={() => onToggleFilter(position)}
-            />
-          ))}
-        </div>
+      <div 
+        className="flex rounded-lg overflow-hidden"
+        style={{ 
+          backgroundColor: 'rgba(255,255,255,0.05)',
+          marginTop: `${SPACING.md}px`,
+          marginBottom: `${SPACING.xs}px`,
+        }}
+      >
+        {POSITIONS.map(position => (
+          <FilterButton
+            key={position}
+            position={position}
+            count={draftedCounts[position] || 0}
+            isActive={positionFilters.includes(position)}
+            onToggle={() => onToggleFilter(position)}
+          />
+        ))}
       </div>
       
       {/* Search Bar */}
