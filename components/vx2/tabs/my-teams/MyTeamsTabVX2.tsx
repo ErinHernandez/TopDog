@@ -211,7 +211,7 @@ function TeamListView({ teams, isLoading, onSelect, onNameChange }: TeamListView
         <SearchInput
           value={searchQuery}
           onChange={setSearchQuery}
-          placeholder="Search for player(s), to search multiple use , or /"
+          placeholder="Search for player(s) or team"
         />
       </div>
       
