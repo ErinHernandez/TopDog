@@ -63,6 +63,66 @@ export interface LiveDraftsTabVX2Props {
 // SUB-COMPONENTS
 // ============================================================================
 
+interface DraftProgressBarProps {
+  value: number;
+  totalRounds: number;
+  currentRound: number;
+  color: string;
+}
+
+function DraftProgressBar({ value, totalRounds, currentRound, color }: DraftProgressBarProps): React.ReactElement {
+  const clampedValue = Math.max(0, Math.min(100, value));
+  
+  return (
+    <div
+      className="relative"
+      style={{
+        height: '4px',
+        borderRadius: '2px',
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+      }}
+      role="progressbar"
+      aria-valuenow={clampedValue}
+      aria-valuemin={0}
+      aria-valuemax={100}
+    >
+      {/* Progress fill */}
+      <div
+        className="absolute inset-y-0 left-0 transition-all duration-300 ease-out"
+        style={{
+          width: `${clampedValue}%`,
+          backgroundColor: color,
+          borderRadius: '2px',
+        }}
+      />
+      
+      {/* Round knobs */}
+      {Array.from({ length: totalRounds }, (_, i) => {
+        const roundNumber = i + 1;
+        const roundPosition = (roundNumber / totalRounds) * 100;
+        const isPastRound = roundNumber < currentRound;
+        const isCurrentRound = roundNumber === currentRound;
+        
+        return (
+          <div
+            key={roundNumber}
+            className="absolute top-1/2 transform -translate-y-1/2 -translate-x-1/2"
+            style={{
+              left: `${roundPosition}%`,
+              width: '6px',
+              height: '6px',
+              borderRadius: '50%',
+              backgroundColor: isPastRound || isCurrentRound ? color : 'rgba(255, 255, 255, 0.3)',
+              border: `1px solid ${isPastRound || isCurrentRound ? color : 'rgba(255, 255, 255, 0.5)'}`,
+              zIndex: 1,
+            }}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
 interface DraftCardProps {
   draft: LiveDraft;
   onEnter: () => void;
@@ -97,10 +157,7 @@ function DraftCard({ draft, onEnter }: DraftCardProps): React.ReactElement {
       )}
       
       {/* Info Row */}
-      <div className="flex items-center justify-between mb-3">
-        <span style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
-          Pick {draft.pickNumber} of {draft.totalPicks}
-        </span>
+      <div className="flex items-center justify-end mb-3">
         {isYourTurn && draft.timeLeftSeconds ? (
           <span 
             className="font-mono font-bold"
@@ -124,11 +181,12 @@ function DraftCard({ draft, onEnter }: DraftCardProps): React.ReactElement {
         ) : null}
       </div>
       
-      {/* Progress Bar */}
-      <ProgressBar 
+      {/* Progress Bar with Round Knobs */}
+      <DraftProgressBar 
         value={progress}
+        totalRounds={Math.ceil(draft.totalPicks / draft.teamCount)}
+        currentRound={Math.ceil(draft.pickNumber / draft.teamCount)}
         color={isYourTurn ? POSITION_COLORS.RB : STATE_COLORS.active}
-        size="sm"
       />
     </button>
   );
