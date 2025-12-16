@@ -598,6 +598,9 @@ export default function LiveDraftsTabVX2({
         }}
       >
         <TabSwitcher selected={draftType} onSelect={setDraftType} />
+        <p style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px`, marginTop: `${SPACING.xs}px` }}>
+          {filteredDrafts.length} active draft{filteredDrafts.length !== 1 ? 's' : ''}
+        </p>
       </div>
       
       {/* Drafts List */}
