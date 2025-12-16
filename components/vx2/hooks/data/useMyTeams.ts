@@ -90,7 +90,7 @@ export interface UseMyTeamsResult {
 const MOCK_TEAMS: MyTeam[] = [
   {
     id: 'the-topdog-1',
-    name: 'The TopDog International I',
+    name: 'The TopDog International   I',
     tournament: 'The TopDog International',
     tournamentId: 'topdog-international',
     rank: 1245,
@@ -120,7 +120,7 @@ const MOCK_TEAMS: MyTeam[] = [
   },
   {
     id: 'the-topdog-2',
-    name: 'The TopDog International II',
+    name: 'The TopDog International   II',
     tournament: 'The TopDog International',
     tournamentId: 'topdog-international',
     rank: 8934,
@@ -148,7 +148,7 @@ const MOCK_TEAMS: MyTeam[] = [
   },
   {
     id: 'the-topdog-3',
-    name: 'The TopDog International III',
+    name: 'The TopDog International   III',
     tournament: 'The TopDog International',
     tournamentId: 'topdog-international',
     rank: 25678,
@@ -175,7 +175,7 @@ const MOCK_TEAMS: MyTeam[] = [
   },
   {
     id: 'the-topdog-4',
-    name: 'The TopDog International IV',
+    name: 'The TopDog International   IV',
     tournament: 'The TopDog International',
     tournamentId: 'topdog-regional',
     rank: 456,
