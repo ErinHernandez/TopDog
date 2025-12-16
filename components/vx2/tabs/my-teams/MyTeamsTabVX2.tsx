@@ -33,8 +33,8 @@ const MYTEAMS_PX = {
   cardGap: SPACING.md,
   headerPadding: SPACING.lg,
   rowPaddingX: SPACING.lg,
-  rowPaddingY: SPACING.sm,
-  photoSize: 36,
+  rowPaddingY: SPACING.xs,
+  photoSize: 28,
 } as const;
 
 // ============================================================================
@@ -282,10 +282,10 @@ function PlayerRow({ player }: PlayerRowProps): React.ReactElement {
             width: `${MYTEAMS_PX.photoSize}px`,
             height: `${MYTEAMS_PX.photoSize}px`,
             backgroundColor: BG_COLORS.tertiary,
-            marginRight: `${SPACING.md}px`,
+            marginRight: `${SPACING.sm}px`,
           }}
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill={TEXT_COLORS.muted}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill={TEXT_COLORS.muted}>
             <circle cx="12" cy="8" r="4" />
             <path d="M20 21c0-4.418-3.582-7-8-7s-8 2.582-8 7" />
           </svg>
@@ -298,7 +298,7 @@ function PlayerRow({ player }: PlayerRowProps): React.ReactElement {
           >
             {player.name}
           </h3>
-          <div className="flex items-center gap-2 mt-0.5">
+          <div className="flex items-center gap-2" style={{ marginTop: '2px' }}>
             <PositionBadge position={player.position} size="sm" />
             <span style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>
               {player.team} (Bye {player.bye})
