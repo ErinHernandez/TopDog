@@ -30,7 +30,7 @@ const CARD_PX = {
   titleMarginBottom: SPACING.md,
   
   // Logo
-  logoSize: 200,
+  logoSize: 150,  // 200px reduced by 25%
   logoMarginBottom: SPACING.md,
   
   // Progress
