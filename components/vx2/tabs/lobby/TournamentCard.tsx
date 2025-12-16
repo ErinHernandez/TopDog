@@ -163,7 +163,7 @@ export function TournamentCard({
       {featured && (
         <div 
           className="flex justify-center"
-          style={{ marginBottom: `${CARD_PX.logoMarginBottom}px` }}
+          style={{ marginTop: `${SPACING.lg}px`, marginBottom: `${CARD_PX.logoMarginBottom}px` }}
         >
           <img 
             src="/globe_tournament.png" 
@@ -212,6 +212,7 @@ export function TournamentCard({
           height: `${CARD_PX.buttonHeight}px`,
           fontSize: `${CARD_PX.buttonFontSize}px`,
           borderRadius: `${RADIUS.md}px`,
+          marginTop: `${SPACING.lg}px`,
           marginBottom: `${CARD_PX.buttonMarginBottom}px`,
           border: 'none',
           cursor: 'pointer',
