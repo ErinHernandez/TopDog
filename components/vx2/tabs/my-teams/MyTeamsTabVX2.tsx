@@ -313,7 +313,7 @@ function TeamListView({ teams, isLoading, onSelect, onNameChange }: TeamListView
               setSearchQuery(value);
               setShowDropdown(value.trim().length > 0);
             }}
-            placeholder="Search for player(s) or team"
+            placeholder="Search for player(s)"
           />
           
           {/* Dropdown */}
