@@ -71,7 +71,7 @@ function PositionFilters({ selected, onChange }: PositionFiltersProps): React.Re
       style={{ 
         backgroundColor: 'rgba(255,255,255,0.05)',
         marginTop: `${SPACING.md}px`,
-        marginBottom: `${SPACING.sm}px`,
+        marginBottom: `${SPACING.xs}px`,
       }}
     >
       {positions.map(pos => {
