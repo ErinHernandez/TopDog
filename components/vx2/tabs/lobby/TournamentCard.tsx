@@ -144,7 +144,7 @@ export function TournamentCard({
       <h2 
         className="text-center font-bold leading-tight"
         style={{ 
-          fontSize: '22px',
+          fontSize: '26px',
           fontFamily: "'Anton SC', sans-serif",
           textTransform: 'uppercase',
           letterSpacing: '1px',
