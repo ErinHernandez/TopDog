@@ -14,6 +14,7 @@ import { BG_COLORS, TEXT_COLORS, BRAND_COLORS, STATE_COLORS } from '../../core/c
 import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
 import { ProgressBar } from '../../components/shared';
 import type { Tournament } from '../../hooks/data';
+import { TILED_BG_STYLE } from '../../draft-room/constants';
 
 // ============================================================================
 // CONSTANTS
@@ -53,7 +54,7 @@ const CARD_COLORS = {
   border: 'rgba(75, 85, 99, 0.5)',
   text: TEXT_COLORS.primary,
   textMuted: TEXT_COLORS.secondary,
-  accent: BRAND_COLORS.primary,
+  accent: '#1E3A5F',  // Matches tiled background base color
   accentHover: BRAND_COLORS.accent,
   progressBg: 'rgba(55, 65, 81, 1)',
 } as const;
@@ -182,7 +183,7 @@ export function TournamentCard({
           </div>
           <ProgressBar 
             value={fillPercentage} 
-            color={CARD_COLORS.accent}
+            color="#1E3A5F"
             backgroundColor={CARD_COLORS.progressBg}
             size="md"
           />
@@ -194,8 +195,8 @@ export function TournamentCard({
         onClick={onJoinClick}
         className="w-full font-semibold transition-colors duration-200 active:scale-[0.98]"
         style={{ 
-          backgroundColor: CARD_COLORS.accent,
-          color: '#000000',
+          ...TILED_BG_STYLE,
+          color: '#FFFFFF',
           height: `${CARD_PX.buttonHeight}px`,
           fontSize: `${CARD_PX.buttonFontSize}px`,
           borderRadius: `${RADIUS.md}px`,
