@@ -153,8 +153,8 @@ function PlayerListItem({ player, isRanked, onToggle }: PlayerListItemProps): Re
         onClick={onToggle}
         className="flex items-center justify-center transition-all flex-shrink-0"
         style={{ 
-          width: '36px',
-          height: '36px',
+          width: '32px',
+          height: '32px',
           borderRadius: `${RADIUS.lg}px`,
           backgroundColor: isRanked ? 'rgba(239, 68, 68, 0.15)' : 'rgba(96, 165, 250, 0.15)', 
           color: isRanked ? STATE_COLORS.error : STATE_COLORS.active,
@@ -163,7 +163,7 @@ function PlayerListItem({ player, isRanked, onToggle }: PlayerListItemProps): Re
         }}
         aria-label={isRanked ? `Remove ${player.name}` : `Add ${player.name}`}
       >
-        {isRanked ? <Minus size={20} /> : <Plus size={20} />}
+        {isRanked ? <Minus size={16} /> : <Plus size={16} />}
       </button>
     </div>
   );
