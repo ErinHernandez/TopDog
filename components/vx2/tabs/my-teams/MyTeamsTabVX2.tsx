@@ -21,7 +21,8 @@ import {
   ErrorState,
 } from '../../components/shared';
 import { SearchInput } from '../../components/shared/inputs';
-import { ChevronRight, ChevronLeft, Edit, Share } from '../../components/icons';
+import { ChevronRight, ChevronLeft, Edit, Share, Close } from '../../components/icons';
+import { usePlayerPool } from '../../../../lib/playerPool/usePlayerPool';
 
 // ============================================================================
 // CONSTANTS
@@ -180,6 +181,14 @@ function TeamCardSkeleton(): React.ReactElement {
   );
 }
 
+interface SearchItem {
+  type: 'player' | 'team';
+  id: string;
+  name: string;
+  team?: string;
+  position?: string;
+}
+
 interface TeamListViewProps {
   teams: MyTeam[];
   isLoading: boolean;
@@ -188,13 +197,100 @@ interface TeamListViewProps {
 }
 
 function TeamListView({ teams, isLoading, onSelect, onNameChange }: TeamListViewProps): React.ReactElement {
+  const { players: allPlayers } = usePlayerPool();
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedItems, setSelectedItems] = useState<SearchItem[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
   
-  const filteredTeams = useMemo(() => {
-    if (!searchQuery.trim()) return teams;
+  // Get unique NFL teams from player pool
+  const nflTeams = useMemo(() => {
+    const teamsSet = new Set<string>();
+    allPlayers.forEach(p => {
+      if (p.team) teamsSet.add(p.team);
+    });
+    return Array.from(teamsSet).sort();
+  }, [allPlayers]);
+  
+  // Filter dropdown options based on search query
+  const dropdownOptions = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    
     const query = searchQuery.toLowerCase();
-    return teams.filter(t => t.name.toLowerCase().includes(query));
-  }, [teams, searchQuery]);
+    const options: SearchItem[] = [];
+    
+    // Add matching players
+    allPlayers.forEach(player => {
+      if (player.name.toLowerCase().includes(query)) {
+        // Check if already selected
+        if (!selectedItems.some(item => item.type === 'player' && item.id === player.id)) {
+          options.push({
+            type: 'player',
+            id: player.id,
+            name: player.name,
+            team: player.team,
+            position: player.position,
+          });
+        }
+      }
+    });
+    
+    // Add matching NFL teams
+    nflTeams.forEach(team => {
+      if (team.toLowerCase().includes(query)) {
+        // Check if already selected
+        if (!selectedItems.some(item => item.type === 'team' && item.id === team)) {
+          options.push({
+            type: 'team',
+            id: team,
+            name: team,
+          });
+        }
+      }
+    });
+    
+    return options.slice(0, 10); // Limit to 10 results
+  }, [searchQuery, allPlayers, nflTeams, selectedItems]);
+  
+  // Filter teams based on selected items
+  const filteredTeams = useMemo(() => {
+    if (selectedItems.length === 0) return teams;
+    
+    return teams.filter(team => {
+      return selectedItems.some(item => {
+        if (item.type === 'player') {
+          // Check if team contains this player
+          return team.players.some(p => p.name === item.name);
+        } else if (item.type === 'team') {
+          // Check if team contains ANY player from this NFL team
+          return team.players.some(p => p.team === item.id);
+        }
+        return false;
+      });
+    });
+  }, [teams, selectedItems]);
+  
+  const handleSelectItem = useCallback((item: SearchItem) => {
+    setSelectedItems(prev => [...prev, item]);
+    setSearchQuery('');
+    setShowDropdown(false);
+  }, []);
+  
+  const handleRemoveItem = useCallback((itemId: string) => {
+    setSelectedItems(prev => prev.filter(item => item.id !== itemId));
+  }, []);
+  
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
   
   return (
     <div 
@@ -203,16 +299,117 @@ function TeamListView({ teams, isLoading, onSelect, onNameChange }: TeamListView
     >
       {/* Search */}
       <div
+        ref={searchRef}
         style={{
           padding: `${MYTEAMS_PX.listPadding}px`,
           borderBottom: '1px solid rgba(255,255,255,0.1)',
+          position: 'relative',
         }}
       >
-        <SearchInput
-          value={searchQuery}
-          onChange={setSearchQuery}
-          placeholder="Search for player(s) or team"
-        />
+        <div style={{ position: 'relative' }}>
+          <SearchInput
+            value={searchQuery}
+            onChange={(value) => {
+              setSearchQuery(value);
+              setShowDropdown(value.trim().length > 0);
+            }}
+            placeholder="Search for player(s) or team"
+          />
+          
+          {/* Dropdown */}
+          {showDropdown && dropdownOptions.length > 0 && (
+            <div
+              style={{
+                position: 'absolute',
+                top: '100%',
+                left: 0,
+                right: 0,
+                marginTop: `${SPACING.xs}px`,
+                backgroundColor: BG_COLORS.secondary,
+                borderRadius: `${RADIUS.lg}px`,
+                border: '1px solid rgba(255,255,255,0.1)',
+                maxHeight: '300px',
+                overflowY: 'auto',
+                zIndex: 1000,
+                boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
+              }}
+            >
+              {dropdownOptions.map((option) => (
+                <button
+                  key={`${option.type}-${option.id}`}
+                  onClick={() => handleSelectItem(option)}
+                  className="w-full text-left px-3 py-2 hover:bg-opacity-10 transition-colors"
+                  style={{
+                    borderBottom: '1px solid rgba(255,255,255,0.05)',
+                    color: TEXT_COLORS.primary,
+                  }}
+                >
+                  <div className="flex items-center gap-2">
+                    {option.type === 'player' && option.position && (
+                      <PositionBadge position={option.position as 'QB' | 'RB' | 'WR' | 'TE'} size="sm" />
+                    )}
+                    <div className="flex-1">
+                      <div style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px`, fontWeight: 500 }}>
+                        {option.name}
+                      </div>
+                      {option.type === 'player' && option.team && (
+                        <div style={{ fontSize: `${TYPOGRAPHY.fontSize.xs}px`, color: TEXT_COLORS.muted }}>
+                          {option.team}
+                        </div>
+                      )}
+                      {option.type === 'team' && (
+                        <div style={{ fontSize: `${TYPOGRAPHY.fontSize.xs}px`, color: TEXT_COLORS.muted }}>
+                          NFL Team
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        
+        {/* Selected Items */}
+        {selectedItems.length > 0 && (
+          <div
+            className="flex flex-wrap gap-2"
+            style={{ marginTop: `${SPACING.md}px` }}
+          >
+            {selectedItems.map((item) => (
+              <div
+                key={`${item.type}-${item.id}`}
+                className="flex items-center gap-2 px-3 py-1 rounded-full"
+                style={{
+                  backgroundColor: BG_COLORS.tertiary,
+                  border: '1px solid rgba(255,255,255,0.1)',
+                }}
+              >
+                {item.type === 'player' && item.position && (
+                  <PositionBadge position={item.position as 'QB' | 'RB' | 'WR' | 'TE'} size="sm" />
+                )}
+                <span style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px`, color: TEXT_COLORS.primary }}>
+                  {item.name}
+                </span>
+                <button
+                  onClick={() => handleRemoveItem(item.id)}
+                  className="flex items-center justify-center"
+                  style={{
+                    width: '18px',
+                    height: '18px',
+                    borderRadius: '50%',
+                    backgroundColor: 'rgba(255,255,255,0.1)',
+                    border: 'none',
+                    cursor: 'pointer',
+                  }}
+                  aria-label={`Remove ${item.name}`}
+                >
+                  <Close size={12} color={TEXT_COLORS.muted} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
       
       {/* Team List */}
@@ -231,7 +428,7 @@ function TeamListView({ teams, isLoading, onSelect, onNameChange }: TeamListView
         ) : filteredTeams.length === 0 ? (
           <EmptyState
             title="No Teams Found"
-            description={searchQuery ? "Try a different search" : "Join a draft to build your first team!"}
+            description={selectedItems.length > 0 ? "No teams match your search criteria" : "Join a draft to build your first team!"}
           />
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: `${MYTEAMS_PX.cardGap}px` }}>
