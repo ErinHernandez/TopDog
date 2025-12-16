@@ -181,7 +181,7 @@ export function TournamentCard({
 
       {/* Progress Bar */}
       {tournament.maxEntries && (
-        <div style={{ marginBottom: `${CARD_PX.progressMarginBottom}px` }}>
+        <div style={{ marginTop: `${SPACING.lg}px`, marginBottom: `${SPACING.lg}px` }}>
           <div 
             className="flex justify-between"
             style={{ 
