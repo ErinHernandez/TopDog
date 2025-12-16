@@ -24,6 +24,7 @@ import React, { useCallback } from 'react';
 import { useLiveDrafts, type LiveDraft } from '../../hooks/data';
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS, POSITION_COLORS } from '../../core/constants/colors';
 import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
+import { TILED_BG_STYLE } from '../../draft-room/constants';
 import { 
   ProgressBar, 
   StatusBadge, 
@@ -140,12 +141,16 @@ function DraftCard({ draft, onEnter }: DraftCardProps): React.ReactElement {
       style={{
         padding: `${LIVE_DRAFTS_PX.cardPadding}px`,
         borderRadius: `${LIVE_DRAFTS_PX.cardBorderRadius}px`,
-        backgroundColor: isYourTurn 
-          ? 'rgba(16, 185, 129, 0.15)' 
-          : BG_COLORS.secondary,
-        border: isYourTurn 
-          ? `1px solid ${POSITION_COLORS.RB}40` 
-          : '1px solid rgba(255,255,255,0.1)',
+        ...(isYourTurn 
+          ? {
+              ...TILED_BG_STYLE,
+              border: '1px solid rgba(255,255,255,0.2)',
+            }
+          : {
+              backgroundColor: BG_COLORS.secondary,
+              border: '1px solid rgba(255,255,255,0.1)',
+            }
+        ),
       }}
       aria-label={`${isYourTurn ? 'Your turn' : 'Waiting'} - Pick ${draft.pickNumber} of ${draft.totalPicks}`}
     >
