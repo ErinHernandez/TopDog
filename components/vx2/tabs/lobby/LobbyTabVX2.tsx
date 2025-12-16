@@ -331,6 +331,8 @@ export default function LobbyTabVX2({
         justifyContent: 'center',
         alignItems: 'center',
         overflow: 'hidden',
+        height: '100%',
+        minHeight: 0,
       }}
       role="main"
       aria-label="Tournament lobby"
