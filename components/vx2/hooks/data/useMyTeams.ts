@@ -241,7 +241,24 @@ function generateMockTeams(count: number): MyTeam[] {
   const baseDate = Date.now();
   
   for (let i = 1; i <= count; i++) {
-    const roster = generateTeamRoster();
+    let roster = generateTeamRoster();
+    
+    // Ensure roster has exactly 18 players
+    while (roster.length < 18) {
+      const available = BASE_PLAYER_POOL.filter(p => !roster.some(r => r.name === p.name));
+      if (available.length > 0) {
+        const player = getRandomPlayer(available);
+        roster.push({ ...player, pick: roster.length + 1 });
+      } else {
+        // If we run out of unique players, allow duplicates
+        const player = getRandomPlayer(BASE_PLAYER_POOL);
+        roster.push({ ...player, pick: roster.length + 1 });
+      }
+    }
+    
+    // Trim to exactly 18 if somehow we got more
+    roster = roster.slice(0, 18);
+    
     const totalPoints = roster.reduce((sum, p) => sum + p.projectedPoints, 0);
     const rank = Math.floor(Math.random() * 500000) + 1;
     const totalTeams = 500000 + Math.floor(Math.random() * 100000);
@@ -263,7 +280,11 @@ function generateMockTeams(count: number): MyTeam[] {
   return teams;
 }
 
-const MOCK_TEAMS: MyTeam[] = generateMockTeams(50);
+const MOCK_TEAMS: MyTeam[] = (() => {
+  const teams = generateMockTeams(50);
+  // Ensure all teams have exactly 18 players
+  return teams.filter(team => team.players.length === 18);
+})();
 
 // ============================================================================
 // MOCK FETCH
@@ -271,7 +292,7 @@ const MOCK_TEAMS: MyTeam[] = generateMockTeams(50);
 
 async function fetchMyTeams(): Promise<MyTeam[]> {
   await new Promise(resolve => setTimeout(resolve, 200 + Math.random() * 200));
-  // Only return teams with exactly 18 players (complete drafts)
+  // All teams should already have 18 players, but filter just in case
   return MOCK_TEAMS.filter(team => team.players.length === 18);
 }
 
