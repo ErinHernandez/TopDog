@@ -67,10 +67,11 @@ function PositionFilters({ selected, onChange }: PositionFiltersProps): React.Re
   
   return (
     <div 
-      className="flex mb-3 rounded-lg overflow-hidden"
+      className="flex rounded-lg overflow-hidden"
       style={{ 
         backgroundColor: 'rgba(255,255,255,0.05)',
         marginTop: `${SPACING.md}px`,
+        marginBottom: `${SPACING.sm}px`,
       }}
     >
       {positions.map(pos => {
