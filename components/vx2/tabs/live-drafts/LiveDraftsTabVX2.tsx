@@ -137,7 +137,7 @@ function DraftCard({ draft, onEnter }: DraftCardProps): React.ReactElement {
   return (
     <button
       onClick={onEnter}
-      className="w-full text-left transition-all active:scale-[0.98]"
+      className="w-full text-left transition-all active:scale-[0.98] relative overflow-hidden"
       style={{
         padding: `${LIVE_DRAFTS_PX.cardPadding}px`,
         borderRadius: `${LIVE_DRAFTS_PX.cardBorderRadius}px`,
@@ -154,6 +154,18 @@ function DraftCard({ draft, onEnter }: DraftCardProps): React.ReactElement {
       }}
       aria-label={`${isYourTurn ? 'Your turn' : 'Waiting'} - Pick ${draft.pickNumber} of ${draft.totalPicks}`}
     >
+      {/* Semi-transparent overlay for wr_blue background when on the clock */}
+      {isYourTurn && (
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundColor: 'rgba(0, 0, 0, 0.3)',
+            borderRadius: `${LIVE_DRAFTS_PX.cardBorderRadius}px`,
+            zIndex: 0,
+          }}
+        />
+      )}
+      <div className="relative z-10">
       {/* Header Row - Only show YOUR TURN badge */}
       {isYourTurn && (
         <div className="flex items-center justify-end mb-2">
@@ -195,6 +207,7 @@ function DraftCard({ draft, onEnter }: DraftCardProps): React.ReactElement {
         currentRound={Math.ceil(draft.pickNumber / draft.teamCount)}
         color={isYourTurn ? POSITION_COLORS.RB : STATE_COLORS.active}
       />
+      </div>
     </button>
   );
 }
