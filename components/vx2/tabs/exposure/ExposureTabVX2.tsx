@@ -33,8 +33,8 @@ const EXPOSURE_PX = {
   filterGap: SPACING.sm,
   filterButtonPadding: SPACING.sm,
   rowPaddingX: SPACING.md,
-  rowPaddingY: 6,
-  rowMinHeight: 44,
+  rowPaddingY: 4,
+  rowMinHeight: 36,
 } as const;
 
 type PositionFilter = 'QB' | 'RB' | 'WR' | 'TE';
@@ -125,9 +125,10 @@ function SortHeader({ sortOrder, onToggle }: SortHeaderProps): React.ReactElemen
 
 interface ExposureRowProps {
   player: ExposurePlayer;
+  isFirst?: boolean;
 }
 
-function ExposureRow({ player }: ExposureRowProps): React.ReactElement {
+function ExposureRow({ player, isFirst = false }: ExposureRowProps): React.ReactElement {
   const [showShares, setShowShares] = useState(false);
   const exposurePercent = Math.round(player.exposure);
   
@@ -140,6 +141,7 @@ function ExposureRow({ player }: ExposureRowProps): React.ReactElement {
         paddingTop: `${EXPOSURE_PX.rowPaddingY}px`,
         paddingBottom: `${EXPOSURE_PX.rowPaddingY}px`,
         minHeight: `${EXPOSURE_PX.rowMinHeight}px`,
+        borderTop: isFirst ? '1px solid rgba(255,255,255,0.1)' : 'none',
         borderBottom: '1px solid rgba(255,255,255,0.1)',
       }}
     >
@@ -151,7 +153,7 @@ function ExposureRow({ player }: ExposureRowProps): React.ReactElement {
         >
           {player.name}
         </h3>
-        <div className="flex items-center gap-2 mt-1">
+        <div className="flex items-center gap-2" style={{ marginTop: '2px' }}>
           <PositionBadge position={player.position} size="sm" />
           <span style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>
             {player.team}
@@ -185,11 +187,12 @@ function ExposureRowSkeleton(): React.ReactElement {
         paddingTop: `${EXPOSURE_PX.rowPaddingY}px`,
         paddingBottom: `${EXPOSURE_PX.rowPaddingY}px`,
         minHeight: `${EXPOSURE_PX.rowMinHeight}px`,
+        borderBottom: '1px solid rgba(255,255,255,0.1)',
       }}
     >
       <div>
         <Skeleton width={150} height={18} />
-        <div className="flex items-center gap-2 mt-1">
+        <div className="flex items-center gap-2" style={{ marginTop: '2px' }}>
           <Skeleton width={28} height={18} />
           <Skeleton width={40} height={14} />
         </div>
@@ -317,8 +320,8 @@ export default function ExposureTabVX2(_props: ExposureTabVX2Props): React.React
         ) : (
           // Player list
           <>
-            {filteredPlayers.map(player => (
-              <ExposureRow key={player.id} player={player} />
+            {filteredPlayers.map((player, index) => (
+              <ExposureRow key={player.id} player={player} isFirst={index === 0} />
             ))}
             {/* Bottom padding */}
             <div style={{ height: `${SPACING['2xl']}px` }} />
