@@ -67,8 +67,11 @@ function PositionFilters({ selected, onChange }: PositionFiltersProps): React.Re
   
   return (
     <div 
-      className="flex"
-      style={{ gap: `${EXPOSURE_PX.filterGap}px`, marginTop: `${SPACING.md}px` }}
+      className="flex mb-3 rounded-lg overflow-hidden"
+      style={{ 
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        marginTop: `${SPACING.md}px`,
+      }}
     >
       {positions.map(pos => {
         const isSelected = selected.includes(pos);
@@ -78,14 +81,13 @@ function PositionFilters({ selected, onChange }: PositionFiltersProps): React.Re
           <button
             key={pos}
             onClick={() => handleClick(pos)}
-            className="flex-1 font-medium transition-all"
+            className="flex-1 py-2.5 px-3 font-bold transition-all"
             style={{
-              padding: `${EXPOSURE_PX.filterButtonPadding}px`,
-              borderRadius: `${RADIUS.md}px`,
-              border: `2px solid ${color}`,
-              backgroundColor: isSelected ? color : 'transparent',
-              color: isSelected ? '#000' : TEXT_COLORS.secondary,
-              fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
+              fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
+              backgroundColor: isSelected ? 'rgba(255,255,255,0.1)' : 'transparent',
+              color: isSelected ? color : TEXT_COLORS.muted,
+              borderBottom: `2px solid ${color}`,
+              opacity: isSelected ? 1 : 0.4,
             }}
           >
             {pos}
