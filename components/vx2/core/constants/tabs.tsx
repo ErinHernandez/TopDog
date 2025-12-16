@@ -175,7 +175,7 @@ export const TAB_REGISTRY: Record<TabId, TabConfig> = {
   
   'my-teams': {
     id: 'my-teams',
-    displayName: 'My Teams',
+    displayName: 'Teams',
     path: '/teams',
     icon: {
       component: MyTeamsIcon,
@@ -185,7 +185,7 @@ export const TAB_REGISTRY: Record<TabId, TabConfig> = {
     requiresAuth: true,
     preserveState: true,
     analyticsName: 'tab_my_teams',
-    accessibilityLabel: 'My Teams - View your drafted teams',
+    accessibilityLabel: 'Teams - View your drafted teams',
   },
   
   'exposure': {

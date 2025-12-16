@@ -19,7 +19,7 @@ export type TabId = 'lobby' | 'live-drafts' | 'my-teams' | 'exposure' | 'profile
 /**
  * Display names for UI rendering
  */
-export type TabDisplayName = 'Lobby' | 'Live Drafts' | 'My Teams' | 'Exposure' | 'Profile';
+export type TabDisplayName = 'Lobby' | 'Live Drafts' | 'Teams' | 'Exposure' | 'Profile';
 
 /**
  * Mapping from TabId to display name
@@ -27,7 +27,7 @@ export type TabDisplayName = 'Lobby' | 'Live Drafts' | 'My Teams' | 'Exposure' |
 export const TAB_DISPLAY_NAMES: Record<TabId, TabDisplayName> = {
   'lobby': 'Lobby',
   'live-drafts': 'Live Drafts',
-  'my-teams': 'My Teams',
+  'my-teams': 'Teams',
   'exposure': 'Exposure',
   'profile': 'Profile',
 };

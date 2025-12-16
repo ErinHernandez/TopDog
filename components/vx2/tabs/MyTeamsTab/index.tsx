@@ -32,7 +32,7 @@ export default function MyTeamsTab(): React.ReactElement {
             fontSize: `${TYPOGRAPHY.fontSize.xl}px`,
           }}
         >
-          My Teams
+          Teams
         </h1>
       </div>
 
