@@ -29,6 +29,8 @@ export interface LiveDraft {
   id: string;
   /** Tournament name */
   tournamentName: string;
+  /** Team name for this draft */
+  teamName: string;
   /** Current pick number in the draft */
   pickNumber: number;
   /** Total picks in the draft */
@@ -64,6 +66,28 @@ export interface UseLiveDraftsResult {
 }
 
 // ============================================================================
+// HELPERS
+// ============================================================================
+
+/**
+ * Convert number to Roman numeral
+ */
+function toRomanNumeral(num: number): string {
+  const values = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1];
+  const numerals = ['M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I'];
+  let result = '';
+  
+  for (let i = 0; i < values.length; i++) {
+    while (num >= values[i]) {
+      result += numerals[i];
+      num -= values[i];
+    }
+  }
+  
+  return result;
+}
+
+// ============================================================================
 // MOCK DATA
 // ============================================================================
 
@@ -71,6 +95,7 @@ const MOCK_DRAFTS: LiveDraft[] = [
   {
     id: 'draft-1',
     tournamentName: 'TopDog International',
+    teamName: `The TopDog International   ${toRomanNumeral(1)}`,
     pickNumber: 42,
     totalPicks: 216,
     status: 'your-turn',
@@ -82,6 +107,7 @@ const MOCK_DRAFTS: LiveDraft[] = [
   {
     id: 'draft-2',
     tournamentName: 'TopDog International',
+    teamName: `The TopDog International   ${toRomanNumeral(2)}`,
     pickNumber: 89,
     totalPicks: 216,
     status: 'waiting',
@@ -92,6 +118,7 @@ const MOCK_DRAFTS: LiveDraft[] = [
   {
     id: 'draft-3',
     tournamentName: 'TopDog Regional',
+    teamName: `The TopDog International   ${toRomanNumeral(3)}`,
     pickNumber: 156,
     totalPicks: 216,
     status: 'waiting',

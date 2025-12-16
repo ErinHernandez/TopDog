@@ -20,11 +20,12 @@
  * ```
  */
 
-import React, { useCallback, useState, useMemo } from 'react';
+import React, { useCallback, useState, useMemo, useRef, useEffect } from 'react';
 import { useLiveDrafts, type LiveDraft } from '../../hooks/data';
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS, POSITION_COLORS } from '../../core/constants/colors';
 import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
 import { TILED_BG_STYLE } from '../../draft-room/constants';
+import { Edit } from '../../components/icons';
 import { 
   ProgressBar, 
   StatusBadge, 
@@ -169,16 +170,64 @@ function DraftProgressBar({ value, totalRounds, currentRound, color }: DraftProg
 interface DraftCardProps {
   draft: LiveDraft;
   onEnter: () => void;
+  onTeamNameChange?: (draftId: string, newName: string) => void;
 }
 
-function DraftCard({ draft, onEnter }: DraftCardProps): React.ReactElement {
+function DraftCard({ draft, onEnter, onTeamNameChange }: DraftCardProps): React.ReactElement {
   const isYourTurn = draft.status === 'your-turn';
   const progress = (draft.pickNumber / draft.totalPicks) * 100;
   const picksAway = calculatePicksAway(draft);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedName, setEditedName] = useState(draft.teamName);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Focus input when editing starts
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [isEditing]);
+
+  // Reset edited name when draft changes
+  useEffect(() => {
+    setEditedName(draft.teamName);
+    setIsEditing(false);
+  }, [draft.teamName]);
+
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsEditing(true);
+  };
+
+  const handleBlur = () => {
+    if (editedName.trim() && editedName !== draft.teamName && onTeamNameChange) {
+      onTeamNameChange(draft.id, editedName.trim());
+    } else {
+      setEditedName(draft.teamName);
+    }
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      inputRef.current?.blur();
+    } else if (e.key === 'Escape') {
+      setEditedName(draft.teamName);
+      setIsEditing(false);
+    }
+  };
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    if (!isEditing) {
+      onEnter();
+    }
+  };
   
   return (
     <button
-      onClick={onEnter}
+      onClick={handleCardClick}
       className="w-full text-left transition-all active:scale-[0.98] relative overflow-hidden"
       style={{
         padding: `${LIVE_DRAFTS_PX.cardPadding}px`,
@@ -208,6 +257,48 @@ function DraftCard({ draft, onEnter }: DraftCardProps): React.ReactElement {
         />
       )}
       <div className="relative z-10">
+      {/* Team Name Row */}
+      <div className="flex items-center mb-2" onClick={(e) => e.stopPropagation()}>
+        <button
+          onClick={handleEditClick}
+          className="p-1 mr-2 flex-shrink-0"
+          aria-label="Edit team name"
+          style={{ cursor: 'pointer' }}
+        >
+          <Edit size={18} color={TEXT_COLORS.muted} />
+        </button>
+        {isEditing ? (
+          <input
+            ref={inputRef}
+            type="text"
+            value={editedName}
+            onChange={(e) => setEditedName(e.target.value)}
+            onBlur={handleBlur}
+            onKeyDown={handleKeyDown}
+            className="flex-1 outline-none"
+            style={{
+              backgroundColor: 'transparent',
+              color: TEXT_COLORS.primary,
+              fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
+              fontWeight: 500,
+              border: 'none',
+              padding: 0,
+            }}
+            onClick={(e) => e.stopPropagation()}
+          />
+        ) : (
+          <span
+            className="flex-1 font-medium"
+            style={{
+              color: TEXT_COLORS.primary,
+              fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
+            }}
+          >
+            {draft.teamName}
+          </span>
+        )}
+      </div>
+
       {/* Header Row - Only show On the Clock badge */}
       {isYourTurn && (
         <div className="flex items-center justify-end mb-2">
@@ -378,6 +469,7 @@ export default function LiveDraftsTabVX2({
 }: LiveDraftsTabVX2Props): React.ReactElement {
   const { drafts, isLoading, error, refetch } = useLiveDrafts();
   const [draftType, setDraftType] = useState<DraftType>('live');
+  const [teamNames, setTeamNames] = useState<Record<string, string>>({});
   
   const handleEnterDraft = useCallback((draftId: string) => {
     onEnterDraft?.(draftId);
@@ -386,6 +478,18 @@ export default function LiveDraftsTabVX2({
   const handleJoinDraft = useCallback(() => {
     onJoinDraft?.();
   }, [onJoinDraft]);
+
+  const handleTeamNameChange = useCallback((draftId: string, newName: string) => {
+    setTeamNames(prev => ({ ...prev, [draftId]: newName }));
+  }, []);
+  
+  // Merge drafts with updated team names
+  const draftsWithUpdatedNames = useMemo(() => {
+    return drafts.map(draft => ({
+      ...draft,
+      teamName: teamNames[draft.id] || draft.teamName,
+    }));
+  }, [drafts, teamNames]);
   
   // Filter drafts by type (for now, all drafts are live - slow drafts will be added later)
   const filteredDrafts = useMemo(() => {
@@ -393,8 +497,8 @@ export default function LiveDraftsTabVX2({
       // Return empty array for now - slow drafts will be implemented later
       return [];
     }
-    return drafts;
-  }, [drafts, draftType]);
+    return draftsWithUpdatedNames;
+  }, [draftsWithUpdatedNames, draftType]);
   
   // Loading State
   if (isLoading) {
@@ -522,6 +626,7 @@ export default function LiveDraftsTabVX2({
               key={draft.id}
               draft={draft}
               onEnter={() => handleEnterDraft(draft.id)}
+              onTeamNameChange={handleTeamNameChange}
             />
           ))}
         </div>
