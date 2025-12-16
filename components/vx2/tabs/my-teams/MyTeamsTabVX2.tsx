@@ -325,14 +325,30 @@ interface TeamDetailsViewProps {
 }
 
 function TeamDetailsView({ team, onBack, onViewDraftBoard }: TeamDetailsViewProps): React.ReactElement {
-  // Sort players by position order (QB, RB, WR, TE) then by pick
-  const sortedPlayers = useMemo(() => {
+  // Group players by position, sorted by position order (QB, RB, WR, TE) then by pick
+  const groupedPlayers = useMemo(() => {
     const posOrder = { QB: 0, RB: 1, WR: 2, TE: 3 };
-    return [...team.players].sort((a, b) => {
+    const sorted = [...team.players].sort((a, b) => {
       const posA = posOrder[a.position] ?? 4;
       const posB = posOrder[b.position] ?? 4;
       if (posA !== posB) return posA - posB;
       return a.pick - b.pick;
+    });
+    
+    // Group by position
+    const groups: Record<string, TeamPlayer[]> = {};
+    sorted.forEach(player => {
+      if (!groups[player.position]) {
+        groups[player.position] = [];
+      }
+      groups[player.position].push(player);
+    });
+    
+    // Return as array of [position, players] tuples, sorted by position order
+    return Object.entries(groups).sort(([posA], [posB]) => {
+      const orderA = posOrder[posA as keyof typeof posOrder] ?? 4;
+      const orderB = posOrder[posB as keyof typeof posOrder] ?? 4;
+      return orderA - orderB;
     });
   }, [team]);
   
@@ -405,8 +421,26 @@ function TeamDetailsView({ team, onBack, onViewDraftBoard }: TeamDetailsViewProp
           msOverflowStyle: 'none',
         }}
       >
-        {sortedPlayers.map((player, index) => (
-          <PlayerRow key={`${player.name}-${index}`} player={player} />
+        {groupedPlayers.map(([position, players], groupIndex) => (
+          <React.Fragment key={position}>
+            {/* Position Divider */}
+            {groupIndex > 0 && (
+              <div
+                style={{
+                  height: '1px',
+                  backgroundColor: 'rgba(255,255,255,0.1)',
+                  marginLeft: `${MYTEAMS_PX.rowPaddingX}px`,
+                  marginRight: `${MYTEAMS_PX.rowPaddingX}px`,
+                  marginTop: `${SPACING.xs}px`,
+                  marginBottom: `${SPACING.xs}px`,
+                }}
+              />
+            )}
+            {/* Players in this position group */}
+            {players.map((player, index) => (
+              <PlayerRow key={`${player.name}-${index}`} player={player} />
+            ))}
+          </React.Fragment>
         ))}
         
         {/* Bottom padding */}
