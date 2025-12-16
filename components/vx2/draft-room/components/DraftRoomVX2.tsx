@@ -26,6 +26,7 @@ const TUTORIAL_SHOWN_PREFIX = 'topdog_tutorial_shown_';
 
 // Hooks
 import { useDraftRoom } from '../hooks/useDraftRoom';
+import { useHeadshots } from '../../../lib/swr/usePlayerSWR';
 
 // Components
 import DraftNavbar from './DraftNavbar';
@@ -204,9 +205,10 @@ interface TabContentProps {
   activeTab: DraftTab;
   draftRoom: ReturnType<typeof useDraftRoom>;
   onTutorial?: () => void;
+  headshotsMap?: Record<string, string>;
 }
 
-function TabContent({ activeTab, draftRoom, onTutorial }: TabContentProps): React.ReactElement {
+function TabContent({ activeTab, draftRoom, onTutorial, headshotsMap }: TabContentProps): React.ReactElement {
   switch (activeTab) {
     case 'players':
       return (
@@ -228,6 +230,7 @@ function TabContent({ activeTab, draftRoom, onTutorial }: TabContentProps): Reac
           isQueued={draftRoom.queue.isQueued}
           initialScrollPosition={draftRoom.getScrollPosition('players')}
           onScrollPositionChange={(pos) => draftRoom.saveScrollPosition('players', pos)}
+          headshotsMap={headshotsMap}
         />
       );
     
@@ -302,6 +305,9 @@ export default function DraftRoomVX2({
     userId,
     fastMode,
   });
+  
+  // Fetch player headshots from SportsDataIO
+  const { headshotsMap } = useHeadshots();
   
   // Expose dev tools to parent - always keep ref updated
   React.useEffect(() => {
@@ -473,7 +479,7 @@ export default function DraftRoomVX2({
             overflow: 'hidden',
           }}
         >
-          <TabContent activeTab={draftRoom.activeTab} draftRoom={draftRoom} onTutorial={() => setShowTutorialModal(true)} />
+          <TabContent activeTab={draftRoom.activeTab} draftRoom={draftRoom} onTutorial={() => setShowTutorialModal(true)} headshotsMap={headshotsMap} />
         </main>
       </div>
       
