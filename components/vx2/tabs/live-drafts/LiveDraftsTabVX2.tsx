@@ -1,5 +1,5 @@
 /**
- * LiveDraftsTabVX2 - Live Drafts Tab
+ * LiveDraftsTabVX2 - Fast Drafts Tab
  * 
  * A-Grade Requirements Met:
  * - TypeScript: Full type coverage
@@ -90,7 +90,7 @@ function TabSwitcher({ selected, onSelect }: TabSwitcherProps): React.ReactEleme
           borderBottom: selected === 'live' ? `2px solid ${STATE_COLORS.active}` : '2px solid transparent',
         }}
       >
-        Live Drafts
+        Fast Drafts (30 Sec)
       </button>
       <button
         onClick={() => onSelect('slow')}
@@ -591,7 +591,7 @@ export default function LiveDraftsTabVX2({
       className="flex-1 flex flex-col"
       style={{ backgroundColor: BG_COLORS.primary }}
       role="main"
-      aria-label="Live drafts"
+      aria-label="Fast drafts"
     >
       {/* Header */}
       <div
