@@ -21,8 +21,8 @@ import { TILED_BG_STYLE } from '../../draft-room/constants';
 // ============================================================================
 
 const CARD_PX = {
-  // Main card - increased by 15%
-  padding: 28,
+  // Main card - increased by 10% more
+  padding: 31,
   borderRadius: RADIUS.xl,
   
   // Title
@@ -30,7 +30,7 @@ const CARD_PX = {
   titleMarginBottom: SPACING.xl,
   
   // Logo
-  logoSize: 230,
+  logoSize: 253,
   logoMarginBottom: SPACING.xl,
   
   // Progress
@@ -39,7 +39,7 @@ const CARD_PX = {
   progressLabelMarginBottom: SPACING.sm,
   
   // Button
-  buttonHeight: 52,
+  buttonHeight: 57,
   buttonFontSize: TYPOGRAPHY.fontSize.sm,
   buttonMarginBottom: SPACING.xl,
   
