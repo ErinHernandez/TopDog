@@ -21,30 +21,30 @@ import { TILED_BG_STYLE } from '../../draft-room/constants';
 // ============================================================================
 
 const CARD_PX = {
-  // Main card
-  padding: 16,
+  // Main card - increased padding for 25% more height
+  padding: 24,
   borderRadius: RADIUS.xl,
   
   // Title
   titleFontSize: TYPOGRAPHY.fontSize.xl,
-  titleMarginBottom: SPACING.md,
+  titleMarginBottom: SPACING.lg,
   
   // Logo
   logoSize: 200,
-  logoMarginBottom: SPACING.md,
+  logoMarginBottom: SPACING.lg,
   
   // Progress
-  progressMarginBottom: SPACING.md,
+  progressMarginBottom: SPACING.lg,
   progressLabelFontSize: TYPOGRAPHY.fontSize.sm,
-  progressLabelMarginBottom: SPACING.xs,
+  progressLabelMarginBottom: SPACING.sm,
   
   // Button
-  buttonHeight: 44,
+  buttonHeight: 48,
   buttonFontSize: TYPOGRAPHY.fontSize.sm,
-  buttonMarginBottom: SPACING.md,
+  buttonMarginBottom: SPACING.lg,
   
   // Stats
-  statsGap: SPACING.md,
+  statsGap: SPACING.lg,
   statsValueFontSize: TYPOGRAPHY.fontSize.lg,
   statsLabelFontSize: TYPOGRAPHY.fontSize.xs,
 } as const;
