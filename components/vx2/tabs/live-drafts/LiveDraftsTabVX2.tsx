@@ -20,7 +20,7 @@
  * ```
  */
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useState, useMemo } from 'react';
 import { useLiveDrafts, type LiveDraft } from '../../hooks/data';
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS, POSITION_COLORS } from '../../core/constants/colors';
 import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
@@ -63,6 +63,48 @@ export interface LiveDraftsTabVX2Props {
 // ============================================================================
 // SUB-COMPONENTS
 // ============================================================================
+
+interface TabSwitcherProps {
+  selected: DraftType;
+  onSelect: (type: DraftType) => void;
+}
+
+function TabSwitcher({ selected, onSelect }: TabSwitcherProps): React.ReactElement {
+  return (
+    <div
+      className="flex rounded-lg overflow-hidden"
+      style={{
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        marginBottom: `${SPACING.md}px`,
+      }}
+    >
+      <button
+        onClick={() => onSelect('live')}
+        className="flex-1 py-2.5 px-3 font-bold transition-all"
+        style={{
+          fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
+          backgroundColor: selected === 'live' ? 'rgba(255,255,255,0.1)' : 'transparent',
+          color: selected === 'live' ? TEXT_COLORS.primary : TEXT_COLORS.muted,
+          opacity: selected === 'live' ? 1 : 0.6,
+        }}
+      >
+        Live Drafts
+      </button>
+      <button
+        onClick={() => onSelect('slow')}
+        className="flex-1 py-2.5 px-3 font-bold transition-all"
+        style={{
+          fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
+          backgroundColor: selected === 'slow' ? 'rgba(255,255,255,0.1)' : 'transparent',
+          color: selected === 'slow' ? TEXT_COLORS.primary : TEXT_COLORS.muted,
+          opacity: selected === 'slow' ? 1 : 0.6,
+        }}
+      >
+        Slow Drafts
+      </button>
+    </div>
+  );
+}
 
 interface DraftProgressBarProps {
   value: number;
@@ -313,11 +355,14 @@ function calculatePicksAway(draft: LiveDraft): number {
 // MAIN COMPONENT
 // ============================================================================
 
+type DraftType = 'live' | 'slow';
+
 export default function LiveDraftsTabVX2({
   onEnterDraft,
   onJoinDraft,
 }: LiveDraftsTabVX2Props): React.ReactElement {
   const { drafts, isLoading, error, refetch } = useLiveDrafts();
+  const [draftType, setDraftType] = useState<DraftType>('live');
   
   const handleEnterDraft = useCallback((draftId: string) => {
     onEnterDraft?.(draftId);
@@ -326,6 +371,15 @@ export default function LiveDraftsTabVX2({
   const handleJoinDraft = useCallback(() => {
     onJoinDraft?.();
   }, [onJoinDraft]);
+  
+  // Filter drafts by type (for now, all drafts are live - slow drafts will be added later)
+  const filteredDrafts = useMemo(() => {
+    if (draftType === 'slow') {
+      // Return empty array for now - slow drafts will be implemented later
+      return [];
+    }
+    return drafts;
+  }, [drafts, draftType]);
   
   // Loading State
   if (isLoading) {
@@ -344,7 +398,7 @@ export default function LiveDraftsTabVX2({
             borderBottom: '1px solid rgba(255,255,255,0.1)',
           }}
         >
-          <Skeleton width={150} height={24} />
+          <TabSwitcher selected={draftType} onSelect={setDraftType} />
           <div className="mt-1">
             <Skeleton width={100} height={16} />
           </div>
@@ -384,7 +438,7 @@ export default function LiveDraftsTabVX2({
   }
   
   // Empty State
-  if (drafts.length === 0) {
+  if (filteredDrafts.length === 0 && !isLoading) {
     return (
       <div 
         className="flex-1 flex flex-col"
@@ -423,14 +477,9 @@ export default function LiveDraftsTabVX2({
           borderBottom: '1px solid rgba(255,255,255,0.1)',
         }}
       >
-        <h2 
-          className="font-semibold"
-          style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}
-        >
-          Your Live Drafts
-        </h2>
-        <p style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
-          {drafts.length} active draft{drafts.length !== 1 ? 's' : ''}
+        <TabSwitcher selected={draftType} onSelect={setDraftType} />
+        <p style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px`, marginTop: `${SPACING.xs}px` }}>
+          {filteredDrafts.length} active draft{filteredDrafts.length !== 1 ? 's' : ''}
         </p>
       </div>
       
@@ -453,7 +502,7 @@ export default function LiveDraftsTabVX2({
             gap: `${LIVE_DRAFTS_PX.cardGap}px`,
           }}
         >
-          {drafts.map((draft) => (
+          {filteredDrafts.map((draft) => (
             <DraftCard
               key={draft.id}
               draft={draft}
