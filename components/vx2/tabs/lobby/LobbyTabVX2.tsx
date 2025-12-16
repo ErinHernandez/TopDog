@@ -333,12 +333,11 @@ export default function LobbyTabVX2({
       role="main"
       aria-label="Tournament lobby"
     >
-      {/* Featured Tournament Card - fills available space */}
+      {/* Featured Tournament Card */}
       <TournamentCard
         tournament={featuredTournament}
         onJoinClick={() => handleJoinClick(featuredTournament.id)}
         featured={true}
-        fullHeight={true}
       />
 
       {/* Join Modal */}
