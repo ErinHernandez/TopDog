@@ -19,6 +19,7 @@ import {
   Skeleton, 
   EmptyState, 
   ErrorState,
+  PlayerStatsCard,
 } from '../../components/shared';
 import { SearchInput } from '../../components/shared/inputs';
 import { ChevronRight, ChevronLeft, Edit, Share, Close } from '../../components/icons';
@@ -476,11 +477,14 @@ function TeamListView({ teams, isLoading, onSelect, onNameChange }: TeamListView
 
 interface PlayerRowProps {
   player: TeamPlayer;
+  onClick?: () => void;
+  isExpanded?: boolean;
 }
 
-function PlayerRow({ player }: PlayerRowProps): React.ReactElement {
+function PlayerRow({ player, onClick, isExpanded }: PlayerRowProps): React.ReactElement {
   return (
     <div
+      onClick={onClick}
       className="flex items-center justify-between"
       style={{
         paddingLeft: `${MYTEAMS_PX.rowPaddingX}px`,
@@ -488,6 +492,7 @@ function PlayerRow({ player }: PlayerRowProps): React.ReactElement {
         paddingTop: `${MYTEAMS_PX.rowPaddingY}px`,
         paddingBottom: `${MYTEAMS_PX.rowPaddingY}px`,
         borderBottom: '1px solid rgba(255,255,255,0.1)',
+        cursor: onClick ? 'pointer' : 'default',
       }}
     >
       {/* Player Info */}
@@ -542,6 +547,15 @@ interface TeamDetailsViewProps {
 }
 
 function TeamDetailsView({ team, onBack, onViewDraftBoard }: TeamDetailsViewProps): React.ReactElement {
+  // Expansion state for player stats
+  const [expandedPlayerId, setExpandedPlayerId] = useState<string | null>(null);
+  
+  // Toggle player expansion
+  const handlePlayerClick = useCallback((player: TeamPlayer) => {
+    const playerId = `${player.name}-${player.pick}`;
+    setExpandedPlayerId(prev => prev === playerId ? null : playerId);
+  }, []);
+  
   // Group players by position, sorted by position order (QB, RB, WR, TE) then by pick
   const groupedPlayers = useMemo(() => {
     const posOrder = { QB: 0, RB: 1, WR: 2, TE: 3 };
@@ -655,9 +669,44 @@ function TeamDetailsView({ team, onBack, onViewDraftBoard }: TeamDetailsViewProp
                 }}
               />
               {/* Players in this position group */}
-              {players.map((player, index) => (
-                <PlayerRow key={`${player.name}-${index}`} player={player} />
-              ))}
+              {players.map((player, index) => {
+                const playerId = `${player.name}-${player.pick}`;
+                const isExpanded = expandedPlayerId === playerId;
+                
+                return (
+                  <React.Fragment key={playerId}>
+                    <PlayerRow 
+                      player={player} 
+                      onClick={() => handlePlayerClick(player)}
+                      isExpanded={isExpanded}
+                    />
+                    {/* Expanded Stats Card */}
+                    {isExpanded && (
+                      <div
+                        style={{
+                          paddingLeft: `${MYTEAMS_PX.rowPaddingX}px`,
+                          paddingRight: `${MYTEAMS_PX.rowPaddingX}px`,
+                          paddingTop: `${SPACING.sm}px`,
+                          paddingBottom: `${SPACING.sm}px`,
+                        }}
+                      >
+                        <PlayerStatsCard
+                          player={{
+                            name: player.name,
+                            team: player.team,
+                            position: player.position,
+                            adp: player.adp,
+                            projectedPoints: player.projectedPoints,
+                            bye: player.bye,
+                          }}
+                          showDraftButton={false}
+                          fetchStats={true}
+                        />
+                      </div>
+                    )}
+                  </React.Fragment>
+                );
+              })}
               {/* Position Divider Below */}
               <div
                 style={{

@@ -19,3 +19,6 @@ export type { PlayerCardProps, PlayerData as PlayerCardData, ActionType, Positio
 export { PlayerCell } from './PlayerCell';
 export type { PlayerCellProps, PlayerData } from './PlayerCell';
 
+export { default as PlayerStatsCard } from '../PlayerStatsCard';
+export type { PlayerStatsCardProps } from '../PlayerStatsCard';
+

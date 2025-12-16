@@ -31,6 +31,18 @@ const withPWA = require('next-pwa')({
         },
       },
     },
+    // Player images - Cache First (immutable, taken before season)
+    {
+      urlPattern: /^\/players\/.*\.(webp|png)$/,
+      handler: 'CacheFirst',
+      options: {
+        cacheName: 'topdog-player-images',
+        expiration: {
+          maxEntries: 600, // Enough for all 554 players + variants
+          maxAgeSeconds: 60 * 60 * 24 * 365 * 2, // 2 years (images don't change)
+        },
+      },
+    },
     // Other static assets (images, fonts)
     {
       urlPattern: /\.(png|jpg|jpeg|svg|gif|webp|ttf|woff|woff2)$/,
