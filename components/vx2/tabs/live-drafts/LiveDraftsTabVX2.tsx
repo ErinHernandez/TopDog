@@ -262,7 +262,7 @@ function DraftCard({ draft, onEnter, onTeamNameChange }: DraftCardProps): React.
       {/* Info Row - Team Name on left, Badge/Timer or Picks Away on right */}
       <div className="flex items-center justify-between mb-3">
         {/* Team Name on left */}
-        <div className="flex items-center flex-1 min-w-0" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center min-w-0" onClick={(e) => e.stopPropagation()} style={{ marginLeft: '-4px' }}>
           <button
             onClick={handleEditClick}
             className="p-1 mr-2 flex-shrink-0"
@@ -279,7 +279,7 @@ function DraftCard({ draft, onEnter, onTeamNameChange }: DraftCardProps): React.
               onChange={(e) => setEditedName(e.target.value)}
               onBlur={handleBlur}
               onKeyDown={handleKeyDown}
-              className="flex-1 outline-none min-w-0"
+              className="outline-none"
               style={{
                 backgroundColor: 'transparent',
                 color: TEXT_COLORS.primary,
@@ -287,12 +287,13 @@ function DraftCard({ draft, onEnter, onTeamNameChange }: DraftCardProps): React.
                 fontWeight: 500,
                 border: 'none',
                 padding: 0,
+                minWidth: '150px',
               }}
               onClick={(e) => e.stopPropagation()}
             />
           ) : (
             <span
-              className="flex-1 font-medium truncate"
+              className="font-medium"
               style={{
                 color: TEXT_COLORS.primary,
                 fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
