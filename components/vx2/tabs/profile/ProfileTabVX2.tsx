@@ -24,6 +24,7 @@ import { useUser } from '../../hooks/data';
 import { useModals } from '../../shell/AppShellVX2';
 import { BG_COLORS, TEXT_COLORS, NAVBAR_BLUE } from '../../core/constants/colors';
 import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
+import { TILED_BG_STYLE } from '../../draft-room/constants';
 import { 
   Payment, 
   Rankings, 
@@ -113,7 +114,7 @@ interface MenuItem {
 // MENU CONFIGURATION
 // ============================================================================
 
-const MENU_ITEMS: MenuItem[] = [
+const REGULAR_MENU_ITEMS: MenuItem[] = [
   {
     id: 'payment',
     label: 'Payment Methods',
@@ -122,23 +123,11 @@ const MENU_ITEMS: MenuItem[] = [
     path: '/payment-methods',
   },
   {
-    id: 'rankings',
-    label: 'Rankings',
-    icon: <Rankings size={PROFILE_PX.menuIconSize} />,
-    action: 'rankings',
-  },
-  {
     id: 'customization',
     label: 'Customization',
     icon: <Customize size={PROFILE_PX.menuIconSize} />,
     action: 'navigate',
     path: '/customization',
-  },
-  {
-    id: 'autodraft',
-    label: 'Autodraft Limits',
-    icon: <Autodraft size={PROFILE_PX.menuIconSize} />,
-    action: 'autodraft',
   },
   {
     id: 'account',
@@ -158,6 +147,21 @@ const MENU_ITEMS: MenuItem[] = [
     label: 'Withdraw',
     icon: <Withdraw size={PROFILE_PX.menuIconSize} />,
     action: 'withdraw',
+  },
+];
+
+const PLAY_RELATED_MENU_ITEMS: MenuItem[] = [
+  {
+    id: 'rankings',
+    label: 'Rankings',
+    icon: <Rankings size={PROFILE_PX.menuIconSize} />,
+    action: 'rankings',
+  },
+  {
+    id: 'autodraft',
+    label: 'Autodraft Limits',
+    icon: <Autodraft size={PROFILE_PX.menuIconSize} />,
+    action: 'autodraft',
   },
 ];
 
@@ -402,22 +406,53 @@ export default function ProfileTabVX2({
       {isLoading ? (
         <MenuSkeleton />
       ) : (
-        <nav
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: `${PROFILE_PX.menuGap}px`,
-          }}
-          aria-label="Profile menu"
-        >
-          {MENU_ITEMS.map((item) => (
-            <MenuItemButton
-              key={item.id}
-              item={item}
-              onClick={() => handleMenuClick(item)}
-            />
-          ))}
-        </nav>
+        <>
+          {/* Regular Menu Items */}
+          <nav
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: `${PROFILE_PX.menuGap}px`,
+              marginBottom: `${SPACING.lg}px`,
+            }}
+            aria-label="Profile menu"
+          >
+            {REGULAR_MENU_ITEMS.map((item) => (
+              <MenuItemButton
+                key={item.id}
+                item={item}
+                onClick={() => handleMenuClick(item)}
+              />
+            ))}
+          </nav>
+
+          {/* Divider */}
+          <div
+            style={{
+              height: '2px',
+              marginBottom: `${SPACING.lg}px`,
+              ...TILED_BG_STYLE,
+            }}
+          />
+
+          {/* Play-Related Menu Items */}
+          <nav
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: `${PROFILE_PX.menuGap}px`,
+            }}
+            aria-label="Play-related settings"
+          >
+            {PLAY_RELATED_MENU_ITEMS.map((item) => (
+              <MenuItemButton
+                key={item.id}
+                item={item}
+                onClick={() => handleMenuClick(item)}
+              />
+            ))}
+          </nav>
+        </>
       )}
 
       {/* Bottom padding for scroll */}
