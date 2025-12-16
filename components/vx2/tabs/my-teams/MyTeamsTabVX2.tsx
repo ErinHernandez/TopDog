@@ -379,10 +379,11 @@ function TeamListView({ teams, isLoading, onSelect, onNameChange }: TeamListView
             {selectedItems.map((item) => (
               <div
                 key={`${item.type}-${item.id}`}
-                className="flex items-center gap-2 px-3 py-1 rounded-full"
+                className="flex items-center gap-2 px-3 py-1"
                 style={{
                   backgroundColor: BG_COLORS.tertiary,
                   border: '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: `${RADIUS.sm}px`,
                 }}
               >
                 {item.type === 'player' && item.position && (
