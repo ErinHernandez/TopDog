@@ -163,7 +163,7 @@ export function TournamentCard({
       {featured && (
         <div 
           className="flex justify-center"
-          style={{ marginTop: `${SPACING.lg}px`, marginBottom: `${CARD_PX.logoMarginBottom}px` }}
+          style={{ marginTop: `${SPACING.xl}px`, marginBottom: `${CARD_PX.logoMarginBottom}px` }}
         >
           <img 
             src="/globe_tournament.png" 
