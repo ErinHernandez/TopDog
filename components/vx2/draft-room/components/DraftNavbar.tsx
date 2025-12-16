@@ -308,11 +308,7 @@ export default function DraftNavbar({
       key={shakeKey}
       style={{
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        height: NAVBAR_PX.height,
-        paddingLeft: NAVBAR_PX.paddingX,
-        paddingRight: NAVBAR_PX.paddingX,
+        flexDirection: 'column',
         ...backgroundStyle,
         position: useAbsolutePosition ? 'absolute' : 'fixed',
         top: 0,
@@ -320,34 +316,48 @@ export default function DraftNavbar({
         right: 0,
         zIndex: 50,
         flexShrink: 0,
-        animation: shouldShake ? 'navbar-shake 0.6s ease-in-out' : 'none',
+        // Extend background behind status bar using safe area inset
+        paddingTop: 'env(safe-area-inset-top, 0px)',
       }}
     >
-      {/* Left: Back button */}
-      <div style={{ width: NAVBAR_PX.buttonSize }}>
-        <BackButton onClick={onLeave} />
-      </div>
-      
-      {/* Center: Countdown Timer */}
+      {/* Navbar content - fixed height below safe area */}
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
-          flex: 1,
-          height: '100%',
+          justifyContent: 'space-between',
+          height: NAVBAR_PX.height,
+          paddingLeft: NAVBAR_PX.paddingX,
+          paddingRight: NAVBAR_PX.paddingX,
+          animation: shouldShake ? 'navbar-shake 0.6s ease-in-out' : 'none',
         }}
       >
-        <TimerDisplay 
-          seconds={timerSeconds} 
-          isUserTurn={isUserTurn} 
-          pulseKey={pulseKey}
-          shouldPulse={shouldPulse}
-        />
+        {/* Left: Back button */}
+        <div style={{ width: NAVBAR_PX.buttonSize }}>
+          <BackButton onClick={onLeave} />
+        </div>
+        
+        {/* Center: Countdown Timer */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flex: 1,
+            height: '100%',
+          }}
+        >
+          <TimerDisplay 
+            seconds={timerSeconds} 
+            isUserTurn={isUserTurn} 
+            pulseKey={pulseKey}
+            shouldPulse={shouldPulse}
+          />
+        </div>
+        
+        {/* Right: Spacer for layout balance */}
+        <div style={{ width: NAVBAR_PX.buttonSize }} />
       </div>
-      
-      {/* Right: Spacer for layout balance */}
-      <div style={{ width: NAVBAR_PX.buttonSize }} />
     </header>
   );
 }

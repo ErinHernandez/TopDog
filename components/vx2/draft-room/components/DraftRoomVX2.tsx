@@ -426,11 +426,12 @@ export default function DraftRoomVX2({
         onInfo={handleInfoClick}
       />
       
-      {/* Content wrapper - accounts for fixed navbar/footer */}
+      {/* Content wrapper - accounts for fixed navbar/footer + safe area */}
       <div
         style={{
           position: 'absolute',
-          top: LAYOUT_PX.navbarHeight,
+          // Account for navbar height + safe area inset
+          top: `calc(${LAYOUT_PX.navbarHeight}px + env(safe-area-inset-top, 0px))`,
           left: 0,
           right: 0,
           bottom: LAYOUT_PX.footerHeight,
