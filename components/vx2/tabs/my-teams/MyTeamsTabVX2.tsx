@@ -252,23 +252,42 @@ function TeamListView({ teams, isLoading, onSelect, onNameChange }: TeamListView
     return options.slice(0, 10); // Limit to 10 results
   }, [searchQuery, allPlayers, nflTeams, selectedItems]);
   
-  // Filter teams based on selected items
+  // Check if search query matches an NFL team
+  const matchingNflTeam = useMemo(() => {
+    if (!searchQuery.trim()) return null;
+    const query = searchQuery.trim().toUpperCase();
+    return nflTeams.find(team => team === query || team.toUpperCase() === query);
+  }, [searchQuery, nflTeams]);
+  
+  // Filter teams based on selected items and/or direct NFL team search
   const filteredTeams = useMemo(() => {
-    if (selectedItems.length === 0) return teams;
+    let result = teams;
     
-    return teams.filter(team => {
-      return selectedItems.some(item => {
-        if (item.type === 'player') {
-          // Check if team contains this player
-          return team.players.some(p => p.name === item.name);
-        } else if (item.type === 'team') {
-          // Check if team contains ANY player from this NFL team
-          return team.players.some(p => p.team === item.id);
-        }
-        return false;
+    // First, filter by selected items (dropdown selections)
+    if (selectedItems.length > 0) {
+      result = result.filter(team => {
+        return selectedItems.some(item => {
+          if (item.type === 'player') {
+            // Check if team contains this player
+            return team.players.some(p => p.name === item.name);
+          } else if (item.type === 'team') {
+            // Check if team contains ANY player from this NFL team
+            return team.players.some(p => p.team === item.id);
+          }
+          return false;
+        });
       });
-    });
-  }, [teams, selectedItems]);
+    }
+    
+    // Then, if search query matches an NFL team directly, filter by that
+    if (matchingNflTeam) {
+      result = result.filter(team => {
+        return team.players.some(p => p.team === matchingNflTeam);
+      });
+    }
+    
+    return result;
+  }, [teams, selectedItems, matchingNflTeam]);
   
   const handleSelectItem = useCallback((item: SearchItem) => {
     setSelectedItems(prev => [...prev, item]);
