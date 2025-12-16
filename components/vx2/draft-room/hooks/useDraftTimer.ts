@@ -84,6 +84,9 @@ export function useDraftTimer({
   // Store onExpire in ref to avoid effect cleanup when callback changes
   const onExpireRef = useRef(onExpire);
   onExpireRef.current = onExpire;
+  // Store isActive in ref to avoid effect cleanup when it changes
+  const isActiveRef = useRef(isActive);
+  isActiveRef.current = isActive;
   
   // Delay before auto-pick after timer hits 0 (in milliseconds)
   const EXPIRE_DELAY_MS = 1200;
@@ -114,29 +117,37 @@ export function useDraftTimer({
   }, [isRunning, onTick]);
   
   // Handle expiration with delay (timer sits at 0 for 1.2s before auto-pick)
+  // Uses refs to avoid effect cleanup cancelling pending timeouts
   useEffect(() => {
-    if (isExpired && !hasExpiredRef.current && isActive) {
+    if (isExpired && !hasExpiredRef.current && isActiveRef.current) {
       hasExpiredRef.current = true;
       
-      // Clear any existing timeout
+      // Clear any existing timeout (shouldn't happen, but be safe)
       if (expireTimeoutRef.current) {
         clearTimeout(expireTimeoutRef.current);
       }
       
       // Wait 1.2 seconds at 0 before triggering auto-pick
-      // Use ref to avoid cleanup when callback identity changes
       expireTimeoutRef.current = setTimeout(() => {
-        onExpireRef.current?.();
+        // Safety check: only fire if still active when timeout completes
+        if (isActiveRef.current) {
+          onExpireRef.current?.();
+        }
+        expireTimeoutRef.current = null;
       }, EXPIRE_DELAY_MS);
     }
-    
-    // Cleanup timeout on unmount
+    // NO cleanup here - we don't want dependency changes to cancel the timeout
+    // Timeout is only cancelled by explicit reset() or unmount
+  }, [isExpired]); // Removed isActive - using ref instead
+  
+  // Cleanup timeout only on unmount (separate from expiration effect)
+  useEffect(() => {
     return () => {
       if (expireTimeoutRef.current) {
         clearTimeout(expireTimeoutRef.current);
       }
     };
-  }, [isExpired, isActive]); // Removed onExpire - using ref instead
+  }, []);
   
   // Reset expired ref when timer is reset
   useEffect(() => {
