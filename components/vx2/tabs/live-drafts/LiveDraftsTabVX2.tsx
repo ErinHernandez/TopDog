@@ -86,7 +86,8 @@ function TabSwitcher({ selected, onSelect }: TabSwitcherProps): React.ReactEleme
           fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
           backgroundColor: selected === 'live' ? 'rgba(255,255,255,0.1)' : 'transparent',
           color: selected === 'live' ? TEXT_COLORS.primary : TEXT_COLORS.muted,
-          opacity: selected === 'live' ? 1 : 0.6,
+          opacity: selected === 'live' ? 1 : 0.8,
+          borderBottom: selected === 'live' ? `2px solid ${STATE_COLORS.active}` : '2px solid transparent',
         }}
       >
         Live Drafts
@@ -98,7 +99,8 @@ function TabSwitcher({ selected, onSelect }: TabSwitcherProps): React.ReactEleme
           fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
           backgroundColor: selected === 'slow' ? 'rgba(255,255,255,0.1)' : 'transparent',
           color: selected === 'slow' ? TEXT_COLORS.primary : TEXT_COLORS.muted,
-          opacity: selected === 'slow' ? 1 : 0.6,
+          opacity: selected === 'slow' ? 1 : 0.8,
+          borderBottom: selected === 'slow' ? `2px solid ${STATE_COLORS.active}` : '2px solid transparent',
         }}
       >
         Slow Drafts
