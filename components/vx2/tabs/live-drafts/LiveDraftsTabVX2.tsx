@@ -235,7 +235,7 @@ function DraftCard({ draft, onEnter, onTeamNameChange }: DraftCardProps): React.
         ...(isYourTurn 
           ? {
               ...TILED_BG_STYLE,
-              border: '1px solid rgba(255,255,255,0.2)',
+              border: '3px solid rgba(255,255,255,0.2)',
             }
           : {
               backgroundColor: BG_COLORS.secondary,
@@ -250,7 +250,7 @@ function DraftCard({ draft, onEnter, onTeamNameChange }: DraftCardProps): React.
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            backgroundColor: 'rgba(0, 0, 0, 0.3)',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
             borderRadius: `${LIVE_DRAFTS_PX.cardBorderRadius}px`,
             zIndex: 0,
           }}
@@ -303,9 +303,9 @@ function DraftCard({ draft, onEnter, onTeamNameChange }: DraftCardProps): React.
       {isYourTurn && (
         <div className="flex items-center justify-end mb-2">
           <span
-            className="inline-flex items-center font-semibold uppercase tracking-wide"
+            className="inline-flex flex-col items-center font-semibold uppercase tracking-wide"
             style={{
-              backgroundColor: 'rgba(16, 185, 129, 0.2)',
+              ...TILED_BG_STYLE,
               color: '#FFFFFF',
               paddingLeft: `${SPACING.sm}px`,
               paddingRight: `${SPACING.sm}px`,
@@ -316,7 +316,8 @@ function DraftCard({ draft, onEnter, onTeamNameChange }: DraftCardProps): React.
               lineHeight: 1.2,
             }}
           >
-            On the Clock
+            <span>ON THE</span>
+            <span>CLOCK</span>
           </span>
         </div>
       )}
@@ -597,9 +598,6 @@ export default function LiveDraftsTabVX2({
         }}
       >
         <TabSwitcher selected={draftType} onSelect={setDraftType} />
-        <p style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px`, marginTop: `${SPACING.xs}px` }}>
-          {filteredDrafts.length} active draft{filteredDrafts.length !== 1 ? 's' : ''}
-        </p>
       </div>
       
       {/* Drafts List */}
