@@ -87,20 +87,14 @@ function DraftCard({ draft, onEnter }: DraftCardProps): React.ReactElement {
           ? `1px solid ${POSITION_COLORS.RB}40` 
           : '1px solid rgba(255,255,255,0.1)',
       }}
-      aria-label={`${draft.tournamentName} - ${isYourTurn ? 'Your turn' : 'Waiting'} - Pick ${draft.pickNumber} of ${draft.totalPicks}`}
+      aria-label={`${isYourTurn ? 'Your turn' : 'Waiting'} - Pick ${draft.pickNumber} of ${draft.totalPicks}`}
     >
-      {/* Header Row */}
-      <div className="flex items-center justify-between mb-2">
-        <h3 
-          className="font-semibold truncate mr-2"
-          style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}
-        >
-          {draft.tournamentName}
-        </h3>
-        {isYourTurn && (
+      {/* Header Row - Only show YOUR TURN badge */}
+      {isYourTurn && (
+        <div className="flex items-center justify-end mb-2">
           <StatusBadge status="success" label="YOUR TURN" />
-        )}
-      </div>
+        </div>
+      )}
       
       {/* Info Row */}
       <div className="flex items-center justify-between mb-3">
