@@ -328,16 +328,19 @@ export default function LobbyTabVX2({
         backgroundColor: BG_COLORS.primary,
         display: 'flex',
         flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
         overflow: 'hidden',
       }}
       role="main"
       aria-label="Tournament lobby"
     >
-      {/* Featured Tournament Card */}
+      {/* Featured Tournament Card - centered */}
       <TournamentCard
         tournament={featuredTournament}
         onJoinClick={() => handleJoinClick(featuredTournament.id)}
         featured={true}
+        className="w-full max-w-sm"
       />
 
       {/* Join Modal */}

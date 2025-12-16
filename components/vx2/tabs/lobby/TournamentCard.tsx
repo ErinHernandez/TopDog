@@ -30,7 +30,7 @@ const CARD_PX = {
   titleMarginBottom: SPACING.md,
   
   // Logo
-  logoSize: 112,  // 150px reduced by 25%
+  logoSize: 140,  // 112px increased by 25%
   logoMarginBottom: SPACING.md,
   
   // Progress
@@ -140,7 +140,7 @@ export function TournamentCard({
       role="article"
       aria-label={`${tournament.title} tournament`}
     >
-      {/* Tournament Title */}
+      {/* Tournament Title - Split into two lines */}
       <h2 
         className="text-center font-bold leading-tight"
         style={{ 
@@ -149,7 +149,14 @@ export function TournamentCard({
           marginBottom: `${CARD_PX.titleMarginBottom}px`,
         }}
       >
-        {tournament.title}
+        {tournament.title.includes('INTERNATIONAL') ? (
+          <>
+            {tournament.title.replace(' INTERNATIONAL', '')}<br />
+            INTERNATIONAL
+          </>
+        ) : (
+          tournament.title
+        )}
       </h2>
 
       {/* Tournament Logo/Image */}
