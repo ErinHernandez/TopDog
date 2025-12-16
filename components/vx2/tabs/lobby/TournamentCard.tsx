@@ -215,7 +215,7 @@ export function TournamentCard({
           height: `${CARD_PX.buttonHeight}px`,
           fontSize: `${CARD_PX.buttonFontSize}px`,
           borderRadius: `${RADIUS.md}px`,
-          marginTop: `${SPACING.lg}px`,
+          marginTop: `${SPACING['2xl']}px`,
           marginBottom: `${CARD_PX.buttonMarginBottom}px`,
           border: 'none',
           cursor: 'pointer',
