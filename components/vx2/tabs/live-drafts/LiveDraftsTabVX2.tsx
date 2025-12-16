@@ -257,30 +257,7 @@ function DraftCard({ draft, onEnter, onTeamNameChange }: DraftCardProps): React.
         />
       )}
       <div className="relative z-10">
-      {/* Header Row - Only show On the Clock badge */}
-      {isYourTurn && (
-        <div className="flex items-center justify-end mb-2">
-          <span
-            className="inline-flex flex-col items-center font-semibold uppercase tracking-wide"
-            style={{
-              ...TILED_BG_STYLE,
-              color: '#FFFFFF',
-              paddingLeft: `${SPACING.sm}px`,
-              paddingRight: `${SPACING.sm}px`,
-              paddingTop: '2px',
-              paddingBottom: '2px',
-              borderRadius: `${RADIUS.sm}px`,
-              fontSize: `${TYPOGRAPHY.fontSize.xs - 1}px`,
-              lineHeight: 1.2,
-            }}
-          >
-            <span>ON THE</span>
-            <span>CLOCK</span>
-          </span>
-        </div>
-      )}
-      
-      {/* Info Row - Team Name on left, Timer/Picks Away on right */}
+      {/* Info Row - Team Name on left, Badge/Timer or Picks Away on right */}
       <div className="flex items-center justify-between mb-3">
         {/* Team Name on left */}
         <div className="flex items-center flex-1 min-w-0" onClick={(e) => e.stopPropagation()}>
@@ -324,20 +301,45 @@ function DraftCard({ draft, onEnter, onTeamNameChange }: DraftCardProps): React.
           )}
         </div>
         
-        {/* Timer/Picks Away on right */}
+        {/* Badge/Timer or Picks Away on right */}
         <div className="flex-shrink-0 ml-2">
-          {isYourTurn && draft.timeLeftSeconds !== undefined ? (
-            <span 
-              style={{ 
-                color: '#FFFFFF',
-                fontSize: '26px',
-                fontWeight: 700,
-                fontVariantNumeric: 'tabular-nums',
-                lineHeight: 1,
-              }}
-            >
-              {draft.timeLeftSeconds}
-            </span>
+          {isYourTurn ? (
+            <div className="flex flex-col items-end">
+              {/* On the Clock badge */}
+              <span
+                className="inline-flex flex-col items-center font-semibold uppercase tracking-wide mb-1"
+                style={{
+                  ...TILED_BG_STYLE,
+                  color: '#FFFFFF',
+                  paddingLeft: `${SPACING.sm}px`,
+                  paddingRight: `${SPACING.sm}px`,
+                  paddingTop: '2px',
+                  paddingBottom: '2px',
+                  borderRadius: `${RADIUS.sm}px`,
+                  fontSize: `${TYPOGRAPHY.fontSize.xs + 1}px`,
+                  lineHeight: 1.2,
+                }}
+              >
+                <span>ON THE</span>
+                <span>CLOCK</span>
+              </span>
+              {/* Timer centered under badge */}
+              {draft.timeLeftSeconds !== undefined && (
+                <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                  <span 
+                    style={{ 
+                      color: '#FFFFFF',
+                      fontSize: '26px',
+                      fontWeight: 700,
+                      fontVariantNumeric: 'tabular-nums',
+                      lineHeight: 1,
+                    }}
+                  >
+                    {draft.timeLeftSeconds}
+                  </span>
+                </div>
+              )}
+            </div>
           ) : picksAway > 0 ? (
             <span 
               className="font-bold"
