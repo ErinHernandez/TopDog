@@ -163,15 +163,17 @@ function DraftCard({ draft, onEnter }: DraftCardProps): React.ReactElement {
       
       {/* Info Row */}
       <div className="flex items-center justify-end mb-3">
-        {isYourTurn && draft.timeLeftSeconds ? (
+        {isYourTurn && draft.timeLeftSeconds !== undefined ? (
           <span 
-            className="font-mono font-bold"
             style={{ 
-              color: draft.timeLeftSeconds <= 15 ? '#EF4444' : POSITION_COLORS.RB,
-              fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
+              color: '#FFFFFF',
+              fontSize: '26px',
+              fontWeight: 700,
+              fontVariantNumeric: 'tabular-nums',
+              lineHeight: 1,
             }}
           >
-            {formatTime(draft.timeLeftSeconds)}
+            {draft.timeLeftSeconds}
           </span>
         ) : picksAway > 0 ? (
           <span 
