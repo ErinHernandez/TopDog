@@ -21,7 +21,7 @@ import {
   ErrorState,
 } from '../../components/shared';
 import { SearchInput } from '../../components/shared/inputs';
-import { ChevronRight, Edit, Share } from '../../components/icons';
+import { ChevronRight, ChevronLeft, Edit, Share } from '../../components/icons';
 
 // ============================================================================
 // CONSTANTS
@@ -303,10 +303,11 @@ function PlayerRow({ player }: PlayerRowProps): React.ReactElement {
 
 interface TeamDetailsViewProps {
   team: MyTeam;
+  onBack: () => void;
   onViewDraftBoard?: () => void;
 }
 
-function TeamDetailsView({ team, onViewDraftBoard }: TeamDetailsViewProps): React.ReactElement {
+function TeamDetailsView({ team, onBack, onViewDraftBoard }: TeamDetailsViewProps): React.ReactElement {
   // Sort players by position order (QB, RB, WR, TE) then by pick
   const sortedPlayers = useMemo(() => {
     const posOrder = { QB: 0, RB: 1, WR: 2, TE: 3 };
@@ -332,6 +333,16 @@ function TeamDetailsView({ team, onViewDraftBoard }: TeamDetailsViewProps): Reac
         }}
       >
         <div className="flex items-center flex-1 min-w-0">
+          <button 
+            onClick={onBack}
+            className="p-1 mr-2 flex items-center justify-center transition-all active:scale-95"
+            aria-label="Back to teams"
+            style={{
+              borderRadius: `${RADIUS.md}px`,
+            }}
+          >
+            <ChevronLeft size={20} color={TEXT_COLORS.primary} />
+          </button>
           <button className="p-1 mr-2" aria-label="Edit team name">
             <Edit size={18} color={TEXT_COLORS.muted} />
           </button>
@@ -434,6 +445,14 @@ export default function MyTeamsTabVX2({
     }
   }, [selectedTeam, onSelectTeam]);
   
+  const handleBack = useCallback(() => {
+    if (onSelectTeam) {
+      onSelectTeam(null);
+    } else {
+      setInternalSelectedTeam(null);
+    }
+  }, [onSelectTeam]);
+  
   const handleViewDraftBoard = useCallback(() => {
     if (selectedTeam && onViewDraftBoard) {
       onViewDraftBoard(selectedTeam);
@@ -461,6 +480,7 @@ export default function MyTeamsTabVX2({
     return (
       <TeamDetailsView 
         team={selectedTeam}
+        onBack={handleBack}
         onViewDraftBoard={onViewDraftBoard ? handleViewDraftBoard : undefined}
       />
     );
