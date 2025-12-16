@@ -128,7 +128,7 @@ function PositionRow({ position, value, maxValue, onChange, disabled }: Position
           className="text-center font-bold"
           style={{
             width: '48px',
-            fontSize: '24px',
+            fontSize: '20px',
             color: '#f1f5f9', // Slate-100
           }}
         >
