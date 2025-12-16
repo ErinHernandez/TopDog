@@ -257,48 +257,6 @@ function DraftCard({ draft, onEnter, onTeamNameChange }: DraftCardProps): React.
         />
       )}
       <div className="relative z-10">
-      {/* Team Name Row */}
-      <div className="flex items-center mb-2" onClick={(e) => e.stopPropagation()}>
-        <button
-          onClick={handleEditClick}
-          className="p-1 mr-2 flex-shrink-0"
-          aria-label="Edit team name"
-          style={{ cursor: 'pointer' }}
-        >
-          <Edit size={18} color={TEXT_COLORS.muted} />
-        </button>
-        {isEditing ? (
-          <input
-            ref={inputRef}
-            type="text"
-            value={editedName}
-            onChange={(e) => setEditedName(e.target.value)}
-            onBlur={handleBlur}
-            onKeyDown={handleKeyDown}
-            className="flex-1 outline-none"
-            style={{
-              backgroundColor: 'transparent',
-              color: TEXT_COLORS.primary,
-              fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-              fontWeight: 500,
-              border: 'none',
-              padding: 0,
-            }}
-            onClick={(e) => e.stopPropagation()}
-          />
-        ) : (
-          <span
-            className="flex-1 font-medium"
-            style={{
-              color: TEXT_COLORS.primary,
-              fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-            }}
-          >
-            {draft.teamName}
-          </span>
-        )}
-      </div>
-
       {/* Header Row - Only show On the Clock badge */}
       {isYourTurn && (
         <div className="flex items-center justify-end mb-2">
@@ -322,31 +280,76 @@ function DraftCard({ draft, onEnter, onTeamNameChange }: DraftCardProps): React.
         </div>
       )}
       
-      {/* Info Row */}
-      <div className="flex items-center justify-end mb-3">
-        {isYourTurn && draft.timeLeftSeconds !== undefined ? (
-          <span 
-            style={{ 
-              color: '#FFFFFF',
-              fontSize: '26px',
-              fontWeight: 700,
-              fontVariantNumeric: 'tabular-nums',
-              lineHeight: 1,
-            }}
+      {/* Info Row - Team Name on left, Timer/Picks Away on right */}
+      <div className="flex items-center justify-between mb-3">
+        {/* Team Name on left */}
+        <div className="flex items-center flex-1 min-w-0" onClick={(e) => e.stopPropagation()}>
+          <button
+            onClick={handleEditClick}
+            className="p-1 mr-2 flex-shrink-0"
+            aria-label="Edit team name"
+            style={{ cursor: 'pointer' }}
           >
-            {draft.timeLeftSeconds}
-          </span>
-        ) : picksAway > 0 ? (
-          <span 
-            className="font-bold"
-            style={{ 
-              color: TEXT_COLORS.secondary,
-              fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-            }}
-          >
-            {picksAway} pick{picksAway !== 1 ? 's' : ''} away
-          </span>
-        ) : null}
+            <Edit size={18} color={TEXT_COLORS.muted} />
+          </button>
+          {isEditing ? (
+            <input
+              ref={inputRef}
+              type="text"
+              value={editedName}
+              onChange={(e) => setEditedName(e.target.value)}
+              onBlur={handleBlur}
+              onKeyDown={handleKeyDown}
+              className="flex-1 outline-none min-w-0"
+              style={{
+                backgroundColor: 'transparent',
+                color: TEXT_COLORS.primary,
+                fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
+                fontWeight: 500,
+                border: 'none',
+                padding: 0,
+              }}
+              onClick={(e) => e.stopPropagation()}
+            />
+          ) : (
+            <span
+              className="flex-1 font-medium truncate"
+              style={{
+                color: TEXT_COLORS.primary,
+                fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
+              }}
+            >
+              {draft.teamName}
+            </span>
+          )}
+        </div>
+        
+        {/* Timer/Picks Away on right */}
+        <div className="flex-shrink-0 ml-2">
+          {isYourTurn && draft.timeLeftSeconds !== undefined ? (
+            <span 
+              style={{ 
+                color: '#FFFFFF',
+                fontSize: '26px',
+                fontWeight: 700,
+                fontVariantNumeric: 'tabular-nums',
+                lineHeight: 1,
+              }}
+            >
+              {draft.timeLeftSeconds}
+            </span>
+          ) : picksAway > 0 ? (
+            <span 
+              className="font-bold"
+              style={{ 
+                color: TEXT_COLORS.secondary,
+                fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
+              }}
+            >
+              {picksAway} pick{picksAway !== 1 ? 's' : ''} away
+            </span>
+          ) : null}
+        </div>
       </div>
       
       {/* Progress Bar with Round Knobs */}
