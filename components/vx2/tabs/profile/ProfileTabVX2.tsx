@@ -366,6 +366,33 @@ export default function ProfileTabVX2({
         )}
       </div>
 
+      {/* Account Balance */}
+      {!isLoading && user && (
+        <div
+          className="flex flex-col items-center"
+          style={{ marginBottom: `${SPACING.md}px` }}
+        >
+          <div
+            style={{
+              fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
+              color: TEXT_COLORS.muted,
+              marginBottom: `${SPACING.xs}px`,
+            }}
+          >
+            Account Balance
+          </div>
+          <div
+            className="font-bold"
+            style={{
+              fontSize: `${TYPOGRAPHY.fontSize['2xl']}px`,
+              color: TEXT_COLORS.primary,
+            }}
+          >
+            {user.balanceFormatted || '$0.00'}
+          </div>
+        </div>
+      )}
+
       {/* Deposit Button */}
       {!isLoading && (
         <DepositButton onClick={() => console.log('Open deposit flow')} />
