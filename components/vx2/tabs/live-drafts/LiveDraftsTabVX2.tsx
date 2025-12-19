@@ -126,6 +126,7 @@ function DraftProgressBar({ value, totalRounds, currentRound, color }: DraftProg
         height: '4px',
         borderRadius: '2px',
         backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        marginBottom: '16px', // Add space below for the label
       }}
       role="progressbar"
       aria-valuenow={clampedValue}
@@ -152,17 +153,43 @@ function DraftProgressBar({ value, totalRounds, currentRound, color }: DraftProg
         return (
           <div
             key={roundNumber}
-            className="absolute top-1/2 transform -translate-y-1/2 -translate-x-1/2"
+            className="absolute"
             style={{
               left: `${roundPosition}%`,
-              width: '6px',
-              height: '6px',
-              borderRadius: '50%',
-              backgroundColor: isPastRound || isCurrentRound ? 'rgba(200, 200, 200, 0.5)' : 'rgba(255, 255, 255, 0.3)',
-              border: `1px solid ${isPastRound || isCurrentRound ? 'rgba(200, 200, 200, 0.7)' : 'rgba(255, 255, 255, 0.5)'}`,
+              top: '50%',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
               zIndex: 1,
+              transform: 'translateX(-50%) translateY(-50%)',
             }}
-          />
+          >
+            {/* Round dot - positioned at progress bar center */}
+            <div
+              style={{
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                backgroundColor: isPastRound || isCurrentRound ? 'rgba(200, 200, 200, 0.5)' : 'rgba(255, 255, 255, 0.3)',
+                border: `1px solid ${isPastRound || isCurrentRound ? 'rgba(200, 200, 200, 0.7)' : 'rgba(255, 255, 255, 0.5)'}`,
+              }}
+            />
+            {/* Round label - only for current round, positioned below dot */}
+            {isCurrentRound && (
+              <div
+                style={{
+                  marginTop: '10px',
+                  fontSize: '10px',
+                  color: 'rgba(255, 255, 255, 0.7)',
+                  fontWeight: 500,
+                  whiteSpace: 'nowrap',
+                  lineHeight: 1,
+                }}
+              >
+                Round {roundNumber}
+              </div>
+            )}
+          </div>
         );
       })}
     </div>

@@ -104,11 +104,13 @@ export default function AppHeaderVX({
         return { backgroundColor: '#10B981' };
       default:
         return {
-          backgroundColor: '#4285F4', // WR blue color as fallback
           backgroundImage: 'url(/wr_blue.png)',
           backgroundRepeat: 'no-repeat',
           backgroundPosition: 'center center',
           backgroundSize: 'cover',
+          // Ensure background extends into padding area (safe area inset)
+          backgroundOrigin: 'border-box',
+          backgroundClip: 'border-box',
         };
     }
   };
@@ -140,8 +142,6 @@ export default function AppHeaderVX({
         paddingTop: 'env(safe-area-inset-top, 0px)',
         // Background - extends into safe area padding
         ...getBackgroundStyle(),
-        // Ensure background covers entire element including padding
-        backgroundClip: 'border-box',
         // Stacking context - below modals (500), above content
         position: 'relative',
         zIndex: Z_INDEX.sticky,
