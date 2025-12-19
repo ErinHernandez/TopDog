@@ -104,9 +104,11 @@ export default function AppHeaderVX({
         return { backgroundColor: '#10B981' };
       default:
         return {
+          // Fallback color that matches wr_blue.png (blue #4285F4)
+          backgroundColor: '#4285F4',
           backgroundImage: 'url(/wr_blue.png)',
           backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'center center',
+          backgroundPosition: 'top center',
           backgroundSize: 'cover',
           // Ensure background extends into padding area (safe area inset)
           backgroundOrigin: 'border-box',

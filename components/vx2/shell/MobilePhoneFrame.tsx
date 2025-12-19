@@ -34,25 +34,20 @@ export default function MobilePhoneFrame({
   height = PHONE_FRAME.height,
   className = '',
 }: MobilePhoneFrameProps): React.ReactElement {
-  const [isMobileDevice, setIsMobileDevice] = useState(false);
-
-  useEffect(() => {
-    // Only show status bar on desktop browsers, not on actual mobile devices
-    const checkMobile = () => {
-      if (typeof window === 'undefined') return;
-      
-      const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-      const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
-      const isIPadOS = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
-      const isAndroid = /android/i.test(userAgent);
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
-                          window.navigator.standalone === true;
-      
-      setIsMobileDevice(isIOS || isIPadOS || isAndroid || isStandalone);
-    };
-
-    checkMobile();
-  }, []);
+  // Default to false (show status bar) unless we detect a mobile device
+  const [isMobileDevice, setIsMobileDevice] = useState(() => {
+    // Initial state - check if we're on a mobile device
+    if (typeof window === 'undefined') return false;
+    
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+    const isIPadOS = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+    const isAndroid = /android/i.test(userAgent);
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+                        window.navigator.standalone === true;
+    
+    return isIOS || isIPadOS || isAndroid || isStandalone;
+  });
 
   return (
     <div 

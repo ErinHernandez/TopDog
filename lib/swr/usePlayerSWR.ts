@@ -12,9 +12,11 @@
  *   const { stats, isLoading } = useSeasonStats({ position: 'QB' });
  */
 
+import { useMemo } from 'react';
 import useSWR, { type KeyedMutator } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import { API_ENDPOINTS, CACHE_TIMES, fetcher } from './config';
+import { getPlayerId } from '@/lib/playerPhotos';
 
 import type { FantasyPosition, NFLTeam, InjuryReport, PlayerNews, NFLTeamInfo } from '@/types/player';
 import type { TransformedPlayerStats, TransformedADP } from '@/types/api';
@@ -184,46 +186,81 @@ interface UsePlayerDataCombinedReturn {
 // ============================================================================
 
 /**
- * Fetch player headshots
+ * Generate player headshot URLs directly from player pool
+ * No API call needed - images are served as static files from /players/ directory
  * Uses immutable SWR - headshots are taken before the season and never change
- * Data is fetched once and cached permanently until page refresh
  */
 export function useHeadshots(options: HeadshotsOptions = {}): UseHeadshotsReturn {
   const { position, team, enabled = true } = options;
   
-  // Build query string
-  const params = new URLSearchParams();
-  if (position) params.append('position', position);
-  if (team) params.append('team', team);
-  
-  const queryString = params.toString();
-  const url = enabled 
-    ? `${API_ENDPOINTS.HEADSHOTS}${queryString ? `?${queryString}` : ''}`
+  // Generate cache key based on filters
+  const cacheKey = enabled 
+    ? `headshots:${position || 'all'}:${team || 'all'}`
     : null;
   
-  // useSWRImmutable = never revalidates automatically
-  const { data, error, isLoading, isValidating, mutate } = useSWRImmutable<PlayerWithHeadshot[]>(
-    url,
+  // Fetch player pool and generate headshot URLs
+  const { data: playerPoolData, error: poolError, isLoading: poolLoading } = useSWRImmutable(
+    enabled ? '/data/player-pool-2025.json' : null,
     fetcher
   );
   
+  // Generate headshots from player pool data
+  // Handle both array format (legacy) and {players: []} format
+  const headshots: PlayerWithHeadshot[] = useMemo(() => {
+    if (!enabled) return [];
+    
+    // Handle both array format and object with players property
+    const playersArray = Array.isArray(playerPoolData) 
+      ? playerPoolData 
+      : playerPoolData?.players || [];
+    
+    if (!playersArray || playersArray.length === 0) return [];
+    
+    let players = playersArray;
+    
+    // Filter by position if specified
+    if (position) {
+      const positions = Array.isArray(position) ? position : [position];
+      players = players.filter(p => positions.includes(p.position?.toUpperCase()));
+    }
+    
+    // Filter by team if specified
+    if (team) {
+      players = players.filter(p => p.team?.toUpperCase() === team.toUpperCase());
+    }
+    
+    // Generate headshot URLs directly using getPlayerId helper
+    return players.map(player => {
+      const playerId = player.name ? getPlayerId(player.name) : null;
+      
+      return {
+        playerId: player.id || playerId || '',
+        name: player.name || '',
+        team: player.team || '',
+        position: player.position || '',
+        headshotUrl: playerId ? `/players/${playerId}.webp` : null,
+      };
+    }).filter(p => p.name && p.headshotUrl); // Only include players with valid data
+  }, [playerPoolData, position, team, enabled]);
+  
   // Create lookup map by player name
-  const headshotsMap: Record<string, string> = {};
-  if (data) {
-    data.forEach(player => {
+  const headshotsMap: Record<string, string> = useMemo(() => {
+    const map: Record<string, string> = {};
+    headshots.forEach(player => {
       if (player.name && player.headshotUrl) {
-        headshotsMap[player.name] = player.headshotUrl;
+        map[player.name] = player.headshotUrl;
       }
     });
-  }
+    return map;
+  }, [headshots]);
   
   return {
-    headshots: data || [],
+    headshots,
     headshotsMap,
-    isLoading,
-    isValidating,
-    error,
-    mutate,
+    isLoading: poolLoading,
+    isValidating: false, // Static data, never revalidates
+    error: poolError,
+    mutate: () => {}, // No-op since data is static
   };
 }
 
