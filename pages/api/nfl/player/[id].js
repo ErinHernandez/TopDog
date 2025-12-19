@@ -7,32 +7,51 @@
  */
 
 import { getPlayerById } from '../../../../lib/sportsdataio';
+import { 
+  withErrorHandling, 
+  validateMethod, 
+  requireEnvVar,
+  createSuccessResponse,
+  ErrorType,
+  createErrorResponse,
+} from '../../../../lib/apiErrorHandler';
 
 export default async function handler(req, res) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    // Validate HTTP method
+    validateMethod(req, ['GET'], logger);
 
-  const apiKey = process.env.SPORTSDATAIO_API_KEY;
-  if (!apiKey) {
-    return res.status(500).json({ error: 'API key not configured' });
-  }
+    // Check required environment variables
+    const apiKey = requireEnvVar('SPORTSDATAIO_API_KEY', logger);
 
-  try {
     const { id } = req.query;
     
     if (!id) {
-      return res.status(400).json({ error: 'Player ID required' });
+      const error = new Error('Player ID required');
+      error.name = 'ValidationError';
+      throw error;
     }
+
+    logger.info('Fetching player', { playerId: id });
     
     const player = await getPlayerById(apiKey, id);
     
     if (!player) {
-      return res.status(404).json({ 
-        ok: false, 
-        error: `Player with ID ${id} not found` 
-      });
+      logger.warn('Player not found', { playerId: id });
+      const errorResponse = createErrorResponse(
+        ErrorType.NOT_FOUND,
+        `Player with ID ${id} not found`,
+        { playerId: id },
+        res.getHeader('X-Request-ID')
+      );
+      return res.status(errorResponse.statusCode).json(errorResponse.body);
     }
+    
+    logger.debug('Player found', { 
+      playerId: id, 
+      name: player.Name,
+      position: player.Position 
+    });
     
     // Transform to clean output
     const data = {
@@ -67,13 +86,8 @@ export default async function handler(req, res) {
       byeWeek: player.ByeWeek,
     };
     
-    return res.status(200).json({
-      ok: true,
-      data,
-    });
-  } catch (err) {
-    console.error('Player API error:', err);
-    return res.status(500).json({ error: err.message });
-  }
+    const response = createSuccessResponse(data, 200, logger);
+    return res.status(response.statusCode).json(response.body);
+  });
 }
 

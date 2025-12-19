@@ -104,7 +104,10 @@ export default function AppHeaderVX({
         return { backgroundColor: '#10B981' };
       default:
         return {
-          background: 'url(/wr_blue.png) no-repeat center center',
+          backgroundColor: '#4285F4', // WR blue color as fallback
+          backgroundImage: 'url(/wr_blue.png)',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center center',
           backgroundSize: 'cover',
         };
     }
@@ -133,10 +136,12 @@ export default function AppHeaderVX({
     <header
       className="w-full flex-shrink-0"
       style={{
-        // Safe area handling for notched devices
+        // Safe area handling for notched devices - background extends into this area
         paddingTop: 'env(safe-area-inset-top, 0px)',
-        // Background
+        // Background - extends into safe area padding
         ...getBackgroundStyle(),
+        // Ensure background covers entire element including padding
+        backgroundClip: 'border-box',
         // Stacking context - below modals (500), above content
         position: 'relative',
         zIndex: Z_INDEX.sticky,

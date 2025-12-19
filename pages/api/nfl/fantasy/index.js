@@ -8,19 +8,25 @@
 
 import { getFantasyPlayers } from '../../../../lib/sportsdataio';
 import { POSITIONS } from '../../../../components/draft/v3/constants/positions';
+import { 
+  withErrorHandling, 
+  validateMethod, 
+  requireEnvVar,
+  createSuccessResponse,
+} from '../../../../lib/apiErrorHandler';
 
 export default async function handler(req, res) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    // Validate HTTP method
+    validateMethod(req, ['GET'], logger);
 
-  const apiKey = process.env.SPORTSDATAIO_API_KEY;
-  if (!apiKey) {
-    return res.status(500).json({ error: 'API key not configured' });
-  }
+    // Check required environment variables
+    const apiKey = requireEnvVar('SPORTSDATAIO_API_KEY', logger);
 
-  try {
+    logger.info('Fetching fantasy overview');
+
     const allPlayers = await getFantasyPlayers(apiKey, { limit: 500 });
+    logger.debug('Fantasy players fetched', { count: allPlayers.length });
     
     // Group by position and get top 10 each
     const byPosition = {};
@@ -39,6 +45,10 @@ export default async function handler(req, res) {
         }));
     });
     
+    logger.debug('Position breakdowns created', { 
+      positions: Object.keys(byPosition) 
+    });
+    
     // Overall top 20
     const top20 = allPlayers.slice(0, 20).map(p => ({
       name: p.name,
@@ -49,23 +59,23 @@ export default async function handler(req, res) {
       overallRank: p.overallRank,
     }));
     
-    return res.status(200).json({
-      ok: true,
+    const positionCounts = {
+      QB: allPlayers.filter(p => p.position === 'QB').length,
+      RB: allPlayers.filter(p => p.position === 'RB').length,
+      WR: allPlayers.filter(p => p.position === 'WR').length,
+      TE: allPlayers.filter(p => p.position === 'TE').length,
+    };
+    
+    const response = createSuccessResponse({
       summary: {
         totalPlayers: allPlayers.length,
-        byPosition: {
-          QB: allPlayers.filter(p => p.position === 'QB').length,
-          RB: allPlayers.filter(p => p.position === 'RB').length,
-          WR: allPlayers.filter(p => p.position === 'WR').length,
-          TE: allPlayers.filter(p => p.position === 'TE').length,
-        },
+        byPosition: positionCounts,
       },
       top20,
       topByPosition: byPosition,
-    });
-  } catch (err) {
-    console.error('Fantasy Overview API error:', err);
-    return res.status(500).json({ error: err.message });
-  }
+    }, 200, logger);
+    
+    return res.status(response.statusCode).json(response.body);
+  });
 }
 

@@ -21,16 +21,16 @@ import { TILED_BG_STYLE } from '../../draft-room/constants';
 // ============================================================================
 
 const CARD_PX = {
-  // Main card - increased by 10% more
-  padding: 31,
+  // Main card - increased by 10% more, reduced padding by 10px to reduce height
+  padding: 21,
   borderRadius: RADIUS.xl,
   
   // Title
   titleFontSize: TYPOGRAPHY.fontSize.xl,
   titleMarginBottom: SPACING.xl,
   
-  // Logo
-  logoSize: 253,
+  // Logo - reduced by 20px to help reduce overall height
+  logoSize: 233,
   logoMarginBottom: SPACING.xl,
   
   // Progress
@@ -90,7 +90,7 @@ function StatItem({ value, label }: StatItemProps): React.ReactElement {
       <div 
         className="font-bold" 
         style={{ 
-          fontSize: `${CARD_PX.statsValueFontSize}px`, 
+          fontSize: `clamp(14px, 3vw, ${CARD_PX.statsValueFontSize}px)`, 
           color: CARD_COLORS.text,
         }}
       >
@@ -98,7 +98,7 @@ function StatItem({ value, label }: StatItemProps): React.ReactElement {
       </div>
       <div 
         style={{ 
-          fontSize: `${CARD_PX.statsLabelFontSize}px`, 
+          fontSize: `clamp(10px, 2vw, ${CARD_PX.statsLabelFontSize}px)`, 
           color: CARD_COLORS.textMuted,
         }}
       >
@@ -136,15 +136,21 @@ export function TournamentCard({
           ? `3px solid ${CARD_COLORS.accent}` 
           : `1px solid ${CARD_COLORS.border}`,
         padding: `${CARD_PX.padding}px`,
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        maxHeight: '100%',
+        minHeight: 0,
+        overflow: 'hidden',
       }}
       role="article"
       aria-label={`${tournament.title} tournament`}
     >
       {/* Tournament Title - Split into two lines */}
       <h2 
-        className="text-center font-bold leading-tight"
+        className="text-center font-bold leading-tight flex-shrink-0"
         style={{ 
-          fontSize: '26px',
+          fontSize: 'clamp(18px, 4vw, 26px)',
           fontFamily: "'Anton SC', sans-serif",
           textTransform: 'uppercase',
           letterSpacing: '1px',
@@ -165,7 +171,7 @@ export function TournamentCard({
       {/* Tournament Logo/Image */}
       {featured && (
         <div 
-          className="flex justify-center"
+          className="flex justify-center flex-shrink-0"
           style={{ marginTop: `${SPACING.xl}px`, marginBottom: `${CARD_PX.logoMarginBottom}px` }}
         >
           <img 
@@ -173,8 +179,9 @@ export function TournamentCard({
             alt=""
             aria-hidden="true"
             style={{ 
-              width: `${CARD_PX.logoSize}px`, 
-              height: `${CARD_PX.logoSize}px`, 
+              width: 'min(233px, 55vw, 30vh)',
+              height: 'min(233px, 55vw, 30vh)',
+              maxWidth: '100%',
               objectFit: 'contain',
               borderRadius: `${RADIUS.lg}px`,
             }}
@@ -184,11 +191,11 @@ export function TournamentCard({
 
       {/* Progress Bar */}
       {tournament.maxEntries && (
-        <div style={{ marginTop: `${SPACING.lg}px`, marginBottom: `${SPACING.lg}px` }}>
+        <div className="flex-shrink-0" style={{ marginTop: `${SPACING.lg}px`, marginBottom: `${SPACING.lg}px` }}>
           <div 
             className="flex justify-between"
             style={{ 
-              fontSize: `${CARD_PX.progressLabelFontSize}px`, 
+              fontSize: `clamp(11px, 2vw, ${CARD_PX.progressLabelFontSize}px)`, 
               color: CARD_COLORS.textMuted,
               marginBottom: `${CARD_PX.progressLabelMarginBottom}px`,
             }}
@@ -208,14 +215,14 @@ export function TournamentCard({
       {/* Join Button */}
       <button
         onClick={onJoinClick}
-        className="w-full font-semibold transition-colors duration-200 active:scale-[0.98]"
+        className="w-full font-semibold transition-colors duration-200 active:scale-[0.98] flex-shrink-0"
         style={{ 
           ...TILED_BG_STYLE,
           color: '#FFFFFF',
-          height: `${CARD_PX.buttonHeight}px`,
-          fontSize: `${CARD_PX.buttonFontSize}px`,
+          height: `clamp(44px, 7vh, ${CARD_PX.buttonHeight}px)`,
+          fontSize: `clamp(12px, 2vw, ${CARD_PX.buttonFontSize}px)`,
           borderRadius: `${RADIUS.md}px`,
-          marginTop: `${SPACING['2xl']}px`,
+          marginTop: `${SPACING.xl}px`,
           marginBottom: `${CARD_PX.buttonMarginBottom}px`,
           border: 'none',
           cursor: 'pointer',
@@ -227,10 +234,12 @@ export function TournamentCard({
 
       {/* Stats Grid */}
       <div 
+        className="flex-shrink-0"
         style={{ 
           display: 'grid', 
           gridTemplateColumns: '1fr 1fr 1fr', 
           gap: `${CARD_PX.statsGap}px`,
+          marginTop: 'auto',
         }}
       >
         <StatItem value={tournament.entryFee} label="Entry" />

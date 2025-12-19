@@ -14,41 +14,57 @@
  */
 
 import { getWeekScores, getCurrentWeek } from '../../../lib/sportsdataio';
+import { 
+  withErrorHandling, 
+  validateMethod, 
+  requireEnvVar,
+  createSuccessResponse,
+} from '../../../lib/apiErrorHandler';
 
 export default async function handler(req, res) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    // Validate HTTP method
+    validateMethod(req, ['GET'], logger);
 
-  const apiKey = process.env.SPORTSDATAIO_API_KEY;
-  if (!apiKey) {
-    return res.status(500).json({ error: 'API key not configured' });
-  }
+    // Check required environment variables
+    const apiKey = requireEnvVar('SPORTSDATAIO_API_KEY', logger);
 
-  try {
     const { season, week, status, team, refresh } = req.query;
     const forceRefresh = refresh === 'true';
+    
+    logger.info('Fetching scores', {
+      season: season || 'default',
+      week: week || 'default',
+      status,
+      team,
+      refresh: forceRefresh,
+    });
     
     // Get current week if not specified
     let seasonYear = parseInt(season);
     let weekNum = parseInt(week);
     
     if (!seasonYear || !weekNum) {
+      logger.debug('Week/season not provided, fetching current week');
       const current = await getCurrentWeek(apiKey);
       if (current) {
         seasonYear = seasonYear || current.season;
         weekNum = weekNum || current.week;
+        logger.debug('Using current week from API', { season: seasonYear, week: weekNum });
       } else {
         seasonYear = seasonYear || new Date().getFullYear();
         weekNum = weekNum || 1;
+        logger.warn('Could not get current week, using defaults', { season: seasonYear, week: weekNum });
       }
     }
     
     let scores = await getWeekScores(apiKey, seasonYear, weekNum, forceRefresh);
+    logger.debug('Scores fetched', { count: scores.length });
     
     // Filter by status
     if (status) {
       const statusLower = status.toLowerCase();
+      const beforeCount = scores.length;
       if (statusLower === 'live') {
         scores = scores.filter(g => g.isLive);
       } else if (statusLower === 'final') {
@@ -56,14 +72,25 @@ export default async function handler(req, res) {
       } else if (statusLower === 'scheduled') {
         scores = scores.filter(g => g.isScheduled);
       }
+      logger.debug('Filtered by status', { 
+        status: statusLower, 
+        before: beforeCount, 
+        after: scores.length 
+      });
     }
     
     // Filter by team
     if (team) {
       const teamUpper = team.toUpperCase();
+      const beforeCount = scores.length;
       scores = scores.filter(g => 
         g.homeTeam === teamUpper || g.awayTeam === teamUpper
       );
+      logger.debug('Filtered by team', { 
+        team: teamUpper, 
+        before: beforeCount, 
+        after: scores.length 
+      });
     }
     
     // Sort: live games first, then by date
@@ -78,8 +105,7 @@ export default async function handler(req, res) {
     const finalCount = scores.filter(g => g.isFinal).length;
     const scheduledCount = scores.filter(g => g.isScheduled).length;
     
-    return res.status(200).json({
-      ok: true,
+    const response = createSuccessResponse({
       season: seasonYear,
       week: weekNum,
       summary: {
@@ -89,10 +115,9 @@ export default async function handler(req, res) {
         scheduled: scheduledCount,
       },
       data: scores,
-    });
-  } catch (err) {
-    console.error('Scores API error:', err);
-    return res.status(500).json({ error: err.message });
-  }
+    }, 200, logger);
+    
+    return res.status(response.statusCode).json(response.body);
+  });
 }
 

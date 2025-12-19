@@ -321,7 +321,6 @@ export default function DraftRoomVX2({
   
   // Leave confirmation modal state
   const [showLeaveModal, setShowLeaveModal] = useState(false);
-  const shouldLeaveRef = useRef(false);
   
   // Info and tutorial modal state
   const [showInfoModal, setShowInfoModal] = useState(false);
@@ -329,14 +328,6 @@ export default function DraftRoomVX2({
   
   // Track if we've already auto-shown tutorial for this draft session
   const hasAutoShownTutorial = useRef(false);
-  
-  // Trigger navigation after modal closes
-  useEffect(() => {
-    if (!showLeaveModal && shouldLeaveRef.current && onLeave) {
-      shouldLeaveRef.current = false;
-      onLeave();
-    }
-  }, [showLeaveModal, onLeave]);
   
   // Auto-show tutorial when draft becomes active (first time only per draft)
   useEffect(() => {
@@ -374,16 +365,21 @@ export default function DraftRoomVX2({
   
   // Confirm leaving
   const handleLeaveConfirm = useCallback(() => {
+    console.log('[DraftRoomVX2] Leave confirmed, cleaning up...');
     // Call leave draft cleanup
     draftRoom.leaveDraft();
-    // Close modal first
+    // Close modal
     setShowLeaveModal(false);
-    // Then trigger navigation
+    // Trigger navigation immediately
     if (onLeave) {
-      // Small delay to ensure modal closes smoothly
-      setTimeout(() => {
+      console.log('[DraftRoomVX2] Calling onLeave callback...');
+      try {
         onLeave();
-      }, 100);
+      } catch (error) {
+        console.error('[DraftRoomVX2] Error in onLeave callback:', error);
+      }
+    } else {
+      console.warn('[DraftRoomVX2] onLeave callback not provided!');
     }
   }, [draftRoom, onLeave]);
   

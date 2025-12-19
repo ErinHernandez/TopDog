@@ -52,3 +52,4 @@ export function useIsMobileDevice() {
 
 export default useIsMobileDevice;
 
+

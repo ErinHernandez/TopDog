@@ -116,3 +116,4 @@ export function getElapsedTime(remaining: number, total: number): number {
   return Math.max(0, total - remaining);
 }
 
+

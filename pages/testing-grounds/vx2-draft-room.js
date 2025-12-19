@@ -59,8 +59,11 @@ export default function VX2DraftRoomPage() {
     // Set flag so app knows to open live-drafts tab
     sessionStorage.setItem('topdog_came_from_draft', 'true');
     // Navigate to app (will read flag and go to live-drafts)
-    router.push('/testing-grounds/vx2-mobile-app-demo');
-  }, [router]);
+    const targetPath = '/testing-grounds/vx2-mobile-app-demo';
+    console.log('[VX2DraftRoomPage] handleLeaveDraft called, navigating to:', targetPath);
+    // Use window.location for more reliable navigation
+    window.location.href = targetPath;
+  }, []);
   
   // Desktop: just store tools for manual control
   const handleDevToolsReady = useCallback((tools) => {

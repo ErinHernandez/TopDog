@@ -195,3 +195,4 @@ If you encounter issues:
 3. Check missing players report: `public/players/missing-players.json`
 4. Verify image files exist in `public/players/` directory
 
+
