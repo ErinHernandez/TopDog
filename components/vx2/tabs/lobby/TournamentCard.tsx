@@ -29,8 +29,8 @@ const CARD_PX = {
   titleFontSize: TYPOGRAPHY.fontSize.xl,
   titleMarginBottom: SPACING.xl,
   
-  // Logo - reduced by 20px to help reduce overall height
-  logoSize: 233,
+  // Logo - base size with 10% increase
+  logoSize: 254, // 231px * 1.1 = 254px (10% increase)
   logoMarginBottom: SPACING.xl,
   
   // Progress
@@ -41,7 +41,7 @@ const CARD_PX = {
   // Button
   buttonHeight: 57,
   buttonFontSize: TYPOGRAPHY.fontSize.sm,
-  buttonMarginBottom: SPACING.xl,
+  buttonMarginBottom: SPACING.md, // Reduced from SPACING.xl
   
   // Stats
   statsGap: SPACING.xl,
@@ -138,10 +138,11 @@ export function TournamentCard({
         padding: `${CARD_PX.padding}px`,
         display: 'flex',
         flexDirection: 'column',
-        height: '100%',
+        width: '100%',
+        height: '100%', // Fill parent height (constrained by container padding)
         maxHeight: '100%',
         minHeight: 0,
-        overflow: 'hidden',
+        boxSizing: 'border-box',
       }}
       role="article"
       aria-label={`${tournament.title} tournament`}
@@ -179,8 +180,8 @@ export function TournamentCard({
             alt=""
             aria-hidden="true"
             style={{ 
-              width: 'min(233px, 55vw, 30vh)',
-              height: 'min(233px, 55vw, 30vh)',
+              width: 'min(254px, 59.9vw, 32.7vh)', // Increased by 10%
+              height: 'min(254px, 59.9vw, 32.7vh)', // Increased by 10%
               maxWidth: '100%',
               objectFit: 'contain',
               borderRadius: `${RADIUS.lg}px`,
@@ -239,7 +240,7 @@ export function TournamentCard({
           display: 'grid', 
           gridTemplateColumns: '1fr 1fr 1fr', 
           gap: `${CARD_PX.statsGap}px`,
-          marginTop: 'auto',
+          marginTop: `${SPACING.lg}px`,
         }}
       >
         <StatItem value={tournament.entryFee} label="Entry" />

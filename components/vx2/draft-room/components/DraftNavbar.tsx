@@ -316,8 +316,8 @@ export default function DraftNavbar({
         right: 0,
         zIndex: 50,
         flexShrink: 0,
-        // Extend background behind status bar using safe area inset
-        paddingTop: 'env(safe-area-inset-top, 0px)',
+        // Extend background behind status bar using safe area inset (reduced for tighter spacing)
+        paddingTop: 'max(0px, calc(env(safe-area-inset-top, 0px) - 20px))',
       }}
     >
       {/* Navbar content - fixed height below safe area */}

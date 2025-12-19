@@ -8,7 +8,7 @@
 
 import React, { useState, useRef } from 'react';
 import { POSITION_COLORS } from '../../../constants/colors';
-import { getPlayerPhotoUrl, getPlayerId } from '../../../../lib/playerPhotos';
+import { getPlayerPhotoUrl, getPlayerId } from '../../../../../lib/playerPhotos';
 
 // ============================================================================
 // PIXEL-PERFECT CONSTANTS

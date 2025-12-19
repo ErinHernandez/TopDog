@@ -3,7 +3,7 @@
  * Demonstrates SportsDataIO headshots integration
  */
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useHeadshots } from '../../lib/swr/usePlayerSWR';
 
 export default function HeadshotsTest() {

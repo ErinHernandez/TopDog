@@ -26,7 +26,7 @@ const TUTORIAL_SHOWN_PREFIX = 'topdog_tutorial_shown_';
 
 // Hooks
 import { useDraftRoom } from '../hooks/useDraftRoom';
-import { useHeadshots } from '../../../lib/swr/usePlayerSWR';
+import { useHeadshots } from '../../../../lib/swr/usePlayerSWR';
 
 // Components
 import DraftNavbar from './DraftNavbar';

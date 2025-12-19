@@ -321,9 +321,6 @@ export default function LobbyTabVX2({
   const featuredTournament = tournaments.find(t => t.isFeatured) || tournaments[0];
   
   // Calculate available height: 100vh minus header (60px) and footer (80px) and padding
-  // Using CSS calc for viewport-based sizing
-  const containerPadding = LOBBY_PX.containerPaddingY * 2; // Top and bottom padding
-  
   return (
     <div 
       className="flex-1 relative"
@@ -342,11 +339,13 @@ export default function LobbyTabVX2({
       aria-label="Tournament lobby"
     >
       {/* Featured Tournament Card - centered with responsive sizing */}
+      {/* Height is constrained by container padding (top/bottom), similar to width */}
       <div
         className="w-full max-w-sm"
         style={{
-          maxHeight: `calc(100vh - 60px - 80px - ${containerPadding}px)`,
           maxWidth: '100%',
+          width: '100%',
+          height: '100%', // Fill available height (container height minus padding)
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
@@ -359,7 +358,7 @@ export default function LobbyTabVX2({
           tournament={featuredTournament}
           onJoinClick={() => handleJoinClick(featuredTournament.id)}
           featured={true}
-          className="w-full"
+          className="w-full h-full"
         />
       </div>
 

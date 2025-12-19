@@ -57,36 +57,44 @@ interface LeaveButtonNewProps {
  */
 function LeaveButtonNew({ onClick }: LeaveButtonNewProps): React.ReactElement {
   const buttonRef = React.useRef<HTMLButtonElement>(null);
-  const [isNavigating, setIsNavigating] = React.useState(false);
+  const isNavigatingRef = React.useRef(false);
   
   const handleClick = React.useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
-    // Stop all event propagation
+    // Stop all event propagation immediately
     event.preventDefault();
     event.stopPropagation();
+    if (event.nativeEvent) {
+      event.nativeEvent.stopImmediatePropagation();
+    }
     
-    // Prevent double-clicks
-    if (isNavigating) {
+    // Prevent double-clicks using ref (doesn't cause re-render)
+    if (isNavigatingRef.current) {
+      console.log('[LeaveButtonNew] Already navigating, ignoring click');
       return;
     }
     
-    setIsNavigating(true);
-    console.log('[LeaveButtonNew] Click handler executing');
+    isNavigatingRef.current = true;
+    console.log('[LeaveButtonNew] Click handler executing, button ref:', buttonRef.current);
     
-    // Execute navigation handler
-    try {
-      onClick();
-    } catch (error) {
-      console.error('[LeaveButtonNew] Error in onClick handler:', error);
-      setIsNavigating(false);
-    }
-  }, [onClick, isNavigating]);
+    // Execute navigation handler immediately - don't wrap in try/catch to let errors bubble
+    onClick();
+  }, [onClick]);
   
   return (
     <button
       ref={buttonRef}
       type="button"
       onClick={handleClick}
-      disabled={isNavigating}
+      onMouseDown={(e) => {
+        // Don't prevent default on mousedown - let click event fire
+        e.stopPropagation();
+      }}
+      onTouchStart={(e) => {
+        e.stopPropagation();
+      }}
+      onTouchEnd={(e) => {
+        e.stopPropagation();
+      }}
       style={{
         width: '100%',
         height: 52,
@@ -96,15 +104,17 @@ function LeaveButtonNew({ onClick }: LeaveButtonNewProps): React.ReactElement {
         color: MODAL_COLORS.primaryButtonText,
         fontSize: 16,
         fontWeight: 600,
-        cursor: isNavigating ? 'wait' : 'pointer',
+        cursor: 'pointer',
         pointerEvents: 'auto',
         position: 'relative',
         zIndex: 10000,
         WebkitTapHighlightColor: 'transparent',
         userSelect: 'none',
-        opacity: isNavigating ? 0.7 : 1,
-        transition: 'opacity 0.2s',
+        WebkitUserSelect: 'none',
+        touchAction: 'manipulation',
+        isolation: 'isolate', // Create new stacking context
       }}
+      aria-label="Leave draft room"
     >
       Yes, Leave Draft Room
     </button>
@@ -121,6 +131,33 @@ export default function LeaveConfirmModal({
   onCancel,
 }: LeaveConfirmModalProps): React.ReactElement | null {
   const stayButtonRef = useRef<HTMLButtonElement>(null);
+  
+  // Direct navigation handler - memoized to prevent recreation
+  const handleLeaveNavigation = React.useCallback(() => {
+    // Direct navigation handler - completely new logic
+    const targetPath = '/testing-grounds/vx2-mobile-app-demo';
+    console.log('[LeaveConfirmModal] handleLeaveNavigation called, navigating to:', targetPath);
+    
+    // Also call the onConfirm callback if provided (for cleanup)
+    if (onConfirm) {
+      try {
+        onConfirm();
+      } catch (e) {
+        console.warn('[LeaveConfirmModal] Error in onConfirm:', e);
+      }
+    }
+    
+    // Set session flag before navigation
+    try {
+      sessionStorage.setItem('topdog_came_from_draft', 'true');
+    } catch (e) {
+      console.warn('[LeaveConfirmModal] Could not set session flag:', e);
+    }
+    
+    // Direct navigation - use window.location.assign for better reliability
+    console.log('[LeaveConfirmModal] About to navigate...');
+    window.location.assign(targetPath);
+  }, [onConfirm]);
   
   // Focus stay button when modal opens
   useEffect(() => {
@@ -267,21 +304,7 @@ export default function LeaveConfirmModal({
         >
           {/* Primary: Leave Button - NEW IMPLEMENTATION */}
           <LeaveButtonNew 
-            onClick={() => {
-              // Direct navigation handler - completely new logic
-              const targetPath = '/testing-grounds/vx2-mobile-app-demo';
-              console.log('[LeaveButtonNew] Button clicked, navigating to:', targetPath);
-              
-              // Set session flag before navigation
-              try {
-                sessionStorage.setItem('topdog_came_from_draft', 'true');
-              } catch (e) {
-                console.warn('[LeaveButtonNew] Could not set session flag:', e);
-              }
-              
-              // Direct navigation - no callbacks, no chains
-              window.location.href = targetPath;
-            }}
+            onClick={handleLeaveNavigation}
           />
           
           {/* Secondary: Stay Button */}

@@ -5,7 +5,7 @@
  * Used by AppShellVX2 when showPhoneFrame is true.
  */
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { PHONE_FRAME } from '../core/constants';
 import iPhoneStatusBar from './iPhoneStatusBar';
 
@@ -34,21 +34,6 @@ export default function MobilePhoneFrame({
   height = PHONE_FRAME.height,
   className = '',
 }: MobilePhoneFrameProps): React.ReactElement {
-  // Default to false (show status bar) unless we detect a mobile device
-  const [isMobileDevice, setIsMobileDevice] = useState(() => {
-    // Initial state - check if we're on a mobile device
-    if (typeof window === 'undefined') return false;
-    
-    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-    const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
-    const isIPadOS = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
-    const isAndroid = /android/i.test(userAgent);
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
-                        window.navigator.standalone === true;
-    
-    return isIOS || isIPadOS || isAndroid || isStandalone;
-  });
-
   return (
     <div 
       className={`bg-gray-900 min-h-screen flex items-center justify-center p-4 ${className}`}
@@ -72,8 +57,8 @@ export default function MobilePhoneFrame({
             borderRadius: `${PHONE_FRAME.borderRadius}px`,
           }}
         >
-          {/* Native iPhone Status Bar - only show on desktop browsers */}
-          {!isMobileDevice && <iPhoneStatusBar />}
+          {/* Native iPhone Status Bar - always show in phone frame (desktop preview) */}
+          <iPhoneStatusBar />
           {children}
         </div>
         

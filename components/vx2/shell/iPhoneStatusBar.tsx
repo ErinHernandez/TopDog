@@ -8,7 +8,7 @@
  * - Battery icon with percentage
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 // ============================================================================
 // TYPES
@@ -51,7 +51,27 @@ export default function iPhoneStatusBar({
     const minutes = now.getMinutes();
     return `${hours}:${minutes.toString().padStart(2, '0')}`;
   };
-  const displayTime = time || getCurrentTime();
+  
+  // Use provided time or manage state for auto-updating time
+  const [displayTime, setDisplayTime] = useState(time || getCurrentTime());
+  
+  // Update time every minute if time prop is not provided
+  useEffect(() => {
+    if (time) {
+      setDisplayTime(time);
+      return;
+    }
+    
+    // Update immediately
+    setDisplayTime(getCurrentTime());
+    
+    // Update every minute
+    const interval = setInterval(() => {
+      setDisplayTime(getCurrentTime());
+    }, 60000); // 60 seconds
+    
+    return () => clearInterval(interval);
+  }, [time]);
 
   // Ensure battery is between 0-100
   const batteryLevel = Math.max(0, Math.min(100, battery));
@@ -71,14 +91,18 @@ export default function iPhoneStatusBar({
 
   return (
     <div
-      className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 text-white text-sm font-medium"
+      className="flex items-center justify-between px-4 text-white text-sm font-medium"
       style={{
         height: `${STATUS_BAR_HEIGHT}px`,
         ...statusBarStyle,
         paddingTop: 'env(safe-area-inset-top, 0px)',
         paddingLeft: 'max(16px, env(safe-area-inset-left, 0px))',
         paddingRight: 'max(16px, env(safe-area-inset-right, 0px))',
-        zIndex: 1000,
+        zIndex: 9999, // Ensure it's above everything including header
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
       }}
       role="status"
       aria-label="Status bar"
@@ -89,6 +113,7 @@ export default function iPhoneStatusBar({
           fontSize: '15px',
           fontWeight: 600,
           letterSpacing: '-0.5px',
+          color: '#FFFFFF', // Explicit white color
         }}
       >
         {displayTime}
@@ -145,6 +170,7 @@ export default function iPhoneStatusBar({
               fontSize: '14px',
               fontWeight: 600,
               letterSpacing: '-0.3px',
+              color: '#FFFFFF', // Explicit white color
             }}
           >
             {batteryLevel}

@@ -186,8 +186,8 @@ interface UsePlayerDataCombinedReturn {
 // ============================================================================
 
 /**
- * Generate player headshot URLs directly from player pool
- * No API call needed - images are served as static files from /players/ directory
+ * Generate player headshot URLs from SportsDataIO (actual headshots, not placeholders)
+ * Falls back to player pool photoUrl if SportsDataIO headshot not available
  * Uses immutable SWR - headshots are taken before the season and never change
  */
 export function useHeadshots(options: HeadshotsOptions = {}): UseHeadshotsReturn {
@@ -198,13 +198,19 @@ export function useHeadshots(options: HeadshotsOptions = {}): UseHeadshotsReturn
     ? `headshots:${position || 'all'}:${team || 'all'}`
     : null;
   
-  // Fetch player pool and generate headshot URLs
+  // Fetch SportsDataIO headshots (actual headshot URLs)
+  const { data: sportsDataIOHeadshots, error: sportsDataIOError, isLoading: sportsDataIOLoading } = useSWRImmutable(
+    enabled ? '/api/nfl/headshots-sportsdataio' : null,
+    fetcher
+  );
+  
+  // Fetch player pool for player list and fallback URLs
   const { data: playerPoolData, error: poolError, isLoading: poolLoading } = useSWRImmutable(
     enabled ? '/data/player-pool-2025.json' : null,
     fetcher
   );
   
-  // Generate headshots from player pool data
+  // Generate headshots from player pool data, using SportsDataIO URLs when available
   // Handle both array format (legacy) and {players: []} format
   const headshots: PlayerWithHeadshot[] = useMemo(() => {
     if (!enabled) return [];
@@ -229,19 +235,39 @@ export function useHeadshots(options: HeadshotsOptions = {}): UseHeadshotsReturn
       players = players.filter(p => p.team?.toUpperCase() === team.toUpperCase());
     }
     
-    // Generate headshot URLs directly using getPlayerId helper
+    // Get SportsDataIO headshots map (actual headshot URLs)
+    const sportsDataIOHeadshotsMap = sportsDataIOHeadshots?.headshotsMap || {};
+    
+    // Generate headshot URLs - prioritize SportsDataIO, fallback to player pool photoUrl
     return players.map(player => {
-      const playerId = player.name ? getPlayerId(player.name) : null;
+      // Use player.id from pool (matches actual file names in /players/ directory)
+      const playerId = player.id || (player.name ? getPlayerId(player.name) : null);
+      
+      // Priority 1: SportsDataIO headshot (actual headshot, not placeholder)
+      // Priority 2: Player pool photoUrl (may be placeholder, but better than nothing)
+      // Priority 3: Generated local URL (will likely be placeholder)
+      let headshotUrl = null;
+      
+      if (sportsDataIOHeadshotsMap[player.name]) {
+        // Use SportsDataIO headshot (actual photo)
+        headshotUrl = sportsDataIOHeadshotsMap[player.name];
+      } else if (player.photoUrl && !player.photoUrl.startsWith('/players/')) {
+        // Use player pool photoUrl if it's not a local placeholder
+        headshotUrl = player.photoUrl;
+      } else if (playerId) {
+        // Fallback to local file (likely placeholder, but try anyway)
+        headshotUrl = `/players/${playerId}.webp`;
+      }
       
       return {
-        playerId: player.id || playerId || '',
+        playerId: playerId || '',
         name: player.name || '',
         team: player.team || '',
         position: player.position || '',
-        headshotUrl: playerId ? `/players/${playerId}.webp` : null,
+        headshotUrl: headshotUrl,
       };
-    }).filter(p => p.name && p.headshotUrl); // Only include players with valid data
-  }, [playerPoolData, position, team, enabled]);
+    }); // Include all players - headshotUrl will be generated for all
+  }, [playerPoolData, sportsDataIOHeadshots, position, team, enabled]);
   
   // Create lookup map by player name
   const headshotsMap: Record<string, string> = useMemo(() => {
@@ -257,9 +283,9 @@ export function useHeadshots(options: HeadshotsOptions = {}): UseHeadshotsReturn
   return {
     headshots,
     headshotsMap,
-    isLoading: poolLoading,
+    isLoading: sportsDataIOLoading || poolLoading,
     isValidating: false, // Static data, never revalidates
-    error: poolError,
+    error: sportsDataIOError || poolError,
     mutate: () => {}, // No-op since data is static
   };
 }

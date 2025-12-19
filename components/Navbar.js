@@ -108,7 +108,9 @@ export default function Navbar() {
           transition: draftAnimation.shouldEngorge ? 'none' : (hasStartedPulsing ? 'transform 0.5s ease-in-out' : 'none'),
           position: 'relative',
           minWidth: '100vw',
-          overflow: 'visible'
+          overflow: 'visible',
+          // Extend background behind status bar using safe area inset (reduced for tighter spacing)
+          paddingTop: 'max(0px, calc(env(safe-area-inset-top, 0px) - 20px))',
         }}
       >
         <nav className="shadow-lg text-black zoom-resistant" style={{ background: 'url(/wr_blue.png) no-repeat center center', backgroundSize: 'cover', width: '100vw', marginLeft: '0', transform: 'translateZ(0)', position: 'relative', minWidth: '100vw', overflow: 'visible' }}>
