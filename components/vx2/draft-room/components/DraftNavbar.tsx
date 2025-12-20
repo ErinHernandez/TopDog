@@ -57,17 +57,17 @@ if (typeof document !== 'undefined') {
 
 const NAVBAR_PX = {
   // Container
-  height: 48,
+  height: 26, // Compact for unified header
   paddingX: 16,
   
   // Timer
-  timerFontSize: 26,
+  timerFontSize: 32, // Larger for centered display
   timerFontWeight: 700,
   
   // Buttons
-  buttonSize: 40,
-  iconSize: 24,
-  iconStrokeWidth: 2.5,
+  buttonSize: 26,
+  iconSize: 18,
+  iconStrokeWidth: 2,
 } as const;
 
 /** Grace period duration in ms - time after timer hits 0 when user can still pick */
@@ -98,13 +98,15 @@ export interface DraftNavbarProps {
   onGracePeriodEnd?: () => void;
   /** Callback when info button is pressed */
   onInfo?: () => void;
+  /** Hide the timer (when it's rendered externally centered across both bars) */
+  hideTimer?: boolean;
 }
 
 // ============================================================================
 // SUB-COMPONENTS
 // ============================================================================
 
-// Back button - white chevron
+// Back button - white chevron (OLD - keeping for reference but not using)
 function BackButton({ onClick }: { onClick: () => void }): React.ReactElement {
   return (
     <button
@@ -131,6 +133,95 @@ function BackButton({ onClick }: { onClick: () => void }): React.ReactElement {
         height={NAVBAR_PX.iconSize}
         viewBox="0 0 24 24"
         fill="none"
+      >
+        <path
+          d="M15 19L8 12L15 5"
+          stroke={NAVBAR_COLORS.text}
+          strokeWidth={NAVBAR_PX.iconStrokeWidth}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </button>
+  );
+}
+
+// NEW Exit Draft Room Button - Fresh implementation with direct navigation
+function ExitDraftButton({ onLeaveCallback }: { onLeaveCallback?: () => void }): React.ReactElement {
+  const handleExitClick = React.useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+    // Prevent any default behavior
+    event.preventDefault();
+    event.stopPropagation();
+    
+    console.log('[ExitDraftButton] Button clicked - initiating exit');
+    
+    // Set session flag for app navigation
+    try {
+      sessionStorage.setItem('topdog_came_from_draft', 'true');
+      console.log('[ExitDraftButton] Session flag set');
+    } catch (e) {
+      console.warn('[ExitDraftButton] Could not set session flag:', e);
+    }
+    
+    // Call the callback if provided
+    if (onLeaveCallback) {
+      try {
+        console.log('[ExitDraftButton] Calling onLeave callback');
+        onLeaveCallback();
+      } catch (error) {
+        console.error('[ExitDraftButton] Error in callback:', error);
+      }
+    }
+    
+    // Direct navigation - use window.location for reliability
+    const targetPath = '/testing-grounds/vx2-mobile-app-demo';
+    console.log('[ExitDraftButton] Navigating to:', targetPath);
+    
+    // Use requestAnimationFrame to ensure UI updates before navigation
+    requestAnimationFrame(() => {
+      window.location.href = targetPath;
+    });
+  }, [onLeaveCallback]);
+  
+  return (
+    <button
+      type="button"
+      onClick={handleExitClick}
+      aria-label="Leave draft room"
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: NAVBAR_PX.buttonSize,
+        height: NAVBAR_PX.buttonSize,
+        borderRadius: NAVBAR_PX.buttonSize / 2,
+        background: 'transparent',
+        border: 'none',
+        cursor: 'pointer',
+        WebkitTapHighlightColor: 'transparent',
+        transition: 'background-color 0.2s',
+        position: 'relative',
+        zIndex: 100,
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.backgroundColor = 'transparent';
+      }}
+      onTouchStart={(e) => {
+        e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)';
+      }}
+      onTouchEnd={(e) => {
+        e.currentTarget.style.backgroundColor = 'transparent';
+      }}
+    >
+      <svg
+        width={NAVBAR_PX.iconSize}
+        height={NAVBAR_PX.iconSize}
+        viewBox="0 0 24 24"
+        fill="none"
+        style={{ pointerEvents: 'none' }}
       >
         <path
           d="M15 19L8 12L15 5"
@@ -249,6 +340,7 @@ export default function DraftNavbar({
   isUserTurn = false,
   onGracePeriodEnd,
   onInfo,
+  hideTimer = false,
 }: DraftNavbarProps): React.ReactElement {
   // Track pulse animation - triggers at 3, 2, 1, 0 for user's turn only
   const [pulseKey, setPulseKey] = useState(0);
@@ -303,6 +395,36 @@ export default function DraftNavbar({
 
   const backgroundStyle = getBackgroundStyle();
 
+  // Position style - when inside a container, use relative; otherwise absolute/fixed
+  const getPositionStyle = () => {
+    if (useAbsolutePosition === true) {
+      return {
+        position: 'absolute' as const,
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 50,
+        // Extend background behind status bar using safe area inset
+        paddingTop: 'max(0px, calc(env(safe-area-inset-top, 0px) - 20px))',
+      };
+    }
+    if (useAbsolutePosition === false) {
+      // No positioning - used when navbar is inside a flex container
+      return {
+        flexShrink: 0,
+      };
+    }
+    // Default: fixed position
+    return {
+      position: 'fixed' as const,
+      top: 0,
+      left: 0,
+      right: 0,
+      zIndex: 50,
+      paddingTop: 'max(0px, calc(env(safe-area-inset-top, 0px) - 20px))',
+    };
+  };
+
   return (
     <header
       key={shakeKey}
@@ -310,14 +432,7 @@ export default function DraftNavbar({
         display: 'flex',
         flexDirection: 'column',
         ...backgroundStyle,
-        position: useAbsolutePosition ? 'absolute' : 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 50,
-        flexShrink: 0,
-        // Extend background behind status bar using safe area inset (reduced for tighter spacing)
-        paddingTop: 'max(0px, calc(env(safe-area-inset-top, 0px) - 20px))',
+        ...getPositionStyle(),
       }}
     >
       {/* Navbar content - fixed height below safe area */}
@@ -332,28 +447,31 @@ export default function DraftNavbar({
           animation: shouldShake ? 'navbar-shake 0.6s ease-in-out' : 'none',
         }}
       >
-        {/* Left: Back button */}
-        <div style={{ width: NAVBAR_PX.buttonSize }}>
-          <BackButton onClick={onLeave} />
-        </div>
+        {/* Left: Spacer (Exit button removed - will be added elsewhere) */}
+        <div style={{ width: NAVBAR_PX.buttonSize }} />
         
-        {/* Center: Countdown Timer */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flex: 1,
-            height: '100%',
-          }}
-        >
-          <TimerDisplay 
-            seconds={timerSeconds} 
-            isUserTurn={isUserTurn} 
-            pulseKey={pulseKey}
-            shouldPulse={shouldPulse}
-          />
-        </div>
+        {/* Center: Countdown Timer (hidden when rendered externally) */}
+        {!hideTimer && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flex: 1,
+              height: '100%',
+            }}
+          >
+            <TimerDisplay 
+              seconds={timerSeconds} 
+              isUserTurn={isUserTurn} 
+              pulseKey={pulseKey}
+              shouldPulse={shouldPulse}
+            />
+          </div>
+        )}
+        
+        {/* Center spacer when timer hidden */}
+        {hideTimer && <div style={{ flex: 1 }} />}
         
         {/* Right: Spacer for layout balance */}
         <div style={{ width: NAVBAR_PX.buttonSize }} />

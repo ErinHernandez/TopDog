@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { PHONE_FRAME } from '../core/constants';
-import iPhoneStatusBar from './iPhoneStatusBar';
+import IPhoneStatusBar from './iPhoneStatusBar';
 
 // ============================================================================
 // TYPES
@@ -22,17 +22,23 @@ export interface MobilePhoneFrameProps {
   height?: number;
   /** Additional className for outer container */
   className?: string;
+  /** Optional header overlay content (spans full header including status bar) */
+  headerOverlay?: React.ReactNode;
 }
 
 // ============================================================================
 // MAIN COMPONENT
 // ============================================================================
 
+// Combined header height (status bar 28px + header 26px)
+const COMBINED_HEADER_HEIGHT = 54;
+
 export default function MobilePhoneFrame({
   children,
   width = PHONE_FRAME.width,
   height = PHONE_FRAME.height,
   className = '',
+  headerOverlay,
 }: MobilePhoneFrameProps): React.ReactElement {
   return (
     <div 
@@ -58,8 +64,39 @@ export default function MobilePhoneFrame({
           }}
         >
           {/* Native iPhone Status Bar - always show in phone frame (desktop preview) */}
-          <iPhoneStatusBar />
-          {children}
+          <IPhoneStatusBar />
+          {/* Content wrapper - pushed down to account for status bar */}
+          <div 
+            style={{ 
+              position: 'absolute',
+              top: '28px', // STATUS_BAR_HEIGHT (compact)
+              left: 0,
+              right: 0,
+              bottom: 0,
+              overflow: 'hidden',
+            }}
+          >
+            {children}
+          </div>
+          {/* Header overlay - spans full header area (status bar + header) */}
+          {headerOverlay && (
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: `${COMBINED_HEADER_HEIGHT}px`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                pointerEvents: 'none',
+                zIndex: 10000, // Above status bar (9999)
+              }}
+            >
+              {headerOverlay}
+            </div>
+          )}
         </div>
         
         {/* Notch (cosmetic) */}

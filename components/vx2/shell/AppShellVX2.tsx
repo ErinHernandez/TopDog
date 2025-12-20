@@ -25,6 +25,8 @@ import {
   RankingsModalVX2 
 } from '../modals';
 
+const LOGO_HEIGHT = 32;
+
 // ============================================================================
 // MODAL CONTEXT
 // ============================================================================
@@ -86,10 +88,11 @@ function InnerShell({ badgeOverrides }: InnerShellProps): React.ReactElement {
         className="h-full flex flex-col relative"
         style={{ backgroundColor: BG_COLORS.primary }}
       >
-        {/* App Header - No back button or deposit button in main app */}
+        {/* App Header - No back button, deposit button, or logo (logo rendered as overlay in MobilePhoneFrame) */}
         <AppHeaderVX2
           showBackButton={false}
           showDeposit={false}
+          hideLogo={true}
         />
         
         {/* Tab Content Area */}
@@ -124,14 +127,64 @@ function InnerShell({ badgeOverrides }: InnerShellProps): React.ReactElement {
 // MAIN COMPONENT
 // ============================================================================
 
+// Logo overlay component for header
+function LogoOverlay(): React.ReactElement {
+  const { navigateToTab } = useTabNavigation();
+  
+  const handleLogoClick = () => {
+    navigateToTab('lobby');
+  };
+  
+  return (
+    <button
+      onClick={handleLogoClick}
+      style={{
+        pointerEvents: 'auto',
+        background: 'none',
+        border: 'none',
+        padding: 0,
+        cursor: 'pointer',
+      }}
+      aria-label="Go to Lobby"
+    >
+      <img
+        src="/logo.png"
+        alt="TopDog"
+        style={{
+          height: `${LOGO_HEIGHT}px`,
+          width: 'auto',
+          display: 'block',
+          objectFit: 'contain',
+        }}
+      />
+    </button>
+  );
+}
+
 export default function AppShellVX2({
   initialTab = 'lobby',
   showPhoneFrame = true,
   badgeOverrides,
   onTabChange,
 }: AppShellVX2Props): React.ReactElement {
-  // Wrap shell in navigation provider
-  const shell = (
+  // Optionally wrap in phone frame for desktop preview
+  if (showPhoneFrame) {
+    return (
+      <TabNavigationProvider 
+        initialTab={initialTab}
+        onTabChange={onTabChange}
+      >
+        <MobilePhoneFrame
+          headerOverlay={<LogoOverlay />}
+        >
+          <InnerShell badgeOverrides={badgeOverrides} />
+        </MobilePhoneFrame>
+      </TabNavigationProvider>
+    );
+  }
+  
+  // Without phone frame (actual mobile device)
+  return (
     <TabNavigationProvider 
       initialTab={initialTab}
       onTabChange={onTabChange}
@@ -139,16 +192,5 @@ export default function AppShellVX2({
       <InnerShell badgeOverrides={badgeOverrides} />
     </TabNavigationProvider>
   );
-  
-  // Optionally wrap in phone frame for desktop preview
-  if (showPhoneFrame) {
-    return (
-      <MobilePhoneFrame>
-        {shell}
-      </MobilePhoneFrame>
-    );
-  }
-  
-  return shell;
 }
 

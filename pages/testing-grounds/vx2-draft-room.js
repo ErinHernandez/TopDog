@@ -161,6 +161,7 @@ export default function VX2DraftRoomPage() {
               height: '812px',
             }}
           >
+            {/* DraftRoomVX2 renders its own status bar that syncs with navbar background */}
             <DraftRoomVX2
               key={draftKey}
               roomId="test-room-123"

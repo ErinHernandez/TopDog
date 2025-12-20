@@ -8,6 +8,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { DraftNavbar, DraftInfoModal, DraftTutorialModal } from '../../components/vx2/draft-room';
+import IPhoneStatusBar from '../../components/vx2/shell/iPhoneStatusBar';
 
 export default function NavbarSandboxPage() {
   const router = useRouter();
@@ -83,48 +84,62 @@ export default function NavbarSandboxPage() {
               position: 'relative',
             }}
           >
-            {/* Navbar inside phone - uses absolute positioning within frame */}
-            <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-              <DraftNavbar
-                onLeave={handleLeave}
-                useAbsolutePosition={true}
-                timerSeconds={timerSeconds}
-                isUserTurn={isUserTurn}
-                onGracePeriodEnd={handleGracePeriodEnd}
-                onInfo={handleInfo}
-              />
-              {/* Gray area below navbar to show context */}
-              <div 
-                style={{ 
-                  position: 'absolute',
-                  top: 48,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  backgroundColor: '#101927',
-                }}
-              />
-              {/* Info Modal */}
-              <DraftInfoModal
-                isOpen={isInfoModalOpen}
-                onClose={() => setIsInfoModalOpen(false)}
-                onTutorial={handleTutorial}
-                draftInfo={{
-                  format: 'Snake',
-                  teams: 12,
-                  rounds: 18,
-                  pickTime: 30,
-                  scoring: 'Best Ball',
-                }}
-              />
-              
-              {/* Tutorial Modal */}
-              <DraftTutorialModal
-                isOpen={isTutorialOpen}
-                onClose={() => setIsTutorialOpen(false)}
-                onRules={() => console.log('Rules clicked')}
-                format="Snake"
-              />
+            {/* iPhone Status Bar - dev only */}
+            <IPhoneStatusBar />
+            {/* Content wrapper - pushed down to account for status bar */}
+            <div 
+              style={{ 
+                position: 'absolute',
+                top: '28px',
+                left: 0,
+                right: 0,
+                bottom: 0,
+                overflow: 'hidden',
+              }}
+            >
+              {/* Navbar inside phone - uses absolute positioning within frame */}
+              <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                <DraftNavbar
+                  onLeave={handleLeave}
+                  useAbsolutePosition={true}
+                  timerSeconds={timerSeconds}
+                  isUserTurn={isUserTurn}
+                  onGracePeriodEnd={handleGracePeriodEnd}
+                  onInfo={handleInfo}
+                />
+                {/* Gray area below navbar to show context */}
+                <div 
+                  style={{ 
+                    position: 'absolute',
+                    top: 48,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: '#101927',
+                  }}
+                />
+                {/* Info Modal */}
+                <DraftInfoModal
+                  isOpen={isInfoModalOpen}
+                  onClose={() => setIsInfoModalOpen(false)}
+                  onTutorial={handleTutorial}
+                  draftInfo={{
+                    format: 'Snake',
+                    teams: 12,
+                    rounds: 18,
+                    pickTime: 30,
+                    scoring: 'Best Ball',
+                  }}
+                />
+                
+                {/* Tutorial Modal */}
+                <DraftTutorialModal
+                  isOpen={isTutorialOpen}
+                  onClose={() => setIsTutorialOpen(false)}
+                  onRules={() => console.log('Rules clicked')}
+                  format="Snake"
+                />
+              </div>
             </div>
           </div>
         </div>

@@ -8,7 +8,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import iPhoneStatusBar from '../../vx2/shell/iPhoneStatusBar';
+import IPhoneStatusBar from '../../../vx2/shell/iPhoneStatusBar';
 
 // ============================================================================
 // TYPES
@@ -71,8 +71,20 @@ export default function MobilePhoneFrameVX({
           style={{ width: '100%', height: '100%' }}
         >
           {/* Native iPhone Status Bar - only show on desktop browsers */}
-          {!isMobileDevice && <iPhoneStatusBar />}
-          {children}
+          {!isMobileDevice && <IPhoneStatusBar />}
+          {/* Content wrapper - pushed down to account for status bar on desktop */}
+          <div 
+            style={{ 
+              position: 'absolute',
+              top: isMobileDevice ? 0 : '28px',
+              left: 0,
+              right: 0,
+              bottom: 0,
+              overflow: 'hidden',
+            }}
+          >
+            {children}
+          </div>
         </div>
       </div>
     </div>

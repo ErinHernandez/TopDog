@@ -1,31 +1,16 @@
 /**
- * iPhoneStatusBar - Native iPhone Status Bar Component
+ * DraftStatusBar - iPhone status bar that matches DraftNavbar background
  * 
- * Displays native iPhone status bar elements:
- * - Time
- * - Signal strength bars
- * - WiFi icon
- * - Battery icon with percentage
+ * This status bar follows the same background logic as DraftNavbar:
+ * - Not user's turn: Dark background (#1F2937)
+ * - User's turn + timer <= 9s: Red urgent background (#DC2626)
+ * - User's turn + timer > 9s: Blue tiled background
+ * 
+ * This creates a unified navbar appearance in the draft room.
  */
 
 import React, { useState, useEffect } from 'react';
-
-// ============================================================================
-// TYPES
-// ============================================================================
-
-export interface iPhoneStatusBarProps {
-  /** Current time to display (defaults to current time) */
-  time?: string;
-  /** Battery percentage (0-100, defaults to 79) */
-  battery?: number;
-  /** Signal strength bars (0-4, defaults to 4) */
-  signalBars?: number;
-  /** Show WiFi icon (defaults to true) */
-  showWifi?: boolean;
-  /** Background color (should match header) */
-  backgroundColor?: string;
-}
+import { TILED_BG_STYLE } from '../constants';
 
 // ============================================================================
 // CONSTANTS
@@ -34,17 +19,25 @@ export interface iPhoneStatusBarProps {
 const STATUS_BAR_HEIGHT = 28; // Compact status bar for unified header
 
 // ============================================================================
+// TYPES
+// ============================================================================
+
+export interface DraftStatusBarProps {
+  /** Timer seconds remaining */
+  timerSeconds: number;
+  /** Whether it's the current user's turn */
+  isUserTurn: boolean;
+}
+
+// ============================================================================
 // COMPONENT
 // ============================================================================
 
-export default function iPhoneStatusBar({
-  time,
-  battery = 79,
-  signalBars = 4,
-  showWifi = true,
-  backgroundColor,
-}: iPhoneStatusBarProps): React.ReactElement {
-  // Get current time if not provided (format: 7:44)
+export default function DraftStatusBar({
+  timerSeconds,
+  isUserTurn,
+}: DraftStatusBarProps): React.ReactElement {
+  // Get current time (format: 7:44)
   const getCurrentTime = () => {
     const now = new Date();
     const hours = now.getHours();
@@ -52,57 +45,52 @@ export default function iPhoneStatusBar({
     return `${hours}:${minutes.toString().padStart(2, '0')}`;
   };
   
-  // Use provided time or manage state for auto-updating time
-  const [displayTime, setDisplayTime] = useState(time || getCurrentTime());
+  const [displayTime, setDisplayTime] = useState(getCurrentTime());
   
-  // Update time every minute if time prop is not provided
+  // Update time every minute
   useEffect(() => {
-    if (time) {
-      setDisplayTime(time);
-      return;
-    }
-    
-    // Update immediately
     setDisplayTime(getCurrentTime());
-    
-    // Update every minute
     const interval = setInterval(() => {
       setDisplayTime(getCurrentTime());
-    }, 60000); // 60 seconds
-    
+    }, 60000);
     return () => clearInterval(interval);
-  }, [time]);
+  }, []);
 
-  // Ensure battery is between 0-100
-  const batteryLevel = Math.max(0, Math.min(100, battery));
-  const signalLevel = Math.max(0, Math.min(4, signalBars));
+  // Background follows same logic as DraftNavbar
+  const getBackgroundStyle = (): React.CSSProperties => {
+    if (!isUserTurn) {
+      return { backgroundColor: '#1F2937' }; // Dark - not your turn
+    }
+    if (timerSeconds <= 9) {
+      return { backgroundColor: '#DC2626' }; // Red-600 - urgent
+    }
+    return {
+      backgroundImage: TILED_BG_STYLE.backgroundImage,
+      backgroundRepeat: TILED_BG_STYLE.backgroundRepeat,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center center',
+      backgroundColor: TILED_BG_STYLE.backgroundColor,
+    };
+  };
 
-  // Use wr_blue.png background to match header, or provided backgroundColor
-  const statusBarStyle: React.CSSProperties = backgroundColor
-    ? { backgroundColor }
-    : {
-        backgroundImage: 'url(/wr_blue.png)',
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center center',
-        backgroundSize: 'cover',
-        backgroundOrigin: 'border-box',
-        backgroundClip: 'border-box',
-      };
+  const backgroundStyle = getBackgroundStyle();
+
+  // Fixed values for dev preview
+  const batteryLevel = 79;
+  const signalLevel = 4;
 
   return (
     <div
       className="flex items-center justify-between px-4 text-white text-sm font-medium"
       style={{
         height: `${STATUS_BAR_HEIGHT}px`,
-        ...statusBarStyle,
+        ...backgroundStyle,
         paddingTop: 'env(safe-area-inset-top, 0px)',
         paddingLeft: 'max(16px, env(safe-area-inset-left, 0px))',
         paddingRight: 'max(16px, env(safe-area-inset-right, 0px))',
-        zIndex: 9999, // Ensure it's above everything including header
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
+        zIndex: 60, // Above navbar (50) but not crazy high
+        flexShrink: 0,
+        transition: 'background-color 0.15s ease',
       }}
       role="status"
       aria-label="Status bar"
@@ -113,7 +101,7 @@ export default function iPhoneStatusBar({
           fontSize: '15px',
           fontWeight: 600,
           letterSpacing: '-0.5px',
-          color: '#FFFFFF', // Explicit white color
+          color: '#FFFFFF',
         }}
       >
         {displayTime}
@@ -138,30 +126,28 @@ export default function iPhoneStatusBar({
         </div>
 
         {/* WiFi icon */}
-        {showWifi && (
-          <svg
-            width="16"
-            height="12"
-            viewBox="0 0 16 12"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            style={{ marginLeft: '2px' }}
-            aria-hidden="true"
-          >
-            <path
-              d="M8 9C8.55228 9 9 9.44772 9 10C9 10.5523 8.55228 11 8 11C7.44772 11 7 10.5523 7 10C7 9.44772 7.44772 9 8 9Z"
-              fill="#FFFFFF"
-            />
-            <path
-              d="M8 0C5.23858 0 2.73509 1.14688 0.929688 3.04297L2.38086 4.49414C3.79053 3.08447 5.78491 2.25 8 2.25C10.2151 2.25 12.2095 3.08447 13.6191 4.49414L15.0703 3.04297C13.2649 1.14688 10.7614 0 8 0Z"
-              fill="#FFFFFF"
-            />
-            <path
-              d="M8 4.5C6.61929 4.5 5.39453 5.05469 4.56445 5.93164L6.01562 7.38281C6.52148 6.87793 7.2207 6.5 8 6.5C8.7793 6.5 9.47852 6.87793 9.98438 7.38281L11.4355 5.93164C10.6055 5.05469 9.38071 4.5 8 4.5Z"
-              fill="#FFFFFF"
-            />
-          </svg>
-        )}
+        <svg
+          width="16"
+          height="12"
+          viewBox="0 0 16 12"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          style={{ marginLeft: '2px' }}
+          aria-hidden="true"
+        >
+          <path
+            d="M8 9C8.55228 9 9 9.44772 9 10C9 10.5523 8.55228 11 8 11C7.44772 11 7 10.5523 7 10C7 9.44772 7.44772 9 8 9Z"
+            fill="#FFFFFF"
+          />
+          <path
+            d="M8 0C5.23858 0 2.73509 1.14688 0.929688 3.04297L2.38086 4.49414C3.79053 3.08447 5.78491 2.25 8 2.25C10.2151 2.25 12.2095 3.08447 13.6191 4.49414L15.0703 3.04297C13.2649 1.14688 10.7614 0 8 0Z"
+            fill="#FFFFFF"
+          />
+          <path
+            d="M8 4.5C6.61929 4.5 5.39453 5.05469 4.56445 5.93164L6.01562 7.38281C6.52148 6.87793 7.2207 6.5 8 6.5C8.7793 6.5 9.47852 6.87793 9.98438 7.38281L11.4355 5.93164C10.6055 5.05469 9.38071 4.5 8 4.5Z"
+            fill="#FFFFFF"
+          />
+        </svg>
 
         {/* Battery icon */}
         <div className="flex items-center" style={{ marginLeft: '4px', gap: '4px' }}>
@@ -170,7 +156,7 @@ export default function iPhoneStatusBar({
               fontSize: '14px',
               fontWeight: 600,
               letterSpacing: '-0.3px',
-              color: '#FFFFFF', // Explicit white color
+              color: '#FFFFFF',
             }}
           >
             {batteryLevel}

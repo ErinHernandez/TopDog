@@ -43,84 +43,6 @@ export interface LeaveConfirmModalProps {
   onCancel: () => void;
 }
 
-interface LeaveButtonNewProps {
-  onClick: () => void;
-}
-
-// ============================================================================
-// NEW LEAVE BUTTON COMPONENT
-// ============================================================================
-
-/**
- * New Leave Button - Completely independent implementation
- * Handles navigation directly without relying on callbacks
- */
-function LeaveButtonNew({ onClick }: LeaveButtonNewProps): React.ReactElement {
-  const buttonRef = React.useRef<HTMLButtonElement>(null);
-  const isNavigatingRef = React.useRef(false);
-  
-  const handleClick = React.useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
-    // Stop all event propagation immediately
-    event.preventDefault();
-    event.stopPropagation();
-    if (event.nativeEvent) {
-      event.nativeEvent.stopImmediatePropagation();
-    }
-    
-    // Prevent double-clicks using ref (doesn't cause re-render)
-    if (isNavigatingRef.current) {
-      console.log('[LeaveButtonNew] Already navigating, ignoring click');
-      return;
-    }
-    
-    isNavigatingRef.current = true;
-    console.log('[LeaveButtonNew] Click handler executing, button ref:', buttonRef.current);
-    
-    // Execute navigation handler immediately - don't wrap in try/catch to let errors bubble
-    onClick();
-  }, [onClick]);
-  
-  return (
-    <button
-      ref={buttonRef}
-      type="button"
-      onClick={handleClick}
-      onMouseDown={(e) => {
-        // Don't prevent default on mousedown - let click event fire
-        e.stopPropagation();
-      }}
-      onTouchStart={(e) => {
-        e.stopPropagation();
-      }}
-      onTouchEnd={(e) => {
-        e.stopPropagation();
-      }}
-      style={{
-        width: '100%',
-        height: 52,
-        backgroundColor: MODAL_COLORS.primaryButton,
-        border: 'none',
-        borderRadius: 12,
-        color: MODAL_COLORS.primaryButtonText,
-        fontSize: 16,
-        fontWeight: 600,
-        cursor: 'pointer',
-        pointerEvents: 'auto',
-        position: 'relative',
-        zIndex: 10000,
-        WebkitTapHighlightColor: 'transparent',
-        userSelect: 'none',
-        WebkitUserSelect: 'none',
-        touchAction: 'manipulation',
-        isolation: 'isolate', // Create new stacking context
-      }}
-      aria-label="Leave draft room"
-    >
-      Yes, Leave Draft Room
-    </button>
-  );
-}
-
 // ============================================================================
 // MAIN COMPONENT
 // ============================================================================
@@ -131,33 +53,6 @@ export default function LeaveConfirmModal({
   onCancel,
 }: LeaveConfirmModalProps): React.ReactElement | null {
   const stayButtonRef = useRef<HTMLButtonElement>(null);
-  
-  // Direct navigation handler - memoized to prevent recreation
-  const handleLeaveNavigation = React.useCallback(() => {
-    // Direct navigation handler - completely new logic
-    const targetPath = '/testing-grounds/vx2-mobile-app-demo';
-    console.log('[LeaveConfirmModal] handleLeaveNavigation called, navigating to:', targetPath);
-    
-    // Also call the onConfirm callback if provided (for cleanup)
-    if (onConfirm) {
-      try {
-        onConfirm();
-      } catch (e) {
-        console.warn('[LeaveConfirmModal] Error in onConfirm:', e);
-      }
-    }
-    
-    // Set session flag before navigation
-    try {
-      sessionStorage.setItem('topdog_came_from_draft', 'true');
-    } catch (e) {
-      console.warn('[LeaveConfirmModal] Could not set session flag:', e);
-    }
-    
-    // Direct navigation - use window.location.assign for better reliability
-    console.log('[LeaveConfirmModal] About to navigate...');
-    window.location.assign(targetPath);
-  }, [onConfirm]);
   
   // Focus stay button when modal opens
   useEffect(() => {
@@ -302,10 +197,47 @@ export default function LeaveConfirmModal({
             zIndex: 1002,
           }}
         >
-          {/* Primary: Leave Button - NEW IMPLEMENTATION */}
-          <LeaveButtonNew 
-            onClick={handleLeaveNavigation}
-          />
+          {/* Primary: Leave Button */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              console.log('[LeaveConfirmModal] Leave button clicked - calling onConfirm');
+              try {
+                if (onConfirm && typeof onConfirm === 'function') {
+                  console.log('[LeaveConfirmModal] onConfirm is a function, calling it...');
+                  onConfirm();
+                } else {
+                  console.error('[LeaveConfirmModal] onConfirm callback not provided or not a function!', onConfirm);
+                }
+              } catch (error) {
+                console.error('[LeaveConfirmModal] Error in onConfirm:', error);
+              }
+            }}
+            onMouseDown={(e) => {
+              // Prevent any potential issues with mouse down interfering
+              e.stopPropagation();
+            }}
+            style={{
+              width: '100%',
+              height: 52,
+              backgroundColor: MODAL_COLORS.primaryButton,
+              border: 'none',
+              borderRadius: 12,
+              color: MODAL_COLORS.primaryButtonText,
+              fontSize: 16,
+              fontWeight: 600,
+              cursor: 'pointer',
+              pointerEvents: 'auto',
+              position: 'relative',
+              zIndex: 10000,
+              WebkitTapHighlightColor: 'transparent',
+              userSelect: 'none',
+            }}
+          >
+            Yes, Leave Draft Room
+          </button>
           
           {/* Secondary: Stay Button */}
           <button

@@ -42,7 +42,7 @@ export const TOTAL_PICKS = DRAFT_DEFAULTS.teamCount * DRAFT_DEFAULTS.rosterSize;
  */
 export const DRAFT_LAYOUT = {
   // Navbar (content height only - safe area inset added separately)
-  navbarHeight: 48,
+  navbarHeight: 26, // Compact for unified header with status bar
   navbarPaddingX: SPACING.md,
   
   // Picks Bar

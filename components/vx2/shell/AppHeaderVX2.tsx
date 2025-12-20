@@ -31,6 +31,8 @@ export interface AppHeaderVX2Props {
   leftContent?: React.ReactNode;
   /** Visual variant for background */
   variant?: 'default' | 'urgent' | 'success';
+  /** Hide the center logo (for when logo is rendered as overlay) */
+  hideLogo?: boolean;
 }
 
 // ============================================================================
@@ -95,6 +97,7 @@ export default function AppHeaderVX2({
   rightContent,
   leftContent,
   variant = 'default',
+  hideLogo = false,
 }: AppHeaderVX2Props): React.ReactElement {
   const { navigateToTab } = useTabNavigation();
 
@@ -182,7 +185,7 @@ export default function AppHeaderVX2({
             >
               {title}
             </h1>
-          ) : (
+          ) : !hideLogo ? (
             <button
               onClick={handleLogoClick}
               className="flex items-center justify-center"
@@ -207,7 +210,7 @@ export default function AppHeaderVX2({
                 }}
               />
             </button>
-          )}
+          ) : null}
         </div>
 
         {/* RIGHT SECTION - Deposit button or custom content */}

@@ -26,10 +26,11 @@ const TUTORIAL_SHOWN_PREFIX = 'topdog_tutorial_shown_';
 
 // Hooks
 import { useDraftRoom } from '../hooks/useDraftRoom';
-import { useHeadshots } from '../../../../lib/swr/usePlayerSWR';
+import { useHeadshots } from '@/lib/swr/usePlayerSWR';
 
 // Components
 import DraftNavbar from './DraftNavbar';
+import DraftStatusBar from './DraftStatusBar';
 import PicksBar from './PicksBar';
 import PlayerList from './PlayerList';
 import QueueView from './QueueView';
@@ -435,22 +436,72 @@ export default function DraftRoomVX2({
         overflow: 'hidden',
       }}
     >
-      {/* Navbar */}
-      <DraftNavbar
-        onLeave={handleLeaveClick}
-        useAbsolutePosition={useAbsolutePosition}
-        timerSeconds={draftRoom.timer.seconds}
-        isUserTurn={draftRoom.isMyTurn && draftRoom.status === 'active'}
-        onGracePeriodEnd={handleGracePeriodEnd}
-        onInfo={handleInfoClick}
-      />
-      
-      {/* Content wrapper - accounts for fixed navbar/footer + safe area */}
+      {/* Combined Status Bar + Navbar Header (54px total: 28px + 26px) */}
       <div
         style={{
           position: 'absolute',
-          // Account for navbar height + safe area inset
-          top: `calc(${LAYOUT_PX.navbarHeight}px + env(safe-area-inset-top, 0px))`,
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '54px', // Status bar (28px) + navbar (26px)
+          zIndex: 50,
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        {/* Status Bar - matches navbar background for unified appearance */}
+        <DraftStatusBar
+          timerSeconds={draftRoom.timer.seconds}
+          isUserTurn={draftRoom.isMyTurn && draftRoom.status === 'active'}
+        />
+        
+        {/* Navbar - timer hidden, rendered externally below */}
+        <DraftNavbar
+          onLeave={handleLeaveClick}
+          useAbsolutePosition={false}
+          timerSeconds={draftRoom.timer.seconds}
+          isUserTurn={draftRoom.isMyTurn && draftRoom.status === 'active'}
+          onGracePeriodEnd={handleGracePeriodEnd}
+          onInfo={handleInfoClick}
+          hideTimer={true}
+        />
+        
+        {/* Centered Timer - spans both status bar and navbar, above all elements */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '54px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            pointerEvents: 'none', // Allow clicks through to buttons
+            zIndex: 100, // Above status bar and navbar
+          }}
+        >
+          <div
+            style={{
+              fontSize: '32px',
+              fontWeight: 700,
+              fontVariantNumeric: 'tabular-nums',
+              color: '#FFFFFF',
+              textShadow: '0 2px 4px rgba(0,0,0,0.4)',
+            }}
+            aria-label={`${draftRoom.timer.seconds} seconds remaining`}
+          >
+            {draftRoom.timer.seconds}
+          </div>
+        </div>
+      </div>
+      
+      {/* Content wrapper - accounts for combined header (54px) + safe area */}
+      <div
+        style={{
+          position: 'absolute',
+          // Account for combined header (54px) + safe area inset
+          top: `calc(54px + env(safe-area-inset-top, 0px))`,
           left: 0,
           right: 0,
           bottom: LAYOUT_PX.footerHeight,

@@ -40,3 +40,6 @@ export type { DraftFooterProps } from './DraftFooter';
 
 export { default as PlayerExpandedCard } from './PlayerExpandedCard';
 export type { PlayerExpandedCardProps } from './PlayerExpandedCard';
+
+export { default as DraftStatusBar } from './DraftStatusBar';
+export type { DraftStatusBarProps } from './DraftStatusBar';

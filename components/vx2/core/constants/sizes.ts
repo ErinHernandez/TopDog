@@ -61,12 +61,12 @@ export const Z_INDEX = {
 // ============================================================================
 
 export const HEADER = {
-  /** Total header height (including safe area) */
-  height: 60,
+  /** Total header height (compact for unified header) */
+  height: 26,
   /** Horizontal padding */
   paddingX: 16,
   /** Logo height */
-  logoHeight: 40,
+  logoHeight: 22,
   /** Logo max width */
   logoMaxWidth: 120,
   /** Button touch target */

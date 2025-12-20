@@ -12,6 +12,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import DraftRoomVX from '../../components/vx/mobile/draft/DraftRoomVX';
+import IPhoneStatusBar from '../../components/vx2/shell/iPhoneStatusBar';
 
 export default function VXMobileDemo() {
   // Draft control state (lifted to page level for external controls)
@@ -75,20 +76,34 @@ export default function VXMobileDemo() {
       <div className="flex items-start gap-8">
         {/* Phone Frame */}
         <div
-          className="bg-black rounded-[40px] overflow-hidden shadow-2xl flex-shrink-0"
+          className="bg-black rounded-[40px] overflow-hidden shadow-2xl flex-shrink-0 relative"
           style={{
             width: '375px',
             height: '812px',
           }}
         >
-          <DraftRoomVX
-            key={draftKey}
-            isDraftActive={isDraftActive}
-            isDraftPaused={isDraftPaused}
-            mockDraftSpeed={mockDraftSpeed}
-            onDraftStart={handleStartDraft}
-            forcePickTrigger={forcePickTrigger}
-          />
+          {/* iPhone Status Bar - dev only */}
+          <IPhoneStatusBar />
+          {/* Content wrapper - pushed down to account for status bar */}
+          <div 
+            style={{ 
+              position: 'absolute',
+              top: '28px',
+              left: 0,
+              right: 0,
+              bottom: 0,
+              overflow: 'hidden',
+            }}
+          >
+            <DraftRoomVX
+              key={draftKey}
+              isDraftActive={isDraftActive}
+              isDraftPaused={isDraftPaused}
+              mockDraftSpeed={mockDraftSpeed}
+              onDraftStart={handleStartDraft}
+              forcePickTrigger={forcePickTrigger}
+            />
+          </div>
         </div>
 
         {/* Controls Panel (Outside Phone) */}

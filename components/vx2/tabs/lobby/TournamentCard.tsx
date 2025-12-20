@@ -29,8 +29,8 @@ const CARD_PX = {
   titleFontSize: TYPOGRAPHY.fontSize.xl,
   titleMarginBottom: SPACING.xl,
   
-  // Logo - base size with 10% increase
-  logoSize: 254, // 231px * 1.1 = 254px (10% increase)
+  // Logo - reduced by 20px to help reduce overall height
+  logoSize: 233,
   logoMarginBottom: SPACING.xl,
   
   // Progress
@@ -41,7 +41,7 @@ const CARD_PX = {
   // Button
   buttonHeight: 57,
   buttonFontSize: TYPOGRAPHY.fontSize.sm,
-  buttonMarginBottom: SPACING.md, // Reduced from SPACING.xl
+  buttonMarginBottom: SPACING.xl,
   
   // Stats
   statsGap: SPACING.xl,
@@ -90,7 +90,7 @@ function StatItem({ value, label }: StatItemProps): React.ReactElement {
       <div 
         className="font-bold" 
         style={{ 
-          fontSize: `clamp(14px, 3vw, ${CARD_PX.statsValueFontSize}px)`, 
+          fontSize: `${CARD_PX.statsValueFontSize}px`, 
           color: CARD_COLORS.text,
         }}
       >
@@ -98,7 +98,7 @@ function StatItem({ value, label }: StatItemProps): React.ReactElement {
       </div>
       <div 
         style={{ 
-          fontSize: `clamp(10px, 2vw, ${CARD_PX.statsLabelFontSize}px)`, 
+          fontSize: `${CARD_PX.statsLabelFontSize}px`, 
           color: CARD_COLORS.textMuted,
         }}
       >
@@ -124,7 +124,7 @@ export function TournamentCard({
   
   return (
     <div 
-      className={`relative ${className}`}
+      className={`relative w-full h-full ${className}`}
       style={{
         backgroundImage: CARD_COLORS.background,
         backgroundColor: CARD_COLORS.backgroundFallback,
@@ -138,114 +138,114 @@ export function TournamentCard({
         padding: `${CARD_PX.padding}px`,
         display: 'flex',
         flexDirection: 'column',
-        width: '100%',
-        height: '100%', // Fill parent height (constrained by container padding)
-        maxHeight: '100%',
-        minHeight: 0,
-        boxSizing: 'border-box',
       }}
       role="article"
       aria-label={`${tournament.title} tournament`}
     >
-      {/* Tournament Title - Split into two lines */}
-      <h2 
-        className="text-center font-bold leading-tight flex-shrink-0"
-        style={{ 
-          fontSize: 'clamp(18px, 4vw, 26px)',
-          fontFamily: "'Anton SC', sans-serif",
-          textTransform: 'uppercase',
-          letterSpacing: '1px',
-          color: CARD_COLORS.text,
-          marginBottom: `${CARD_PX.titleMarginBottom}px`,
-        }}
-      >
-        {tournament.title.includes('INTERNATIONAL') ? (
-          <>
-            {tournament.title.replace(' INTERNATIONAL', '')}<br />
-            INTERNATIONAL
-          </>
-        ) : (
-          tournament.title
-        )}
-      </h2>
-
-      {/* Tournament Logo/Image */}
-      {featured && (
-        <div 
-          className="flex justify-center flex-shrink-0"
-          style={{ marginTop: `${SPACING.xl}px`, marginBottom: `${CARD_PX.logoMarginBottom}px` }}
+      {/* Top Section - Title + Logo */}
+      <div>
+        {/* Tournament Title - Split into two lines */}
+        <h2 
+          className="text-center font-bold leading-tight"
+          style={{ 
+            fontSize: '26px',
+            fontFamily: "'Anton SC', sans-serif",
+            textTransform: 'uppercase',
+            letterSpacing: '1px',
+            color: CARD_COLORS.text,
+            marginBottom: `${CARD_PX.titleMarginBottom}px`,
+          }}
         >
-          <img 
-            src="/globe_tournament.png" 
-            alt=""
-            aria-hidden="true"
-            style={{ 
-              width: 'min(254px, 59.9vw, 32.7vh)', // Increased by 10%
-              height: 'min(254px, 59.9vw, 32.7vh)', // Increased by 10%
-              maxWidth: '100%',
-              objectFit: 'contain',
-              borderRadius: `${RADIUS.lg}px`,
-            }}
-          />
-        </div>
-      )}
+          {tournament.title.includes('INTERNATIONAL') ? (
+            <>
+              {tournament.title.replace(' INTERNATIONAL', '')}<br />
+              INTERNATIONAL
+            </>
+          ) : (
+            tournament.title
+          )}
+        </h2>
 
-      {/* Progress Bar */}
-      {tournament.maxEntries && (
-        <div className="flex-shrink-0" style={{ marginTop: `${SPACING.lg}px`, marginBottom: `${SPACING.lg}px` }}>
+        {/* Tournament Logo/Image */}
+        {featured && (
           <div 
-            className="flex justify-between"
-            style={{ 
-              fontSize: `clamp(11px, 2vw, ${CARD_PX.progressLabelFontSize}px)`, 
-              color: CARD_COLORS.textMuted,
-              marginBottom: `${CARD_PX.progressLabelMarginBottom}px`,
-            }}
+            className="flex justify-center"
+            style={{ marginTop: `${SPACING.xl * 2}px`, marginBottom: `${SPACING.md}px` }}
           >
-            <span>Tournament Fill</span>
-            <span>{fillPercentage}% Full</span>
+            <img 
+              src="/globe_tournament.png" 
+              alt=""
+              aria-hidden="true"
+              style={{ 
+                width: `${CARD_PX.logoSize}px`, 
+                height: `${CARD_PX.logoSize}px`, 
+                objectFit: 'contain',
+                borderRadius: `${RADIUS.lg}px`,
+              }}
+            />
           </div>
-          <ProgressBar 
-            value={fillPercentage} 
-            fillBackgroundImage="url(/wr_blue.png)"
-            backgroundColor={CARD_COLORS.progressBg}
-            size="md"
-          />
+        )}
+      </div>
+
+      {/* Spacer to push bottom content down */}
+      <div style={{ flex: 1 }} />
+
+      {/* Bottom Section - Progress, Button, Stats */}
+      <div>
+        {/* Progress Bar */}
+        {tournament.maxEntries && (
+          <div style={{ marginBottom: `${SPACING.lg}px` }}>
+            <div 
+              className="flex justify-between"
+              style={{ 
+                fontSize: `${CARD_PX.progressLabelFontSize}px`, 
+                color: CARD_COLORS.textMuted,
+                marginBottom: `${CARD_PX.progressLabelMarginBottom}px`,
+              }}
+            >
+              <span>Tournament Fill</span>
+              <span>{fillPercentage}% Full</span>
+            </div>
+            <ProgressBar 
+              value={fillPercentage} 
+              fillBackgroundImage="url(/wr_blue.png)"
+              backgroundColor={CARD_COLORS.progressBg}
+              size="md"
+            />
+          </div>
+        )}
+
+        {/* Join Button */}
+        <button
+          onClick={onJoinClick}
+          className="w-full font-semibold transition-colors duration-200 active:scale-[0.98]"
+          style={{ 
+            ...TILED_BG_STYLE,
+            color: '#FFFFFF',
+            height: `${CARD_PX.buttonHeight}px`,
+            fontSize: `${CARD_PX.buttonFontSize}px`,
+            borderRadius: `${RADIUS.md}px`,
+            marginBottom: `${SPACING.lg}px`,
+            border: 'none',
+            cursor: 'pointer',
+          }}
+          aria-label={`Join ${tournament.title} for ${tournament.entryFee}`}
+        >
+          Join Tournament
+        </button>
+
+        {/* Stats Grid */}
+        <div 
+          style={{ 
+            display: 'grid', 
+            gridTemplateColumns: '1fr 1fr 1fr', 
+            gap: `${CARD_PX.statsGap}px`,
+          }}
+        >
+          <StatItem value={tournament.entryFee} label="Entry" />
+          <StatItem value={tournament.totalEntries} label="Entries" />
+          <StatItem value={tournament.firstPlacePrize} label="1st Place" />
         </div>
-      )}
-
-      {/* Join Button */}
-      <button
-        onClick={onJoinClick}
-        className="w-full font-semibold transition-colors duration-200 active:scale-[0.98] flex-shrink-0"
-        style={{ 
-          ...TILED_BG_STYLE,
-          color: '#FFFFFF',
-          height: `clamp(44px, 7vh, ${CARD_PX.buttonHeight}px)`,
-          fontSize: `clamp(12px, 2vw, ${CARD_PX.buttonFontSize}px)`,
-          borderRadius: `${RADIUS.md}px`,
-          marginTop: `${SPACING.xl}px`,
-          marginBottom: `${CARD_PX.buttonMarginBottom}px`,
-          border: 'none',
-          cursor: 'pointer',
-        }}
-        aria-label={`Join ${tournament.title} for ${tournament.entryFee}`}
-      >
-        Join Tournament
-      </button>
-
-      {/* Stats Grid */}
-      <div 
-        className="flex-shrink-0"
-        style={{ 
-          display: 'grid', 
-          gridTemplateColumns: '1fr 1fr 1fr', 
-          gap: `${CARD_PX.statsGap}px`,
-          marginTop: `${SPACING.lg}px`,
-        }}
-      >
-        <StatItem value={tournament.entryFee} label="Entry" />
-        <StatItem value={tournament.totalEntries} label="Entries" />
-        <StatItem value={tournament.firstPlacePrize} label="1st Place" />
       </div>
     </div>
   );
