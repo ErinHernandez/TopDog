@@ -307,9 +307,16 @@ export default function DraftRoomVX({
   }, []);
 
   const handleLeaveDraft = useCallback(() => {
-    // Navigate back to mobile app (VX lobby) - use client-side navigation
-    router.push('/testing-grounds/vx-mobile-app-demo');
-  }, [router]);
+    // Navigate back to mobile app (VX lobby)
+    // Use window.location.replace for reliable navigation in production (Vercel)
+    // This is more reliable than router.push in production environments
+    const targetPath = '/testing-grounds/vx-mobile-app-demo';
+    console.log('[DraftRoomVX] handleLeaveDraft called, navigating to:', targetPath);
+    // Use setTimeout to ensure it happens after any React state updates
+    setTimeout(() => {
+      window.location.replace(targetPath);
+    }, 100);
+  }, []);
 
   // Lock to prevent concurrent picks
   const isPickingRef = useRef(false);
