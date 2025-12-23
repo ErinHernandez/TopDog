@@ -25,15 +25,46 @@ let manifestCache = null;
 let manifestCacheTime = 0;
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
-function loadManifest() {
+// Helper to get base URL for fetching static files
+function getBaseUrl(req) {
+  // Server-side: construct from request headers
+  // In Vercel, use x-forwarded-proto and x-forwarded-host
+  const protocol = req.headers['x-forwarded-proto'] || (req.headers['x-forwarded-host'] ? 'https' : 'http');
+  const host = req.headers['x-forwarded-host'] || req.headers.host || 'localhost:3000';
+  return `${protocol}://${host}`;
+}
+
+async function loadManifest(req) {
   const now = Date.now();
   if (manifestCache && (now - manifestCacheTime) < CACHE_TTL) {
     return manifestCache;
   }
 
   try {
-    const manifestData = fs.readFileSync(MANIFEST_PATH, 'utf8');
-    manifestCache = JSON.parse(manifestData);
+    // Try filesystem first (works in local dev and build time)
+    try {
+      if (fs.existsSync && fs.existsSync(MANIFEST_PATH)) {
+        const manifestData = fs.readFileSync(MANIFEST_PATH, 'utf8');
+        manifestCache = JSON.parse(manifestData);
+        manifestCacheTime = now;
+        return manifestCache;
+      }
+    } catch (fsError) {
+      // Filesystem access not available (e.g., in serverless), fall through to HTTP fetch
+    }
+    
+    // Fallback to HTTP fetch (works in serverless environments)
+    const baseUrl = getBaseUrl(req);
+    const manifestUrl = `${baseUrl}/players/manifest.json`;
+    const response = await fetch(manifestUrl);
+    
+    if (!response.ok) {
+      console.error(`Headshots manifest not found at: ${manifestUrl}`);
+      return null;
+    }
+    
+    const manifestData = await response.json();
+    manifestCache = manifestData;
     manifestCacheTime = now;
     return manifestCache;
   } catch (error) {
@@ -42,13 +73,38 @@ function loadManifest() {
   }
 }
 
-function loadPlayerPool() {
+async function loadPlayerPool(req) {
   try {
-    const poolData = fs.readFileSync(PLAYER_POOL_PATH, 'utf8');
-    return JSON.parse(poolData);
+    // Try filesystem first (works in local dev and build time)
+    try {
+      if (fs.existsSync && fs.existsSync(PLAYER_POOL_PATH)) {
+        const poolData = fs.readFileSync(PLAYER_POOL_PATH, 'utf8');
+        const parsed = JSON.parse(poolData);
+        // Handle both array format and {players: []} format
+        const playersArray = Array.isArray(parsed) ? parsed : parsed?.players || [];
+        return playersArray;
+      }
+    } catch (fsError) {
+      // Filesystem access not available (e.g., in serverless), fall through to HTTP fetch
+    }
+    
+    // Fallback to HTTP fetch (works in serverless environments)
+    const baseUrl = getBaseUrl(req);
+    const poolUrl = `${baseUrl}/data/player-pool-2025.json`;
+    const response = await fetch(poolUrl);
+    
+    if (!response.ok) {
+      console.error(`Player pool not found at: ${poolUrl}`);
+      return null;
+    }
+    
+    const parsed = await response.json();
+    // Handle both array format and {players: []} format
+    const playersArray = Array.isArray(parsed) ? parsed : parsed?.players || [];
+    return playersArray;
   } catch (error) {
     console.error('Error loading player pool:', error);
-    return [];
+    return null;
   }
 }
 
@@ -80,14 +136,17 @@ export default async function handler(req, res) {
   }
 
   try {
-    const manifest = loadManifest();
+    const manifest = await loadManifest(req);
     if (!manifest) {
       return res.status(500).json({ error: 'Headshots manifest not available' });
     }
 
-    const playerPool = loadPlayerPool();
-    if (!playerPool || playerPool.length === 0) {
-      return res.status(500).json({ error: 'Player pool not available' });
+    const playerPool = await loadPlayerPool(req);
+    if (!playerPool || (Array.isArray(playerPool) && playerPool.length === 0)) {
+      return res.status(500).json({ 
+        error: 'Player pool not available',
+        details: playerPool === null ? 'Failed to load player pool file' : 'Player pool is empty'
+      });
     }
 
     const { team, position, name, id } = req.query;
