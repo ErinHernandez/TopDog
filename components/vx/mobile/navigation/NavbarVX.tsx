@@ -113,9 +113,10 @@ export default function NavbarVX({
       <nav
         className="flex items-center justify-between transition-colors duration-300"
         style={{
-          height: `${NAVBAR_PX.height}px`,
+          minHeight: `calc(${NAVBAR_PX.height}px + env(safe-area-inset-top, 0px))`,
           paddingLeft: `${NAVBAR_PX.paddingX}px`,
           paddingRight: `${NAVBAR_PX.paddingX}px`,
+          paddingTop: 'env(safe-area-inset-top, 0px)',
           background: backgroundColor || `url(/wr_blue.png) no-repeat center center`,
           backgroundSize: 'cover',
           position: 'relative',
@@ -159,10 +160,11 @@ export default function NavbarVX({
         {/* Center - Timer (draft mode) or Logo/Title */}
         <div className="flex-1 flex items-center justify-center h-full">
           {isDraftMode && timer !== undefined ? (
-            // Timer display for draft mode
+            // Timer display for draft mode - same height as logo (32px)
             <div
-              className="text-white font-bold"
+              className="text-white font-bold flex items-center justify-center"
               style={{
+                height: '32px',
                 fontSize: '32px',
                 lineHeight: 1,
                 fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
