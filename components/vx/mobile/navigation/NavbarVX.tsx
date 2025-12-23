@@ -156,9 +156,22 @@ export default function NavbarVX({
           )}
         </div>
 
-        {/* Center - Logo or Title */}
+        {/* Center - Timer (draft mode) or Logo/Title */}
         <div className="flex-1 flex items-center justify-center h-full">
-          {title ? (
+          {isDraftMode && timer !== undefined ? (
+            // Timer display for draft mode
+            <div
+              className="text-white font-bold"
+              style={{
+                fontSize: '32px',
+                lineHeight: 1,
+                fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {timer.toString().padStart(2, '0')}
+            </div>
+          ) : title ? (
             <span 
               className="text-white font-bold"
               style={{ fontSize: `${NAVBAR_PX.titleFontSize}px` }}
