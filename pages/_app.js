@@ -30,6 +30,7 @@ function MyApp({ Component, pageProps }) {
   }, []);
   
   // Check if we're in a draft room, dev navbar, or mobile demo page to hide navbar
+  const isLandingPage = router.pathname === '/';
   const isDraftRoom = router.pathname.startsWith('/draft/');
   const isDevDraftNavbar = router.pathname === '/dev-draft-navbar';
   const isMobileDemo = router.pathname.includes('mobile-') && router.pathname.includes('-demo');
@@ -81,11 +82,11 @@ function MyApp({ Component, pageProps }) {
       <UserProvider>
         <PlayerDataProvider>
           <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-            {!isDraftRoom && !isDevDraftNavbar && !isMobileDemo && !isTestingGrounds && <Navbar />}
+            {!isLandingPage && !isDraftRoom && !isDevDraftNavbar && !isMobileDemo && !isTestingGrounds && <Navbar />}
             <div style={{ flex: '1' }}>
               <Component {...pageProps} />
             </div>
-            {!isDraftRoom && !isDevDraftNavbar && !isMobileDemo && !isTestingGrounds && <Footer />}
+            {!isLandingPage && !isDraftRoom && !isDevDraftNavbar && !isMobileDemo && !isTestingGrounds && <Footer />}
             {isTestingGrounds && !isMobileDevice && <DevNav />}
           </div>
         </PlayerDataProvider>
