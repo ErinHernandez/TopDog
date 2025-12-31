@@ -189,12 +189,14 @@ export default function LeaveConfirmModal({
         <div
           onClick={(e) => e.stopPropagation()}
           onMouseDown={(e) => e.stopPropagation()}
+          onTouchStart={(e) => e.stopPropagation()}
           style={{
             display: 'flex',
             flexDirection: 'column',
             gap: 12,
             position: 'relative',
             zIndex: 1002,
+            pointerEvents: 'auto',
           }}
         >
           {/* Primary: Leave Button */}
@@ -217,7 +219,23 @@ export default function LeaveConfirmModal({
             }}
             onMouseDown={(e) => {
               // Prevent any potential issues with mouse down interfering
+              e.preventDefault();
               e.stopPropagation();
+            }}
+            onTouchStart={(e) => {
+              e.stopPropagation();
+            }}
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              console.log('[LeaveConfirmModal] Leave button touched - calling onConfirm');
+              try {
+                if (onConfirm && typeof onConfirm === 'function') {
+                  onConfirm();
+                }
+              } catch (error) {
+                console.error('[LeaveConfirmModal] Error in onConfirm (touch):', error);
+              }
             }}
             style={{
               width: '100%',
@@ -234,6 +252,7 @@ export default function LeaveConfirmModal({
               zIndex: 10000,
               WebkitTapHighlightColor: 'transparent',
               userSelect: 'none',
+              touchAction: 'manipulation',
             }}
           >
             Yes, Leave Draft Room
@@ -242,7 +261,20 @@ export default function LeaveConfirmModal({
           {/* Secondary: Stay Button */}
           <button
             ref={stayButtonRef}
-            onClick={onCancel}
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onCancel();
+            }}
+            onTouchStart={(e) => {
+              e.stopPropagation();
+            }}
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onCancel();
+            }}
             style={{
               width: '100%',
               height: 52,
@@ -253,6 +285,8 @@ export default function LeaveConfirmModal({
               fontSize: 16,
               fontWeight: 600,
               cursor: 'pointer',
+              pointerEvents: 'auto',
+              touchAction: 'manipulation',
             }}
           >
             Stay in Room

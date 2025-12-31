@@ -25,6 +25,7 @@ import type { DraftPick, DraftPlayer, Participant, Position, DraftStatus } from 
 import { POSITION_COLORS, DRAFT_DEFAULTS, TILED_BG_STYLE } from '../constants';
 import { useImageShare } from '../hooks/useImageShare';
 import { Share } from '../../components/icons/actions/Share';
+import ShareOptionsModal from './ShareOptionsModal';
 
 // ============================================================================
 // SCROLLING USERNAME COMPONENT
@@ -117,11 +118,11 @@ const ScrollingUsername: React.FC<ScrollingUsernameProps> = ({
 
 const PICKS_BAR_PX = {
   // Container
-  containerHeight: 124, // Fits card height + padding
+  containerHeight: 116, // Fits card height + padding (reduced by 8px)
   containerBg: '#101927',
   containerPaddingX: 8,
   containerPaddingTop: 2,
-  containerPaddingBottom: 4,
+  containerPaddingBottom: 0,
   
   // Cards - EXACT match to Board's TeamHeader
   cardWidth: 96,
@@ -937,6 +938,7 @@ export default function PicksBar({
   const scrollRef = useRef<HTMLDivElement>(null);
   const currentPickRef = useRef<HTMLDivElement>(null);
   const picksContentRef = useRef<HTMLDivElement>(null);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   
   const teamCount = participants.length || DRAFT_DEFAULTS.teamCount;
   const rosterSize = DRAFT_DEFAULTS.rosterSize;
@@ -952,11 +954,18 @@ export default function PicksBar({
     },
   });
   
-  // Handle share button click
+  // Get user name for sharing
+  const userName = participants[userParticipantIndex]?.name || 'My Picks';
+  
+  // Handle share button click - open modal
   const handleShare = useCallback(() => {
-    const userName = participants[userParticipantIndex]?.name || 'My Team';
+    setIsShareModalOpen(true);
+  }, []);
+  
+  // Handle image share from modal
+  const handleShareImage = useCallback(() => {
     captureAndShare(picksContentRef.current, 'picks', userName);
-  }, [captureAndShare, participants, userParticipantIndex]);
+  }, [captureAndShare, userName]);
   
   // Build picks map for quick lookup
   const picksMap = useMemo(() => {
@@ -1029,6 +1038,7 @@ export default function PicksBar({
         paddingLeft: 0,
         paddingRight: 0,
         position: 'relative',
+        marginTop: 8,
       }}
     >
       {/* Scrollable Container */}
@@ -1157,6 +1167,18 @@ export default function PicksBar({
             <Share size={18} color="#FFFFFF" strokeWidth={2} aria-hidden />
           )}
         </button>
+      )}
+      
+      {/* Share Options Modal */}
+      {enableShare && (
+        <ShareOptionsModal
+          isOpen={isShareModalOpen}
+          onClose={() => setIsShareModalOpen(false)}
+          shareType="picks"
+          contentName={userName}
+          onShareImage={handleShareImage}
+          isCapturingImage={isCapturing}
+        />
       )}
     </div>
   );

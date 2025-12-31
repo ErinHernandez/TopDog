@@ -100,8 +100,6 @@ export interface PlayerListProps {
   /** Update search query */
   onSearchChange: (query: string) => void;
   
-  /** Optional map of player names to headshot URLs (SportsDataIO) */
-  headshotsMap?: Record<string, string>;
   /** Clear all filters */
   onClearAll: () => void;
   
@@ -263,8 +261,7 @@ function PlayerRow({
   isQueued, 
   onToggleQueue,
   onRowClick,
-  headshotsMap,
-}: PlayerRowProps & { headshotsMap?: Record<string, string> }): React.ReactElement {
+}: PlayerRowProps): React.ReactElement {
   const positionColor = POSITION_COLORS[player.position];
   
   const cellStyle: React.CSSProperties = {
@@ -290,32 +287,6 @@ function PlayerRow({
       {/* Player Info */}
       <td style={{ ...cellStyle, paddingLeft: 10, paddingRight: 8 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          {/* Player Headshot */}
-          {headshotsMap?.[player.name] && (
-            <div
-              style={{
-                width: 28,
-                height: 28,
-                borderRadius: '50%',
-                overflow: 'hidden',
-                flexShrink: 0,
-                backgroundColor: '#111827',
-              }}
-            >
-              <img
-                src={headshotsMap[player.name]}
-                alt={player.name}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                }}
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                }}
-              />
-            </div>
-          )}
           <div style={{ minWidth: 0, flex: 1 }}>
             <div
               style={{
@@ -400,7 +371,7 @@ function PlayerRow({
       
       {/* PROJ Column */}
       <td style={{ ...cellStyle, textAlign: 'right', paddingRight: 12, fontSize: PLAYER_LIST_PX.statFontSize, color: TEXT_COLORS.secondary, fontVariantNumeric: 'tabular-nums' }}>
-        {player.projectedPoints ? `${Math.round(player.projectedPoints)} pts` : '-'}
+        {player.projectedPoints ? Math.round(player.projectedPoints) : '-'}
       </td>
       
       {/* RANK Column */}
@@ -433,7 +404,6 @@ export default function PlayerList({
   isQueued,
   initialScrollPosition = 0,
   onScrollPositionChange,
-  headshotsMap,
 }: PlayerListProps): React.ReactElement {
   const [expandedPlayerId, setExpandedPlayerId] = useState<string | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -641,7 +611,6 @@ export default function PlayerList({
                     isQueued={isQueued(player.id)}
                     onToggleQueue={() => onToggleQueue(player)}
                     onRowClick={() => handleRowClick(player.id)}
-                    headshotsMap={headshotsMap}
                   />
                   {/* Expanded Card */}
                   {expandedPlayerId === player.id && (

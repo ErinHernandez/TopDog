@@ -56,13 +56,32 @@ export default function VX2DraftRoomPage() {
   }, []);
   
   const handleLeaveDraft = useCallback(() => {
+    // #region agent log
+    console.warn('[VX2 DEBUG] handleLeaveDraft called in page component');
+    // #endregion
     // Set flag so app knows to open live-drafts tab
-    sessionStorage.setItem('topdog_came_from_draft', 'true');
+    try {
+      sessionStorage.setItem('topdog_came_from_draft', 'true');
+      // #region agent log
+      console.warn('[VX2 DEBUG] Session flag set successfully');
+      // #endregion
+    } catch (e) {
+      console.error('[VX2DraftRoomPage] Failed to set session flag:', e);
+    }
     // Navigate to app (will read flag and go to live-drafts)
     const targetPath = '/testing-grounds/vx2-mobile-app-demo';
     console.log('[VX2DraftRoomPage] handleLeaveDraft called, navigating to:', targetPath);
-    // Use window.location for more reliable navigation
-    window.location.href = targetPath;
+    // #region agent log
+    console.warn('[VX2 DEBUG] About to navigate to:', targetPath);
+    // #endregion
+    // Use window.location.replace for more reliable navigation (doesn't add to history)
+    // Use setTimeout to ensure it happens after any React state updates
+    setTimeout(() => {
+      // #region agent log
+      console.warn('[VX2 DEBUG] Executing navigation now');
+      // #endregion
+      window.location.replace(targetPath);
+    }, 100);
   }, []);
   
   // Desktop: just store tools for manual control

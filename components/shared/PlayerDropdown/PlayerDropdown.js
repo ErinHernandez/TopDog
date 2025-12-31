@@ -49,9 +49,6 @@ export default function PlayerDropdown({
   
   // Dropdown positioning
   dropdownOffset = 14, // Pixels below player row to show dropdown
-  
-  // Headshots map for player photos (optional)
-  headshotsMap = {},
 }) {
   const [players, setPlayers] = useState(externalPlayers || []);
   const [expandedPlayer, setExpandedPlayer] = useState(null);
@@ -313,7 +310,6 @@ export default function PlayerDropdown({
                 player={player}
                 isMyTurn={isMyTurn}
                 showDraftButton={context !== 'TEAM_MANAGEMENT'}
-                headshotUrl={headshotsMap[player.name] || null}
                 onDraft={(e) => handleDraftPlayer(player, e)}
                 onClose={() => setExpandedPlayer(null)}
               />

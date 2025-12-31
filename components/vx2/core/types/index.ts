@@ -44,3 +44,32 @@ export type {
   ViewportInfo,
 } from './app';
 
+// Tablet types
+export type {
+  TabletOrientation,
+  OrientationChangeEvent,
+  PanelId,
+  PanelVisibility,
+  PanelDimensions,
+  TabletLayoutContextValue,
+  DraftActivePanel,
+  DraftLayoutMode,
+  TabletDraftRoomProps,
+  PanelContainerProps,
+  PanelDividerProps,
+  iPadModel,
+  TabletDeviceInfo,
+  TabletNavStyle,
+  TabletNavState,
+  TabletNavContextValue,
+  TabletShellProps,
+  TabletFrameProps,
+  PortraitBlockerProps,
+  OrientationGuardProps,
+  UseTabletOrientationResult,
+  UseIsTabletResult,
+  UseTabletLayoutResult,
+  PanelResizeEvent,
+  StoredLayoutPreferences,
+} from './tablet';
+

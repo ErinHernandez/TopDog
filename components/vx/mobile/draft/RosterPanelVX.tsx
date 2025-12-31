@@ -68,8 +68,6 @@ const ROSTER_PX = {
   
   // Player Content
   playerContentPaddingX: 8,
-  playerPhotoSize: 28,
-  playerPhotoMarginRight: 12,
   playerNameFontSize: 13,
   teamByeFontSize: 11,
   teamByeMinWidth: 60,
@@ -407,72 +405,6 @@ function getPlayerForSlot(
 }
 
 // ============================================================================
-// PLAYER PHOTO COMPONENT
-// ============================================================================
-
-interface PlayerPhotoProps {
-  player: Player;
-  size?: number;
-}
-
-function PlayerPhoto({ player, size = ROSTER_PX.playerPhotoSize }: PlayerPhotoProps): React.ReactElement {
-  const [error, setError] = React.useState(false);
-  const [teamLogoError, setTeamLogoError] = React.useState(false);
-  const positionColor = POSITION_COLORS[player.position as keyof typeof POSITION_COLORS] || ROSTER_COLORS.textSecondary;
-  
-  // Generate initials from player name (last resort fallback)
-  const initials = player.name
-    .split(' ')
-    .map(n => n.charAt(0))
-    .join('')
-    .substring(0, 2)
-    .toUpperCase();
-
-  if (error) {
-    // Fallback to NFL team logo
-    if (!teamLogoError && player.team) {
-      return (
-        <img
-          src={`/logos/nfl/${player.team.toLowerCase()}.png`}
-          alt={player.team}
-          className="object-contain"
-          style={{ width: size, height: size }}
-          onError={() => setTeamLogoError(true)}
-        />
-      );
-    }
-    
-    // Last resort: initials with position color background
-    return (
-      <div 
-        className="rounded-full flex items-center justify-center font-bold"
-        style={{ 
-          width: size, 
-          height: size, 
-          backgroundColor: positionColor,
-          color: ROSTER_COLORS.textPrimary,
-          fontSize: size * 0.35,
-        }}
-      >
-        {initials}
-      </div>
-    );
-  }
-
-  // Try to load player headshot (ESPN/NFL style URL pattern)
-  // Using a placeholder pattern - replace with actual API when available
-  return (
-    <img
-      src={`/players/${player.name.toLowerCase().replace(/[^a-z]/g, '-')}.png`}
-      alt={player.name}
-      className="rounded-full object-cover"
-      style={{ width: size, height: size, backgroundColor: ROSTER_COLORS.dropdownBg }}
-      onError={() => setError(true)}
-    />
-  );
-}
-
-// ============================================================================
 // ROSTER ROW COMPONENT
 // ============================================================================
 
@@ -523,14 +455,6 @@ function RosterRow({ position, player, isStarter, showTopBorder = false }: Roste
           className="flex-1 flex items-center z-10"
           style={{ paddingLeft: `${ROSTER_PX.playerContentPaddingX}px`, paddingRight: `${ROSTER_PX.playerContentPaddingX}px` }}
         >
-          {/* Player Photo */}
-          <div 
-            className="flex-shrink-0"
-            style={{ marginRight: `${ROSTER_PX.playerPhotoMarginRight}px` }}
-          >
-            <PlayerPhoto player={player} size={ROSTER_PX.playerPhotoSize} />
-          </div>
-          
           {/* Player Name - takes available space */}
           <div 
             className="flex-1 font-medium truncate"

@@ -22,3 +22,7 @@ export type { PlayerCellProps, PlayerData } from './PlayerCell';
 export { default as PlayerStatsCard } from '../PlayerStatsCard';
 export type { PlayerStatsCardProps } from '../PlayerStatsCard';
 
+// Optimized Image (legacy device support)
+export { OptimizedImage, PlayerImage, TeamLogo } from './OptimizedImage';
+export type { OptimizedImageProps, PlayerImageProps, TeamLogoProps } from './OptimizedImage';
+

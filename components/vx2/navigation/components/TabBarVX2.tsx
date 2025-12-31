@@ -222,6 +222,9 @@ export default function TabBarVX2({
   
   // Keyboard navigation handler
   const handleKeyDown = useCallback((e: React.KeyboardEvent, currentIndex: number) => {
+    // Guard against empty tabs array (defensive programming)
+    if (tabs.length === 0) return;
+    
     let newIndex = currentIndex;
     
     switch (e.key) {
@@ -241,6 +244,9 @@ export default function TabBarVX2({
         return; // Don't prevent default for other keys
     }
     
+    // Ensure newIndex is valid (defensive check)
+    if (newIndex < 0 || newIndex >= tabs.length) return;
+    
     e.preventDefault();
     
     // Navigate to new tab
@@ -253,7 +259,7 @@ export default function TabBarVX2({
   
   return (
     <nav
-      className={`flex-shrink-0 ${className}`}
+      className={`vx2-tab-bar flex-shrink-0 ${className}`}
       style={{
         backgroundColor: TAB_BAR_COLORS.background,
         borderTop: `1px solid ${TAB_BAR_COLORS.border}`,

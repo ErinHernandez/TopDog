@@ -14,6 +14,7 @@ import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { useMyTeams, type MyTeam, type TeamPlayer } from '../../hooks/data';
 import { BG_COLORS, TEXT_COLORS, POSITION_COLORS } from '../../core/constants/colors';
 import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
+import { useHeader } from '../../core';
 import { 
   PositionBadge,
   Skeleton, 
@@ -24,7 +25,7 @@ import {
 import { SearchInput } from '../../components/shared/inputs';
 import { ChevronRight, ChevronLeft, Edit, Share, Close } from '../../components/icons';
 import { usePlayerPool } from '../../../../lib/playerPool/usePlayerPool';
-import { getPlayerPhotoUrl, getPlayerId } from '../../../../lib/playerPhotos';
+import ShareOptionsModal from '../../draft-room/components/ShareOptionsModal';
 
 // ============================================================================
 // CONSTANTS
@@ -37,7 +38,6 @@ const MYTEAMS_PX = {
   headerPadding: SPACING.lg,
   rowPaddingX: SPACING.lg,
   rowPaddingY: SPACING.xs,
-  photoSize: 28,
 } as const;
 
 // ============================================================================
@@ -480,89 +480,60 @@ interface PlayerRowProps {
   player: TeamPlayer;
   onClick?: () => void;
   isExpanded?: boolean;
+  isLastInGroup?: boolean;
 }
 
-function PlayerRow({ player, onClick, isExpanded }: PlayerRowProps): React.ReactElement {
-  const [imageError, setImageError] = React.useState(false);
+function PlayerRow({ player, onClick, isExpanded, isLastInGroup }: PlayerRowProps): React.ReactElement {
+  // Sandbox-style position badge (inline, not using shared component)
+  const positionColors: Record<string, string> = {
+    QB: '#F472B6',
+    RB: '#0fba80',
+    WR: '#FBBF25',
+    TE: '#7C3AED',
+  };
+  const badgeColor = positionColors[player.position] || '#6B7280';
   
-  // Get player ID for image path
-  const playerId = (player as any).id || getPlayerId(player.name);
-  const photoUrl = getPlayerPhotoUrl(
-    player.name,
-    player.team,
-    player.position,
-    MYTEAMS_PX.photoSize,
-    playerId,
-    (player as any).photoUrl
-  );
-
   return (
     <div
       onClick={onClick}
-      className="flex items-center justify-between"
       style={{
-        paddingLeft: `${MYTEAMS_PX.rowPaddingX}px`,
-        paddingRight: `${MYTEAMS_PX.rowPaddingX}px`,
-        paddingTop: `${MYTEAMS_PX.rowPaddingY}px`,
-        paddingBottom: `${MYTEAMS_PX.rowPaddingY}px`,
-        borderBottom: '1px solid rgba(255,255,255,0.1)',
+        backgroundColor: 'rgba(255,255,255,0.03)',
+        borderRadius: '3px',
+        marginBottom: isLastInGroup ? '0px' : '2px',
+        overflow: 'hidden',
         cursor: onClick ? 'pointer' : 'default',
       }}
     >
-      {/* Player Info */}
-      <div className="flex items-center flex-1 min-w-0">
-        {/* Player Photo */}
-        <div
-          className="flex-shrink-0 rounded-full overflow-hidden flex items-center justify-center"
-          style={{
-            width: `${MYTEAMS_PX.photoSize}px`,
-            height: `${MYTEAMS_PX.photoSize}px`,
-            backgroundColor: imageError ? BG_COLORS.tertiary : 'transparent',
-            marginRight: `${SPACING.sm}px`,
-          }}
-        >
-          {!imageError && photoUrl ? (
-            <img
-              src={photoUrl}
-              alt={player.name}
-              className="w-full h-full object-cover"
-              onError={() => setImageError(true)}
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-              }}
-            />
-          ) : (
-            <svg width="14" height="14" viewBox="0 0 24 24" fill={TEXT_COLORS.muted}>
-              <circle cx="12" cy="8" r="4" />
-              <path d="M20 21c0-4.418-3.582-7-8-7s-8 2.582-8 7" />
-            </svg>
-          )}
-        </div>
-        
-        <div className="min-w-0">
-          <h3 
-            className="font-medium truncate"
-            style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
-          >
-            {player.name}
-          </h3>
-          <div className="flex items-center gap-2" style={{ marginTop: '2px' }}>
-            <PositionBadge position={player.position} size="sm" />
-            <span style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>
-              {player.team} (Bye {player.bye})
-            </span>
-          </div>
-        </div>
-      </div>
-      
-      {/* Projected Points */}
       <div
-        className="text-right flex-shrink-0"
-        style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          padding: '4px 8px',
+        }}
       >
-        {player.projectedPoints || 0} pts
+        {/* Player Info - exact sandbox layout */}
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '6px' }}>
+          {/* Position Badge - sandbox style */}
+          <div
+            style={{
+              backgroundColor: badgeColor,
+              color: '#000',
+              fontSize: '10px',
+              fontWeight: 600,
+              padding: '2px 6px',
+              borderRadius: '3px',
+              textTransform: 'uppercase',
+            }}
+          >
+            {player.position}
+          </div>
+          <span style={{ color: '#fff', fontSize: '12px', fontWeight: 500 }}>
+            {player.name}
+          </span>
+          <span style={{ color: '#6B7280', fontSize: '10px' }}>
+            {player.team}
+          </span>
+        </div>
       </div>
     </div>
   );
@@ -577,11 +548,26 @@ interface TeamDetailsViewProps {
 function TeamDetailsView({ team, onBack, onViewDraftBoard }: TeamDetailsViewProps): React.ReactElement {
   // Expansion state for player stats
   const [expandedPlayerId, setExpandedPlayerId] = useState<string | null>(null);
+  // Share modal state
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  // Header context for back button
+  const { setShowBackButton, clearBackButton } = useHeader();
+  
+  // Show back button in header when viewing team details
+  useEffect(() => {
+    setShowBackButton(true, onBack);
+    return () => clearBackButton();
+  }, [setShowBackButton, clearBackButton, onBack]);
   
   // Toggle player expansion
   const handlePlayerClick = useCallback((player: TeamPlayer) => {
     const playerId = `${player.name}-${player.pick}`;
     setExpandedPlayerId(prev => prev === playerId ? null : playerId);
+  }, []);
+  
+  // Handle share button click
+  const handleShareClick = useCallback(() => {
+    setIsShareModalOpen(true);
   }, []);
   
   // Group players by position, sorted by position order (QB, RB, WR, TE) then by pick
@@ -616,90 +602,59 @@ function TeamDetailsView({ team, onBack, onViewDraftBoard }: TeamDetailsViewProp
       className="flex-1 flex flex-col min-h-0"
       style={{ backgroundColor: BG_COLORS.primary }}
     >
-      {/* Header */}
+      {/* Team Name Bar - Sandbox Style (exact match) */}
       <div
-        className="flex items-center justify-between flex-shrink-0"
         style={{
-          padding: `${MYTEAMS_PX.headerPadding}px`,
-          borderBottom: '1px solid rgba(255,255,255,0.1)',
+          backgroundColor: '#101927',
+          padding: '10px 12px 6px 12px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+          gap: '6px',
         }}
       >
-        <div className="flex items-center flex-1 min-w-0">
-          <button 
-            onClick={onBack}
-            className="p-1 mr-2 flex items-center justify-center transition-all active:scale-95"
-            aria-label="Back to teams"
-            style={{
-              borderRadius: `${RADIUS.md}px`,
-            }}
-          >
-            <ChevronLeft size={20} color={TEXT_COLORS.primary} />
-          </button>
-          <button className="p-1 mr-2" aria-label="Edit team name">
-            <Edit size={18} color={TEXT_COLORS.muted} />
-          </button>
-          <h2 
-            className="font-semibold truncate"
-            style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}
-          >
-            {team.name}
-          </h2>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <button className="p-2" aria-label="Share team">
-            <Share size={20} color={TEXT_COLORS.muted} />
-          </button>
-          {onViewDraftBoard && (
-            <button 
-              onClick={onViewDraftBoard}
-              className="p-2"
-              aria-label="View draft board"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill={TEXT_COLORS.muted}>
-                <rect x="3" y="3" width="5" height="5" rx="1" />
-                <rect x="10" y="3" width="5" height="5" rx="1" />
-                <rect x="17" y="3" width="5" height="5" rx="1" />
-                <rect x="3" y="10" width="5" height="5" rx="1" />
-                <rect x="10" y="10" width="5" height="5" rx="1" />
-                <rect x="17" y="10" width="5" height="5" rx="1" />
-                <rect x="3" y="17" width="5" height="5" rx="1" />
-                <rect x="10" y="17" width="5" height="5" rx="1" />
-                <rect x="17" y="17" width="5" height="5" rx="1" />
-              </svg>
-            </button>
-          )}
-        </div>
+        <button
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: '2px',
+            display: 'flex',
+            alignItems: 'center',
+          }}
+          aria-label="Edit team name"
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+        </button>
+        <span style={{ color: '#fff', fontSize: '12px', fontWeight: 500, paddingTop: 2 }}>
+          {team.name}
+        </span>
       </div>
       
-      {/* Player Roster */}
+      {/* Player Roster - Sandbox Style (pixel-for-pixel match) */}
       <div
         className="flex-1 min-h-0 overflow-y-auto"
         style={{
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
+          backgroundColor: '#101927',
+          padding: '8px 12px',
         }}
       >
         {groupedPlayers.map(([position, players], groupIndex) => {
-          const positionColor = POSITION_COLORS[position.toUpperCase() as keyof typeof POSITION_COLORS] || TEXT_COLORS.muted;
-          
           return (
             <React.Fragment key={position}>
-              {/* Position Divider Above */}
-              <div
-                style={{
-                  height: '2px',
-                  backgroundColor: positionColor,
-                  marginLeft: `${MYTEAMS_PX.rowPaddingX}px`,
-                  marginRight: `${MYTEAMS_PX.rowPaddingX}px`,
-                  marginTop: groupIndex > 0 ? `${SPACING.sm}px` : '0',
-                  marginBottom: `${SPACING.xs}px`,
-                }}
-              />
+              {/* Spacing between position groups - exactly 6px */}
+              {groupIndex > 0 && <div style={{ height: '6px' }} />}
+              
               {/* Players in this position group */}
               {players.map((player, index) => {
                 const playerId = `${player.name}-${player.pick}`;
                 const isExpanded = expandedPlayerId === playerId;
+                const isLastInGroup = index === players.length - 1;
                 
                 return (
                   <React.Fragment key={playerId}>
@@ -707,17 +662,11 @@ function TeamDetailsView({ team, onBack, onViewDraftBoard }: TeamDetailsViewProp
                       player={player} 
                       onClick={() => handlePlayerClick(player)}
                       isExpanded={isExpanded}
+                      isLastInGroup={isLastInGroup && !isExpanded}
                     />
                     {/* Expanded Stats Card */}
                     {isExpanded && (
-                      <div
-                        style={{
-                          paddingLeft: `${MYTEAMS_PX.rowPaddingX}px`,
-                          paddingRight: `${MYTEAMS_PX.rowPaddingX}px`,
-                          paddingTop: `${SPACING.sm}px`,
-                          paddingBottom: `${SPACING.sm}px`,
-                        }}
-                      >
+                      <div style={{ padding: '2px 4px 4px' }}>
                         <PlayerStatsCard
                           player={{
                             name: player.name,
@@ -735,24 +684,21 @@ function TeamDetailsView({ team, onBack, onViewDraftBoard }: TeamDetailsViewProp
                   </React.Fragment>
                 );
               })}
-              {/* Position Divider Below */}
-              <div
-                style={{
-                  height: '2px',
-                  backgroundColor: positionColor,
-                  marginLeft: `${MYTEAMS_PX.rowPaddingX}px`,
-                  marginRight: `${MYTEAMS_PX.rowPaddingX}px`,
-                  marginTop: `${SPACING.xs}px`,
-                  marginBottom: groupIndex < groupedPlayers.length - 1 ? `${SPACING.sm}px` : '0',
-                }}
-              />
             </React.Fragment>
           );
         })}
         
-        {/* Bottom padding */}
-        <div style={{ height: '100px' }} />
+        {/* Bottom padding - minimal to stop at last player */}
+        <div style={{ height: '8px' }} />
       </div>
+      
+      {/* Share Options Modal */}
+      <ShareOptionsModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        shareType="roster"
+        contentName={team.name}
+      />
     </div>
   );
 }

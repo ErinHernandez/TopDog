@@ -238,17 +238,231 @@ export const BREAKPOINTS = {
 // ============================================================================
 
 export const PHONE_FRAME = {
-  /** iPhone 12/13/14 width */
-  width: 375,
-  /** iPhone 12/13/14 height */
-  height: 812,
+  /** Sandbox-matched width */
+  width: 280,
+  /** Sandbox-matched height */
+  height: 580,
   /** Border radius */
-  borderRadius: 24,
+  borderRadius: 36,
   /** Frame padding */
-  framePadding: 4,
+  framePadding: 8,
   /** Bezel color */
   bezelColor: '#000000',
 } as const;
+
+// ============================================================================
+// DEVICE PRESETS (For Testing Different iPhone Models)
+// ============================================================================
+
+export type DevicePresetId = 
+  | 'iphone-se'            // iPhone SE / iPhone 8 (375x667, Home Button)
+  | 'iphone-mini'          // iPhone 12/13 Mini (375x812, Small Notch)
+  | 'iphone-12'            // iPhone 12 (390x844, Large Notch)
+  | 'iphone-13'            // iPhone 13 (390x844, Small Notch)
+  | 'iphone-15'            // iPhone 15 (393x852, Dynamic Island)
+  | 'iphone-11'            // iPhone 11 (414x896, Large Notch)
+  | 'iphone-12-pro-max'    // iPhone 12 Pro Max (428x926, Large Notch)
+  | 'iphone-13-pro-max'    // iPhone 13 Pro Max (428x926, Small Notch)
+  | 'iphone-14-pro-max'    // iPhone 14 Pro Max (430x932, Dynamic Island)
+  | 'iphone-16-pro-max';   // iPhone 16 Pro Max (440x956, Dynamic Island)
+
+export interface DevicePreset {
+  id: DevicePresetId;
+  name: string;
+  /** Screen width in points */
+  width: number;
+  /** Screen height in points */
+  height: number;
+  /** Scale factor for preview (to fit on screen) */
+  scale: number;
+  /** Whether device has Dynamic Island */
+  hasDynamicIsland: boolean;
+  /** Whether device has notch (older Face ID models) */
+  hasNotch: boolean;
+  /** Status bar height */
+  statusBarHeight: number;
+  /** Home indicator height (0 for home button devices) */
+  homeIndicatorHeight: number;
+  /** Screen corner radius */
+  screenRadius: number;
+  /** Bezel corner radius */
+  bezelRadius: number;
+  /** Dynamic Island / notch dimensions */
+  notchWidth?: number;
+  notchHeight?: number;
+  /** Dynamic Island top offset from screen edge */
+  islandTopOffset?: number;
+  /** Bezel width around the screen */
+  bezelWidth?: number;
+}
+
+export const DEVICE_PRESETS: Record<DevicePresetId, DevicePreset> = {
+  'iphone-se': {
+    id: 'iphone-se',
+    name: 'iPhone SE',
+    width: 375,
+    height: 667,
+    scale: 0.87,
+    hasDynamicIsland: false,
+    hasNotch: false,
+    statusBarHeight: 20,
+    homeIndicatorHeight: 0,
+    screenRadius: 0,
+    bezelRadius: 40,
+  },
+  'iphone-mini': {
+    id: 'iphone-mini',
+    name: 'iPhone 13 Mini',
+    width: 375,
+    height: 812,
+    scale: 0.72,
+    hasDynamicIsland: false,
+    hasNotch: true,
+    statusBarHeight: 50,
+    homeIndicatorHeight: 34,
+    screenRadius: 40,
+    bezelRadius: 48,
+    notchWidth: 145,
+    notchHeight: 32,
+  },
+  'iphone-12': {
+    id: 'iphone-12',
+    name: 'iPhone 12',
+    width: 390,
+    height: 844,
+    scale: 0.69,
+    hasDynamicIsland: false,
+    hasNotch: true,
+    statusBarHeight: 47,
+    homeIndicatorHeight: 34,
+    screenRadius: 44,
+    bezelRadius: 52,
+    notchWidth: 209,
+    notchHeight: 32,
+  },
+  'iphone-13': {
+    id: 'iphone-13',
+    name: 'iPhone 13',
+    width: 390,
+    height: 844,
+    scale: 0.69,
+    hasDynamicIsland: false,
+    hasNotch: true,
+    statusBarHeight: 47,
+    homeIndicatorHeight: 34,
+    screenRadius: 44,
+    bezelRadius: 52,
+    notchWidth: 162,
+    notchHeight: 32,
+  },
+  'iphone-15': {
+    id: 'iphone-15',
+    name: 'iPhone 15',
+    width: 393,
+    height: 852,
+    scale: 0.68,
+    hasDynamicIsland: true,
+    hasNotch: false,
+    statusBarHeight: 59,
+    homeIndicatorHeight: 34,
+    screenRadius: 47,
+    bezelRadius: 55,
+    notchWidth: 126,
+    notchHeight: 37,
+  },
+  'iphone-11': {
+    id: 'iphone-11',
+    name: 'iPhone 11',
+    width: 414,
+    height: 896,
+    scale: 0.65,
+    hasDynamicIsland: false,
+    hasNotch: true,
+    statusBarHeight: 48,
+    homeIndicatorHeight: 34,
+    screenRadius: 40,
+    bezelRadius: 48,
+    notchWidth: 209,
+    notchHeight: 32,
+  },
+  'iphone-12-pro-max': {
+    id: 'iphone-12-pro-max',
+    name: 'iPhone 12 Pro Max',
+    width: 428,
+    height: 926,
+    scale: 0.63,
+    hasDynamicIsland: false,
+    hasNotch: true,
+    statusBarHeight: 47,
+    homeIndicatorHeight: 34,
+    screenRadius: 44,
+    bezelRadius: 52,
+    notchWidth: 209,
+    notchHeight: 32,
+  },
+  'iphone-13-pro-max': {
+    id: 'iphone-13-pro-max',
+    name: 'iPhone 13 Pro Max',
+    width: 428,
+    height: 926,
+    scale: 0.63,
+    hasDynamicIsland: false,
+    hasNotch: true,
+    statusBarHeight: 47,
+    homeIndicatorHeight: 34,
+    screenRadius: 44,
+    bezelRadius: 52,
+    notchWidth: 162,
+    notchHeight: 32,
+  },
+  'iphone-14-pro-max': {
+    id: 'iphone-14-pro-max',
+    name: 'iPhone 14 Pro Max',
+    width: 430,
+    height: 932,
+    scale: 0.62,
+    hasDynamicIsland: true,
+    hasNotch: false,
+    statusBarHeight: 59,
+    homeIndicatorHeight: 34,
+    screenRadius: 55,
+    bezelRadius: 63,
+    notchWidth: 126,
+    notchHeight: 37,
+  },
+  'iphone-16-pro-max': {
+    id: 'iphone-16-pro-max',
+    name: 'iPhone 16 Pro Max',
+    width: 440,
+    height: 956,
+    scale: 0.61,
+    hasDynamicIsland: true,
+    hasNotch: false,
+    statusBarHeight: 62,
+    homeIndicatorHeight: 34,
+    screenRadius: 55,
+    bezelRadius: 63,
+    notchWidth: 126,
+    notchHeight: 37,
+  },
+} as const;
+
+/** Default device for previews */
+export const DEFAULT_DEVICE: DevicePresetId = 'iphone-15';
+
+/** All device preset IDs in display order (smallest to largest) */
+export const ALL_DEVICES: DevicePresetId[] = [
+  'iphone-se',
+  'iphone-mini',
+  'iphone-12',
+  'iphone-13',
+  'iphone-15',
+  'iphone-11',
+  'iphone-12-pro-max',
+  'iphone-13-pro-max',
+  'iphone-14-pro-max',
+  'iphone-16-pro-max',
+];
 
 // ============================================================================
 // SAFE AREAS

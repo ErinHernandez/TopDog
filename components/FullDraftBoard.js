@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { logoOptions } from './team-logos';
-import { getPlayerPhotoUrl, getPlayerInitials, getPositionColor as getPositionPhotoColor } from '../lib/playerPhotos';
 import { POSITION_HELPERS, POSITIONS } from './draft/v3/constants/positions';
 
 // Team colors (keep as before)
@@ -29,43 +28,6 @@ const CheckeredFlag = () => (
     <rect x="9" y="9" width="9" height="9" fill="black" />
   </svg>
 );
-
-// Player Photo Component with fallback handling
-const PlayerPhoto = ({ playerName, teamCode, position, size = 32 }) => {
-  const [imageError, setImageError] = React.useState(false);
-  const photoUrl = getPlayerPhotoUrl(playerName, teamCode, position, size);
-  const initials = getPlayerInitials(playerName);
-  const bgColor = getPositionPhotoColor(position);
-
-  if (imageError || !photoUrl) {
-    // Fallback to initials with position-based background
-    return (
-      <div 
-        className="flex items-center justify-center text-white font-bold rounded-full"
-        style={{ 
-          width: size, 
-          height: size, 
-          backgroundColor: bgColor,
-          fontSize: size * 0.35,
-          minWidth: size,
-          minHeight: size
-        }}
-      >
-        {initials}
-      </div>
-    );
-  }
-
-  return (
-    <img 
-      src={photoUrl}
-      alt={playerName}
-      className="rounded-full object-cover"
-      style={{ width: size, height: size, minWidth: size, minHeight: size }}
-      onError={() => setImageError(true)}
-    />
-  );
-};
 
 export default function FullDraftBoard({ room, picks, participants, draftOrder, PLAYER_POOL }) {
   const [hasVisitedBoard, setHasVisitedBoard] = useState(false);
@@ -431,16 +393,6 @@ export default function FullDraftBoard({ room, picks, participants, draftOrder, 
                               </div>
                             )}
 
-                            {/* Player Photo */}
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 0, marginBottom: 2 }}>
-                              <PlayerPhoto 
-                                playerName={playerName}
-                                teamCode={playerData?.team}
-                                position={playerData?.position}
-                                size={20}
-                              />
-                            </div>
-                            
                             <div style={{ fontSize: 9, letterSpacing: 0.3, color: '#fff', marginTop: 2, fontFamily: 'Arial, Helvetica, sans-serif', lineHeight: 1.0, textAlign: 'center', wordWrap: 'break-word', overflowWrap: 'break-word', hyphens: 'auto', maxWidth: '100%', padding: '0 2px' }}>
                               {playerName || null}
                             </div>

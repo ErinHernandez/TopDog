@@ -1,0 +1,36 @@
+# TopDog Browser Targets
+# Enterprise Legacy Device Support Configuration
+# Created: December 30, 2024
+# 
+# This configuration ensures VX2 components work on:
+# - Tier 1: iPhone 11+ (iOS 15+) - Full support
+# - Tier 2: iPhone 8/X/XR/XS (iOS 15+) - Compatible
+# - Tier 3: iPhone 6s/7/SE 1st gen (iOS 15) - Best effort
+#
+# Covers ~98% of iOS users globally
+
+# iOS Safari - Primary target
+iOS >= 12
+Safari >= 12
+
+# For broader PWA support on Android (future expansion)
+Chrome >= 80
+ChromeAndroid >= 80
+
+# Samsung Internet (significant Android market share)
+Samsung >= 12
+
+# Firefox (small but non-zero mobile share)
+Firefox >= 78
+FirefoxAndroid >= 78
+
+# Development browsers (last versions for dev experience)
+last 1 Chrome version
+last 1 Firefox version
+last 1 Safari version
+
+# Explicitly exclude old/dead browsers
+not dead
+not op_mini all
+not IE 11
+

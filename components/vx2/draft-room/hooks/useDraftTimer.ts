@@ -84,6 +84,15 @@ export function useDraftTimer({
   // Store onExpire in ref to avoid effect cleanup when callback changes
   const onExpireRef = useRef(onExpire);
   onExpireRef.current = onExpire;
+  // Store onTick in ref to avoid stale closure in setInterval callback
+  const onTickRef = useRef(onTick);
+  onTickRef.current = onTick;
+  
+  // #region agent log
+  useEffect(() => {
+    fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useDraftTimer.ts:89',message:'onTick ref updated',data:{onTickProvided:!!onTick,onTickRefCurrent:!!onTickRef.current},timestamp:Date.now(),sessionId:'debug-session',runId:'verify-fix',hypothesisId:'verify-onTick-ref'})}).catch(()=>{});
+  }, [onTick]);
+  // #endregion
   // Store isActive in ref to avoid effect cleanup when it changes
   const isActiveRef = useRef(isActive);
   isActiveRef.current = isActive;
@@ -106,15 +115,18 @@ export function useDraftTimer({
       setSeconds(prev => {
         const next = prev - 1;
         
-        // Call onTick callback
-        onTick?.(next);
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useDraftTimer.ts:114',message:'Timer tick - calling onTick via ref',data:{next,onTickRefExists:!!onTickRef.current},timestamp:Date.now(),sessionId:'debug-session',runId:'verify-fix',hypothesisId:'verify-onTick-call'})}).catch(()=>{});
+        // #endregion
+        // Call onTick callback - using ref to avoid stale closure
+        onTickRef.current?.(next);
         
         return next;
       });
     }, 1000);
     
     return () => clearInterval(interval);
-  }, [isRunning, onTick]);
+  }, [isRunning]); // Removed onTick from deps - using ref instead
   
   // Handle expiration with delay (timer sits at 0 for 1.2s before auto-pick)
   // Uses refs to avoid effect cleanup cancelling pending timeouts

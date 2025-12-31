@@ -88,7 +88,7 @@ function StatItem({ value, label }: StatItemProps): React.ReactElement {
   return (
     <div className="text-center">
       <div 
-        className="font-bold" 
+        className="vx2-tournament-stat-value font-bold" 
         style={{ 
           fontSize: `${CARD_PX.statsValueFontSize}px`, 
           color: CARD_COLORS.text,
@@ -97,6 +97,7 @@ function StatItem({ value, label }: StatItemProps): React.ReactElement {
         {value}
       </div>
       <div 
+        className="vx2-tournament-stat-label"
         style={{ 
           fontSize: `${CARD_PX.statsLabelFontSize}px`, 
           color: CARD_COLORS.textMuted,
@@ -124,7 +125,7 @@ export function TournamentCard({
   
   return (
     <div 
-      className={`relative w-full h-full ${className}`}
+      className={`vx2-tournament-card relative w-full h-full ${className}`}
       style={{
         backgroundImage: CARD_COLORS.background,
         backgroundColor: CARD_COLORS.backgroundFallback,
@@ -146,7 +147,7 @@ export function TournamentCard({
       <div>
         {/* Tournament Title - Split into two lines */}
         <h2 
-          className="text-center font-bold leading-tight"
+          className="vx2-tournament-title text-center font-bold leading-tight"
           style={{ 
             fontSize: '26px',
             fontFamily: "'Anton SC', sans-serif",
@@ -169,16 +170,14 @@ export function TournamentCard({
         {/* Tournament Logo/Image */}
         {featured && (
           <div 
-            className="flex justify-center"
-            style={{ marginTop: `${SPACING.xl * 2}px`, marginBottom: `${SPACING.md}px` }}
+            className="vx2-tournament-logo-wrapper flex justify-center"
           >
             <img 
               src="/globe_tournament.png" 
               alt=""
               aria-hidden="true"
+              className="vx2-tournament-logo"
               style={{ 
-                width: `${CARD_PX.logoSize}px`, 
-                height: `${CARD_PX.logoSize}px`, 
                 objectFit: 'contain',
                 borderRadius: `${RADIUS.lg}px`,
               }}
@@ -187,16 +186,16 @@ export function TournamentCard({
         )}
       </div>
 
-      {/* Spacer to push bottom content down */}
-      <div style={{ flex: 1 }} />
+      {/* Spacer to push bottom content down - hidden on compact */}
+      <div className="vx2-card-spacer" style={{ flex: 1 }} />
 
       {/* Bottom Section - Progress, Button, Stats */}
       <div>
         {/* Progress Bar */}
         {tournament.maxEntries && (
-          <div style={{ marginBottom: `${SPACING.lg}px` }}>
+          <div className="vx2-progress-section" style={{ marginBottom: `${SPACING.lg}px` }}>
             <div 
-              className="flex justify-between"
+              className="vx2-progress-labels flex justify-between"
               style={{ 
                 fontSize: `${CARD_PX.progressLabelFontSize}px`, 
                 color: CARD_COLORS.textMuted,
@@ -218,7 +217,7 @@ export function TournamentCard({
         {/* Join Button */}
         <button
           onClick={onJoinClick}
-          className="w-full font-semibold transition-colors duration-200 active:scale-[0.98]"
+          className="vx2-tournament-button w-full font-semibold transition-colors duration-200 active:scale-[0.98]"
           style={{ 
             ...TILED_BG_STYLE,
             color: '#FFFFFF',
@@ -236,6 +235,7 @@ export function TournamentCard({
 
         {/* Stats Grid */}
         <div 
+          className="vx2-tournament-stats"
           style={{ 
             display: 'grid', 
             gridTemplateColumns: '1fr 1fr 1fr', 

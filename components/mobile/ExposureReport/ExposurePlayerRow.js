@@ -6,7 +6,6 @@
 
 import React from 'react';
 import PositionBadge from '../../draft/v3/mobile/apple/components/PositionBadge';
-import { getPlayerPhotoUrl } from '../../../lib/playerPhotos';
 import { BYE_WEEKS } from '../../../lib/nflConstants';
 
 export default function ExposurePlayerRow({
@@ -16,9 +15,7 @@ export default function ExposurePlayerRow({
   isLast,
   showShares,
   onToggleShares,
-  headshotsMap
 }) {
-  const photoUrl = headshotsMap[player.name] || getPlayerPhotoUrl(player.name, player.team, player.position, 40);
   const byeWeek = BYE_WEEKS[player.team] || 'TBD';
   const exposurePercent = Math.round((player.exposure / 210) * 100);
 
@@ -32,25 +29,10 @@ export default function ExposurePlayerRow({
       style={{ minHeight: '32px' }}
     >
       <div className="flex items-center justify-between">
-        {/* Left Side - Player Photo and Info */}
+        {/* Left Side - Player Info */}
         <div className="flex items-center flex-1 min-w-0">
-          {/* Player Photo */}
-          <div 
-            className="flex-shrink-0 rounded-full overflow-hidden"
-            style={{ width: '36px', height: '36px', marginLeft: '8px', marginRight: '10px' }}
-          >
-            <img 
-              src={photoUrl}
-              alt={player.name}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                e.target.src = `/logos/nfl/${player.team?.toLowerCase()}.png`;
-              }}
-            />
-          </div>
-          
           {/* Player Info */}
-          <div className="min-w-0 flex-1" style={{ marginLeft: '2px' }}>
+          <div className="min-w-0 flex-1" style={{ marginLeft: '10px' }}>
             <div className="flex items-center overflow-hidden">
               <h3 className="font-medium text-white truncate max-w-[200px] text-sm">
                 {player.name}

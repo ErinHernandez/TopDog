@@ -22,6 +22,7 @@ import { BG_COLORS, TEXT_COLORS } from '../../core/constants/colors';
 import PlayerExpandedCard from './PlayerExpandedCard';
 import { useImageShare } from '../hooks/useImageShare';
 import { Share } from '../../components/icons/actions/Share';
+import ShareOptionsModal from './ShareOptionsModal';
 
 // ============================================================================
 // PIXEL-PERFECT CONSTANTS (matched from VX RosterPanelVX.tsx)
@@ -62,8 +63,6 @@ const ROSTER_PX = {
   
   // Player Content
   playerContentPaddingX: 8,
-  playerPhotoSize: 28,
-  playerPhotoMarginRight: 12,
   playerNameFontSize: 13,
   teamByeFontSize: 11,
   teamByeMinWidth: 60,
@@ -126,11 +125,6 @@ export interface RosterViewProps {
 // ============================================================================
 // HELPER FUNCTIONS
 // ============================================================================
-
-function createRosterGradient(position: string): string {
-  const color = POSITION_COLORS[position as Position] || '#6B7280';
-  return `linear-gradient(to right, ${color}40 0%, transparent 50%)`;
-}
 
 function getByeWeek(team: string): number | null {
   // Bye week lookup - 2024 season
@@ -263,60 +257,6 @@ function PositionBadge({ position, size }: PositionBadgeProps): React.ReactEleme
   );
 }
 
-interface PlayerPhotoProps {
-  player: DraftPlayer;
-  size?: number;
-}
-
-function PlayerPhoto({ player, size = ROSTER_PX.playerPhotoSize }: PlayerPhotoProps): React.ReactElement {
-  const [error, setError] = React.useState(false);
-  const positionColor = POSITION_COLORS[player.position as Position] || ROSTER_COLORS.textSecondary;
-  
-  const initials = player.name
-    .split(' ')
-    .map(n => n.charAt(0))
-    .join('')
-    .substring(0, 2)
-    .toUpperCase();
-
-  if (error) {
-    // Show initials fallback when player photo fails
-    return (
-      <div
-        style={{
-          width: size,
-          height: size,
-          borderRadius: '50%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontWeight: 700,
-          backgroundColor: positionColor,
-          color: ROSTER_COLORS.textPrimary,
-          fontSize: size * 0.35,
-        }}
-      >
-        {initials}
-      </div>
-    );
-  }
-
-  return (
-    <img
-      src={`/players/${player.name.toLowerCase().replace(/[^a-z]/g, '-')}.png`}
-      alt={player.name}
-      style={{
-        width: size,
-        height: size,
-        borderRadius: '50%',
-        objectFit: 'cover',
-        backgroundColor: ROSTER_COLORS.dropdownBg,
-      }}
-      onError={() => setError(true)}
-    />
-  );
-}
-
 interface RosterRowProps {
   position: RosterPosition;
   player: DraftPlayer | null;
@@ -346,18 +286,6 @@ function RosterRow({ position, player, isStarter, showTopBorder = false, isExpan
           cursor: player ? 'pointer' : 'default',
         }}
       >
-        {/* Gradient overlay for filled bench slots */}
-        {!isStarter && player && (
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              pointerEvents: 'none',
-              background: createRosterGradient(player.position),
-              zIndex: 1,
-            }}
-          />
-        )}
         
         {/* Position Badge Column */}
         <div
@@ -666,6 +594,7 @@ export default function RosterView({
 }: RosterViewProps): React.ReactElement {
   const [selectedIndex, setSelectedIndex] = useState(userParticipantIndex);
   const [expandedPlayerId, setExpandedPlayerId] = useState<string | null>(null);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const rosterContentRef = useRef<HTMLDivElement>(null);
   
@@ -679,12 +608,19 @@ export default function RosterView({
     },
   });
   
-  // Handle share button click
+  // Get selected participant name
+  const selectedParticipant = participants[selectedIndex];
+  const teamName = selectedParticipant?.name || 'My Team';
+  
+  // Handle share button click - open modal
   const handleShare = useCallback(() => {
-    const selectedParticipant = participants[selectedIndex];
-    const teamName = selectedParticipant?.name || 'My Team';
+    setIsShareModalOpen(true);
+  }, []);
+  
+  // Handle image share from modal
+  const handleShareImage = useCallback(() => {
     captureAndShare(rosterContentRef.current, 'roster', teamName);
-  }, [captureAndShare, participants, selectedIndex]);
+  }, [captureAndShare, teamName]);
   
   // Collapse expanded card when switching teams
   useEffect(() => {
@@ -737,11 +673,11 @@ export default function RosterView({
         backgroundColor: ROSTER_COLORS.background,
         color: ROSTER_COLORS.textPrimary,
         position: 'relative',
+        paddingTop: 16, // Space below PicksBar
       }}
     >
-      {/* Capturable Roster Content */}
-      <div ref={rosterContentRef}>
-        {/* Header with Dropdown */}
+      {/* Header with Dropdown - fixed at top */}
+      <div style={{ flexShrink: 0 }}>
         <TeamSelector
           participants={participants}
           selectedIndex={selectedIndex}
@@ -749,22 +685,25 @@ export default function RosterView({
           onTheClockIndex={onTheClockIndex}
           draftDirectionUp={draftDirectionUp}
         />
-        
-        {/* Roster List - Scrollable */}
-        <div
-          ref={scrollContainerRef}
-          onScroll={handleScroll}
-          style={{
-            flex: 1,
-            overflowY: 'auto',
-            WebkitOverflowScrolling: 'touch',
-            overscrollBehavior: 'contain',
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-            borderTop: `2px solid ${ROSTER_COLORS.headerBorder}`,
-            paddingBottom: 24,
-          }}
-        >
+      </div>
+      
+      {/* Roster List - Scrollable */}
+      <div
+        ref={scrollContainerRef}
+        onScroll={handleScroll}
+        style={{
+          flex: 1,
+          overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch',
+          overscrollBehavior: 'contain',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+          borderTop: `2px solid ${ROSTER_COLORS.headerBorder}`,
+          paddingBottom: 24,
+        }}
+      >
+        {/* Capturable Roster Content */}
+        <div ref={rosterContentRef}>
           {/* Starting Lineup */}
           {STARTING_POSITIONS.map((position, index) => {
             const player = getPlayerForSlot(team, position, index, STARTING_POSITIONS);
@@ -862,6 +801,16 @@ export default function RosterView({
           to { transform: rotate(360deg); }
         }
       `}</style>
+      
+      {/* Share Options Modal */}
+      <ShareOptionsModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        shareType="roster"
+        contentName={teamName}
+        onShareImage={handleShareImage}
+        isCapturingImage={isCapturing}
+      />
     </div>
   );
 }

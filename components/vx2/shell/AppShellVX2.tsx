@@ -11,12 +11,14 @@
  * This replaces MobileAppVX with a cleaner, context-driven architecture.
  */
 
-import React, { useCallback, useState, createContext, useContext } from 'react';
-import { TabNavigationProvider, useTabNavigation } from '../core';
+import React, { useCallback, useState, createContext, useContext, useEffect } from 'react';
+import { TabNavigationProvider, HeaderProvider } from '../core';
 import type { TabId } from '../core/types';
+import type { DevicePresetId } from '../core/constants/sizes';
 import { BG_COLORS } from '../core/constants/colors';
+import { getDeviceClassFromPreset } from '../core/constants/responsive';
+import type { DeviceClass } from '../core/constants/responsive';
 import { TabBarVX2, TabContentVX2 } from '../navigation';
-import AppHeaderVX2 from './AppHeaderVX2';
 import MobilePhoneFrame from './MobilePhoneFrame';
 import { 
   AutodraftLimitsModalVX2, 
@@ -24,8 +26,6 @@ import {
   WithdrawModalVX2, 
   RankingsModalVX2 
 } from '../modals';
-
-const LOGO_HEIGHT = 32;
 
 // ============================================================================
 // MODAL CONTEXT
@@ -53,6 +53,8 @@ export interface AppShellVX2Props {
   initialTab?: TabId;
   /** Whether to show in phone frame (for desktop preview) */
   showPhoneFrame?: boolean;
+  /** Device preset for phone frame (optional, defaults to standard iPhone) */
+  devicePreset?: DevicePresetId;
   /** Badge overrides for tabs */
   badgeOverrides?: Partial<Record<TabId, number>>;
   /** Callback when tab changes */
@@ -65,35 +67,85 @@ export interface AppShellVX2Props {
 
 interface InnerShellProps {
   badgeOverrides?: Partial<Record<TabId, number>>;
+  deviceClass?: DeviceClass;
 }
 
-function InnerShell({ badgeOverrides }: InnerShellProps): React.ReactElement {
+function InnerShell({ badgeOverrides, deviceClass = 'standard' }: InnerShellProps): React.ReactElement {
+  // #region agent log
+  fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AppShellVX2.tsx:70',message:'InnerShell rendering',data:{hasBadgeOverrides:!!badgeOverrides},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'F'})}).catch(()=>{});
+  // #endregion
   // Modal state
   const [showAutodraftLimits, setShowAutodraftLimits] = useState(false);
   const [showDepositHistory, setShowDepositHistory] = useState(false);
   const [showWithdraw, setShowWithdraw] = useState(false);
   const [showRankings, setShowRankings] = useState(false);
   
+  // #region agent log
+  useEffect(() => {
+    fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AppShellVX2.tsx:74',message:'InnerShell modal state',data:{showAutodraftLimits,showDepositHistory,showWithdraw,showRankings},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'F'})}).catch(()=>{});
+  }, [showAutodraftLimits, showDepositHistory, showWithdraw, showRankings]);
+  // #endregion
+  
   // Modal handlers
   const modalContext: ModalContextType = {
-    openAutodraftLimits: useCallback(() => setShowAutodraftLimits(true), []),
-    openDepositHistory: useCallback(() => setShowDepositHistory(true), []),
-    openWithdraw: useCallback(() => setShowWithdraw(true), []),
-    openRankings: useCallback(() => setShowRankings(true), []),
+    openAutodraftLimits: useCallback(() => {
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AppShellVX2.tsx:79',message:'openAutodraftLimits called',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'F'})}).catch(()=>{});
+      // #endregion
+      setShowAutodraftLimits(true);
+    }, []),
+    openDepositHistory: useCallback(() => {
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AppShellVX2.tsx:83',message:'openDepositHistory called',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'F'})}).catch(()=>{});
+      // #endregion
+      setShowDepositHistory(true);
+    }, []),
+    openWithdraw: useCallback(() => {
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AppShellVX2.tsx:87',message:'openWithdraw called',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'F'})}).catch(()=>{});
+      // #endregion
+      setShowWithdraw(true);
+    }, []),
+    openRankings: useCallback(() => {
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AppShellVX2.tsx:91',message:'openRankings called',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'F'})}).catch(()=>{});
+      // #endregion
+      setShowRankings(true);
+    }, []),
   };
   
   return (
     <ModalContext.Provider value={modalContext}>
       <div 
-        className="h-full flex flex-col relative"
+        className={`h-full flex flex-col relative vx2-device-${deviceClass}`}
+        data-device-class={deviceClass}
         style={{ backgroundColor: BG_COLORS.primary }}
       >
-        {/* App Header - No back button, deposit button, or logo (logo rendered as overlay in MobilePhoneFrame) */}
-        <AppHeaderVX2
-          showBackButton={false}
-          showDeposit={false}
-          hideLogo={true}
-        />
+        {/* Logo bar with blue background */}
+        <div
+          className="vx2-logo-bar"
+          style={{
+            height: 44,
+            display: 'flex',
+            alignItems: 'center',
+            flexShrink: 0,
+            backgroundImage: 'url(/wr_blue.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            paddingLeft: 12,
+            paddingRight: 12,
+          }}
+        >
+          <img
+            src="/logo.png"
+            alt="TopDog"
+            style={{
+              height: 28,
+              width: 'auto',
+              objectFit: 'contain',
+            }}
+          />
+        </div>
         
         {/* Tab Content Area */}
         <TabContentVX2 />
@@ -127,46 +179,20 @@ function InnerShell({ badgeOverrides }: InnerShellProps): React.ReactElement {
 // MAIN COMPONENT
 // ============================================================================
 
-// Logo overlay component for header
-function LogoOverlay(): React.ReactElement {
-  const { navigateToTab } = useTabNavigation();
-  
-  const handleLogoClick = () => {
-    navigateToTab('lobby');
-  };
-  
-  return (
-    <button
-      onClick={handleLogoClick}
-      style={{
-        pointerEvents: 'auto',
-        background: 'none',
-        border: 'none',
-        padding: 0,
-        cursor: 'pointer',
-      }}
-      aria-label="Go to Lobby"
-    >
-      <img
-        src="/logo.png"
-        alt="TopDog"
-        style={{
-          height: `${LOGO_HEIGHT}px`,
-          width: 'auto',
-          display: 'block',
-          objectFit: 'contain',
-        }}
-      />
-    </button>
-  );
-}
-
 export default function AppShellVX2({
   initialTab = 'lobby',
   showPhoneFrame = true,
+  devicePreset,
   badgeOverrides,
   onTabChange,
 }: AppShellVX2Props): React.ReactElement {
+  // #region agent log
+  console.warn('[VX2 DEBUG] AppShellVX2 rendering', {initialTab, showPhoneFrame, devicePreset, hasBadgeOverrides: !!badgeOverrides, hasOnTabChange: !!onTabChange});
+  fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AppShellVX2.tsx:164',message:'AppShellVX2 rendering',data:{initialTab,showPhoneFrame,devicePreset,hasBadgeOverrides:!!badgeOverrides,hasOnTabChange:!!onTabChange},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'A'})}).catch((e)=>console.error('[VX2 DEBUG] Fetch failed', e));
+  // #endregion
+  // Get device class from preset for simulated frames
+  const deviceClass = getDeviceClassFromPreset(devicePreset);
+  
   // Optionally wrap in phone frame for desktop preview
   if (showPhoneFrame) {
     return (
@@ -174,22 +200,26 @@ export default function AppShellVX2({
         initialTab={initialTab}
         onTabChange={onTabChange}
       >
-        <MobilePhoneFrame
-          headerOverlay={<LogoOverlay />}
-        >
-          <InnerShell badgeOverrides={badgeOverrides} />
-        </MobilePhoneFrame>
+        <HeaderProvider>
+          <MobilePhoneFrame
+            devicePreset={devicePreset}
+          >
+            <InnerShell badgeOverrides={badgeOverrides} deviceClass={deviceClass} />
+          </MobilePhoneFrame>
+        </HeaderProvider>
       </TabNavigationProvider>
     );
   }
   
-  // Without phone frame (actual mobile device)
+  // Without phone frame (actual mobile device) - use standard, CSS media queries will handle it
   return (
     <TabNavigationProvider 
       initialTab={initialTab}
       onTabChange={onTabChange}
     >
-      <InnerShell badgeOverrides={badgeOverrides} />
+      <HeaderProvider>
+        <InnerShell badgeOverrides={badgeOverrides} deviceClass="standard" />
+      </HeaderProvider>
     </TabNavigationProvider>
   );
 }

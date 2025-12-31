@@ -486,17 +486,21 @@ export default function WithdrawModalVX2({ isOpen, onClose }: WithdrawModalVX2Pr
   const handleConfirm = useCallback(async () => {
     setIsLoading(true);
     await new Promise(resolve => setTimeout(resolve, 1500));
+    // Check if modal is still open before setting state (race condition prevention)
+    if (!isOpen) return;
     const code = generateMockCode();
     setMockCode(code);
     console.log('Withdrawal confirmation code:', code);
     setIsLoading(false);
     setStep('code');
-  }, []);
+  }, [isOpen]);
 
   const handleVerifyCode = useCallback(async (enteredCode: string) => {
     setIsVerifying(true);
     setCodeError(null);
     await new Promise(resolve => setTimeout(resolve, 1000));
+    // Check if modal is still open before setting state (race condition prevention)
+    if (!isOpen) return;
     if (enteredCode === mockCode || enteredCode === '123456') {
       setIsVerifying(false);
       setStep('success');
@@ -505,7 +509,7 @@ export default function WithdrawModalVX2({ isOpen, onClose }: WithdrawModalVX2Pr
       setCodeError('Incorrect code. Please try again.');
       setIsVerifying(false);
     }
-  }, [mockCode]);
+  }, [mockCode, isOpen]);
 
   const handleResendCode = useCallback(async () => {
     const code = generateMockCode();

@@ -16,7 +16,7 @@ export default function MyTeamsTab({
   setShowDraftBoard 
 }) {
   // Get player data from centralized context
-  const { allPlayers, headshotsMap } = usePlayerData();
+  const { allPlayers } = usePlayerData();
   
   // Teams state (will be replaced with Firebase data)
   const [teams, setTeams] = useState(MOCK_TEAMS);
@@ -28,7 +28,6 @@ export default function MyTeamsTab({
         team={selectedTeam}
         teams={teams}
         setTeams={setTeams}
-        headshotsMap={headshotsMap}
         setDraftBoardTeam={setDraftBoardTeam}
         setShowDraftBoard={setShowDraftBoard}
       />

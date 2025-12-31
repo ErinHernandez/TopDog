@@ -10,7 +10,6 @@ import PositionBadge from '../../../draft/v3/mobile/apple/components/PositionBad
 import ShareButton from '../../ShareButton';
 import { SHARE_TYPES, generateShareData } from '../../../../lib/shareConfig';
 import { BYE_WEEKS } from '../../../../lib/nflConstants';
-import { getPlayerPhotoUrl as getPlayerAvatar } from '../../../../lib/playerPhotos';
 import { POSITIONS } from '../../../draft/v3/constants/positions';
 import { getTotalPlayers } from './mockTeamData';
 
@@ -18,17 +17,11 @@ export default function TeamDetailsView({
   team,
   teams,
   setTeams,
-  headshotsMap,
   setDraftBoardTeam,
   setShowDraftBoard
 }) {
   const [editingTeamName, setEditingTeamName] = useState(null);
   const [teamNameInput, setTeamNameInput] = useState('');
-
-  // Get player photo URL - headshot from API or fallback to avatar
-  const getPlayerPhotoUrl = (name, teamCode, pos) => {
-    return headshotsMap[name] || getPlayerAvatar(name, teamCode, pos, 40);
-  };
 
   // Generate detailed roster text for sharing
   const generateRosterShareText = (team) => {
@@ -172,7 +165,6 @@ export default function TeamDetailsView({
                   context="TEAM_MANAGEMENT"
                   showActions={false}
                   showStats={true}
-                  headshotsMap={headshotsMap}
                   renderPlayerCell={(player, index, { isExpanded, isSelected }) => {
                     const isLastPlayer = index === players.length - 1;
                     
@@ -183,16 +175,7 @@ export default function TeamDetailsView({
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center flex-1 min-w-0">
-                            <div className="flex-shrink-0 rounded-full overflow-hidden" style={{ width: '36px', height: '36px', marginRight: '10px' }}>
-                              <img 
-                                src={getPlayerPhotoUrl(player.name, player.team, player.position)}
-                                alt={player.name}
-                                className="w-full h-full object-cover"
-                                onError={(e) => { e.target.src = `/logos/nfl/${player.team?.toLowerCase()}.png`; }}
-                              />
-                            </div>
-                            
-                            <div className="min-w-0 flex-1" style={{ marginLeft: '2px' }}>
+                            <div className="min-w-0 flex-1">
                               <div className="flex items-center overflow-hidden">
                                 <h3 className="font-medium text-white truncate max-w-[200px] text-sm">{player.name}</h3>
                               </div>

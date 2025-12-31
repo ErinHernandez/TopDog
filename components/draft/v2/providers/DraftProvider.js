@@ -39,8 +39,6 @@ export default function DraftProvider({ roomId, children }) {
     allPlayers, 
     availablePlayers: contextAvailablePlayers, 
     syncDraftedPlayers,
-    headshotsMap,
-    getPlayerHeadshot 
   } = usePlayerData();
   
   // Core state
@@ -370,10 +368,6 @@ export default function DraftProvider({ roomId, children }) {
     timer,
     isLoading,
     error,
-    
-    // Player data from centralized context
-    headshotsMap,
-    getPlayerHeadshot,
     
     // User state
     userName,

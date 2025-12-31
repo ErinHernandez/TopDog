@@ -33,6 +33,11 @@ export function getParticipantForPick(
   pickNumber: number, 
   teamCount: number = DRAFT_DEFAULTS.teamCount
 ): number {
+  // Guard against invalid inputs to prevent division by zero
+  if (pickNumber < 1 || teamCount < 1) {
+    return 0;
+  }
+  
   const round = Math.ceil(pickNumber / teamCount);
   const positionInRound = (pickNumber - 1) % teamCount;
   const isOddRound = round % 2 === 1;
@@ -53,6 +58,10 @@ export function getRoundForPick(
   pickNumber: number, 
   teamCount: number = DRAFT_DEFAULTS.teamCount
 ): number {
+  // Guard against invalid inputs to prevent division by zero
+  if (pickNumber < 1 || teamCount < 1) {
+    return 1;
+  }
   return Math.ceil(pickNumber / teamCount);
 }
 
@@ -67,6 +76,10 @@ export function getPickInRound(
   pickNumber: number,
   teamCount: number = DRAFT_DEFAULTS.teamCount
 ): number {
+  // Guard against invalid inputs to prevent division by zero
+  if (pickNumber < 1 || teamCount < 1) {
+    return 1;
+  }
   return ((pickNumber - 1) % teamCount) + 1;
 }
 
