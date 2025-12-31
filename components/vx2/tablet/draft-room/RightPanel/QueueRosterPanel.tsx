@@ -14,13 +14,8 @@ import type { DraftPlayer, Position } from '../../../draft-room/types';
 // TYPES
 // ============================================================================
 
-interface QueuePlayer extends DraftPlayer {
-  id: string;
-  name: string;
-  team: string;
-  position: Position;
-  adp?: number;
-}
+// QueuePlayer is just an alias for DraftPlayer in this context
+type QueuePlayer = DraftPlayer;
 
 export interface QueueRosterPanelProps {
   /** Queue items */

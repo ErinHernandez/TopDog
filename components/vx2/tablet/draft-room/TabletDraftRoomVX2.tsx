@@ -615,8 +615,8 @@ function InnerDraftRoom({ roomId, onLeave, fastMode }: InnerDraftRoomProps): Rea
               participants={draftRoom.participants}
               userParticipantIndex={draftRoom.userParticipantIndex}
               currentPickNumber={draftRoom.currentPickNumber}
-              timer={draftRoom.timerValue}
-              isDraftActive={draftRoom.isDraftActive}
+              timer={draftRoom.timer.seconds}
+              isDraftActive={draftRoom.status === 'active'}
               getPickForSlot={draftRoom.picks.getPickForSlot}
             />
           </div>
