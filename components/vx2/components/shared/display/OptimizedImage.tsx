@@ -333,3 +333,4 @@ export function TeamLogo({
 
 export default OptimizedImage;
 
+

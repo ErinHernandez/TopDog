@@ -74,7 +74,8 @@ export function useDraftEngine({
   // Derived State
   // ============================================
   
-  const participants = room?.participants ?? [];
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Memoize participants to stabilize hook dependencies
+  const participants = useMemo(() => room?.participants ?? [], [room?.participants]);
   const teamCount = room?.settings.teamCount ?? DRAFT_CONFIG.teamCount;
   const currentPickNumber = picks.length + 1;
   const currentRound = getRoundForPick(currentPickNumber, teamCount);

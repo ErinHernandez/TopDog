@@ -49,7 +49,7 @@ export default function BorderColorPicker() {
     <div className="p-6 bg-gray-800 rounded-lg">
       <h3 className="text-lg font-semibold text-white mb-4">Border Customization</h3>
       <p className="text-gray-300 text-sm mb-6">
-        Choose your border color for draft rooms. This will be used for your username header, future pick cells, picks bar cards, and navbar when you're on the clock (≤10s). Completed player picks will keep their position colors.
+        Choose your border color for draft rooms. This will be used for your username header, future pick cells, picks bar cards, and navbar when you&apos;re on the clock (≤10s). Completed player picks will keep their position colors.
       </p>
 
       {/* Current Selection Preview */}

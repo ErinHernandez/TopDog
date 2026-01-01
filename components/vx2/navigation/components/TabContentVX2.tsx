@@ -75,6 +75,7 @@ export default function TabContentVX2({
     // #region agent log
     fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'TabContentVX2.tsx:62',message:'TabContentVX2 mounted',data:{activeTab:state.activeTab},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'A'})}).catch(()=>{});
     // #endregion
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Only run on mount
   }, []);
   
   // Restore scroll position when tab becomes active

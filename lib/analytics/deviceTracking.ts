@@ -464,7 +464,7 @@ export function useDeviceTracking(options?: { trackPerformance?: boolean }) {
 // EXPORTS
 // ============================================================================
 
-export default {
+const deviceTracking = {
   collectDeviceInfo,
   collectPerformanceMetrics,
   trackDeviceInfo,
@@ -474,3 +474,4 @@ export default {
   useDeviceTracking,
 };
 
+export default deviceTracking;

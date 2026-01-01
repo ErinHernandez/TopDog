@@ -286,6 +286,7 @@ export function TabNavigationProvider({
       onTabChange?.(prevTabRef.current, state.activeTab);
       prevTabRef.current = state.activeTab;
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- state.isTransitioning check handled inside effect
   }, [state.activeTab, onTabChange]);
   
   // Clear transitioning state after animation

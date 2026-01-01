@@ -12,6 +12,7 @@
 
 import React, { useState } from 'react';
 import Head from 'next/head';
+import Link from 'next/link';
 import { TabNavigationProvider } from '../../components/vx2/core';
 import { TabBarVX2, TabContentVX2 } from '../../components/vx2/navigation';
 import MobilePhoneFrame from '../../components/vx2/shell/MobilePhoneFrame';
@@ -217,7 +218,7 @@ export default function DeviceComparisonPage() {
           textAlign: 'center',
           marginTop: '48px',
         }}>
-          <a
+          <Link
             href="/testing-grounds/vx2-mobile-app-demo"
             style={{
               color: '#3B82F6',
@@ -226,7 +227,7 @@ export default function DeviceComparisonPage() {
             }}
           >
             Back to VX2 App Demo
-          </a>
+          </Link>
         </div>
       </div>
     </>

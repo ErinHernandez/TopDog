@@ -93,6 +93,7 @@ export default function useTimer({
         clearInterval(intervalRef.current);
       }
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- time excluded to avoid resetting interval on each tick
   }, [isRunning, interval]);
 
   // Clear interval when time reaches 0

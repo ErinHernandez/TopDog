@@ -520,7 +520,7 @@ export default function QueueView({
               color: QUEUE_COLORS.textMuted,
             }}
           >
-            Your top queued player will be auto-drafted when it's your turn
+            Your top queued player will be auto-drafted when it&apos;s your turn
           </span>
         </div>
       )}

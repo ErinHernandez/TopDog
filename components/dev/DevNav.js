@@ -335,10 +335,25 @@ export default function DevNav() {
                 color: '#CCFBF1',
                 borderRadius: 6,
                 fontSize: 12,
+                marginBottom: 4,
                 textDecoration: 'none',
               }}
             >
               Device Comparison
+            </Link>
+            <Link 
+              href="/testing-grounds/tournament-card-sandbox"
+              style={{
+                display: 'block',
+                padding: '6px 10px',
+                backgroundColor: router.pathname === '/testing-grounds/tournament-card-sandbox' ? '#6B21A6' : '#7C3AED',
+                color: '#E9D5FF',
+                borderRadius: 6,
+                fontSize: 12,
+                textDecoration: 'none',
+              }}
+            >
+              Card Sandbox (Tournament)
             </Link>
           </div>
           

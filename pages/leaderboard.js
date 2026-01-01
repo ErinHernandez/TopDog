@@ -78,7 +78,7 @@ export default function Leaderboard() {
         <main className="container py-[18px] zoom-resistant" style={{ minWidth: '1400px', transform: 'translateZ(0)' }}>
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-4">Leaderboard</h1>
-            <p className="text-gray-600">See who's dominating the competition</p>
+            <p className="text-gray-600">See who&apos;s dominating the competition</p>
           </div>
 
           {/* League Filter */}

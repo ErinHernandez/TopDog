@@ -152,7 +152,7 @@ export default function DraftRoom() {
     }
   };
 
-  // Verify and clean up picks that don't belong to this room
+  // Verify and clean up picks that don&apos;t belong to this room
   const verifyAndCleanPicks = async () => {
     try {
       const picksRef = collection(db, 'draftRooms', roomId, 'picks');
@@ -273,6 +273,7 @@ export default function DraftRoom() {
       unsub();
       clearTimeout(timeoutId);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Intentionally limited to roomId to avoid re-subscribing on every state change
   }, [roomId]);
 
   // Periodic verification that no drafted players are in available list
@@ -414,7 +415,7 @@ export default function DraftRoom() {
         if (typeof playerField === 'string') {
           normalizedPlayer = playerField;
         } else if (typeof playerField === 'object' && playerField !== null) {
-          // If it's an object, try to extract the name
+          // If it&apos;s an object, try to extract the name
           if (playerField.name && typeof playerField.name === 'string') {
             normalizedPlayer = playerField.name;
           } else if (playerField.player && typeof playerField.player === 'string') {
@@ -474,7 +475,7 @@ export default function DraftRoom() {
       // Additional safety check: verify picks belong to this room
       const invalidPicks = picksArr.filter(pick => !pick.roomId || pick.roomId !== roomId);
       if (invalidPicks.length > 0) {
-        console.warn(`[ROOM ${roomId}] Found ${invalidPicks.length} picks that don't belong to this room:`, invalidPicks);
+        console.warn(`[ROOM ${roomId}] Found ${invalidPicks.length} picks that don&apos;t belong to this room:`, invalidPicks);
       }
     }, (error) => {
       console.error(`[ROOM ${roomId}] Error listening to picks:`, error);
@@ -497,7 +498,8 @@ export default function DraftRoom() {
         repairPickGaps();
       }
     }
-  }, [picks.length]); // Only depend on picks.length to avoid infinite loops
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Intentionally limited to picks.length to avoid infinite repair loops
+  }, [picks.length]);
 
   // Load rankings from localStorage and set sorting
   useEffect(() => {
@@ -769,10 +771,11 @@ export default function DraftRoom() {
     }, 1000);
     return () => clearInterval(timerRef.current);
   } else {
-    // Reset timer when it's not our turn or draft is paused
+    // Reset timer when it&apos;s not our turn or draft is paused
     setTimer(timerDuration);
     clearInterval(timerRef.current);
   }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Timer logic intentionally excludes effectiveDraftOrder and pickIndex to prevent timer resets
   }, [isMyTurn, isDraftActive, picks.length, totalPicks, room?.settings?.timerSeconds, currentPicker, room?.mockDrafters, userName, room?.status]);
 
   // Ripple effect trigger when user is on the clock and timer reaches 10 seconds
@@ -877,6 +880,7 @@ export default function DraftRoom() {
         clearTimeout(graceTimeoutRef.current);
       }
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Grace period logic intentionally excludes makePick/makeAutoPick/canDraftPlayer to avoid stale closures
   }, [isInGracePeriod, isDraftActive, room?.status, availablePlayers, effectiveDraftOrder, pickIndex, room?.mockDrafters, userName, isMyTurn, picks, queue, rankings]);
 
   // Reset grace period when turn changes or pick is made
@@ -898,7 +902,7 @@ export default function DraftRoom() {
       if (isMyTurn) {
         // Determine who would be auto-picked (using current state values)
         const getAutoPickPlayerNow = () => {
-          // Get current user's roster to check position counts
+          // Get current user&apos;s roster to check position counts
           const userPicks = picks.filter(pick => pick.user === userName);
           const userRoster = userPicks.map(pick => {
             const playerData = PLAYER_POOL.find(p => p.name === pick.player);
@@ -976,6 +980,7 @@ export default function DraftRoom() {
         }
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Disabled autopick logic, dependencies intentionally limited
   }, [timer, isMyTurn, isDraftActive, availablePlayers, rankings, queue, effectiveDraftOrder, pickIndex, room?.mockDrafters, userName, room?.status]);
 
   // Check for draft completion
@@ -990,7 +995,7 @@ export default function DraftRoom() {
             completedAt: new Date()
           });
 
-          // Save user's drafted team to Firestore
+          // Save user&apos;s drafted team to Firestore
           const userId = userName;
           const userPicks = picks.filter(p => p.user === userId);
           const playerDetails = userPicks.map(p => {
@@ -1016,6 +1021,7 @@ export default function DraftRoom() {
       
       completeDraft();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Completion logic intentionally excludes clearPicksForRoom, picks array, room?.name, and userName to avoid premature triggers
   }, [picks.length, totalPicks, isDraftActive, isRoomOwner, roomId]);
 
   // Positional limits
@@ -1180,7 +1186,7 @@ export default function DraftRoom() {
 
   // Get current autopick player for display purposes (using current render state)
   const getCurrentAutoPickPlayer = () => {
-    // Get current user's roster to check position counts
+    // Get current user&apos;s roster to check position counts
     const userPicks = picks.filter(pick => pick.user === userName);
     const userRoster = userPicks.map(pick => {
       const playerData = PLAYER_POOL.find(p => p.name === pick.player);
@@ -1352,7 +1358,7 @@ export default function DraftRoom() {
       setShowRandomizationNotification(true);
       setPreDraftCountdown(60); // Start 60-second countdown
       
-      // Save the randomized order but don't start draft yet
+      // Save the randomized order but don&apos;t start draft yet
       updateDoc(doc(db, 'draftRooms', roomId), { 
         draftOrder: shuffled,
         draftOrderTimestamp: timestamp
@@ -1363,6 +1369,7 @@ export default function DraftRoom() {
         setShowRandomizationNotification(false);
       }, 5000);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Randomization logic intentionally limited to prevent re-randomization
   }, [participants.length, room?.status, isRoomOwner, draftOrder.length, roomId]);
 
   // Reset countdown when draft order is set
@@ -1516,7 +1523,7 @@ export default function DraftRoom() {
     setShowTeamModal(true);
   };
 
-  // Get current user's roster
+  // Get current user&apos;s roster
   const myRoster = getTeamRoster(userName);
   const myRosterGrouped = getTeamRosterGrouped(userName);
 
@@ -1745,7 +1752,7 @@ export default function DraftRoom() {
     if (!matchesPosition) {
       console.log(`[POSITION FILTER] Player ${player.name} (${player.position}) filtered out. Current filters:`, positionFilters, 'Effective filters:', effectivePositionFilters);
     }
-    // Debug logging for all players to see what's happening
+    // Debug logging for all players to see what&apos;s happening
     if (player.name && player.name.includes('Josh Allen')) {
       console.log(`[DEBUG] Josh Allen - position: ${player.position}, filters: ${positionFilters}, effective filters: ${effectivePositionFilters}, includes ALL: ${effectivePositionFilters.includes('ALL')}, includes position: ${effectivePositionFilters.includes(player.position)}, matchesPosition: ${matchesPosition}`);
     }
@@ -2003,19 +2010,19 @@ export default function DraftRoom() {
       timestamp: new Date().toISOString()
     });
     
-    // Defensive check: if a pick is already in progress, don't start another
+    // Defensive check: if a pick is already in progress, don&apos;t start another
     if (pickInProgressRef.current) {
       console.log('❌ MOCK PICK BLOCKED: Pick already in progress');
       return;
     }
     
-    // Defensive check: if pickLoading is already true, don't start another
+    // Defensive check: if pickLoading is already true, don&apos;t start another
     if (pickLoading) {
       console.log('❌ MOCK PICK BLOCKED: pickLoading already true');
       return;
     }
     
-    // Defensive check: if this pick number has already been processed, don't make it again
+    // Defensive check: if this pick number has already been processed, don&apos;t make it again
     if (picks.length >= pickNumber) {
       console.log('❌ MOCK PICK BLOCKED: Pick number already processed', {
         requestedPickNumber: pickNumber,
@@ -2054,7 +2061,7 @@ export default function DraftRoom() {
       const qbsAvailable = availableForMock.filter(p => p.position === 'QB');
       const nonQbsAvailable = availableForMock.filter(p => p.position !== 'QB');
       
-      // QB strategy: Delay QBs until round 4+ unless it's a top-tier QB (ADP < 50)
+      // QB strategy: Delay QBs until round 4+ unless it&apos;s a top-tier QB (ADP < 50)
       const shouldDelayQBs = currentRound < 4 && qbsAvailable.length > 0;
       const topTierQBs = qbsAvailable.filter(qb => (qb.adp || 999) < 50);
       
@@ -2188,6 +2195,7 @@ export default function DraftRoom() {
     } else if (!isMockDrafter) {
       console.log('👤 NOT A MOCK DRAFTER OR USER TURN:', currentPicker);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Mock draft logic intentionally excludes makeMockPick and pickLoading to prevent race conditions
   }, [isDraftActive, picks.length, totalPicks, mockDraftSpeed, effectiveDraftOrder, pickIndex, room?.mockDrafters, currentPickNumber, currentRound]);
 
   // Additional debugging: Log every state change
@@ -2233,6 +2241,7 @@ export default function DraftRoom() {
 
       return () => clearTimeout(stallTimeout);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Stall detection intentionally excludes makeMockPick to prevent infinite stall recovery loops
   }, [isDraftActive, mockDraftSpeed, picks.length, totalPicks, room?.status, effectiveDraftOrder, pickIndex, room?.mockDrafters, currentPickNumber, currentRound]);
 
   // User turn stall detection and recovery
@@ -2293,7 +2302,7 @@ export default function DraftRoom() {
     }
   }, [room?.status, preDraftCountdown, roomId]);
 
-  // Auto-switch to user's team when it's their turn or when page loads
+  // Auto-switch to user&apos;s team when it&apos;s their turn or when page loads
   useEffect(() => {
     if (isMyTurn && isDraftActive) {
       setSelectedTeam(userName);
@@ -2326,12 +2335,12 @@ export default function DraftRoom() {
     return '#C4b5fe';
   };
 
-  // Get current team's data for dropdown viewing
+  // Get current team&apos;s data for dropdown viewing
   const currentTeamRoster = getTeamRoster(selectedTeam);
   const currentTeamRosterGrouped = getTeamRosterGrouped(selectedTeam);
   const currentTeamStartingLineup = getTeamStartingLineup(selectedTeam);
   
-  // Get user's team data for roster display (always shows user's picks)
+  // Get user&apos;s team data for roster display (always shows user&apos;s picks)
   const userTeamRoster = getTeamRoster(userName);
   const userTeamRosterGrouped = getTeamRosterGrouped(userName);
   const userTeamStartingLineup = getTeamStartingLineup(userName);
@@ -2601,7 +2610,7 @@ export default function DraftRoom() {
                   >
                     <div style={{ display: 'flex', height: '100%', width: '100%' }}>
                       {(() => {
-                        // Get position percentages for the team in this card's border
+                        // Get position percentages for the team in this card&apos;s border
                         const teamInCard = team;
                         const percentages = getTeamPositionPercentages(teamInCard);
                         const teamPicksCount = picks.filter(pick => pick.user === teamInCard).length;
@@ -2765,7 +2774,7 @@ export default function DraftRoom() {
       <div style={{ paddingLeft: '16px', paddingRight: '32px', position: 'absolute', top: '182px', left: '215.5px' }}>
         <PicksAwayCalendar 
           picksAway={(() => {
-            // If it's user's turn, show 0 (which displays "ON THE CLOCK")
+            // If it&apos;s user&apos;s turn, show 0 (which displays "ON THE CLOCK")
             if (isMyTurn && isDraftActive) {
               return 0;
             }
@@ -2774,7 +2783,7 @@ export default function DraftRoom() {
             let picksUntilUserTurn = 0;
             let checkingPickNumber = currentPickNumber;
             
-            // Look ahead to find when it's the user's turn
+            // Look ahead to find when it&apos;s the user&apos;s turn
             while (checkingPickNumber <= totalPicks) {
               const checkRound = Math.ceil(checkingPickNumber / effectiveDraftOrder.length);
               const checkIsSnakeRound = checkRound % 2 === 0;
@@ -3156,7 +3165,7 @@ export default function DraftRoom() {
                       const g2 = 0x43;
                       const b2 = 0x4D;
                       
-                      // At 135px, we're 80% through the total 169px gradient
+                      // At 135px, we&apos;re 80% through the total 169px gradient
                       const startPercent = 0.8;
                       const startR = Math.round(r1 + (r2 - r1) * startPercent);
                       const startG = Math.round(g1 + (g2 - g1) * startPercent);
@@ -3378,7 +3387,7 @@ export default function DraftRoom() {
               </div>
             </div>
             
-            {/* Positional Count Display - Shows selected team's picks */}
+            {/* Positional Count Display - Shows selected team&apos;s picks */}
             <div className="mb-2 p-2 bg-white/5 rounded" style={{ border: '1px solid rgba(128, 128, 128, 0.6)', marginTop: '4px', marginBottom: '12px' }}>
               <div className="flex justify-between text-sm">
                 <div className="flex items-center gap-1">

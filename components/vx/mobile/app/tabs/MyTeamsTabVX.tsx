@@ -94,7 +94,6 @@ const MYTEAMS_COLORS = {
 // TYPES
 // ============================================================================
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface MyTeamsTabVXProps {
   selectedTeam: any;
   setSelectedTeam: (team: any) => void;

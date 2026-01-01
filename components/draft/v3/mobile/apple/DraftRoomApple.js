@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 /**
  * Draft Room V3 - Apple/iOS Optimized
  * 
@@ -55,7 +56,7 @@ export default function DraftRoomApple({ roomId, mockState: propMockState, setMo
       { name: 'CHEMTRAILSROCK', team: 'SkyWriters' }
     ],
     
-    // Draft picks (start with empty array - draft hasn't started)
+    // Draft picks (start with empty array - draft hasn&apos;t started)
     picks: [],
     
     // Available players (simplified data)
@@ -69,7 +70,7 @@ export default function DraftRoomApple({ roomId, mockState: propMockState, setMo
       { name: 'Jahmyr Gibbs', position: 'RB', team: 'DET', adp: 5.4 }
     ],
     
-    // User's team (simplified)
+    // User&apos;s team (simplified)
     userTeam: []
   });
 
@@ -121,7 +122,7 @@ export default function DraftRoomApple({ roomId, mockState: propMockState, setMo
   const handleDraftPlayer = (player) => {
     console.log('Draft player:', player);
     
-    // Check if it's actually the user's turn
+    // Check if it&apos;s actually the user&apos;s turn
     if (!mockState.isMyTurn) {
       console.log('❌ Not your turn to draft');
       return;
@@ -818,7 +819,7 @@ export default function DraftRoomApple({ roomId, mockState: propMockState, setMo
                     <p>• Entry to the Tournament will be closed prior to the 1st game of the 2025 season. This means that the Tournament closure time would move if the timing of the first game were to change for any reason.</p>
                     <p>• Entrants draft a team of players who accumulate points throughout the duration of the contest period.</p>
                     <p>• Once entrants draft, their rosters are set—there are no waivers, substitutions, or trades during the contest period.</p>
-                    <p>• At the end of each NFL week, TopDog.dog automatically selects the entrant's highest scoring players at the designated positions to be "starters" and only those players' statistics over that week are counted toward the entrant's accumulated score. This means entrants do not need to set their lineups.</p>
+                    <p>• At the end of each NFL week, TopDog.dog automatically selects the entrant&apos;s highest scoring players at the designated positions to be "starters" and only those players' statistics over that week are counted toward the entrant&apos;s accumulated score. This means entrants do not need to set their lineups.</p>
                     <p>• Entrants compete in groups ("Groups") over the course of multiple rounds ("Rounds").</p>
                   </div>
                 </div>
@@ -887,7 +888,7 @@ export default function DraftRoomApple({ roomId, mockState: propMockState, setMo
                 {/* Prize Pool */}
                 <div>
                   <h3 className="text-lg font-semibold mb-3 text-white">Prize pool</h3>
-                  <p className="text-gray-300 text-sm mb-4">Note that at TopDog.dog's discretion, TopDog.dog could pay out partial prizes upon advancement that eventually will equal the total prizes per user as seen below.</p>
+                  <p className="text-gray-300 text-sm mb-4">Note that at TopDog.dog&apos;s discretion, TopDog.dog could pay out partial prizes upon advancement that eventually will equal the total prizes per user as seen below.</p>
                   
                   <div className="bg-gray-800/50 rounded-lg p-4 mb-4">
                     <h4 className="font-semibold mb-3 text-white">Tournament prize breakdown</h4>
@@ -967,7 +968,7 @@ export default function DraftRoomApple({ roomId, mockState: propMockState, setMo
 
                   <div>
                     <h3 className="text-lg font-semibold mb-2 text-white">Multiple entries</h3>
-                    <p className="text-gray-300 text-sm">If an entrant enters more than one entry in the Tournament, each entry will be placed in a different Group for Round 1. Similarly, a single entrant's entries will not be in the same Group if the number of groups is greater than the entrant's remaining number of entries.</p>
+                    <p className="text-gray-300 text-sm">If an entrant enters more than one entry in the Tournament, each entry will be placed in a different Group for Round 1. Similarly, a single entrant&apos;s entries will not be in the same Group if the number of groups is greater than the entrant&apos;s remaining number of entries.</p>
                   </div>
 
                   <div>
@@ -988,12 +989,12 @@ export default function DraftRoomApple({ roomId, mockState: propMockState, setMo
 
                   <div>
                     <h3 className="text-lg font-semibold mb-2 text-white">Multiple accounts and collusion</h3>
-                    <p className="text-gray-300 text-sm">Each user on TopDog.dog is permitted to maintain one account. "Multi-accounting" or colluding with any other entrant is expressly prohibited. If you have opened, maintained, used, colluded with, or controlled more than one account, as determined in TopDog.dog's sole discretion, we may terminate or suspend any or all of your accounts and may revoke or withhold any prizes that you have won.</p>
+                    <p className="text-gray-300 text-sm">Each user on TopDog.dog is permitted to maintain one account. "Multi-accounting" or colluding with any other entrant is expressly prohibited. If you have opened, maintained, used, colluded with, or controlled more than one account, as determined in TopDog.dog&apos;s sole discretion, we may terminate or suspend any or all of your accounts and may revoke or withhold any prizes that you have won.</p>
                   </div>
 
                   <div>
                     <h3 className="text-lg font-semibold mb-2 text-white">Suspended accounts</h3>
-                    <p className="text-gray-300 text-sm">If you undertake any actions that are detrimental to TopDog.dog or other users on TopDog.dog's service, we may suspend some or all functions associated with your account. If you want to communicate with us regarding restoration of your account, please email support@topdog.dog.</p>
+                    <p className="text-gray-300 text-sm">If you undertake any actions that are detrimental to TopDog.dog or other users on TopDog.dog&apos;s service, we may suspend some or all functions associated with your account. If you want to communicate with us regarding restoration of your account, please email support@topdog.dog.</p>
                   </div>
 
                   <div>
@@ -1013,12 +1014,12 @@ export default function DraftRoomApple({ roomId, mockState: propMockState, setMo
 
                   <div>
                     <h3 className="text-lg font-semibold mb-2 text-white">Traded and retired players</h3>
-                    <p className="text-gray-300 text-sm">When players are traded in real life or retire, entrants will accumulate points based on the player's performance on the new team. Entrants are not permitted to swap players, even if a player in their lineup is no longer eligible to earn points.</p>
+                    <p className="text-gray-300 text-sm">When players are traded in real life or retire, entrants will accumulate points based on the player&apos;s performance on the new team. Entrants are not permitted to swap players, even if a player in their lineup is no longer eligible to earn points.</p>
                   </div>
 
                   <div>
                     <h3 className="text-lg font-semibold mb-2 text-white">Contest cancellation</h3>
-                    <p className="text-gray-300 text-sm">TopDog.dog reserves the right to cancel contests at our sole discretion, without any restrictions. Typically, we would only do so in cases where we believe that due to problems with our services or occurring in events impacting the sporting events, there would be questions regarding the contest's integrity.</p>
+                    <p className="text-gray-300 text-sm">TopDog.dog reserves the right to cancel contests at our sole discretion, without any restrictions. Typically, we would only do so in cases where we believe that due to problems with our services or occurring in events impacting the sporting events, there would be questions regarding the contest&apos;s integrity.</p>
                   </div>
                 </div>
               </div>
@@ -1074,7 +1075,7 @@ export function DraftRoomAppleDemo() {
       { name: 'CHEMTRAILSROCK', team: 'SkyWriters' }
     ],
     
-    // Draft picks (start with empty array - draft hasn't started)
+    // Draft picks (start with empty array - draft hasn&apos;t started)
     picks: [],
     
     // Available players (comprehensive player pool)
@@ -1548,7 +1549,7 @@ export function DraftRoomAppleDemo() {
       // Advance to next pick
       const nextPickNumber = currentPick + 1;
       
-      // Determine if it's user's turn (snake draft logic)
+      // Determine if it&apos;s user&apos;s turn (snake draft logic)
       const nextRound = Math.ceil(nextPickNumber / prevState.participants.length);
       const isNextSnakeRound = nextRound % 2 === 0;
       const nextPickIndexInRound = (nextPickNumber - 1) % prevState.participants.length;
@@ -1609,7 +1610,7 @@ export function DraftRoomAppleDemo() {
     else if (mockState.isDraftActive && !mockState.isPaused) {
       interval = setInterval(() => {
         setMockState(prevState => {
-          // Skip grace period handling here - it's handled in separate useEffect
+          // Skip grace period handling here - it&apos;s handled in separate useEffect
           if (prevState.isInGracePeriod) {
             return prevState; // Don't modify state during grace period
           }
@@ -1689,7 +1690,8 @@ export function DraftRoomAppleDemo() {
         }));
       }, 100);
     }
-  }, []); // Only run on mount
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Intentionally empty deps, only run on mount
+  }, []);
 
   const startMockDraft = () => {
     setIsDraftActive(true);
@@ -1750,7 +1752,7 @@ export function DraftRoomAppleDemo() {
   const handleDraftPlayer = (player) => {
     console.log('Draft player:', player);
     
-    // Check if it's actually the user's turn
+    // Check if it&apos;s actually the user&apos;s turn
     if (!mockState.isMyTurn) {
       console.log('❌ Not your turn - cannot draft');
       return;
@@ -1864,7 +1866,7 @@ export function DraftRoomAppleDemo() {
       : pickIndexInRound;
   };
 
-  // Get user's autodraft limits from Firebase + localStorage
+  // Get user&apos;s autodraft limits from Firebase + localStorage
   const [POSITIONAL_LIMITS, setPositionalLimits] = React.useState({
     QB: 4,
     RB: 10,
@@ -2063,7 +2065,7 @@ export function DraftRoomAppleDemo() {
       // Advance to next pick
       const nextPickNumber = currentPick + 1;
       
-      // Determine if it's user's turn (simplified - assume user is first participant)
+      // Determine if it&apos;s user&apos;s turn (simplified - assume user is first participant)
       const nextRound = Math.ceil(nextPickNumber / prevState.participants.length);
       const isNextSnakeRound = nextRound % 2 === 0;
       const nextPickIndexInRound = (nextPickNumber - 1) % prevState.participants.length;

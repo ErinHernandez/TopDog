@@ -121,32 +121,6 @@ function InnerShell({ badgeOverrides, deviceClass = 'standard' }: InnerShellProp
         data-device-class={deviceClass}
         style={{ backgroundColor: BG_COLORS.primary }}
       >
-        {/* Logo bar with blue background */}
-        <div
-          className="vx2-logo-bar"
-          style={{
-            height: 44,
-            display: 'flex',
-            alignItems: 'center',
-            flexShrink: 0,
-            backgroundImage: 'url(/wr_blue.png)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            paddingLeft: 12,
-            paddingRight: 12,
-          }}
-        >
-          <img
-            src="/logo.png"
-            alt="TopDog"
-            style={{
-              height: 28,
-              width: 'auto',
-              objectFit: 'contain',
-            }}
-          />
-        </div>
-        
         {/* Tab Content Area */}
         <TabContentVX2 />
         

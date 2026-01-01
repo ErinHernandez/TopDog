@@ -84,6 +84,7 @@ export default function LocationData2() {
       const filtered = filterStates(allStates, searchTerm, filterCategory);
       setFilteredStates(filtered);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- filterStates is a stable function
   }, [searchTerm, filterCategory, allStates]);
 
   // Function to handle state hover

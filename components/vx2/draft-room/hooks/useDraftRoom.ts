@@ -204,8 +204,9 @@ export function useDraftRoom({
     return () => clearTimeout(timer);
   }, [roomId]);
   
-  // Derived values
-  const participants = room?.participants ?? [];
+  // Derived values - memoized to stabilize hook dependencies
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const participants = useMemo(() => room?.participants ?? [], [room?.participants]);
   const teamCount = room?.settings.teamCount ?? DRAFT_DEFAULTS.teamCount;
   
   const userParticipantIndex = useMemo(() => {

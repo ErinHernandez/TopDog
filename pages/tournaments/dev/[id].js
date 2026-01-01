@@ -26,6 +26,7 @@ export default function DevTournamentDetail() {
     if (id && hasDevAccess) {
       fetchTournament();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- fetchTournament is stable
   }, [id, hasDevAccess]);
 
   const checkDevAccess = () => {

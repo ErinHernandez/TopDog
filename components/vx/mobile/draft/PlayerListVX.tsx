@@ -304,8 +304,8 @@ export default function PlayerListVX({
             width: '44px',
           }}
           onClick={handleRankSort}
-          aria-label="Sort by rank"
-          aria-sort={sortDirection.startsWith('rank') ? (sortDirection === 'rank_asc' ? 'ascending' : 'descending') : 'none'}
+          aria-label={`Sort by rank${sortDirection.startsWith('rank') ? (sortDirection === 'rank_asc' ? ', currently ascending' : ', currently descending') : ''}`}
+          aria-pressed={sortDirection.startsWith('rank')}
         >
           RANK
         </button>
@@ -323,8 +323,8 @@ export default function PlayerListVX({
             width: '44px',
           }}
           onClick={handleProjSort}
-          aria-label="Sort by projection"
-          aria-sort={sortDirection.startsWith('proj') ? (sortDirection === 'proj_asc' ? 'ascending' : 'descending') : 'none'}
+          aria-label={`Sort by projection${sortDirection.startsWith('proj') ? (sortDirection === 'proj_asc' ? ', currently ascending' : ', currently descending') : ''}`}
+          aria-pressed={sortDirection.startsWith('proj')}
         >
           PROJ
         </button>
@@ -339,8 +339,8 @@ export default function PlayerListVX({
             width: '44px',
           }}
           onClick={handleADPSort}
-          aria-label="Sort by ADP"
-          aria-sort={sortDirection === 'asc' ? 'ascending' : sortDirection === 'desc' ? 'descending' : 'none'}
+          aria-label={`Sort by ADP${sortDirection === 'asc' ? ', currently ascending' : sortDirection === 'desc' ? ', currently descending' : ''}`}
+          aria-pressed={sortDirection === 'asc' || sortDirection === 'desc'}
         >
           ADP
         </button>

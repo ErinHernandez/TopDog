@@ -104,10 +104,10 @@ export function useReducedAnimations(): boolean {
  * Hook to get animation duration adjusted for device
  */
 export function useAnimationDuration(baseDuration: number): number {
-  const capabilities = useDeviceCapabilities();
+  useDeviceCapabilities(); // Read for side effects only
   return useMemo(
     () => getAnimationDuration(baseDuration),
-    [baseDuration, capabilities.prefersReducedMotion, capabilities.supportTier]
+    [baseDuration]
   );
 }
 
@@ -115,10 +115,10 @@ export function useAnimationDuration(baseDuration: number): number {
  * Hook to get recommended batch size for list rendering
  */
 export function useBatchSize(): number {
-  const capabilities = useDeviceCapabilities();
+  useDeviceCapabilities(); // Read for side effects only
   return useMemo(
     () => getRecommendedBatchSize(),
-    [capabilities.supportTier]
+    []
   );
 }
 
@@ -126,10 +126,10 @@ export function useBatchSize(): number {
  * Hook to get recommended debounce delay
  */
 export function useDebounceDelay(): number {
-  const capabilities = useDeviceCapabilities();
+  useDeviceCapabilities(); // Read for side effects only
   return useMemo(
     () => getRecommendedDebounceDelay(),
-    [capabilities.supportTier]
+    []
   );
 }
 

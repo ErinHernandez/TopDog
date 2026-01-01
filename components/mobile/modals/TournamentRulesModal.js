@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 /**
  * TournamentRulesModal - Full-screen Tournament Rules Modal
  * 
@@ -69,7 +70,7 @@ export default function TournamentRulesModal({ open, onClose }) {
                     <span>Once entrants draft, their rosters are set-there are no waivers, substitutions, or trades during the contest period.</span>
                   </div>
                   <div>
-                    <span>At the end of each NFL week, TopDog.dog automatically selects the entrant's highest scoring players at the designated positions to be "starters" and only those players' statistics over that week are counted toward the entrant's accumulated score. This means entrants do not need to set their lineups.</span>
+                    <span>At the end of each NFL week, TopDog.dog automatically selects the entrant&apos;s highest scoring players at the designated positions to be "starters" and only those players' statistics over that week are counted toward the entrant&apos;s accumulated score. This means entrants do not need to set their lineups.</span>
                   </div>
                   <div>
                     <span>Entrants compete in groups ("Groups") over the course of multiple rounds ("Rounds").</span>
@@ -136,7 +137,7 @@ export default function TournamentRulesModal({ open, onClose }) {
 
               {/* Prize pool */}
               <RuleSection title="Prize pool">
-                <p className="text-sm text-gray-300 mb-3">Note that at TopDog.dog's discretion, TopDog.dog could pay out partial prizes upon advancement that eventually will equal the total prizes per user as seen below.</p>
+                <p className="text-sm text-gray-300 mb-3">Note that at TopDog.dog&apos;s discretion, TopDog.dog could pay out partial prizes upon advancement that eventually will equal the total prizes per user as seen below.</p>
                 
                 <h4 className="font-medium text-white mb-2">Tournament prize breakdown</h4>
                 <div className="grid grid-cols-2 gap-2 text-sm text-gray-300">
@@ -212,7 +213,7 @@ export default function TournamentRulesModal({ open, onClose }) {
 
               {/* Multiple entries */}
               <RuleSection title="Multiple entries">
-                <p className="text-sm text-gray-300">If an entrant enters more than one entry in the Tournament, each entry will be placed in a different Group for Round 1. Similarly, a single entrant's entries will not be in the same Group if the number of groups is greater than the entrant's remaining number of entries.</p>
+                <p className="text-sm text-gray-300">If an entrant enters more than one entry in the Tournament, each entry will be placed in a different Group for Round 1. Similarly, a single entrant&apos;s entries will not be in the same Group if the number of groups is greater than the entrant&apos;s remaining number of entries.</p>
               </RuleSection>
 
               {/* Slow drafts */}
@@ -233,12 +234,12 @@ export default function TournamentRulesModal({ open, onClose }) {
 
               {/* Multiple accounts and collusion */}
               <RuleSection title="Multiple accounts and collusion">
-                <p className="text-sm text-gray-300">Each user on TopDog.dog is permitted to maintain one account. "Multi-accounting" or colluding with any other entrant is expressly prohibited. If you have opened, maintained, used, colluded with, or controlled more than one account, as determined in TopDog.dog's sole discretion, we may terminate or suspend any or all of your accounts and may revoke or withhold any prizes that you have won.</p>
+                <p className="text-sm text-gray-300">Each user on TopDog.dog is permitted to maintain one account. "Multi-accounting" or colluding with any other entrant is expressly prohibited. If you have opened, maintained, used, colluded with, or controlled more than one account, as determined in TopDog.dog&apos;s sole discretion, we may terminate or suspend any or all of your accounts and may revoke or withhold any prizes that you have won.</p>
               </RuleSection>
 
               {/* Suspended accounts */}
               <RuleSection title="Suspended accounts">
-                <p className="text-sm text-gray-300">If you undertake any actions that are detrimental to TopDog.dog or other users on TopDog.dog's service, we may suspend some or all functions associated with your account. If you want to communicate with us regarding restoration of your account, please email support@topdog.dog.</p>
+                <p className="text-sm text-gray-300">If you undertake any actions that are detrimental to TopDog.dog or other users on TopDog.dog&apos;s service, we may suspend some or all functions associated with your account. If you want to communicate with us regarding restoration of your account, please email support@topdog.dog.</p>
               </RuleSection>
 
               {/* Cancelling entries */}
@@ -258,12 +259,12 @@ export default function TournamentRulesModal({ open, onClose }) {
 
               {/* Traded and retired players */}
               <RuleSection title="Traded and retired players">
-                <p className="text-sm text-gray-300">When players are traded in real life or retire, entrants will accumulate points based on the player's performance on the new team. Entrants are not permitted to swap players, even if a player in their lineup is no longer eligible to earn points.</p>
+                <p className="text-sm text-gray-300">When players are traded in real life or retire, entrants will accumulate points based on the player&apos;s performance on the new team. Entrants are not permitted to swap players, even if a player in their lineup is no longer eligible to earn points.</p>
               </RuleSection>
 
               {/* Contest cancellation */}
               <RuleSection title="Contest cancellation">
-                <p className="text-sm text-gray-300">TopDog.dog reserves the right to cancel contests at our sole discretion, without any restrictions. Typically, we would only do so in cases where we believe that due to problems with our services or occurring in events impacting the sporting events, there would be questions regarding the contest's integrity.</p>
+                <p className="text-sm text-gray-300">TopDog.dog reserves the right to cancel contests at our sole discretion, without any restrictions. Typically, we would only do so in cases where we believe that due to problems with our services or occurring in events impacting the sporting events, there would be questions regarding the contest&apos;s integrity.</p>
               </RuleSection>
 
             </div>

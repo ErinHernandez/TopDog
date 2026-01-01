@@ -363,6 +363,7 @@ export default function PlayerListApple({
           return 0;
       }
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- customRankings handled separately
   }, [deduplicatedPlayers, activeFilters, searchTerm, sortDirection]);
 
   return (

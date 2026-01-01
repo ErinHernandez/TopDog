@@ -56,7 +56,7 @@ export default function CustomerSupport() {
 
     try {
       // Here you would typically send the data to your backend
-      // For now, we'll simulate a successful submission
+      // For now, we&apos;ll simulate a successful submission
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       setSubmitStatus({ type: 'success', message: 'Your message has been sent successfully! We\'ll get back to you soon.' });
@@ -88,7 +88,7 @@ export default function CustomerSupport() {
         <div className="bg-white shadow-sm border-b">
           <div className="max-w-4xl mx-auto px-4 py-6">
             <h1 className="text-3xl font-bold text-gray-900">Customer Support</h1>
-            <p className="text-gray-600 mt-2">We're here to help! Send us a message and we'll get back to you as soon as possible.</p>
+            <p className="text-gray-600 mt-2">We're here to help! Send us a message and we&apos;ll get back to you as soon as possible.</p>
           </div>
         </div>
 

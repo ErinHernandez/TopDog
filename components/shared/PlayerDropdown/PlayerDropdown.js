@@ -64,6 +64,7 @@ export default function PlayerDropdown({
     if (!externalPlayers) {
       loadPlayers();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- loadPlayers is stable
   }, [position, team, searchTerm, sortBy, externalPlayers]);
 
   // Subscribe to player data updates

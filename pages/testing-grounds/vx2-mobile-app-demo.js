@@ -124,6 +124,7 @@ export default function VX2MobileAppDemo() {
     if (router.query.tab) {
       router.replace('/testing-grounds/vx2-mobile-app-demo', undefined, { shallow: true });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- router object changes on every render, only need specific props
   }, [router.isReady, router.query.tab]);
   
   // Track tab changes for debugging

@@ -32,14 +32,14 @@
   --vx2-logo-bar-height: 36px;
   --vx2-logo-height: 22px;
   --vx2-button-height: 48px;
-  --vx2-image-max-size: 160px;
+  --vx2-image-max-size: 280px;
   --vx2-progress-height: 8px;
   --vx2-stats-row-height: 44px;
   
   /* Margins */
   --vx2-title-margin-bottom: 16px;
-  --vx2-image-margin-top: 20px;
-  --vx2-image-margin-bottom: 8px;
+  --vx2-image-margin-top: 32px;
+  --vx2-image-margin-bottom: 12px;
   --vx2-progress-margin-bottom: 12px;
   --vx2-button-margin-bottom: 12px;
 }
@@ -84,14 +84,14 @@
 
 /* Logo wrapper - same proportional spacing */
 .vx2-device-compact .vx2-tournament-logo-wrapper {
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
+  margin-top: 16px !important;
+  margin-bottom: 16px !important;
 }
 
 /* Logo - scaled */
 .vx2-device-compact .vx2-tournament-logo {
-  width: 100px !important;
-  height: 100px !important;
+  width: 240px !important;
+  height: auto !important;
 }
 
 /* Spacer - KEEP IT to maintain same layout as other devices */
@@ -158,13 +158,13 @@
   }
   
   .vx2-tournament-logo-wrapper {
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
+    margin-top: 16px !important;
+    margin-bottom: 16px !important;
   }
   
   .vx2-tournament-logo {
-    width: 100px !important;
-    height: 100px !important;
+    width: 240px !important;
+    height: auto !important;
   }
   
   .vx2-progress-section {
@@ -222,7 +222,7 @@
     --vx2-logo-bar-height: 44px;
     --vx2-logo-height: 28px;
     --vx2-button-height: 57px;
-    --vx2-image-max-size: 200px;
+    --vx2-image-max-size: 320px;
     --vx2-progress-height: 8px;
     --vx2-stats-row-height: 50px;
     

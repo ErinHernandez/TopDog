@@ -10,10 +10,7 @@ export default function Navbar() {
   const router = useRouter();
   const { user, userBalance } = useUser();
   
-  // Don't render navbar on any mobile pages
-  if (router.pathname.startsWith('/mobile')) {
-    return null;
-  }
+  // All hooks must be called before any early returns
   const [showProfileDropdown, setShowProfileDropdown] = useState(false)
   const [showDevDropdown, setShowDevDropdown] = useState(false)
   const [hasDevAccess, setHasDevAccess] = useState(false)
@@ -22,8 +19,17 @@ export default function Navbar() {
   const [draftAnimation, setDraftAnimation] = useState({ shouldAnimate: false, isPulsing: false })
   const [hasStartedPulsing, setHasStartedPulsing] = useState(false)
 
+  const checkDevAccess = () => {
+    const accessToken = sessionStorage.getItem('devAccessToken');
+    console.log('🔧 Dev Access Check:', { userId: user?.uid, accessToken, hasAccess: canAccessDevFeatures(user?.uid || 'NEWUSERNAME', accessToken) });
+    if (canAccessDevFeatures(user?.uid || 'NEWUSERNAME', accessToken)) {
+      setHasDevAccess(true);
+    }
+  };
+
   useEffect(() => {
     checkDevAccess()
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- checkDevAccess is stable, only run when user changes
   }, [user])
 
   // Listen for draft animation events
@@ -46,14 +52,6 @@ export default function Navbar() {
     }
   }, [draftAnimation])
 
-  const checkDevAccess = () => {
-    const accessToken = sessionStorage.getItem('devAccessToken');
-    console.log('🔧 Dev Access Check:', { userId: user?.uid, accessToken, hasAccess: canAccessDevFeatures(user?.uid || 'NEWUSERNAME', accessToken) });
-    if (canAccessDevFeatures(user?.uid || 'NEWUSERNAME', accessToken)) {
-      setHasDevAccess(true);
-    }
-  };
-
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -69,6 +67,11 @@ export default function Navbar() {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [])
+
+  // Don't render navbar on any mobile pages - AFTER all hooks
+  if (router.pathname.startsWith('/mobile')) {
+    return null;
+  }
 
   // Button label logic
   const balance = userBalance?.balance || 0

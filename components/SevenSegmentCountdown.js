@@ -71,11 +71,7 @@ function MonocraftDigit({ value, color = '#ff1a1a' }) {
 }
 
 export default function SevenSegmentCountdown({ initialSeconds = 29, useMonocraft = false, isUserOnClock = false }) {
-  // For long durations (over 99 seconds), use the LongDurationTimer
-  if (initialSeconds > 99) {
-    return <LongDurationTimer initialSeconds={initialSeconds} useMonocraft={useMonocraft} isUserOnClock={isUserOnClock} />;
-  }
-
+  // All hooks must be called before any early returns
   const [seconds, setSeconds] = useState(initialSeconds);
 
   // Update local state when prop changes
@@ -89,6 +85,11 @@ export default function SevenSegmentCountdown({ initialSeconds = 29, useMonocraf
       return () => clearTimeout(timer);
     }
   }, [seconds]);
+
+  // For long durations (over 99 seconds), use the LongDurationTimer - AFTER all hooks
+  if (initialSeconds > 99) {
+    return <LongDurationTimer initialSeconds={initialSeconds} useMonocraft={useMonocraft} isUserOnClock={isUserOnClock} />;
+  }
 
   // Always show two digits
   const display = String(seconds).padStart(2, '0');

@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import React from 'react';
 import PicksAwayCalendar from '../components/PicksAwayCalendar';
 
@@ -55,7 +56,7 @@ export default function TearawayDemo() {
             <li>• <strong>Perforation Line:</strong> Dotted line at top simulating tear line</li>
             <li>• <strong>Torn Edge:</strong> Shows previous page underneath when countdown starts</li>
             <li>• <strong>Dynamic Colors:</strong> Changes based on picks away (Green=0, Orange=1-3, White=4+)</li>
-            <li>• <strong>Urgency Animation:</strong> Slight rotation when it's your turn (0 picks away)</li>
+            <li>• <strong>Urgency Animation:</strong> Slight rotation when it&apos;s your turn (0 picks away)</li>
             <li>• <strong>Typography:</strong> Classic serif font for authentic calendar feel</li>
             <li>• <strong>Internal Labels:</strong> "PICKS AWAY" text integrated inside the calendar</li>
             <li>• <strong>Shadows & Glow:</strong> Appropriate visual feedback for different pick states</li>

@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 /**
  * V3 Demo Page - Showcase of New Architecture
  * Demonstrates the V3 component system and design patterns

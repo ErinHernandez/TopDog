@@ -25,6 +25,7 @@ export default function ExportModal({
     if (isOpen && exportType !== 'draft') {
       checkDataAccess();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- checkDataAccess is stable, only run when modal opens or type changes
   }, [isOpen, exportType]);
 
   const checkDataAccess = async () => {
@@ -192,7 +193,7 @@ export default function ExportModal({
 
           {/* Export Info */}
           <div className="mb-6 p-3 bg-gray-800 rounded text-sm text-left">
-            <h4 className="font-semibold text-[#2DE2C5] mb-2">What's Included:</h4>
+            <h4 className="font-semibold text-[#2DE2C5] mb-2">What&apos;s Included:</h4>
             <ul className="text-gray-300 space-y-1">
               {exportType === 'draft' && (
                 <>

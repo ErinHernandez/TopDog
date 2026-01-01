@@ -125,7 +125,7 @@ export default function QueuePanelVX({
       {queuedPlayers.length > 0 && (
         <div className="px-4 py-2 border-t border-white/10 text-center">
           <span className="text-gray-500 text-xs">
-            Your top queued player will be auto-drafted when it's your turn
+            Your top queued player will be auto-drafted when it&apos;s your turn
           </span>
         </div>
       )}

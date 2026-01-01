@@ -34,8 +34,6 @@ export default function FullDraftBoard({ room, picks, participants, draftOrder, 
   const [savedScrollPosition, setSavedScrollPosition] = useState(null);
   const tableRef = useRef(null);
   
-  if (!room) return null;
-
   const totalRounds = room?.settings?.totalRounds || 18;
   const effectiveDraftOrder = draftOrder.length > 0 ? draftOrder : participants;
   const rounds = Array.from({ length: totalRounds }, (_, i) => i + 1);
@@ -181,6 +179,9 @@ export default function FullDraftBoard({ room, picks, participants, draftOrder, 
       setSavedScrollPosition(e.target.scrollLeft);
     }
   };
+
+  // Early return AFTER all hooks
+  if (!room) return null;
 
   return (
     <div className="mb-8 overflow-hidden">

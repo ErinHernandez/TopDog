@@ -115,6 +115,7 @@ export default function DraftBoardContainer({
     if (process.env.NODE_ENV === 'development') {
       console.log('DraftBoardContainer Debug:', getDebugInfo());
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- getDebugInfo is stable
   }, [hasNavbar, hasFooter, hasPicksBar, activeTab, customHeightOffset]);
 
   return (
