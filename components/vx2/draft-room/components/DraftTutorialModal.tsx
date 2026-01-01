@@ -43,9 +43,9 @@ export interface DraftTutorialModalProps {
   onRules?: () => void;
   /** Draft format for title */
   format?: string;
-  /** Whether to show the "don't show again" checkbox */
+  /** Whether to show the "don&apos;t show again" checkbox */
   showDontShowAgain?: boolean;
-  /** Callback when "don't show again" is changed */
+  /** Callback when "don&apos;t show again" is changed */
   onDontShowAgainChange?: (checked: boolean) => void;
 }
 
@@ -476,7 +476,7 @@ const TUTORIAL_PAGES: TutorialPage[] = [
   {
     illustration: <DraftCardsIllustration />,
     title: 'Pick Your Players',
-    description: 'When the timer shows, it\'s your turn. Tap any available player to add them to your roster.',
+    description: 'When the timer shows, it\&apos;s your turn. Tap any available player to add them to your roster.',
     tips: [
       'Filter by position using the tabs at top',
       'Blue border = your cards',
@@ -803,7 +803,7 @@ export default function DraftTutorialModal({
             transition: 'background-color 0.2s ease',
             }}
           >
-          {isLastPage ? 'Let\'s Draft!' : 'Continue'}
+          {isLastPage ? 'Let\&apos;s Draft!' : 'Continue'}
           </button>
       </div>
     </div>

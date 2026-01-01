@@ -146,41 +146,27 @@ function BackButton({ onClick }: { onClick: () => void }): React.ReactElement {
   );
 }
 
-// NEW Exit Draft Room Button - Fresh implementation with direct navigation
+// Exit Draft Room Button - Opens confirmation modal
 function ExitDraftButton({ onLeaveCallback }: { onLeaveCallback?: () => void }): React.ReactElement {
   const handleExitClick = React.useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
     // Prevent any default behavior
     event.preventDefault();
     event.stopPropagation();
     
-    console.log('[ExitDraftButton] Button clicked - initiating exit');
+    // #region agent log
+    console.warn('[VX2 DEBUG] ExitDraftButton clicked', {hasCallback: !!onLeaveCallback});
+    // #endregion
     
-    // Set session flag for app navigation
-    try {
-      sessionStorage.setItem('topdog_came_from_draft', 'true');
-      console.log('[ExitDraftButton] Session flag set');
-    } catch (e) {
-      console.warn('[ExitDraftButton] Could not set session flag:', e);
-    }
-    
-    // Call the callback if provided
+    // Call the callback to open confirmation modal (if provided)
     if (onLeaveCallback) {
       try {
-        console.log('[ExitDraftButton] Calling onLeave callback');
         onLeaveCallback();
       } catch (error) {
         console.error('[ExitDraftButton] Error in callback:', error);
       }
+    } else {
+      console.warn('[ExitDraftButton] No onLeave callback provided');
     }
-    
-    // Direct navigation - use window.location for reliability
-    const targetPath = '/testing-grounds/vx2-mobile-app-demo';
-    console.log('[ExitDraftButton] Navigating to:', targetPath);
-    
-    // Use requestAnimationFrame to ensure UI updates before navigation
-    requestAnimationFrame(() => {
-      window.location.href = targetPath;
-    });
   }, [onLeaveCallback]);
   
   return (
@@ -447,8 +433,8 @@ export default function DraftNavbar({
           animation: shouldShake ? 'navbar-shake 0.6s ease-in-out' : 'none',
         }}
       >
-        {/* Left: Spacer (Exit button removed - will be added elsewhere) */}
-        <div style={{ width: NAVBAR_PX.buttonSize }} />
+        {/* Left: Exit Button */}
+        <ExitDraftButton onLeaveCallback={onLeave} />
         
         {/* Center: Countdown Timer (hidden when rendered externally) */}
         {!hideTimer && (

@@ -22,6 +22,7 @@ import { POSITION_COLORS } from '../constants';
 import { BG_COLORS, TEXT_COLORS } from '../../core/constants/colors';
 import { useImageShare } from '../hooks/useImageShare';
 import { Share } from '../../components/icons/actions/Share';
+import ShareOptionsModal from './ShareOptionsModal';
 
 // ============================================================================
 // PIXEL-PERFECT CONSTANTS (matched from VX DraftBoardVX.tsx)
@@ -127,6 +128,10 @@ function getPositionColor(position: string): string {
 }
 
 function formatPickNumber(pickNumber: number, teamCount: number): string {
+  // Guard against division by zero
+  if (teamCount < 1) {
+    return '0.00';
+  }
   const round = Math.ceil(pickNumber / teamCount);
   const pickInRound = ((pickNumber - 1) % teamCount) + 1;
   return `${round}.${String(pickInRound).padStart(2, '0')}`;
@@ -458,6 +463,7 @@ export default function DraftBoard({
 }: DraftBoardProps): React.ReactElement {
   const scrollRef = useRef<HTMLDivElement>(null);
   const boardContentRef = useRef<HTMLDivElement>(null);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const teamCount = participants.length || 12;
   
   // Image share hook
@@ -470,11 +476,18 @@ export default function DraftBoard({
     },
   });
   
-  // Handle share button click
+  // Get user name for sharing
+  const userName = participants[userParticipantIndex]?.name || 'Draft Board';
+  
+  // Handle share button click - open modal
   const handleShare = useCallback(() => {
-    const userName = participants[userParticipantIndex]?.name || 'My Team';
+    setIsShareModalOpen(true);
+  }, []);
+  
+  // Handle image share from modal
+  const handleShareImage = useCallback(() => {
     captureAndShare(boardContentRef.current, 'draft-board', userName);
-  }, [captureAndShare, participants, userParticipantIndex]);
+  }, [captureAndShare, userName]);
   
   // Restore scroll position on mount
   useEffect(() => {
@@ -491,9 +504,10 @@ export default function DraftBoard({
   }, [onScrollPositionChange]);
   
   // Determine if user is on the clock
-  const currentRound = Math.ceil(currentPickNumber / teamCount);
+  // Guard against division by zero (defensive programming)
+  const currentRound = teamCount > 0 ? Math.ceil(currentPickNumber / teamCount) : 1;
   const isSnakeRound = currentRound % 2 === 0;
-  const pickIndexInRound = (currentPickNumber - 1) % teamCount;
+  const pickIndexInRound = teamCount > 0 ? (currentPickNumber - 1) % teamCount : 0;
   const currentParticipantIndex = isSnakeRound
     ? teamCount - 1 - pickIndexInRound
     : pickIndexInRound;
@@ -544,9 +558,10 @@ export default function DraftBoard({
     const counts: Record<Position, number> = { QB: 0, RB: 0, WR: 0, TE: 0 };
     
     picks.forEach(pick => {
-      const round = Math.ceil(pick.pickNumber / teamCount);
+      // Guard against division by zero (defensive programming)
+      const round = teamCount > 0 ? Math.ceil(pick.pickNumber / teamCount) : 1;
       const isSnakeRound = round % 2 === 0;
-      const pickIndexInRound = (pick.pickNumber - 1) % teamCount;
+      const pickIndexInRound = teamCount > 0 ? (pick.pickNumber - 1) % teamCount : 0;
       const pickParticipantIndex = isSnakeRound
         ? teamCount - 1 - pickIndexInRound
         : pickIndexInRound;
@@ -726,6 +741,16 @@ export default function DraftBoard({
           to { transform: rotate(360deg); }
         }
       `}</style>
+      
+      {/* Share Options Modal */}
+      <ShareOptionsModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        shareType="draft-board"
+        contentName={userName}
+        onShareImage={handleShareImage}
+        isCapturingImage={isCapturing}
+      />
     </div>
   );
 }

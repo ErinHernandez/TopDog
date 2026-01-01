@@ -151,6 +151,9 @@ export function useDraftRoom({
   initialStatus = 'loading',
   fastMode = false,
 }: UseDraftRoomOptions): UseDraftRoomResult {
+  // #region agent log
+  fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useDraftRoom.ts:149',message:'useDraftRoom hook called',data:{roomId,initialStatus,fastMode},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'G'})}).catch(()=>{});
+  // #endregion
   // Room state (mock for now)
   const [room, setRoom] = useState<DraftRoom | null>(null);
   const [status, setStatus] = useState<DraftStatus>(initialStatus);
@@ -180,20 +183,30 @@ export function useDraftRoom({
   
   // Load mock room on mount - starts in 'waiting' state, user must click Start Draft
   useEffect(() => {
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useDraftRoom.ts:182',message:'useDraftRoom loading effect',data:{roomId,useMockData:DEV_FLAGS.useMockData},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'G'})}).catch(()=>{});
+    // #endregion
     if (!DEV_FLAGS.useMockData) return;
     
     const timer = setTimeout(() => {
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useDraftRoom.ts:186',message:'useDraftRoom creating mock room',data:{roomId},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'G'})}).catch(()=>{});
+      // #endregion
       const mockRoom = createMockRoom(roomId);
       setRoom(mockRoom);
       setStatus('waiting'); // Start in waiting state, not active
       setIsLoading(false);
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useDraftRoom.ts:190',message:'useDraftRoom mock room loaded',data:{roomId,participantCount:mockRoom.participants.length,status:'waiting'},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'G'})}).catch(()=>{});
+      // #endregion
     }, 500);
     
     return () => clearTimeout(timer);
   }, [roomId]);
   
-  // Derived values
-  const participants = room?.participants ?? [];
+  // Derived values - memoized to stabilize hook dependencies
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const participants = useMemo(() => room?.participants ?? [], [room?.participants]);
   const teamCount = room?.settings.teamCount ?? DRAFT_DEFAULTS.teamCount;
   
   const userParticipantIndex = useMemo(() => {
@@ -316,7 +329,13 @@ export function useDraftRoom({
     return draftPlayer(nextInQueue);
   }, [queueHook, picksHook, draftPlayer]);
   
+  const leaveDraftCalledRef = useRef(false);
   const leaveDraft = useCallback(() => {
+    // Guard against duplicate calls (e.g., React StrictMode double-render)
+    if (leaveDraftCalledRef.current) {
+      return;
+    }
+    leaveDraftCalledRef.current = true;
     console.log('[useDraftRoom] Leaving draft...');
   }, []);
   

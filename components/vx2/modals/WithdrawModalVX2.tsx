@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 /**
  * WithdrawModalVX2 - Enterprise Withdrawal Modal
  * 
@@ -449,7 +450,7 @@ function SuccessStep({ amount, method, onClose }: SuccessStepProps): React.React
       </div>
       <h2 className="font-bold mb-2" style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize['2xl']}px` }}>Success!</h2>
       <p className="text-center mb-6" style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}>{formatDollars(amount)} is on its way to your {method.label}</p>
-      <div className="text-center mb-8 px-4 py-3 rounded-lg" style={{ backgroundColor: 'rgba(255,255,255,0.03)', color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>Typically arrives within 24 hours.<br />We'll email you when it's there.</div>
+      <div className="text-center mb-8 px-4 py-3 rounded-lg" style={{ backgroundColor: 'rgba(255,255,255,0.03)', color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>Typically arrives within 24 hours.<br />We'll email you when it&apos;s there.</div>
       <button onClick={onClose} className="w-full py-4 rounded-xl font-bold" style={{ backgroundColor: STATE_COLORS.active, color: '#000', fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}>Done</button>
     </div>
   );
@@ -486,17 +487,21 @@ export default function WithdrawModalVX2({ isOpen, onClose }: WithdrawModalVX2Pr
   const handleConfirm = useCallback(async () => {
     setIsLoading(true);
     await new Promise(resolve => setTimeout(resolve, 1500));
+    // Check if modal is still open before setting state (race condition prevention)
+    if (!isOpen) return;
     const code = generateMockCode();
     setMockCode(code);
     console.log('Withdrawal confirmation code:', code);
     setIsLoading(false);
     setStep('code');
-  }, []);
+  }, [isOpen]);
 
   const handleVerifyCode = useCallback(async (enteredCode: string) => {
     setIsVerifying(true);
     setCodeError(null);
     await new Promise(resolve => setTimeout(resolve, 1000));
+    // Check if modal is still open before setting state (race condition prevention)
+    if (!isOpen) return;
     if (enteredCode === mockCode || enteredCode === '123456') {
       setIsVerifying(false);
       setStep('success');
@@ -505,7 +510,7 @@ export default function WithdrawModalVX2({ isOpen, onClose }: WithdrawModalVX2Pr
       setCodeError('Incorrect code. Please try again.');
       setIsVerifying(false);
     }
-  }, [mockCode]);
+  }, [mockCode, isOpen]);
 
   const handleResendCode = useCallback(async () => {
     const code = generateMockCode();

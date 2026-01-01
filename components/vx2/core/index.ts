@@ -14,3 +14,6 @@ export * from './constants';
 // Context
 export * from './context';
 
+// Utils (device capabilities, etc.)
+export * from './utils';
+

@@ -404,10 +404,7 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
   const handleClose = useCallback(() => { if (hasChanges) setShowUnsavedWarning(true); else onClose(); }, [hasChanges, onClose]);
   const handleDiscardAndClose = useCallback(() => { setShowUnsavedWarning(false); setCustomRankings(originalRankings); onClose(); }, [originalRankings, onClose]);
 
-  useEffect(() => { if (isOpen) { loadData(); setUndoHistory([]); } }, [isOpen]);
-  useEffect(() => { if (!isOpen) { setActiveTab('build'); setSearchQuery(''); setPositionFilter(null); setUndoHistory([]); } }, [isOpen]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
@@ -431,17 +428,40 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
         { name: 'Tyreek Hill', position: 'WR', team: 'MIA', adp: 8.5, proj: 255 },
       ];
       const saved = localStorage.getItem('vx2Rankings');
-      const savedRankings = saved ? JSON.parse(saved) : [];
-      setCustomRankings(savedRankings);
-      setOriginalRankings(savedRankings);
-      setPlayerPool(mockPool);
+      let savedRankings: string[] = [];
+      if (saved) {
+        try {
+          savedRankings = JSON.parse(saved);
+        } catch (e) {
+          // If JSON is corrupted, use empty array
+          console.error('Error parsing saved rankings:', e);
+          savedRankings = [];
+        }
+      }
+      // Check if modal is still open before setting state (race condition prevention)
+      if (isOpen) {
+        setCustomRankings(savedRankings);
+        setOriginalRankings(savedRankings);
+        setPlayerPool(mockPool);
+      }
     } catch (e) {
       console.error('Error loading rankings:', e);
-      setError('Failed to load data.');
+      if (isOpen) {
+        setError('Failed to load data.');
+      }
     } finally {
-      setIsLoading(false);
+      if (isOpen) {
+        setIsLoading(false);
+      }
     }
-  };
+  }, [isOpen]);
+
+  useEffect(() => { 
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'RankingsModalVX2.tsx:445',message:'useEffect triggered for modal open/close',data:{isOpen,loadDataExists:!!loadData},timestamp:Date.now(),sessionId:'debug-session',runId:'verify-fix',hypothesisId:'verify-loadData-effect'})}).catch(()=>{});
+    // #endregion
+    if (isOpen) { loadData(); setUndoHistory([]); } 
+  }, [isOpen, loadData]);
 
   const getRank = useCallback((name: string) => { const idx = customRankings.indexOf(name); return idx >= 0 ? idx + 1 : undefined; }, [customRankings]);
   const isPlayerRanked = useCallback((name: string) => customRankings.includes(name), [customRankings]);
@@ -514,6 +534,16 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
     }
   }, []);
 
+  // Cleanup long press timer on unmount
+  useEffect(() => {
+    return () => {
+      if (clearLongPressTimer.current) {
+        clearTimeout(clearLongPressTimer.current);
+        clearLongPressTimer.current = null;
+      }
+    };
+  }, []);
+
   // Players tab always sorted by ADP - order never changes
   const filteredPlayers = useMemo(() => {
     let players = [...playerPool];
@@ -538,19 +568,25 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
     return rankedPlayers.filter(p => p.name.toLowerCase().includes(q) || p.team.toLowerCase().includes(q));
   }, [rankedPlayers, searchQuery]);
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     setIsSaving(true);
     try {
       await new Promise(r => setTimeout(r, 500));
+      // Check if modal is still open before setting state (race condition prevention)
+      if (!isOpen) return;
       localStorage.setItem('vx2Rankings', JSON.stringify(customRankings));
       setOriginalRankings(customRankings);
       setUndoHistory([]); // Clear history after save
     } catch (e) {
-      setError('Failed to save.');
+      if (isOpen) {
+        setError('Failed to save.');
+      }
     } finally {
-      setIsSaving(false);
+      if (isOpen) {
+        setIsSaving(false);
+      }
     }
-  };
+  }, [isOpen, customRankings]);
 
 
   if (!isOpen) return null;

@@ -14,7 +14,6 @@
 import React from 'react';
 import { createTeamGradient } from '@/lib/gradientUtils';
 import { BYE_WEEKS } from '@/lib/nflConstants';
-import { getPlayerPhotoUrl } from '@/lib/playerPhotos';
 
 import type { FantasyPosition } from '@/types/player';
 
@@ -42,10 +41,8 @@ interface PlayerExpandedCardProps {
   onClose?: () => void;
   /** Whether it's the user's turn to draft */
   isMyTurn?: boolean;
-  /** Whether to show the draft button (false shows headshot instead) */
+  /** Whether to show the draft button */
   showDraftButton?: boolean;
-  /** URL for player headshot image */
-  headshotUrl?: string | null;
   /** Additional inline styles */
   style?: React.CSSProperties;
 }
@@ -79,7 +76,6 @@ export default function PlayerExpandedCard({
   onClose,
   isMyTurn = false,
   showDraftButton = true,
-  headshotUrl = null,
   style = {},
 }: PlayerExpandedCardProps): React.ReactElement | null {
   if (!player) return null;
@@ -115,10 +111,6 @@ export default function PlayerExpandedCard({
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>): void => {
     e.currentTarget.style.display = 'none';
-  };
-
-  const handleHeadshotError = (e: React.SyntheticEvent<HTMLImageElement>): void => {
-    e.currentTarget.src = `/logos/nfl/${team?.toLowerCase()}.png`;
   };
 
   return (
@@ -181,19 +173,7 @@ export default function PlayerExpandedCard({
           >
             DRAFT
           </button>
-        ) : (
-          <div 
-            className="rounded-full overflow-hidden flex-shrink-0"
-            style={{ width: '50px', height: '50px' }}
-          >
-            <img 
-              src={headshotUrl || getPlayerPhotoUrl(name, team, position, 50)}
-              alt={name}
-              className="w-full h-full object-cover"
-              onError={handleHeadshotError}
-            />
-          </div>
-        )}
+        ) : null}
       </div>
 
       {/* Stats Table */}

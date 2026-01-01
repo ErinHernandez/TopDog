@@ -226,8 +226,16 @@ function JoinModal({ tournament, onClose, onConfirm, isJoining }: JoinModalProps
 export default function LobbyTabVX2({ 
   onJoinClick,
 }: LobbyTabVX2Props): React.ReactElement {
+  // #region agent log
+  fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'LobbyTabVX2.tsx:226',message:'LobbyTabVX2 rendering',data:{hasOnJoinClick:!!onJoinClick},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'I'})}).catch(()=>{});
+  // #endregion
   const router = useRouter();
   const { tournaments, isLoading, error, refetch } = useTournaments();
+  // #region agent log
+  React.useEffect(() => {
+    fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'LobbyTabVX2.tsx:230',message:'LobbyTabVX2 data state',data:{tournamentCount:tournaments.length,isLoading,hasError:!!error},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'I'})}).catch(()=>{});
+  }, [tournaments.length, isLoading, error]);
+  // #endregion
   const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
   const [isJoining, setIsJoining] = useState(false);
 
@@ -323,7 +331,7 @@ export default function LobbyTabVX2({
   // Calculate available height: 100vh minus header (60px) and footer (80px) and padding
   return (
     <div 
-      className="flex-1 relative"
+      className="vx2-lobby-container flex-1 relative"
       style={{ 
         padding: `${LOBBY_PX.containerPaddingY}px ${LOBBY_PX.containerPaddingX}px`,
         backgroundColor: BG_COLORS.primary,
@@ -339,26 +347,26 @@ export default function LobbyTabVX2({
       aria-label="Tournament lobby"
     >
       {/* Featured Tournament Card - centered with responsive sizing */}
-      {/* Height is constrained by container padding (top/bottom), similar to width */}
+      {/* Height adapts to available space via flexbox */}
       <div
-        className="w-full max-w-sm"
+        className="w-full"
         style={{
           maxWidth: '100%',
           width: '100%',
-          height: '100%', // Fill available height (container height minus padding)
+          flex: '1 1 auto',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
-          flexShrink: 1,
           minHeight: 0,
+          maxHeight: '100%',
         }}
       >
         <TournamentCard
           tournament={featuredTournament}
           onJoinClick={() => handleJoinClick(featuredTournament.id)}
           featured={true}
-          className="w-full h-full"
+          className="w-full"
         />
       </div>
 

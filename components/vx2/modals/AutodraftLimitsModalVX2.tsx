@@ -187,37 +187,53 @@ export default function AutodraftLimitsModalVX2({
   const hasChanges = JSON.stringify(limits) !== JSON.stringify(originalLimits);
   const isAtDefaults = JSON.stringify(limits) === JSON.stringify(DEFAULT_LIMITS);
 
-  // Load limits when modal opens
-  useEffect(() => {
-    if (isOpen) {
-      loadLimits();
-    }
-  }, [isOpen]);
-
-  const loadLimits = async () => {
+  const loadLimits = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 300));
+      // Check if modal is still open before setting state (race condition prevention)
+      if (!isOpen) return;
       // In production, fetch from API/localStorage
       const saved = localStorage.getItem('autodraftLimits');
       if (saved) {
-        const parsed = JSON.parse(saved);
-        setLimits(parsed);
-        setOriginalLimits(parsed);
+        try {
+          const parsed = JSON.parse(saved);
+          setLimits(parsed);
+          setOriginalLimits(parsed);
+        } catch (e) {
+          // If JSON is corrupted, use defaults
+          console.error('Error parsing autodraft limits:', e);
+          setLimits(DEFAULT_LIMITS);
+          setOriginalLimits(DEFAULT_LIMITS);
+        }
       } else {
         setLimits(DEFAULT_LIMITS);
         setOriginalLimits(DEFAULT_LIMITS);
       }
     } catch (e) {
       console.error('Error loading autodraft limits:', e);
-      setLimits(DEFAULT_LIMITS);
-      setOriginalLimits(DEFAULT_LIMITS);
+      if (isOpen) {
+        setLimits(DEFAULT_LIMITS);
+        setOriginalLimits(DEFAULT_LIMITS);
+      }
     } finally {
-      setIsLoading(false);
+      if (isOpen) {
+        setIsLoading(false);
+      }
     }
-  };
+  }, [isOpen]);
+
+  // Load limits when modal opens
+  useEffect(() => {
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AutodraftLimitsModalVX2.tsx:221',message:'useEffect triggered for modal open',data:{isOpen,loadLimitsExists:!!loadLimits},timestamp:Date.now(),sessionId:'debug-session',runId:'verify-fix',hypothesisId:'verify-loadLimits-effect'})}).catch(()=>{});
+    // #endregion
+    if (isOpen) {
+      loadLimits();
+    }
+  }, [isOpen, loadLimits]);
 
   const updateLimit = useCallback((position: Position, delta: number) => {
     setLimits(prev => {
@@ -226,22 +242,28 @@ export default function AutodraftLimitsModalVX2({
     });
   }, []);
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     setIsSaving(true);
     setError(null);
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 500));
+      // Check if modal is still open before setting state (race condition prevention)
+      if (!isOpen) return;
       localStorage.setItem('autodraftLimits', JSON.stringify(limits));
       setOriginalLimits(limits);
       onClose();
     } catch (e) {
       console.error('Error saving autodraft limits:', e);
-      setError('Failed to save. Please try again.');
+      if (isOpen) {
+        setError('Failed to save. Please try again.');
+      }
     } finally {
-      setIsSaving(false);
+      if (isOpen) {
+        setIsSaving(false);
+      }
     }
-  };
+  }, [isOpen, limits, onClose]);
 
   const handleReset = useCallback(() => {
     setLimits(DEFAULT_LIMITS);

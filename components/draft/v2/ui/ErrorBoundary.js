@@ -56,7 +56,7 @@ class ErrorBoundary extends React.Component {
               Something went wrong
             </h2>
             <p className="text-gray-300 mb-4">
-              This component encountered an error and couldn't render properly.
+              This component encountered an error and couldn&apos;t render properly.
             </p>
             
             {process.env.NODE_ENV === 'development' && this.state.error && (

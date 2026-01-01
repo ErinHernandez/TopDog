@@ -13,9 +13,6 @@ import { POSITIONS } from '../draft/v3/constants/positions';
 import { ExposurePlayerRow, PositionFilterBar } from './ExposureReport';
 
 const ExposureReportMobile = () => {
-  // Get headshots from centralized context
-  const { headshotsMap } = usePlayerData();
-  
   const [exposureData, setExposureData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedPositions, setSelectedPositions] = useState([]);
@@ -200,7 +197,6 @@ const ExposureReportMobile = () => {
                 isLast={index === filteredPlayers.length - 1}
                 showShares={showShares[player.name]}
                 onToggleShares={toggleSharesDisplay}
-                headshotsMap={headshotsMap}
               />
             ))}
           </div>

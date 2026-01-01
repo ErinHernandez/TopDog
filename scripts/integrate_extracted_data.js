@@ -248,7 +248,7 @@ function main() {
         return;
     }
     
-    console.log(`📊 Found ${extractedData.length:,} records`);
+    console.log(`📊 Found ${extractedData.length.toLocaleString()} records`);
     
     // Detect data type
     const dataType = detectDataType(extractedData[0]);

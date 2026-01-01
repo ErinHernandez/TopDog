@@ -1,0 +1,439 @@
+/**
+ * Legacy Device Support CSS
+ * 
+ * Provides fallbacks for CSS features not available on older iOS versions:
+ * - Flexbox gap (iOS 14.5+)
+ * - aspect-ratio (iOS 15+) - not currently used in VX2
+ * - :focus-visible (iOS 15.4+) - not currently used in VX2
+ * 
+ * Created: December 30, 2024
+ * Target: iOS 12+ Safari
+ */
+
+/* ============================================================================
+   FLEXBOX GAP FALLBACKS
+   iOS 14.5+ supports gap in flexbox, older versions need margin-based fallbacks
+   ============================================================================ */
+
+/**
+ * Horizontal flex gap fallback
+ * Usage: class="flex-row-gap" style="--gap: 8px"
+ * 
+ * On modern browsers: uses native gap
+ * On legacy: uses negative margin + child margins (same visual result)
+ */
+.flex-row-gap {
+  display: flex;
+  flex-direction: row;
+}
+
+/* Legacy fallback (negative margin technique) */
+.flex-row-gap {
+  margin-left: calc(var(--gap, 8px) * -0.5);
+  margin-right: calc(var(--gap, 8px) * -0.5);
+}
+
+.flex-row-gap > * {
+  margin-left: calc(var(--gap, 8px) * 0.5);
+  margin-right: calc(var(--gap, 8px) * 0.5);
+}
+
+/* Modern browsers override with native gap */
+@supports (gap: 1px) {
+  .flex-row-gap {
+    gap: var(--gap, 8px);
+    margin-left: 0;
+    margin-right: 0;
+  }
+  
+  .flex-row-gap > * {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+/**
+ * Vertical flex gap fallback
+ * Usage: class="flex-col-gap" style="--gap: 8px"
+ */
+.flex-col-gap {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Legacy fallback */
+.flex-col-gap {
+  margin-top: calc(var(--gap, 8px) * -0.5);
+  margin-bottom: calc(var(--gap, 8px) * -0.5);
+}
+
+.flex-col-gap > * {
+  margin-top: calc(var(--gap, 8px) * 0.5);
+  margin-bottom: calc(var(--gap, 8px) * 0.5);
+}
+
+/* Modern browsers override */
+@supports (gap: 1px) {
+  .flex-col-gap {
+    gap: var(--gap, 8px);
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+  
+  .flex-col-gap > * {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+}
+
+/**
+ * Simple adjacent sibling gap (most common pattern)
+ * Usage: class="gap-children-x" style="--gap: 8px"
+ * 
+ * Applies gap between children using adjacent sibling selector
+ * Simpler than negative margin approach but only works for uniform gaps
+ */
+.gap-children-x > * + * {
+  margin-left: var(--gap, 8px);
+}
+
+.gap-children-y > * + * {
+  margin-top: var(--gap, 8px);
+}
+
+/* Modern browsers can use gap directly */
+@supports (gap: 1px) {
+  .gap-children-x,
+  .gap-children-y {
+    gap: var(--gap, 8px);
+  }
+  
+  .gap-children-x > * + *,
+  .gap-children-y > * + * {
+    margin-left: 0;
+    margin-top: 0;
+  }
+}
+
+/* ============================================================================
+   PRESET GAP SIZES
+   Common gap values as utility classes
+   ============================================================================ */
+
+/* 4px gap */
+.gap-1 { --gap: 4px; }
+.gap-x-1 > * + * { margin-left: 4px; }
+.gap-y-1 > * + * { margin-top: 4px; }
+
+@supports (gap: 1px) {
+  .gap-1 { gap: 4px; }
+  .gap-x-1 { gap: 0 4px; }
+  .gap-y-1 { gap: 4px 0; }
+  .gap-x-1 > * + *, .gap-y-1 > * + * { margin: 0; }
+}
+
+/* 8px gap */
+.gap-2 { --gap: 8px; }
+.gap-x-2 > * + * { margin-left: 8px; }
+.gap-y-2 > * + * { margin-top: 8px; }
+
+@supports (gap: 1px) {
+  .gap-2 { gap: 8px; }
+  .gap-x-2 { gap: 0 8px; }
+  .gap-y-2 { gap: 8px 0; }
+  .gap-x-2 > * + *, .gap-y-2 > * + * { margin: 0; }
+}
+
+/* 12px gap */
+.gap-3 { --gap: 12px; }
+.gap-x-3 > * + * { margin-left: 12px; }
+.gap-y-3 > * + * { margin-top: 12px; }
+
+@supports (gap: 1px) {
+  .gap-3 { gap: 12px; }
+  .gap-x-3 { gap: 0 12px; }
+  .gap-y-3 { gap: 12px 0; }
+  .gap-x-3 > * + *, .gap-y-3 > * + * { margin: 0; }
+}
+
+/* 16px gap */
+.gap-4 { --gap: 16px; }
+.gap-x-4 > * + * { margin-left: 16px; }
+.gap-y-4 > * + * { margin-top: 16px; }
+
+@supports (gap: 1px) {
+  .gap-4 { gap: 16px; }
+  .gap-x-4 { gap: 0 16px; }
+  .gap-y-4 { gap: 16px 0; }
+  .gap-x-4 > * + *, .gap-y-4 > * + * { margin: 0; }
+}
+
+/* 24px gap */
+.gap-6 { --gap: 24px; }
+.gap-x-6 > * + * { margin-left: 24px; }
+.gap-y-6 > * + * { margin-top: 24px; }
+
+@supports (gap: 1px) {
+  .gap-6 { gap: 24px; }
+  .gap-x-6 { gap: 0 24px; }
+  .gap-y-6 { gap: 24px 0; }
+  .gap-x-6 > * + *, .gap-y-6 > * + * { margin: 0; }
+}
+
+/* ============================================================================
+   ASPECT RATIO FALLBACK
+   iOS 15+ supports aspect-ratio, older versions need padding-bottom hack
+   ============================================================================ */
+
+/**
+ * Aspect ratio container
+ * Usage: class="aspect-container aspect-16-9"
+ */
+.aspect-container {
+  position: relative;
+  width: 100%;
+  height: 0;
+}
+
+.aspect-container > * {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Common aspect ratios using padding-bottom trick */
+.aspect-1-1 { padding-bottom: 100%; }
+.aspect-16-9 { padding-bottom: 56.25%; }
+.aspect-4-3 { padding-bottom: 75%; }
+.aspect-3-2 { padding-bottom: 66.67%; }
+.aspect-2-1 { padding-bottom: 50%; }
+
+/* Modern browsers can use native aspect-ratio */
+@supports (aspect-ratio: 1) {
+  .aspect-container {
+    height: auto;
+    padding-bottom: 0 !important;
+  }
+  
+  .aspect-container > * {
+    position: relative;
+  }
+  
+  .aspect-1-1 { aspect-ratio: 1 / 1; }
+  .aspect-16-9 { aspect-ratio: 16 / 9; }
+  .aspect-4-3 { aspect-ratio: 4 / 3; }
+  .aspect-3-2 { aspect-ratio: 3 / 2; }
+  .aspect-2-1 { aspect-ratio: 2 / 1; }
+}
+
+/* ============================================================================
+   REDUCED MOTION SUPPORT
+   Respect user preference for reduced motion (accessibility)
+   ============================================================================ */
+
+/**
+ * Disable animations for users who prefer reduced motion
+ * Also useful for legacy devices where animations may cause performance issues
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/**
+ * Class to force reduced motion (can be applied via JS for legacy devices)
+ */
+.reduced-motion *,
+.reduced-motion *::before,
+.reduced-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* ============================================================================
+   LEGACY DEVICE DETECTION CLASSES
+   Applied via JavaScript based on device/iOS detection
+   ============================================================================ */
+
+/**
+ * Classes applied to html element:
+ * - .legacy-device: Any device in Tier 2/3
+ * - .ios-lt-14: iOS version less than 14
+ * - .ios-lt-15: iOS version less than 15
+ * - .no-flex-gap: Browser doesn't support flexbox gap
+ */
+
+/* Hide elements that require newer iOS */
+html.ios-lt-14 .ios-14-only { display: none !important; }
+html.ios-lt-15 .ios-15-only { display: none !important; }
+
+/* Show legacy-specific content */
+html:not(.legacy-device) .legacy-only { display: none !important; }
+
+/* Performance optimizations for legacy devices */
+html.legacy-device .perf-heavy {
+  /* Disable expensive effects on older devices */
+  filter: none !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+
+html.legacy-device .perf-heavy-shadow {
+  /* Replace complex shadows with simple border */
+  box-shadow: none !important;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================================================
+   SAFE AREA FALLBACKS
+   For devices without notch/Dynamic Island (older iPhones with home button)
+   ============================================================================ */
+
+/**
+ * Safe area insets with fallbacks
+ * env() is supported from iOS 11.2+, but older syntax was constant()
+ */
+.safe-area-top {
+  /* Fallback for very old browsers */
+  padding-top: 20px;
+  /* iOS 11.0-11.1 used constant() */
+  padding-top: constant(safe-area-inset-top, 20px);
+  /* Modern iOS uses env() */
+  padding-top: env(safe-area-inset-top, 20px);
+}
+
+.safe-area-bottom {
+  padding-bottom: 0px;
+  padding-bottom: constant(safe-area-inset-bottom, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.safe-area-left {
+  padding-left: 0px;
+  padding-left: constant(safe-area-inset-left, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+}
+
+.safe-area-right {
+  padding-right: 0px;
+  padding-right: constant(safe-area-inset-right, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* ============================================================================
+   TOUCH OPTIMIZATION
+   Ensure good touch behavior on all iOS versions
+   ============================================================================ */
+
+/**
+ * Prevent 300ms tap delay on older iOS
+ * Modern browsers don't need this but it doesn't hurt
+ */
+.touch-action-manipulation {
+  touch-action: manipulation;
+}
+
+/**
+ * Disable text selection on interactive elements
+ * Prevents accidental selection during rapid taps
+ */
+.no-select {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/**
+ * Enable momentum scrolling on iOS
+ */
+.scroll-momentum {
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+}
+
+/* ============================================================================
+   IMAGE FALLBACKS
+   For browsers that don't support modern image formats
+   ============================================================================ */
+
+/**
+ * Use PNG fallback when WebP not supported
+ * Applied via JavaScript: html.no-webp img.webp-image
+ */
+html.no-webp img.webp-image {
+  /* JavaScript will swap src to .png version */
+}
+
+/* Lazy loading polyfill indicator */
+img.lazy-load:not([data-loaded]) {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Disable shimmer on reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  img.lazy-load:not([data-loaded]) {
+    animation: none;
+    background: #f0f0f0;
+  }
+}
+
+/* ============================================================================
+   SCROLLBAR HIDING (Cross-browser)
+   Already in globals.css but included here for completeness
+   ============================================================================ */
+
+.hide-scrollbar {
+  /* Firefox */
+  scrollbar-width: none;
+  /* IE/Edge */
+  -ms-overflow-style: none;
+}
+
+/* WebKit (Safari, Chrome) */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* ============================================================================
+   PRINT STYLES
+   Basic print optimization
+   ============================================================================ */
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-only {
+    display: block !important;
+  }
+  
+  /* Remove backgrounds and shadows for printing */
+  * {
+    background: white !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+}
+
+

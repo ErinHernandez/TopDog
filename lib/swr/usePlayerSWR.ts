@@ -26,6 +26,15 @@ import type { TransformedPlayerStats, TransformedADP } from '@/types/api';
 // SHARED TYPES
 // ============================================================================
 
+/** Player pool entry structure */
+interface PlayerPoolEntry {
+  id?: string | number;
+  name?: string;
+  team?: string;
+  position?: string;
+  photoUrl?: string;
+}
+
 /** Player with headshot (from API) */
 interface PlayerWithHeadshot {
   playerId: number;
@@ -216,13 +225,14 @@ export function useHeadshots(options: HeadshotsOptions = {}): UseHeadshotsReturn
     if (!enabled) return [];
     
     // Handle both array format and object with players property
-    const playersArray = Array.isArray(playerPoolData) 
-      ? playerPoolData 
-      : playerPoolData?.players || [];
+    const typedPoolData = playerPoolData as (PlayerPoolEntry[] | { players: PlayerPoolEntry[] } | undefined);
+    const playersArray: PlayerPoolEntry[] = Array.isArray(typedPoolData) 
+      ? typedPoolData 
+      : typedPoolData?.players || [];
     
     if (!playersArray || playersArray.length === 0) return [];
     
-    let players = playersArray;
+    let players: PlayerPoolEntry[] = playersArray;
     
     // Filter by position if specified
     if (position) {
@@ -236,7 +246,8 @@ export function useHeadshots(options: HeadshotsOptions = {}): UseHeadshotsReturn
     }
     
     // Get SportsDataIO headshots map (actual headshot URLs)
-    const sportsDataIOHeadshotsMap = sportsDataIOHeadshots?.headshotsMap || {};
+    const typedHeadshots = sportsDataIOHeadshots as { headshotsMap?: Record<string, string> } | undefined;
+    const sportsDataIOHeadshotsMap: Record<string, string> = typedHeadshots?.headshotsMap || {};
     
     // Generate headshot URLs - prioritize SportsDataIO, fallback to player pool photoUrl
     return players.map(player => {
@@ -260,12 +271,12 @@ export function useHeadshots(options: HeadshotsOptions = {}): UseHeadshotsReturn
       }
       
       return {
-        playerId: playerId || '',
-        name: player.name || '',
-        team: player.team || '',
-        position: player.position || '',
+        playerId: typeof playerId === 'number' ? playerId : 0,
+        name: String(player.name || ''),
+        team: String(player.team || ''),
+        position: String(player.position || ''),
         headshotUrl: headshotUrl,
-      };
+      } as PlayerWithHeadshot;
     }); // Include all players - headshotUrl will be generated for all
   }, [playerPoolData, sportsDataIOHeadshots, position, team, enabled]);
   
@@ -286,7 +297,7 @@ export function useHeadshots(options: HeadshotsOptions = {}): UseHeadshotsReturn
     isLoading: sportsDataIOLoading || poolLoading,
     isValidating: false, // Static data, never revalidates
     error: sportsDataIOError || poolError,
-    mutate: () => {}, // No-op since data is static
+    mutate: (() => Promise.resolve(headshots)) as KeyedMutator<PlayerWithHeadshot[]>, // No-op since data is static
   };
 }
 

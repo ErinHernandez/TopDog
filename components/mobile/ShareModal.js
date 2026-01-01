@@ -167,7 +167,7 @@ const ShareModal = ({
               </div>
               <div className="text-left">
                 <div className="font-medium text-white">Share</div>
-                <div className="text-sm text-gray-400">Use your device's share menu</div>
+                <div className="text-sm text-gray-400">Use your device&apos;s share menu</div>
               </div>
             </button>
           )}

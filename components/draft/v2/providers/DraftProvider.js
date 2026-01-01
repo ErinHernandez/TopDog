@@ -39,8 +39,6 @@ export default function DraftProvider({ roomId, children }) {
     allPlayers, 
     availablePlayers: contextAvailablePlayers, 
     syncDraftedPlayers,
-    headshotsMap,
-    getPlayerHeadshot 
   } = usePlayerData();
   
   // Core state
@@ -187,8 +185,11 @@ export default function DraftProvider({ roomId, children }) {
     return () => {
       if (roomUnsubscribe.current) roomUnsubscribe.current();
       if (picksUnsubscribe.current) picksUnsubscribe.current();
-      if (timerRef.current) clearInterval(timerRef.current);
+      // Copy ref value for cleanup
+      const timer = timerRef.current;
+      if (timer) clearInterval(timer);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- Intentionally limited to prevent re-subscription loops
   }, [roomId, userName]);
 
   /**
@@ -370,10 +371,6 @@ export default function DraftProvider({ roomId, children }) {
     timer,
     isLoading,
     error,
-    
-    // Player data from centralized context
-    headshotsMap,
-    getPlayerHeadshot,
     
     // User state
     userName,

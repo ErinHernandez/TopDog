@@ -91,7 +91,7 @@ export default function Rules() {
       </section>
       <section className="mb-8">
         <h2 className="text-2xl font-bold mb-2" style={{ color: '#2DE2C5' }}>Eligibility & Accounts</h2>
-        <p className="mb-2 text-gray-200">One account per user. Collusion and multi-accounting are prohibited. Suspended accounts may have prizes revoked. See Terms of Use for more details. If you undertake any actions that are detrimental to TopDog or other users on TopDog's service, we may suspend some or all functions associated with your account. If you want to communicate with us regarding restoration of your account, please email support@topdog.dog.</p>
+        <p className="mb-2 text-gray-200">One account per user. Collusion and multi-accounting are prohibited. Suspended accounts may have prizes revoked. See Terms of Use for more details. If you undertake any actions that are detrimental to TopDog or other users on TopDog&apos;s service, we may suspend some or all functions associated with your account. If you want to communicate with us regarding restoration of your account, please email support@topdog.dog.</p>
       </section>
       <section className="mb-8">
         <h2 className="text-2xl font-bold mb-2" style={{ color: '#2DE2C5' }}>Lineup Restrictions & Edits</h2>

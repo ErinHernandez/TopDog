@@ -10,3 +10,9 @@ export {
   useTabNavigation,
 } from './TabNavigationContext';
 
+export {
+  HeaderContext,
+  HeaderProvider,
+  useHeader,
+} from './HeaderContext';
+

@@ -48,5 +48,37 @@ export {
   SAFE_AREA,
   DURATION,
   EASING,
+  DEVICE_PRESETS,
+  DEFAULT_DEVICE,
+  ALL_DEVICES,
 } from './sizes';
+export type { DevicePresetId, DevicePreset } from './sizes';
+
+// Tablet constants
+export {
+  TABLET_FRAME,
+  TABLET_BREAKPOINTS,
+  TABLET_PANELS,
+  TABLET_HEADER,
+  TABLET_NAV,
+  TABLET_DRAFT,
+  TABLET_TYPOGRAPHY,
+  TABLET_SPACING,
+  TABLET_TOUCH,
+  TABLET_SAFE_AREA,
+  TABLET_Z_INDEX,
+  TABLET_ANIMATIONS,
+} from './tablet';
+
+// Responsive constants
+export {
+  DEVICE_CLASSIFICATIONS,
+  RESPONSIVE_SCALE,
+  getDeviceClass,
+  getDeviceClassFromPreset,
+  getResponsiveScale,
+  getScaleFactor,
+  getResponsiveCSSVars,
+} from './responsive';
+export type { DeviceClass, DeviceClassification, ResponsiveScale } from './responsive';
 

@@ -212,7 +212,7 @@ export default function NavbarSandboxPage() {
           
           {/* User Turn Toggle */}
           <div className="flex items-center justify-between mb-4">
-            <span className="text-gray-300 text-sm">User's Turn</span>
+            <span className="text-gray-300 text-sm">User&apos;s Turn</span>
             <button
               onClick={() => setIsUserTurn(!isUserTurn)}
               className={`w-12 h-6 rounded-full transition-colors ${

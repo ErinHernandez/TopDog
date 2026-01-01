@@ -26,11 +26,9 @@ const TUTORIAL_SHOWN_PREFIX = 'topdog_tutorial_shown_';
 
 // Hooks
 import { useDraftRoom } from '../hooks/useDraftRoom';
-import { useHeadshots } from '@/lib/swr/usePlayerSWR';
 
 // Components
-import DraftNavbar from './DraftNavbar';
-import DraftStatusBar from './DraftStatusBar';
+import DraftStatusBar, { HEADER_HEIGHT } from './DraftStatusBar';
 import PicksBar from './PicksBar';
 import PlayerList from './PlayerList';
 import QueueView from './QueueView';
@@ -206,10 +204,9 @@ interface TabContentProps {
   activeTab: DraftTab;
   draftRoom: ReturnType<typeof useDraftRoom>;
   onTutorial?: () => void;
-  headshotsMap?: Record<string, string>;
 }
 
-function TabContent({ activeTab, draftRoom, onTutorial, headshotsMap }: TabContentProps): React.ReactElement {
+function TabContent({ activeTab, draftRoom, onTutorial }: TabContentProps): React.ReactElement {
   switch (activeTab) {
     case 'players':
       return (
@@ -231,7 +228,6 @@ function TabContent({ activeTab, draftRoom, onTutorial, headshotsMap }: TabConte
           isQueued={draftRoom.queue.isQueued}
           initialScrollPosition={draftRoom.getScrollPosition('players')}
           onScrollPositionChange={(pos) => draftRoom.saveScrollPosition('players', pos)}
-          headshotsMap={headshotsMap}
         />
       );
     
@@ -300,15 +296,15 @@ export default function DraftRoomVX2({
   fastMode = false,
   onDevToolsReady,
 }: DraftRoomVX2Props): React.ReactElement {
+  // #region agent log
+  fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'DraftRoomVX2.tsx:164',message:'DraftRoomVX2 rendering',data:{roomId,userId,useAbsolutePosition,fastMode,hasOnLeave:!!onLeave,hasOnDevToolsReady:!!onDevToolsReady},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'G'})}).catch(()=>{});
+  // #endregion
   // Initialize draft room hook
   const draftRoom = useDraftRoom({
     roomId,
     userId,
     fastMode,
   });
-  
-  // Fetch player headshots from SportsDataIO
-  const { headshotsMap } = useHeadshots();
   
   // Expose dev tools to parent - always keep ref updated
   React.useEffect(() => {
@@ -349,9 +345,11 @@ export default function DraftRoomVX2({
     hasAutoShownTutorial.current = true;
     
     // Show the tutorial with a small delay to let the UI settle
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       setShowTutorialModal(true);
     }, 300);
+    
+    return () => clearTimeout(timer);
   }, [draftRoom.status, roomId]);
   
   // Handle "don't show again" checkbox
@@ -361,26 +359,47 @@ export default function DraftRoomVX2({
   
   // Show leave confirmation modal
   const handleLeaveClick = useCallback(() => {
+    // #region agent log
+    console.warn('[VX2 DEBUG] handleLeaveClick called - opening modal');
+    // #endregion
     setShowLeaveModal(true);
   }, []);
   
   // Confirm leaving
   const handleLeaveConfirm = useCallback(() => {
+    // #region agent log
+    console.warn('[VX2 DEBUG] handleLeaveConfirm called', {hasOnLeave: !!onLeave});
+    // #endregion
     console.log('[DraftRoomVX2] Leave confirmed, cleaning up...');
     // Call leave draft cleanup
     draftRoom.leaveDraft();
-    // Close modal
+    // Close modal first
     setShowLeaveModal(false);
-    // Trigger navigation immediately
+    // Trigger navigation - use setTimeout to ensure it happens after state update
     if (onLeave) {
       console.log('[DraftRoomVX2] Calling onLeave callback...');
-      try {
-        onLeave();
-      } catch (error) {
-        console.error('[DraftRoomVX2] Error in onLeave callback:', error);
-      }
+      // #region agent log
+      console.warn('[VX2 DEBUG] Scheduling onLeave callback');
+      // #endregion
+      // Use setTimeout to ensure navigation happens after modal closes
+      setTimeout(() => {
+        try {
+          // #region agent log
+          console.warn('[VX2 DEBUG] Calling onLeave callback now');
+          // #endregion
+          onLeave();
+        } catch (error) {
+          console.error('[DraftRoomVX2] Error in onLeave callback:', error);
+          // #region agent log
+          console.error('[VX2 DEBUG ERROR] onLeave callback threw error', error);
+          // #endregion
+        }
+      }, 0);
     } else {
       console.warn('[DraftRoomVX2] onLeave callback not provided!');
+      // #region agent log
+      console.error('[VX2 DEBUG ERROR] onLeave callback not provided');
+      // #endregion
     }
   }, [draftRoom, onLeave]);
   
@@ -436,72 +455,30 @@ export default function DraftRoomVX2({
         overflow: 'hidden',
       }}
     >
-      {/* Combined Status Bar + Navbar Header (54px total: 28px + 26px) */}
+      {/* Unified Header - Status bar with centered timer */}
       <div
         style={{
           position: 'absolute',
           top: 0,
           left: 0,
           right: 0,
-          height: '54px', // Status bar (28px) + navbar (26px)
           zIndex: 50,
-          display: 'flex',
-          flexDirection: 'column',
         }}
       >
-        {/* Status Bar - matches navbar background for unified appearance */}
         <DraftStatusBar
           timerSeconds={draftRoom.timer.seconds}
           isUserTurn={draftRoom.isMyTurn && draftRoom.status === 'active'}
-        />
-        
-        {/* Navbar - timer hidden, rendered externally below */}
-        <DraftNavbar
-          onLeave={handleLeaveClick}
-          useAbsolutePosition={false}
-          timerSeconds={draftRoom.timer.seconds}
-          isUserTurn={draftRoom.isMyTurn && draftRoom.status === 'active'}
           onGracePeriodEnd={handleGracePeriodEnd}
-          onInfo={handleInfoClick}
-          hideTimer={true}
+          onLeave={handleLeaveClick}
         />
-        
-        {/* Centered Timer - spans both status bar and navbar, above all elements */}
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: '54px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            pointerEvents: 'none', // Allow clicks through to buttons
-            zIndex: 100, // Above status bar and navbar
-          }}
-        >
-          <div
-            style={{
-              fontSize: '32px',
-              fontWeight: 700,
-              fontVariantNumeric: 'tabular-nums',
-              color: '#FFFFFF',
-              textShadow: '0 2px 4px rgba(0,0,0,0.4)',
-            }}
-            aria-label={`${draftRoom.timer.seconds} seconds remaining`}
-          >
-            {draftRoom.timer.seconds}
-          </div>
-        </div>
       </div>
       
-      {/* Content wrapper - accounts for combined header (54px) + safe area */}
+      {/* Content wrapper - accounts for combined header + safe area */}
       <div
         style={{
           position: 'absolute',
-          // Account for combined header (54px) + safe area inset
-          top: `calc(54px + env(safe-area-inset-top, 0px))`,
+          // Account for combined header + safe area inset
+          top: `calc(${HEADER_HEIGHT}px + env(safe-area-inset-top, 0px))`,
           left: 0,
           right: 0,
           bottom: LAYOUT_PX.footerHeight,
@@ -531,7 +508,7 @@ export default function DraftRoomVX2({
             overflow: 'hidden',
           }}
         >
-          <TabContent activeTab={draftRoom.activeTab} draftRoom={draftRoom} onTutorial={() => setShowTutorialModal(true)} headshotsMap={headshotsMap} />
+          <TabContent activeTab={draftRoom.activeTab} draftRoom={draftRoom} onTutorial={() => setShowTutorialModal(true)} />
         </main>
       </div>
       

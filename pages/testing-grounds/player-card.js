@@ -313,6 +313,7 @@ export default function PlayerCardTest() {
         clearInterval(interval);
       }
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- makePick is stable, excluded to prevent timer reset on each pick
   }, [isDraftActive, draftTimer, availablePlayers.length, isDraftPaused]);
   
   // Function to simulate picks for testing (old function - keeping for reference)

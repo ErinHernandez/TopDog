@@ -117,7 +117,7 @@ export const PerformanceMonitor = ({ showMetrics = true, showLogs = true }) => (
 );
 
 // Export all stubs for easy importing
-export default {
+const Stubs = {
   TeamRoster,
   DraftStats,
   Chat,
@@ -131,3 +131,5 @@ export default {
   DraftTimer,
   PerformanceMonitor
 };
+
+export default Stubs;

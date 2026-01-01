@@ -23,6 +23,9 @@ export type { PicksBarProps } from './PicksBar';
 export { default as PlayerList } from './PlayerList';
 export type { PlayerListProps } from './PlayerList';
 
+export { default as VirtualizedPlayerList } from './VirtualizedPlayerList';
+export type { VirtualizedPlayerListProps } from './VirtualizedPlayerList';
+
 export { default as QueueView } from './QueueView';
 export type { QueueViewProps } from './QueueView';
 
@@ -43,3 +46,6 @@ export type { PlayerExpandedCardProps } from './PlayerExpandedCard';
 
 export { default as DraftStatusBar } from './DraftStatusBar';
 export type { DraftStatusBarProps } from './DraftStatusBar';
+
+export { default as ShareOptionsModal } from './ShareOptionsModal';
+export type { ShareOptionsModalProps, ShareType } from './ShareOptionsModal';

@@ -175,6 +175,11 @@ export default class TabErrorBoundary extends Component<
   }
   
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
+    // #region agent log
+    const errorData = {location:'TabErrorBoundary.tsx:177',message:'TabErrorBoundary caught error',data:{tabId:this.props.tabId,errorMessage:error.message,errorName:error.name,componentStack:errorInfo.componentStack?.substring(0,200)},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'F'};
+    console.error('[VX2 DEBUG ERROR] TabErrorBoundary caught error', errorData);
+    fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(errorData)}).catch((e)=>console.error('[VX2 DEBUG] Fetch failed', e));
+    // #endregion
     // Log the error
     console.error(`[TabErrorBoundary] Error in tab "${this.props.tabId}":`, error);
     console.error('Component stack:', errorInfo.componentStack);

@@ -1,0 +1,364 @@
+/**
+ * VX2 Device-Specific Sizing
+ * 
+ * Enterprise-grade responsive system using CSS custom properties.
+ * Supports all iPhone models from SE (375x667) to 16 Pro Max (440x956).
+ * 
+ * Device Classifications:
+ * - Compact: height <= 700px (iPhone SE, iPhone 8)
+ * - Standard: height 701-880px (iPhone 12-15, Mini models)
+ * - Large: height > 880px (Pro Max models)
+ */
+
+/* ============================================================================
+   CSS CUSTOM PROPERTIES - DEFAULT (STANDARD)
+   ============================================================================ */
+
+:root {
+  /* Typography */
+  --vx2-title-size: 22px;
+  --vx2-title-line-height: 1.15;
+  --vx2-label-size: 11px;
+  --vx2-value-size: 14px;
+  --vx2-button-text-size: 13px;
+  --vx2-progress-label-size: 11px;
+  
+  /* Spacing */
+  --vx2-card-padding: 16px;
+  --vx2-section-gap: 12px;
+  --vx2-element-gap: 8px;
+  
+  /* Components */
+  --vx2-logo-bar-height: 36px;
+  --vx2-logo-height: 22px;
+  --vx2-button-height: 48px;
+  --vx2-image-max-size: 280px;
+  --vx2-progress-height: 8px;
+  --vx2-stats-row-height: 44px;
+  
+  /* Margins */
+  --vx2-title-margin-bottom: 16px;
+  --vx2-image-margin-top: 32px;
+  --vx2-image-margin-bottom: 12px;
+  --vx2-progress-margin-bottom: 12px;
+  --vx2-button-margin-bottom: 12px;
+}
+
+/* ============================================================================
+   COMPACT DEVICES (iPhone SE, iPhone 8 - height <= 700px)
+   ============================================================================ */
+
+/* ============================================================================
+   COMPACT DEVICES - Class-based for simulated phone frames
+   Applied via .vx2-device-compact class on container
+   
+   Fresh start: Same layout as other models, proportionally scaled
+   Scale factor: ~0.78 (SE 667px / iPhone 15 852px)
+   ============================================================================ */
+
+/* Logo bar */
+.vx2-device-compact .vx2-logo-bar {
+  height: 32px !important;
+}
+
+.vx2-device-compact .vx2-logo-bar img {
+  height: 20px !important;
+}
+
+/* Lobby container */
+.vx2-device-compact .vx2-lobby-container {
+  padding: 12px !important;
+}
+
+/* Tournament card - SAME structure as other devices */
+.vx2-device-compact .vx2-tournament-card {
+  padding: 16px !important;
+  /* Same flex layout as other models - no changes to justify-content */
+}
+
+/* Title - scaled */
+.vx2-device-compact .vx2-tournament-title {
+  font-size: 20px !important;
+  margin-bottom: 20px !important;
+}
+
+/* Logo wrapper - same proportional spacing */
+.vx2-device-compact .vx2-tournament-logo-wrapper {
+  margin-top: 16px !important;
+  margin-bottom: 16px !important;
+}
+
+/* Logo - scaled */
+.vx2-device-compact .vx2-tournament-logo {
+  width: 240px !important;
+  height: auto !important;
+}
+
+/* Spacer - KEEP IT to maintain same layout as other devices */
+.vx2-device-compact .vx2-card-spacer {
+  flex: 1 !important;
+  display: block !important;
+}
+
+/* Progress section - scaled */
+.vx2-device-compact .vx2-progress-section {
+  margin-bottom: 12px !important;
+}
+
+.vx2-device-compact .vx2-progress-labels {
+  font-size: 11px !important;
+  margin-bottom: 4px !important;
+}
+
+/* Button - scaled */
+.vx2-device-compact .vx2-tournament-button {
+  height: 40px !important;
+  font-size: 12px !important;
+  margin-bottom: 12px !important;
+}
+
+/* Stats - scaled */
+.vx2-device-compact .vx2-tournament-stats {
+  gap: 12px !important;
+}
+
+.vx2-device-compact .vx2-tournament-stat-value {
+  font-size: 14px !important;
+}
+
+.vx2-device-compact .vx2-tournament-stat-label {
+  font-size: 10px !important;
+}
+
+/* ============================================================================
+   COMPACT DEVICES - Media query fallback for actual mobile devices
+   Same values as class-based styles above
+   ============================================================================ */
+
+@media screen and (max-height: 700px) {
+  .vx2-logo-bar {
+    height: 32px !important;
+  }
+  
+  .vx2-logo-bar img {
+    height: 20px !important;
+  }
+  
+  .vx2-lobby-container {
+    padding: 12px !important;
+  }
+  
+  .vx2-tournament-card {
+    padding: 16px !important;
+  }
+  
+  .vx2-tournament-title {
+    font-size: 20px !important;
+    margin-bottom: 20px !important;
+  }
+  
+  .vx2-tournament-logo-wrapper {
+    margin-top: 16px !important;
+    margin-bottom: 16px !important;
+  }
+  
+  .vx2-tournament-logo {
+    width: 240px !important;
+    height: auto !important;
+  }
+  
+  .vx2-progress-section {
+    margin-bottom: 12px !important;
+  }
+  
+  .vx2-progress-labels {
+    font-size: 11px !important;
+    margin-bottom: 4px !important;
+  }
+  
+  .vx2-tournament-button {
+    height: 40px !important;
+    font-size: 12px !important;
+    margin-bottom: 12px !important;
+  }
+  
+  .vx2-tournament-stats {
+    gap: 12px !important;
+  }
+  
+  .vx2-tournament-stat-value {
+    font-size: 14px !important;
+  }
+  
+  .vx2-tournament-stat-label {
+    font-size: 10px !important;
+  }
+  
+  .vx2-card-spacer {
+    display: none !important;
+  }
+}
+
+/* ============================================================================
+   LARGE DEVICES (Pro Max models - height > 880px)
+   ============================================================================ */
+
+@media screen and (min-height: 881px) {
+  :root {
+    /* Typography - full size */
+    --vx2-title-size: 26px;
+    --vx2-title-line-height: 1.1;
+    --vx2-label-size: 12px;
+    --vx2-value-size: 16px;
+    --vx2-button-text-size: 14px;
+    --vx2-progress-label-size: 13px;
+    
+    /* Spacing - generous */
+    --vx2-card-padding: 21px;
+    --vx2-section-gap: 16px;
+    --vx2-element-gap: 12px;
+    
+    /* Components - full sizes */
+    --vx2-logo-bar-height: 44px;
+    --vx2-logo-height: 28px;
+    --vx2-button-height: 57px;
+    --vx2-image-max-size: 320px;
+    --vx2-progress-height: 8px;
+    --vx2-stats-row-height: 50px;
+    
+    /* Margins - spacious */
+    --vx2-title-margin-bottom: 24px;
+    --vx2-image-margin-top: 32px;
+    --vx2-image-margin-bottom: 12px;
+    --vx2-progress-margin-bottom: 16px;
+    --vx2-button-margin-bottom: 16px;
+  }
+}
+
+/* ============================================================================
+   COMPONENT STYLES USING CSS VARIABLES
+   ============================================================================ */
+
+/* Logo Bar */
+.vx2-logo-bar {
+  height: var(--vx2-logo-bar-height) !important;
+}
+
+.vx2-logo-bar img {
+  height: var(--vx2-logo-height) !important;
+}
+
+/* Tournament Card */
+.vx2-tournament-card {
+  padding: var(--vx2-card-padding) !important;
+}
+
+.vx2-tournament-title {
+  font-size: var(--vx2-title-size) !important;
+  line-height: var(--vx2-title-line-height) !important;
+  margin-bottom: var(--vx2-title-margin-bottom) !important;
+}
+
+.vx2-tournament-logo-wrapper {
+  margin-top: var(--vx2-image-margin-top);
+  margin-bottom: var(--vx2-image-margin-bottom);
+}
+
+.vx2-tournament-logo {
+  width: var(--vx2-image-max-size) !important;
+  height: var(--vx2-image-max-size) !important;
+}
+
+.vx2-tournament-button {
+  height: var(--vx2-button-height) !important;
+  font-size: var(--vx2-button-text-size) !important;
+  margin-bottom: var(--vx2-button-margin-bottom) !important;
+}
+
+.vx2-tournament-stats {
+  gap: var(--vx2-element-gap) !important;
+  min-height: var(--vx2-stats-row-height);
+}
+
+.vx2-tournament-stat-value {
+  font-size: var(--vx2-value-size) !important;
+}
+
+.vx2-tournament-stat-label {
+  font-size: var(--vx2-label-size) !important;
+}
+
+/* Progress Section */
+.vx2-tournament-card .vx2-progress-section {
+  margin-bottom: var(--vx2-progress-margin-bottom) !important;
+}
+
+.vx2-tournament-card .vx2-progress-labels {
+  font-size: var(--vx2-progress-label-size) !important;
+  margin-bottom: var(--vx2-element-gap) !important;
+}
+
+/* Lobby Container */
+.vx2-lobby-container {
+  padding: var(--vx2-card-padding) !important;
+}
+
+/* Tab Bar */
+.vx2-tab-bar {
+  padding-top: var(--vx2-element-gap) !important;
+}
+
+/* ============================================================================
+   FLUID SIZING ALTERNATIVES (using clamp)
+   Use these classes when you want smooth scaling instead of breakpoints
+   ============================================================================ */
+
+.vx2-fluid-title {
+  /* Fluid: min 14px, preferred 3.5vh, max 26px */
+  font-size: clamp(14px, 3.5vh, 26px);
+}
+
+.vx2-fluid-image {
+  /* Fluid: min 80px, preferred 18vh, max 200px */
+  width: clamp(80px, 18vh, 200px);
+  height: clamp(80px, 18vh, 200px);
+}
+
+.vx2-fluid-button {
+  /* Fluid: min 34px, preferred 6vh, max 57px */
+  height: clamp(34px, 6vh, 57px);
+}
+
+.vx2-fluid-padding {
+  /* Fluid: min 8px, preferred 2vh, max 21px */
+  padding: clamp(8px, 2vh, 21px);
+}
+
+/* ============================================================================
+   UTILITY CLASSES
+   ============================================================================ */
+
+/* Hide on compact devices */
+@media screen and (max-height: 700px) {
+  .vx2-hide-compact {
+    display: none !important;
+  }
+}
+
+/* Show only on compact devices */
+.vx2-show-compact {
+  display: none !important;
+}
+
+@media screen and (max-height: 700px) {
+  .vx2-show-compact {
+    display: block !important;
+  }
+}
+
+/* Reduce spacing on compact */
+@media screen and (max-height: 700px) {
+  .vx2-compact-spacing > * + * {
+    margin-top: 4px !important;
+  }
+}

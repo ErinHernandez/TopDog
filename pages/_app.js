@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { SWRConfig } from 'swr';
 import '../styles/globals.css'
+import '../styles/legacy-support.css'
+import '../styles/device-sizing.css'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import DevNav from '../components/dev/DevNav'

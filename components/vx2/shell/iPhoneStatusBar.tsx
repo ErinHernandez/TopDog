@@ -37,7 +37,7 @@ const STATUS_BAR_HEIGHT = 28; // Compact status bar for unified header
 // COMPONENT
 // ============================================================================
 
-export default function iPhoneStatusBar({
+export default function IPhoneStatusBar({
   time,
   battery = 79,
   signalBars = 4,

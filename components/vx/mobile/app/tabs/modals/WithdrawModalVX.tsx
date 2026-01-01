@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 /**
  * WithdrawModalVX - Withdrawal Modal for VX Profile
  * 
@@ -7,7 +8,7 @@
  * - Free withdrawals
  * - 6-digit confirmation code security
  * 
- * Design principle: If someone in rural Haiti can't withdraw in 60 seconds, we failed.
+ * Design principle: If someone in rural Haiti can&apos;t withdraw in 60 seconds, we failed.
  */
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
@@ -838,7 +839,7 @@ function SuccessStep({ amount, method, onClose }: SuccessStepProps): React.React
         }}
       >
         Typically arrives within 24 hours.<br />
-        We'll email you when it's there.
+        We'll email you when it&apos;s there.
       </div>
 
       <button

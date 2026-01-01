@@ -50,8 +50,8 @@ const CARD_PX = {
 } as const;
 
 const CARD_COLORS = {
-  background: 'url(/tournament_card_background.png)',
-  backgroundFallback: '#191932',
+  background: 'url(/FUll_tournamentcard_spaceI.png)',
+  backgroundFallback: '#0a0a1a',
   border: 'rgba(75, 85, 99, 0.5)',
   text: TEXT_COLORS.primary,
   textMuted: TEXT_COLORS.secondary,
@@ -64,6 +64,32 @@ const CARD_COLORS = {
 // TYPES
 // ============================================================================
 
+/** Style overrides for sandbox experimentation */
+export interface CardStyleOverrides {
+  /** Background image or gradient (e.g., 'url(...)', 'linear-gradient(...)') */
+  background?: string;
+  /** Fallback background color */
+  backgroundFallback?: string;
+  /** Border color */
+  border?: string;
+  /** Border width in pixels */
+  borderWidth?: number;
+  /** Accent color for featured border */
+  accent?: string;
+  /** Progress bar background color */
+  progressBg?: string;
+  /** Card padding in pixels */
+  padding?: number;
+  /** Border radius in pixels */
+  borderRadius?: number;
+  /** Button background style (replaces tiled) */
+  buttonBackground?: string;
+  /** Button background color */
+  buttonBackgroundColor?: string;
+  /** Custom background image URL (alternative to gradient) */
+  backgroundImage?: string;
+}
+
 export interface TournamentCardProps {
   /** Tournament data */
   tournament: Tournament;
@@ -73,6 +99,8 @@ export interface TournamentCardProps {
   featured?: boolean;
   /** Additional className */
   className?: string;
+  /** Style overrides for sandbox experimentation */
+  styleOverrides?: CardStyleOverrides;
 }
 
 // ============================================================================
@@ -86,24 +114,32 @@ interface StatItemProps {
 
 function StatItem({ value, label }: StatItemProps): React.ReactElement {
   return (
-    <div className="text-center">
-      <div 
-        className="font-bold" 
+    <div className="text-center" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <span 
+        className="vx2-tournament-stat-value font-bold" 
         style={{ 
           fontSize: `${CARD_PX.statsValueFontSize}px`, 
           color: CARD_COLORS.text,
+          backgroundColor: '#000000',
+          padding: '2px 6px',
+          borderRadius: '4px',
         }}
       >
         {value}
-      </div>
-      <div 
+      </span>
+      <span 
+        className="vx2-tournament-stat-label"
         style={{ 
           fontSize: `${CARD_PX.statsLabelFontSize}px`, 
           color: CARD_COLORS.textMuted,
+          backgroundColor: '#000000',
+          padding: '1px 4px',
+          borderRadius: '3px',
+          marginTop: '2px',
         }}
       >
         {label}
-      </div>
+      </span>
     </div>
   );
 }
@@ -117,99 +153,83 @@ export function TournamentCard({
   onJoinClick,
   featured = false,
   className = '',
+  styleOverrides = {},
 }: TournamentCardProps): React.ReactElement {
   const fillPercentage = tournament.maxEntries 
     ? Math.round((tournament.currentEntries / tournament.maxEntries) * 100)
     : 0;
   
+  // Merge style overrides with defaults
+  // If backgroundImage URL is provided, wrap it in url(); otherwise use gradient/pattern
+  const resolvedBackground = styleOverrides.backgroundImage 
+    ? `url(${styleOverrides.backgroundImage})`
+    : (styleOverrides.background ?? CARD_COLORS.background);
+    
+  const colors = {
+    background: resolvedBackground,
+    backgroundFallback: styleOverrides.backgroundFallback ?? CARD_COLORS.backgroundFallback,
+    border: styleOverrides.border ?? CARD_COLORS.border,
+    borderWidth: styleOverrides.borderWidth ?? (featured ? 3 : 1),
+    accent: styleOverrides.accent ?? CARD_COLORS.accent,
+    progressBg: styleOverrides.progressBg ?? CARD_COLORS.progressBg,
+  };
+  
+  const sizes = {
+    padding: styleOverrides.padding ?? CARD_PX.padding,
+    borderRadius: styleOverrides.borderRadius ?? CARD_PX.borderRadius,
+  };
+  
+  // Determine border color based on featured and overrides
+  const borderColor = featured ? colors.accent : colors.border;
+  
   return (
     <div 
-      className={`relative w-full h-full ${className}`}
+      className={`vx2-tournament-card relative w-full h-full ${className}`}
       style={{
-        backgroundImage: CARD_COLORS.background,
-        backgroundColor: CARD_COLORS.backgroundFallback,
+        backgroundImage: colors.background,
+        backgroundColor: colors.backgroundFallback,
         backgroundSize: 'cover',
-        backgroundPosition: 'center',
+        backgroundPosition: 'center center',
         backgroundRepeat: 'no-repeat',
-        borderRadius: `${CARD_PX.borderRadius}px`,
-        border: featured 
-          ? `3px solid ${CARD_COLORS.accent}` 
-          : `1px solid ${CARD_COLORS.border}`,
-        padding: `${CARD_PX.padding}px`,
+        borderRadius: `${sizes.borderRadius}px`,
+        border: `${colors.borderWidth}px solid ${borderColor}`,
+        padding: `${sizes.padding}px`,
         display: 'flex',
         flexDirection: 'column',
       }}
       role="article"
       aria-label={`${tournament.title} tournament`}
     >
-      {/* Top Section - Title + Logo */}
-      <div>
-        {/* Tournament Title - Split into two lines */}
+      {/* Tournament Title */}
+      <div style={{ marginTop: '12px' }}>
         <h2 
-          className="text-center font-bold leading-tight"
+          className="vx2-tournament-title text-center font-bold leading-tight"
           style={{ 
-            fontSize: '26px',
+            fontSize: '36px',
             fontFamily: "'Anton SC', sans-serif",
             textTransform: 'uppercase',
-            letterSpacing: '1px',
+            letterSpacing: '2px',
             color: CARD_COLORS.text,
-            marginBottom: `${CARD_PX.titleMarginBottom}px`,
+            textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
           }}
         >
-          {tournament.title.includes('INTERNATIONAL') ? (
-            <>
-              {tournament.title.replace(' INTERNATIONAL', '')}<br />
-              INTERNATIONAL
-            </>
-          ) : (
-            tournament.title
-          )}
+          The TopDog<br />
+          International
         </h2>
-
-        {/* Tournament Logo/Image */}
-        {featured && (
-          <div 
-            className="flex justify-center"
-            style={{ marginTop: `${SPACING.xl * 2}px`, marginBottom: `${SPACING.md}px` }}
-          >
-            <img 
-              src="/globe_tournament.png" 
-              alt=""
-              aria-hidden="true"
-              style={{ 
-                width: `${CARD_PX.logoSize}px`, 
-                height: `${CARD_PX.logoSize}px`, 
-                objectFit: 'contain',
-                borderRadius: `${RADIUS.lg}px`,
-              }}
-            />
-          </div>
-        )}
       </div>
 
-      {/* Spacer to push bottom content down */}
-      <div style={{ flex: 1 }} />
+      {/* Spacer to push bottom content down - hidden on compact */}
+      <div className="vx2-card-spacer" style={{ flex: 1 }} />
 
       {/* Bottom Section - Progress, Button, Stats */}
       <div>
         {/* Progress Bar */}
         {tournament.maxEntries && (
-          <div style={{ marginBottom: `${SPACING.lg}px` }}>
-            <div 
-              className="flex justify-between"
-              style={{ 
-                fontSize: `${CARD_PX.progressLabelFontSize}px`, 
-                color: CARD_COLORS.textMuted,
-                marginBottom: `${CARD_PX.progressLabelMarginBottom}px`,
-              }}
-            >
-              <span>Tournament Fill</span>
-              <span>{fillPercentage}% Full</span>
-            </div>
+          <div className="vx2-progress-section" style={{ marginBottom: `${SPACING.lg}px` }}>
             <ProgressBar 
               value={fillPercentage} 
               fillBackgroundImage="url(/wr_blue.png)"
-              backgroundColor={CARD_COLORS.progressBg}
+              backgroundColor={colors.progressBg}
               size="md"
             />
           </div>
@@ -218,9 +238,17 @@ export function TournamentCard({
         {/* Join Button */}
         <button
           onClick={onJoinClick}
-          className="w-full font-semibold transition-colors duration-200 active:scale-[0.98]"
+          className="vx2-tournament-button w-full font-semibold transition-colors duration-200 active:scale-[0.98]"
           style={{ 
-            ...TILED_BG_STYLE,
+            ...(styleOverrides.buttonBackground ? {} : TILED_BG_STYLE),
+            ...(styleOverrides.buttonBackground ? { 
+              backgroundImage: styleOverrides.buttonBackground,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            } : {}),
+            ...(styleOverrides.buttonBackgroundColor ? { 
+              backgroundColor: styleOverrides.buttonBackgroundColor 
+            } : {}),
             color: '#FFFFFF',
             height: `${CARD_PX.buttonHeight}px`,
             fontSize: `${CARD_PX.buttonFontSize}px`,
@@ -236,6 +264,7 @@ export function TournamentCard({
 
         {/* Stats Grid */}
         <div 
+          className="vx2-tournament-stats"
           style={{ 
             display: 'grid', 
             gridTemplateColumns: '1fr 1fr 1fr', 
@@ -247,6 +276,7 @@ export function TournamentCard({
           <StatItem value={tournament.firstPlacePrize} label="1st Place" />
         </div>
       </div>
+      
     </div>
   );
 }

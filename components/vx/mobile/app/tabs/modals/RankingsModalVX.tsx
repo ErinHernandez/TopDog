@@ -6,7 +6,7 @@
  * Uses contained Modal to stay within phone frame bounds.
  * 
  * Design: Tabbed single-panel (Build Rankings / My Rankings)
- * - Differentiates from competitor's side-by-side layout
+ * - Differentiates from competitor&apos;s side-by-side layout
  */
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
@@ -669,7 +669,7 @@ export default function RankingsModalVX({
       const index = prev.indexOf(playerName);
       if (index <= 0) return prev;
       const newRankings = [...prev];
-      // Calculate target position (can't go below 0)
+      // Calculate target position (can&apos;t go below 0)
       const targetIndex = Math.max(0, index - spots);
       // Remove player from current position
       const [player] = newRankings.splice(index, 1);
@@ -685,7 +685,7 @@ export default function RankingsModalVX({
       const index = prev.indexOf(playerName);
       if (index < 0 || index >= prev.length - 1) return prev;
       const newRankings = [...prev];
-      // Calculate target position (can't go beyond end)
+      // Calculate target position (can&apos;t go beyond end)
       const targetIndex = Math.min(prev.length - 1, index + spots);
       // Remove player from current position
       const [player] = newRankings.splice(index, 1);

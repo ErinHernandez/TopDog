@@ -68,6 +68,7 @@ export default function PlayerList({
     });
 
     return filtered;
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- positionFilters is a constant object
   }, [availablePlayers, search, positionFilter, sortBy]);
 
   // Get position color
