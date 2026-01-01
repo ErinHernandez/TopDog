@@ -226,16 +226,10 @@ function JoinModal({ tournament, onClose, onConfirm, isJoining }: JoinModalProps
 export default function LobbyTabVX2({ 
   onJoinClick,
 }: LobbyTabVX2Props): React.ReactElement {
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'LobbyTabVX2.tsx:226',message:'LobbyTabVX2 rendering',data:{hasOnJoinClick:!!onJoinClick},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'I'})}).catch(()=>{});
-  // #endregion
   const router = useRouter();
   const { tournaments, isLoading, error, refetch } = useTournaments();
-  // #region agent log
   React.useEffect(() => {
-    fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'LobbyTabVX2.tsx:230',message:'LobbyTabVX2 data state',data:{tournamentCount:tournaments.length,isLoading,hasError:!!error},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'I'})}).catch(()=>{});
   }, [tournaments.length, isLoading, error]);
-  // #endregion
   const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
   const [isJoining, setIsJoining] = useState(false);
 

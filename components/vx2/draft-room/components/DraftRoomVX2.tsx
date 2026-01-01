@@ -296,9 +296,6 @@ export default function DraftRoomVX2({
   fastMode = false,
   onDevToolsReady,
 }: DraftRoomVX2Props): React.ReactElement {
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'DraftRoomVX2.tsx:164',message:'DraftRoomVX2 rendering',data:{roomId,userId,useAbsolutePosition,fastMode,hasOnLeave:!!onLeave,hasOnDevToolsReady:!!onDevToolsReady},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'G'})}).catch(()=>{});
-  // #endregion
   // Initialize draft room hook
   const draftRoom = useDraftRoom({
     roomId,
@@ -359,17 +356,13 @@ export default function DraftRoomVX2({
   
   // Show leave confirmation modal
   const handleLeaveClick = useCallback(() => {
-    // #region agent log
     console.warn('[VX2 DEBUG] handleLeaveClick called - opening modal');
-    // #endregion
     setShowLeaveModal(true);
   }, []);
   
   // Confirm leaving
   const handleLeaveConfirm = useCallback(() => {
-    // #region agent log
     console.warn('[VX2 DEBUG] handleLeaveConfirm called', {hasOnLeave: !!onLeave});
-    // #endregion
     console.log('[DraftRoomVX2] Leave confirmed, cleaning up...');
     // Call leave draft cleanup
     draftRoom.leaveDraft();
@@ -378,28 +371,20 @@ export default function DraftRoomVX2({
     // Trigger navigation - use setTimeout to ensure it happens after state update
     if (onLeave) {
       console.log('[DraftRoomVX2] Calling onLeave callback...');
-      // #region agent log
       console.warn('[VX2 DEBUG] Scheduling onLeave callback');
-      // #endregion
       // Use setTimeout to ensure navigation happens after modal closes
       setTimeout(() => {
         try {
-          // #region agent log
           console.warn('[VX2 DEBUG] Calling onLeave callback now');
-          // #endregion
           onLeave();
         } catch (error) {
           console.error('[DraftRoomVX2] Error in onLeave callback:', error);
-          // #region agent log
           console.error('[VX2 DEBUG ERROR] onLeave callback threw error', error);
-          // #endregion
         }
       }, 0);
     } else {
       console.warn('[DraftRoomVX2] onLeave callback not provided!');
-      // #region agent log
       console.error('[VX2 DEBUG ERROR] onLeave callback not provided');
-      // #endregion
     }
   }, [draftRoom, onLeave]);
   

@@ -153,9 +153,7 @@ function ExitDraftButton({ onLeaveCallback }: { onLeaveCallback?: () => void }):
     event.preventDefault();
     event.stopPropagation();
     
-    // #region agent log
     console.warn('[VX2 DEBUG] ExitDraftButton clicked', {hasCallback: !!onLeaveCallback});
-    // #endregion
     
     // Call the callback to open confirmation modal (if provided)
     if (onLeaveCallback) {

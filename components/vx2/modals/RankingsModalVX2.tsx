@@ -457,9 +457,6 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
   }, [isOpen]);
 
   useEffect(() => { 
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'RankingsModalVX2.tsx:445',message:'useEffect triggered for modal open/close',data:{isOpen,loadDataExists:!!loadData},timestamp:Date.now(),sessionId:'debug-session',runId:'verify-fix',hypothesisId:'verify-loadData-effect'})}).catch(()=>{});
-    // #endregion
     if (isOpen) { loadData(); setUndoHistory([]); } 
   }, [isOpen, loadData]);
 

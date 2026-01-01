@@ -109,18 +109,12 @@ async function fetchTournaments(): Promise<Tournament[]> {
  * @returns Tournament data with loading/error states and refetch capability
  */
 export function useTournaments(): UseTournamentsResult {
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useTournaments.ts:111',message:'useTournaments hook called',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'H'})}).catch(()=>{});
-  // #endregion
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefetching, setIsRefetching] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = useCallback(async (isRefetch = false) => {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useTournaments.ts:117',message:'fetchData called',data:{isRefetch},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'H'})}).catch(()=>{});
-    // #endregion
     try {
       if (isRefetch) {
         setIsRefetching(true);
@@ -130,14 +124,8 @@ export function useTournaments(): UseTournamentsResult {
       setError(null);
       
       const data = await fetchTournaments();
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useTournaments.ts:127',message:'fetchTournaments success',data:{tournamentCount:data.length},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'H'})}).catch(()=>{});
-      // #endregion
       setTournaments(data);
     } catch (err) {
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useTournaments.ts:131',message:'fetchTournaments error',data:{errorMessage:err instanceof Error ? err.message : 'Unknown error'},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'H'})}).catch(()=>{});
-      // #endregion
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setIsLoading(false);
@@ -147,9 +135,6 @@ export function useTournaments(): UseTournamentsResult {
 
   // Initial fetch
   useEffect(() => {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useTournaments.ts:142',message:'useTournaments initial fetch effect',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'H'})}).catch(()=>{});
-    // #endregion
     fetchData();
   }, [fetchData]);
 
