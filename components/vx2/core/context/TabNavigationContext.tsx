@@ -255,22 +255,16 @@ export function TabNavigationProvider({
   initialTab,
   onTabChange,
 }: TabNavigationProviderProps): React.ReactElement {
-  // #region agent log
   const logData = {location:'TabNavigationContext.tsx:253',message:'TabNavigationProvider initializing',data:{initialTab,hasOnTabChange:!!onTabChange},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'A'};
   console.warn('[VX2 DEBUG] TabNavigationProvider initializing', logData);
-  fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(logData)}).catch((e)=>console.error('[VX2 DEBUG] Fetch failed', e));
-  // #endregion
   // Initialize state with optional override
   const [state, dispatch] = useReducer(
     tabNavigationReducer,
     initialTab ? { ...initialState, activeTab: initialTab } : initialState
   );
   
-  // #region agent log
   const logData2 = {location:'TabNavigationContext.tsx:261',message:'TabNavigationProvider state initialized',data:{activeTab:state.activeTab,historyLength:state.history.length,tabStatesCount:Object.keys(state.tabStates).length},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'A'};
   console.log('[DEBUG]', logData2);
-  fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(logData2)}).catch(()=>{});
-  // #endregion
   
   // Track previous tab for change callbacks
   const prevTabRef = useRef<TabId | null>(null);
@@ -278,11 +272,8 @@ export function TabNavigationProvider({
   // Call onTabChange when tab changes
   useEffect(() => {
     if (prevTabRef.current !== state.activeTab) {
-      // #region agent log
       const logData3 = {location:'TabNavigationContext.tsx:269',message:'Tab change detected',data:{fromTab:prevTabRef.current,toTab:state.activeTab,isTransitioning:state.isTransitioning},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'B'};
       console.log('[DEBUG]', logData3);
-      fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(logData3)}).catch(()=>{});
-      // #endregion
       onTabChange?.(prevTabRef.current, state.activeTab);
       prevTabRef.current = state.activeTab;
     }
@@ -304,9 +295,6 @@ export function TabNavigationProvider({
   // ========== Navigation Actions ==========
   
   const navigateToTab = useCallback((tabId: TabId, params?: Record<string, string>) => {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'TabNavigationContext.tsx:289',message:'navigateToTab called',data:{targetTab:tabId,currentTab:state.activeTab,hasParams:!!params},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'B'})}).catch(()=>{});
-    // #endregion
     dispatch({ 
       type: 'NAVIGATE_TO_TAB', 
       payload: { tabId, params, addToHistory: true } 
@@ -466,14 +454,8 @@ export function TabNavigationProvider({
 export function useTabNavigation(): TabNavigationContextValue {
   const context = React.useContext(TabNavigationContext);
   
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'TabNavigationContext.tsx:446',message:'useTabNavigation hook called',data:{hasContext:!!context,activeTab:context?.state.activeTab},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'A'})}).catch(()=>{});
-  // #endregion
   
   if (!context) {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'TabNavigationContext.tsx:450',message:'useTabNavigation ERROR - context missing',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'C'})}).catch(()=>{});
-    // #endregion
     throw new Error(
       'useTabNavigation must be used within a TabNavigationProvider. ' +
       'Make sure your component is wrapped in <TabNavigationProvider>.'

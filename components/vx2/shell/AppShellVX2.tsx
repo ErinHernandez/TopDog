@@ -71,45 +71,27 @@ interface InnerShellProps {
 }
 
 function InnerShell({ badgeOverrides, deviceClass = 'standard' }: InnerShellProps): React.ReactElement {
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AppShellVX2.tsx:70',message:'InnerShell rendering',data:{hasBadgeOverrides:!!badgeOverrides},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'F'})}).catch(()=>{});
-  // #endregion
   // Modal state
   const [showAutodraftLimits, setShowAutodraftLimits] = useState(false);
   const [showDepositHistory, setShowDepositHistory] = useState(false);
   const [showWithdraw, setShowWithdraw] = useState(false);
   const [showRankings, setShowRankings] = useState(false);
   
-  // #region agent log
   useEffect(() => {
-    fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AppShellVX2.tsx:74',message:'InnerShell modal state',data:{showAutodraftLimits,showDepositHistory,showWithdraw,showRankings},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'F'})}).catch(()=>{});
   }, [showAutodraftLimits, showDepositHistory, showWithdraw, showRankings]);
-  // #endregion
   
   // Modal handlers
   const modalContext: ModalContextType = {
     openAutodraftLimits: useCallback(() => {
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AppShellVX2.tsx:79',message:'openAutodraftLimits called',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'F'})}).catch(()=>{});
-      // #endregion
       setShowAutodraftLimits(true);
     }, []),
     openDepositHistory: useCallback(() => {
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AppShellVX2.tsx:83',message:'openDepositHistory called',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'F'})}).catch(()=>{});
-      // #endregion
       setShowDepositHistory(true);
     }, []),
     openWithdraw: useCallback(() => {
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AppShellVX2.tsx:87',message:'openWithdraw called',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'F'})}).catch(()=>{});
-      // #endregion
       setShowWithdraw(true);
     }, []),
     openRankings: useCallback(() => {
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AppShellVX2.tsx:91',message:'openRankings called',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'F'})}).catch(()=>{});
-      // #endregion
       setShowRankings(true);
     }, []),
   };
@@ -160,10 +142,6 @@ export default function AppShellVX2({
   badgeOverrides,
   onTabChange,
 }: AppShellVX2Props): React.ReactElement {
-  // #region agent log
-  console.warn('[VX2 DEBUG] AppShellVX2 rendering', {initialTab, showPhoneFrame, devicePreset, hasBadgeOverrides: !!badgeOverrides, hasOnTabChange: !!onTabChange});
-  fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AppShellVX2.tsx:164',message:'AppShellVX2 rendering',data:{initialTab,showPhoneFrame,devicePreset,hasBadgeOverrides:!!badgeOverrides,hasOnTabChange:!!onTabChange},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'A'})}).catch((e)=>console.error('[VX2 DEBUG] Fetch failed', e));
-  // #endregion
   // Get device class from preset for simulated frames
   const deviceClass = getDeviceClassFromPreset(devicePreset);
   

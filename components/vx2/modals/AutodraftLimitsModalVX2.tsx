@@ -227,9 +227,6 @@ export default function AutodraftLimitsModalVX2({
 
   // Load limits when modal opens
   useEffect(() => {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'AutodraftLimitsModalVX2.tsx:221',message:'useEffect triggered for modal open',data:{isOpen,loadLimitsExists:!!loadLimits},timestamp:Date.now(),sessionId:'debug-session',runId:'verify-fix',hypothesisId:'verify-loadLimits-effect'})}).catch(()=>{});
-    // #endregion
     if (isOpen) {
       loadLimits();
     }
