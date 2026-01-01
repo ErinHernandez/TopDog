@@ -21,7 +21,7 @@ import React, { useState, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { useTournaments, type Tournament } from '../../hooks/data';
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BRAND_COLORS } from '../../core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY, Z_INDEX } from '../../core/constants/sizes';
+import { SPACING, RADIUS, TYPOGRAPHY, Z_INDEX, SAFE_AREA } from '../../core/constants/sizes';
 import { EmptyState, ErrorState } from '../../components/shared';
 import { TournamentCard, TournamentCardSkeleton } from './TournamentCard';
 import { Close } from '../../components/icons';
@@ -328,6 +328,7 @@ export default function LobbyTabVX2({
       className="vx2-lobby-container flex-1 relative"
       style={{ 
         padding: `${LOBBY_PX.containerPaddingY}px ${LOBBY_PX.containerPaddingX}px`,
+        paddingBottom: `calc(${LOBBY_PX.containerPaddingY}px + ${SAFE_AREA.bottom})`,
         backgroundColor: BG_COLORS.primary,
         display: 'flex',
         flexDirection: 'column',
