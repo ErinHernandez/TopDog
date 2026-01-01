@@ -269,6 +269,7 @@ export function TournamentCard({
             display: 'grid', 
             gridTemplateColumns: '1fr 1fr 1fr', 
             gap: `${CARD_PX.statsGap}px`,
+            paddingBottom: '8px',
           }}
         >
           <StatItem value={tournament.entryFee} label="Entry" />
