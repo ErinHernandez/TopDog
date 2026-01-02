@@ -24,8 +24,8 @@ export default function Home() {
         }}
       >
         <img
-          src="/logo.png"
-          alt="TopDog"
+          src="/under_construction_no_bg.png"
+          alt="TopDog - Under Construction"
           style={{
             width: '200px',
             height: 'auto',
