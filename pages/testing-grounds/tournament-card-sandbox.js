@@ -146,7 +146,7 @@ const PRESETS = {
 // ============================================================================
 
 const BACKGROUND_OPTIONS = [
-  { value: 'url(/FUll_tournamentcard_spaceI.png)', label: 'Space Background' },
+  { value: 'url(/tournament_card_bg.webp)', label: 'Space Background' },
   { value: 'linear-gradient(135deg, #1E3A5F 0%, #0F172A 100%)', label: 'Blue Gradient' },
   { value: 'linear-gradient(135deg, #4C1D95 0%, #1E1B4B 100%)', label: 'Purple Gradient' },
   { value: 'linear-gradient(135deg, #064E3B 0%, #022C22 100%)', label: 'Green Gradient' },
@@ -311,7 +311,7 @@ export default function TournamentCardSandbox() {
   
   // Style override state
   const [overrides, setOverrides] = useState({
-    background: 'url(/FUll_tournamentcard_spaceI.png)',
+    background: 'url(/tournament_card_bg.webp)',
     backgroundFallback: '#0a0a1a',
     border: 'rgba(75, 85, 99, 0.5)',
     borderWidth: 1,
@@ -343,7 +343,7 @@ export default function TournamentCardSandbox() {
         ...prev,
         ...preset.overrides,
         // Reset to defaults for any keys not in preset
-        background: preset.overrides.background ?? 'url(/FUll_tournamentcard_spaceI.png)',
+        background: preset.overrides.background ?? 'url(/tournament_card_bg.webp)',
         backgroundFallback: preset.overrides.backgroundFallback ?? '#191932',
         border: preset.overrides.border ?? 'rgba(75, 85, 99, 0.5)',
         borderWidth: preset.overrides.borderWidth ?? 1,
