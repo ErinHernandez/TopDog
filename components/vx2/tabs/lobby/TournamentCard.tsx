@@ -50,7 +50,7 @@ const CARD_PX = {
 } as const;
 
 const CARD_COLORS = {
-  background: 'url(/FUll_tournamentcard_spaceI.png)',
+  background: 'url(/tournament_card_bg.webp)',
   backgroundFallback: '#0a0a1a',
   border: 'rgba(75, 85, 99, 0.5)',
   text: TEXT_COLORS.primary,
