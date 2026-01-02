@@ -9,12 +9,15 @@
  * - Documentation: JSDoc, props documented
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BG_COLORS, TEXT_COLORS, BRAND_COLORS, STATE_COLORS } from '../../core/constants/colors';
 import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
 import { ProgressBar } from '../../components/shared';
 import type { Tournament } from '../../hooks/data';
 import { TILED_BG_STYLE } from '../../draft-room/constants';
+
+// Tiny blur placeholder (92 bytes) - loads instantly, shows while full image loads
+const BLUR_PLACEHOLDER = 'data:image/webp;base64,UklGRlQAAABXRUJQVlA4IEgAAABwAwCdASoUABsAPyl+uFOuKCWisAwBwCUJZQAAW+q+9Bpo4aAA/uvZ+YkAc4jvVTc7+oJAY99soPLjJTrwm3j5Y3VE0BWmGAA=';
 
 // ============================================================================
 // CONSTANTS
@@ -155,6 +158,8 @@ export function TournamentCard({
   className = '',
   styleOverrides = {},
 }: TournamentCardProps): React.ReactElement {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  
   const fillPercentage = tournament.maxEntries 
     ? Math.round((tournament.currentEntries / tournament.maxEntries) * 100)
     : 0;
@@ -164,6 +169,29 @@ export function TournamentCard({
   const resolvedBackground = styleOverrides.backgroundImage 
     ? `url(${styleOverrides.backgroundImage})`
     : (styleOverrides.background ?? CARD_COLORS.background);
+  
+  // Extract the URL from the background string for preloading
+  const bgUrlMatch = resolvedBackground.match(/url\(['"]?([^'"]+)['"]?\)/);
+  const bgUrl = bgUrlMatch ? bgUrlMatch[1] : null;
+  
+  // Preload the full image
+  useEffect(() => {
+    if (!bgUrl || bgUrl.startsWith('data:')) {
+      // Skip preload for data URIs or gradients
+      setImageLoaded(true);
+      return;
+    }
+    
+    const img = new Image();
+    img.onload = () => setImageLoaded(true);
+    img.onerror = () => setImageLoaded(true); // Show anyway on error
+    img.src = bgUrl;
+    
+    // If already cached, onload fires synchronously
+    if (img.complete) {
+      setImageLoaded(true);
+    }
+  }, [bgUrl]);
     
   const colors = {
     background: resolvedBackground,
@@ -186,20 +214,52 @@ export function TournamentCard({
     <div 
       className={`vx2-tournament-card relative w-full h-full ${className}`}
       style={{
-        backgroundImage: colors.background,
         backgroundColor: colors.backgroundFallback,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center center',
-        backgroundRepeat: 'no-repeat',
         borderRadius: `${sizes.borderRadius}px`,
         border: `${colors.borderWidth}px solid ${borderColor}`,
         padding: `${sizes.padding}px`,
         display: 'flex',
         flexDirection: 'column',
+        overflow: 'hidden',
+        position: 'relative',
       }}
       role="article"
       aria-label={`${tournament.title} tournament`}
     >
+      {/* Blur placeholder layer - shows instantly */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundImage: `url(${BLUR_PLACEHOLDER})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center center',
+          backgroundRepeat: 'no-repeat',
+          borderRadius: `${sizes.borderRadius - 1}px`,
+          zIndex: 0,
+        }}
+      />
+      
+      {/* Full image layer - fades in when loaded */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundImage: colors.background,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center center',
+          backgroundRepeat: 'no-repeat',
+          borderRadius: `${sizes.borderRadius - 1}px`,
+          zIndex: 1,
+          opacity: imageLoaded ? 1 : 0,
+          transition: 'opacity 0.3s ease-out',
+        }}
+      />
+      
+      {/* Content layer */}
+      <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', flex: 1 }}>
       {/* Tournament Title */}
       <div style={{ marginTop: '12px' }}>
         <h2 
@@ -277,7 +337,7 @@ export function TournamentCard({
           <StatItem value={tournament.firstPlacePrize} label="1st Place" />
         </div>
       </div>
-      
+      </div>{/* End content layer */}
     </div>
   );
 }
