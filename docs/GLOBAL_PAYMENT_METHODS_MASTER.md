@@ -230,20 +230,26 @@ currency: getCurrencyForCountry(userCountry) // 'eur', 'gbp', etc.
 
 ---
 
-## Phase 3: BNPL Evaluation (Week 4-6)
+## Phase 3: Regional Payment Methods (Week 4-6)
 
-| Method | Fee | UX Consideration |
-|--------|-----|------------------|
-| **Affirm** | 5.99% + $0.30 | Users can split large deposits |
-| **Afterpay** | 6% + $0.30 | Popular with younger users |
-| **Klarna** | Variable | Multiple payment plans |
+### Enable (Dashboard Toggles)
+| Method | Region | Market Share |
+|--------|--------|--------------|
+| **Cash App Pay** | US | 50M+ users |
+| **Swish** | Sweden | 80% of adults |
+| **MobilePay** | Denmark/Finland | 75% of Danes |
+| **Twint** | Switzerland | 80% of online shops |
+| **Multibanco** | Portugal | Universal |
+| **MB WAY** | Portugal | Mobile payments |
+| **Canadian PAD** | Canada | Bank debit |
 
-**UX Lens**: Some users prefer installment options. Higher fees, but if it removes friction for a segment of users, consider it.
+### Never Enable: BNPL
+- ~~Klarna~~, ~~Affirm~~, ~~Afterpay~~ 
 
-**Decision needed**: 
-- Do users want to split fantasy deposits into installments?
-- Regulatory considerations for gaming
-- Higher merchant fees (but UX-first means we'd absorb them)
+**Why no BNPL:**
+- Regulatory risk: Gaming regulators prohibit credit-based deposits
+- Chargeback risk: Users lose money, stop paying installments
+- Wrong model: Fantasy is entertainment, not a purchase to finance
 
 ---
 
@@ -415,9 +421,11 @@ currency: getCurrencyForCountry(userCountry) // 'eur', 'gbp', etc.
 | **iDEAL** | €0.29 flat | Low cost |
 | **Bancontact** | 1.4% + €0.25 | Medium |
 | **PayPal** | 3.49% + $0.49 | Higher |
-| **BNPL** | 5-6% + $0.30 | Highest |
 | **Pix** | 0.99% | Very low |
 | **OXXO** | 3% + MXN$10 | Medium |
+| **Swish** | ~2.9% | Sweden |
+| **MobilePay** | ~1% | Denmark/Finland (low!) |
+| **Twint** | ~1.3% | Switzerland |
 
 ## Currency Strategy
 

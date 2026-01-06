@@ -22,9 +22,15 @@ import type { StripeExpressCheckoutElementConfirmEvent, AvailablePaymentMethods 
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../core/constants/colors';
 import { SPACING, RADIUS, TYPOGRAPHY, Z_INDEX } from '../core/constants/sizes';
 import { Close, ChevronLeft, Plus } from '../components/icons';
-import { formatDollars } from '../utils/formatting';
+import { formatSmallestUnit, toSmallestUnit, toDisplayAmount } from '../utils/formatting';
 import { StripeProvider } from '../providers/StripeProvider';
 import { createScopedLogger } from '../../../lib/clientLogger';
+import { getCurrencyConfig, getCurrencyForCountry } from '../../../lib/stripe/currencyConfig';
+import { VoucherStep, type VoucherInfo, type AsyncPaymentType } from './VoucherStep';
+import { CurrencySelector } from '../components/CurrencySelector';
+import { FXWarningBanner } from '../components/FXWarningBanner';
+import { AmountStepper } from '../components/AmountStepper';
+import { useStripeExchangeRate } from '../../../hooks/useStripeExchangeRate';
 
 const logger = createScopedLogger('[DepositModal]');
 
@@ -38,7 +44,9 @@ export interface DepositModalVX2Props {
   userId: string;
   userEmail: string;
   userName?: string;
-  onSuccess?: (transactionId: string, amount: number) => void;
+  /** User's country code (ISO 3166-1 alpha-2, e.g., 'US', 'GB', 'DE') */
+  userCountry?: string;
+  onSuccess?: (transactionId: string, amount: number, currency: string) => void;
 }
 
 interface SavedPaymentMethod {
@@ -58,7 +66,7 @@ interface WalletAvailability {
   googlePay: boolean;
 }
 
-type DepositStep = 'amount' | 'method' | 'confirm' | 'processing' | 'success' | 'error';
+type DepositStep = 'amount' | 'method' | 'confirm' | 'processing' | 'voucher' | 'success' | 'error';
 
 // ============================================================================
 // CONSTANTS
@@ -97,93 +105,91 @@ function CardBrandIcon({ brand }: { brand: string }): React.ReactElement {
 // ============================================================================
 
 interface AmountStepProps {
-  selectedAmount: number;
-  customAmount: string;
-  onSelectAmount: (amount: number) => void;
-  onCustomAmountChange: (value: string) => void;
+  /** Amount in USD (whole dollars, not cents) */
+  amountUSD: number;
+  /** Selected display currency */
+  currency: string;
+  /** User's geolocated local currency */
+  localCurrency: string;
+  /** Exchange rate data */
+  exchangeRate: number | null;
+  rateDisplay: string | null;
+  rateLoading: boolean;
+  /** Whether this is a non-USD deposit (shows currency exchange notice) */
+  showCurrencyExchangeNotice: boolean;
+  /** Callbacks */
+  onAmountChange: (usdAmount: number) => void;
+  onCurrencyChange: (currency: string) => void;
   onContinue: () => void;
 }
 
 function AmountStep({
-  selectedAmount,
-  customAmount,
-  onSelectAmount,
-  onCustomAmountChange,
+  amountUSD,
+  currency,
+  localCurrency,
+  exchangeRate,
+  rateDisplay,
+  rateLoading,
+  showCurrencyExchangeNotice,
+  onAmountChange,
+  onCurrencyChange,
   onContinue,
 }: AmountStepProps): React.ReactElement {
-  const isCustom = !QUICK_AMOUNTS.includes(selectedAmount) && selectedAmount > 0;
-  const isValid = selectedAmount >= MIN_AMOUNT * 100 && selectedAmount <= MAX_AMOUNT * 100;
+  const isValid = amountUSD >= 25 && amountUSD <= 10000;
+  const showFXWarning = currency !== localCurrency;
   
   return (
     <div className="space-y-6">
-      <div>
-        <h3 
-          className="font-semibold mb-4"
-          style={{ fontSize: `${TYPOGRAPHY.fontSize.lg}px`, color: TEXT_COLORS.primary }}
-        >
-          Select Amount
-        </h3>
-        
-        <div className="grid grid-cols-3 gap-3">
-          {QUICK_AMOUNTS.map(amount => (
-            <button
-              key={amount}
-              onClick={() => onSelectAmount(amount * 100)}
-              className="py-3 px-4 rounded-lg font-medium transition-all"
-              style={{
-                backgroundColor: selectedAmount === amount * 100 
-                  ? STATE_COLORS.active 
-                  : BG_COLORS.tertiary,
-                color: selectedAmount === amount * 100 
-                  ? '#000' 
-                  : TEXT_COLORS.primary,
-                border: `1px solid ${selectedAmount === amount * 100 
-                  ? STATE_COLORS.active 
-                  : BORDER_COLORS.default}`,
-              }}
-            >
-              ${amount}
-            </button>
-          ))}
-        </div>
-      </div>
+      {/* Currency Selector */}
+      <CurrencySelector
+        selectedCurrency={currency}
+        localCurrency={localCurrency}
+        onSelect={onCurrencyChange}
+        label="Deposit Currency"
+      />
       
-      <div>
-        <label 
-          className="block mb-2"
-          style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px`, color: TEXT_COLORS.secondary }}
+      {/* FX Warning Banner - when currency differs from local */}
+      {showFXWarning && (
+        <FXWarningBanner
+          selectedCurrency={currency}
+          localCurrency={localCurrency}
+          dismissible={true}
+        />
+      )}
+      
+      {/* Currency Exchange Notice for non-USD deposits */}
+      {showCurrencyExchangeNotice && !showFXWarning && (
+        <div 
+          className="p-4 rounded-lg"
+          style={{ 
+            backgroundColor: `${STATE_COLORS.info}15`,
+            border: `1px solid ${STATE_COLORS.info}40`,
+          }}
         >
-          Or enter custom amount
-        </label>
-        <div className="relative">
-          <span 
-            className="absolute left-4 top-1/2 -translate-y-1/2"
-            style={{ color: TEXT_COLORS.muted }}
+          <p style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px`, color: TEXT_COLORS.primary }}>
+            Your deposit will be converted to USD at no extra cost to you. 
+            Your account balance is always kept in USD.
+          </p>
+          <p 
+            className="mt-2"
+            style={{ fontSize: `${TYPOGRAPHY.fontSize.xs}px`, color: TEXT_COLORS.secondary }}
           >
-            $
-          </span>
-          <input
-            type="number"
-            value={customAmount}
-            onChange={(e) => onCustomAmountChange(e.target.value)}
-            placeholder="0.00"
-            min={MIN_AMOUNT}
-            max={MAX_AMOUNT}
-            className="w-full py-3 pl-8 pr-4 rounded-lg"
-            style={{
-              backgroundColor: BG_COLORS.tertiary,
-              color: TEXT_COLORS.primary,
-              border: `1px solid ${isCustom ? STATE_COLORS.active : BORDER_COLORS.default}`,
-            }}
-          />
+            When you withdraw, we will ask your preferred currency and convert free of charge.
+          </p>
         </div>
-        <p 
-          className="mt-2"
-          style={{ fontSize: `${TYPOGRAPHY.fontSize.xs}px`, color: TEXT_COLORS.muted }}
-        >
-          Min: ${MIN_AMOUNT} / Max: ${MAX_AMOUNT.toLocaleString()}
-        </p>
-      </div>
+      )}
+      
+      {/* Amount Stepper with $25 increments */}
+      <AmountStepper
+        amountUSD={amountUSD}
+        onChange={onAmountChange}
+        displayCurrency={currency}
+        exchangeRate={exchangeRate}
+        rateDisplay={rateDisplay}
+        rateLoading={rateLoading}
+        minUSD={25}
+        maxUSD={10000}
+      />
       
       <button
         onClick={onContinue}
@@ -195,7 +201,7 @@ function AmountStep({
           opacity: isValid ? 1 : 0.5,
         }}
       >
-        Continue with {formatDollars(selectedAmount / 100)}
+        Continue with ${amountUSD}
       </button>
     </div>
   );
@@ -414,6 +420,7 @@ function MethodStep({
 
 interface ConfirmStepProps {
   amount: number;
+  currency: string;
   paymentMethod: string;
   onBack: () => void;
   onConfirm: () => void;
@@ -422,11 +429,14 @@ interface ConfirmStepProps {
 
 function ConfirmStep({
   amount,
+  currency,
   paymentMethod,
   onBack,
   onConfirm,
   isProcessing,
 }: ConfirmStepProps): React.ReactElement {
+  const isNonUSD = currency !== 'USD';
+  
   return (
     <div className="space-y-6">
       <div>
@@ -444,22 +454,36 @@ function ConfirmStep({
           <div className="flex justify-between">
             <span style={{ color: TEXT_COLORS.secondary }}>Amount</span>
             <span className="font-semibold" style={{ color: TEXT_COLORS.primary }}>
-              {formatDollars(amount / 100)}
+              {formatSmallestUnit(amount, { currency })}
             </span>
           </div>
           <div className="flex justify-between">
             <span style={{ color: TEXT_COLORS.secondary }}>Payment Method</span>
             <span style={{ color: TEXT_COLORS.primary }}>{paymentMethod}</span>
           </div>
+          {isNonUSD && (
+            <div className="flex justify-between">
+              <span style={{ color: TEXT_COLORS.secondary }}>Currency Conversion</span>
+              <span style={{ color: STATE_COLORS.success }}>Free</span>
+            </div>
+          )}
           <div 
             className="border-t pt-3 flex justify-between"
             style={{ borderColor: BORDER_COLORS.default }}
           >
             <span className="font-medium" style={{ color: TEXT_COLORS.primary }}>Total</span>
             <span className="font-bold text-lg" style={{ color: STATE_COLORS.success }}>
-              {formatDollars(amount / 100)}
+              {formatSmallestUnit(amount, { currency })}
             </span>
           </div>
+          {isNonUSD && (
+            <p 
+              className="text-center"
+              style={{ fontSize: `${TYPOGRAPHY.fontSize.xs}px`, color: TEXT_COLORS.muted }}
+            >
+              Will be converted to USD at the current exchange rate
+            </p>
+          )}
         </div>
       </div>
       
@@ -492,7 +516,7 @@ function ConfirmStep({
               Processing...
             </>
           ) : (
-            `Deposit ${formatDollars(amount / 100)}`
+            `Deposit ${formatSmallestUnit(amount, { currency })}`
           )}
         </button>
       </div>
@@ -503,6 +527,7 @@ function ConfirmStep({
 interface ResultStepProps {
   success: boolean;
   amount?: number;
+  currency?: string;
   transactionId?: string;
   errorMessage?: string;
   onClose: () => void;
@@ -511,6 +536,7 @@ interface ResultStepProps {
 function ResultStep({
   success,
   amount,
+  currency = 'USD',
   transactionId,
   errorMessage,
   onClose,
@@ -546,9 +572,19 @@ function ResultStep({
         </h3>
         
         {success && amount && (
-          <p style={{ color: TEXT_COLORS.secondary }}>
-            {formatDollars(amount / 100)} has been added to your balance
-          </p>
+          <>
+            <p style={{ color: TEXT_COLORS.secondary }}>
+              {formatSmallestUnit(amount, { currency })} has been added to your balance
+            </p>
+            {currency !== 'USD' && (
+              <p 
+                className="mt-1"
+                style={{ fontSize: `${TYPOGRAPHY.fontSize.xs}px`, color: TEXT_COLORS.muted }}
+              >
+                Converted to USD at no extra cost
+              </p>
+            )}
+          </>
         )}
         
         {!success && errorMessage && (
@@ -585,6 +621,14 @@ function ResultStep({
 
 interface DepositModalContentProps extends DepositModalVX2Props {
   clientSecret: string;
+  /** User's display currency */
+  displayCurrency: string;
+  /** User's geolocated local currency */
+  localCurrency: string;
+  /** Currency symbol */
+  currencySymbol: string;
+  /** Callback when user changes currency */
+  onCurrencyChange: (currency: string) => void;
 }
 
 function DepositModalContent({
@@ -593,16 +637,28 @@ function DepositModalContent({
   userId,
   userEmail,
   userName,
+  userCountry = 'US',
   onSuccess,
   clientSecret,
+  displayCurrency,
+  localCurrency,
+  currencySymbol,
+  onCurrencyChange,
 }: DepositModalContentProps): React.ReactElement | null {
   const stripe = useStripe();
   const elements = useElements();
   
-  // State
+  // Get exchange rate for the selected currency
+  const { 
+    rate: exchangeRate, 
+    rateDisplay, 
+    loading: rateLoading,
+    toLocal,
+  } = useStripeExchangeRate(displayCurrency);
+  
+  // State - store amount in USD for consistency
   const [step, setStep] = useState<DepositStep>('amount');
-  const [selectedAmount, setSelectedAmount] = useState(5000); // $50 default
-  const [customAmount, setCustomAmount] = useState('');
+  const [amountUSD, setAmountUSD] = useState(50); // Default $50 USD
   const [savedMethods, setSavedMethods] = useState<SavedPaymentMethod[]>([]);
   const [selectedMethodId, setSelectedMethodId] = useState<string | null>(null);
   const [useNewCard, setUseNewCard] = useState(false);
@@ -615,6 +671,15 @@ function DepositModalContent({
     applePay: false,
     googlePay: false,
   });
+  const [voucherInfo, setVoucherInfo] = useState<VoucherInfo | null>(null);
+  const [selectedPaymentType, setSelectedPaymentType] = useState<string>('card');
+  
+  // Calculate the amount in smallest currency units for payment
+  const selectedAmount = useMemo(() => {
+    // Convert USD to local currency, then to smallest units
+    const localAmount = toLocal(amountUSD);
+    return toSmallestUnit(localAmount, displayCurrency);
+  }, [amountUSD, toLocal, displayCurrency]);
   
   // Load saved payment methods
   useEffect(() => {
@@ -642,19 +707,9 @@ function DepositModalContent({
     }
   };
   
-  // Handle custom amount input
-  const handleCustomAmountChange = useCallback((value: string) => {
-    setCustomAmount(value);
-    const numValue = parseFloat(value);
-    if (!isNaN(numValue) && numValue >= MIN_AMOUNT && numValue <= MAX_AMOUNT) {
-      setSelectedAmount(Math.round(numValue * 100));
-    }
-  }, []);
-  
-  // Handle amount selection
-  const handleSelectAmount = useCallback((amountCents: number) => {
-    setSelectedAmount(amountCents);
-    setCustomAmount('');
+  // Handle USD amount change from stepper
+  const handleAmountChange = useCallback((usdAmount: number) => {
+    setAmountUSD(usdAmount);
   }, []);
   
   // Handle wallet availability update
@@ -692,7 +747,7 @@ function DepositModalContent({
       if (paymentIntent?.status === 'succeeded') {
         setTransactionId(paymentIntent.id);
         setStep('success');
-        onSuccess?.(paymentIntent.id, selectedAmount);
+        onSuccess?.(paymentIntent.id, selectedAmount, displayCurrency);
       } else if (paymentIntent?.status === 'requires_action') {
         // Handle additional authentication if needed
         logger.debug('Payment requires additional action');
@@ -705,7 +760,7 @@ function DepositModalContent({
     } finally {
       setIsProcessing(false);
     }
-  }, [stripe, elements, clientSecret, selectedAmount, onSuccess]);
+  }, [stripe, elements, clientSecret, selectedAmount, displayCurrency, onSuccess]);
   
   // Payment method description for confirm screen
   const paymentMethodDescription = useMemo(() => {
@@ -717,6 +772,21 @@ function DepositModalContent({
     }
     return 'New card';
   }, [selectedMethodId, savedMethods]);
+  
+  // Determine async payment type based on currency and country
+  const getAsyncPaymentType = useCallback((): AsyncPaymentType | null => {
+    if (displayCurrency === 'MXN' && userCountry === 'MX') return 'oxxo';
+    if (displayCurrency === 'BRL' && userCountry === 'BR') {
+      // Check if user selected pix or boleto (for now default to pix as it's instant)
+      return selectedPaymentType === 'boleto' ? 'boleto' : 'pix';
+    }
+    return null;
+  }, [displayCurrency, userCountry, selectedPaymentType]);
+  
+  // Check if payment requires async flow (voucher/QR code)
+  const isAsyncPayment = useMemo(() => {
+    return getAsyncPaymentType() !== null;
+  }, [getAsyncPaymentType]);
   
   // Process payment
   const processPayment = async () => {
@@ -746,7 +816,10 @@ function DepositModalContent({
         
         if (paymentIntent?.status === 'succeeded') {
           setStep('success');
-          onSuccess?.(paymentIntent.id, selectedAmount);
+          onSuccess?.(paymentIntent.id, selectedAmount, displayCurrency);
+        } else if (paymentIntent?.status === 'requires_action') {
+          // Handle async payment (OXXO, Boleto)
+          await handleAsyncPayment(paymentIntent);
         }
       } else {
         // Using new card via Elements
@@ -772,7 +845,10 @@ function DepositModalContent({
         if (paymentIntent?.status === 'succeeded') {
           setTransactionId(paymentIntent.id);
           setStep('success');
-          onSuccess?.(paymentIntent.id, selectedAmount);
+          onSuccess?.(paymentIntent.id, selectedAmount, displayCurrency);
+        } else if (paymentIntent?.status === 'requires_action') {
+          // Handle async payment (OXXO, Boleto, Pix)
+          await handleAsyncPayment(paymentIntent);
         }
       }
     } catch (err) {
@@ -782,6 +858,73 @@ function DepositModalContent({
       setStep('error');
     } finally {
       setIsProcessing(false);
+    }
+  };
+  
+  // Handle async payments (OXXO, Boleto, Pix) that require user action
+  const handleAsyncPayment = async (paymentIntent: { 
+    id: string; 
+    next_action?: { 
+      type: string;
+      oxxo_display_details?: { hosted_voucher_url?: string; expires_after?: number };
+      boleto_display_details?: { hosted_voucher_url?: string; expires_at?: number };
+      pix_display_qr_code?: { hosted_instructions_url?: string; expires_at?: number };
+    } | null;
+  }) => {
+    const nextAction = paymentIntent.next_action;
+    if (!nextAction) {
+      logger.warn('Payment requires action but no next_action provided');
+      setError('Payment requires additional action');
+      setStep('error');
+      return;
+    }
+    
+    let voucherUrl: string | undefined;
+    let expiresAt: string | undefined;
+    let paymentType: AsyncPaymentType = 'oxxo';
+    
+    // OXXO voucher
+    if (nextAction.oxxo_display_details) {
+      voucherUrl = nextAction.oxxo_display_details.hosted_voucher_url;
+      if (nextAction.oxxo_display_details.expires_after) {
+        expiresAt = new Date(nextAction.oxxo_display_details.expires_after * 1000).toISOString();
+      }
+      paymentType = 'oxxo';
+    }
+    
+    // Boleto voucher
+    if (nextAction.boleto_display_details) {
+      voucherUrl = nextAction.boleto_display_details.hosted_voucher_url;
+      if (nextAction.boleto_display_details.expires_at) {
+        expiresAt = new Date(nextAction.boleto_display_details.expires_at * 1000).toISOString();
+      }
+      paymentType = 'boleto';
+    }
+    
+    // Pix QR code
+    if (nextAction.pix_display_qr_code) {
+      voucherUrl = nextAction.pix_display_qr_code.hosted_instructions_url;
+      if (nextAction.pix_display_qr_code.expires_at) {
+        expiresAt = new Date(nextAction.pix_display_qr_code.expires_at * 1000).toISOString();
+      }
+      paymentType = 'pix';
+    }
+    
+    if (voucherUrl && expiresAt) {
+      setVoucherInfo({
+        type: paymentType,
+        voucherUrl,
+        expiresAt,
+        amount: selectedAmount,
+        currency: displayCurrency,
+      });
+      setTransactionId(paymentIntent.id);
+      setStep('voucher');
+      logger.debug('Async payment voucher ready', { paymentType, voucherUrl });
+    } else {
+      logger.warn('Async payment missing voucher info', { nextAction });
+      setError('Payment information incomplete. Please try again.');
+      setStep('error');
     }
   };
   
@@ -839,10 +982,15 @@ function DepositModalContent({
         <div className="p-6">
           {step === 'amount' && (
             <AmountStep
-              selectedAmount={selectedAmount}
-              customAmount={customAmount}
-              onSelectAmount={handleSelectAmount}
-              onCustomAmountChange={handleCustomAmountChange}
+              amountUSD={amountUSD}
+              currency={displayCurrency}
+              localCurrency={localCurrency}
+              exchangeRate={exchangeRate}
+              rateDisplay={rateDisplay}
+              rateLoading={rateLoading}
+              showCurrencyExchangeNotice={displayCurrency !== 'USD'}
+              onAmountChange={handleAmountChange}
+              onCurrencyChange={onCurrencyChange}
               onContinue={() => setStep('method')}
             />
           )}
@@ -875,6 +1023,7 @@ function DepositModalContent({
           {step === 'confirm' && (
             <ConfirmStep
               amount={selectedAmount}
+              currency={displayCurrency}
               paymentMethod={paymentMethodDescription}
               onBack={() => setStep('method')}
               onConfirm={processPayment}
@@ -882,10 +1031,25 @@ function DepositModalContent({
             />
           )}
           
+          {step === 'voucher' && voucherInfo && (
+            <VoucherStep
+              voucherInfo={voucherInfo}
+              onClose={() => {
+                // User chose to pay later - close modal
+                onClose();
+              }}
+              onViewVoucher={() => {
+                // User viewed voucher - they can close when ready
+                logger.debug('User viewed voucher', { type: voucherInfo.type });
+              }}
+            />
+          )}
+          
           {(step === 'success' || step === 'error') && (
             <ResultStep
               success={step === 'success'}
               amount={selectedAmount}
+              currency={displayCurrency}
               transactionId={transactionId || undefined}
               errorMessage={error || undefined}
               onClose={() => {
@@ -914,7 +1078,28 @@ export function DepositModalVX2(props: DepositModalVX2Props): React.ReactElement
   const [error, setError] = useState<string | null>(null);
   const hasAttemptedRef = useRef(false);
   
-  const { isOpen, userId, userEmail, userName, onClose } = props;
+  const { isOpen, userId, userEmail, userName, userCountry = 'US', onClose } = props;
+  
+  // User's geolocated local currency (default for their country)
+  const localCurrency = useMemo(() => getCurrencyForCountry(userCountry), [userCountry]);
+  
+  // Selected deposit currency (can differ from local if user changes it)
+  const [selectedCurrency, setSelectedCurrency] = useState<string>(localCurrency);
+  
+  // Get config for the selected currency
+  const currencyConfig = useMemo(() => getCurrencyConfig(selectedCurrency), [selectedCurrency]);
+  
+  // Handle currency change - recreate payment intent with new currency
+  const handleCurrencyChange = useCallback((newCurrency: string) => {
+    if (newCurrency !== selectedCurrency) {
+      logger.debug('Currency changed', { from: selectedCurrency, to: newCurrency });
+      setSelectedCurrency(newCurrency);
+      // Reset payment intent to create new one with new currency
+      setClientSecret(null);
+      hasAttemptedRef.current = false;
+      setError(null);
+    }
+  }, [selectedCurrency]);
   
   // Reset when modal opens/closes
   useEffect(() => {
@@ -922,14 +1107,16 @@ export function DepositModalVX2(props: DepositModalVX2Props): React.ReactElement
       // Reset for new modal opening
       hasAttemptedRef.current = false;
       setError(null);
+      // Reset to local currency when modal opens
+      setSelectedCurrency(localCurrency);
     } else {
       // Clear state when modal closes
       setClientSecret(null);
       setError(null);
     }
-  }, [isOpen]);
+  }, [isOpen, localCurrency]);
   
-  // Create payment intent when modal opens
+  // Create payment intent when modal opens or currency changes
   useEffect(() => {
     if (!isOpen || !userId || clientSecret || hasAttemptedRef.current) {
       return;
@@ -941,13 +1128,15 @@ export function DepositModalVX2(props: DepositModalVX2Props): React.ReactElement
     
     const createPaymentIntent = async () => {
       try {
-        logger.debug('Creating payment intent', { userId, userEmail });
+        logger.debug('Creating payment intent', { userId, userEmail, selectedCurrency });
         
         const response = await fetch('/api/stripe/payment-intent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            amountCents: 5000, // Initial amount, will be updated
+            amountCents: currencyConfig.minAmountSmallestUnit * 10, // ~$50 equivalent
+            currency: selectedCurrency,
+            country: userCountry,
             userId,
             email: userEmail || undefined,
             name: userName || undefined,
@@ -975,7 +1164,7 @@ export function DepositModalVX2(props: DepositModalVX2Props): React.ReactElement
     };
     
     createPaymentIntent();
-  }, [isOpen, userId, userEmail, userName, clientSecret]);
+  }, [isOpen, userId, userEmail, userName, userCountry, selectedCurrency, currencyConfig, clientSecret]);
   
   const handleRetry = useCallback(() => {
     hasAttemptedRef.current = false;
@@ -1046,7 +1235,14 @@ export function DepositModalVX2(props: DepositModalVX2Props): React.ReactElement
   
   return (
     <StripeProvider clientSecret={clientSecret}>
-      <DepositModalContent {...props} clientSecret={clientSecret} />
+      <DepositModalContent 
+        {...props} 
+        clientSecret={clientSecret}
+        displayCurrency={selectedCurrency}
+        localCurrency={localCurrency}
+        currencySymbol={currencyConfig.symbol}
+        onCurrencyChange={handleCurrencyChange}
+      />
     </StripeProvider>
   );
 }

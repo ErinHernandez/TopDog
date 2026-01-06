@@ -82,10 +82,29 @@ export interface Transaction {
   userId: string;
   /** Type of transaction */
   type: TransactionType;
-  /** Amount in cents (positive for credits, negative for debits) */
+  /** Amount in smallest unit of currency (cents for USD, etc.) */
   amountCents: number;
   /** Current status */
   status: TransactionStatus;
+  
+  // Currency tracking
+  /** ISO 4217 currency code (e.g., 'USD', 'EUR', 'GBP') */
+  currency: string;
+  /** Original amount in smallest unit of the original currency */
+  originalAmountSmallestUnit?: number;
+  /** USD equivalent in cents (for reporting/accounting) */
+  usdEquivalentCents?: number;
+  /** Exchange rate at time of transaction (if converted) */
+  exchangeRate?: number;
+  
+  // Payment method tracking
+  /** Type of payment method used */
+  paymentMethodType?: PaymentMethodType;
+  /** Voucher URL for async payments (OXXO, Boleto) */
+  voucherUrl?: string;
+  /** Expiration time for voucher-based payments */
+  expiresAt?: string;
+  
   /** Stripe PaymentIntent ID (for deposits) */
   stripePaymentIntentId?: string;
   /** Stripe Payout ID (for withdrawals) */
@@ -115,6 +134,20 @@ export interface CreateTransactionInput {
   userId: string;
   type: TransactionType;
   amountCents: number;
+  /** ISO 4217 currency code (defaults to 'USD') */
+  currency?: string;
+  /** Original amount in smallest unit of original currency */
+  originalAmountSmallestUnit?: number;
+  /** USD equivalent in cents (for reporting) */
+  usdEquivalentCents?: number;
+  /** Exchange rate at time of transaction */
+  exchangeRate?: number;
+  /** Type of payment method used */
+  paymentMethodType?: PaymentMethodType;
+  /** Voucher URL for async payments */
+  voucherUrl?: string;
+  /** Expiration time for voucher-based payments */
+  expiresAt?: string;
   stripePaymentIntentId?: string;
   stripePayoutId?: string;
   stripeTransferId?: string;
@@ -130,23 +163,66 @@ export interface CreateTransactionInput {
 
 /**
  * Supported payment method types
+ * 
+ * Categories:
+ * - Global: card, paypal, link, apple_pay, google_pay
+ * - Bank Debit: us_bank_account, sepa_debit, acss_debit
+ * - Europe: ideal, bancontact, sofort, eps, p24, blik
+ * - Scandinavia/Switzerland: swish, mobilepay, twint
+ * - Portugal: multibanco, mb_way
+ * - Asia-Pacific: paynow, fpx, promptpay, grabpay
+ * - Latin America: oxxo, boleto, pix
+ * - US: cashapp
  */
 export type PaymentMethodType = 
+  // Global
   | 'card'
-  | 'us_bank_account'
   | 'paypal'
   | 'link'
   | 'apple_pay'
-  | 'google_pay';
+  | 'google_pay'
+  // Bank Debit
+  | 'us_bank_account'
+  | 'sepa_debit'
+  | 'acss_debit'
+  // Europe
+  | 'ideal'
+  | 'bancontact'
+  | 'sofort'
+  | 'eps'
+  | 'p24'
+  | 'blik'
+  // Scandinavia/Switzerland
+  | 'swish'
+  | 'mobilepay'
+  | 'twint'
+  // Portugal
+  | 'multibanco'
+  | 'mb_way'
+  // Asia-Pacific
+  | 'paynow'
+  | 'fpx'
+  | 'promptpay'
+  | 'grabpay'
+  // Latin America
+  | 'oxxo'
+  | 'boleto'
+  | 'pix'
+  // US
+  | 'cashapp';
 
 /**
  * Payment intent creation request
  */
 export interface CreatePaymentIntentRequest {
-  /** Amount in cents */
+  /** Amount in smallest unit of currency (cents for USD, etc.) */
   amountCents: number;
+  /** ISO 4217 currency code (defaults to 'usd') */
+  currency?: string;
   /** Firebase user ID */
   userId: string;
+  /** User's country code for payment method filtering */
+  userCountry?: string;
   /** Stripe Customer ID (optional, will be created if missing) */
   customerId?: string;
   /** Payment method types to allow */
@@ -171,8 +247,17 @@ export interface PaymentIntentResponse {
   paymentIntentId: string;
   /** Current status */
   status: Stripe.PaymentIntent.Status;
-  /** Amount in cents */
+  /** Amount in smallest unit of currency */
   amountCents: number;
+  /** ISO 4217 currency code */
+  currency: string;
+  /** Next action details for async payments (voucher URL, etc.) */
+  nextAction?: {
+    type: string;
+    redirectUrl?: string;
+    voucherUrl?: string;
+    expiresAt?: string;
+  };
 }
 
 // ============================================================================
@@ -256,8 +341,10 @@ export interface ConnectAccountStatus {
 export interface CreatePayoutRequest {
   /** Firebase user ID */
   userId: string;
-  /** Amount in cents */
+  /** Amount in smallest unit of currency */
   amountCents: number;
+  /** ISO 4217 currency code (defaults to 'usd') */
+  currency?: string;
   /** Description */
   description?: string;
   /** Idempotency key */
@@ -272,8 +359,10 @@ export interface CreatePayoutRequest {
 export interface PayoutResponse {
   /** Payout/Transfer ID */
   payoutId: string;
-  /** Amount in cents */
+  /** Amount in smallest unit of currency */
   amountCents: number;
+  /** ISO 4217 currency code */
+  currency: string;
   /** Current status */
   status: string;
   /** Estimated arrival date */
@@ -288,16 +377,23 @@ export interface PayoutResponse {
  * Webhook event types we handle
  */
 export type WebhookEventType =
+  // Payment Intent lifecycle
   | 'payment_intent.succeeded'
   | 'payment_intent.payment_failed'
   | 'payment_intent.canceled'
+  | 'payment_intent.requires_action'   // Async payments (OXXO, Boleto)
+  | 'payment_intent.processing'        // Payment being processed
+  // Setup Intent
   | 'setup_intent.succeeded'
   | 'setup_intent.setup_failed'
+  // Payouts/Transfers
   | 'payout.paid'
   | 'payout.failed'
   | 'transfer.created'
   | 'transfer.failed'
+  // Connect accounts
   | 'account.updated'
+  // Disputes and refunds
   | 'charge.dispute.created'
   | 'charge.dispute.closed'
   | 'charge.refunded';

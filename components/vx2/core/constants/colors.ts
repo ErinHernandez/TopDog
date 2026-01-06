@@ -87,6 +87,7 @@ export const TEXT_COLORS = {
 export const BORDER_COLORS = {
   default: 'rgba(255, 255, 255, 0.1)',
   light: 'rgba(255, 255, 255, 0.05)',
+  subtle: 'rgba(255, 255, 255, 0.15)',
   focus: '#59c5bf',
   error: '#ef4444',
   success: '#10b981',
@@ -107,6 +108,7 @@ export const STATE_COLORS = {
   success: '#10B981',      // Green for success
   warning: '#F59E0B',      // Amber for warning
   error: '#EF4444',        // Red for error
+  info: '#3B82F6',         // Blue for info states
 } as const;
 
 // ============================================================================

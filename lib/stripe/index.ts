@@ -108,3 +108,60 @@ export type {
   AuditAction,
 } from './firebaseSchema';
 
+// Currency configuration
+export {
+  CURRENCY_CONFIG,
+  COUNTRY_TO_CURRENCY,
+  ZERO_DECIMAL_CURRENCIES,
+  THREE_DECIMAL_CURRENCIES,
+  SELECTABLE_CURRENCIES,
+  NON_US_SELECTABLE_CURRENCIES,
+  isZeroDecimalCurrency,
+  isThreeDecimalCurrency,
+  getDecimalMultiplier,
+  getCurrencyConfig,
+  getCurrencyForCountry,
+  toSmallestUnit,
+  toDisplayAmount,
+  validateAmount,
+  getCurrencyOptions,
+} from './currencyConfig';
+
+export type {
+  CurrencyConfig,
+} from './currencyConfig';
+
+// Display currency resolution
+export {
+  getDisplayCurrency,
+  resolveDisplayCurrency,
+  setDisplayCurrencyPreference,
+  resetDisplayCurrencyPreference,
+  updateLastDepositCurrency,
+  canChangeCurrency,
+  getSourceLabel,
+  getCurrencyDisplayData,
+} from './displayCurrency';
+
+export type {
+  DisplayCurrencySource,
+  DisplayCurrencyResult,
+  UserCurrencyData,
+} from './displayCurrency';
+
+// Exchange rate service
+export {
+  getStripeExchangeRate,
+  getCachedRate,
+  convertFromUSD,
+  convertToUSD,
+  roundForDisplay,
+  getUSD25Increments,
+  isValid25Increment,
+  getNearestIncrements,
+} from './exchangeRates';
+
+export type {
+  StripeExchangeRate,
+} from './exchangeRates';
+

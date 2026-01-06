@@ -10,3 +10,12 @@ export * from './icons';
 // Shared UI components
 export * from './shared';
 
+// Currency components
+export * from './CurrencySelector';
+export * from './CurrencyIcon';
+export * from './FXWarningBanner';
+export * from './AmountStepper';
+
+// Pending payments component
+export * from './PendingPayments';
+

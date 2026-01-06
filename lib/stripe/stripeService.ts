@@ -226,8 +226,18 @@ export async function detachPaymentMethod(
 // PAYMENT INTENT OPERATIONS
 // ============================================================================
 
+import { 
+  getCurrencyConfig, 
+  validateAmount, 
+  toDisplayAmount,
+  isZeroDecimalCurrency,
+} from './currencyConfig';
+
 /**
  * Create a PaymentIntent for a deposit
+ * 
+ * Supports multiple currencies with currency-specific validation.
+ * Zero-decimal currencies (JPY, KRW, VND) are handled correctly.
  */
 export async function createPaymentIntent(
   request: CreatePaymentIntentRequest
@@ -235,7 +245,9 @@ export async function createPaymentIntent(
   const stripe = getStripe();
   const {
     amountCents,
+    currency = 'usd',
     userId,
+    userCountry,
     customerId,
     paymentMethodTypes = ['card'],
     savePaymentMethod = false,
@@ -244,20 +256,27 @@ export async function createPaymentIntent(
     metadata = {},
   } = request;
   
+  const currencyUpper = currency.toUpperCase();
+  const currencyLower = currency.toLowerCase();
+  const currencyConfig = getCurrencyConfig(currencyUpper);
+  
   try {
-    // Validate minimum amount
-    if (amountCents < 500) {
-      throw new Error('Minimum deposit amount is $5.00');
+    // Validate amount against currency-specific limits
+    const validation = validateAmount(amountCents, currencyUpper);
+    if (!validation.isValid) {
+      throw new Error(validation.error);
     }
     
     // Build payment intent params
     const params: Stripe.PaymentIntentCreateParams = {
       amount: amountCents,
-      currency: 'usd',
+      currency: currencyLower,
       customer: customerId,
       payment_method_types: paymentMethodTypes,
       metadata: {
         firebaseUserId: userId,
+        originalCurrency: currencyUpper,
+        userCountry: userCountry || '',
         ...metadata,
       },
     };
@@ -280,16 +299,48 @@ export async function createPaymentIntent(
       idempotencyKey ? { idempotencyKey } : undefined
     );
     
-    return {
+    // Build response with next action info for async payments
+    const response: PaymentIntentResponse = {
       clientSecret: paymentIntent.client_secret!,
       paymentIntentId: paymentIntent.id,
       status: paymentIntent.status,
       amountCents: paymentIntent.amount,
+      currency: currencyUpper,
     };
+    
+    // Add next action info for async payments (OXXO, Boleto, etc.)
+    if (paymentIntent.next_action) {
+      response.nextAction = {
+        type: paymentIntent.next_action.type,
+      };
+      
+      // Handle OXXO voucher
+      if (paymentIntent.next_action.oxxo_display_details) {
+        response.nextAction.voucherUrl = paymentIntent.next_action.oxxo_display_details.hosted_voucher_url || undefined;
+        response.nextAction.expiresAt = paymentIntent.next_action.oxxo_display_details.expires_after 
+          ? new Date(paymentIntent.next_action.oxxo_display_details.expires_after * 1000).toISOString()
+          : undefined;
+      }
+      
+      // Handle Boleto voucher
+      if (paymentIntent.next_action.boleto_display_details) {
+        response.nextAction.voucherUrl = paymentIntent.next_action.boleto_display_details.hosted_voucher_url || undefined;
+        response.nextAction.expiresAt = paymentIntent.next_action.boleto_display_details.expires_at
+          ? new Date(paymentIntent.next_action.boleto_display_details.expires_at * 1000).toISOString()
+          : undefined;
+      }
+      
+      // Handle redirect-based payments
+      if (paymentIntent.next_action.redirect_to_url) {
+        response.nextAction.redirectUrl = paymentIntent.next_action.redirect_to_url.url || undefined;
+      }
+    }
+    
+    return response;
   } catch (error) {
     await captureError(error as Error, {
       tags: { component: 'stripe', operation: 'createPaymentIntent' },
-      extra: { userId, amountCents },
+      extra: { userId, amountCents, currency: currencyUpper },
     });
     throw error;
   }
@@ -448,6 +499,9 @@ export async function getConnectAccountStatus(
 
 /**
  * Create a payout to a user's Connect account
+ * 
+ * Supports multiple currencies. The payout currency typically matches
+ * the user's account balance currency.
  */
 export async function createPayout(
   request: CreatePayoutRequest
@@ -456,10 +510,14 @@ export async function createPayout(
   const {
     userId,
     amountCents,
+    currency = 'usd',
     description = 'Withdrawal',
     idempotencyKey,
     metadata = {},
   } = request;
+  
+  const currencyLower = currency.toLowerCase();
+  const currencyUpper = currency.toUpperCase();
   
   try {
     // Get user's Connect account
@@ -484,8 +542,29 @@ export async function createPayout(
     }
     
     // Verify user has sufficient balance
+    // Note: Balance is stored in USD. For non-USD withdrawals, we need to convert
+    // the withdrawal amount to USD using an exchange rate before comparing.
     const currentBalance = (userDoc.data().balance || 0) as number;
-    if (currentBalance < amountCents / 100) {
+    
+    // Convert withdrawal amount to display amount in its currency
+    const withdrawalDisplayAmount = toDisplayAmount(amountCents, currencyUpper);
+    
+    // TODO: Implement proper exchange rate conversion for non-USD withdrawals
+    // For now, this only works correctly for USD withdrawals.
+    // For other currencies, we need to:
+    // 1. Get current exchange rate (e.g., from Stripe or external API)
+    // 2. Convert withdrawalDisplayAmount * exchangeRate to get USD equivalent
+    // 3. Compare USD equivalent to currentBalance
+    if (currencyUpper !== 'USD') {
+      throw new Error(
+        `Currency conversion not yet implemented. ` +
+        `Withdrawals in ${currencyUpper} require exchange rate conversion to USD. ` +
+        `Please use USD for withdrawals until this feature is implemented.`
+      );
+    }
+    
+    // For USD, compare directly (balance is already in USD)
+    if (currentBalance < withdrawalDisplayAmount) {
       throw new Error('Insufficient balance');
     }
     
@@ -493,11 +572,12 @@ export async function createPayout(
     const transfer = await stripe.transfers.create(
       {
         amount: amountCents,
-        currency: 'usd',
+        currency: currencyLower,
         destination: userData.stripeConnectAccountId,
         description,
         metadata: {
           firebaseUserId: userId,
+          originalCurrency: currencyUpper,
           ...metadata,
         },
       },
@@ -507,13 +587,14 @@ export async function createPayout(
     return {
       payoutId: transfer.id,
       amountCents: transfer.amount,
+      currency: currencyUpper,
       status: 'pending',
       arrivalDate: undefined, // Will be updated via webhook
     };
   } catch (error) {
     await captureError(error as Error, {
       tags: { component: 'stripe', operation: 'createPayout' },
-      extra: { userId, amountCents },
+      extra: { userId, amountCents, currency: currencyUpper },
     });
     throw error;
   }
@@ -537,12 +618,29 @@ export async function createTransaction(
       userId: input.userId,
       type: input.type,
       amountCents: input.amountCents,
+      currency: input.currency || 'USD',
       status: 'pending',
       createdAt: now,
       updatedAt: now,
     };
     
-    // Only add optional fields if they have values
+    // Currency tracking fields
+    if (input.originalAmountSmallestUnit !== undefined) {
+      transaction.originalAmountSmallestUnit = input.originalAmountSmallestUnit;
+    }
+    if (input.usdEquivalentCents !== undefined) {
+      transaction.usdEquivalentCents = input.usdEquivalentCents;
+    }
+    if (input.exchangeRate !== undefined) {
+      transaction.exchangeRate = input.exchangeRate;
+    }
+    
+    // Payment method tracking
+    if (input.paymentMethodType) transaction.paymentMethodType = input.paymentMethodType;
+    if (input.voucherUrl) transaction.voucherUrl = input.voucherUrl;
+    if (input.expiresAt) transaction.expiresAt = input.expiresAt;
+    
+    // Standard optional fields
     if (input.stripePaymentIntentId) transaction.stripePaymentIntentId = input.stripePaymentIntentId;
     if (input.stripePayoutId) transaction.stripePayoutId = input.stripePayoutId;
     if (input.stripeTransferId) transaction.stripeTransferId = input.stripeTransferId;
@@ -672,6 +770,9 @@ export async function updateUserBalance(
   amountCents: number,
   operation: 'add' | 'subtract'
 ): Promise<number> {
+  // #region agent log
+  fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'stripeService.ts:768',message:'updateUserBalance called',data:{userId,amountCents,operation},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+  // #endregion
   try {
     const userRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userRef);
@@ -681,11 +782,20 @@ export async function updateUserBalance(
     }
     
     const currentBalance = (userDoc.data().balance || 0) as number;
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'stripeService.ts:782',message:'BEFORE conversion - always dividing by 100',data:{amountCents,currentBalance},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
     const amountDollars = amountCents / 100;
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'stripeService.ts:783',message:'AFTER conversion - amountDollars calculated',data:{amountDollars,conversionMethod:'divide_by_100'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
     
     const newBalance = operation === 'add'
       ? currentBalance + amountDollars
       : currentBalance - amountDollars;
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'stripeService.ts:787',message:'Balance calculation result',data:{currentBalance,amountDollars,newBalance,operation},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
     
     if (newBalance < 0) {
       throw new Error('Insufficient balance');

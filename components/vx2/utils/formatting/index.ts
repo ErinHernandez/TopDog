@@ -7,6 +7,14 @@ export {
   formatDollars,
   formatCompactCurrency,
   parseCurrency,
+  formatSmallestUnit,
+  formatDisplayAmount,
+  toSmallestUnit,
+  toDisplayAmount,
+  getCurrencySymbol,
+  isZeroDecimalCurrency,
+  isThreeDecimalCurrency,
+  getCurrencyDecimals,
 } from './currency';
 export type { FormatCurrencyOptions } from './currency';
 

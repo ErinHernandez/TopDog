@@ -1,12 +1,12 @@
 /**
- * Firebase Schema for Stripe Integration
+ * Firebase Schema for Payment Integration
  * 
  * This file documents and provides utilities for the Firebase collections
- * used in the Stripe integration.
+ * used in payment integrations (Stripe and Paystack).
  * 
  * Collections:
- * - users/{userId} - Extended with payment data
- * - transactions/{transactionId} - Payment/withdrawal records
+ * - users/{userId} - Extended with payment data (Stripe + Paystack)
+ * - transactions/{transactionId} - Payment/withdrawal records (unified)
  * - audit_log/{logId} - Security audit trail
  */
 
@@ -22,6 +22,7 @@ import {
   Timestamp,
 } from 'firebase/firestore';
 import type { Transaction, TransactionType, TransactionStatus, UserPaymentData } from './stripeTypes';
+import type { PaystackTransferRecipient, PaystackChannel } from '../paystack/paystackTypes';
 
 // ============================================================================
 // USER PAYMENT DATA
@@ -40,11 +41,19 @@ export interface UserDocument {
   lastActive?: Timestamp;
   balance: number;
   
-  // Payment-related fields (new)
+  // Stripe payment fields
   stripeCustomerId?: string;
   stripeConnectAccountId?: string;
   stripeConnectOnboarded?: boolean;
   defaultPaymentMethodId?: string;
+  
+  // Paystack payment fields
+  paystackCustomerCode?: string;
+  paystackTransferRecipients?: PaystackTransferRecipient[];
+  defaultPaystackRecipient?: string;
+  
+  // Provider preference (determined by user's country)
+  preferredPaymentProvider?: 'stripe' | 'paystack';
   
   // Statistics (existing, extended)
   totalDeposits?: number;
@@ -90,7 +99,7 @@ export async function initializeUserPaymentData(
 }
 
 /**
- * Get user's payment data
+ * Get user's payment data (Stripe)
  */
 export async function getUserPaymentData(userId: string): Promise<UserPaymentData | null> {
   const userRef = doc(db, 'users', userId);
@@ -109,12 +118,40 @@ export async function getUserPaymentData(userId: string): Promise<UserPaymentDat
   };
 }
 
+/**
+ * User Paystack data interface
+ */
+export interface UserPaystackData {
+  paystackCustomerCode?: string;
+  paystackTransferRecipients?: PaystackTransferRecipient[];
+  defaultPaystackRecipient?: string;
+}
+
+/**
+ * Get user's Paystack data
+ */
+export async function getUserPaystackData(userId: string): Promise<UserPaystackData | null> {
+  const userRef = doc(db, 'users', userId);
+  const userDoc = await getDoc(userRef);
+  
+  if (!userDoc.exists()) {
+    return null;
+  }
+  
+  const data = userDoc.data();
+  return {
+    paystackCustomerCode: data.paystackCustomerCode,
+    paystackTransferRecipients: data.paystackTransferRecipients,
+    defaultPaystackRecipient: data.defaultPaystackRecipient,
+  };
+}
+
 // ============================================================================
 // TRANSACTIONS COLLECTION
 // ============================================================================
 
 /**
- * Transaction document schema
+ * Transaction document schema (unified for Stripe and Paystack)
  * Collection: transactions/{transactionId}
  */
 export interface TransactionDocument {
@@ -122,13 +159,25 @@ export interface TransactionDocument {
   userId: string;
   type: TransactionType;
   amountCents: number;
+  currency?: string; // Added for multi-currency support
   status: TransactionStatus;
+  
+  // Provider identification
+  provider: 'stripe' | 'paystack';
   
   // Stripe references
   stripePaymentIntentId?: string;
   stripePayoutId?: string;
   stripeTransferId?: string;
   stripeChargeId?: string;
+  
+  // Paystack references
+  paystackReference?: string;
+  paystackTransferCode?: string;
+  paystackChannel?: PaystackChannel;
+  paystackAuthorizationCode?: string;
+  paystackFees?: number;
+  ussdCode?: string;
   
   // Display info
   paymentMethod?: string;
@@ -157,6 +206,12 @@ export interface TransactionDocument {
   deviceId?: string;
   riskScore?: number;
   riskFactors?: string[];
+  
+  // Currency conversion (for non-USD deposits)
+  originalAmountSmallest?: number;
+  originalCurrency?: string;
+  exchangeRate?: number;
+  usdEquivalentCents?: number;
 }
 
 // ============================================================================
@@ -185,7 +240,16 @@ export type AuditAction =
   | 'connect_onboarding_complete'
   | 'risk_flag_raised'
   | 'balance_updated'
-  | 'refund_processed';
+  | 'refund_processed'
+  // Paystack-specific actions
+  | 'paystack_charge_initiated'
+  | 'paystack_charge_success'
+  | 'paystack_charge_failed'
+  | 'paystack_transfer_initiated'
+  | 'paystack_transfer_success'
+  | 'paystack_transfer_failed'
+  | 'paystack_recipient_created'
+  | 'paystack_recipient_deleted';
 
 /**
  * Audit log document schema
