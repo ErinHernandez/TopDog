@@ -13,6 +13,9 @@
  */
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { createScopedLogger } from '../../../../lib/clientLogger';
+
+const logger = createScopedLogger('[ShareOptionsModal]');
 
 // ============================================================================
 // CONSTANTS - iOS Share Sheet Colors
@@ -343,7 +346,7 @@ export default function ShareOptionsModal({
       }
     } catch (error) {
       if ((error as Error).name !== 'AbortError') {
-        console.error('Share failed:', error);
+        logger.error('Share failed', error instanceof Error ? error : new Error(String(error)));
       }
     }
   }, [getTextContent, getShareUrl, shareType, contentName]);
@@ -368,7 +371,7 @@ export default function ShareOptionsModal({
         onClose();
       }, 800);
     } catch (error) {
-      console.error('Copy link failed:', error);
+      logger.error('Copy link failed', error instanceof Error ? error : new Error(String(error)));
     }
   }, [getShareUrl, onClose]);
   

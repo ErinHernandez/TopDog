@@ -23,9 +23,11 @@ import MobilePhoneFrame from './MobilePhoneFrame';
 import { 
   AutodraftLimitsModalVX2, 
   DepositHistoryModalVX2, 
+  DepositModalVX2,
   WithdrawModalVX2, 
   RankingsModalVX2 
 } from '../modals';
+import { useAuth } from '../auth';
 
 // ============================================================================
 // MODAL CONTEXT
@@ -33,6 +35,7 @@ import {
 
 interface ModalContextType {
   openAutodraftLimits: () => void;
+  openDeposit: () => void;
   openDepositHistory: () => void;
   openWithdraw: () => void;
   openRankings: () => void;
@@ -71,19 +74,22 @@ interface InnerShellProps {
 }
 
 function InnerShell({ badgeOverrides, deviceClass = 'standard' }: InnerShellProps): React.ReactElement {
+  const { state: authState } = useAuth();
+  
   // Modal state
   const [showAutodraftLimits, setShowAutodraftLimits] = useState(false);
+  const [showDeposit, setShowDeposit] = useState(false);
   const [showDepositHistory, setShowDepositHistory] = useState(false);
   const [showWithdraw, setShowWithdraw] = useState(false);
   const [showRankings, setShowRankings] = useState(false);
-  
-  useEffect(() => {
-  }, [showAutodraftLimits, showDepositHistory, showWithdraw, showRankings]);
   
   // Modal handlers
   const modalContext: ModalContextType = {
     openAutodraftLimits: useCallback(() => {
       setShowAutodraftLimits(true);
+    }, []),
+    openDeposit: useCallback(() => {
+      setShowDeposit(true);
     }, []),
     openDepositHistory: useCallback(() => {
       setShowDepositHistory(true);
@@ -114,6 +120,16 @@ function InnerShell({ badgeOverrides, deviceClass = 'standard' }: InnerShellProp
           isOpen={showAutodraftLimits} 
           onClose={() => setShowAutodraftLimits(false)} 
         />
+        {authState.user && (
+          <DepositModalVX2
+            isOpen={showDeposit}
+            onClose={() => setShowDeposit(false)}
+            userId={authState.user.uid}
+            userEmail={authState.user.email || ''}
+            userName={authState.profile?.displayName || authState.user.displayName || undefined}
+            onSuccess={() => setShowDeposit(false)}
+          />
+        )}
         <DepositHistoryModalVX2 
           isOpen={showDepositHistory} 
           onClose={() => setShowDepositHistory(false)} 

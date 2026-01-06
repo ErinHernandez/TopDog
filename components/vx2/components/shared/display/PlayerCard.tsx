@@ -30,21 +30,14 @@ import { BG_COLORS, TEXT_COLORS, STATE_COLORS, POSITION_COLORS } from '../../../
 import { SPACING, RADIUS, TYPOGRAPHY } from '../../../core/constants/sizes';
 import { PositionBadge } from './PositionBadge';
 import { Plus, Minus, ChevronUp, ChevronDown } from '../../icons';
+import type { Position, PlayerData } from './types';
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-export type Position = 'QB' | 'RB' | 'WR' | 'TE';
-
-export interface PlayerData {
-  name: string;
-  position: string;
-  team: string;
-  adp?: number | string;
-  proj?: number | string;
-  rank?: number;
-}
+// Re-export shared types for convenience
+export type { Position, PlayerData };
 
 export type ActionType = 
   | { type: 'toggle'; isActive: boolean; onToggle: () => void }

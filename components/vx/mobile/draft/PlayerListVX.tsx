@@ -181,12 +181,14 @@ export default function PlayerListVX({
     if (searchTerm.trim()) {
       const search = searchTerm.toLowerCase().trim();
       filtered = filtered.filter(player => {
+        const playerNameLower = player.name?.toLowerCase() || '';
+        const playerTeamLower = player.team?.toLowerCase() || '';
         const fullTeamName = TEAM_NAMES[player.team] || '';
         const formattedName = formatPlayerName(player.name);
         return (
-          player.name.toLowerCase().includes(search) ||
+          playerNameLower.includes(search) ||
           formattedName.toLowerCase().includes(search) ||
-          player.team.toLowerCase().includes(search) ||
+          playerTeamLower.includes(search) ||
           fullTeamName.toLowerCase().includes(search)
         );
       });
@@ -205,9 +207,9 @@ export default function PlayerListVX({
           const adpB2 = Math.round(parseFloat(String(b.adp))) || 999;
           return adpB2 - adpA2;
         case 'name_asc':
-          return a.name.localeCompare(b.name);
+          return (a.name || '').localeCompare(b.name || '');
         case 'name_desc':
-          return b.name.localeCompare(a.name);
+          return (b.name || '').localeCompare(a.name || '');
         case 'rank_asc':
           return (getCustomRank(a.name, customRankings) || 999) - (getCustomRank(b.name, customRankings) || 999);
         case 'rank_desc':

@@ -19,6 +19,9 @@ import {
   getResponsiveCSSVars,
   ResponsiveScale,
 } from '../../core/constants/responsive';
+import { createScopedLogger } from '../../../../lib/clientLogger';
+
+const logger = createScopedLogger('[useDeviceClass]');
 
 // ============================================================================
 // MAIN HOOK
@@ -112,12 +115,9 @@ export function useDeviceClassDebug(componentName: string): DeviceClass {
   const deviceClass = useDeviceClass();
   
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log(
-        `[${componentName}] Device class: ${deviceClass}`,
-        `(height: ${window.innerHeight}px)`
-      );
-    }
+    logger.debug(`[${componentName}] Device class: ${deviceClass}`, { 
+      height: window.innerHeight 
+    });
   }, [deviceClass, componentName]);
   
   return deviceClass;

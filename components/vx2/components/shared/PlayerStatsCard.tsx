@@ -23,12 +23,17 @@ import { BYE_WEEKS } from '@/lib/nflConstants';
 import { generatePlayerId } from '../../draft-room/utils';
 import type { SeasonStats } from '@/lib/historicalStats/types';
 import * as historicalService from '@/lib/historicalStats/service';
+import type { Position } from './display/types';
+import { createScopedLogger } from '../../../../lib/clientLogger';
+
+const logger = createScopedLogger('[PlayerStatsCard]');
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-type FantasyPosition = 'QB' | 'RB' | 'WR' | 'TE';
+// Use shared Position type
+type FantasyPosition = Position;
 
 export interface PlayerStatsCardProps {
   /** Player data to display */
@@ -483,7 +488,7 @@ export default function PlayerStatsCard({
         setHistoricalStats(statsMap);
       })
       .catch(err => {
-        console.warn('[PlayerStatsCard] Failed to load historical stats:', err);
+        logger.warn('Failed to load historical stats', { error: String(err) });
         setHistoricalStats(new Map());
       })
       .finally(() => setLoadingStats(false));

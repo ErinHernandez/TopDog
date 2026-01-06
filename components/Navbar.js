@@ -151,6 +151,40 @@ export default function Navbar() {
                       marginTop: '2px'
                     }}
                   />
+                  <svg
+                    width="32"
+                    height="32"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    style={{
+                      marginLeft: '8px',
+                      marginRight: '4px',
+                      minWidth: '24px',
+                      width: '24px',
+                      height: '24px',
+                      flexShrink: 0
+                    }}
+                  >
+                    <path
+                      d="M12 2L3 7V10C3 15.55 6.84 20.74 12 22C17.16 20.74 21 15.55 21 10V7L12 2Z"
+                      fill="#FBBF25"
+                      stroke="#18181b"
+                      strokeWidth="1"
+                    />
+                    <path
+                      d="M12 2V8M12 8L8 10M12 8L16 10"
+                      stroke="#18181b"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d="M9 12L15 12"
+                      stroke="#18181b"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                    />
+                  </svg>
                   <span 
                     className="ml-2 sm:ml-4 md:ml-6 lg:ml-8 text-xl font-medium hidden sm:inline" 
                     style={{ 

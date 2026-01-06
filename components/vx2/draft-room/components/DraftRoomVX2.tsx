@@ -16,6 +16,10 @@ import type { DraftTab } from '../types';
 import { DRAFT_LAYOUT } from '../constants';
 import { BG_COLORS, TEXT_COLORS } from '../../core/constants/colors';
 import { SPACING, TYPOGRAPHY, RADIUS } from '../../core/constants/sizes';
+import { createScopedLogger } from '../../../../lib/clientLogger';
+
+// Create scoped logger for this component
+const logger = createScopedLogger('[DraftRoomVX2]');
 
 // ============================================================================
 // TUTORIAL STORAGE KEYS
@@ -356,35 +360,55 @@ export default function DraftRoomVX2({
   
   // Show leave confirmation modal
   const handleLeaveClick = useCallback(() => {
-    console.warn('[VX2 DEBUG] handleLeaveClick called - opening modal');
+    logger.debug('Leave button clicked - opening modal');
     setShowLeaveModal(true);
   }, []);
   
+  // Track if component is mounted to prevent state updates after unmount
+  const isMountedRef = useRef(true);
+  const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+      // Clear any pending leave timeout on unmount
+      if (leaveTimeoutRef.current) {
+        clearTimeout(leaveTimeoutRef.current);
+        leaveTimeoutRef.current = null;
+      }
+    };
+  }, []);
+
   // Confirm leaving
   const handleLeaveConfirm = useCallback(() => {
-    console.warn('[VX2 DEBUG] handleLeaveConfirm called', {hasOnLeave: !!onLeave});
-    console.log('[DraftRoomVX2] Leave confirmed, cleaning up...');
+    logger.debug('Leave confirmed, cleaning up', { hasOnLeave: !!onLeave });
     // Call leave draft cleanup
     draftRoom.leaveDraft();
     // Close modal first
     setShowLeaveModal(false);
     // Trigger navigation - use setTimeout to ensure it happens after state update
     if (onLeave) {
-      console.log('[DraftRoomVX2] Calling onLeave callback...');
-      console.warn('[VX2 DEBUG] Scheduling onLeave callback');
+      logger.debug('Scheduling onLeave callback');
+      // Clear any existing timeout
+      if (leaveTimeoutRef.current) {
+        clearTimeout(leaveTimeoutRef.current);
+      }
       // Use setTimeout to ensure navigation happens after modal closes
-      setTimeout(() => {
-        try {
-          console.warn('[VX2 DEBUG] Calling onLeave callback now');
-          onLeave();
-        } catch (error) {
-          console.error('[DraftRoomVX2] Error in onLeave callback:', error);
-          console.error('[VX2 DEBUG ERROR] onLeave callback threw error', error);
+      leaveTimeoutRef.current = setTimeout(() => {
+        // Only call onLeave if component is still mounted
+        if (isMountedRef.current) {
+          try {
+            logger.debug('Calling onLeave callback');
+            onLeave();
+          } catch (error) {
+            logger.error('Error in onLeave callback', error as Error);
+          }
         }
+        leaveTimeoutRef.current = null;
       }, 0);
     } else {
-      console.warn('[DraftRoomVX2] onLeave callback not provided!');
-      console.error('[VX2 DEBUG ERROR] onLeave callback not provided');
+      logger.warn('onLeave callback not provided');
     }
   }, [draftRoom, onLeave]);
   
@@ -530,7 +554,7 @@ export default function DraftRoomVX2({
       <DraftTutorialModal
         isOpen={showTutorialModal}
         onClose={() => setShowTutorialModal(false)}
-        onRules={() => console.log('Rules clicked')}
+        onRules={() => logger.debug('Rules clicked')}
         format="Snake"
         showDontShowAgain={true}
         onDontShowAgainChange={handleDontShowAgainChange}

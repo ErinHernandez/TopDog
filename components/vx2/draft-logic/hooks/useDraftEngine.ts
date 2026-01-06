@@ -24,6 +24,9 @@ import { useDraftTimer } from './useDraftTimer';
 import { useDraftQueue } from './useDraftQueue';
 import { useAutodraft } from './useAutodraft';
 import { usePickExecutor } from './usePickExecutor';
+import { createScopedLogger } from '../../../../lib/clientLogger';
+
+const logger = createScopedLogger('[DraftEngine]');
 
 // ============================================================================
 // TYPES
@@ -143,7 +146,7 @@ export function useDraftEngine({
     
     if (result) {
       // Execute autopick through executor
-      console.log(`[DraftEngine] Autopick: ${result.player.name} (${result.source})`);
+      logger.debug('Autopick', { player: result.player.name, source: result.source });
     }
   }, [
     isMyTurn, 
@@ -180,11 +183,11 @@ export function useDraftEngine({
     positionLimits: autodraft.positionLimits,
     draftStatus: status,
     onPickSuccess: (pick) => {
-      console.log(`[DraftEngine] Pick success: ${pick.player.name}`);
+      logger.debug('Pick success', { player: pick.player.name });
       timer.reset();
     },
     onPickError: (err) => {
-      console.error(`[DraftEngine] Pick error: ${err}`);
+      logger.error('Pick error', err instanceof Error ? err : new Error(String(err)));
       setError(err);
     },
   });

@@ -12,6 +12,7 @@ import React from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { AppShellVX2 } from '../../components/vx2';
+import { AuthProvider } from '../../components/vx2/auth';
 import { useIsMobileDevice } from '../../hooks/useIsMobileDevice';
 import { DEVICE_PRESETS, ALL_DEVICES } from '../../components/vx2/core/constants';
 
@@ -163,23 +164,24 @@ export default function VX2MobileAppDemo() {
         On mobile: fullscreen app (no phone frame)
         On desktop: phone frame preview 
       */}
-      {isMobile ? (
-        <div style={{ 
-          position: 'fixed', 
-          inset: 0, 
-          backgroundColor: '#101927',
-          overflow: 'hidden',
-        }}>
-          <AppShellVX2
-            initialTab={initialTab}
-            showPhoneFrame={false}
-            onTabChange={handleTabChange}
-            badgeOverrides={{
-              'live-drafts': 3,
-            }}
-          />
-        </div>
-      ) : (
+      <AuthProvider>
+        {isMobile ? (
+          <div style={{ 
+            position: 'fixed', 
+            inset: 0, 
+            backgroundColor: '#101927',
+            overflow: 'hidden',
+          }}>
+            <AppShellVX2
+              initialTab={initialTab}
+              showPhoneFrame={false}
+              onTabChange={handleTabChange}
+              badgeOverrides={{
+                'live-drafts': 3,
+              }}
+            />
+          </div>
+        ) : (
         <div style={{ 
           position: 'relative', 
           minHeight: '100vh',
@@ -426,7 +428,8 @@ export default function VX2MobileAppDemo() {
             ))}
           </div>
         </div>
-      )}
+        )}
+      </AuthProvider>
     </>
   );
 }

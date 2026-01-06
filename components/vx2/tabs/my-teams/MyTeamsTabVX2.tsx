@@ -223,7 +223,7 @@ function TeamListView({ teams, isLoading, onSelect, onNameChange }: TeamListView
     
     // Add matching players
     allPlayers.forEach(player => {
-      if (player.name.toLowerCase().includes(query)) {
+      if ((player.name?.toLowerCase() || '').includes(query)) {
         // Check if already selected
         if (!selectedItems.some(item => item.type === 'player' && item.id === player.id)) {
           options.push({

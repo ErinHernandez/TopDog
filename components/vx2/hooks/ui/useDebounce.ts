@@ -101,6 +101,12 @@ export function useDebounce<T>(
 
 /**
  * Return type for useDebouncedCallback
+ * 
+ * @template T - Function type to debounce (must be a function)
+ * 
+ * Note: Uses `any[]` for function parameters as this is the standard TypeScript
+ * pattern for generic function types. The function signature is preserved through
+ * the generic constraint.
  */
 export interface UseDebouncedCallbackResult<T extends (...args: any[]) => any> {
   /** Debounced function */
@@ -116,9 +122,13 @@ export interface UseDebouncedCallbackResult<T extends (...args: any[]) => any> {
 /**
  * Debounce a callback function
  * 
+ * @template T - Function type to debounce (must be a function)
  * @param callback - Function to debounce
  * @param delay - Delay in milliseconds
  * @returns Debounced function with cancel/flush controls
+ * 
+ * Note: Uses `any[]` for function parameters as this is the standard TypeScript
+ * pattern for generic function types. The actual function signature is preserved.
  */
 export function useDebouncedCallback<T extends (...args: any[]) => any>(
   callback: T,

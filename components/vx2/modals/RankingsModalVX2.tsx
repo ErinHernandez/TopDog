@@ -16,6 +16,8 @@ import { BG_COLORS, TEXT_COLORS, STATE_COLORS, POSITION_COLORS } from '../core/c
 import { SPACING, RADIUS, TYPOGRAPHY, Z_INDEX } from '../core/constants/sizes';
 import { Close, Plus, Minus, Search } from '../components/icons';
 import { PositionBadge } from '../components/shared';
+import type { Position } from '../components/shared/display/types';
+import { POSITIONS } from '../components/shared/display/types';
 
 // ============================================================================
 // TYPES
@@ -38,9 +40,6 @@ interface Player {
 }
 
 type TabType = 'build' | 'rankings';
-type Position = 'QB' | 'RB' | 'WR' | 'TE';
-
-const POSITIONS: Position[] = ['QB', 'RB', 'WR', 'TE'];
 
 // ============================================================================
 // SUB-COMPONENTS
@@ -432,9 +431,8 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
       if (saved) {
         try {
           savedRankings = JSON.parse(saved);
-        } catch (e) {
-          // If JSON is corrupted, use empty array
-          console.error('Error parsing saved rankings:', e);
+        } catch {
+          // If JSON is corrupted, use empty array (this is expected behavior, not an error)
           savedRankings = [];
         }
       }
@@ -444,8 +442,8 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
         setOriginalRankings(savedRankings);
         setPlayerPool(mockPool);
       }
-    } catch (e) {
-      console.error('Error loading rankings:', e);
+    } catch {
+      // Error handled by showing user-facing error message
       if (isOpen) {
         setError('Failed to load data.');
       }
@@ -547,7 +545,7 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
     if (positionFilter) players = players.filter(p => p.position === positionFilter);
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      players = players.filter(p => p.name.toLowerCase().includes(q) || p.team.toLowerCase().includes(q));
+      players = players.filter(p => (p.name?.toLowerCase() || '').includes(q) || (p.team?.toLowerCase() || '').includes(q));
     }
     // Always sort by ADP in Players tab
     players.sort((a, b) => {
@@ -562,7 +560,7 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
   const filteredRankedPlayers = useMemo(() => {
     if (!searchQuery.trim()) return rankedPlayers;
     const q = searchQuery.toLowerCase();
-    return rankedPlayers.filter(p => p.name.toLowerCase().includes(q) || p.team.toLowerCase().includes(q));
+    return rankedPlayers.filter(p => (p.name?.toLowerCase() || '').includes(q) || (p.team?.toLowerCase() || '').includes(q));
   }, [rankedPlayers, searchQuery]);
 
   const handleSave = useCallback(async () => {

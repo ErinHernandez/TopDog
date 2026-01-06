@@ -95,8 +95,8 @@ export function usePlayerDropdown({
       if (filters.team && player.team !== filters.team) return false;
       if (filters.searchTerm) {
         const term = filters.searchTerm.toLowerCase();
-        return player.name.toLowerCase().includes(term) || 
-               player.team.toLowerCase().includes(term);
+        return (player.name?.toLowerCase() || '').includes(term) || 
+               (player.team?.toLowerCase() || '').includes(term);
       }
       return true;
     });
@@ -111,9 +111,9 @@ export function usePlayerDropdown({
       case 'projection':
         return sorted.sort((a, b) => b.projectedPoints - a.projectedPoints);
       case 'name':
-        return sorted.sort((a, b) => a.name.localeCompare(b.name));
+        return sorted.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
       case 'position':
-        return sorted.sort((a, b) => a.position.localeCompare(b.position));
+        return sorted.sort((a, b) => (a.position || '').localeCompare(b.position || ''));
       default:
         return sorted;
     }

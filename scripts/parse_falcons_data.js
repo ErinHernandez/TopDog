@@ -77,12 +77,15 @@ function parseFalconsData(dataString) {
       // Handle multi-word player names (position is first part, so start from second)
       if (parts[1] && isNaN(parts[1])) {
         // Check if third part is also a name (not a number)
-        if (parts[2] && isNaN(parts[2])) {
+        if (parts[2] && isNaN(parts[2]) && parts[3] && isNaN(parts[3])) {
           playerName = `${parts[1]} ${parts[2]} ${parts[3]}`;
           dataStartIndex = 4;
-        } else {
+        } else if (parts[2] && isNaN(parts[2])) {
           playerName = `${parts[1]} ${parts[2]}`;
           dataStartIndex = 3;
+        } else {
+          playerName = parts[1];
+          dataStartIndex = 2;
         }
       } else {
         playerName = parts[1];
@@ -104,6 +107,7 @@ function parseFalconsData(dataString) {
       console.log(`   Player name: "${playerName}", data starts at index: ${dataStartIndex}`);
       
       // Ensure we have enough data columns (minimum 16 data points after player name)
+      // Also need to account for games at dataStartIndex - 1
       const minRequiredColumns = dataStartIndex + 16;
       if (parts.length < minRequiredColumns) {
         // For the last player, be more flexible if we have at least the basic stats
@@ -115,6 +119,11 @@ function parseFalconsData(dataString) {
         }
       }
       
+      // Ensure dataStartIndex - 1 is valid before accessing games
+      if (dataStartIndex < 1 || dataStartIndex - 1 >= parts.length) {
+        console.log(`⚠️  Skipping ${playerName}: invalid dataStartIndex (${dataStartIndex})`);
+        return;
+      }
       const games = parseInt(parts[dataStartIndex - 1]) || 17; // Games is at dataStartIndex - 1
       
       // Passing stats: Att Comp Yds TD INT Sk
@@ -185,7 +194,7 @@ function parseFalconsData(dataString) {
             touchdowns: rushingTDs,
             longRush: rushingYards > 0 ? Math.round(15 + Math.random() * 20) : 0,
             yardsPerAttempt: rushingAttempts > 0 ? (rushingYards / rushingAttempts).toFixed(1) : "0.0",
-            yardsPerGame: (rushingYards / games).toFixed(1),
+            yardsPerGame: games > 0 ? (rushingYards / games).toFixed(1) : "0.0",
             firstDowns: Math.round(rushingYards / 10)
           },
           receiving: {

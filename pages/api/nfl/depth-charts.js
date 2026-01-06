@@ -10,20 +10,24 @@
  */
 
 import { getDepthCharts, getDepthChartsByTeam } from '../../../lib/sportsdataio';
+import { 
+  withErrorHandling, 
+  validateMethod, 
+  requireEnvVar,
+  createSuccessResponse,
+  createErrorResponse,
+  ErrorType,
+} from '../../../lib/apiErrorHandler';
 
 export default async function handler(req, res) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    validateMethod(req, ['GET'], logger);
+    const apiKey = requireEnvVar('SPORTSDATAIO_API_KEY', logger);
 
-  const apiKey = process.env.SPORTSDATAIO_API_KEY;
-  if (!apiKey) {
-    return res.status(500).json({ error: 'API key not configured' });
-  }
-
-  try {
     const { team, position, grouped, refresh } = req.query;
     const forceRefresh = refresh === 'true';
+    
+    logger.info('Fetching depth charts', { team, position, grouped, refresh: forceRefresh });
     
     // Return grouped by team if requested
     if (grouped === 'true') {
@@ -33,20 +37,21 @@ export default async function handler(req, res) {
       if (team) {
         const teamData = byTeam[team.toUpperCase()];
         if (!teamData) {
-          return res.status(404).json({ error: `Team ${team} not found` });
+          const error = createErrorResponse(ErrorType.NOT_FOUND, `Team ${team} not found`, 404, logger);
+          return res.status(error.statusCode).json(error.body);
         }
-        return res.status(200).json({
-          ok: true,
+        const response = createSuccessResponse({
           team: team.toUpperCase(),
           data: teamData,
-        });
+        }, 200, logger);
+        return res.status(response.statusCode).json(response.body);
       }
       
-      return res.status(200).json({
-        ok: true,
+      const response = createSuccessResponse({
         teamCount: Object.keys(byTeam).length,
         data: byTeam,
-      });
+      }, 200, logger);
+      return res.status(response.statusCode).json(response.body);
     }
     
     // Return flat list
@@ -79,14 +84,12 @@ export default async function handler(req, res) {
       playerId: c.PlayerID,
     }));
     
-    return res.status(200).json({
-      ok: true,
+    const response = createSuccessResponse({
       count: transformed.length,
       data: transformed,
-    });
-  } catch (err) {
-    console.error('Depth Charts API error:', err);
-    return res.status(500).json({ error: err.message });
-  }
+    }, 200, logger);
+    
+    return res.status(response.statusCode).json(response.body);
+  });
 }
 

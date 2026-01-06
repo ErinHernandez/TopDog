@@ -23,6 +23,9 @@ import { BG_COLORS, TEXT_COLORS } from '../../core/constants/colors';
 import { useImageShare } from '../hooks/useImageShare';
 import { Share } from '../../components/icons/actions/Share';
 import ShareOptionsModal from './ShareOptionsModal';
+import { createScopedLogger } from '../../../../lib/clientLogger';
+
+const logger = createScopedLogger('[DraftBoard]');
 
 // ============================================================================
 // PIXEL-PERFECT CONSTANTS (matched from VX DraftBoardVX.tsx)
@@ -469,10 +472,10 @@ export default function DraftBoard({
   // Image share hook
   const { captureAndShare, isCapturing } = useImageShare({
     onSuccess: (method) => {
-      console.log(`[DraftBoard] Share successful via ${method}`);
+      logger.debug('Share successful', { method });
     },
     onError: (error) => {
-      console.error('[DraftBoard] Share failed:', error);
+      logger.error('Share failed', error instanceof Error ? error : new Error(String(error)));
     },
   });
   

@@ -25,6 +25,9 @@ import { SPACING, RADIUS, TYPOGRAPHY, Z_INDEX, SAFE_AREA } from '../../core/cons
 import { EmptyState, ErrorState } from '../../components/shared';
 import { TournamentCard, TournamentCardSkeleton } from './TournamentCard';
 import { Close } from '../../components/icons';
+import { createScopedLogger } from '../../../../lib/clientLogger';
+
+const logger = createScopedLogger('[LobbyTab]');
 
 // ============================================================================
 // CONSTANTS
@@ -255,7 +258,7 @@ export default function LobbyTabVX2({
       // Navigate to VX2 Draft Room
       router.push('/testing-grounds/vx2-draft-room');
     } catch (e) {
-      console.error('Failed to join tournament:', e);
+      logger.error('Failed to join tournament', e instanceof Error ? e : new Error(String(e)));
     } finally {
       setIsJoining(false);
       setSelectedTournament(null);
@@ -328,7 +331,6 @@ export default function LobbyTabVX2({
       className="vx2-lobby-container flex-1 relative"
       style={{ 
         padding: `${LOBBY_PX.containerPaddingY}px ${LOBBY_PX.containerPaddingX}px`,
-        paddingBottom: `calc(${LOBBY_PX.containerPaddingY}px + ${SAFE_AREA.bottom})`,
         backgroundColor: BG_COLORS.primary,
         display: 'flex',
         flexDirection: 'column',

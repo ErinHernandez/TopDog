@@ -17,5 +17,5 @@ export type { UsePickExecutorOptions, UsePickExecutorResult } from './usePickExe
 export { useDraftEngine } from './useDraftEngine';
 export type { UseDraftEngineOptions, UseDraftEngineResult } from './useDraftEngine';
 
-
-
+export { useDynamicIsland } from './useDynamicIsland';
+export type { UseDynamicIslandOptions, UseDynamicIslandResult } from './useDynamicIsland';

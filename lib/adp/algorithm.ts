@@ -217,8 +217,8 @@ export function calculateADP(
   
   // Find date range
   const timestamps = recentPicks.map(p => p.timestamp);
-  const minTimestamp = Math.min(...timestamps);
-  const maxTimestamp = Math.max(...timestamps);
+  const minTimestamp = timestamps.length > 0 ? Math.min(...timestamps) : now;
+  const maxTimestamp = timestamps.length > 0 ? Math.max(...timestamps) : now;
   
   // Calculate ADP for each player
   const playerADPs: Record<string, PlayerADP> = {};
@@ -263,9 +263,9 @@ export function calculateADP(
     
     // Calculate stats from filtered picks
     const positions = filtered.map(p => p.pickNumber);
-    const highPick = Math.min(...positions);
-    const lowPick = Math.max(...positions);
-    const stdDev = standardDeviation(positions);
+    const highPick = positions.length > 0 ? Math.min(...positions) : 0;
+    const lowPick = positions.length > 0 ? Math.max(...positions) : 0;
+    const stdDev = positions.length > 0 ? standardDeviation(positions) : 0;
     
     // Calculate weighted average
     const calculatedADP = calculateWeightedAverage(filtered, now, params.decayDays);
@@ -300,9 +300,11 @@ export function calculateADP(
   
   const executionTimeMs = Date.now() - startTime;
   
-  // Determine blend mode
-  const slowPicks = recentPicks.filter(p => p.draftType === 'slow').length;
-  const fastPicks = recentPicks.filter(p => p.draftType === 'fast').length;
+  // Determine blend mode - cache filter results to avoid iterating twice
+  const slowPicksArray = recentPicks.filter(p => p.draftType === 'slow');
+  const fastPicksArray = recentPicks.filter(p => p.draftType === 'fast');
+  const slowPicks = slowPicksArray.length;
+  const fastPicks = fastPicksArray.length;
   let blendMode: 'seed-only' | 'slow-only' | 'blended' | 'fast-only';
   
   if (recentPicks.length === 0) {

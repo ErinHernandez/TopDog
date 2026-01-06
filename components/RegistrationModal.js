@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { UserRegistrationService } from '../lib/userRegistration';
 import { validateUsername, getUsernameRequirements } from '../lib/usernameValidation';
-import { getAllowedCharacters, getLocaleDescription } from '../lib/localeCharacters';
+import { getApprovedCountriesSorted } from '../lib/localeCharacters';
 
 export default function RegistrationModal({ open, onClose, onRegistrationSuccess, user }) {
   const [formData, setFormData] = useState({
@@ -20,34 +20,8 @@ export default function RegistrationModal({ open, onClose, onRegistrationSuccess
   const [usernameAvailability, setUsernameAvailability] = useState(null);
   const [requirements, setRequirements] = useState(getUsernameRequirements('US'));
   
-  // Country options for the dropdown
-  const countries = [
-    { code: 'US', name: 'United States' },
-    { code: 'CA', name: 'Canada' },
-    { code: 'FR', name: 'France' },
-    { code: 'DE', name: 'Germany' },
-    { code: 'ES', name: 'Spain' },
-    { code: 'RU', name: 'Russia' },
-    { code: 'JP', name: 'Japan' },
-    { code: 'KR', name: 'Korea' },
-    { code: 'MX', name: 'Mexico' },
-    { code: 'TR', name: 'Turkey' },
-    { code: 'SE', name: 'Sweden' },
-    { code: 'NO', name: 'Norway' },
-    { code: 'DK', name: 'Denmark' },
-    { code: 'FI', name: 'Finland' },
-    { code: 'PL', name: 'Poland' },
-    { code: 'CZ', name: 'Czech Republic' },
-    { code: 'SK', name: 'Slovakia' },
-    { code: 'HU', name: 'Hungary' },
-    { code: 'RO', name: 'Romania' },
-    { code: 'BG', name: 'Bulgaria' },
-    { code: 'HR', name: 'Croatia' },
-    { code: 'SI', name: 'Slovenia' },
-    { code: 'EE', name: 'Estonia' },
-    { code: 'LV', name: 'Latvia' },
-    { code: 'LT', name: 'Lithuania' }
-  ];
+  // Get approved countries from centralized config (sorted alphabetically)
+  const countries = getApprovedCountriesSorted();
   
   // Update requirements when country changes
   useEffect(() => {

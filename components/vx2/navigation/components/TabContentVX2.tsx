@@ -13,6 +13,9 @@ import { useTabNavigation } from '../../core';
 import type { TabId } from '../../core/types';
 import { useDebouncedCallback } from '../../hooks/ui/useDebounce';
 import TabErrorBoundary from './TabErrorBoundary';
+import { createScopedLogger } from '../../../../lib/clientLogger';
+
+const logger = createScopedLogger('[TabContentVX2]');
 
 // Direct imports for all tabs (SSR compatible)
 import { LobbyTabVX2 as LobbyTab } from '../../tabs/lobby';
@@ -52,10 +55,9 @@ export default function TabContentVX2({
   className = '',
   errorComponent,
 }: TabContentVX2Props): React.ReactElement {
-  const logData = {location:'TabContentVX2.tsx:51',message:'TabContentVX2 rendering',data:{className,hasErrorComponent:!!errorComponent},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'A'};
-  console.warn('[VX2 DEBUG] TabContentVX2 START', logData);
+  logger.debug('Rendering', { className, hasErrorComponent: !!errorComponent });
   const { state, saveTabState, getTabState, getTabConfig } = useTabNavigation();
-  console.warn('[VX2 DEBUG] TabContentVX2 useTabNavigation success', {activeTab: state.activeTab});
+  logger.debug('Tab navigation initialized', { activeTab: state.activeTab });
   const contentRef = useRef<HTMLDivElement>(null);
   const tabConfig = getTabConfig(state.activeTab);
   const [isMounted, setIsMounted] = useState(false);
@@ -123,12 +125,10 @@ export default function TabContentVX2({
   // Get the active tab component
   const TabComponent = TAB_COMPONENTS[state.activeTab];
   
-  const logDataTab = {location:'TabContentVX2.tsx:120',message:'TabComponent lookup',data:{activeTab:state.activeTab,hasTabComponent:!!TabComponent},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'E'};
-  console.log('[DEBUG]', logDataTab);
+  logger.debug('Tab component lookup', { activeTab: state.activeTab, hasTabComponent: !!TabComponent });
   
   if (!TabComponent) {
-    const logDataError = {location:'TabContentVX2.tsx:123',message:'TabComponent ERROR - component not found',data:{activeTab:state.activeTab},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'E'};
-    console.error('[DEBUG ERROR]', logDataError);
+    logger.error('Tab component not found', undefined, { activeTab: state.activeTab });
   }
   
   return (

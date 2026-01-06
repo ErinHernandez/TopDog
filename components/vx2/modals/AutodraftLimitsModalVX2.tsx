@@ -14,6 +14,11 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS, POSITION_COLORS } from '../core/constants/colors';
 import { SPACING, RADIUS, TYPOGRAPHY, Z_INDEX } from '../core/constants/sizes';
 import { Close, Plus, Minus } from '../components/icons';
+import type { Position, PositionLimits } from '../draft-logic';
+import { POSITIONS } from '../draft-logic';
+import { createScopedLogger } from '../../../lib/clientLogger';
+
+const logger = createScopedLogger('[AutodraftLimitsModal]');
 
 // ============================================================================
 // CONSTANTS
@@ -25,15 +30,6 @@ const MODAL_PX = {
   rowGap: SPACING.md,
   buttonHeight: 48,
 } as const;
-
-type Position = 'QB' | 'RB' | 'WR' | 'TE';
-
-interface PositionLimits {
-  QB: number;
-  RB: number;
-  WR: number;
-  TE: number;
-}
 
 const DEFAULT_LIMITS: PositionLimits = {
   QB: 4,
@@ -48,8 +44,6 @@ const MAX_LIMITS: PositionLimits = {
   WR: 11,
   TE: 5,
 };
-
-const POSITIONS: Position[] = ['QB', 'RB', 'WR', 'TE'];
 
 // ============================================================================
 // TYPES
@@ -204,7 +198,7 @@ export default function AutodraftLimitsModalVX2({
           setOriginalLimits(parsed);
         } catch (e) {
           // If JSON is corrupted, use defaults
-          console.error('Error parsing autodraft limits:', e);
+          logger.debug('Error parsing autodraft limits', { error: e });
           setLimits(DEFAULT_LIMITS);
           setOriginalLimits(DEFAULT_LIMITS);
         }
@@ -213,7 +207,7 @@ export default function AutodraftLimitsModalVX2({
         setOriginalLimits(DEFAULT_LIMITS);
       }
     } catch (e) {
-      console.error('Error loading autodraft limits:', e);
+      logger.debug('Error loading autodraft limits', { error: e });
       if (isOpen) {
         setLimits(DEFAULT_LIMITS);
         setOriginalLimits(DEFAULT_LIMITS);
@@ -251,7 +245,7 @@ export default function AutodraftLimitsModalVX2({
       setOriginalLimits(limits);
       onClose();
     } catch (e) {
-      console.error('Error saving autodraft limits:', e);
+      logger.error('Error saving autodraft limits', e instanceof Error ? e : new Error(String(e)));
       if (isOpen) {
         setError('Failed to save. Please try again.');
       }

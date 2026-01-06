@@ -27,10 +27,13 @@ import type {
 } from '../types';
 import { 
   TAB_REGISTRY, 
-  TAB_ORDER, 
+  TAB_ORDER,
   DEFAULT_TAB,
   getTabFromPath,
 } from '../constants';
+import { createScopedLogger } from '../../../../lib/clientLogger';
+
+const logger = createScopedLogger('[TabNavigation]');
 
 // ============================================================================
 // INITIAL STATE
@@ -255,16 +258,18 @@ export function TabNavigationProvider({
   initialTab,
   onTabChange,
 }: TabNavigationProviderProps): React.ReactElement {
-  const logData = {location:'TabNavigationContext.tsx:253',message:'TabNavigationProvider initializing',data:{initialTab,hasOnTabChange:!!onTabChange},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'A'};
-  console.warn('[VX2 DEBUG] TabNavigationProvider initializing', logData);
+  logger.debug('Initializing', { initialTab, hasOnTabChange: !!onTabChange });
   // Initialize state with optional override
   const [state, dispatch] = useReducer(
     tabNavigationReducer,
     initialTab ? { ...initialState, activeTab: initialTab } : initialState
   );
   
-  const logData2 = {location:'TabNavigationContext.tsx:261',message:'TabNavigationProvider state initialized',data:{activeTab:state.activeTab,historyLength:state.history.length,tabStatesCount:Object.keys(state.tabStates).length},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'A'};
-  console.log('[DEBUG]', logData2);
+  logger.debug('State initialized', { 
+    activeTab: state.activeTab, 
+    historyLength: state.history.length, 
+    tabStatesCount: Object.keys(state.tabStates).length 
+  });
   
   // Track previous tab for change callbacks
   const prevTabRef = useRef<TabId | null>(null);
@@ -272,8 +277,11 @@ export function TabNavigationProvider({
   // Call onTabChange when tab changes
   useEffect(() => {
     if (prevTabRef.current !== state.activeTab) {
-      const logData3 = {location:'TabNavigationContext.tsx:269',message:'Tab change detected',data:{fromTab:prevTabRef.current,toTab:state.activeTab,isTransitioning:state.isTransitioning},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'B'};
-      console.log('[DEBUG]', logData3);
+      logger.debug('Tab change detected', { 
+        fromTab: prevTabRef.current, 
+        toTab: state.activeTab, 
+        isTransitioning: state.isTransitioning 
+      });
       onTabChange?.(prevTabRef.current, state.activeTab);
       prevTabRef.current = state.activeTab;
     }

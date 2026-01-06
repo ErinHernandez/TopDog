@@ -65,18 +65,22 @@ export default function FullDraftBoard({ room, picks, participants, draftOrder, 
   const findPlayerInPool = (playerName) => {
     if (!playerName || !PLAYER_POOL) return null;
     
+    // Cache lowercase version to avoid repeated calls
+    const playerNameLower = playerName.toLowerCase();
+    
     // Try exact match first
     let player = PLAYER_POOL.find(p => p.name === playerName);
     if (player) return player;
     
     // Try case-insensitive match
-    player = PLAYER_POOL.find(p => p.name.toLowerCase() === playerName.toLowerCase());
+    player = PLAYER_POOL.find(p => p.name && p.name.toLowerCase() === playerNameLower);
     if (player) return player;
     
     // Try matching by last name (common format: "McBride" vs "Trey McBride")
     const lastName = playerName.split(' ').pop();
     if (lastName && lastName.length > 2) {
-      player = PLAYER_POOL.find(p => p.name.toLowerCase().includes(lastName.toLowerCase()));
+      const lastNameLower = lastName.toLowerCase();
+      player = PLAYER_POOL.find(p => p.name && p.name.toLowerCase().includes(lastNameLower));
       if (player) return player;
     }
     
@@ -84,29 +88,33 @@ export default function FullDraftBoard({ room, picks, participants, draftOrder, 
     const nameParts = playerName.split(' ');
     if (nameParts.length >= 2) {
       const firstName = nameParts[0];
+      const firstNameLower = firstName.toLowerCase();
       const lastName = nameParts.slice(1).join(' ');
+      const lastNameLower = lastName.toLowerCase();
       
       // Try "First Last" format
       player = PLAYER_POOL.find(p => {
+        if (!p.name) return false;
         const poolNameParts = p.name.split(' ');
         if (poolNameParts.length >= 2) {
           const poolFirstName = poolNameParts[0];
           const poolLastName = poolNameParts.slice(1).join(' ');
-          return poolFirstName.toLowerCase() === firstName.toLowerCase() && 
-                 poolLastName.toLowerCase() === lastName.toLowerCase();
+          return poolFirstName.toLowerCase() === firstNameLower && 
+                 poolLastName.toLowerCase() === lastNameLower;
         }
         return false;
       });
       if (player) return player;
       
-      // Try "Last, First" format
+      // Try "Last, First" format (same logic as above)
       player = PLAYER_POOL.find(p => {
+        if (!p.name) return false;
         const poolNameParts = p.name.split(' ');
         if (poolNameParts.length >= 2) {
           const poolFirstName = poolNameParts[0];
           const poolLastName = poolNameParts.slice(1).join(' ');
-          return poolFirstName.toLowerCase() === firstName.toLowerCase() && 
-                 poolLastName.toLowerCase() === lastName.toLowerCase();
+          return poolFirstName.toLowerCase() === firstNameLower && 
+                 poolLastName.toLowerCase() === lastNameLower;
         }
         return false;
       });

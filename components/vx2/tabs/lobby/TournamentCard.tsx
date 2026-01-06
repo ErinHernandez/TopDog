@@ -53,14 +53,14 @@ const CARD_PX = {
 } as const;
 
 const CARD_COLORS = {
-  background: 'url(/tournament_card_bg.webp)',
+  background: 'url(/do_riding_football_III.webp)',
   backgroundFallback: '#0a0a1a',
   border: 'rgba(75, 85, 99, 0.5)',
   text: TEXT_COLORS.primary,
   textMuted: TEXT_COLORS.secondary,
   accent: '#1E3A5F',  // Matches tiled background base color
   accentHover: BRAND_COLORS.accent,
-  progressBg: 'rgba(55, 65, 81, 1)',
+  progressBg: 'rgba(55, 65, 81, 0.5)',
 } as const;
 
 // ============================================================================
@@ -234,7 +234,7 @@ export function TournamentCard({
           inset: 0,
           backgroundImage: `url(${BLUR_PLACEHOLDER})`,
           backgroundSize: 'cover',
-          backgroundPosition: 'center center',
+          backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
           borderRadius: `${sizes.borderRadius - 1}px`,
           zIndex: 0,
@@ -249,7 +249,7 @@ export function TournamentCard({
           inset: 0,
           backgroundImage: colors.background,
           backgroundSize: 'cover',
-          backgroundPosition: 'center center',
+          backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
           borderRadius: `${sizes.borderRadius - 1}px`,
           zIndex: 1,
@@ -265,7 +265,7 @@ export function TournamentCard({
         <h2 
           className="vx2-tournament-title text-center font-bold leading-tight"
           style={{ 
-            fontSize: '36px',
+            fontSize: '42px',
             fontFamily: "'Anton SC', sans-serif",
             textTransform: 'uppercase',
             letterSpacing: '2px',
@@ -282,7 +282,7 @@ export function TournamentCard({
       <div className="vx2-card-spacer" style={{ flex: 1 }} />
 
       {/* Bottom Section - Progress, Button, Stats */}
-      <div>
+      <div style={{ marginTop: `${SPACING.xl}px` }}>
         {/* Progress Bar */}
         {tournament.maxEntries && (
           <div className="vx2-progress-section" style={{ marginBottom: `${SPACING.lg}px` }}>
@@ -329,7 +329,6 @@ export function TournamentCard({
             display: 'grid', 
             gridTemplateColumns: '1fr 1fr 1fr', 
             gap: `${CARD_PX.statsGap}px`,
-            paddingBottom: '8px',
           }}
         >
           <StatItem value={tournament.entryFee} label="Entry" />

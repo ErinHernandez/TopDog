@@ -601,7 +601,7 @@ export default function RankingsModalVX({
     if (isOpen) {
       loadData();
     }
-  }, [isOpen]);
+  }, [isOpen, loadData]);
 
   // Reset tab when modal closes
   useEffect(() => {
@@ -708,8 +708,8 @@ export default function RankingsModalVX({
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase().trim();
       players = players.filter(p => 
-        p.name.toLowerCase().includes(query) ||
-        p.team.toLowerCase().includes(query)
+        (p.name?.toLowerCase() || '').includes(query) ||
+        (p.team?.toLowerCase() || '').includes(query)
       );
     }
 
@@ -747,9 +747,9 @@ export default function RankingsModalVX({
     if (!searchQuery.trim()) return rankedPlayers;
     const query = searchQuery.toLowerCase();
     return rankedPlayers.filter(player => 
-      player.name.toLowerCase().includes(query) ||
-      player.team.toLowerCase().includes(query) ||
-      player.position.toLowerCase().includes(query)
+      (player.name?.toLowerCase() || '').includes(query) ||
+      (player.team?.toLowerCase() || '').includes(query) ||
+      (player.position?.toLowerCase() || '').includes(query)
     );
   }, [rankedPlayers, searchQuery]);
 

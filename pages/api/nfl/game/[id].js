@@ -9,31 +9,44 @@
 
 import { fetchBoxScore } from '../../../../lib/sportsdataio';
 import { POSITIONS } from '../../../../components/draft/v3/constants/positions';
+import { 
+  withErrorHandling, 
+  validateMethod, 
+  requireEnvVar,
+  createSuccessResponse,
+  ErrorType,
+  createErrorResponse,
+} from '../../../../lib/apiErrorHandler';
 
 export default async function handler(req, res) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    // Validate HTTP method
+    validateMethod(req, ['GET'], logger);
 
-  const apiKey = process.env.SPORTSDATAIO_API_KEY;
-  if (!apiKey) {
-    return res.status(500).json({ error: 'API key not configured' });
-  }
+    // Check required environment variables
+    const apiKey = requireEnvVar('SPORTSDATAIO_API_KEY', logger);
 
-  try {
     const { id } = req.query;
     
     if (!id) {
-      return res.status(400).json({ error: 'Game ID required' });
+      const error = new Error('Game ID required');
+      error.name = 'ValidationError';
+      throw error;
     }
+    
+    logger.info('Fetching game box score', { gameId: id });
     
     const boxScore = await fetchBoxScore(apiKey, id);
     
     if (!boxScore || !boxScore.Score) {
-      return res.status(404).json({ 
-        ok: false, 
-        error: `Game with ID ${id} not found` 
-      });
+      logger.warn('Game not found', { gameId: id });
+      const errorResponse = createErrorResponse(
+        ErrorType.NOT_FOUND,
+        `Game with ID ${id} not found`,
+        { gameId: id },
+        res.getHeader('X-Request-ID')
+      );
+      return res.status(errorResponse.statusCode).json(errorResponse.body);
     }
     
     // Transform to cleaner format
@@ -105,13 +118,13 @@ export default async function handler(req, res) {
       scoringPlays: boxScore.ScoringPlays || [],
     };
     
-    return res.status(200).json({
-      ok: true,
-      data,
+    logger.debug('Game box score fetched', { 
+      gameId: id, 
+      playerStatsCount: data.playerStats.length 
     });
-  } catch (err) {
-    console.error('Game API error:', err);
-    return res.status(500).json({ error: err.message });
-  }
+    
+    const response = createSuccessResponse(data, 200, logger);
+    return res.status(response.statusCode).json(response.body);
+  });
 }
 

@@ -11,10 +11,6 @@ export default function Statistics() {
   const [activeTab, setActiveTab] = useState('overview');
   const userId = 'NEWUSERNAME'; // Replace with real user ID in production
 
-  useEffect(() => {
-    fetchUserStats();
-  }, []);
-
   const fetchUserStats = async () => {
     try {
       const stats = await getUserStats(userId);
@@ -30,6 +26,10 @@ export default function Statistics() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchUserStats();
+  }, []);
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {

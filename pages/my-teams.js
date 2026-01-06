@@ -296,8 +296,10 @@ export default function MyTeams() {
     if (!searchTerms || searchTerms.length === 0) return teams;
     
     return teams.filter(team => {
+      // Pre-compute lowercase arrays once per team instead of per term
       const teamPlayers = team.draftPicks.map(pick => pick.player.toLowerCase());
       const teamNflTeams = team.draftPicks.map(pick => pick.team.toLowerCase());
+      const teamNflTeamsUpper = team.draftPicks.map(pick => pick.team.toUpperCase());
       
       // Team must contain ALL searched terms (AND logic, not OR)
       return searchTerms.every(term => {
@@ -315,12 +317,10 @@ export default function MyTeams() {
         if (mappedTeams) {
           if (Array.isArray(mappedTeams)) {
             // For cities with multiple teams (LA, NY)
-            mappedTeamMatch = mappedTeams.some(teamAbbr => 
-              teamNflTeams.some(nflTeam => nflTeam.toUpperCase() === teamAbbr)
-            );
+            mappedTeamMatch = mappedTeams.some(teamAbbr => teamNflTeamsUpper.includes(teamAbbr));
           } else {
             // Single team mapping
-            mappedTeamMatch = teamNflTeams.some(nflTeam => nflTeam.toUpperCase() === mappedTeams);
+            mappedTeamMatch = teamNflTeamsUpper.includes(mappedTeams);
           }
         }
         

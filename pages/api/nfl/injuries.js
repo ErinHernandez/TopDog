@@ -10,40 +10,71 @@
  */
 
 import { getInjuries } from '../../../lib/sportsdataio';
+import { 
+  withErrorHandling, 
+  validateMethod, 
+  requireEnvVar,
+  createSuccessResponse,
+} from '../../../lib/apiErrorHandler';
 
 export default async function handler(req, res) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    // Validate HTTP method
+    validateMethod(req, ['GET'], logger);
 
-  const apiKey = process.env.SPORTSDATAIO_API_KEY;
-  if (!apiKey) {
-    return res.status(500).json({ error: 'API key not configured' });
-  }
+    // Check required environment variables
+    const apiKey = requireEnvVar('SPORTSDATAIO_API_KEY', logger);
 
-  try {
     const { team, position, status, refresh } = req.query;
     const forceRefresh = refresh === 'true';
     
+    logger.info('Fetching injuries', {
+      filters: {
+        team,
+        position,
+        status,
+        refresh: forceRefresh,
+      }
+    });
+    
     let injuries = await getInjuries(apiKey, forceRefresh);
+    logger.debug('Injuries fetched', { count: injuries.length });
     
     // Filter by team
     if (team) {
+      const beforeCount = injuries.length;
       injuries = injuries.filter(i => i.Team === team.toUpperCase());
+      logger.debug('Filtered by team', { 
+        team: team.toUpperCase(), 
+        before: beforeCount, 
+        after: injuries.length 
+      });
     }
     
     // Filter by position
     if (position) {
+      const beforeCount = injuries.length;
       const positions = position.toUpperCase().split(',');
       injuries = injuries.filter(i => positions.includes(i.Position));
+      logger.debug('Filtered by position', { 
+        positions, 
+        before: beforeCount, 
+        after: injuries.length 
+      });
     }
     
     // Filter by status
     if (status) {
+      const beforeCount = injuries.length;
       const statuses = status.split(',').map(s => s.toLowerCase());
       injuries = injuries.filter(i => 
         statuses.includes((i.Status || '').toLowerCase())
       );
+      logger.debug('Filtered by status', { 
+        statuses, 
+        before: beforeCount, 
+        after: injuries.length 
+      });
     }
     
     // Transform for cleaner output
@@ -59,14 +90,12 @@ export default async function handler(req, res) {
       playerId: i.PlayerID,
     }));
     
-    return res.status(200).json({
-      ok: true,
+    const response = createSuccessResponse({
       count: transformed.length,
       data: transformed,
-    });
-  } catch (err) {
-    console.error('Injuries API error:', err);
-    return res.status(500).json({ error: err.message });
-  }
+    }, 200, logger);
+    
+    return res.status(response.statusCode).json(response.body);
+  });
 }
 

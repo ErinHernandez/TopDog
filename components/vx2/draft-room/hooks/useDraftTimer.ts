@@ -18,6 +18,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import type { TimerUrgency } from '../types';
 import { formatTimer, getTimerUrgency, getTimerColor } from '../utils';
 import { DRAFT_DEFAULTS } from '../constants';
+import { DRAFT_TIMER } from '../../core/constants/timing';
 
 // ============================================================================
 // TYPES
@@ -81,6 +82,8 @@ export function useDraftTimer({
   const hasExpiredRef = useRef(false);
   // Track the expiration delay timeout
   const expireTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Store interval in ref for cleanup
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
   // Store onExpire in ref to avoid effect cleanup when callback changes
   const onExpireRef = useRef(onExpire);
   onExpireRef.current = onExpire;
@@ -88,14 +91,11 @@ export function useDraftTimer({
   const onTickRef = useRef(onTick);
   onTickRef.current = onTick;
   
-  useEffect(() => {
-  }, [onTick]);
   // Store isActive in ref to avoid effect cleanup when it changes
   const isActiveRef = useRef(isActive);
   isActiveRef.current = isActive;
   
   // Delay before auto-pick after timer hits 0 (in milliseconds)
-  const EXPIRE_DELAY_MS = 1200;
   
   // Derived state
   const isExpired = seconds <= 0;
@@ -106,9 +106,15 @@ export function useDraftTimer({
   
   // Timer countdown effect
   useEffect(() => {
-    if (!isRunning) return;
+    if (!isRunning) {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      return;
+    }
     
-    const interval = setInterval(() => {
+    const intervalId = setInterval(() => {
       setSeconds(prev => {
         const next = prev - 1;
         
@@ -119,7 +125,14 @@ export function useDraftTimer({
       });
     }, 1000);
     
-    return () => clearInterval(interval);
+    intervalRef.current = intervalId;
+    
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
   }, [isRunning]); // Removed onTick from deps - using ref instead
   
   // Handle expiration with delay (timer sits at 0 for 1.2s before auto-pick)
@@ -140,7 +153,7 @@ export function useDraftTimer({
           onExpireRef.current?.();
         }
         expireTimeoutRef.current = null;
-      }, EXPIRE_DELAY_MS);
+      }, DRAFT_TIMER.EXPIRE_DELAY_MS);
     }
     // NO cleanup here - we don't want dependency changes to cancel the timeout
     // Timeout is only cancelled by explicit reset() or unmount

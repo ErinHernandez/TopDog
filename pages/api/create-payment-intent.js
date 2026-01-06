@@ -1,22 +1,33 @@
 import Stripe from 'stripe';
+import { 
+  withErrorHandling, 
+  validateMethod, 
+  requireEnvVar,
+  createSuccessResponse,
+  createErrorResponse,
+  ErrorType,
+} from '../../lib/apiErrorHandler';
 
 const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method not allowed' });
-  }
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    validateMethod(req, ['POST'], logger);
+    requireEnvVar('STRIPE_SECRET_KEY', logger);
 
-  if (!stripe) {
-    return res.status(500).json({ message: 'Stripe not configured' });
-  }
+    if (!stripe) {
+      const error = createErrorResponse(ErrorType.INTERNAL, 'Stripe not configured', 500, logger);
+      return res.status(error.statusCode).json(error.body);
+    }
 
-  try {
     const { amount, userId } = req.body;
 
     if (!amount || amount < 500) { // Minimum $5.00
-      return res.status(400).json({ message: 'Invalid amount' });
+      const error = createErrorResponse(ErrorType.VALIDATION, 'Invalid amount (minimum $5.00)', 400, logger);
+      return res.status(error.statusCode).json(error.body);
     }
+
+    logger.info('Creating payment intent', { amount, userId: userId ? '***' : undefined });
 
     // Create a PaymentIntent with the order amount and currency
     const paymentIntent = await stripe.paymentIntents.create({
@@ -27,11 +38,10 @@ export default async function handler(req, res) {
       },
     });
 
-    res.status(200).json({
+    const response = createSuccessResponse({
       clientSecret: paymentIntent.client_secret,
-    });
-  } catch (error) {
-    console.error('Error creating payment intent:', error);
-    res.status(500).json({ message: 'Error creating payment intent' });
-  }
+    }, 200, logger);
+    
+    return res.status(response.statusCode).json(response.body);
+  });
 } 

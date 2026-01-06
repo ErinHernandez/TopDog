@@ -188,15 +188,15 @@ export const RADIUS = {
 export const TYPOGRAPHY = {
   // Font sizes
   fontSize: {
-    xs: 11,
-    sm: 13,
-    base: 14,
-    lg: 16,
-    xl: 18,
-    '2xl': 24,
-    '3xl': 30,
-    '4xl': 36,
-    '5xl': 48,
+    xs: 12,
+    sm: 14,
+    base: 16,
+    lg: 18,
+    xl: 20,
+    '2xl': 26,
+    '3xl': 32,
+    '4xl': 40,
+    '5xl': 52,
   },
   
   // Line heights

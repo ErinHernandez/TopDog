@@ -14,6 +14,9 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { TILED_BG_STYLE } from '../constants';
+import { createScopedLogger } from '../../../../lib/clientLogger';
+
+const logger = createScopedLogger('[DraftNavbar]');
 
 // ============================================================================
 // PULSE ANIMATION STYLE
@@ -70,7 +73,9 @@ const NAVBAR_PX = {
   iconStrokeWidth: 2,
 } as const;
 
-/** Grace period duration in ms - time after timer hits 0 when user can still pick */
+// Grace period re-exported from centralized timing constants
+export { DRAFT_TIMER } from '../../core/constants/timing';
+/** @deprecated Use DRAFT_TIMER.GRACE_PERIOD_MS from timing constants */
 export const GRACE_PERIOD_MS = 600;
 
 const NAVBAR_COLORS = {
@@ -153,17 +158,17 @@ function ExitDraftButton({ onLeaveCallback }: { onLeaveCallback?: () => void }):
     event.preventDefault();
     event.stopPropagation();
     
-    console.warn('[VX2 DEBUG] ExitDraftButton clicked', {hasCallback: !!onLeaveCallback});
+    logger.debug('Exit button clicked', { hasCallback: !!onLeaveCallback });
     
     // Call the callback to open confirmation modal (if provided)
     if (onLeaveCallback) {
       try {
         onLeaveCallback();
       } catch (error) {
-        console.error('[ExitDraftButton] Error in callback:', error);
+        logger.error('Error in exit callback', error as Error);
       }
     } else {
-      console.warn('[ExitDraftButton] No onLeave callback provided');
+      logger.warn('No onLeave callback provided');
     }
   }, [onLeaveCallback]);
   
@@ -357,7 +362,7 @@ export default function DraftNavbar({
       // Call onGracePeriodEnd after shake animation completes
       const timeout = setTimeout(() => {
         onGracePeriodEndRef.current?.();
-      }, GRACE_PERIOD_MS);
+      }, DRAFT_TIMER.GRACE_PERIOD_MS);
         return () => clearTimeout(timeout);
     }
     return undefined;

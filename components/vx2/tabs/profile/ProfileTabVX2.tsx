@@ -20,11 +20,13 @@
  */
 
 import React, { useCallback } from 'react';
+import { useRouter } from 'next/router';
 import { useUser } from '../../hooks/data';
 import { useModals } from '../../shell/AppShellVX2';
 import { BG_COLORS, TEXT_COLORS, NAVBAR_BLUE } from '../../core/constants/colors';
 import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
 import { TILED_BG_STYLE } from '../../draft-room/constants';
+import { createScopedLogger } from '../../../../lib/clientLogger';
 import { 
   Payment, 
   Rankings, 
@@ -37,6 +39,8 @@ import {
   Plus,
 } from '../../components/icons';
 import { Skeleton } from '../../components/shared';
+
+const logger = createScopedLogger('[ProfileTab]');
 
 // ============================================================================
 // CONSTANTS
@@ -320,6 +324,7 @@ export default function ProfileTabVX2({
   onOpenDepositHistory: onOpenDepositHistoryProp,
   onOpenWithdraw: onOpenWithdrawProp,
 }: ProfileTabVX2Props): React.ReactElement {
+  const router = useRouter();
   const { user, isLoading } = useUser();
   const modals = useModals();
   
@@ -338,10 +343,12 @@ export default function ProfileTabVX2({
         if (modals) modals.openWithdraw(); else onOpenWithdrawProp?.();
         break;
       case 'navigate':
-        console.log('Navigate to:', item.path);
+        if (item.path) {
+          router.push(item.path);
+        }
         break;
     }
-  }, [modals, onOpenRankingsProp, onOpenAutodraftLimitsProp, onOpenDepositHistoryProp, onOpenWithdrawProp]);
+  }, [router, modals, onOpenRankingsProp, onOpenAutodraftLimitsProp, onOpenDepositHistoryProp, onOpenWithdrawProp]);
   
   return (
     <div 
@@ -399,7 +406,10 @@ export default function ProfileTabVX2({
 
       {/* Deposit Button */}
       {!isLoading && (
-        <DepositButton onClick={() => console.log('Open deposit flow')} />
+        <DepositButton onClick={() => {
+          console.log('[ProfileTab] Deposit button clicked, modals:', modals);
+          modals?.openDeposit();
+        }} />
       )}
 
       {/* Menu Items */}

@@ -7,8 +7,14 @@
  * Currently a stub endpoint - can be extended to send to external analytics services.
  */
 
+import { 
+  withErrorHandling, 
+  validateMethod, 
+  createSuccessResponse,
+} from '../../lib/apiErrorHandler';
+
 export default async function handler(req, res) {
-  // Handle CORS preflight requests
+  // Handle CORS preflight requests (before withErrorHandling)
   if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -16,26 +22,20 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    validateMethod(req, ['POST'], logger);
 
-  try {
-    const { event, data, timestamp, userId, sessionId } = req.body;
+    const { event, userId, sessionId, timestamp } = req.body;
 
-    // Log analytics event (in production, you might send to external service)
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[Analytics]', { event, userId, sessionId, timestamp });
-    }
+    // Log analytics event (in dev mode with debug logger)
+    logger.debug('Analytics event received', { event, userId, sessionId, timestamp });
 
     // Return success response
-    return res.status(200).json({ 
-      ok: true,
+    const response = createSuccessResponse({ 
       message: 'Analytics event received' 
-    });
-  } catch (err) {
-    console.error('Analytics API error:', err);
-    return res.status(500).json({ error: err.message || 'Internal server error' });
-  }
+    }, 200, logger);
+    
+    return res.status(response.statusCode).json(response.body);
+  });
 }
 

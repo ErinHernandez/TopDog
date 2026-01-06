@@ -96,7 +96,7 @@ function parseClayProjections(dataString, teamName = 'UNKNOWN') {
             touchdowns: rushingTDs,
             longRush: rushingYards > 0 ? Math.round(15 + Math.random() * 20) : 0,
             yardsPerAttempt: rushingAttempts > 0 ? (rushingYards / rushingAttempts).toFixed(1) : "0.0",
-            yardsPerGame: (rushingYards / games).toFixed(1),
+            yardsPerGame: games > 0 ? (rushingYards / games).toFixed(1) : "0.0",
             firstDowns: Math.round(rushingYards / 10),
             fumbles: Math.round(Math.random() * 3)
           },
@@ -107,7 +107,7 @@ function parseClayProjections(dataString, teamName = 'UNKNOWN') {
             touchdowns: receivingTDs,
             longReception: receivingYards > 0 ? Math.round(25 + Math.random() * 40) : 0,
             yardsPerReception: receptions > 0 ? (receivingYards / receptions).toFixed(1) : "0.0",
-            yardsPerGame: (receivingYards / games).toFixed(1),
+            yardsPerGame: games > 0 ? (receivingYards / games).toFixed(1) : "0.0",
             catchPercentage: targets > 0 ? ((receptions / targets) * 100).toFixed(1) : "0.0",
             fumbles: Math.round(Math.random() * 2)
           } : undefined

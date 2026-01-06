@@ -14,10 +14,14 @@ export { ProgressBar } from './ProgressBar';
 export type { ProgressBarProps } from './ProgressBar';
 
 export { PlayerCard } from './PlayerCard';
-export type { PlayerCardProps, PlayerData as PlayerCardData, ActionType, Position } from './PlayerCard';
+export type { PlayerCardProps, ActionType } from './PlayerCard';
 
 export { PlayerCell } from './PlayerCell';
-export type { PlayerCellProps, PlayerData } from './PlayerCell';
+export type { PlayerCellProps } from './PlayerCell';
+
+// Export shared types and constants from central location
+export type { Position, PlayerData } from './types';
+export { POSITIONS } from './types';
 
 export { default as PlayerStatsCard } from '../PlayerStatsCard';
 export type { PlayerStatsCardProps } from '../PlayerStatsCard';

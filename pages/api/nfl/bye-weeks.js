@@ -9,21 +9,23 @@
  */
 
 import { getByeWeeks } from '../../../lib/sportsdataio';
+import { 
+  withErrorHandling, 
+  validateMethod, 
+  requireEnvVar,
+  createSuccessResponse,
+} from '../../../lib/apiErrorHandler';
 
 export default async function handler(req, res) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    validateMethod(req, ['GET'], logger);
+    const apiKey = requireEnvVar('SPORTSDATAIO_API_KEY', logger);
 
-  const apiKey = process.env.SPORTSDATAIO_API_KEY;
-  if (!apiKey) {
-    return res.status(500).json({ error: 'API key not configured' });
-  }
-
-  try {
     const { season, week, refresh } = req.query;
     const seasonYear = parseInt(season) || new Date().getFullYear();
     const forceRefresh = refresh === 'true';
+    
+    logger.info('Fetching bye weeks', { season: seasonYear, week, refresh: forceRefresh });
     
     let byes = await getByeWeeks(apiKey, seasonYear, forceRefresh);
     
@@ -45,16 +47,14 @@ export default async function handler(req, res) {
       byWeek[b.Week].push(b.Team);
     });
     
-    return res.status(200).json({
-      ok: true,
+    const response = createSuccessResponse({
       season: seasonYear,
       count: byes.length,
       byWeek,
       data: byes.map(b => ({ team: b.Team, week: b.Week })),
-    });
-  } catch (err) {
-    console.error('Bye Weeks API error:', err);
-    return res.status(500).json({ error: err.message });
-  }
+    }, 200, logger);
+    
+    return res.status(response.statusCode).json(response.body);
+  });
 }
 
