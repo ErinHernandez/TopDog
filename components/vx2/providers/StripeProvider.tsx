@@ -16,10 +16,10 @@
  * ```
  */
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
-import type { StripeElementsOptions, Appearance } from '@stripe/stripe-js';
+import type { StripeElementsOptions, Appearance, Stripe } from '@stripe/stripe-js';
 import { BG_COLORS, TEXT_COLORS, BORDER_COLORS, STATE_COLORS } from '../core/constants/colors';
 
 // ============================================================================
@@ -29,9 +29,23 @@ import { BG_COLORS, TEXT_COLORS, BORDER_COLORS, STATE_COLORS } from '../core/con
 const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 
 // Lazy load Stripe.js - only loaded once, then cached
-const stripePromise = stripePublishableKey 
-  ? loadStripe(stripePublishableKey)
-  : null;
+// Wrapped in a function to handle errors gracefully
+let stripePromise: Promise<Stripe | null> | null = null;
+let stripeLoadError: Error | null = null;
+
+if (stripePublishableKey) {
+  try {
+    stripePromise = loadStripe(stripePublishableKey).catch((error) => {
+      console.warn('[StripeProvider] Failed to load Stripe.js:', error.message);
+      stripeLoadError = error;
+      return null;
+    });
+  } catch (error) {
+    console.warn('[StripeProvider] Error initializing Stripe:', error);
+    stripeLoadError = error as Error;
+    stripePromise = null;
+  }
+}
 
 // ============================================================================
 // VX2 STRIPE APPEARANCE
@@ -184,6 +198,25 @@ export function StripeProvider({
   appearance,
   locale = 'en',
 }: StripeProviderProps): React.ReactElement | null {
+  const [stripeError, setStripeError] = useState<string | null>(null);
+  
+  // Check if Stripe loaded successfully
+  useEffect(() => {
+    if (!stripePromise) {
+      setStripeError('Stripe not configured');
+      return;
+    }
+    
+    stripePromise.then((stripe) => {
+      if (!stripe) {
+        setStripeError('Failed to load Stripe');
+      }
+    }).catch((error) => {
+      console.warn('[StripeProvider] Stripe load error:', error);
+      setStripeError(error.message || 'Failed to load Stripe');
+    });
+  }, []);
+  
   // Merge custom appearance with VX2 defaults
   const finalAppearance = useMemo(() => {
     if (!appearance) return VX2_STRIPE_APPEARANCE;
@@ -216,9 +249,11 @@ export function StripeProvider({
     return opts;
   }, [clientSecret, finalAppearance, locale]);
   
-  // Don't render if Stripe key is not configured
-  if (!stripePromise) {
-    console.warn('[StripeProvider] NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY not configured');
+  // Don't render if Stripe key is not configured or failed to load
+  if (!stripePromise || stripeError) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('[StripeProvider] Stripe not available:', stripeError || 'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY not configured');
+    }
     return <>{children}</>;
   }
   

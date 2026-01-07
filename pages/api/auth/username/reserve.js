@@ -36,21 +36,24 @@ import {
   getDoc,
   serverTimestamp 
 } from 'firebase/firestore';
-import { getAuth } from 'firebase-admin/auth';
-import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { initializeApp as initializeClientApp, getApps as getClientApps } from 'firebase/app';
+import { verifyAdminAccess } from '../../../../lib/adminAuth.js';
+
+// Use require for firebase-admin to ensure Turbopack compatibility
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const admin = require('firebase-admin');
 
 // ============================================================================
 // FIREBASE ADMIN INITIALIZATION
 // ============================================================================
 
 // Initialize Firebase Admin (for verifying tokens)
-if (getApps().length === 0) {
+if (admin.apps.length === 0) {
   try {
     const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT || '{}');
     if (serviceAccount.project_id) {
-      initializeApp({
-        credential: cert(serviceAccount),
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
       });
     }
   } catch (error) {
@@ -77,51 +80,19 @@ const db = getFirestore(clientApp);
 // CONSTANTS
 // ============================================================================
 
-const ADMIN_UIDS = new Set([
-  // Add admin UIDs here or fetch from environment
-  process.env.ADMIN_UID_1,
-  process.env.ADMIN_UID_2,
-].filter(Boolean));
-
 const MAX_RESERVATIONS_PER_ADMIN = 100;
 const DEFAULT_EXPIRY_DAYS = 90;
+
+// Create rate limiter (strict for admin operations)
+const reserveUsernameLimiter = createAuthRateLimiter('usernameChange');
 
 // ============================================================================
 // HELPERS
 // ============================================================================
 
 async function verifyAdminToken(authHeader) {
-  if (!authHeader?.startsWith('Bearer ')) {
-    return { isAdmin: false, error: 'Missing authorization header' };
-  }
-  
-  const token = authHeader.split('Bearer ')[1];
-  
-  try {
-    // For development without Firebase Admin
-    if (process.env.NODE_ENV === 'development' && token === 'dev-admin-token') {
-      return { isAdmin: true, uid: 'dev-admin', email: 'admin@dev.local' };
-    }
-    
-    // Verify with Firebase Admin
-    const adminAuth = getAuth();
-    const decodedToken = await adminAuth.verifyIdToken(token);
-    
-    // Check if user is admin
-    if (ADMIN_UIDS.has(decodedToken.uid) || decodedToken.admin === true) {
-      return { 
-        isAdmin: true, 
-        uid: decodedToken.uid, 
-        email: decodedToken.email 
-      };
-    }
-    
-    return { isAdmin: false, error: 'User is not an admin' };
-    
-  } catch (error) {
-    console.error('Token verification error:', error);
-    return { isAdmin: false, error: 'Invalid token' };
-  }
+  // Use centralized admin verification utility
+  return await verifyAdminAccess(authHeader);
 }
 
 function generateReservationId(username) {
@@ -132,7 +103,7 @@ function generateReservationId(username) {
 // HANDLER
 // ============================================================================
 
-export default async function handler(req, res) {
+const handler = async function(req, res) {
   // Only allow POST
   if (req.method !== 'POST') {
     return res.status(405).json({ 
@@ -141,15 +112,53 @@ export default async function handler(req, res) {
     });
   }
   
+  const clientIP = getClientIP(req);
+  
+  // Check rate limit
+  const rateLimitResult = await reserveUsernameLimiter.check(req);
+  
+  // Set rate limit headers
+  res.setHeader('X-RateLimit-Limit', reserveUsernameLimiter.config.maxRequests);
+  res.setHeader('X-RateLimit-Remaining', rateLimitResult.remaining);
+  res.setHeader('X-RateLimit-Reset', Math.floor(rateLimitResult.resetAt / 1000));
+  
+  if (!rateLimitResult.allowed) {
+    await logSecurityEvent(
+      SecurityEventType.RATE_LIMIT_EXCEEDED,
+      'medium',
+      { endpoint: '/api/auth/username/reserve' },
+      null,
+      clientIP
+    );
+    
+    return res.status(429).json({
+      success: false,
+      error: 'RATE_LIMIT_EXCEEDED',
+      message: 'Too many requests. Please try again later.',
+      retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000),
+    });
+  }
+  
   try {
     // Verify admin authentication
     const adminCheck = await verifyAdminToken(req.headers.authorization);
     
     if (!adminCheck.isAdmin) {
+      await logSecurityEvent(
+        SecurityEventType.AUTH_FAILURE,
+        'high',
+        { 
+          endpoint: '/api/auth/username/reserve',
+          reason: 'admin_access_denied'
+        },
+        null,
+        clientIP
+      );
+      
       return res.status(403).json({
         success: false,
         error: 'UNAUTHORIZED',
-        message: adminCheck.error || 'Admin access required',
+        message: 'Admin access required',
       });
     }
     
@@ -161,8 +170,16 @@ export default async function handler(req, res) {
       notes = ''
     } = req.body;
     
+    // Sanitize input
+    const sanitizedUsername = username ? sanitizeUsername(username) : null;
+    const sanitizedReservedFor = reservedFor ? sanitizeString(reservedFor, { maxLength: 100 }) : null;
+    const sanitizedNotes = notes ? sanitizeString(notes, { maxLength: 500 }) : null;
+    const sanitizedExpiresInDays = typeof expiresInDays === 'number' 
+      ? Math.max(1, Math.min(365, expiresInDays)) 
+      : DEFAULT_EXPIRY_DAYS;
+    
     // Validate request
-    if (!username || typeof username !== 'string') {
+    if (!sanitizedUsername) {
       return res.status(400).json({
         success: false,
         error: 'INVALID_REQUEST',
@@ -170,15 +187,15 @@ export default async function handler(req, res) {
       });
     }
     
-    if (!reservedFor || typeof reservedFor !== 'string') {
+    if (!sanitizedReservedFor) {
       return res.status(400).json({
         success: false,
         error: 'INVALID_REQUEST',
-        message: 'Reserved for (VIP name) is required',
+        message: 'Reserved for (VIP name) is required and must be valid',
       });
     }
     
-    const normalizedUsername = username.toLowerCase().trim();
+    const normalizedUsername = sanitizedUsername.toLowerCase().trim();
     
     // Check if username already exists or is reserved
     // Check existing users
@@ -220,21 +237,21 @@ export default async function handler(req, res) {
     
     // Create reservation
     const reservationId = generateReservationId(normalizedUsername);
-    const expiresAt = expiresInDays > 0 
-      ? new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000)
+    const expiresAt = sanitizedExpiresInDays > 0 
+      ? new Date(Date.now() + sanitizedExpiresInDays * 24 * 60 * 60 * 1000)
       : null;
     
     const reservation = {
       id: reservationId,
       username: normalizedUsername,
       usernameLower: normalizedUsername,
-      reservedFor: reservedFor.trim(),
+      reservedFor: sanitizedReservedFor,
       reservedBy: adminCheck.uid,
       reservedByEmail: adminCheck.email,
       reservedAt: serverTimestamp(),
       expiresAt: expiresAt,
       priority: ['normal', 'high', 'critical'].includes(priority) ? priority : 'normal',
-      notes: notes.trim(),
+      notes: sanitizedNotes || '',
       claimed: false,
       claimedAt: null,
       claimedBy: null,
@@ -247,19 +264,32 @@ export default async function handler(req, res) {
       action: 'VIP_RESERVATION_CREATED',
       reservationId,
       username: normalizedUsername,
-      reservedFor: reservedFor.trim(),
+      reservedFor: sanitizedReservedFor,
       performedBy: adminCheck.uid,
       performedByEmail: adminCheck.email,
       timestamp: serverTimestamp(),
     });
     
+    // Log security event
+    await logSecurityEvent(
+      SecurityEventType.ADMIN_ACTION,
+      'high',
+      { 
+        action: 'username_reserved',
+        username: normalizedUsername,
+        reservedFor: sanitizedReservedFor
+      },
+      adminCheck.uid,
+      clientIP
+    );
+    
     return res.status(201).json({
       success: true,
-      message: `Username "${normalizedUsername}" reserved for ${reservedFor}`,
+      message: 'Username reserved successfully',
       reservation: {
         id: reservationId,
         username: normalizedUsername,
-        reservedFor: reservedFor.trim(),
+        reservedFor: sanitizedReservedFor,
         expiresAt: expiresAt?.toISOString() || null,
         priority,
       },
@@ -268,11 +298,27 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error('Username reservation error:', error);
     
+    await logSecurityEvent(
+      SecurityEventType.SUSPICIOUS_ACTIVITY,
+      'medium',
+      { 
+        endpoint: '/api/auth/username/reserve',
+        error: error.message
+      },
+      null,
+      clientIP
+    );
+    
     return res.status(500).json({
       success: false,
       error: 'SERVER_ERROR',
       message: 'Error reserving username',
     });
   }
-}
+};
+
+// Export with CSRF protection and rate limiting
+export default withCSRFProtection(
+  withRateLimit(handler, reserveUsernameLimiter)
+);
 
