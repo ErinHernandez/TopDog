@@ -544,7 +544,6 @@ export function TabNavigationProvider({
 export function useTabNavigation(): TabNavigationContextValue {
   const context = React.useContext(TabNavigationContext);
   
-  
   if (!context) {
     throw new Error(
       'useTabNavigation must be used within a TabNavigationProvider. ' +

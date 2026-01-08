@@ -9,7 +9,7 @@
 
 import React from 'react';
 import { useTabNavigation } from '../core';
-import { HEADER, Z_INDEX, SAFE_AREA } from '../core/constants';
+import { HEADER, Z_INDEX } from '../core/constants';
 import { HEADER_COLORS, STATE_COLORS } from '../core/constants/colors';
 import { createScopedLogger } from '../../../lib/clientLogger';
 
@@ -138,8 +138,6 @@ export default function AppHeaderVX2({
     <header
       className="w-full flex-shrink-0"
       style={{
-        // Safe area handling for notched devices
-        paddingTop: SAFE_AREA.top,
         // Background
         ...getBackgroundStyle(),
         // Stacking context

@@ -4,42 +4,93 @@ import { useRouter } from 'next/router';
 import { getAuth } from 'firebase/auth';
 import { canAccessDevFeatures } from '../lib/devAuth';
 import DevAccessModal from '../components/DevAccessModal';
-import { useAuthContext } from '../components/vx2/auth/context/AuthContext';
+
+// Disable static generation - this page requires client-side auth
+export async function getServerSideProps() {
+  return {
+    props: {},
+  };
+}
+
+// Safe auth hook that handles SSR
+function useSafeAuth() {
+  const [authState, setAuthState] = useState({ user: null, isAuthenticated: false });
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    // Only use auth context on client side
+    if (typeof window !== 'undefined') {
+      try {
+        const { useAuthContext } = require('../components/vx2/auth/context/AuthContext');
+        // This won't work here, need to use auth directly
+        const auth = getAuth();
+        const unsubscribe = auth.onAuthStateChanged((user) => {
+          setAuthState({
+            user: user,
+            isAuthenticated: !!user
+          });
+        });
+        return () => unsubscribe();
+      } catch (e) {
+        // Auth context not available, use Firebase auth directly
+        const auth = getAuth();
+        const unsubscribe = auth.onAuthStateChanged((user) => {
+          setAuthState({
+            user: user,
+            isAuthenticated: !!user
+          });
+        });
+        return () => unsubscribe();
+      }
+    }
+  }, []);
+
+  return { ...authState, mounted };
+}
 
 export default function DevAccess() {
   const router = useRouter();
-  const { user, isAuthenticated } = useAuthContext();
+  const { user, isAuthenticated, mounted } = useSafeAuth();
   const [hasDevAccess, setHasDevAccess] = useState(false);
   const [showAccessModal, setShowAccessModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    checkDevAccess();
-  }, [user, isAuthenticated]);
+    if (mounted) {
+      checkDevAccess();
+    }
+  }, [user, isAuthenticated, mounted]);
 
   const checkDevAccess = async () => {
-    const accessToken = sessionStorage.getItem('devAccessToken');
-    
-    // Get Firebase auth token to check custom claims
-    let authToken = null;
-    if (isAuthenticated && user) {
-      try {
-        const auth = getAuth();
-        const tokenResult = await auth.currentUser?.getIdTokenResult(true);
-        if (tokenResult) {
-          authToken = tokenResult.claims;
+    setIsLoading(true);
+    try {
+      const accessToken = typeof window !== 'undefined' ? sessionStorage.getItem('devAccessToken') : null;
+      
+      // Get Firebase auth token to check custom claims
+      let authToken = null;
+      if (isAuthenticated && user) {
+        try {
+          const auth = getAuth();
+          const tokenResult = await auth.currentUser?.getIdTokenResult(true);
+          if (tokenResult) {
+            authToken = tokenResult.claims;
+          }
+        } catch (error) {
+          console.warn('[DevAccess] Failed to get auth token:', error);
         }
-      } catch (error) {
-        console.warn('[DevAccess] Failed to get auth token:', error);
       }
-    }
-    
-    // Use proper authentication context instead of hardcoded user ID
-    const userId = user?.uid || null;
-    
-    if (canAccessDevFeatures(userId, accessToken, authToken)) {
-      setHasDevAccess(true);
-    } else {
-      setShowAccessModal(true);
+      
+      // Use proper authentication context instead of hardcoded user ID
+      const userId = user?.uid || null;
+      
+      if (canAccessDevFeatures(userId, accessToken, authToken)) {
+        setHasDevAccess(true);
+      } else {
+        setShowAccessModal(true);
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -54,6 +105,21 @@ export default function DevAccess() {
     setHasDevAccess(false);
     router.push('/');
   };
+
+  // Show loading state during SSR or while checking auth
+  if (!mounted || isLoading) {
+    return (
+      <>
+        <Head>
+          <title>Development Access - TopDog.dog</title>
+          <meta name="description" content="Loading development access" />
+        </Head>
+        <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+          <div className="text-white text-xl">Loading...</div>
+        </div>
+      </>
+    );
+  }
 
   if (hasDevAccess) {
     return (
