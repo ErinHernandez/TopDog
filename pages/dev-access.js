@@ -11,6 +11,11 @@ export async function getServerSideProps() {
   };
 }
 
+// Explicit runtime configuration to prevent static generation
+export const config = {
+  runtime: 'nodejs',
+};
+
 // Lazy load Firebase auth to avoid build-time evaluation
 // This function is only called on the client side
 const getAuth = () => {
@@ -61,9 +66,30 @@ function useSafeAuth() {
   return { ...authState, mounted };
 }
 
+// Build-time detection helper
+const isBuildPhase = () => {
+  const phase = process.env.NEXT_PHASE;
+  return phase === 'phase-production-build' || phase === 'phase-export';
+};
+
 export default function DevAccess() {
   const router = useRouter();
   const { user, isAuthenticated, mounted } = useSafeAuth();
+  
+  // Prevent execution during build/prerender phase (after hooks are called)
+  if (typeof window === 'undefined' && isBuildPhase()) {
+    return (
+      <>
+        <Head>
+          <title>Development Access - TopDog.dog</title>
+          <meta name="description" content="Loading development access" />
+        </Head>
+        <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+          <div className="text-white text-xl">Loading...</div>
+        </div>
+      </>
+    );
+  }
   const [hasDevAccess, setHasDevAccess] = useState(false);
   const [showAccessModal, setShowAccessModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
