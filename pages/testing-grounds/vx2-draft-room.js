@@ -12,8 +12,9 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { DraftRoomVX2 } from '../../components/vx2/draft-room';
 import { useIsMobileDevice } from '../../hooks/useIsMobileDevice';
+import withDevAccess from '../../components/withDevAccess';
 
-export default function VX2DraftRoomPage() {
+function VX2DraftRoomPage() {
   const router = useRouter();
   const { isMobile, isLoaded } = useIsMobileDevice();
   const [draftKey, setDraftKey] = useState(0);
@@ -39,6 +40,7 @@ export default function VX2DraftRoomPage() {
     }
     
     // On mobile, check if user came from the app (has session flag)
+    if (typeof window === 'undefined') return;
     const cameFromApp = sessionStorage.getItem('topdog_joined_draft');
     if (!cameFromApp) {
       // Direct access on mobile - redirect to app demo (lobby)
@@ -47,7 +49,9 @@ export default function VX2DraftRoomPage() {
     }
     
     // Clear the flag so refreshing the page will redirect
-    sessionStorage.removeItem('topdog_joined_draft');
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('topdog_joined_draft');
+    }
     setIsAuthorized(true);
   }, [isMobile, isLoaded, router]);
   
@@ -58,11 +62,13 @@ export default function VX2DraftRoomPage() {
   const handleLeaveDraft = useCallback(() => {
     console.warn('[VX2 DEBUG] handleLeaveDraft called in page component');
     // Set flag so app knows to open live-drafts tab
-    try {
-      sessionStorage.setItem('topdog_came_from_draft', 'true');
-      console.warn('[VX2 DEBUG] Session flag set successfully');
-    } catch (e) {
-      console.error('[VX2DraftRoomPage] Failed to set session flag:', e);
+    if (typeof window !== 'undefined') {
+      try {
+        sessionStorage.setItem('topdog_came_from_draft', 'true');
+        console.warn('[VX2 DEBUG] Session flag set successfully');
+      } catch (e) {
+        console.error('[VX2DraftRoomPage] Failed to set session flag:', e);
+      }
     }
     // Navigate to app (will read flag and go to live-drafts)
     const targetPath = '/testing-grounds/vx2-mobile-app-demo';
@@ -71,8 +77,10 @@ export default function VX2DraftRoomPage() {
     // Use window.location.replace for more reliable navigation (doesn't add to history)
     // Use setTimeout to ensure it happens after any React state updates
     setTimeout(() => {
-      console.warn('[VX2 DEBUG] Executing navigation now');
-      window.location.replace(targetPath);
+      if (typeof window !== 'undefined') {
+        console.warn('[VX2 DEBUG] Executing navigation now');
+        window.location.replace(targetPath);
+      }
     }, 100);
   }, []);
   
@@ -355,3 +363,6 @@ export default function VX2DraftRoomPage() {
     </>
   );
 }
+
+// Protect with dev access - requires developer authentication
+export default withDevAccess(VX2DraftRoomPage);

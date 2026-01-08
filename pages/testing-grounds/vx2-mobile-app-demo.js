@@ -15,11 +15,12 @@ import { AppShellVX2 } from '../../components/vx2';
 import { AuthProvider } from '../../components/vx2/auth';
 import { useIsMobileDevice } from '../../hooks/useIsMobileDevice';
 import { DEVICE_PRESETS, ALL_DEVICES } from '../../components/vx2/core/constants';
+import withDevAccess from '../../components/withDevAccess';
 
 const DEVICE_STORAGE_KEY = 'vx2-demo-devices';
 const PANEL_MINIMIZED_KEY = 'vx2-demo-panel-minimized';
 
-export default function VX2MobileAppDemo() {
+function VX2MobileAppDemo() {
   const router = useRouter();
   const { isMobile, isLoaded } = useIsMobileDevice();
   
@@ -434,3 +435,5 @@ export default function VX2MobileAppDemo() {
   );
 }
 
+// Protect with dev access - requires developer authentication
+export default withDevAccess(VX2MobileAppDemo);

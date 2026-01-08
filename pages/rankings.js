@@ -77,7 +77,7 @@ export default function Rankings() {
     
     // Load saved data from customRankings system
     const savedCustomRankings = loadCustomRankings();
-    const savedPositionalLimits = localStorage.getItem('rankingsPositionalLimits');
+    const savedPositionalLimits = typeof window !== 'undefined' ? localStorage.getItem('rankingsPositionalLimits') : null;
     
     // Convert custom rankings array to limits format
     if (savedCustomRankings && savedCustomRankings.length > 0) {
@@ -417,7 +417,9 @@ export default function Rankings() {
     saveCustomRankings(customRankingsArray);
     
     // Save positional limits separately (still using localStorage)
-    localStorage.setItem('rankingsPositionalLimits', JSON.stringify(positionalLimits));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('rankingsPositionalLimits', JSON.stringify(positionalLimits));
+    }
     alert('Rankings and limits saved successfully!');
   };
 

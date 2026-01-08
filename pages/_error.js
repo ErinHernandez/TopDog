@@ -19,7 +19,11 @@ function Error({ statusCode, err }) {
           </pre>
         )}
         <button
-          onClick={() => window.location.reload()}
+          onClick={() => {
+            if (typeof window !== 'undefined') {
+              window.location.reload();
+            }
+          }}
           className="mt-6 bg-[#c4b5fd] text-gray-900 px-6 py-3 rounded-lg font-bold hover:bg-[#2DE2C5] transition-colors"
         >
           Refresh Page

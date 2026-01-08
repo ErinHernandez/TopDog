@@ -746,6 +746,7 @@ export default function MyTeams() {
               </button>
                 <button 
                   onClick={() => {
+                    if (typeof window === 'undefined') return;
                     const shareData = {
                       title: 'Draft Board - TopDog.dog',
                       text: `Check out this draft board from ${selectedTeam?.name || 'TopDog'}`,

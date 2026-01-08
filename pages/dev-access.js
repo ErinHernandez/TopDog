@@ -115,7 +115,9 @@ export default function DevAccess() {
   };
 
   const handleLogout = () => {
-    sessionStorage.removeItem('devAccessToken');
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('devAccessToken');
+    }
     setHasDevAccess(false);
     router.push('/');
   };

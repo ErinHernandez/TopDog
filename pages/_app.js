@@ -33,6 +33,7 @@ function MyApp({ Component, pageProps }) {
   
   // Detect mobile device for hiding dev nav
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     const checkMobile = () => {
       const userAgent = navigator.userAgent || navigator.vendor || window.opera;
       const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
@@ -72,10 +73,11 @@ function MyApp({ Component, pageProps }) {
 
     // Initialize user metrics and exposure preloader
     const initUserTracking = () => {
+      if (typeof window === 'undefined') return;
       try {
         // Record page visit
         const currentPage = window.location.pathname;
-        const referrer = document.referrer;
+        const referrer = typeof document !== 'undefined' ? document.referrer : '';
         userMetrics.recordPageVisit(currentPage, referrer);
 
         // Initialize exposure preloader

@@ -187,7 +187,11 @@ export default function LocationData2() {
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Data</h2>
           <p className="text-gray-600 mb-4">{error}</p>
           <button 
-            onClick={() => window.location.reload()} 
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                window.location.reload();
+              }
+            }} 
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           >
             Retry
@@ -350,7 +354,11 @@ export default function LocationData2() {
                 </button>
                 
                 <button 
-                  onClick={() => window.location.reload()}
+                  onClick={() => {
+                    if (typeof window !== 'undefined') {
+                      window.location.reload();
+                    }
+                  }}
                   className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   Reload Map
