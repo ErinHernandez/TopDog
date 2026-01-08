@@ -539,6 +539,11 @@ export default function WithdrawModalVX2({
     setIsCheckingConnect(true);
     try {
       const response = await fetch(`/api/stripe/connect/account?userId=${userId}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
       
       if (data.success && data.data) {
@@ -665,6 +670,10 @@ export default function WithdrawModalVX2({
           amountCents,
         }),
       });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       
       const data = await response.json();
       

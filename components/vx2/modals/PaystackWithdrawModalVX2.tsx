@@ -1121,6 +1121,11 @@ export function PaystackWithdrawModalVX2({
   const loadRecipients = async () => {
     try {
       const response = await fetch(`/api/paystack/transfer/recipient?userId=${userId}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
       if (data.ok && data.data?.recipients) {
         setRecipients(data.data.recipients);
@@ -1143,6 +1148,11 @@ export function PaystackWithdrawModalVX2({
         KE: 'kenya',
       };
       const response = await fetch(`/api/paystack/transfer/recipient?banks=${countryMap[userCountry]}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
       if (data.ok && data.data?.banks) {
         setBanks(data.data.banks);
@@ -1173,6 +1183,10 @@ export function PaystackWithdrawModalVX2({
           setAsDefault: recipients.length === 0,
         }),
       });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       
       const data = await response.json();
       
@@ -1225,6 +1239,10 @@ export function PaystackWithdrawModalVX2({
             reason: 'Withdrawal from TopDog',
           }),
         });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         
         const data = await response.json();
         

@@ -188,6 +188,10 @@ export function XenditDepositModalVX2({
           }),
         });
         
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const data = await response.json();
         
         if (!data.success) {
@@ -211,6 +215,10 @@ export function XenditDepositModalVX2({
             mobileNumber: requiresPhone ? userPhone : undefined,
           }),
         });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         
         const data = await response.json();
         

@@ -1065,6 +1065,10 @@ export function PaystackDepositModalVX2({
           }),
         });
         
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const data = await response.json();
         
         if (!data.ok) {
@@ -1092,6 +1096,10 @@ export function PaystackDepositModalVX2({
             paymentMethodTypes: ['card'],
           }),
         });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         
         const data = await response.json();
         
@@ -1142,6 +1150,10 @@ export function PaystackDepositModalVX2({
         }),
       });
       
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
       
       if (!data.ok) {
@@ -1185,6 +1197,10 @@ export function PaystackDepositModalVX2({
         }),
       });
       
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
       
       if (!data.ok) {
@@ -1217,6 +1233,11 @@ export function PaystackDepositModalVX2({
     
     try {
       const response = await fetch(`/api/paystack/verify?reference=${ref}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
       
       if (data.ok && data.data?.status === 'success') {
@@ -1248,6 +1269,11 @@ export function PaystackDepositModalVX2({
     
     try {
       const response = await fetch(`/api/paystack/verify?reference=${reference}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
       
       if (data.ok && data.data?.status === 'success') {

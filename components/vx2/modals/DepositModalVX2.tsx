@@ -693,6 +693,11 @@ function DepositModalContent({
   const loadSavedMethods = async () => {
     try {
       const response = await fetch(`/api/stripe/payment-methods?userId=${userId}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
       
       if (data.ok && data.data?.paymentMethods) {
@@ -1151,6 +1156,10 @@ export function DepositModalVX2(props: DepositModalVX2Props): React.ReactElement
             paymentMethodTypes: ['card', 'link'],
           }),
         });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         
         const data = await response.json();
         logger.debug('Payment intent response', { ok: data.ok, hasSecret: !!data.data?.clientSecret });
