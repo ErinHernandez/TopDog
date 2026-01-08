@@ -2,16 +2,56 @@
 import React, { useState, useEffect } from 'react';
 import PaymentSecurityDashboard from '../components/PaymentSecurityDashboard';
 import { paymentSystem } from '../lib/paymentSystemIntegration';
-import { useAuthContext } from '../components/vx2/auth/context/AuthContext';
-import { getAuth } from 'firebase/auth';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+
+// Disable static generation - this page requires client-side auth
+export async function getServerSideProps() {
+  return {
+    props: {},
+  };
+}
+
+// Safe auth hook that handles SSR
+function useSafeAuth() {
+  const [authState, setAuthState] = useState({ user: null, isAuthenticated: false });
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    // Only use auth on client side - use Firebase auth directly
+    // We don't use AuthContext here to avoid build-time issues
+    if (typeof window !== 'undefined') {
+      try {
+        const auth = getAuth();
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+          setAuthState({
+            user: user,
+            isAuthenticated: !!user
+          });
+        });
+        return () => unsubscribe();
+      } catch (e) {
+        // Firebase not initialized, set default state
+        setAuthState({
+          user: null,
+          isAuthenticated: false
+        });
+      }
+    }
+  }, []);
+
+  return { ...authState, mounted };
+}
 
 export default function PaymentSecurityDashboardPage() {
   const [systemStatus, setSystemStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { user, isAuthenticated } = useAuthContext();
+  const { user, isAuthenticated, mounted } = useSafeAuth();
 
   useEffect(() => {
+    if (!mounted) return;
+    
     const checkAdminAccess = async () => {
       // In development, allow access for testing (but still try to verify)
       if (process.env.NODE_ENV === 'development') {
@@ -99,9 +139,10 @@ export default function PaymentSecurityDashboardPage() {
     };
     
     checkAdminAccess();
-  }, [user, isAuthenticated]);
+  }, [user, isAuthenticated, mounted]);
 
-  if (loading) {
+  // Show loading state during SSR or while checking auth
+  if (!mounted || loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">

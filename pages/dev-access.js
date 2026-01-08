@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { getAuth } from 'firebase/auth';
 import { canAccessDevFeatures } from '../lib/devAuth';
 import DevAccessModal from '../components/DevAccessModal';
 
@@ -12,6 +11,20 @@ export async function getServerSideProps() {
   };
 }
 
+// Lazy load Firebase auth to avoid build-time evaluation
+// This function is only called on the client side
+const getAuth = () => {
+  if (typeof window === 'undefined') return null;
+  try {
+    // Dynamic require that webpack can't statically analyze
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const firebaseAuth = require('firebase/auth');
+    return firebaseAuth.getAuth();
+  } catch (e) {
+    return null;
+  }
+};
+
 // Safe auth hook that handles SSR
 function useSafeAuth() {
   const [authState, setAuthState] = useState({ user: null, isAuthenticated: false });
@@ -19,31 +32,30 @@ function useSafeAuth() {
 
   useEffect(() => {
     setMounted(true);
-    // Only use auth context on client side
+    // Only use auth on client side - use Firebase auth directly
+    // We don't use AuthContext here to avoid build-time issues
     if (typeof window !== 'undefined') {
       try {
-        const { useAuthContext } = require('../components/vx2/auth/context/AuthContext');
-        // This won't work here, need to use auth directly
         const auth = getAuth();
-        const unsubscribe = auth.onAuthStateChanged((user) => {
-          setAuthState({
-            user: user,
-            isAuthenticated: !!user
+        if (auth) {
+          const unsubscribe = auth.onAuthStateChanged((user) => {
+            setAuthState({
+              user: user,
+              isAuthenticated: !!user
+            });
           });
-        });
-        return () => unsubscribe();
+          return () => unsubscribe();
+        }
       } catch (e) {
-        // Auth context not available, use Firebase auth directly
-        const auth = getAuth();
-        const unsubscribe = auth.onAuthStateChanged((user) => {
-          setAuthState({
-            user: user,
-            isAuthenticated: !!user
-          });
-        });
-        return () => unsubscribe();
+        // Firebase not initialized, set default state
+        console.warn('[DevAccess] Firebase auth not available:', e);
       }
     }
+    // Set default state if auth is not available
+    setAuthState({
+      user: null,
+      isAuthenticated: false
+    });
   }, []);
 
   return { ...authState, mounted };
@@ -72,9 +84,11 @@ export default function DevAccess() {
       if (isAuthenticated && user) {
         try {
           const auth = getAuth();
-          const tokenResult = await auth.currentUser?.getIdTokenResult(true);
-          if (tokenResult) {
-            authToken = tokenResult.claims;
+          if (auth?.currentUser) {
+            const tokenResult = await auth.currentUser.getIdTokenResult(true);
+            if (tokenResult) {
+              authToken = tokenResult.claims;
+            }
           }
         } catch (error) {
           console.warn('[DevAccess] Failed to get auth token:', error);
