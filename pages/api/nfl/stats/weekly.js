@@ -15,6 +15,14 @@
  */
 
 import { getWeeklyFantasyStats, getCurrentWeek } from '../../../../lib/sportsdataio';
+import { RateLimiter } from '../../../../lib/rateLimiter';
+
+// Rate limiter (60 per minute)
+const rateLimiter = new RateLimiter({
+  maxRequests: 60,
+  windowMs: 60 * 1000,
+  endpoint: 'nfl_stats_weekly',
+});
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -27,6 +35,11 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Rate limiting
+    const rateLimitResult = await rateLimiter.check(req);
+    if (!rateLimitResult.allowed) {
+      return res.status(429).json({ error: 'Rate limit exceeded' });
+    }
     const { season, week, position, team, limit = '50', refresh } = req.query;
     const forceRefresh = refresh === 'true';
     

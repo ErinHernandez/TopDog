@@ -13,8 +13,9 @@ import React, { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import DraftRoomVX from '../../components/vx/mobile/draft/DraftRoomVX';
 import IPhoneStatusBar from '../../components/vx2/shell/iPhoneStatusBar';
+import withDevAccess from '../../components/withDevAccess';
 
-export default function VXMobileDemo() {
+function VXMobileDemo() {
   const [showWarning, setShowWarning] = useState(true);
   // Draft control state (lifted to page level for external controls)
   const [isDraftActive, setIsDraftActive] = useState(false);
@@ -259,3 +260,6 @@ export default function VXMobileDemo() {
     </div>
   );
 }
+
+// Protect with dev access - requires developer authentication
+export default withDevAccess(VXMobileDemo);

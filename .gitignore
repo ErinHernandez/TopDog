@@ -25,6 +25,8 @@ node_modules
 .env.development.local
 .env.test.local
 .env.production.local
+firebase-env-for-vercel.env
+*env-for-vercel.env
 
 # Logs
 npm-debug.log*

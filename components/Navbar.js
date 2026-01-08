@@ -39,10 +39,6 @@ export default function Navbar() {
     
     const hasAccess = canAccessDevFeatures(userId, accessToken, authToken);
     
-    if (process.env.NODE_ENV === 'development') {
-      console.log('🔧 Dev Access Check:', { userId, accessToken: !!accessToken, hasCustomClaim: !!authToken?.developer, hasAccess });
-    }
-    
     if (hasAccess) {
       setHasDevAccess(true);
     } else {
@@ -103,9 +99,6 @@ export default function Navbar() {
     : 'Deposit'
 
   const handleLogoClick = (e) => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('🔧 Logo Click:', { hasDevAccess, showDevDropdown });
-    }
     if (hasDevAccess) {
       e.preventDefault();
       setShowDevDropdown(!showDevDropdown);
@@ -441,9 +434,6 @@ export default function Navbar() {
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      if (process.env.NODE_ENV === 'development') {
-                        console.log('Profile dropdown clicked, current state:', showProfileDropdown);
-                      }
                       setShowProfileDropdown(!showProfileDropdown);
                     }}
                     className="hover:text-accent px-1 sm:px-2 md:px-3 py-2 rounded-md text-base font-medium flex items-center cursor-pointer"
@@ -477,8 +467,6 @@ export default function Navbar() {
                       backgroundColor: '#111827',
                       border: '1px solid #374151'
                     }}>
-                      {process.env.NODE_ENV === 'development' && console.log('Rendering profile dropdown, showProfileDropdown:', showProfileDropdown)}
-                      
                       {/* Main Profile Section */}
                       <div className="px-4 py-2 border-b border-gray-600 zoom-resistant" style={{ position: 'relative', overflow: 'visible', borderColor: 'rgba(255, 255, 255, 0.1)' }}>
                         <h4 className="text-xs font-semibold mb-2" style={{ 

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import SevenSegmentCountdown from '../../components/SevenSegmentCountdown';
+import withDevAccess from '../../components/withDevAccess';
 
-export default function PlayerCardTest() {
+function PlayerCardTest() {
   const [draftingTeam, setDraftingTeam] = useState('NEWUSERNAME');
   const [isOnClock, setIsOnClock] = useState(true); // For testing - set to true to see black font
   const [pickNumber, setPickNumber] = useState(1); // For testing - current pick number
@@ -1378,3 +1379,6 @@ export default function PlayerCardTest() {
     </div>
   );
 }
+
+// Protect with dev access - requires developer authentication
+export default withDevAccess(PlayerCardTest);

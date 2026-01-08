@@ -18,6 +18,7 @@ import { TournamentCard } from '../../components/vx2/tabs/lobby/TournamentCard';
 import MobilePhoneFrame from '../../components/vx2/shell/MobilePhoneFrame';
 import { DEVICE_PRESETS, BG_COLORS } from '../../components/vx2/core/constants';
 import DevNav from '../../components/dev/DevNav';
+import withDevAccess from '../../components/withDevAccess';
 
 // ============================================================================
 // VIEW MODES
@@ -281,7 +282,7 @@ function DeviceCardWrapper({ devicePreset, styleOverrides, tournament }) {
 // MAIN SANDBOX
 // ============================================================================
 
-export default function TournamentCardSandbox() {
+function TournamentCardSandbox() {
   // View mode state
   const [viewMode, setViewMode] = useState('cards');
   
@@ -851,3 +852,5 @@ const styleOverrides = {
   );
 }
 
+// Protect with dev access - requires developer authentication
+export default withDevAccess(TournamentCardSandbox);

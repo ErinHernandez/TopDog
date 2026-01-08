@@ -12,8 +12,9 @@ import {
   TOURNAMENT_THEMES,
   ACTIVE_TOURNAMENT 
 } from '../../components/draft/v3/constants/navbar';
+import withDevAccess from '../../components/withDevAccess';
 
-export default function NavbarThemingDemo() {
+function NavbarThemingDemo() {
   const availableThemes = TOURNAMENT_HELPERS.getAvailableThemes();
   const currentInfo = TOURNAMENT_HELPERS.getCurrentTournament();
 
@@ -173,3 +174,6 @@ export default function NavbarThemingDemo() {
     </div>
   );
 }
+
+// Protect with dev access - requires developer authentication
+export default withDevAccess(NavbarThemingDemo);

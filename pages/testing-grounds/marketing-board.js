@@ -13,6 +13,7 @@
 
 import React, { useState, useRef, useCallback } from 'react';
 import Head from 'next/head';
+import withDevAccess from '../../components/withDevAccess';
 import TournamentBoardMarketing, {
   HomepageHeroBoard,
   SocialMediaBoard,
@@ -124,7 +125,7 @@ function NumberInput({ label, value, onChange, min, max }) {
 // MAIN PAGE COMPONENT
 // ============================================================================
 
-export default function MarketingBoardPage() {
+function MarketingBoardPage() {
   const boardRef = useRef(null);
   const [activePreset, setActivePreset] = useState('homepage');
   const [animated, setAnimated] = useState(false);
@@ -407,3 +408,5 @@ export default function MarketingBoardPage() {
   );
 }
 
+// Protect with dev access - requires developer authentication
+export default withDevAccess(MarketingBoardPage);

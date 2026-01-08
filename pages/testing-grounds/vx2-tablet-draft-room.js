@@ -15,8 +15,9 @@ import { TabletDraftRoomVX2 } from '../../components/vx2/tablet';
 import { TabletFrame } from '../../components/vx2/tablet';
 import { useIsTablet } from '../../components/vx2/hooks/ui/useIsTablet';
 import { OrientationGuard } from '../../components/vx2/tablet';
+import withDevAccess from '../../components/withDevAccess';
 
-export default function VX2TabletDraftRoomPage() {
+function VX2TabletDraftRoomPage() {
   const router = useRouter();
   const { isTablet, isIPad, isLoaded } = useIsTablet();
   const [draftKey, setDraftKey] = useState(0);
@@ -217,3 +218,5 @@ export default function VX2TabletDraftRoomPage() {
   );
 }
 
+// Protect with dev access - requires developer authentication
+export default withDevAccess(VX2TabletDraftRoomPage);

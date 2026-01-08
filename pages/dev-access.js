@@ -69,7 +69,11 @@ function useSafeAuth() {
 // Build-time detection helper
 const isBuildPhase = () => {
   const phase = process.env.NEXT_PHASE;
-  return phase === 'phase-production-build' || phase === 'phase-export';
+  const isSSR = typeof window === 'undefined';
+  // Check for build phase or prerender (SSR in production)
+  return phase === 'phase-production-build' || 
+         phase === 'phase-export' ||
+         (isSSR && process.env.NODE_ENV === 'production');
 };
 
 export default function DevAccess() {

@@ -16,6 +16,7 @@ import {
 } from '../../components/vx2/auth';
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS } from '../../components/vx2/core/constants/colors';
 import MobilePhoneFrame from '../../components/vx2/shell/MobilePhoneFrame';
+import withDevAccess from '../../components/withDevAccess';
 
 // ============================================================================
 // AUTH STATUS COMPONENT
@@ -284,7 +285,7 @@ function AuthTestContent() {
 // WRAPPED EXPORT
 // ============================================================================
 
-export default function AuthTestPage() {
+function AuthTestPage() {
   return (
     <AuthProvider>
       <AuthTestContent />
@@ -292,3 +293,12 @@ export default function AuthTestPage() {
   );
 }
 
+// Disable static generation - this page requires client-side auth
+export async function getServerSideProps() {
+  return {
+    props: {},
+  };
+}
+
+// Protect with dev access - requires developer authentication
+export default withDevAccess(AuthTestPage);

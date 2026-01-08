@@ -14,6 +14,14 @@
  */
 
 import { getADP, getPlayerADP, getADPByPosition, transformADP } from '../../../../lib/sportsdataio';
+import { RateLimiter } from '../../../../lib/rateLimiter';
+
+// Rate limiter (60 per minute)
+const rateLimiter = new RateLimiter({
+  maxRequests: 60,
+  windowMs: 60 * 1000,
+  endpoint: 'nfl_fantasy_adp',
+});
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -26,6 +34,11 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Rate limiting
+    const rateLimitResult = await rateLimiter.check(req);
+    if (!rateLimitResult.allowed) {
+      return res.status(429).json({ error: 'Rate limit exceeded' });
+    }
     const { position, limit = '100', scoring = 'ppr', name, refresh } = req.query;
     const forceRefresh = refresh === 'true';
     

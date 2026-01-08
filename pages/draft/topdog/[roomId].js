@@ -182,6 +182,7 @@ export default function DraftRoom() {
   // Join room as a participant
   useEffect(() => {
     if (!roomId) return;
+    if (typeof window === 'undefined') return;
     // Get username from localStorage or generate a random one
     const storedName = localStorage.getItem('draftUserName');
     const name = storedName || getRandomName();
@@ -503,6 +504,7 @@ export default function DraftRoom() {
 
   // Load rankings from localStorage and set sorting
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     const stored = localStorage.getItem('draftRankings');
     console.log('Loading rankings from localStorage:', stored);
     if (stored) {
@@ -542,6 +544,7 @@ export default function DraftRoom() {
 
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     const stored = localStorage.getItem('draftQueue');
     if (stored) {
       try {
@@ -565,6 +568,7 @@ export default function DraftRoom() {
     
     // Clean up any corrupted data in localStorage
     const cleanupLocalStorage = () => {
+      if (typeof window === 'undefined') return;
       try {
         const stored = localStorage.getItem('draftQueue');
         if (stored) {
@@ -583,6 +587,7 @@ export default function DraftRoom() {
 
   // Load rankings from localStorage
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     const stored = localStorage.getItem('draftRankings');
     if (stored) {
       try {
@@ -606,6 +611,7 @@ export default function DraftRoom() {
 
   // Save queue to localStorage
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     // Only save if queue is a valid array of player objects
     if (Array.isArray(queue) && queue.every(player => 
       player && typeof player === 'object' && typeof player.name === 'string'
@@ -645,6 +651,7 @@ export default function DraftRoom() {
 
   const handleRankingsUpload = (e) => {
     e.preventDefault();
+    if (typeof window === 'undefined') return;
     const lines = (rankingsText || '')
       .split(/\n|,/)
       .map(l => l.trim())
@@ -664,6 +671,7 @@ export default function DraftRoom() {
     
     const reader = new FileReader();
     reader.onload = (event) => {
+      if (typeof window === 'undefined') return;
       const text = event.target.result;
       const lines = text
         .split(/\n|,/)
@@ -679,7 +687,9 @@ export default function DraftRoom() {
 
   const clearRankings = () => {
     setRankings([]);
-    localStorage.removeItem('draftRankings');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('draftRankings');
+    }
   };
 
   const getPlayerRanking = (playerName) => {

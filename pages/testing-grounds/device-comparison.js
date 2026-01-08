@@ -13,6 +13,7 @@
 import React, { useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import withDevAccess from '../../components/withDevAccess';
 import { TabNavigationProvider } from '../../components/vx2/core';
 import { TabBarVX2, TabContentVX2 } from '../../components/vx2/navigation';
 import MobilePhoneFrame from '../../components/vx2/shell/MobilePhoneFrame';
@@ -74,7 +75,7 @@ function DeviceFrame({ devicePreset, initialTab = 'lobby' }) {
 // MAIN PAGE
 // ============================================================================
 
-export default function DeviceComparisonPage() {
+function DeviceComparisonPage() {
   const [selectedTab, setSelectedTab] = useState('lobby');
   
   const tabs = [
@@ -234,3 +235,5 @@ export default function DeviceComparisonPage() {
   );
 }
 
+// Protect with dev access - requires developer authentication
+export default withDevAccess(DeviceComparisonPage);

@@ -101,8 +101,12 @@ export default async function handler(
       result = await handleDisbursementCallback(payload as DisbursementCallback);
       
     } else {
-      // Unknown event type
-      console.log('[Xendit Webhook] Unknown event type', { payload });
+      // Unknown event type - only log safe metadata, not full payload
+      console.log('[Xendit Webhook] Unknown event type', { 
+        payloadKeys: Object.keys(payload),
+        hasId: !!payload.id,
+        hasStatus: !!payload.status,
+      });
       result = { success: true, actions: ['unknown_event_type'] };
     }
     

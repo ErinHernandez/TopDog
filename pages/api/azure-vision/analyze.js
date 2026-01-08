@@ -7,6 +7,7 @@ import {
   getImageTags, 
   describeImage 
 } from '../../../lib/azureVision';
+import { RateLimiter } from '../../../lib/rateLimiter';
 
 export const config = {
   api: {
@@ -16,12 +17,27 @@ export const config = {
   },
 };
 
+// Rate limiter for vision API (10 per minute - these cost money)
+const rateLimiter = new RateLimiter({
+  maxRequests: 10,
+  windowMs: 60 * 1000,
+  endpoint: 'azure_vision',
+});
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
+    // Rate limiting
+    const rateLimitResult = await rateLimiter.check(req);
+    if (!rateLimitResult.allowed) {
+      return res.status(429).json({
+        error: 'Too many requests',
+        retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000),
+      });
+    }
     const { imageUrl, analysisType } = req.body;
 
     if (!imageUrl) {

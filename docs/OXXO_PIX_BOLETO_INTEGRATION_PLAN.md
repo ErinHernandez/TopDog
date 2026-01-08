@@ -1,7 +1,7 @@
 # OXXO, Pix, and Boleto Integration Plan
 ## Mexico & Brazil Payment Methods
 
-> **Philosophy**: Enterprise grade. Fanatical about UX. Take your time, quality over speed. Think longer before responding.
+> **Philosophy**: Enterprise grade. Fanatical about UX. Use a deterministic, precise approach. Be thorough, take your time, quality over speed.
 
 ---
 

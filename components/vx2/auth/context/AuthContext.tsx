@@ -261,6 +261,16 @@ export function AuthProvider({
   children,
   onAuthStateChange,
 }: AuthProviderProps): React.ReactElement {
+  // Build-time detection: return children without auth initialization
+  const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build' || 
+                       process.env.NEXT_PHASE === 'phase-export';
+  
+  if (isBuildPhase || typeof window === 'undefined') {
+    // During build or SSR, return children without auth context
+    // The useAuthContext hook will handle this case with safe defaults
+    return <>{children}</>;
+  }
+  
   const [state, dispatch] = useReducer(authReducer, initialState);
   
   // Store phone verification result
@@ -853,17 +863,106 @@ export function AuthProvider({
 }
 
 // ============================================================================
+// BUILD-TIME SAFE DEFAULTS
+// ============================================================================
+
+/**
+ * Create safe default context value for build/prerender phase
+ * Prevents build errors when AuthProvider is not available
+ */
+function createBuildTimeSafeDefaults(): AuthContextValue {
+  const safeState: AuthState = {
+    status: 'idle',
+    user: null,
+    profile: null,
+    isLoading: false,
+    isInitializing: false,
+    error: null,
+    profileCompleteness: 'minimal',
+  };
+
+  // Build-phase error
+  const buildError: AuthError = {
+    code: 'BUILD_PHASE',
+    message: 'Auth operations not available during build phase',
+    field: undefined,
+    originalError: new Error('Build phase'),
+  };
+
+  // No-op functions for build phase - return proper types
+  const noOpSignUp = async (): Promise<SignUpResult> => ({ 
+    success: false, 
+    error: buildError 
+  });
+  const noOpSignIn = async (): Promise<SignInResult> => ({ 
+    success: false, 
+    error: buildError 
+  });
+  const noOpPhoneVerify = async (): Promise<PhoneVerifyResult> => ({ 
+    success: false,
+    verificationId: '',
+    error: buildError 
+  });
+  const noOpAuth = async (): Promise<AuthResult> => ({ 
+    success: false, 
+    error: buildError 
+  });
+  const noOpVoid = async (): Promise<void> => {};
+
+  return {
+    state: safeState,
+    user: null,
+    profile: null,
+    isAuthenticated: false,
+    isLoading: false,
+    error: null,
+    signUpWithEmail: noOpSignUp,
+    signInWithEmail: noOpSignIn,
+    signInWithPhone: noOpPhoneVerify,
+    verifyPhoneCode: noOpSignIn,
+    signInAnonymously: noOpSignIn,
+    signOut: noOpAuth,
+    updateProfile: noOpAuth,
+    changeUsername: noOpAuth,
+    deleteAccount: noOpAuth,
+    sendVerificationEmail: noOpAuth,
+    sendPasswordResetEmail: noOpAuth,
+    linkEmailPassword: noOpAuth,
+    linkPhoneNumber: noOpPhoneVerify,
+    refreshProfile: noOpVoid,
+    clearError: () => {},
+  };
+}
+
+// ============================================================================
 // HOOK
 // ============================================================================
 
 /**
  * Hook to access auth context
- * @throws Error if used outside of AuthProvider
+ * @throws Error if used outside of AuthProvider (except during build phase)
  */
 export function useAuthContext(): AuthContextValue {
   const context = React.useContext(AuthContext);
   
+  // Build-time detection: return safe defaults during build/prerender
+  // Check multiple conditions to catch all build/prerender scenarios
+  const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build' || 
+                       process.env.NEXT_PHASE === 'phase-export';
+  const isSSR = typeof window === 'undefined';
+  const isPrerender = isSSR && (process.env.NODE_ENV === 'production' || process.env.NEXT_PHASE);
+  
+  // If no context is available, check if we're in a safe environment to return defaults
   if (!context) {
+    // During build/prerender/SSR, return safe defaults instead of throwing
+    // This prevents build errors when components are analyzed during static generation
+    // Be very defensive: if we're in SSR (no window) and no context, assume build/prerender
+    if (isBuildPhase || isPrerender || isSSR) {
+      return createBuildTimeSafeDefaults();
+    }
+    
+    // Only throw error in runtime client-side when context should be available
+    // This should only happen if someone uses useAuthContext outside AuthProvider in client-side code
     throw new Error(
       'useAuthContext must be used within an AuthProvider. ' +
       'Make sure your component is wrapped in <AuthProvider>.'

@@ -16,6 +16,14 @@
 
 import { getPlayerSeasonStats } from '../../../../lib/sportsdataio';
 import { transformPlayerStats, FANTASY_POSITIONS } from '../../../../lib/playerModel';
+import { RateLimiter } from '../../../../lib/rateLimiter';
+
+// Rate limiter for stats API (60 per minute)
+const rateLimiter = new RateLimiter({
+  maxRequests: 60,
+  windowMs: 60 * 1000,
+  endpoint: 'nfl_stats_season',
+});
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -28,6 +36,11 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Rate limiting
+    const rateLimitResult = await rateLimiter.check(req);
+    if (!rateLimitResult.allowed) {
+      return res.status(429).json({ error: 'Rate limit exceeded' });
+    }
     const { season, position, team, limit = '50', sort = 'ppr', refresh } = req.query;
     const seasonYear = parseInt(season) || new Date().getFullYear();
     const forceRefresh = refresh === 'true';

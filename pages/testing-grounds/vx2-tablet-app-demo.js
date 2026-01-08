@@ -10,8 +10,9 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { TabletShellVX2 } from '../../components/vx2/tablet';
 import { useIsTablet } from '../../components/vx2/hooks/ui/useIsTablet';
+import withDevAccess from '../../components/withDevAccess';
 
-export default function VX2TabletAppDemo() {
+function VX2TabletAppDemo() {
   const router = useRouter();
   const { isTablet, isIPad, isLoaded } = useIsTablet();
   
@@ -99,3 +100,5 @@ export default function VX2TabletAppDemo() {
   );
 }
 
+// Protect with dev access - requires developer authentication
+export default withDevAccess(VX2TabletAppDemo);

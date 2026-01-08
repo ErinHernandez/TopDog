@@ -435,5 +435,12 @@ function VX2MobileAppDemo() {
   );
 }
 
+// Disable static generation - this page requires client-side auth
+export async function getServerSideProps() {
+  return {
+    props: {},
+  };
+}
+
 // Protect with dev access - requires developer authentication
 export default withDevAccess(VX2MobileAppDemo);

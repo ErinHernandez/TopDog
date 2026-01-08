@@ -12,8 +12,9 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { DraftRoomAppleDemo } from '../../components/draft/v3/mobile/apple/DraftRoomApple';
+import withDevAccess from '../../components/withDevAccess';
 
-export default function MobileAppleDemo() {
+function MobileAppleDemo() {
   const [showWarning, setShowWarning] = useState(true);
   
   useEffect(() => {
@@ -89,3 +90,6 @@ export default function MobileAppleDemo() {
     </div>
   );
 }
+
+// Protect with dev access - requires developer authentication
+export default withDevAccess(MobileAppleDemo);

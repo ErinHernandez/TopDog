@@ -34,6 +34,7 @@ export default function DevTournaments() {
   }, []);
 
   const checkDevAccess = () => {
+    if (typeof window === 'undefined') return;
     const accessToken = sessionStorage.getItem('devAccessToken');
     const userId = 'Not Todd Middleton'; // Replace with real user ID in production
     

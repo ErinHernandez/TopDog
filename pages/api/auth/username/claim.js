@@ -33,6 +33,7 @@ import {
   runTransaction
 } from 'firebase/firestore';
 import { initializeApp, getApps } from 'firebase/app';
+import { RateLimiter } from '../../../../lib/rateLimiter';
 
 // ============================================================================
 // FIREBASE INITIALIZATION
@@ -50,6 +51,13 @@ const firebaseConfig = {
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 const db = getFirestore(app);
 
+// Rate limiter for VIP claim attempts (5 per hour - strict to prevent abuse)
+const rateLimiter = new RateLimiter({
+  maxRequests: 5,
+  windowMs: 60 * 60 * 1000, // 1 hour
+  endpoint: 'vip_claim',
+});
+
 // ============================================================================
 // HANDLER
 // ============================================================================
@@ -63,6 +71,22 @@ export default async function handler(req, res) {
   }
   
   try {
+    // Rate limiting
+    const rateLimitResult = await rateLimiter.check(req);
+    
+    res.setHeader('X-RateLimit-Limit', '5');
+    res.setHeader('X-RateLimit-Remaining', rateLimitResult.remaining);
+    res.setHeader('X-RateLimit-Reset', Math.floor(rateLimitResult.resetAt / 1000));
+    
+    if (!rateLimitResult.allowed) {
+      return res.status(429).json({
+        success: false,
+        error: 'RATE_LIMIT_EXCEEDED',
+        message: 'Too many claim attempts. Please try again later.',
+        retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000),
+      });
+    }
+    
     const { username, claimToken, userId } = req.body;
     
     // Validate request

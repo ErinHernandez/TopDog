@@ -1,6 +1,6 @@
 # Official Currency Icons/Logos Resources
 
-> Philosophy: Enterprise grade. Fanatical about UX. Take your time, quality over speed. Think longer before responding.
+> Philosophy: Enterprise grade. Fanatical about UX. Use a deterministic, precise approach. Be thorough, take your time, quality over speed.
 
 This document provides official sources and resources for currency icons, logos, and symbols for all 141 supported currencies in the TopDog platform.
 

@@ -1,4 +1,5 @@
 import { processPdfWithAzureVision, processMultiplePdfPages } from '../../../lib/pdfProcessor';
+import { RateLimiter } from '../../../lib/rateLimiter';
 
 export const config = {
   api: {
@@ -8,12 +9,27 @@ export const config = {
   },
 };
 
+// Rate limiter for PDF processing (5 per hour - very expensive operation)
+const rateLimiter = new RateLimiter({
+  maxRequests: 5,
+  windowMs: 60 * 60 * 1000,
+  endpoint: 'clay_pdf',
+});
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
+    // Rate limiting
+    const rateLimitResult = await rateLimiter.check(req);
+    if (!rateLimitResult.allowed) {
+      return res.status(429).json({
+        error: 'Too many PDF processing requests',
+        retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000),
+      });
+    }
     const { pageNumber, analysisType, processMultiple, startPage, endPage } = req.body;
 
     // Default to the Clay projections PDF

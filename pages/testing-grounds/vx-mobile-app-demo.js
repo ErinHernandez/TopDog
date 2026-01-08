@@ -12,8 +12,9 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { MobileAppVXDemo } from '../../components/vx/mobile/app';
+import withDevAccess from '../../components/withDevAccess';
 
-export default function VXMobileAppDemo() {
+function VXMobileAppDemo() {
   const [showWarning, setShowWarning] = useState(true);
   
   useEffect(() => {
@@ -140,3 +141,5 @@ export default function VXMobileAppDemo() {
   );
 }
 
+// Protect with dev access - requires developer authentication
+export default withDevAccess(VXMobileAppDemo);

@@ -17,6 +17,7 @@ import { SPACING, RADIUS, TYPOGRAPHY, Z_INDEX } from '../../components/vx2/core/
 import { Close, ChevronDown, Plus } from '../../components/vx2/components/icons';
 import Switch from '../../components/vx/shared/Switch';
 import { formatCents } from '../../components/vx2/utils/formatting';
+import withDevAccess from '../../components/withDevAccess';
 
 // ============================================================================
 // CONSTANTS
@@ -478,7 +479,7 @@ function JoinTournamentModalDesktop({
 // MAIN PAGE COMPONENT
 // ============================================================================
 
-export default function JoinTournamentModalDesktopPage() {
+function JoinTournamentModalDesktopPage() {
   const [userState, setUserState] = useState('logged-out'); // 'logged-out' | 'logged-in' | 'low-balance'
   const [isJoining, setIsJoining] = useState(false);
 
@@ -629,3 +630,5 @@ export default function JoinTournamentModalDesktopPage() {
   );
 }
 
+// Protect with dev access - requires developer authentication
+export default withDevAccess(JoinTournamentModalDesktopPage);
