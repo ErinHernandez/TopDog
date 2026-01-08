@@ -42,7 +42,6 @@ import type {
 import { USERNAME_CONSTRAINTS } from '../constants';
 import {
   validateUsername,
-  checkUsernameAvailability,
   getUsernameRequirements,
 } from '../../../../lib/usernameValidation';
 
@@ -115,8 +114,8 @@ export function useUsernameValidation(
     const validationResult: UsernameValidationResult = {
       isValid: result.isValid,
       errors: result.errors || [],
-      warnings: result.warnings || [],
-      suggestions: result.suggestions,
+      warnings: [], // validateUsername doesn't return warnings
+      suggestions: undefined, // validateUsername doesn't return suggestions
     };
     
     setValidation(validationResult);
@@ -125,7 +124,7 @@ export function useUsernameValidation(
     return validationResult;
   }, [countryCode, onValidationChange]);
 
-  // Check availability (debounced)
+  // Check availability (debounced) - uses API endpoint for suggestions and warnings
   const performAvailabilityCheck = useCallback(async (value: string): Promise<UsernameAvailabilityResult> => {
     if (!value || value.length < USERNAME_CONSTRAINTS.MIN_LENGTH) {
       const result: UsernameAvailabilityResult = {
@@ -139,13 +138,28 @@ export function useUsernameValidation(
     setIsCheckingAvailability(true);
     
     try {
-      const result = await checkUsernameAvailability(value);
+      // Call API endpoint to get suggestions and warnings
+      const response = await fetch('/api/auth/username/check', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: value,
+          countryCode: countryCode,
+        }),
+      });
+      
+      const apiResult = await response.json();
+      
       const availabilityResult: UsernameAvailabilityResult = {
-        isAvailable: result.isAvailable,
-        message: result.message,
-        isVIPReserved: result.isVIPReserved,
-        reservedFor: result.reservedFor,
-        similarUsernames: result.similarUsernames,
+        isAvailable: apiResult.isAvailable || false,
+        message: apiResult.message || 'Error checking availability',
+        isVIPReserved: apiResult.isVIPReserved,
+        reservedFor: apiResult.reservedFor,
+        similarUsernames: apiResult.similarUsernames,
+        suggestions: apiResult.suggestions,
+        warnings: apiResult.warnings,
       };
       
       setAvailability(availabilityResult);
@@ -154,6 +168,7 @@ export function useUsernameValidation(
       
       return availabilityResult;
     } catch (error) {
+      console.error('Error checking username availability:', error);
       const errorResult: UsernameAvailabilityResult = {
         isAvailable: false,
         message: 'Error checking availability',
@@ -163,7 +178,7 @@ export function useUsernameValidation(
     } finally {
       setIsCheckingAvailability(false);
     }
-  }, [onAvailabilityChange]);
+  }, [countryCode, onAvailabilityChange]);
 
   // Set username with debounced validation
   const setUsername = useCallback((value: string) => {

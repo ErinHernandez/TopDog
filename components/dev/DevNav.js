@@ -5,34 +5,181 @@
  * - Compare with links
  * - Back/Forward browser navigation
  * - Draggable position (persisted to localStorage)
+ * - Resizable panel (persisted to localStorage)
+ * - Reorderable links (drag to reorder, persisted to localStorage)
+ * - Dev login/logout controls (for testing auth states)
  */
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
+// ============================================================================
+// AUTH HOOK (safe to use outside AuthProvider)
+// ============================================================================
+
+/**
+ * Safe auth hook that works even outside AuthProvider
+ * Returns null values if AuthProvider is not present
+ */
+function useSafeAuth() {
+  const [authState, setAuthState] = useState({
+    user: null,
+    isAuthenticated: false,
+    isAnonymous: false,
+    isLoading: true,
+  });
+  
+  useEffect(() => {
+    // Dynamically import Firebase to avoid issues if not configured
+    let unsubscribe = () => {};
+    
+    async function setupAuthListener() {
+      try {
+        const { getAuth, onAuthStateChanged } = await import('firebase/auth');
+        const auth = getAuth();
+        
+        unsubscribe = onAuthStateChanged(auth, (user) => {
+          setAuthState({
+            user: user ? {
+              uid: user.uid,
+              email: user.email,
+              displayName: user.displayName,
+              isAnonymous: user.isAnonymous,
+            } : null,
+            isAuthenticated: !!user && !user.isAnonymous,
+            isAnonymous: user?.isAnonymous ?? false,
+            isLoading: false,
+          });
+        });
+      } catch (error) {
+        // Firebase not configured
+        setAuthState(prev => ({ ...prev, isLoading: false }));
+      }
+    }
+    
+    setupAuthListener();
+    return () => unsubscribe();
+  }, []);
+  
+  const signIn = useCallback(async (email, password) => {
+    try {
+      const { getAuth, signInWithEmailAndPassword } = await import('firebase/auth');
+      const auth = getAuth();
+      await signInWithEmailAndPassword(auth, email, password);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }, []);
+  
+  const signOut = useCallback(async () => {
+    try {
+      const { getAuth, signOut: firebaseSignOut } = await import('firebase/auth');
+      const auth = getAuth();
+      await firebaseSignOut(auth);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }, []);
+  
+  return { ...authState, signIn, signOut };
+}
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
 const STORAGE_KEY = 'devnav-position';
 const MINIMIZED_KEY = 'devnav-minimized';
+const SIZE_KEY = 'devnav-size';
+const LINK_ORDER_KEY = 'devnav-link-order';
+const DEV_AUTH_OVERRIDE_KEY = 'devnav-auth-override'; // 'logged-in' | 'logged-out' | null
+
+// Default links configuration
+const DEFAULT_LINKS = [
+  { id: 'mobile-demo', href: '/testing-grounds/mobile-apple-demo', label: 'Mobile Demo (Original)', bgColor: '#78350F', bgColorActive: '#4B3621', textColor: '#FCD34D' },
+  { id: 'vx-draft', href: '/testing-grounds/vx-mobile-demo', label: 'VX Draft Room (Original)', bgColor: '#111827', bgColorActive: '#374151', textColor: '#D1D5DB' },
+  { id: 'vx2-shell', href: '/testing-grounds/vx2-mobile-app-demo', label: 'VX2 App Shell', bgColor: '#111827', bgColorActive: '#374151', textColor: '#D1D5DB' },
+  { id: 'card-sandbox', href: '/testing-grounds/card-sandbox', label: 'Card Sandbox', bgColor: '#1E3A8A', bgColorActive: '#1E3A5F', textColor: '#93C5FD' },
+  { id: 'navbar-sandbox', href: '/testing-grounds/navbar-sandbox', label: 'Navbar Sandbox', bgColor: '#5B21B6', bgColorActive: '#4C1D95', textColor: '#C4B5FD' },
+  { id: 'vx2-draft', href: '/testing-grounds/vx2-draft-room', label: 'VX2 Draft Room', bgColor: '#14532D', bgColorActive: '#1F4D3A', textColor: '#86EFAC' },
+  { id: 'vx2-tablet', href: '/testing-grounds/vx2-tablet-draft-room', label: 'VX2 Tablet Draft', bgColor: '#9A3412', bgColorActive: '#7C2D12', textColor: '#FDBA74' },
+  { id: 'device-compare', href: '/testing-grounds/device-comparison', label: 'Device Comparison', bgColor: '#14B8A6', bgColorActive: '#0F766E', textColor: '#CCFBF1' },
+  { id: 'tournament-sandbox', href: '/testing-grounds/tournament-card-sandbox', label: 'Card Sandbox (Tournament)', bgColor: '#7C3AED', bgColorActive: '#6B21A6', textColor: '#E9D5FF' },
+  { id: 'join-modal-desktop', href: '/testing-grounds/join-tournament-modal-desktop', label: 'Join Modal (Desktop)', bgColor: '#0369A1', bgColorActive: '#075985', textColor: '#7DD3FC' },
+  { id: 'auth-test', href: '/testing-grounds/vx2-auth-test', label: 'Auth Components Test', bgColor: '#065F46', bgColorActive: '#064E3B', textColor: '#A7F3D0' },
+  { id: 'profile', href: '/profile', label: 'User Profile', bgColor: '#1E40AF', bgColorActive: '#1E3A8A', textColor: '#BFDBFE' },
+];
+
+const MIN_WIDTH = 180;
+const MIN_HEIGHT = 200;
+const MAX_WIDTH = 500;
+const MAX_HEIGHT = 800;
 
 export default function DevNav() {
   const router = useRouter();
   const containerRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
+  const [resizeDirection, setResizeDirection] = useState(null);
   const [position, setPosition] = useState({ x: null, y: null });
+  const [size, setSize] = useState({ width: 200, height: null });
   const [isMinimized, setIsMinimized] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [devAuthOverride, setDevAuthOverride] = useState(null); // 'logged-in' | 'logged-out' | null
+  const [linkOrder, setLinkOrder] = useState(DEFAULT_LINKS.map(l => l.id));
+  const [draggedLinkId, setDraggedLinkId] = useState(null);
+  const [dragOverLinkId, setDragOverLinkId] = useState(null);
   const dragOffset = useRef({ x: 0, y: 0 });
+  const resizeStart = useRef({ x: 0, y: 0, width: 0, height: 0 });
   
-  // Load saved position and minimized state on mount
+  // Safe auth hook (still used for display purposes)
+  const { isLoading } = useSafeAuth();
+  
+  // Handle dev auth override toggle
+  const handleDevAuthToggle = useCallback(() => {
+    setDevAuthOverride(prev => {
+      const newValue = prev === 'logged-in' ? 'logged-out' : 'logged-in';
+      try {
+        localStorage.setItem(DEV_AUTH_OVERRIDE_KEY, newValue);
+        // Dispatch event for AuthGateVX2 to listen to
+        window.dispatchEvent(new CustomEvent('devAuthOverrideChange', { detail: newValue }));
+      } catch (e) {
+        // Ignore localStorage errors
+      }
+      return newValue;
+    });
+  }, []);
+  
+  // Load saved state on mount
   useEffect(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        setPosition(parsed);
+      const savedPosition = localStorage.getItem(STORAGE_KEY);
+      if (savedPosition) {
+        setPosition(JSON.parse(savedPosition));
       }
-      const minimized = localStorage.getItem(MINIMIZED_KEY);
-      if (minimized) {
-        setIsMinimized(JSON.parse(minimized));
+      const savedMinimized = localStorage.getItem(MINIMIZED_KEY);
+      if (savedMinimized) {
+        setIsMinimized(JSON.parse(savedMinimized));
+      }
+      const savedSize = localStorage.getItem(SIZE_KEY);
+      if (savedSize) {
+        setSize(JSON.parse(savedSize));
+      }
+      const savedLinkOrder = localStorage.getItem(LINK_ORDER_KEY);
+      if (savedLinkOrder) {
+        const parsed = JSON.parse(savedLinkOrder);
+        // Merge with any new links that may have been added
+        const existingIds = new Set(parsed);
+        const newLinks = DEFAULT_LINKS.map(l => l.id).filter(id => !existingIds.has(id));
+        setLinkOrder([...parsed, ...newLinks]);
+      }
+      // Load dev auth override
+      const savedAuthOverride = localStorage.getItem(DEV_AUTH_OVERRIDE_KEY);
+      if (savedAuthOverride) {
+        setDevAuthOverride(savedAuthOverride);
       }
     } catch (e) {
       // Ignore localStorage errors
@@ -59,9 +206,33 @@ export default function DevNav() {
     }
   }, [isMinimized]);
   
+  // Save size when it changes
+  useEffect(() => {
+    if (size.width || size.height) {
+      try {
+        localStorage.setItem(SIZE_KEY, JSON.stringify(size));
+      } catch (e) {
+        // Ignore localStorage errors
+      }
+    }
+  }, [size]);
+  
+  // Save link order when it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem(LINK_ORDER_KEY, JSON.stringify(linkOrder));
+    } catch (e) {
+      // Ignore localStorage errors
+    }
+  }, [linkOrder]);
+  
   const toggleMinimized = useCallback(() => {
     setIsMinimized(prev => !prev);
   }, []);
+  
+  // ============================================================================
+  // DRAG HANDLING (for moving the panel)
+  // ============================================================================
   
   const handleMouseDown = useCallback((e) => {
     if (!containerRef.current) return;
@@ -76,28 +247,87 @@ export default function DevNav() {
   }, []);
   
   const handleMouseMove = useCallback((e) => {
-    if (!isDragging) return;
+    if (isDragging) {
+      const newX = e.clientX - dragOffset.current.x;
+      const newY = e.clientY - dragOffset.current.y;
+      
+      // Constrain to viewport
+      const maxX = window.innerWidth - (containerRef.current?.offsetWidth || 200);
+      const maxY = window.innerHeight - (containerRef.current?.offsetHeight || 200);
+      
+      setPosition({
+        x: Math.max(0, Math.min(newX, maxX)),
+        y: Math.max(0, Math.min(newY, maxY)),
+      });
+    }
     
-    const newX = e.clientX - dragOffset.current.x;
-    const newY = e.clientY - dragOffset.current.y;
-    
-    // Constrain to viewport
-    const maxX = window.innerWidth - (containerRef.current?.offsetWidth || 200);
-    const maxY = window.innerHeight - (containerRef.current?.offsetHeight || 200);
-    
-    setPosition({
-      x: Math.max(0, Math.min(newX, maxX)),
-      y: Math.max(0, Math.min(newY, maxY)),
-    });
-  }, [isDragging]);
+    if (isResizing && resizeDirection) {
+      const deltaX = e.clientX - resizeStart.current.x;
+      const deltaY = e.clientY - resizeStart.current.y;
+      
+      let newWidth = resizeStart.current.width;
+      let newHeight = resizeStart.current.height;
+      let newX = position.x;
+      let newY = position.y;
+      
+      if (resizeDirection.includes('e')) {
+        newWidth = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, resizeStart.current.width + deltaX));
+      }
+      if (resizeDirection.includes('w')) {
+        const widthChange = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, resizeStart.current.width - deltaX)) - resizeStart.current.width;
+        newWidth = resizeStart.current.width + widthChange;
+        if (position.x !== null) {
+          newX = resizeStart.current.posX - widthChange;
+        }
+      }
+      if (resizeDirection.includes('s')) {
+        newHeight = Math.max(MIN_HEIGHT, Math.min(MAX_HEIGHT, resizeStart.current.height + deltaY));
+      }
+      if (resizeDirection.includes('n')) {
+        const heightChange = Math.max(MIN_HEIGHT, Math.min(MAX_HEIGHT, resizeStart.current.height - deltaY)) - resizeStart.current.height;
+        newHeight = resizeStart.current.height + heightChange;
+        if (position.y !== null) {
+          newY = resizeStart.current.posY - heightChange;
+        }
+      }
+      
+      setSize({ width: newWidth, height: newHeight });
+      if (newX !== position.x || newY !== position.y) {
+        setPosition({ x: newX, y: newY });
+      }
+    }
+  }, [isDragging, isResizing, resizeDirection, position]);
   
   const handleMouseUp = useCallback(() => {
     setIsDragging(false);
+    setIsResizing(false);
+    setResizeDirection(null);
   }, []);
+  
+  // ============================================================================
+  // RESIZE HANDLING
+  // ============================================================================
+  
+  const handleResizeStart = useCallback((e, direction) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const rect = containerRef.current?.getBoundingClientRect();
+    resizeStart.current = {
+      x: e.clientX,
+      y: e.clientY,
+      width: rect?.width || 200,
+      height: rect?.height || 400,
+      posX: position.x,
+      posY: position.y,
+    };
+    setIsResizing(true);
+    setResizeDirection(direction);
+  }, [position]);
   
   // Add/remove global mouse listeners
   useEffect(() => {
-    if (isDragging) {
+    if (isDragging || isResizing) {
       window.addEventListener('mousemove', handleMouseMove);
       window.addEventListener('mouseup', handleMouseUp);
       return () => {
@@ -105,22 +335,98 @@ export default function DevNav() {
         window.removeEventListener('mouseup', handleMouseUp);
       };
     }
-  }, [isDragging, handleMouseMove, handleMouseUp]);
+  }, [isDragging, isResizing, handleMouseMove, handleMouseUp]);
   
   // Reset position to default (bottom-right)
   const handleReset = useCallback(() => {
     setPosition({ x: null, y: null });
+    setSize({ width: 200, height: null });
     try {
       localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(SIZE_KEY);
     } catch (e) {
       // Ignore
     }
+  }, []);
+  
+  // Reset link order to default
+  const handleResetOrder = useCallback(() => {
+    setLinkOrder(DEFAULT_LINKS.map(l => l.id));
+    try {
+      localStorage.removeItem(LINK_ORDER_KEY);
+    } catch (e) {
+      // Ignore
+    }
+  }, []);
+  
+  // ============================================================================
+  // LINK REORDERING (drag and drop)
+  // ============================================================================
+  
+  const handleLinkDragStart = useCallback((e, linkId) => {
+    setDraggedLinkId(linkId);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', linkId);
+  }, []);
+  
+  const handleLinkDragOver = useCallback((e, linkId) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setDragOverLinkId(linkId);
+  }, []);
+  
+  const handleLinkDragLeave = useCallback(() => {
+    setDragOverLinkId(null);
+  }, []);
+  
+  const handleLinkDrop = useCallback((e, targetLinkId) => {
+    e.preventDefault();
+    
+    if (!draggedLinkId || draggedLinkId === targetLinkId) {
+      setDraggedLinkId(null);
+      setDragOverLinkId(null);
+      return;
+    }
+    
+    setLinkOrder(prev => {
+      const newOrder = [...prev];
+      const draggedIndex = newOrder.indexOf(draggedLinkId);
+      const targetIndex = newOrder.indexOf(targetLinkId);
+      
+      if (draggedIndex === -1 || targetIndex === -1) return prev;
+      
+      // Remove dragged item and insert at target position
+      newOrder.splice(draggedIndex, 1);
+      newOrder.splice(targetIndex, 0, draggedLinkId);
+      
+      return newOrder;
+    });
+    
+    setDraggedLinkId(null);
+    setDragOverLinkId(null);
+  }, [draggedLinkId]);
+  
+  const handleLinkDragEnd = useCallback(() => {
+    setDraggedLinkId(null);
+    setDragOverLinkId(null);
   }, []);
 
   // Calculate style based on position
   const positionStyle = position.x !== null && position.y !== null
     ? { left: position.x, top: position.y }
     : { bottom: 20, right: 20 };
+
+  // Get ordered links
+  const orderedLinks = linkOrder
+    .map(id => DEFAULT_LINKS.find(l => l.id === id))
+    .filter(Boolean);
+
+  // Resize handle style
+  const resizeHandleStyle = {
+    position: 'absolute',
+    background: 'transparent',
+    zIndex: 10,
+  };
 
   return (
     <div 
@@ -135,10 +441,73 @@ export default function DevNav() {
         paddingBottom: isMinimized ? 8 : 16,
         boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
         zIndex: 9999,
-        minWidth: isMinimized ? 'auto' : 200,
-        userSelect: isDragging ? 'none' : 'auto',
+        width: isMinimized ? 'auto' : (size.width || 200),
+        minWidth: isMinimized ? 'auto' : MIN_WIDTH,
+        maxWidth: MAX_WIDTH,
+        height: isMinimized ? 'auto' : (size.height || 'auto'),
+        minHeight: isMinimized ? 'auto' : MIN_HEIGHT,
+        maxHeight: MAX_HEIGHT,
+        userSelect: (isDragging || isResizing) ? 'none' : 'auto',
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
+      {/* Resize handles - only show when not minimized */}
+      {!isMinimized && (
+        <>
+          {/* Corner handles */}
+          <div
+            onMouseDown={(e) => handleResizeStart(e, 'nw')}
+            style={{ ...resizeHandleStyle, top: 0, left: 0, width: 12, height: 12, cursor: 'nw-resize' }}
+          />
+          <div
+            onMouseDown={(e) => handleResizeStart(e, 'ne')}
+            style={{ ...resizeHandleStyle, top: 0, right: 0, width: 12, height: 12, cursor: 'ne-resize' }}
+          />
+          <div
+            onMouseDown={(e) => handleResizeStart(e, 'sw')}
+            style={{ ...resizeHandleStyle, bottom: 0, left: 0, width: 12, height: 12, cursor: 'sw-resize' }}
+          />
+          <div
+            onMouseDown={(e) => handleResizeStart(e, 'se')}
+            style={{ ...resizeHandleStyle, bottom: 0, right: 0, width: 12, height: 12, cursor: 'se-resize' }}
+          />
+          {/* Edge handles */}
+          <div
+            onMouseDown={(e) => handleResizeStart(e, 'n')}
+            style={{ ...resizeHandleStyle, top: 0, left: 12, right: 12, height: 6, cursor: 'n-resize' }}
+          />
+          <div
+            onMouseDown={(e) => handleResizeStart(e, 's')}
+            style={{ ...resizeHandleStyle, bottom: 0, left: 12, right: 12, height: 6, cursor: 's-resize' }}
+          />
+          <div
+            onMouseDown={(e) => handleResizeStart(e, 'w')}
+            style={{ ...resizeHandleStyle, left: 0, top: 12, bottom: 12, width: 6, cursor: 'w-resize' }}
+          />
+          <div
+            onMouseDown={(e) => handleResizeStart(e, 'e')}
+            style={{ ...resizeHandleStyle, right: 0, top: 12, bottom: 12, width: 6, cursor: 'e-resize' }}
+          />
+          {/* Visual resize indicator at bottom-right */}
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 4,
+              right: 4,
+              width: 8,
+              height: 8,
+              opacity: 0.4,
+              pointerEvents: 'none',
+            }}
+          >
+            <svg width="8" height="8" viewBox="0 0 8 8" fill="#6B7280">
+              <path d="M8 0v8H0L8 0z" />
+            </svg>
+          </div>
+        </>
+      )}
+      
       {/* Drag Handle */}
       <div
         onMouseDown={handleMouseDown}
@@ -149,6 +518,7 @@ export default function DevNav() {
           marginBottom: isMinimized ? 0 : 8,
           cursor: isDragging ? 'grabbing' : 'grab',
           padding: '4px 0',
+          flexShrink: 0,
         }}
       >
         <div style={{
@@ -175,6 +545,24 @@ export default function DevNav() {
         </div>
         {/* Header buttons */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          {/* Edit mode toggle */}
+          {!isMinimized && (
+            <button
+              onClick={() => setIsEditMode(prev => !prev)}
+              style={{
+                background: isEditMode ? '#3B82F6' : 'none',
+                border: 'none',
+                color: isEditMode ? '#FFFFFF' : '#6B7280',
+                fontSize: 10,
+                cursor: 'pointer',
+                padding: '2px 6px',
+                borderRadius: 4,
+              }}
+              title={isEditMode ? 'Done editing' : 'Reorder links'}
+            >
+              {isEditMode ? 'done' : 'edit'}
+            </button>
+          )}
           {/* Reset position button */}
           {position.x !== null && !isMinimized && (
             <button
@@ -210,151 +598,166 @@ export default function DevNav() {
           </button>
         </div>
       </div>
+      
       {/* Content - only show when not minimized */}
       {!isMinimized && (
         <>
+          {/* Edit mode instructions */}
+          {isEditMode && (
+            <div style={{
+              fontSize: 10,
+              color: '#9CA3AF',
+              marginBottom: 8,
+              padding: '6px 8px',
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              borderRadius: 6,
+              border: '1px dashed #3B82F6',
+            }}>
+              Drag links to reorder.
+              <button
+                onClick={handleResetOrder}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#60A5FA',
+                  fontSize: 10,
+                  cursor: 'pointer',
+                  marginLeft: 8,
+                  textDecoration: 'underline',
+                }}
+              >
+                Reset order
+              </button>
+            </div>
+          )}
+          
           {/* Compare with Links */}
           <div 
             style={{ 
               marginBottom: 12,
-              maxHeight: 120,
+              flex: 1,
               overflowY: 'auto',
+              minHeight: 0,
             }}
           >
-            <Link 
-              href="/testing-grounds/mobile-apple-demo"
+            {orderedLinks.map((link) => (
+              <div
+                key={link.id}
+                draggable={isEditMode}
+                onDragStart={(e) => handleLinkDragStart(e, link.id)}
+                onDragOver={(e) => handleLinkDragOver(e, link.id)}
+                onDragLeave={handleLinkDragLeave}
+                onDrop={(e) => handleLinkDrop(e, link.id)}
+                onDragEnd={handleLinkDragEnd}
+                style={{
+                  marginBottom: 4,
+                  opacity: draggedLinkId === link.id ? 0.5 : 1,
+                  transform: dragOverLinkId === link.id ? 'translateY(2px)' : 'none',
+                  transition: 'transform 0.1s ease',
+                }}
+              >
+                <Link 
+                  href={link.href}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '6px 10px',
+                    backgroundColor: router.pathname === link.href ? link.bgColorActive : link.bgColor,
+                    color: link.textColor,
+                    borderRadius: 6,
+                    fontSize: 12,
+                    textDecoration: 'none',
+                    cursor: isEditMode ? 'grab' : 'pointer',
+                    border: dragOverLinkId === link.id ? '2px dashed #3B82F6' : '2px solid transparent',
+                  }}
+                  onClick={(e) => isEditMode && e.preventDefault()}
+                >
+                  {isEditMode && (
+                    <svg 
+                      width="10" 
+                      height="10" 
+                      viewBox="0 0 10 10" 
+                      fill="currentColor"
+                      style={{ marginRight: 6, flexShrink: 0, opacity: 0.5 }}
+                    >
+                      <circle cx="2" cy="2" r="1" />
+                      <circle cx="8" cy="2" r="1" />
+                      <circle cx="2" cy="5" r="1" />
+                      <circle cx="8" cy="5" r="1" />
+                      <circle cx="2" cy="8" r="1" />
+                      <circle cx="8" cy="8" r="1" />
+                    </svg>
+                  )}
+                  {link.label}
+                </Link>
+              </div>
+            ))}
+          </div>
+          
+          {/* Dev Auth Controls */}
+          <div 
+            style={{ 
+              marginBottom: 12,
+              paddingTop: 8,
+              borderTop: '1px solid #374151',
+              flexShrink: 0,
+            }}
+          >
+            <div style={{ 
+              fontSize: 10, 
+              color: '#6B7280', 
+              marginBottom: 6,
+              fontWeight: 600,
+            }}>
+              AUTH (DEV)
+            </div>
+            
+            {/* Dev Auth Toggle */}
+            <button 
+              onClick={handleDevAuthToggle}
+              aria-label={devAuthOverride === 'logged-in' ? 'Toggle to logged out' : 'Toggle to logged in'}
               style={{
-                display: 'block',
-                padding: '6px 10px',
-                backgroundColor: router.pathname === '/testing-grounds/mobile-apple-demo' ? '#4B3621' : '#78350F',
-                color: '#FCD34D',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '8px 10px',
+                backgroundColor: 'rgba(0,0,0,0.2)',
                 borderRadius: 6,
-                fontSize: 12,
-                marginBottom: 4,
-                textDecoration: 'none',
+                cursor: 'pointer',
+                userSelect: 'none',
+                width: '100%',
+                border: 'none',
               }}
             >
-              Mobile Demo (Original)
-            </Link>
-            <Link 
-              href="/testing-grounds/vx-mobile-demo"
-              style={{
-                display: 'block',
-                padding: '6px 10px',
-                backgroundColor: router.pathname === '/testing-grounds/vx-mobile-demo' ? '#374151' : '#111827',
-                color: '#D1D5DB',
-                borderRadius: 6,
-                fontSize: 12,
-                marginBottom: 4,
-                textDecoration: 'none',
-              }}
-            >
-              VX Draft Room (Original)
-            </Link>
-            <Link 
-              href="/testing-grounds/vx2-mobile-app-demo"
-              style={{
-                display: 'block',
-                padding: '6px 10px',
-                backgroundColor: router.pathname === '/testing-grounds/vx2-mobile-app-demo' ? '#374151' : '#111827',
-                color: '#D1D5DB',
-                borderRadius: 6,
-                fontSize: 12,
-                marginBottom: 4,
-                textDecoration: 'none',
-              }}
-            >
-              VX2 App Shell
-            </Link>
-            <Link 
-              href="/testing-grounds/card-sandbox"
-              style={{
-                display: 'block',
-                padding: '6px 10px',
-                backgroundColor: router.pathname === '/testing-grounds/card-sandbox' ? '#1E3A5F' : '#1E3A8A',
-                color: '#93C5FD',
-                borderRadius: 6,
-                fontSize: 12,
-                marginBottom: 4,
-                textDecoration: 'none',
-              }}
-            >
-              Card Sandbox
-            </Link>
-            <Link 
-              href="/testing-grounds/navbar-sandbox"
-              style={{
-                display: 'block',
-                padding: '6px 10px',
-                backgroundColor: router.pathname === '/testing-grounds/navbar-sandbox' ? '#4C1D95' : '#5B21B6',
-                color: '#C4B5FD',
-                borderRadius: 6,
-                fontSize: 12,
-                marginBottom: 4,
-                textDecoration: 'none',
-              }}
-            >
-              Navbar Sandbox
-            </Link>
-            <Link 
-              href="/testing-grounds/vx2-draft-room"
-              style={{
-                display: 'block',
-                padding: '6px 10px',
-                backgroundColor: router.pathname === '/testing-grounds/vx2-draft-room' ? '#1F4D3A' : '#14532D',
-                color: '#86EFAC',
-                borderRadius: 6,
-                fontSize: 12,
-                marginBottom: 4,
-                textDecoration: 'none',
-              }}
-            >
-              VX2 Draft Room
-            </Link>
-            <Link 
-              href="/testing-grounds/vx2-tablet-draft-room"
-              style={{
-                display: 'block',
-                padding: '6px 10px',
-                backgroundColor: router.pathname === '/testing-grounds/vx2-tablet-draft-room' ? '#7C2D12' : '#9A3412',
-                color: '#FDBA74',
-                borderRadius: 6,
-                fontSize: 12,
-                marginBottom: 4,
-                textDecoration: 'none',
-              }}
-            >
-              VX2 Tablet Draft
-            </Link>
-            <Link 
-              href="/testing-grounds/device-comparison"
-              style={{
-                display: 'block',
-                padding: '6px 10px',
-                backgroundColor: router.pathname === '/testing-grounds/device-comparison' ? '#0F766E' : '#14B8A6',
-                color: '#CCFBF1',
-                borderRadius: 6,
-                fontSize: 12,
-                marginBottom: 4,
-                textDecoration: 'none',
-              }}
-            >
-              Device Comparison
-            </Link>
-            <Link 
-              href="/testing-grounds/tournament-card-sandbox"
-              style={{
-                display: 'block',
-                padding: '6px 10px',
-                backgroundColor: router.pathname === '/testing-grounds/tournament-card-sandbox' ? '#6B21A6' : '#7C3AED',
-                color: '#E9D5FF',
-                borderRadius: 6,
-                fontSize: 12,
-                textDecoration: 'none',
-              }}
-            >
-              Card Sandbox (Tournament)
-            </Link>
+              <span style={{ 
+                fontSize: 11, 
+                color: devAuthOverride === 'logged-in' ? '#10B981' : '#EF4444',
+                fontWeight: 500,
+              }}>
+                {isLoading ? 'Loading...' : devAuthOverride === 'logged-in' ? 'Logged In' : 'Logged Out'}
+              </span>
+              
+              {/* Toggle Switch */}
+              <div style={{
+                width: 36,
+                height: 20,
+                borderRadius: 10,
+                backgroundColor: devAuthOverride === 'logged-in' ? '#065F46' : '#374151',
+                position: 'relative',
+                transition: 'background-color 0.2s ease',
+              }}>
+                <div style={{
+                  width: 16,
+                  height: 16,
+                  borderRadius: '50%',
+                  backgroundColor: devAuthOverride === 'logged-in' ? '#10B981' : '#6B7280',
+                  position: 'absolute',
+                  top: 2,
+                  left: devAuthOverride === 'logged-in' ? 18 : 2,
+                  transition: 'left 0.2s ease, background-color 0.2s ease',
+                }} />
+              </div>
+            </button>
           </div>
           
           {/* Browser Navigation */}
@@ -366,6 +769,7 @@ export default function DevNav() {
               paddingTop: 4,
               paddingBottom: 0,
               borderTop: '1px solid #374151',
+              flexShrink: 0,
             }}
           >
             <button 
@@ -408,4 +812,3 @@ export default function DevNav() {
     </div>
   );
 }
-

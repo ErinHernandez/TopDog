@@ -22,6 +22,7 @@ import {
   ErrorState,
 } from '../../components/shared';
 import { SearchInput } from '../../components/shared/inputs';
+import { Rankings } from '../../components/icons';
 import type { Position } from '../../components/shared/display/types';
 import { POSITIONS } from '../../components/shared/display/types';
 
@@ -229,6 +230,8 @@ export default function ExposureTabVX2(_props: ExposureTabVX2Props): React.React
   const [selectedPositions, setSelectedPositions] = useState<PositionFilter[]>([]);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   
+  // Note: Auth check removed - AuthGateVX2 ensures only logged-in users can access tabs
+  
   // Auto-reset when all positions are selected
   useEffect(() => {
     // Use shared POSITIONS constant
@@ -302,11 +305,13 @@ export default function ExposureTabVX2(_props: ExposureTabVX2Props): React.React
           borderBottom: '1px solid rgba(255,255,255,0.1)',
         }}
       >
-        <SearchInput
-          value={searchQuery}
-          onChange={setSearchQuery}
-          placeholder="Search..."
-        />
+        <div style={{ paddingTop: '4px' }}>
+          <SearchInput
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search..."
+          />
+        </div>
         
         {!searchQuery && (
           <PositionFilters

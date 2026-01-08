@@ -1,19 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useUser } from '../lib/userContext';
 import { db } from '../lib/firebase';
 import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
 
 export default function DepositHistory() {
+  const router = useRouter();
+  const { user, loading: authLoading } = useUser();
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const userId = 'Not Todd Middleton'; // In production, this would come from authentication
+  
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/login');
+    }
+  }, [user, authLoading, router]);
+  
+  const userId = user?.uid;
 
   useEffect(() => {
-    fetchTransactionHistory();
-  }, []);
+    if (userId) {
+      fetchTransactionHistory();
+    } else if (!authLoading) {
+      setLoading(false);
+    }
+  }, [userId, authLoading]);
 
   const fetchTransactionHistory = async () => {
+    if (!userId) return;
+    
     try {
       // Fetch transaction history
       const transactionsQuery = query(

@@ -147,10 +147,11 @@ export function selectAutodraftPlayer(
   currentRoster: DraftPlayer[],
   queue: string[] = [],
   customRankings: string[] = [],
-  positionLimits: PositionLimits = DEFAULT_POSITION_LIMITS
+  positionLimits: PositionLimits = DEFAULT_POSITION_LIMITS,
+  excludedPlayerNames: string[] = []
 ): AutodraftResult | null {
   // Filter to only draftable players (within position limits)
-  const draftablePlayers = filterDraftablePlayers(
+  let draftablePlayers = filterDraftablePlayers(
     availablePlayers,
     currentRoster,
     positionLimits
@@ -160,27 +161,74 @@ export function selectAutodraftPlayer(
     return null;
   }
   
-  // Create lookup map for O(1) availability checks
+  // Create lookup maps for O(1) availability checks (by both id and name)
   const availableById = new Map(draftablePlayers.map(p => [p.id, p]));
+  const availableByName = new Map(draftablePlayers.map(p => [p.name, p]));
+  
+  // Check if we need positions for a valid lineup
+  const remainingSlots = getRemainingSlots(currentRoster, positionLimits);
+  const neededPositions = (['QB', 'RB', 'WR', 'TE'] as const).filter(
+    pos => remainingSlots[pos] > 0
+  );
+  
+  // Helper to check if player is excluded
+  const isExcluded = (player: DraftPlayer): boolean => {
+    return excludedPlayerNames.length > 0 && (
+      excludedPlayerNames.includes(player.id) || 
+      excludedPlayerNames.includes(player.name)
+    );
+  };
+  
+  // Helper to check if excluded player is necessary for valid lineup
+  const isNecessaryExcluded = (player: DraftPlayer): boolean => {
+    if (!isExcluded(player)) return false;
+    if (!neededPositions.includes(player.position)) return false;
+    
+    // Check if this is the only remaining player for this needed position
+    const playersForPosition = draftablePlayers.filter(p => p.position === player.position);
+    return playersForPosition.length === 1;
+  };
   
   // Priority 1: Check queue
-  for (const playerId of queue) {
-    const player = availableById.get(playerId);
-    if (player) {
-      return { player, source: 'queue' };
+  // Excluded players can be auto-drafted from queue if queue only contains excluded players
+  const queuePlayers = queue
+    .map(id => availableById.get(id) || availableByName.get(id))
+    .filter((p): p is DraftPlayer => !!p);
+  
+  if (queuePlayers.length > 0) {
+    // If queue has non-excluded players, use first non-excluded
+    const nonExcluded = queuePlayers.find(p => !isExcluded(p));
+    if (nonExcluded) {
+      return { player: nonExcluded, source: 'queue' };
     }
+    // If queue only has excluded players, use first one (allowed per docs)
+    return { player: queuePlayers[0], source: 'queue' };
   }
   
-  // Priority 2: Check custom rankings
+  // Priority 2: Check custom rankings (filter out excluded unless necessary)
   for (const playerId of customRankings) {
-    const player = availableById.get(playerId);
+    const player = availableById.get(playerId) || availableByName.get(playerId);
     if (player) {
-      return { player, source: 'custom_ranking' };
+      // Allow excluded if necessary for valid lineup
+      if (!isExcluded(player) || isNecessaryExcluded(player)) {
+        return { player, source: 'custom_ranking' };
+      }
     }
   }
   
-  // Priority 3: Best by ADP
-  const sortedByADP = [...draftablePlayers].sort((a, b) => {
+  // Priority 3: Best by ADP (filter out excluded unless necessary)
+  const nonExcludedPlayers = draftablePlayers.filter(p => !isExcluded(p) || isNecessaryExcluded(p));
+  
+  if (nonExcludedPlayers.length === 0) {
+    // If no non-excluded players available, check if we need to use excluded for valid lineup
+    // This shouldn't happen if isNecessaryExcluded logic is correct, but as fallback:
+    if (draftablePlayers.length > 0) {
+      return { player: draftablePlayers[0], source: 'adp' };
+    }
+    return null;
+  }
+  
+  const sortedByADP = [...nonExcludedPlayers].sort((a, b) => {
     // Handle missing ADP values
     const adpA = a.adp ?? 999;
     const adpB = b.adp ?? 999;

@@ -11,8 +11,10 @@
 
 /**
  * Authentication provider types
+ * Includes both our internal provider types and Firebase provider ID strings
+ * Note: No third-party OAuth (Google/Apple) per industry standard for DFS platforms
  */
-export type AuthProvider = 'email' | 'phone' | 'google' | 'apple' | 'anonymous';
+export type AuthProvider = 'email' | 'phone' | 'anonymous' | 'password';
 
 /**
  * User authentication status
@@ -186,21 +188,13 @@ export interface PhoneVerifyData {
 }
 
 /**
- * OAuth sign in data
- */
-export interface OAuthSignInData {
-  provider: 'google' | 'apple';
-  username?: string;
-  countryCode?: string;
-}
-
-/**
  * Profile update data
  */
 export interface ProfileUpdateData {
   firstName?: string;
   lastName?: string;
   displayName?: string;
+  countryCode?: string;
   preferences?: Partial<UserPreferences>;
 }
 
@@ -271,6 +265,8 @@ export interface UsernameAvailabilityResult {
   isVIPReserved?: boolean;
   reservedFor?: string;
   similarUsernames?: string[];
+  suggestions?: string[]; // Suggested alternative usernames when unavailable
+  warnings?: string[]; // Warnings about similar usernames or other issues
 }
 
 /**
@@ -347,7 +343,6 @@ export interface AuthContextValue {
   signInWithEmail: (data: EmailSignInData) => Promise<SignInResult>;
   signInWithPhone: (data: PhoneAuthData) => Promise<PhoneVerifyResult>;
   verifyPhoneCode: (data: PhoneVerifyData) => Promise<SignInResult>;
-  signInWithOAuth: (data: OAuthSignInData) => Promise<SignInResult>;
   signInAnonymously: () => Promise<SignInResult>;
   signOut: () => Promise<AuthResult>;
   
@@ -363,7 +358,6 @@ export interface AuthContextValue {
   // Account linking
   linkEmailPassword: (email: string, password: string) => Promise<AuthResult>;
   linkPhoneNumber: (phoneNumber: string) => Promise<PhoneVerifyResult>;
-  linkOAuth: (provider: 'google' | 'apple') => Promise<AuthResult>;
   
   // Utilities
   refreshProfile: () => Promise<void>;

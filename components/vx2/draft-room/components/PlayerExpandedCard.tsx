@@ -61,7 +61,7 @@ export interface PlayerExpandedCardProps {
 // ============================================================================
 
 // Teams with light backgrounds requiring dark text
-const LIGHT_BG_TEAMS = ['DET'];
+const LIGHT_BG_TEAMS = ['DET', 'LAC', 'KC', 'MIA', 'PHI', 'LAR'];
 
 const PX = {
   // Header

@@ -7,7 +7,8 @@
  * POST /api/stripe/setup-intent
  */
 
-import type { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiResponse } from 'next';
+import type { AuthenticatedRequest } from '../../../lib/apiTypes';
 import { 
   withErrorHandling, 
   validateMethod, 
@@ -21,6 +22,9 @@ import {
   getUserPaymentData,
   logPaymentEvent,
 } from '../../../lib/stripe';
+import { withAuth, verifyUserAccess } from '../../../lib/apiAuth';
+import { createPaymentRateLimiter, withRateLimit } from '../../../lib/rateLimitConfig';
+import { withCSRFProtection } from '../../../lib/csrfProtection';
 import { v4 as uuidv4 } from 'uuid';
 
 // ============================================================================
@@ -44,15 +48,46 @@ interface SetupIntentRequestBody {
 // HANDLER
 // ============================================================================
 
-export default async function handler(
-  req: NextApiRequest, 
+// Create rate limiter
+const setupIntentLimiter = createPaymentRateLimiter('paymentMethods');
+
+const handler = async function(
+  req: AuthenticatedRequest, 
   res: NextApiResponse
 ) {
   return withErrorHandling(req, res, async (req, res, logger) => {
     validateMethod(req, ['POST'], logger);
     
+    // Check rate limit
+    const rateLimitResult = await setupIntentLimiter.check(req);
+    
+    // Set rate limit headers
+    res.setHeader('X-RateLimit-Limit', setupIntentLimiter.config.maxRequests);
+    res.setHeader('X-RateLimit-Remaining', rateLimitResult.remaining);
+    res.setHeader('X-RateLimit-Reset', Math.floor(rateLimitResult.resetAt / 1000));
+    
+    if (!rateLimitResult.allowed) {
+      return res.status(429).json({
+        success: false,
+        error: 'RATE_LIMIT_EXCEEDED',
+        message: 'Too many requests. Please try again later.',
+        retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000),
+      });
+    }
+    
     const body = req.body as SetupIntentRequestBody;
     const { userId, email } = body;
+    
+    // Verify user access
+    if (req.user && !verifyUserAccess(req.user.uid, userId || '')) {
+      const error = createErrorResponse(
+        ErrorType.FORBIDDEN,
+        'Access denied',
+        403,
+        logger
+      );
+      return res.status(error.statusCode).json(error.body);
+    }
     
     if (!userId || !email) {
       const error = createErrorResponse(
@@ -118,5 +153,13 @@ export default async function handler(
       return res.status(errorResponse.statusCode).json(errorResponse.body);
     }
   });
-}
+};
+
+// Export with authentication, CSRF protection, and rate limiting
+export default withCSRFProtection(
+  withAuth(
+    withRateLimit(handler, setupIntentLimiter),
+    { required: true, allowAnonymous: false }
+  )
+);
 

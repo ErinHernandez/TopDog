@@ -30,7 +30,6 @@ import { createScopedLogger } from '../../../../lib/clientLogger';
 import { 
   Payment, 
   Rankings, 
-  Customize, 
   Autodraft, 
   UserIcon, 
   History, 
@@ -127,13 +126,6 @@ const REGULAR_MENU_ITEMS: MenuItem[] = [
     path: '/payment-methods',
   },
   {
-    id: 'customization',
-    label: 'Customization',
-    icon: <Customize size={PROFILE_PX.menuIconSize} />,
-    action: 'navigate',
-    path: '/customization',
-  },
-  {
     id: 'account',
     label: 'Account Information',
     icon: <UserIcon size={PROFILE_PX.menuIconSize} />,
@@ -204,23 +196,6 @@ function AvatarBox({ displayName }: AvatarBoxProps): React.ReactElement {
         }}
       >
         {displayName}
-      </div>
-
-      {/* Placeholder content */}
-      <div className="flex-1 flex items-center justify-center">
-        <div 
-          className="text-center leading-tight"
-          style={{
-            fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-            color: TEXT_COLORS.muted,
-          }}
-        >
-          Background
-          <br />
-          Customization
-          <br />
-          Coming Soon
-        </div>
       </div>
     </div>
   );
@@ -350,6 +325,8 @@ export default function ProfileTabVX2({
     }
   }, [router, modals, onOpenRankingsProp, onOpenAutodraftLimitsProp, onOpenDepositHistoryProp, onOpenWithdrawProp]);
   
+  // Note: Auth check removed - AuthGateVX2 ensures only logged-in users can access tabs
+  
   return (
     <div 
       className="flex-1 flex flex-col overflow-y-auto"
@@ -365,58 +342,44 @@ export default function ProfileTabVX2({
       role="main"
       aria-label="Profile settings"
     >
-      {/* Avatar Box */}
-      <div 
-        className="flex justify-center"
-        style={{ marginBottom: `${PROFILE_PX.boxMarginBottom}px` }}
-      >
-        {isLoading ? (
-          <AvatarBoxSkeleton />
-        ) : (
-          <AvatarBox displayName={user?.displayName || 'Guest'} />
-        )}
-      </div>
-
-      {/* Account Balance */}
-      {!isLoading && user && (
-        <div
-          className="flex flex-col items-center"
-          style={{ marginBottom: `${SPACING.md}px` }}
-        >
-          <div
-            style={{
-              fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-              color: TEXT_COLORS.muted,
-              marginBottom: `${SPACING.xs}px`,
-            }}
-          >
-            Account Balance
-          </div>
-          <div
-            className="font-bold"
-            style={{
-              fontSize: `${TYPOGRAPHY.fontSize['2xl']}px`,
-              color: TEXT_COLORS.primary,
-            }}
-          >
-            {user.balanceFormatted || '$0.00'}
-          </div>
-        </div>
-      )}
-
-      {/* Deposit Button */}
+      {/* Loading State */}
+      {isLoading && <MenuSkeleton />}
+      
+      {/* Authenticated Content */}
       {!isLoading && (
-        <DepositButton onClick={() => {
-          console.log('[ProfileTab] Deposit button clicked, modals:', modals);
-          modals?.openDeposit();
-        }} />
-      )}
-
-      {/* Menu Items */}
-      {isLoading ? (
-        <MenuSkeleton />
-      ) : (
         <>
+          {/* Account Balance */}
+          {user && (
+            <div
+              className="flex flex-col items-center"
+              style={{ marginBottom: `${SPACING.md}px` }}
+            >
+              <div
+                style={{
+                  fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
+                  color: TEXT_COLORS.muted,
+                  marginBottom: `${SPACING.xs}px`,
+                }}
+              >
+                Account Balance
+              </div>
+              <div
+                className="font-bold"
+                style={{
+                  fontSize: `${TYPOGRAPHY.fontSize['2xl']}px`,
+                  color: TEXT_COLORS.primary,
+                }}
+              >
+                {user.balanceFormatted || '$0.00'}
+              </div>
+            </div>
+          )}
+
+          {/* Deposit Button */}
+          <DepositButton onClick={() => {
+            modals?.openDeposit();
+          }} />
+
           {/* Regular Menu Items */}
           <nav
             style={{

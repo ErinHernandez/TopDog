@@ -2,6 +2,7 @@
  * AppShellVX2 - Main App Shell/Orchestrator
  * 
  * The root component for the VX2 mobile app that orchestrates:
+ * - Authentication gate (mandatory login before app access)
  * - Tab navigation via context
  * - Header rendering
  * - Content area
@@ -9,9 +10,14 @@
  * - Modal layer
  * 
  * This replaces MobileAppVX with a cleaner, context-driven architecture.
+ * 
+ * AUTHENTICATION:
+ * The app is wrapped with AuthGateVX2, which completely blocks access
+ * to the app content until the user is authenticated. This is NOT a
+ * dismissable modal - users MUST sign in or sign up to access the app.
  */
 
-import React, { useCallback, useState, createContext, useContext, useEffect } from 'react';
+import React, { useCallback, useState, createContext, useContext } from 'react';
 import { TabNavigationProvider, HeaderProvider } from '../core';
 import type { TabId } from '../core/types';
 import type { DevicePresetId } from '../core/constants/sizes';
@@ -27,7 +33,7 @@ import {
   WithdrawModalVX2, 
   RankingsModalVX2 
 } from '../modals';
-import { useAuth } from '../auth';
+import { useAuth, AuthGateVX2 } from '../auth';
 
 // ============================================================================
 // MODAL CONTEXT
@@ -65,7 +71,7 @@ export interface AppShellVX2Props {
 }
 
 // ============================================================================
-// INNER SHELL (uses context)
+// INNER SHELL (uses context) - Only rendered when authenticated
 // ============================================================================
 
 interface InnerShellProps {
@@ -115,7 +121,7 @@ function InnerShell({ badgeOverrides, deviceClass = 'standard' }: InnerShellProp
         {/* Tab Bar */}
         <TabBarVX2 badgeOverrides={badgeOverrides} />
         
-        {/* Modals */}
+        {/* Modals - Only show for authenticated users */}
         <AutodraftLimitsModalVX2 
           isOpen={showAutodraftLimits} 
           onClose={() => setShowAutodraftLimits(false)} 
@@ -134,10 +140,14 @@ function InnerShell({ badgeOverrides, deviceClass = 'standard' }: InnerShellProp
           isOpen={showDepositHistory} 
           onClose={() => setShowDepositHistory(false)} 
         />
-        <WithdrawModalVX2 
-          isOpen={showWithdraw} 
-          onClose={() => setShowWithdraw(false)} 
-        />
+        {authState.user && (
+          <WithdrawModalVX2 
+            isOpen={showWithdraw} 
+            onClose={() => setShowWithdraw(false)}
+            userId={authState.user.uid}
+            userEmail={authState.user.email || ''}
+          />
+        )}
         <RankingsModalVX2 
           isOpen={showRankings} 
           onClose={() => setShowRankings(false)} 
@@ -169,10 +179,11 @@ export default function AppShellVX2({
         onTabChange={onTabChange}
       >
         <HeaderProvider>
-          <MobilePhoneFrame
-            devicePreset={devicePreset}
-          >
-            <InnerShell badgeOverrides={badgeOverrides} deviceClass={deviceClass} />
+          <MobilePhoneFrame devicePreset={devicePreset}>
+            {/* AuthGateVX2 gates all app content - must authenticate to access */}
+            <AuthGateVX2>
+              <InnerShell badgeOverrides={badgeOverrides} deviceClass={deviceClass} />
+            </AuthGateVX2>
           </MobilePhoneFrame>
         </HeaderProvider>
       </TabNavigationProvider>
@@ -186,9 +197,11 @@ export default function AppShellVX2({
       onTabChange={onTabChange}
     >
       <HeaderProvider>
-        <InnerShell badgeOverrides={badgeOverrides} deviceClass="standard" />
+        {/* AuthGateVX2 gates all app content - must authenticate to access */}
+        <AuthGateVX2>
+          <InnerShell badgeOverrides={badgeOverrides} deviceClass="standard" />
+        </AuthGateVX2>
       </HeaderProvider>
     </TabNavigationProvider>
   );
 }
-

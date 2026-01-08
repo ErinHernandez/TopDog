@@ -52,7 +52,7 @@ function getStripe(): Stripe {
   
   if (!stripeInstance) {
     stripeInstance = new Stripe(STRIPE_SECRET_KEY, {
-      apiVersion: '2024-12-18.acacia',
+      apiVersion: '2025-07-30.basil',
       typescript: true,
     });
   }
@@ -770,9 +770,6 @@ export async function updateUserBalance(
   amountCents: number,
   operation: 'add' | 'subtract'
 ): Promise<number> {
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'stripeService.ts:768',message:'updateUserBalance called',data:{userId,amountCents,operation},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-  // #endregion
   try {
     const userRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userRef);
@@ -782,20 +779,11 @@ export async function updateUserBalance(
     }
     
     const currentBalance = (userDoc.data().balance || 0) as number;
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'stripeService.ts:782',message:'BEFORE conversion - always dividing by 100',data:{amountCents,currentBalance},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
     const amountDollars = amountCents / 100;
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'stripeService.ts:783',message:'AFTER conversion - amountDollars calculated',data:{amountDollars,conversionMethod:'divide_by_100'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
     
     const newBalance = operation === 'add'
       ? currentBalance + amountDollars
       : currentBalance - amountDollars;
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'stripeService.ts:787',message:'Balance calculation result',data:{currentBalance,amountDollars,newBalance,operation},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
     
     if (newBalance < 0) {
       throw new Error('Insufficient balance');

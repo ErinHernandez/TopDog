@@ -25,6 +25,10 @@ import {
 import { isPaystackCountry } from '../../../lib/payments/types';
 import { captureError } from '../../../lib/errorTracking';
 import type { PaystackChannel } from '../../../lib/paystack/paystackTypes';
+import { withAuth } from '../../../lib/apiAuth';
+import { createPaymentRateLimiter, withRateLimit } from '../../../lib/rateLimitConfig';
+import { withCSRFProtection } from '../../../lib/csrfProtection';
+import { logPaymentTransaction, getClientIP } from '../../../lib/securityLogger';
 
 // ============================================================================
 // TYPES
@@ -83,7 +87,10 @@ interface InitializeResponse {
 // HANDLER
 // ============================================================================
 
-export default async function handler(
+// Create rate limiter for payment initialization
+const paymentInitLimiter = createPaymentRateLimiter('initializePayment');
+
+const handler = async function(
   req: NextApiRequest,
   res: NextApiResponse<InitializeResponse>
 ) {
@@ -92,6 +99,25 @@ export default async function handler(
     return res.status(405).json({
       ok: false,
       error: { code: 'method_not_allowed', message: 'Only POST is allowed' },
+    });
+  }
+  
+  // Check rate limit
+  const rateLimitResult = await paymentInitLimiter.check(req);
+  const clientIP = getClientIP(req);
+  
+  // Set rate limit headers
+  res.setHeader('X-RateLimit-Limit', paymentInitLimiter.config.maxRequests);
+  res.setHeader('X-RateLimit-Remaining', rateLimitResult.remaining);
+  res.setHeader('X-RateLimit-Reset', Math.floor(rateLimitResult.resetAt / 1000));
+  
+  if (!rateLimitResult.allowed) {
+    return res.status(429).json({
+      ok: false,
+      error: { 
+        code: 'rate_limit_exceeded', 
+        message: 'Too many requests. Please try again later.' 
+      },
     });
   }
   
@@ -280,6 +306,17 @@ export default async function handler(
       },
     });
     
+    // Log payment transaction
+    await logPaymentTransaction(
+      userId,
+      transaction.id,
+      amountSmallestUnit,
+      currency,
+      'pending',
+      { channel, provider: 'paystack' },
+      clientIP
+    );
+    
     return res.status(200).json({
       ok: true,
       data: {
@@ -307,5 +344,13 @@ export default async function handler(
       error: { code: 'initialization_failed', message },
     });
   }
-}
+};
+
+// Export with authentication, CSRF protection, and rate limiting
+export default withCSRFProtection(
+  withAuth(
+    withRateLimit(handler, paymentInitLimiter),
+    { required: true, allowAnonymous: false }
+  )
+);
 

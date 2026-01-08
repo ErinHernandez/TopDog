@@ -1,17 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useUser } from '../lib/userContext';
 import { getUserStats, calculateUserRank } from '../lib/userStats';
 import { POSITIONS } from '../components/draft/v3/constants/positions';
 
 export default function Statistics() {
+  const router = useRouter();
+  const { user, loading: authLoading } = useUser();
   const [userStats, setUserStats] = useState(null);
   const [userRank, setUserRank] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
-  const userId = 'NEWUSERNAME'; // Replace with real user ID in production
+  
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/login');
+    }
+  }, [user, authLoading, router]);
+  
+  const userId = user?.uid;
 
   const fetchUserStats = async () => {
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
+    
     try {
       const stats = await getUserStats(userId);
       setUserStats(stats);
@@ -28,8 +45,10 @@ export default function Statistics() {
   };
 
   useEffect(() => {
-    fetchUserStats();
-  }, []);
+    if (userId) {
+      fetchUserStats();
+    }
+  }, [userId]);
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {

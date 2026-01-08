@@ -476,7 +476,9 @@ export function ConnectOnboardingModalVX2({
             onClick={handleClose}
             className="p-2 rounded-full hover:bg-white/10"
           >
-            <Close className="w-5 h-5" style={{ color: TEXT_COLORS.muted }} />
+            <span style={{ color: TEXT_COLORS.muted, display: 'inline-block' }}>
+              <Close className="w-5 h-5" />
+            </span>
           </button>
         </div>
         

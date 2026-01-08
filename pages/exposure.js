@@ -35,7 +35,6 @@ export default function Exposure() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSearchTags, setSelectedSearchTags] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const userId = 'Not Todd Middleton'; // Replace with real user ID in production
 
   // Function to handle header clicks for sorting
   const handleHeaderClick = (column) => {

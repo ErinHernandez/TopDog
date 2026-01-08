@@ -17,6 +17,10 @@ import {
   updateTransactionStatus,
 } from '../../../lib/paymongo';
 import { captureError } from '../../../lib/errorTracking';
+import { withAuth } from '../../../lib/apiAuth';
+import { createPaymentRateLimiter, withRateLimit } from '../../../lib/rateLimitConfig';
+import { withCSRFProtection } from '../../../lib/csrfProtection';
+import { logPaymentTransaction, getClientIP } from '../../../lib/securityLogger';
 
 // ============================================================================
 // TYPES
@@ -42,7 +46,10 @@ interface CreatePaymentResponse {
 // HANDLER
 // ============================================================================
 
-export default async function handler(
+// Create rate limiter for payment creation
+const paymentCreateLimiter = createPaymentRateLimiter('createPaymentIntent');
+
+const handler = async function(
   req: NextApiRequest,
   res: NextApiResponse<CreatePaymentResponse>
 ): Promise<void> {
@@ -50,6 +57,23 @@ export default async function handler(
   if (req.method !== 'POST') {
     res.setHeader('Allow', ['POST']);
     res.status(405).json({ success: false, error: 'Method not allowed' });
+    return;
+  }
+  
+  // Check rate limit
+  const rateLimitResult = await paymentCreateLimiter.check(req);
+  const clientIP = getClientIP(req);
+  
+  // Set rate limit headers
+  res.setHeader('X-RateLimit-Limit', paymentCreateLimiter.config.maxRequests);
+  res.setHeader('X-RateLimit-Remaining', rateLimitResult.remaining);
+  res.setHeader('X-RateLimit-Reset', Math.floor(rateLimitResult.resetAt / 1000));
+  
+  if (!rateLimitResult.allowed) {
+    res.status(429).json({ 
+      success: false, 
+      error: 'Rate limit exceeded. Please try again later.' 
+    });
     return;
   }
   
@@ -103,6 +127,17 @@ export default async function handler(
       },
     });
     
+    // Log payment transaction
+    await logPaymentTransaction(
+      body.userId,
+      result.paymentId,
+      source.attributes.amount,
+      source.attributes.currency,
+      result.status,
+      { provider: 'paymongo', sourceId: body.sourceId },
+      clientIP
+    );
+    
     // Update transaction with payment ID
     if (existingTx) {
       await updateTransactionStatus(
@@ -129,6 +164,14 @@ export default async function handler(
       error: error instanceof Error ? error.message : 'Failed to create payment',
     });
   }
-}
+};
+
+// Export with authentication, CSRF protection, and rate limiting
+export default withCSRFProtection(
+  withAuth(
+    withRateLimit(handler, paymentCreateLimiter),
+    { required: true, allowAnonymous: false }
+  )
+);
 
 

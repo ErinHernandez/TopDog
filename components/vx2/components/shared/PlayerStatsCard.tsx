@@ -65,7 +65,7 @@ export interface PlayerStatsCardProps {
 // ============================================================================
 
 // Teams with light backgrounds requiring dark text
-const LIGHT_BG_TEAMS = ['DET'];
+const LIGHT_BG_TEAMS = ['DET', 'LAC', 'KC', 'MIA', 'PHI', 'LAR'];
 
 const PX = {
   // Header
@@ -93,8 +93,8 @@ const PX = {
 } as const;
 
 const COLORS = {
-  headerLabel: '#9ca3af',
-  headerLabelDark: '#000000',
+  headerLabel: '#d1d5db',
+  headerLabelDark: '#d1d5db',
   lineColor: '#4b5563',
   lineColorDark: '#000000',
   draftButtonActive: '#ef4444',

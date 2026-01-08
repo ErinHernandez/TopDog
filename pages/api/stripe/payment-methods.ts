@@ -19,16 +19,23 @@ import {
 import {
   getCustomerWithPaymentMethods,
   detachPaymentMethod,
+  createPaymentIntent,
   setDefaultPaymentMethod,
   getUserPaymentData,
   logPaymentEvent,
 } from '../../../lib/stripe';
+import { withAuth } from '../../../lib/apiAuth';
+import { createPaymentRateLimiter, withRateLimit } from '../../../lib/rateLimitConfig';
+import { withCSRFProtection } from '../../../lib/csrfProtection';
+
+// Create rate limiter
+const paymentMethodsLimiter = createPaymentRateLimiter('paymentMethods');
 
 // ============================================================================
 // HANDLER
 // ============================================================================
 
-export default async function handler(
+async function handler(
   req: NextApiRequest, 
   res: NextApiResponse
 ) {
@@ -53,6 +60,9 @@ export default async function handler(
     }
   });
 }
+
+// Export with authentication, CSRF protection, and rate limiting
+export default withCSRFProtection(withAuth(withRateLimit(handler, paymentMethodsLimiter)));
 
 // ============================================================================
 // HANDLERS

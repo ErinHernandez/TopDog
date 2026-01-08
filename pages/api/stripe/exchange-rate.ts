@@ -27,6 +27,8 @@ import {
   getStripeExchangeRate,
   type StripeExchangeRate,
 } from '../../../lib/stripe';
+import { createPaymentRateLimiter, withRateLimit } from '../../../lib/rateLimitConfig';
+import { sanitizeString } from '../../../lib/inputSanitization';
 
 // ============================================================================
 // TYPES
@@ -48,17 +50,43 @@ interface ExchangeRateResponse {
 // HANDLER
 // ============================================================================
 
-export default async function handler(
+// Create rate limiter (public endpoint, but still rate limit)
+const exchangeRateLimiter = createPaymentRateLimiter('paymentMethods');
+
+const handler = async function(
   req: NextApiRequest, 
   res: NextApiResponse
 ) {
   return withErrorHandling(req, res, async (req, res, logger) => {
     validateMethod(req, ['GET'], logger);
     
+    // Check rate limit
+    const rateLimitResult = await exchangeRateLimiter.check(req);
+    
+    // Set rate limit headers
+    res.setHeader('X-RateLimit-Limit', exchangeRateLimiter.config.maxRequests);
+    res.setHeader('X-RateLimit-Remaining', rateLimitResult.remaining);
+    res.setHeader('X-RateLimit-Reset', Math.floor(rateLimitResult.resetAt / 1000));
+    
+    if (!rateLimitResult.allowed) {
+      return res.status(429).json({
+        success: false,
+        error: 'RATE_LIMIT_EXCEEDED',
+        message: 'Too many requests. Please try again later.',
+        retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000),
+      });
+    }
+    
     const { currency } = req.query as ExchangeRateQuery;
     
+    // Sanitize currency input
+    const sanitizedCurrency = currency ? sanitizeString(String(currency), { 
+      maxLength: 3, 
+      allowSpecialChars: false 
+    }) : null;
+    
     // Validate currency parameter
-    if (!currency) {
+    if (!sanitizedCurrency) {
       const error = createErrorResponse(
         ErrorType.VALIDATION,
         'currency query parameter is required',
@@ -68,7 +96,7 @@ export default async function handler(
       return res.status(error.statusCode).json(error.body);
     }
     
-    const normalizedCurrency = currency.toUpperCase();
+    const normalizedCurrency = sanitizedCurrency.toUpperCase();
     
     // Validate currency format (3 letter ISO code)
     if (!/^[A-Z]{3}$/.test(normalizedCurrency)) {
@@ -126,5 +154,8 @@ export default async function handler(
       return res.status(errorResponse.statusCode).json(errorResponse.body);
     }
   });
-}
+};
+
+// Export with rate limiting (public endpoint, no auth required)
+export default withRateLimit(handler, exchangeRateLimiter);
 

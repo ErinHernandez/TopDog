@@ -4,10 +4,14 @@
  * Enterprise-grade authentication context providing:
  * - Firebase Auth integration
  * - Firestore profile management
- * - Multiple auth providers (email, phone, OAuth)
+ * - Email/password authentication
+ * - Phone number authentication
+ * - Biometric authentication support
  * - Profile completeness tracking
  * - Session management
  * - Error handling
+ * 
+ * Note: No third-party OAuth (Google/Apple) per industry standard for DFS platforms.
  */
 
 import React, {
@@ -30,9 +34,6 @@ import {
   updateProfile as firebaseUpdateProfile,
   linkWithCredential,
   EmailAuthProvider,
-  GoogleAuthProvider,
-  OAuthProvider,
-  signInWithPopup,
   PhoneAuthProvider,
   signInWithPhoneNumber,
   RecaptchaVerifier,
@@ -64,7 +65,6 @@ import type {
   EmailSignInData,
   PhoneAuthData,
   PhoneVerifyData,
-  OAuthSignInData,
   ProfileUpdateData,
   UsernameChangeData,
   SignUpResult,
@@ -363,7 +363,7 @@ export function AuthProvider({
     
     try {
       // Validate username first
-      const validation = validateUsername(data.username, data.countryCode);
+      const validation = validateUsername(data.username, 'US'); // Default to US for email sign up
       if (!validation.isValid) {
         const error: AuthError = {
           code: AUTH_ERROR_CODES.USERNAME_INVALID,
@@ -406,7 +406,7 @@ export function AuthProvider({
         uid: firebaseUser.uid,
         username: data.username.toLowerCase(),
         email: data.email,
-        countryCode: data.countryCode,
+        countryCode: 'US', // Default to US for email sign up
         displayName: data.displayName || data.username,
         isActive: true,
         profileComplete: true,
@@ -529,47 +529,6 @@ export function AuthProvider({
       return { success: false, error: authError };
     }
   }, []);
-  
-  // ========== OAuth ==========
-  
-  const signInWithOAuth = useCallback(async (data: OAuthSignInData): Promise<SignInResult> => {
-    if (!auth) {
-      return { success: false, error: createAuthError(new Error('Auth not initialized')) };
-    }
-    
-    dispatch({ type: 'AUTH_LOADING' });
-    
-    try {
-      let provider;
-      
-      if (data.provider === 'google') {
-        provider = new GoogleAuthProvider();
-        provider.addScope('email');
-        provider.addScope('profile');
-      } else {
-        provider = new OAuthProvider('apple.com');
-        provider.addScope('email');
-        provider.addScope('name');
-      }
-      
-      const result = await signInWithPopup(auth, provider);
-      const authUser = firebaseUserToAuthUser(result.user);
-      
-      // Check if new user
-      const isNewUser = result.user.metadata.creationTime === result.user.metadata.lastSignInTime;
-      
-      return {
-        success: true,
-        data: authUser,
-        isNewUser,
-      };
-      
-    } catch (error) {
-      const authError = createAuthError(error);
-      dispatch({ type: 'AUTH_ERROR', payload: { error: authError } });
-      return { success: false, error: authError };
-    }
-  }, [auth]);
   
   // ========== Anonymous Auth ==========
   
@@ -794,29 +753,6 @@ export function AuthProvider({
     return signInWithPhone({ phoneNumber, countryCode: state.profile?.countryCode || 'US' });
   }, [signInWithPhone, state.profile?.countryCode]);
   
-  const linkOAuth = useCallback(async (provider: 'google' | 'apple'): Promise<AuthResult> => {
-    if (!auth?.currentUser) {
-      return { success: false, error: createAuthError(new Error('Not authenticated')) };
-    }
-    
-    try {
-      let oauthProvider;
-      
-      if (provider === 'google') {
-        oauthProvider = new GoogleAuthProvider();
-      } else {
-        oauthProvider = new OAuthProvider('apple.com');
-      }
-      
-      await signInWithPopup(auth, oauthProvider);
-      return { success: true };
-      
-    } catch (error) {
-      const authError = createAuthError(error);
-      return { success: false, error: authError };
-    }
-  }, [auth]);
-  
   // ========== Utilities ==========
   
   const refreshProfile = useCallback(async (): Promise<void> => {
@@ -873,7 +809,6 @@ export function AuthProvider({
     signInWithEmail,
     signInWithPhone,
     verifyPhoneCode,
-    signInWithOAuth,
     signInAnonymously,
     signOut,
     
@@ -886,7 +821,6 @@ export function AuthProvider({
     
     linkEmailPassword,
     linkPhoneNumber,
-    linkOAuth,
     
     refreshProfile,
     clearError,
@@ -896,7 +830,6 @@ export function AuthProvider({
     signInWithEmail,
     signInWithPhone,
     verifyPhoneCode,
-    signInWithOAuth,
     signInAnonymously,
     signOut,
     updateProfile,
@@ -906,7 +839,6 @@ export function AuthProvider({
     sendPasswordResetEmail,
     linkEmailPassword,
     linkPhoneNumber,
-    linkOAuth,
     refreshProfile,
     clearError,
   ]);

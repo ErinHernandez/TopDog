@@ -20,11 +20,11 @@
 import React, { useState, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { useTournaments, type Tournament } from '../../hooks/data';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BRAND_COLORS } from '../../core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY, Z_INDEX, SAFE_AREA } from '../../core/constants/sizes';
+import { BG_COLORS } from '../../core/constants/colors';
+import { SPACING } from '../../core/constants/sizes';
 import { EmptyState, ErrorState } from '../../components/shared';
 import { TournamentCard, TournamentCardSkeleton } from './TournamentCard';
-import { Close } from '../../components/icons';
+import JoinTournamentModal from './JoinTournamentModal';
 import { createScopedLogger } from '../../../../lib/clientLogger';
 
 const logger = createScopedLogger('[LobbyTab]');
@@ -68,161 +68,6 @@ function LoadingState(): React.ReactElement {
 }
 
 // ============================================================================
-// JOIN MODAL
-// ============================================================================
-
-interface JoinModalProps {
-  tournament: Tournament;
-  onClose: () => void;
-  onConfirm: () => void;
-  isJoining: boolean;
-}
-
-function JoinModal({ tournament, onClose, onConfirm, isJoining }: JoinModalProps): React.ReactElement {
-  return (
-    <div 
-      className="absolute inset-0 flex items-center justify-center"
-      style={{ backgroundColor: 'rgba(0,0,0,0.8)', zIndex: Z_INDEX.modal }}
-      onClick={onClose}
-    >
-      <div 
-        className="w-80 mx-4"
-        style={{ 
-          backgroundColor: BG_COLORS.secondary,
-          borderRadius: `${RADIUS.xl}px`,
-          overflow: 'hidden',
-        }}
-        onClick={e => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div 
-          className="flex items-center justify-between"
-          style={{ 
-            padding: `${SPACING.md}px ${SPACING.lg}px`,
-            borderBottom: '1px solid rgba(255,255,255,0.1)',
-          }}
-        >
-          <h2 
-            className="font-bold"
-            style={{ fontSize: `${TYPOGRAPHY.fontSize.lg}px`, color: TEXT_COLORS.primary }}
-          >
-            Join Tournament
-          </h2>
-          <button
-            onClick={onClose}
-            className="flex items-center justify-center transition-all"
-            style={{ 
-              width: '32px',
-              height: '32px',
-              borderRadius: `${RADIUS.md}px`,
-              backgroundColor: 'rgba(255,255,255,0.1)',
-              color: TEXT_COLORS.muted,
-              border: 'none',
-              cursor: 'pointer',
-            }}
-          >
-            <Close size={16} />
-          </button>
-        </div>
-
-        {/* Content */}
-        <div style={{ padding: `${SPACING.lg}px` }}>
-          <h3 
-            className="font-bold text-center"
-            style={{ 
-              fontSize: `${TYPOGRAPHY.fontSize.base}px`, 
-              color: TEXT_COLORS.primary,
-              marginBottom: `${SPACING.md}px`,
-            }}
-          >
-            {tournament.title}
-          </h3>
-          
-          <div 
-            className="flex justify-around"
-            style={{ marginBottom: `${SPACING.lg}px` }}
-          >
-            <div className="text-center">
-              <div className="font-bold" style={{ fontSize: `${TYPOGRAPHY.fontSize.xl}px`, color: BRAND_COLORS.primary }}>
-                {tournament.entryFee}
-              </div>
-              <div style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px`, color: TEXT_COLORS.muted }}>
-                Entry Fee
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="font-bold" style={{ fontSize: `${TYPOGRAPHY.fontSize.xl}px`, color: TEXT_COLORS.primary }}>
-                {tournament.firstPlacePrize}
-              </div>
-              <div style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px`, color: TEXT_COLORS.muted }}>
-                1st Place
-              </div>
-            </div>
-          </div>
-
-          <p 
-            className="text-center"
-            style={{ 
-              fontSize: `${TYPOGRAPHY.fontSize.sm}px`, 
-              color: TEXT_COLORS.muted,
-              marginBottom: `${SPACING.lg}px`,
-            }}
-          >
-            You will be placed in a draft room once enough players have joined.
-          </p>
-
-          {/* Buttons */}
-          <div className="flex gap-3">
-            <button
-              onClick={onClose}
-              className="flex-1 font-semibold transition-all"
-              style={{ 
-                height: '44px',
-                borderRadius: `${RADIUS.md}px`,
-                backgroundColor: 'rgba(255,255,255,0.1)',
-                color: TEXT_COLORS.primary,
-                border: 'none',
-                cursor: 'pointer',
-                fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-              }}
-            >
-              Cancel
-            </button>
-            <button
-              onClick={onConfirm}
-              disabled={isJoining}
-              className="flex-1 font-semibold transition-all flex items-center justify-center gap-2"
-              style={{ 
-                height: '44px',
-                borderRadius: `${RADIUS.md}px`,
-                backgroundColor: BRAND_COLORS.primary,
-                color: '#000',
-                border: 'none',
-                cursor: isJoining ? 'not-allowed' : 'pointer',
-                fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-                opacity: isJoining ? 0.7 : 1,
-              }}
-            >
-              {isJoining ? (
-                <>
-                  <div 
-                    className="animate-spin rounded-full h-4 w-4 border-2" 
-                    style={{ borderColor: '#000 transparent transparent transparent' }} 
-                  />
-                  Joining...
-                </>
-              ) : (
-                'Join Tournament'
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ============================================================================
 // MAIN COMPONENT
 // ============================================================================
 
@@ -244,7 +89,7 @@ export default function LobbyTabVX2({
     onJoinClick?.(tournamentId);
   }, [tournaments, onJoinClick]);
 
-  const handleConfirmJoin = useCallback(async () => {
+  const handleConfirmJoin = useCallback(async (options: { entries: number; autopilot: boolean }) => {
     if (!selectedTournament) return;
     
     setIsJoining(true);
@@ -252,8 +97,10 @@ export default function LobbyTabVX2({
       // Simulate API call to join tournament
       await new Promise(r => setTimeout(r, 1000));
       
-      // Set session flag so draft room knows user came from app
+      // Store entry options for draft room
       sessionStorage.setItem('topdog_joined_draft', 'true');
+      sessionStorage.setItem('topdog_entry_count', options.entries.toString());
+      sessionStorage.setItem('topdog_autopilot', options.autopilot.toString());
       
       // Navigate to VX2 Draft Room
       router.push('/testing-grounds/vx2-draft-room');
@@ -369,7 +216,7 @@ export default function LobbyTabVX2({
 
       {/* Join Modal */}
       {selectedTournament && (
-        <JoinModal
+        <JoinTournamentModal
           tournament={selectedTournament}
           onClose={handleCloseModal}
           onConfirm={handleConfirmJoin}

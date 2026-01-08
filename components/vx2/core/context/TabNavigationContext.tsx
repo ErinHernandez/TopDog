@@ -16,6 +16,7 @@ import React, {
   useMemo, 
   useEffect,
   useRef,
+  useState,
 } from 'react';
 import type { 
   TabId,
@@ -24,6 +25,7 @@ import type {
   TabNavigationAction,
   TabNavigationContextValue,
   TabPersistedState,
+  RegisteredNavigationGuard,
 } from '../types';
 import { 
   TAB_REGISTRY, 
@@ -274,6 +276,10 @@ export function TabNavigationProvider({
   // Track previous tab for change callbacks
   const prevTabRef = useRef<TabId | null>(null);
   
+  // Navigation guards state
+  const guardsRef = useRef<Map<string, RegisteredNavigationGuard>>(new Map());
+  const [pendingNavigation, setPendingNavigation] = useState<{ tabId: TabId; params?: Record<string, string> } | null>(null);
+  
   // Call onTabChange when tab changes
   useEffect(() => {
     if (prevTabRef.current !== state.activeTab) {
@@ -300,14 +306,80 @@ export function TabNavigationProvider({
     return undefined;
   }, [state.isTransitioning]);
   
+  // ========== Navigation Guards ==========
+  
+  const checkNavigationGuards = useCallback(async (
+    fromTab: TabId, 
+    toTab: TabId
+  ): Promise<{ allow: boolean; reason?: string }> => {
+    // Get all guards, sorted by priority (highest first)
+    const guards = Array.from(guardsRef.current.values())
+      .filter(g => !g.tabId || g.tabId === fromTab)
+      .sort((a, b) => b.priority - a.priority);
+    
+    for (const { guard } of guards) {
+      const result = await guard(fromTab, toTab);
+      if (!result.allow) {
+        return { allow: false, reason: result.reason };
+      }
+    }
+    
+    return { allow: true };
+  }, []);
+  
+  const registerNavigationGuard = useCallback((guard: RegisteredNavigationGuard): () => void => {
+    guardsRef.current.set(guard.id, guard);
+    logger.debug('Navigation guard registered', { guardId: guard.id, tabId: guard.tabId });
+    
+    // Return unregister function
+    return () => {
+      guardsRef.current.delete(guard.id);
+      logger.debug('Navigation guard unregistered', { guardId: guard.id });
+    };
+  }, []);
+  
+  const unregisterNavigationGuard = useCallback((guardId: string) => {
+    guardsRef.current.delete(guardId);
+    logger.debug('Navigation guard unregistered', { guardId });
+  }, []);
+  
+  const confirmPendingNavigation = useCallback(() => {
+    if (pendingNavigation) {
+      logger.debug('Confirming pending navigation', pendingNavigation);
+      dispatch({ 
+        type: 'NAVIGATE_TO_TAB', 
+        payload: { tabId: pendingNavigation.tabId, params: pendingNavigation.params, addToHistory: true } 
+      });
+      setPendingNavigation(null);
+    }
+  }, [pendingNavigation]);
+  
+  const cancelPendingNavigation = useCallback(() => {
+    logger.debug('Cancelling pending navigation');
+    setPendingNavigation(null);
+  }, []);
+  
   // ========== Navigation Actions ==========
   
-  const navigateToTab = useCallback((tabId: TabId, params?: Record<string, string>) => {
+  const navigateToTab = useCallback(async (tabId: TabId, params?: Record<string, string>) => {
+    // Don't navigate to same tab
+    if (tabId === state.activeTab) return;
+    
+    // Check navigation guards
+    const guardResult = await checkNavigationGuards(state.activeTab, tabId);
+    
+    if (!guardResult.allow) {
+      // Store pending navigation for modal to handle
+      setPendingNavigation({ tabId, params });
+      logger.debug('Navigation blocked by guard', { from: state.activeTab, to: tabId, reason: guardResult.reason });
+      return;
+    }
+    
     dispatch({ 
       type: 'NAVIGATE_TO_TAB', 
       payload: { tabId, params, addToHistory: true } 
     });
-  }, [state.activeTab]);
+  }, [state.activeTab, checkNavigationGuards]);
   
   const replaceTab = useCallback((tabId: TabId, params?: Record<string, string>) => {
     dispatch({ 
@@ -423,6 +495,11 @@ export function TabNavigationProvider({
     canGoForward,
     preloadTab,
     isTabPreloaded,
+    registerNavigationGuard,
+    unregisterNavigationGuard,
+    pendingNavigation,
+    confirmPendingNavigation,
+    cancelPendingNavigation,
   }), [
     state,
     navigateToTab,
@@ -442,6 +519,11 @@ export function TabNavigationProvider({
     canGoForward,
     preloadTab,
     isTabPreloaded,
+    registerNavigationGuard,
+    unregisterNavigationGuard,
+    pendingNavigation,
+    confirmPendingNavigation,
+    cancelPendingNavigation,
   ]);
   
   return (

@@ -23,6 +23,7 @@ import type {
   PayMongoWebhookPayload,
   PayMongoSourceAttributes,
   PayMongoPaymentAttributes,
+  PayMongoPayoutAttributes,
   PayMongoSavedBankAccount,
   UserPayMongoData,
 } from './paymongoTypes';

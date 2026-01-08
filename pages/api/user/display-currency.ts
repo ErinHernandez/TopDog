@@ -15,7 +15,8 @@
  *   Body: { userId, country }
  */
 
-import type { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiResponse } from 'next';
+import type { AuthenticatedRequest } from '../../../lib/apiTypes';
 import { 
   withErrorHandling, 
   validateMethod, 
@@ -32,6 +33,9 @@ import {
   CURRENCY_CONFIG,
   getCurrencyOptions,
 } from '../../../lib/stripe';
+import { withAuth, verifyUserAccess } from '../../../lib/apiAuth';
+import { createPaymentRateLimiter, withRateLimit } from '../../../lib/rateLimitConfig';
+import { withCSRFProtection } from '../../../lib/csrfProtection';
 
 // ============================================================================
 // TYPES
@@ -57,12 +61,32 @@ interface ResetDisplayCurrencyBody {
 // HANDLER
 // ============================================================================
 
-export default async function handler(
-  req: NextApiRequest, 
+// Create rate limiter
+const displayCurrencyLimiter = createPaymentRateLimiter('paymentMethods');
+
+const handler = async function(
+  req: AuthenticatedRequest, 
   res: NextApiResponse
 ) {
   return withErrorHandling(req, res, async (req, res, logger) => {
     validateMethod(req, ['GET', 'PUT', 'DELETE'], logger);
+    
+    // Check rate limit
+    const rateLimitResult = await displayCurrencyLimiter.check(req);
+    
+    // Set rate limit headers
+    res.setHeader('X-RateLimit-Limit', displayCurrencyLimiter.config.maxRequests);
+    res.setHeader('X-RateLimit-Remaining', rateLimitResult.remaining);
+    res.setHeader('X-RateLimit-Reset', Math.floor(rateLimitResult.resetAt / 1000));
+    
+    if (!rateLimitResult.allowed) {
+      return res.status(429).json({
+        success: false,
+        error: 'RATE_LIMIT_EXCEEDED',
+        message: 'Too many requests. Please try again later.',
+        retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000),
+      });
+    }
     
     switch (req.method) {
       case 'GET':
@@ -88,11 +112,22 @@ export default async function handler(
 // ============================================================================
 
 async function handleGet(
-  req: NextApiRequest,
+  req: AuthenticatedRequest,
   res: NextApiResponse,
   logger: { info: (msg: string, data?: Record<string, unknown>) => void }
 ) {
   const { userId, country } = req.query as Partial<GetDisplayCurrencyQuery>;
+  
+  // Verify user access - users can only access their own data
+  if (req.user && !verifyUserAccess(req.user.uid, userId || '')) {
+    const error = createErrorResponse(
+      ErrorType.FORBIDDEN,
+      'Access denied',
+      403,
+      logger
+    );
+    return res.status(error.statusCode).json(error.body);
+  }
   
   if (!userId || !country) {
     const error = createErrorResponse(
@@ -142,11 +177,22 @@ async function handleGet(
 // ============================================================================
 
 async function handlePut(
-  req: NextApiRequest,
+  req: AuthenticatedRequest,
   res: NextApiResponse,
   logger: { info: (msg: string, data?: Record<string, unknown>) => void }
 ) {
   const { userId, country, currency } = req.body as Partial<SetDisplayCurrencyBody>;
+  
+  // Verify user access
+  if (req.user && !verifyUserAccess(req.user.uid, userId || '')) {
+    const error = createErrorResponse(
+      ErrorType.FORBIDDEN,
+      'Access denied',
+      403,
+      logger
+    );
+    return res.status(error.statusCode).json(error.body);
+  }
   
   if (!userId || !country || !currency) {
     const error = createErrorResponse(
@@ -210,11 +256,22 @@ async function handlePut(
 // ============================================================================
 
 async function handleDelete(
-  req: NextApiRequest,
+  req: AuthenticatedRequest,
   res: NextApiResponse,
   logger: { info: (msg: string, data?: Record<string, unknown>) => void }
 ) {
   const { userId, country } = req.body as Partial<ResetDisplayCurrencyBody>;
+  
+  // Verify user access
+  if (req.user && !verifyUserAccess(req.user.uid, userId || '')) {
+    const error = createErrorResponse(
+      ErrorType.FORBIDDEN,
+      'Access denied',
+      403,
+      logger
+    );
+    return res.status(error.statusCode).json(error.body);
+  }
   
   if (!userId || !country) {
     const error = createErrorResponse(

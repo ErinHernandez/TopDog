@@ -31,6 +31,8 @@ import {
   type RiskContext,
   type PaymentMethodType,
 } from '../../../lib/stripe';
+import { withCSRFProtection } from '../../../lib/csrfProtection';
+import { logPaymentTransaction, getClientIP } from '../../../lib/securityLogger';
 import { v4 as uuidv4 } from 'uuid';
 
 // ============================================================================
@@ -221,7 +223,8 @@ function getAllowedPaymentMethods(
 // HANDLER
 // ============================================================================
 
-export default async function handler(
+// Wrap handler with CSRF protection
+const handler = async function(
   req: NextApiRequest, 
   res: NextApiResponse
 ) {
@@ -229,6 +232,7 @@ export default async function handler(
     validateMethod(req, ['POST'], logger);
     
     const body = req.body as PaymentIntentRequestBody;
+    const clientIP = getClientIP(req);
     
     // Validate required fields
     const { amountCents, userId, email } = body;
@@ -408,22 +412,13 @@ export default async function handler(
       return res.status(errorResponse.statusCode).json(errorResponse.body);
     }
   });
-}
+};
+
+// Export with CSRF protection
+export default withCSRFProtection(handler);
 
 // ============================================================================
 // HELPERS
 // ============================================================================
 
-/**
- * Extract client IP from request
- */
-function getClientIP(req: NextApiRequest): string | undefined {
-  const forwarded = req.headers['x-forwarded-for'];
-  if (typeof forwarded === 'string') {
-    return forwarded.split(',')[0]?.trim();
-  }
-  if (Array.isArray(forwarded)) {
-    return forwarded[0];
-  }
-  return req.socket?.remoteAddress;
-}
+// Use getClientIP from securityLogger instead

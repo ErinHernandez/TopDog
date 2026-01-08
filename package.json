@@ -38,6 +38,7 @@
     "canvas": "^3.1.2",
     "dotenv": "^17.2.1",
     "firebase": "^11.9.1",
+    "firebase-admin": "^13.0.1",
     "html2canvas": "^1.4.1",
     "multer": "^2.0.2",
     "next": "^16.0.8",
@@ -51,6 +52,7 @@
     "react-dom": "^18.2.0",
     "react-redux": "^7.2.9",
     "react-seven-segment-display": "^2.1.0",
+    "react-window": "^1.8.11",
     "redux": "^5.0.1",
     "stripe": "^18.3.0",
     "swr": "^2.3.7"
@@ -65,6 +67,7 @@
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
+    "@types/react-window": "^1.8.5",
     "autoprefixer": "^10.4.14",
     "axios": "^1.11.0",
     "cypress": "^14.5.0",

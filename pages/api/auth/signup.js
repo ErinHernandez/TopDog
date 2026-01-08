@@ -37,7 +37,8 @@ import {
   runTransaction
 } from 'firebase/firestore';
 import { initializeApp, getApps } from 'firebase/app';
-import { isApprovedCountry } from '../../../../lib/localeCharacters';
+import { isApprovedCountry } from '../../../lib/localeCharacters.js';
+import { createSignupLimiter } from '../../../lib/rateLimiter.js';
 
 // ============================================================================
 // FIREBASE INITIALIZATION
@@ -54,6 +55,12 @@ const firebaseConfig = {
 
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 const db = getFirestore(app);
+
+// Create rate limiter instance
+const rateLimiter = createSignupLimiter();
+
+// Minimum response time to prevent timing attacks (milliseconds)
+const MIN_RESPONSE_TIME_MS = 150;
 
 // ============================================================================
 // CONSTANTS
@@ -130,6 +137,8 @@ function validateUsername(username) {
 // ============================================================================
 
 export default async function handler(req, res) {
+  const startTime = Date.now();
+  
   if (req.method !== 'POST') {
     return res.status(405).json({ 
       error: 'Method not allowed',
@@ -138,6 +147,29 @@ export default async function handler(req, res) {
   }
   
   try {
+    // Step 0: Rate limiting
+    const rateLimitResult = await rateLimiter.check(req);
+    
+    // Set rate limit headers
+    res.setHeader('X-RateLimit-Limit', '3');
+    res.setHeader('X-RateLimit-Remaining', rateLimitResult.remaining);
+    res.setHeader('X-RateLimit-Reset', Math.floor(rateLimitResult.resetAt / 1000));
+    
+    if (!rateLimitResult.allowed) {
+      // Ensure consistent timing even for rate-limited requests to prevent timing attacks
+      const elapsed = Date.now() - startTime;
+      if (elapsed < MIN_RESPONSE_TIME_MS) {
+        await new Promise(resolve => setTimeout(resolve, MIN_RESPONSE_TIME_MS - elapsed));
+      }
+      
+      return res.status(429).json({
+        success: false,
+        error: 'RATE_LIMIT_EXCEEDED',
+        message: 'Too many signup attempts. Please try again later.',
+        retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000), // seconds
+      });
+    }
+    
     const { 
       uid, 
       username, 
@@ -148,15 +180,27 @@ export default async function handler(req, res) {
     
     // Validate UID
     if (!uid || typeof uid !== 'string') {
+      // Ensure consistent timing
+      const elapsed = Date.now() - startTime;
+      if (elapsed < MIN_RESPONSE_TIME_MS) {
+        await new Promise(resolve => setTimeout(resolve, MIN_RESPONSE_TIME_MS - elapsed));
+      }
+      
       return res.status(400).json({
         success: false,
         error: 'INVALID_REQUEST',
-        message: 'User ID is required',
+        message: 'Invalid request',
       });
     }
     
     // Validate country
     if (!isApprovedCountry(countryCode)) {
+      // Ensure consistent timing
+      const elapsed = Date.now() - startTime;
+      if (elapsed < MIN_RESPONSE_TIME_MS) {
+        await new Promise(resolve => setTimeout(resolve, MIN_RESPONSE_TIME_MS - elapsed));
+      }
+      
       return res.status(403).json({
         success: false,
         error: 'COUNTRY_NOT_ALLOWED',
@@ -167,10 +211,17 @@ export default async function handler(req, res) {
     // Validate username
     const validation = validateUsername(username);
     if (!validation.isValid) {
+      // Generic error message to prevent enumeration
+      // Ensure consistent timing
+      const elapsed = Date.now() - startTime;
+      if (elapsed < MIN_RESPONSE_TIME_MS) {
+        await new Promise(resolve => setTimeout(resolve, MIN_RESPONSE_TIME_MS - elapsed));
+      }
+      
       return res.status(400).json({
         success: false,
         error: 'INVALID_USERNAME',
-        message: validation.errors[0],
+        message: 'Username unavailable',
         errors: validation.errors,
       });
     }
@@ -252,12 +303,18 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error('Signup error:', error);
     
-    // Handle specific errors
+    // Ensure consistent timing even on errors
+    const elapsed = Date.now() - startTime;
+    if (elapsed < MIN_RESPONSE_TIME_MS) {
+      await new Promise(resolve => setTimeout(resolve, MIN_RESPONSE_TIME_MS - elapsed));
+    }
+    
+    // Handle specific errors with generic messages to prevent enumeration
     if (error.message === 'USERNAME_TAKEN') {
       return res.status(409).json({
         success: false,
         error: 'USERNAME_TAKEN',
-        message: 'This username is already taken',
+        message: 'Username unavailable',
       });
     }
     
@@ -265,7 +322,7 @@ export default async function handler(req, res) {
       return res.status(403).json({
         success: false,
         error: 'USERNAME_VIP_RESERVED',
-        message: 'This username is reserved for a VIP user',
+        message: 'Username unavailable',
       });
     }
     

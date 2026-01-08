@@ -35,6 +35,10 @@ export {
   SignInModal, 
   ForgotPasswordModal,
   ProfileSettingsModal,
+  // Full-screen auth components (mandatory authentication gate)
+  AuthGateVX2,
+  LoginScreenVX2,
+  SignUpScreenVX2,
 } from './components';
 export type { 
   UsernameInputProps,
@@ -42,6 +46,9 @@ export type {
   SignInModalProps,
   ForgotPasswordModalProps,
   ProfileSettingsModalProps,
+  AuthGateVX2Props,
+  LoginScreenVX2Props,
+  SignUpScreenVX2Props,
 } from './components';
 
 // Types
@@ -64,7 +71,6 @@ export type {
   EmailSignInData,
   PhoneAuthData,
   PhoneVerifyData,
-  OAuthSignInData,
   ProfileUpdateData,
   UsernameChangeData,
   

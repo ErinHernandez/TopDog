@@ -134,7 +134,7 @@ export default function TabContentVX2({
   return (
     <div 
       ref={contentRef}
-      className={`flex-1 min-h-0 overflow-y-auto ${className}`}
+      className={`flex-1 min-h-0 overflow-y-auto flex flex-col ${className}`}
       onScroll={onScroll}
       style={{
         // Hide scrollbar but allow scrolling

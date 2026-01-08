@@ -12,35 +12,44 @@ export default function TournamentRulesModal({ open, onClose }) {
   if (!open) return null;
 
   return (
-    <div className="absolute inset-0 z-[60] bg-[#101927]" style={{
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        height: '100%',
-        width: '100%'
-      }}>
-        {/* Modal Content - Full Screen */}
-        <div className="h-full flex flex-col bg-[#101927]">
-          {/* Close Button - Top Right */}
-          <div className="p-4 flex justify-end">
-            <button
-              onClick={onClose}
-              className="flex items-center justify-center text-white font-medium w-8 h-8"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          
-          {/* Rules Content */}
-          <div className="flex-1 overflow-y-auto p-4 pt-0 mobile-no-scrollbar">
-            <div className="space-y-6 pb-8">
+    <div className="absolute inset-0 z-[60] bg-[#101927]">
+      {/* Full Screen Container */}
+      <div className="h-full w-full flex flex-col bg-[#101927] relative">
+        
+        {/* Close Button - Top Right Fixed */}
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close rules and return"
+          className="absolute right-4 w-10 h-10 flex items-center justify-center rounded-full bg-slate-800/80 backdrop-blur-sm border border-white/5 active:scale-95 transition-transform z-10"
+          style={{ top: 'calc(env(safe-area-inset-top, 44px) + 48px)' }}
+        >
+          <svg 
+            width="18" 
+            height="18" 
+            viewBox="0 0 24 24" 
+            fill="none"
+            aria-hidden="true"
+          >
+            <path 
+              d="M6 6L18 18M18 6L6 18" 
+              stroke="#94A3B8" 
+              strokeWidth="2.5" 
+              strokeLinecap="round"
+            />
+          </svg>
+        </button>
+        
+        {/* Safe Area Spacer */}
+        <div style={{ height: 'calc(env(safe-area-inset-top, 44px) + 48px)' }} className="flex-shrink-0" />
+        
+        {/* Scrollable Rules Content */}
+        <div className="flex-1 overflow-y-auto px-4 pb-8 mobile-no-scrollbar">
+            <div className="space-y-6 pb-8 pt-[28px]">
               
               {/* Tournament Title */}
               <div className="text-center">
-                <h2 className="text-xl font-bold text-white mb-2">TOPDOG INTERNATIONAL TOURNAMENT RULES</h2>
+                <h2 className="text-xl font-bold text-white mb-2">THE TOPDOG INTERNATIONAL TOURNAMENT RULES</h2>
                 <p className="text-sm text-gray-300">TopDog.dog contests are governed by our Terms of Use, Privacy Policy, and the rules listed below.</p>
               </div>
 

@@ -96,15 +96,30 @@ export default async function handler(req, res) {
     const reservationDoc = vipSnapshot.docs[0];
     const reservation = reservationDoc.data();
     
-    // Verify claim token
-    // In production, implement secure token verification
-    // For now, we check if a claim token was generated for this reservation
-    if (reservation.claimToken && reservation.claimToken !== claimToken) {
-      return res.status(403).json({
-        success: false,
-        error: 'INVALID_TOKEN',
-        message: 'Invalid claim token',
-      });
+    // Verify claim token using constant-time comparison to prevent timing attacks
+    if (reservation.claimToken) {
+      const crypto = require('crypto');
+      
+      // Convert tokens to buffers for constant-time comparison
+      const expectedBuffer = Buffer.from(reservation.claimToken, 'utf8');
+      const providedBuffer = Buffer.from(claimToken || '', 'utf8');
+      
+      // Ensure buffers are same length (pad with zeros if needed)
+      // This prevents length-based timing attacks
+      const maxLength = Math.max(expectedBuffer.length, providedBuffer.length);
+      const expectedPadded = Buffer.alloc(maxLength);
+      const providedPadded = Buffer.alloc(maxLength);
+      expectedBuffer.copy(expectedPadded);
+      providedBuffer.copy(providedPadded);
+      
+      // Constant-time comparison
+      if (!crypto.timingSafeEqual(expectedPadded, providedPadded)) {
+        return res.status(403).json({
+          success: false,
+          error: 'INVALID_TOKEN',
+          message: 'Invalid claim token',
+        });
+      }
     }
     
     // Check if expired

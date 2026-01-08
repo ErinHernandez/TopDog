@@ -799,7 +799,11 @@ export function ForgotPasswordModal({
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Success - go back to sign in
-      onBackToSignIn?.() || onClose();
+      if (onBackToSignIn) {
+        onBackToSignIn();
+      } else {
+        onClose();
+      }
     } catch (err) {
       setError('Failed to reset password');
     } finally {

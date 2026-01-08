@@ -147,14 +147,18 @@ export function CurrencySelector({
         </div>
         
         {/* Chevron */}
-        <ChevronDown 
-          size={20} 
-          color={TEXT_COLORS.muted}
+        <span
           style={{
             transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
             transition: 'transform 150ms ease',
+            display: 'inline-block',
           }}
-        />
+        >
+          <ChevronDown 
+            size={20} 
+            color={TEXT_COLORS.muted}
+          />
+        </span>
       </button>
       
       {/* Dropdown Menu */}

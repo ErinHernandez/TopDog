@@ -17,7 +17,7 @@ import PicksAwayCalendar from '../../../components/PicksAwayCalendar';
 import { getCustomPlayerRanking, loadCustomRankings } from '../../../lib/customRankings';
 // Static player stats data (pre-downloaded)
 import { getPlayerStats, hasPlayerStats, getStatsMetadata } from '../../../lib/staticPlayerStats';
-import { createPositionGradient, createQueueGradient, createPickedPlayerGradient } from '../../../lib/gradientUtils';
+import { createPositionGradient, createQueueGradient, createPickedPlayerGradient, getPositionEndColor } from '../../../lib/gradientUtils';
 import RippleEffect from '../../../components/draft/v3/mobile/apple/components/RippleEffect';
 import DraftNavbar from '../../../components/draft/v2/ui/DraftNavbar';
 import { POSITION_COLORS, FLEX_POSITIONS } from '../../../components/draft/v3/constants/positions';

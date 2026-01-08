@@ -1,7 +1,8 @@
 /**
  * LeaveConfirmModal - Confirmation modal for leaving draft
  * 
- * Renders inside the phone frame, not as a browser dialog.
+ * Renders inside the phone frame using absolute positioning.
+ * No portal needed - renders directly in component tree.
  * iOS-native design pattern.
  * 
  * A-Grade Requirements:
@@ -80,6 +81,7 @@ export default function LeaveConfirmModal({
   
   if (!isOpen) return null;
   
+  // Render modal directly (no portal - stays inside parent container)
   return (
     <div
       role="dialog"
@@ -87,7 +89,7 @@ export default function LeaveConfirmModal({
       aria-labelledby="leave-modal-title"
       aria-describedby="leave-modal-description"
       style={{
-        position: 'fixed',
+        position: 'absolute',
         top: 0,
         left: 0,
         right: 0,

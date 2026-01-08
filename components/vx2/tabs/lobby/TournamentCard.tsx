@@ -265,7 +265,7 @@ export function TournamentCard({
         <h2 
           className="vx2-tournament-title text-center font-bold leading-tight"
           style={{ 
-            fontSize: '42px',
+            fontSize: '46px',
             fontFamily: "'Anton SC', sans-serif",
             textTransform: 'uppercase',
             letterSpacing: '2px',

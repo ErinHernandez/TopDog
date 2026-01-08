@@ -340,6 +340,84 @@ export function UsernameInput({
         
       </div>
       
+      {/* Suggestions when username is unavailable */}
+      {availability && !availability.isAvailable && availability.suggestions && availability.suggestions.length > 0 && (
+        <div className="mt-2">
+          <div
+            style={{
+              color: TEXT_COLORS.muted,
+              fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
+              marginBottom: '4px',
+            }}
+          >
+            Suggested alternatives:
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {availability.suggestions.map((suggestion, index) => (
+              <button
+                key={index}
+                type="button"
+                onClick={() => {
+                  if (isControlled) {
+                    controlledOnChange?.(suggestion);
+                  }
+                  internalSetUsername(suggestion);
+                }}
+                className="px-2 py-1 rounded transition-colors"
+                style={{
+                  backgroundColor: BG_COLORS.tertiary,
+                  color: TEXT_COLORS.primary,
+                  border: `1px solid ${BORDER_COLORS.light}`,
+                  fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
+                  cursor: 'pointer',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = BG_COLORS.secondary;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = BG_COLORS.tertiary;
+                }}
+              >
+                {suggestion}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {/* Warnings (similarity warnings, etc.) */}
+      {availability && availability.warnings && availability.warnings.length > 0 && (
+        <div className="mt-2">
+          {availability.warnings.map((warning, index) => (
+            <div
+              key={index}
+              style={{
+                color: STATE_COLORS.warning || '#FBBF25',
+                fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
+              }}
+            >
+              {warning}
+            </div>
+          ))}
+        </div>
+      )}
+      
+      {validation && validation.warnings && validation.warnings.length > 0 && (
+        <div className="mt-2">
+          {validation.warnings.map((warning, index) => (
+            <div
+              key={index}
+              style={{
+                color: STATE_COLORS.warning || '#FBBF25',
+                fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
+              }}
+            >
+              {warning}
+            </div>
+          ))}
+        </div>
+      )}
+      
       {/* Requirements panel (optional) */}
       {showRequirements && isFocused && username.length > 0 && validation && (
         <div

@@ -131,6 +131,17 @@ export function useDraftEngine({
     pickedPlayerIds 
   });
   
+  // Load excluded players from localStorage
+  const excludedPlayers = useMemo(() => {
+    if (typeof window === 'undefined') return [];
+    try {
+      const saved = localStorage.getItem('vx2Excluded');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  }, []);
+
   // Handle timer expiration (autopick)
   const handleTimerExpire = useCallback(() => {
     if (!isMyTurn || status !== 'active') return;
@@ -141,7 +152,8 @@ export function useDraftEngine({
       currentRoster,
       queue.queueIds,
       autodraft.customRankings,
-      autodraft.positionLimits
+      autodraft.positionLimits,
+      excludedPlayers
     );
     
     if (result) {
@@ -155,7 +167,8 @@ export function useDraftEngine({
     currentRoster, 
     queue.queueIds, 
     autodraft.customRankings, 
-    autodraft.positionLimits
+    autodraft.positionLimits,
+    excludedPlayers
   ]);
   
   // Timer
@@ -186,9 +199,10 @@ export function useDraftEngine({
       logger.debug('Pick success', { player: pick.player.name });
       timer.reset();
     },
-    onPickError: (err) => {
-      logger.error('Pick error', err instanceof Error ? err : new Error(String(err)));
-      setError(err);
+    onPickError: (err: unknown) => {
+      const error = err instanceof Error ? err : new Error(String(err));
+      logger.error('Pick error', error);
+      setError(err instanceof Error ? err.message : String(err));
     },
   });
   

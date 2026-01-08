@@ -181,7 +181,7 @@ export async function startDraftTimerActivity(
   
   if (isNativeBridgeAvailable()) {
     // Send to native app to create Live Activity
-    sendToNative('startActivity', activityState);
+    sendToNative('startActivity', activityState as unknown as Record<string, unknown>);
     currentActivityId = activityId;
     return activityId;
   }
@@ -239,7 +239,7 @@ export async function updateDraftTimerActivity(
   }
   
   if (isNativeBridgeAvailable()) {
-    sendToNative('updateActivity', state);
+    sendToNative('updateActivity', state as unknown as Record<string, unknown>);
     return true;
   }
   
@@ -270,7 +270,6 @@ export async function updateDraftTimerActivity(
           tag: `draft-timer-${merged.roomId}`,
           requireInteraction: true,
           silent: true,
-          renotify: false,
           data: merged,
         });
         

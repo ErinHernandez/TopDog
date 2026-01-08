@@ -1,6 +1,6 @@
 # Currency Icons Review Plan - Refined Summary
 
-> Philosophy: Enterprise grade. Fanatical about UX. Be thorough, take your time, quality over speed.
+> Philosophy: Enterprise grade. Fanatical about UX. Take your time, quality over speed. Think longer before responding.
 
 ## Key Refinements Made
 

@@ -348,7 +348,9 @@ function MethodStep({
             className="w-8 h-5 rounded flex items-center justify-center"
             style={{ backgroundColor: STATE_COLORS.active }}
           >
-            <Plus className="w-3 h-3" style={{ color: '#000' }} />
+            <span style={{ color: '#000', display: 'inline-block' }}>
+              <Plus className="w-3 h-3" />
+            </span>
           </div>
           <span style={{ color: TEXT_COLORS.primary }}>Add new payment method</span>
         </button>
@@ -960,7 +962,9 @@ function DepositModalContent({
                 }}
                 className="p-1 rounded hover:bg-white/10"
               >
-                <ChevronLeft className="w-5 h-5" style={{ color: TEXT_COLORS.primary }} />
+                <span style={{ color: TEXT_COLORS.primary, display: 'inline-block' }}>
+                  <ChevronLeft className="w-5 h-5" />
+                </span>
               </button>
             )}
             <h2 
@@ -974,7 +978,9 @@ function DepositModalContent({
             onClick={onClose}
             className="p-2 rounded-full hover:bg-white/10"
           >
-            <Close className="w-5 h-5" style={{ color: TEXT_COLORS.muted }} />
+            <span style={{ color: TEXT_COLORS.muted, display: 'inline-block' }}>
+              <Close className="w-5 h-5" />
+            </span>
           </button>
         </div>
         

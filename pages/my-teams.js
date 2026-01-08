@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useUser } from '../lib/userContext';
 import { nflLogoMapping, getNflLogoUrl } from '../lib/nflLogos';
 import { getRandomMockDrafters } from '../lib/mockDrafters';
 import { PLAYER_POOL } from '../lib/playerPool';
@@ -163,7 +165,17 @@ const getPlayerImageUrl = (playerName, teamCode, position = null) => {
 };
 
 export default function MyTeams() {
-  const userId = 'NEWUSERNAME'; // Replace with real user ID in production
+  const router = useRouter();
+  const { user, loading: authLoading } = useUser();
+  
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/login');
+    }
+  }, [user, authLoading, router]);
+  
+  const userId = user?.uid;
   const [selectedTournament, setSelectedTournament] = useState(TOURNAMENTS[0]);
   const [selectedTeam, setSelectedTeam] = useState(null);
   // Convert mock data to team format directly

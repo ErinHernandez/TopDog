@@ -34,7 +34,7 @@ function getStripe(): Stripe | null {
   if (!STRIPE_SECRET_KEY) return null;
   if (!stripeInstance) {
     stripeInstance = new Stripe(STRIPE_SECRET_KEY, {
-      apiVersion: '2024-12-18.acacia',
+      apiVersion: '2025-07-30.basil',
     });
   }
   return stripeInstance;

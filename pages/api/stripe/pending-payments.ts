@@ -7,17 +7,24 @@
  * These are payments that require offline action to complete.
  */
 
-import type { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiResponse } from 'next';
+import type { AuthenticatedRequest } from '../../../lib/apiTypes';
 import Stripe from 'stripe';
 import { adminDb } from '../../../lib/firebase/firebaseAdmin';
 import { createScopedLogger } from '../../../lib/serverLogger';
+import { withAuth, verifyUserAccess } from '../../../lib/apiAuth';
+import { createPaymentRateLimiter, withRateLimit } from '../../../lib/rateLimitConfig';
+import { sanitizeID } from '../../../lib/inputSanitization';
 
 const logger = createScopedLogger('[API:PendingPayments]');
 
 // Initialize Stripe with secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2023-10-16',
+  apiVersion: '2025-07-30.basil',
 });
+
+// Create rate limiter
+const pendingPaymentsLimiter = createPaymentRateLimiter('paymentMethods');
 
 // ============================================================================
 // TYPES
@@ -141,8 +148,8 @@ function getPaymentStatus(paymentIntent: Stripe.PaymentIntent): 'pending' | 'exp
 // API HANDLER
 // ============================================================================
 
-export default async function handler(
-  req: NextApiRequest,
+const handler = async function(
+  req: AuthenticatedRequest,
   res: NextApiResponse<ApiResponse>
 ) {
   // Only allow GET
@@ -156,23 +163,55 @@ export default async function handler(
     });
   }
   
+  // Check rate limit
+  const rateLimitResult = await pendingPaymentsLimiter.check(req);
+  
+  // Set rate limit headers
+  res.setHeader('X-RateLimit-Limit', pendingPaymentsLimiter.config.maxRequests);
+  res.setHeader('X-RateLimit-Remaining', rateLimitResult.remaining);
+  res.setHeader('X-RateLimit-Reset', Math.floor(rateLimitResult.resetAt / 1000));
+  
+  if (!rateLimitResult.allowed) {
+    return res.status(429).json({
+      ok: false,
+      error: {
+        code: 'RATE_LIMIT_EXCEEDED',
+        message: 'Too many requests. Please try again later.',
+      },
+    });
+  }
+  
   const { userId } = req.query;
   
-  if (!userId || typeof userId !== 'string') {
+  // Sanitize and validate input
+  const sanitizedUserId = typeof userId === 'string' ? sanitizeID(userId) : null;
+  
+  // Verify user access
+  if (req.user && sanitizedUserId && !verifyUserAccess(req.user.uid, sanitizedUserId)) {
+    return res.status(403).json({
+      ok: false,
+      error: {
+        code: 'FORBIDDEN',
+        message: 'Access denied',
+      },
+    });
+  }
+  
+  if (!sanitizedUserId) {
     return res.status(400).json({
       ok: false,
       error: {
         code: 'INVALID_REQUEST',
-        message: 'userId is required',
+        message: 'userId is required and must be valid',
       },
     });
   }
   
   try {
-    logger.debug('Fetching pending payments', { userId });
+    logger.debug('Fetching pending payments', { userId: sanitizedUserId });
     
     // First, get user's Stripe customer ID from Firebase
-    const userDoc = await adminDb.collection('users').doc(userId).get();
+    const userDoc = await adminDb.collection('users').doc(sanitizedUserId).get();
     const userData = userDoc.data();
     const stripeCustomerId = userData?.stripeCustomerId;
     
@@ -218,7 +257,7 @@ export default async function handler(
     }
     
     logger.debug('Found pending payments', { 
-      userId, 
+      userId: sanitizedUserId, 
       count: pendingPayments.length,
     });
     
@@ -228,17 +267,21 @@ export default async function handler(
     });
     
   } catch (error) {
-    logger.error('Error fetching pending payments', { userId, error });
-    
-    const message = error instanceof Error ? error.message : 'Unknown error';
+    logger.error('Error fetching pending payments', { userId: sanitizedUserId, error });
     
     return res.status(500).json({
       ok: false,
       error: {
         code: 'INTERNAL_ERROR',
-        message: `Failed to fetch pending payments: ${message}`,
+        message: 'Failed to fetch pending payments',
       },
     });
   }
-}
+};
+
+// Export with authentication and rate limiting
+export default withAuth(
+  withRateLimit(handler, pendingPaymentsLimiter),
+  { required: true, allowAnonymous: false }
+);
 

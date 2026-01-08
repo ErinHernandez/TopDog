@@ -213,7 +213,9 @@ function DynamicIslandStatusBar({ device, scale }: DynamicIslandStatusBarProps):
   
   // iPhone 16 Pro series has slightly larger island offset
   const is16Pro = device.width >= 402;
-  const contentTop = islandTop + (islandHeight / 2) - (config.timeFontSize / 2) - 1;
+  // Center content vertically with the middle of the Dynamic Island
+  // Account for line-height by adding a small offset
+  const contentTop = islandTop + (islandHeight / 2) - (config.timeFontSize / 2) + 1;
   
   return (
     <>

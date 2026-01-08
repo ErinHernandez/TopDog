@@ -7,7 +7,8 @@
  * GET /api/stripe/customer?userId={userId} - Get customer with payment methods
  */
 
-import type { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiResponse } from 'next';
+import type { AuthenticatedRequest } from '../../../lib/apiTypes';
 import { 
   withErrorHandling, 
   validateMethod, 
@@ -20,13 +21,36 @@ import {
   getCustomerWithPaymentMethods,
   getUserPaymentData,
 } from '../../../lib/stripe';
+import { withAuth, verifyUserAccess } from '../../../lib/apiAuth';
+import { createPaymentRateLimiter, withRateLimit } from '../../../lib/rateLimitConfig';
+import { withCSRFProtection } from '../../../lib/csrfProtection';
 
-export default async function handler(
-  req: NextApiRequest, 
+// Create rate limiter
+const customerLimiter = createPaymentRateLimiter('paymentMethods');
+
+const handler = async function(
+  req: AuthenticatedRequest, 
   res: NextApiResponse
 ) {
   return withErrorHandling(req, res, async (req, res, logger) => {
     validateMethod(req, ['GET', 'POST'], logger);
+    
+    // Check rate limit
+    const rateLimitResult = await customerLimiter.check(req);
+    
+    // Set rate limit headers
+    res.setHeader('X-RateLimit-Limit', customerLimiter.config.maxRequests);
+    res.setHeader('X-RateLimit-Remaining', rateLimitResult.remaining);
+    res.setHeader('X-RateLimit-Reset', Math.floor(rateLimitResult.resetAt / 1000));
+    
+    if (!rateLimitResult.allowed) {
+      return res.status(429).json({
+        success: false,
+        error: 'RATE_LIMIT_EXCEEDED',
+        message: 'Too many requests. Please try again later.',
+        retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000),
+      });
+    }
     
     if (req.method === 'POST') {
       return handleCreateCustomer(req, res, logger);
@@ -34,17 +58,36 @@ export default async function handler(
       return handleGetCustomer(req, res, logger);
     }
   });
-}
+};
+
+// Export with authentication, CSRF protection (for POST), and rate limiting
+export default withCSRFProtection(
+  withAuth(
+    withRateLimit(handler, customerLimiter),
+    { required: true, allowAnonymous: false }
+  )
+);
 
 /**
  * POST - Create or retrieve Stripe Customer
  */
 async function handleCreateCustomer(
-  req: NextApiRequest,
+  req: AuthenticatedRequest,
   res: NextApiResponse,
   logger: { info: (msg: string, data?: unknown) => void }
 ) {
   const { userId, email, name } = req.body;
+  
+  // Verify user access
+  if (req.user && !verifyUserAccess(req.user.uid, userId || '')) {
+    const error = createErrorResponse(
+      ErrorType.FORBIDDEN,
+      'Access denied',
+      403,
+      logger
+    );
+    return res.status(error.statusCode).json(error.body);
+  }
   
   if (!userId || !email) {
     const error = createErrorResponse(
@@ -91,11 +134,22 @@ async function handleCreateCustomer(
  * GET - Retrieve customer with payment methods
  */
 async function handleGetCustomer(
-  req: NextApiRequest,
+  req: AuthenticatedRequest,
   res: NextApiResponse,
   logger: { info: (msg: string, data?: unknown) => void }
 ) {
   const { userId } = req.query;
+  
+  // Verify user access
+  if (req.user && typeof userId === 'string' && !verifyUserAccess(req.user.uid, userId)) {
+    const error = createErrorResponse(
+      ErrorType.FORBIDDEN,
+      'Access denied',
+      403,
+      logger
+    );
+    return res.status(error.statusCode).json(error.body);
+  }
   
   if (!userId || typeof userId !== 'string') {
     const error = createErrorResponse(

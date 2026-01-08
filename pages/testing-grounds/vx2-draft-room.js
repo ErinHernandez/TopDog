@@ -167,6 +167,7 @@ export default function VX2DraftRoomPage() {
           {/* Phone Frame */}
           <div
             className="bg-black rounded-[40px] overflow-hidden shadow-2xl flex-shrink-0 relative"
+            data-phone-frame="true"
             style={{
               width: '375px',
               height: '812px',

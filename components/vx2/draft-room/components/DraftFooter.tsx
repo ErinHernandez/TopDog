@@ -266,7 +266,7 @@ export default function DraftFooter({
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                justifyContent: 'flex-start',
+                justifyContent: 'center',
                 position: 'relative',
                 minHeight: FOOTER_PX.tabMinHeight,
                 paddingLeft: FOOTER_PX.tabPaddingX,

@@ -1,23 +1,42 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
+import { getAuth } from 'firebase/auth';
 import { canAccessDevFeatures } from '../lib/devAuth';
 import DevAccessModal from '../components/DevAccessModal';
+import { useAuthContext } from '../components/vx2/auth/context/AuthContext';
 
 export default function DevAccess() {
   const router = useRouter();
+  const { user, isAuthenticated } = useAuthContext();
   const [hasDevAccess, setHasDevAccess] = useState(false);
   const [showAccessModal, setShowAccessModal] = useState(false);
 
   useEffect(() => {
     checkDevAccess();
-  }, []);
+  }, [user, isAuthenticated]);
 
-  const checkDevAccess = () => {
+  const checkDevAccess = async () => {
     const accessToken = sessionStorage.getItem('devAccessToken');
-    const userId = 'Not Todd Middleton'; // Replace with real user ID in production
     
-    if (canAccessDevFeatures(userId, accessToken)) {
+    // Get Firebase auth token to check custom claims
+    let authToken = null;
+    if (isAuthenticated && user) {
+      try {
+        const auth = getAuth();
+        const tokenResult = await auth.currentUser?.getIdTokenResult(true);
+        if (tokenResult) {
+          authToken = tokenResult.claims;
+        }
+      } catch (error) {
+        console.warn('[DevAccess] Failed to get auth token:', error);
+      }
+    }
+    
+    // Use proper authentication context instead of hardcoded user ID
+    const userId = user?.uid || null;
+    
+    if (canAccessDevFeatures(userId, accessToken, authToken)) {
       setHasDevAccess(true);
     } else {
       setShowAccessModal(true);

@@ -15,6 +15,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { TILED_BG_STYLE } from '../constants';
 import { createScopedLogger } from '../../../../lib/clientLogger';
+import { DRAFT_TIMER } from '../../core/constants/timing';
 
 const logger = createScopedLogger('[DraftNavbar]');
 

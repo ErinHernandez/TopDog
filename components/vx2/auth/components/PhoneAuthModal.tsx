@@ -386,7 +386,7 @@ function VerifyStep({
   error,
 }: VerifyStepProps): React.ReactElement {
   const [code, setCode] = useState(['', '', '', '', '', '']);
-  const [resendCooldown, setResendCooldown] = useState(PHONE_CONSTRAINTS.RESEND_COOLDOWN_SECONDS);
+  const [resendCooldown, setResendCooldown] = useState<number>(PHONE_CONSTRAINTS.RESEND_COOLDOWN_SECONDS);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   
   // Cooldown timer

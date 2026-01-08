@@ -156,7 +156,7 @@ export async function registerBiometric(
     const challenge = generateChallenge();
     
     const publicKeyCredentialCreationOptions: PublicKeyCredentialCreationOptions = {
-      challenge,
+      challenge: challenge.buffer as ArrayBuffer,
       rp: {
         name: 'TopDog',
         id: window.location.hostname,
@@ -254,7 +254,7 @@ export async function authenticateWithBiometric(
     }));
 
     const publicKeyCredentialRequestOptions: PublicKeyCredentialRequestOptions = {
-      challenge,
+      challenge: challenge.buffer as ArrayBuffer,
       rpId: window.location.hostname,
       allowCredentials,
       userVerification: 'required',

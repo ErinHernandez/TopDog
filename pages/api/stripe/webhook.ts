@@ -56,7 +56,7 @@ function getStripe(): Stripe {
   }
   if (!stripe) {
     stripe = new Stripe(STRIPE_SECRET_KEY, {
-      apiVersion: '2024-12-18.acacia',
+      apiVersion: '2025-07-30.basil',
     });
   }
   return stripe;
@@ -206,7 +206,7 @@ async function processEvent(event: Stripe.Event): Promise<ProcessingResult> {
           event.data.object as Stripe.Transfer
         );
         
-      case 'transfer.failed':
+      case 'transfer.failed' as Stripe.Event.Type:
         return await handleTransferFailed(
           event.data.object as Stripe.Transfer
         );
@@ -316,8 +316,6 @@ async function handlePaymentIntentSucceeded(
         paymentMethodDisplay = 'GrabPay';
       } else if (pm.type === 'multibanco') {
         paymentMethodDisplay = 'Multibanco';
-      } else if (pm.type === 'mb_way') {
-        paymentMethodDisplay = 'MB WAY';
       } else if (pm.type === 'paynow') {
         paymentMethodDisplay = 'PayNow';
       } else if (pm.type === 'promptpay') {
@@ -359,9 +357,6 @@ async function handlePaymentIntentSucceeded(
   }
   
   // Credit user balance
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'webhook.ts:362',message:'Calling updateUserBalance from webhook',data:{userId,amount:paymentIntent.amount,currency,paymentIntentId:paymentIntent.id},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-  // #endregion
   await updateUserBalance(userId, paymentIntent.amount, 'add');
   actions.push('balance_credited');
   
@@ -449,7 +444,7 @@ async function handlePaymentIntentRequiresAction(
   }
   
   // Log event
-  await logPaymentEvent(userId, 'payment_requires_action', {
+  await logPaymentEvent(userId, 'payment_initiated', {
     amountCents: paymentIntent.amount,
     severity: 'low',
     metadata: { 
@@ -497,7 +492,7 @@ async function handlePaymentIntentProcessing(
   }
   
   // Log event
-  await logPaymentEvent(userId, 'payment_processing', {
+  await logPaymentEvent(userId, 'payment_initiated', {
     transactionId: existingTx?.id,
     amountCents: paymentIntent.amount,
     severity: 'low',
@@ -559,9 +554,6 @@ async function handleTransferCreated(
   }
   
   // Debit user balance
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'webhook.ts:559',message:'Calling updateUserBalance for transfer',data:{userId,amount:transfer.amount,currency,transferId:transfer.id},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-  // #endregion
   await updateUserBalance(userId, transfer.amount, 'subtract');
   
   // Create transaction record with currency

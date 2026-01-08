@@ -2,22 +2,26 @@
  * VX2 SignUpModal - Enterprise Sign Up Modal
  * 
  * Multi-step registration flow:
- * 1. Email & Password
- * 2. Username Selection
- * 3. Country Selection
- * 4. Success / Email Verification
+ * 1. Email & Password (with strength indicator)
+ * 2. Username Selection (with VIP checking)
+ * 3. Email Verification
+ * 4. Success
+ * 
+ * Note: Secondary method (phone/email for 2FA withdrawals) is OPTIONAL
+ * and can be added later in profile settings. This simplifies onboarding.
  * 
  * Features:
  * - Real-time validation
- * - Country-specific username characters
  * - Password strength indicator
  * - VIP username checking
+ * - Polished loading states
+ * - Keyboard navigation
  * - Accessibility compliant
  */
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../../core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY, Z_INDEX } from '../../core/constants/sizes';
+import { SPACING, TYPOGRAPHY, Z_INDEX } from '../../core/constants/sizes';
 import { Close, ChevronLeft } from '../../components/icons';
 import { UsernameInput } from './UsernameInput';
 import { useAuth } from '../hooks/useAuth';
@@ -34,8 +38,23 @@ export interface SignUpModalProps {
   onSuccess?: () => void;
 }
 
-type SignUpStep = 'credentials' | 'username' | 'emailVerify' | 'secondaryMethod' | 'success';
-type SecondaryMethodType = 'phone' | 'email';
+type SignUpStep = 'credentials' | 'username' | 'emailVerify' | 'success';
+
+// ============================================================================
+// LOGO COMPONENT
+// ============================================================================
+
+function TopDogLogo(): React.ReactElement {
+  return (
+    <div className="flex items-center justify-center">
+      <img 
+        src="/logo.png" 
+        alt="TopDog" 
+        style={{ height: 48 }}
+      />
+    </div>
+  );
+}
 
 // ============================================================================
 // PASSWORD STRENGTH INDICATOR
@@ -58,38 +77,125 @@ function PasswordStrength({ password }: PasswordStrengthProps): React.ReactEleme
   
   const score = Object.values(checks).filter(Boolean).length;
   
-  // Map 7-point score to 5 levels: 0=none, 1=Weak, 2=Fair, 3=Good, 4=Strong
   let strength: number;
-  if (score <= 2) strength = 1;      // Weak: just length or 1-2 checks
-  else if (score <= 3) strength = 2; // Fair: 3 checks
-  else if (score <= 5) strength = 3; // Good: 4-5 checks
-  else strength = 4;                 // Strong: 6-7 checks (needs special char + good length)
+  if (score <= 2) strength = 1;
+  else if (score <= 3) strength = 2;
+  else if (score <= 5) strength = 3;
+  else strength = 4;
   
   const strengthLabel = ['', 'Weak', 'Fair', 'Good', 'Strong'][strength];
-  const strengthColor = ['', STATE_COLORS.error, STATE_COLORS.warning, '#84cc16', STATE_COLORS.success][strength]; // Good = lime, Strong = green
+  const strengthColor = ['', STATE_COLORS.error, STATE_COLORS.warning, '#84cc16', STATE_COLORS.success][strength];
   
-  // Always render the same structure to prevent layout shift, but only show content when typing
   return (
-    <div className="mt-2" style={{ opacity: password ? 1 : 0, transition: 'opacity 0.2s' }}>
-      <div className="flex gap-1 mb-1">
+    <div className="mt-3" style={{ opacity: password ? 1 : 0, transition: 'opacity 0.2s' }}>
+      <div className="flex gap-1.5 mb-2">
         {[1, 2, 3, 4].map((level) => (
           <div
             key={level}
-            className="flex-1 h-1 rounded-full transition-colors"
+            className="flex-1 h-1.5 rounded-full transition-colors"
             style={{
               backgroundColor: strength >= level ? strengthColor : 'rgba(255,255,255,0.1)',
             }}
           />
         ))}
       </div>
-      <div className="flex justify-between items-center" style={{ minHeight: 17 }}>
-        <span style={{ color: strengthColor, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>
+      <div className="flex justify-between items-center">
+        <span style={{ color: strengthColor, fontSize: 13 }}>
           {strengthLabel || '\u00A0'}
         </span>
-        <span style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>
+        <span style={{ color: TEXT_COLORS.muted, fontSize: 13 }}>
           {password.length}/{PASSWORD_CONSTRAINTS.MIN_LENGTH}+ chars
         </span>
       </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// INPUT COMPONENT
+// ============================================================================
+
+interface InputProps {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+  type?: string;
+  autoComplete?: string;
+  disabled?: boolean;
+  error?: string | null;
+  touched?: boolean;
+  inputRef?: React.RefObject<HTMLInputElement>;
+  onBlur?: () => void;
+  rightElement?: React.ReactNode;
+  label?: string;
+}
+
+function Input({
+  value,
+  onChange,
+  placeholder,
+  type = 'text',
+  autoComplete,
+  disabled,
+  error,
+  touched,
+  inputRef,
+  onBlur,
+  rightElement,
+  label,
+}: InputProps): React.ReactElement {
+  const hasError = touched && error;
+  
+  return (
+    <div>
+      {label && (
+        <label 
+          className="block font-medium mb-2"
+          style={{ color: TEXT_COLORS.primary, fontSize: 15 }}
+        >
+          {label}
+        </label>
+      )}
+      <div className="relative">
+        <input
+          ref={inputRef}
+          type={type}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onBlur={onBlur}
+          placeholder={placeholder}
+          autoComplete={autoComplete}
+          disabled={disabled}
+          className="w-full px-5 py-4 rounded-xl outline-none transition-all"
+          style={{
+            backgroundColor: 'rgba(255,255,255,0.05)',
+            color: TEXT_COLORS.primary,
+            border: `2px solid ${hasError ? STATE_COLORS.error : BORDER_COLORS.default}`,
+            fontSize: 17,
+            height: 56,
+            opacity: disabled ? 0.5 : 1,
+            paddingRight: rightElement ? 52 : 20,
+          }}
+        />
+        {rightElement && (
+          <div className="absolute right-4 top-1/2 -translate-y-1/2">
+            {rightElement}
+          </div>
+        )}
+      </div>
+      {hasError && (
+        <div 
+          className="flex items-center gap-1.5 mt-2 px-1"
+          style={{ color: STATE_COLORS.error, fontSize: 13 }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          {error}
+        </div>
+      )}
     </div>
   );
 }
@@ -124,6 +230,9 @@ function CredentialsStep({
   error,
 }: CredentialsStepProps): React.ReactElement {
   const [emailTouched, setEmailTouched] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const emailRef = useRef<HTMLInputElement>(null);
   
   const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const isValidPassword = password.length >= PASSWORD_CONSTRAINTS.MIN_LENGTH &&
@@ -135,199 +244,169 @@ function CredentialsStep({
   const showEmailError = emailTouched && email && !isValidEmail;
   const canContinue = isValidEmail && isValidPassword && passwordsMatch;
   
+  // Auto-focus email input
+  useEffect(() => {
+    setTimeout(() => emailRef.current?.focus(), 100);
+  }, []);
+  
+  // Keyboard handling
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && canContinue) {
+      e.preventDefault();
+      onContinue();
+    }
+  }, [canContinue, onContinue]);
+  
   return (
-    <div className="flex flex-col h-full">
-      {/* Header */}
+    <div className="flex flex-col h-full" onKeyDown={handleKeyDown}>
+      {/* Header with Close Button */}
       <div 
-        className="flex flex-col items-start flex-shrink-0 relative"
-        style={{ 
-          padding: `${SPACING.xl}px ${SPACING.xl}px ${SPACING.lg}px`, 
-          borderBottom: `1px solid ${BORDER_COLORS.default}` 
-        }}
+        className="flex items-center justify-end flex-shrink-0"
+        style={{ padding: `${SPACING.md}px ${SPACING.lg}px` }}
       >
         <button 
           onClick={onClose} 
-          className="p-2 absolute right-4 top-4" 
+          className="p-2 rounded-full transition-colors hover:bg-white/10" 
           aria-label="Close"
         >
-          <Close size={28} color={TEXT_COLORS.muted} />
+          <Close size={24} color={TEXT_COLORS.muted} />
         </button>
-        <div 
-          style={{ 
-            width: 56, 
-            height: 56,
-            background: 'url(/wr_blue.png) center center / cover no-repeat',
-            WebkitMaskImage: 'url(/logo.png)',
-            WebkitMaskSize: 'contain',
-            WebkitMaskRepeat: 'no-repeat',
-            WebkitMaskPosition: 'center',
-            maskImage: 'url(/logo.png)',
-            maskSize: 'contain',
-            maskRepeat: 'no-repeat',
-            maskPosition: 'center',
-          }}
-        />
-        <h2 
-          className="font-bold mt-3" 
-          style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize['2xl']}px` }}
-        >
-          Create Account
-        </h2>
       </div>
       
       {/* Content */}
       <div 
         className="flex-1 overflow-y-auto" 
-        style={{ padding: SPACING.xl, scrollbarWidth: 'none' }}
+        style={{ padding: `0 ${SPACING.xl}px`, scrollbarWidth: 'none' }}
       >
+        {/* Logo & Welcome */}
+        <div className="text-center mb-8">
+          <TopDogLogo />
+          <p 
+            className="mt-6"
+            style={{ color: TEXT_COLORS.secondary, fontSize: 17 }}
+          >
+            Create your account
+          </p>
+        </div>
+        
         {/* Error Message */}
         {error && (
           <div 
-            className="mb-4 p-3 rounded-lg"
+            className="mb-4 p-4 rounded-xl flex items-center gap-3"
             style={{ 
               backgroundColor: 'rgba(239, 68, 68, 0.1)', 
-              color: STATE_COLORS.error,
-              fontSize: `${TYPOGRAPHY.fontSize.sm}px` 
+              border: `1px solid ${STATE_COLORS.error}20`,
             }}
           >
-            {error}
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.error} strokeWidth="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            <span style={{ color: STATE_COLORS.error, fontSize: 15 }}>
+              {error}
+            </span>
           </div>
         )}
         
-        {/* Email Input */}
-        <div className="mb-5">
-          <label 
-            className="block font-medium mb-4"
-            style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}
-          >
-            Email Address
-          </label>
-          <input
-            type="email"
+        <div className="space-y-4">
+          {/* Email Input */}
+          <Input
+            inputRef={emailRef}
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            onFocus={() => setEmailTouched(false)}
+            onChange={setEmail}
             onBlur={() => setEmailTouched(true)}
-            placeholder="you@example.com"
+            placeholder="Email address"
+            type="email"
             autoComplete="email"
-            className="w-full px-5 py-4 rounded-xl outline-none transition-colors"
-            style={{
-              backgroundColor: 'rgba(255,255,255,0.05)',
-              color: TEXT_COLORS.primary,
-              border: `2px solid ${showEmailError ? STATE_COLORS.error : BORDER_COLORS.default}`,
-              fontSize: `${TYPOGRAPHY.fontSize.lg}px`,
-            }}
+            error={showEmailError ? 'Please enter a valid email' : null}
+            touched={emailTouched}
           />
-          {showEmailError && (
-            <span 
-              className="block mt-1"
-              style={{ color: STATE_COLORS.error, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}
-            >
-              Please enter a valid email
-            </span>
-          )}
-        </div>
-        
-        {/* Divider */}
-        <div 
-          style={{ 
-            borderTop: `1px solid ${BORDER_COLORS.default}`,
-            marginTop: SPACING.sm,
-            marginBottom: SPACING.lg,
-          }} 
-        />
-        
-        {/* Password Input */}
-        <div className="mb-1">
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Create a password"
-            autoComplete="new-password"
-            className="w-full px-5 py-4 rounded-xl outline-none transition-colors"
-            style={{
-              backgroundColor: 'rgba(255,255,255,0.05)',
-              color: TEXT_COLORS.primary,
-              border: `2px solid ${BORDER_COLORS.default}`,
-              fontSize: `${TYPOGRAPHY.fontSize.lg}px`,
-            }}
-          />
-          <PasswordStrength password={password} />
-        </div>
-        
-        {/* Confirm Password Input */}
-        <div className="mb-8">
-          <input
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="Confirm your password"
-            autoComplete="new-password"
-            className="w-full px-5 py-4 rounded-xl outline-none transition-colors"
-            style={{
-              backgroundColor: 'rgba(255,255,255,0.05)',
-              color: TEXT_COLORS.primary,
-              border: `2px solid ${confirmPassword && !passwordsMatch ? STATE_COLORS.error : passwordsMatch ? STATE_COLORS.success : BORDER_COLORS.default}`,
-              fontSize: `${TYPOGRAPHY.fontSize.lg}px`,
-            }}
-          />
-          {/* Password match indicator */}
-          {confirmPassword && (
-            <div className="flex items-center gap-1 mt-2">
-              {confirmPassword.split('').map((char, index) => {
-                const matches = password[index] === char;
-                return (
-                  <span 
-                    key={index}
-                    style={{ 
-                      color: matches ? STATE_COLORS.success : STATE_COLORS.error,
-                      fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-                      fontWeight: 600,
-                    }}
-                  >
-                    *
-                  </span>
-                );
-              })}
-              {passwordsMatch && (
-                <svg 
-                  width="14" 
-                  height="14" 
-                  viewBox="0 0 24 24" 
-                  fill="none"
-                  className="ml-1"
-                  style={{ color: STATE_COLORS.success }}
+          
+          {/* Password Input */}
+          <div>
+            <Input
+              value={password}
+              onChange={setPassword}
+              placeholder="Create a password"
+              type={showPassword ? 'text' : 'password'}
+              autoComplete="new-password"
+              rightElement={
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="p-1 rounded transition-colors hover:bg-white/10"
+                  style={{ color: TEXT_COLORS.muted }}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  tabIndex={-1}
                 >
-                  <path
-                    d="M20 6L9 17L4 12"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              )}
-            </div>
-          )}
+                  {showPassword ? (
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" strokeLinecap="round" strokeLinejoin="round"/>
+                      <line x1="1" y1="1" x2="23" y2="23" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  ) : (
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" strokeLinecap="round" strokeLinejoin="round"/>
+                      <circle cx="12" cy="12" r="3" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  )}
+                </button>
+              }
+            />
+            <PasswordStrength password={password} />
+          </div>
+          
+          {/* Confirm Password Input */}
+          <Input
+            value={confirmPassword}
+            onChange={setConfirmPassword}
+            placeholder="Confirm password"
+            type={showConfirmPassword ? 'text' : 'password'}
+            autoComplete="new-password"
+            error={confirmPassword && !passwordsMatch ? 'Passwords do not match' : null}
+            touched={confirmPassword.length > 0}
+            rightElement={
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="p-1 rounded transition-colors hover:bg-white/10"
+                style={{ color: TEXT_COLORS.muted }}
+                aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                tabIndex={-1}
+              >
+                {showConfirmPassword ? (
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" strokeLinecap="round" strokeLinejoin="round"/>
+                    <line x1="1" y1="1" x2="23" y2="23" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                ) : (
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" strokeLinecap="round" strokeLinejoin="round"/>
+                    <circle cx="12" cy="12" r="3" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+              </button>
+            }
+          />
         </div>
         
         {/* Password Requirements */}
         <div 
-          className="p-4 rounded-lg mb-4"
+          className="p-4 rounded-xl mt-6"
           style={{ backgroundColor: 'rgba(255,255,255,0.03)' }}
         >
           <div 
             className="font-medium mb-3"
-            style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}
+            style={{ color: TEXT_COLORS.secondary, fontSize: 15 }}
           >
-            Password must have:
+            Password requirements:
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2">
             {[
               { check: password.length >= 8, label: '8+ characters' },
-              { check: /[A-Z]/.test(password), label: 'Uppercase letter' },
-              { check: /[a-z]/.test(password), label: 'Lowercase letter' },
+              { check: /[A-Z]/.test(password), label: 'Uppercase' },
+              { check: /[a-z]/.test(password), label: 'Lowercase' },
               { check: /\d/.test(password), label: 'Number' },
             ].map((req, i) => (
               <div 
@@ -335,15 +414,15 @@ function CredentialsStep({
                 className="flex items-center gap-2"
                 style={{ 
                   color: req.check ? STATE_COLORS.success : TEXT_COLORS.muted,
-                  fontSize: `${TYPOGRAPHY.fontSize.lg}px` 
+                  fontSize: 14,
                 }}
               >
                 {req.check ? (
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                     <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 ) : (
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                     <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="2"/>
                   </svg>
                 )}
@@ -357,17 +436,22 @@ function CredentialsStep({
       {/* Footer */}
       <div 
         className="flex-shrink-0"
-        style={{ padding: SPACING['2xl'], borderTop: `1px solid ${BORDER_COLORS.default}` }}
+        style={{ 
+          padding: `${SPACING.lg}px ${SPACING.xl}px`,
+          paddingBottom: 'max(env(safe-area-inset-bottom), 24px)',
+          borderTop: `1px solid ${BORDER_COLORS.default}`,
+        }}
       >
         <button
           onClick={onContinue}
           disabled={!canContinue}
-          className="w-full py-5 rounded-xl font-bold transition-all"
+          className="w-full rounded-xl font-bold transition-all"
           style={{
-            fontSize: `${TYPOGRAPHY.fontSize.xl}px`,
-            background: canContinue ? 'url(/wr_blue.png) center center / cover no-repeat' : BG_COLORS.tertiary,
-            color: canContinue ? '#fff' : TEXT_COLORS.disabled,
-            opacity: canContinue ? 1 : 0.5,
+            fontSize: 17,
+            height: 56,
+            backgroundColor: canContinue ? STATE_COLORS.active : BG_COLORS.tertiary,
+            color: canContinue ? '#000' : TEXT_COLORS.disabled,
+            opacity: canContinue ? 1 : 0.6,
           }}
         >
           Continue
@@ -375,19 +459,14 @@ function CredentialsStep({
         
         {onSwitchToSignIn && (
           <p 
-            className="text-center mt-5"
-            style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}
+            className="text-center mt-4"
+            style={{ color: TEXT_COLORS.muted, fontSize: 15 }}
           >
             Already have an account?{' '}
             <button 
               onClick={onSwitchToSignIn}
               className="font-semibold"
-              style={{ 
-                background: 'url(/wr_blue.png) center center / cover no-repeat',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
+              style={{ color: STATE_COLORS.active }}
             >
               Sign In
             </button>
@@ -419,24 +498,34 @@ function UsernameStep({
   canContinue,
   onValidChange,
 }: UsernameStepProps): React.ReactElement {
+  // Keyboard handling
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && canContinue) {
+      e.preventDefault();
+      onContinue();
+    }
+  }, [canContinue, onContinue]);
+  
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full" onKeyDown={handleKeyDown}>
       {/* Header */}
       <div 
         className="flex items-center gap-4 flex-shrink-0"
-        style={{ 
-          padding: `${SPACING.lg}px ${SPACING.xl}px`, 
-          borderBottom: `1px solid ${BORDER_COLORS.default}` 
-        }}
+        style={{ padding: `${SPACING.md}px ${SPACING.lg}px` }}
       >
-        <button onClick={onBack} className="p-2" aria-label="Back">
-          <ChevronLeft size={28} color={TEXT_COLORS.muted} />
+        <button 
+          onClick={onBack} 
+          className="p-2 rounded-full transition-colors hover:bg-white/10" 
+          aria-label="Back"
+        >
+          <ChevronLeft size={24} color={TEXT_COLORS.muted} />
         </button>
       </div>
       
       {/* Content */}
       <div 
-        className="flex-1 flex flex-col justify-center px-8"
+        className="flex-1 flex flex-col justify-center"
+        style={{ padding: `0 ${SPACING.xl}px` }}
       >
         <div className="text-center mb-8">
           <div 
@@ -449,11 +538,11 @@ function UsernameStep({
           </div>
           <h3 
             className="font-bold mb-2"
-            style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize['2xl']}px` }}
+            style={{ color: TEXT_COLORS.primary, fontSize: 24 }}
           >
             Pick your username
           </h3>
-          <p style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}>
+          <p style={{ color: TEXT_COLORS.secondary, fontSize: 15 }}>
             This is how other players will see you
           </p>
         </div>
@@ -462,7 +551,6 @@ function UsernameStep({
           value={username}
           onChange={(value) => {
             setUsername(value);
-            // Reset validity when typing
             onValidChange?.(false);
           }}
           size="lg"
@@ -471,18 +559,18 @@ function UsernameStep({
         
         {/* Username Requirements */}
         <div
-          className="p-4 rounded-lg mt-6"
+          className="p-4 rounded-xl mt-6"
           style={{ backgroundColor: 'rgba(255,255,255,0.03)' }}
         >
           <div
             className="font-medium mb-3"
-            style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}
+            style={{ color: TEXT_COLORS.secondary, fontSize: 15 }}
           >
-            Username must have:
+            Username requirements:
           </div>
-          <div className="grid grid-cols-1 gap-3">
+          <div className="space-y-2">
             {[
-              { check: username.length >= 3, label: '3-18 characters' },
+              { check: username.length >= 3 && username.length <= 18, label: '3-18 characters' },
               { check: /^[a-zA-Z]/.test(username), label: 'Start with a letter' },
               { check: /^[a-zA-Z0-9_]*$/.test(username) && username.length > 0, label: 'Letters, numbers, underscores only' },
             ].map((req, i) => (
@@ -491,15 +579,15 @@ function UsernameStep({
                 className="flex items-center gap-2"
                 style={{
                   color: req.check ? STATE_COLORS.success : TEXT_COLORS.muted,
-                  fontSize: `${TYPOGRAPHY.fontSize.lg}px`
+                  fontSize: 14,
                 }}
               >
                 {req.check ? (
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                     <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 ) : (
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                     <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="2"/>
                   </svg>
                 )}
@@ -513,17 +601,22 @@ function UsernameStep({
       {/* Footer */}
       <div 
         className="flex-shrink-0"
-        style={{ padding: SPACING['2xl'], borderTop: `1px solid ${BORDER_COLORS.default}` }}
+        style={{ 
+          padding: `${SPACING.lg}px ${SPACING.xl}px`,
+          paddingBottom: 'max(env(safe-area-inset-bottom), 24px)',
+          borderTop: `1px solid ${BORDER_COLORS.default}`,
+        }}
       >
         <button
           onClick={onContinue}
           disabled={!canContinue}
-          className="w-full py-5 rounded-xl font-bold transition-all"
+          className="w-full rounded-xl font-bold transition-all"
           style={{
-            fontSize: `${TYPOGRAPHY.fontSize.xl}px`,
-            background: canContinue ? 'url(/wr_blue.png) center center / cover no-repeat' : BG_COLORS.tertiary,
-            color: canContinue ? '#fff' : TEXT_COLORS.disabled,
-            opacity: canContinue ? 1 : 0.5,
+            fontSize: 17,
+            height: 56,
+            backgroundColor: canContinue ? STATE_COLORS.active : BG_COLORS.tertiary,
+            color: canContinue ? '#000' : TEXT_COLORS.disabled,
+            opacity: canContinue ? 1 : 0.6,
           }}
         >
           Continue
@@ -581,10 +674,8 @@ function EmailVerifyStep({
     setIsVerifying(true);
     setVerifyError(null);
     
-    // Simulate verification
     await new Promise(resolve => setTimeout(resolve, 1500));
     
-    // For demo, accept any 6-digit code
     if (code.length === 6) {
       onVerified();
     } else {
@@ -594,29 +685,35 @@ function EmailVerifyStep({
     setIsVerifying(false);
   }, [code, onVerified]);
   
+  // Keyboard handling
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && canSubmit) {
+      e.preventDefault();
+      handleVerify();
+    }
+  }, [canSubmit, handleVerify]);
+  
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full" onKeyDown={handleKeyDown}>
       {/* Header */}
       <div 
         className="flex items-center gap-4 flex-shrink-0"
-        style={{ 
-          padding: `${SPACING.lg}px ${SPACING.xl}px`, 
-          borderBottom: `1px solid ${BORDER_COLORS.default}` 
-        }}
+        style={{ padding: `${SPACING.md}px ${SPACING.lg}px` }}
       >
-        <button onClick={onBack} className="p-2" aria-label="Back">
-          <ChevronLeft size={28} color={TEXT_COLORS.muted} />
-        </button>
-        <h2 
-          className="font-bold" 
-          style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.xl}px` }}
+        <button 
+          onClick={onBack} 
+          className="p-2 rounded-full transition-colors hover:bg-white/10" 
+          aria-label="Back"
         >
-          Verify Email
-        </h2>
+          <ChevronLeft size={24} color={TEXT_COLORS.muted} />
+        </button>
       </div>
       
       {/* Content */}
-      <div className="flex-1 flex flex-col justify-center px-8">
+      <div 
+        className="flex-1 flex flex-col justify-center"
+        style={{ padding: `0 ${SPACING.xl}px` }}
+      >
         <div className="text-center mb-8">
           <div 
             className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4"
@@ -628,28 +725,34 @@ function EmailVerifyStep({
           </div>
           <h3 
             className="font-bold mb-2"
-            style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize['2xl']}px` }}
+            style={{ color: TEXT_COLORS.primary, fontSize: 24 }}
           >
             Check your email
           </h3>
-          <p style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}>
+          <p style={{ color: TEXT_COLORS.secondary, fontSize: 15 }}>
             We sent a 6-digit code to
             <br />
-            <span style={{ color: TEXT_COLORS.primary, fontWeight: 500 }}>{maskedEmail}</span>
+            <span className="font-medium" style={{ color: TEXT_COLORS.primary }}>{maskedEmail}</span>
           </p>
         </div>
         
         {/* Error Message */}
         {(error || verifyError) && (
           <div 
-            className="mb-4 p-3 rounded-lg text-center"
+            className="mb-4 p-4 rounded-xl flex items-center gap-3"
             style={{ 
               backgroundColor: 'rgba(239, 68, 68, 0.1)', 
-              color: STATE_COLORS.error,
-              fontSize: `${TYPOGRAPHY.fontSize.sm}px` 
+              border: `1px solid ${STATE_COLORS.error}20`,
             }}
           >
-            {error || verifyError}
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.error} strokeWidth="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            <span style={{ color: STATE_COLORS.error, fontSize: 15 }}>
+              {error || verifyError}
+            </span>
           </div>
         )}
         
@@ -662,20 +765,20 @@ function EmailVerifyStep({
           maxLength={6}
           autoFocus
           disabled={isVerifying}
-          className="w-full px-5 py-4 rounded-xl outline-none text-center tracking-widest mb-4"
+          className="w-full px-5 py-4 rounded-xl outline-none text-center tracking-[0.5em] font-mono transition-all"
           style={{
             backgroundColor: 'rgba(255,255,255,0.05)',
             color: TEXT_COLORS.primary,
             border: `2px solid ${BORDER_COLORS.default}`,
-            fontSize: `${TYPOGRAPHY.fontSize['2xl']}px`,
-            letterSpacing: '0.5em',
+            fontSize: 24,
+            height: 64,
             opacity: isVerifying ? 0.5 : 1,
           }}
         />
         
         <p 
-          className="text-center"
-          style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
+          className="text-center mt-6"
+          style={{ color: TEXT_COLORS.muted, fontSize: 14 }}
         >
           Didn't receive it? Check your spam folder or{' '}
           {cooldown > 0 ? (
@@ -696,24 +799,29 @@ function EmailVerifyStep({
       {/* Footer */}
       <div 
         className="flex-shrink-0"
-        style={{ padding: SPACING['2xl'], borderTop: `1px solid ${BORDER_COLORS.default}` }}
+        style={{ 
+          padding: `${SPACING.lg}px ${SPACING.xl}px`,
+          paddingBottom: 'max(env(safe-area-inset-bottom), 24px)',
+          borderTop: `1px solid ${BORDER_COLORS.default}`,
+        }}
       >
         <button
           onClick={handleVerify}
           disabled={!canSubmit}
-          className="w-full py-5 rounded-xl font-bold transition-all flex items-center justify-center gap-2"
+          className="w-full rounded-xl font-bold transition-all flex items-center justify-center gap-2"
           style={{
-            fontSize: `${TYPOGRAPHY.fontSize.xl}px`,
-            background: canSubmit ? 'url(/wr_blue.png) center center / cover no-repeat' : BG_COLORS.tertiary,
-            color: canSubmit ? '#fff' : TEXT_COLORS.disabled,
-            opacity: canSubmit ? 1 : 0.5,
+            fontSize: 17,
+            height: 56,
+            backgroundColor: canSubmit ? STATE_COLORS.active : BG_COLORS.tertiary,
+            color: canSubmit ? '#000' : TEXT_COLORS.disabled,
+            opacity: canSubmit ? 1 : 0.6,
           }}
         >
           {isVerifying ? (
             <>
               <div 
                 className="animate-spin rounded-full h-5 w-5 border-2"
-                style={{ borderColor: '#fff transparent transparent transparent' }}
+                style={{ borderColor: '#000 transparent transparent transparent' }}
               />
               Verifying...
             </>
@@ -733,62 +841,15 @@ function EmailVerifyStep({
 interface SuccessStepProps {
   email: string;
   username: string;
-  secondaryType: SecondaryMethodType | null;
-  secondaryValue: string | null;
   onClose: () => void;
 }
 
-function SuccessStep({ email, username, secondaryType, secondaryValue, onClose }: SuccessStepProps): React.ReactElement {
-  const [showVerifyModal, setShowVerifyModal] = useState(false);
-  const [verificationCode, setVerificationCode] = useState('');
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [isVerified, setIsVerified] = useState(false);
-  const [verifyError, setVerifyError] = useState<string | null>(null);
-  
-  const skippedSecondary = !secondaryValue || !secondaryType;
-  
-  const maskedValue = skippedSecondary 
-    ? '' 
-    : secondaryType === 'phone' 
-      ? secondaryValue.slice(0, -4).replace(/\d/g, '*') + secondaryValue.slice(-4)
-      : secondaryValue.replace(/(.{2})(.*)(@.*)/, '$1****$3');
-  
-  const handleVerify = useCallback(async () => {
-    if (verificationCode.length !== 6) return;
-    
-    setIsVerifying(true);
-    setVerifyError(null);
-    
-    // Simulate verification
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // For demo, accept any 6-digit code
-    if (verificationCode.length === 6) {
-      setIsVerified(true);
-      setTimeout(() => {
-        setShowVerifyModal(false);
-      }, 1500);
-    } else {
-      setVerifyError('Invalid verification code');
-    }
-    
-    setIsVerifying(false);
-  }, [verificationCode]);
-  
-  const handleSkipVerification = useCallback(() => {
-    setShowVerifyModal(false);
-  }, []);
-  
-  const handleGetStarted = useCallback(() => {
-    if (skippedSecondary || isVerified) {
-      onClose();
-    } else {
-      setShowVerifyModal(true);
-    }
-  }, [skippedSecondary, isVerified, onClose]);
-  
+function SuccessStep({ email, username, onClose }: SuccessStepProps): React.ReactElement {
   return (
-    <div className="flex flex-col h-full items-center justify-center px-8">
+    <div 
+      className="flex flex-col h-full items-center justify-center"
+      style={{ padding: `0 ${SPACING.xl}px` }}
+    >
       <div 
         className="w-24 h-24 rounded-full flex items-center justify-center mb-6"
         style={{ backgroundColor: 'rgba(16, 185, 129, 0.15)' }}
@@ -800,536 +861,58 @@ function SuccessStep({ email, username, secondaryType, secondaryValue, onClose }
       
       <h2 
         className="font-bold mb-3"
-        style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize['3xl']}px` }}
+        style={{ color: TEXT_COLORS.primary, fontSize: 28 }}
       >
         Welcome, {username}!
       </h2>
       
       <p 
         className="text-center mb-6"
-        style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.xl}px` }}
+        style={{ color: TEXT_COLORS.secondary, fontSize: 17 }}
       >
         Your account has been created
       </p>
       
       <div 
-        className="text-center mb-6 px-5 py-4 rounded-lg w-full"
+        className="text-center mb-6 px-5 py-4 rounded-xl w-full"
         style={{ 
           backgroundColor: 'rgba(255,255,255,0.03)', 
-          color: TEXT_COLORS.muted, 
-          fontSize: `${TYPOGRAPHY.fontSize.base}px` 
         }}
       >
-        <p className="mb-2">We sent a verification email to:</p>
-        <p style={{ color: TEXT_COLORS.primary, fontWeight: 500 }}>{email}</p>
-        <p className="mt-2">Check your inbox to verify your account.</p>
+        <p style={{ color: TEXT_COLORS.muted, fontSize: 14 }} className="mb-2">
+          We sent a verification email to:
+        </p>
+        <p style={{ color: TEXT_COLORS.primary, fontWeight: 500, fontSize: 15 }}>{email}</p>
+        <p style={{ color: TEXT_COLORS.muted, fontSize: 14 }} className="mt-2">
+          Check your inbox to verify your account.
+        </p>
       </div>
       
-      {/* Security confirmation - skipped, pending or verified */}
-      <div 
-        className="flex items-center gap-3 mb-4 px-5 py-4 rounded-lg w-full"
-        style={{ backgroundColor: isVerified ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)' }}
-      >
-        {isVerified ? (
-          <>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.success} strokeWidth="2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-            </svg>
-            <span style={{ color: STATE_COLORS.success, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}>
-              Two-step verification active for withdrawals
-            </span>
-          </>
-        ) : skippedSecondary ? (
-          <>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.warning} strokeWidth="2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-            <div className="flex-1">
-              <span style={{ color: STATE_COLORS.warning, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}>
-                Two-step security not set up
-              </span>
-              <p style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.xs}px`, marginTop: 2 }}>
-                Add a secondary login method in settings to enable withdrawals
-              </p>
-            </div>
-          </>
-        ) : (
-          <>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.warning} strokeWidth="2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-            <div className="flex-1">
-              <span style={{ color: STATE_COLORS.warning, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}>
-                Secondary login pending verification
-              </span>
-              <p style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.xs}px`, marginTop: 2 }}>
-                Verify your {secondaryType} to enable two-step withdrawals
-              </p>
-            </div>
-          </>
-        )}
-      </div>
-
       {/* Tax reminder */}
       <div 
-        className="text-center mb-6 px-5 py-4 rounded-lg w-full"
+        className="text-center mb-8 px-5 py-4 rounded-xl w-full"
         style={{ 
           backgroundColor: 'rgba(255,255,255,0.03)', 
           borderLeft: `3px solid ${TEXT_COLORS.muted}`,
         }}
       >
-        <p style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+        <p style={{ color: TEXT_COLORS.muted, fontSize: 13 }}>
           You are responsible for reporting and paying any applicable taxes on winnings in accordance with your local tax laws.
         </p>
       </div>
       
       <button 
-        onClick={handleGetStarted}
-        className="w-full py-5 rounded-xl font-bold"
+        onClick={onClose}
+        className="w-full rounded-xl font-bold"
         style={{ 
-          background: 'url(/wr_blue.png) center center / cover no-repeat', 
-          color: '#fff', 
-          fontSize: `${TYPOGRAPHY.fontSize.xl}px` 
+          backgroundColor: STATE_COLORS.active,
+          color: '#000', 
+          fontSize: 17,
+          height: 56,
         }}
       >
-        {isVerified || skippedSecondary ? 'Get Started' : 'Verify & Get Started'}
+        Get Started
       </button>
-      
-      {!isVerified && !skippedSecondary && (
-        <button 
-          onClick={onClose}
-          className="mt-4 py-3"
-          style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}
-        >
-          Skip for now
-        </button>
-      )}
-      
-      {/* Verification Modal */}
-      {showVerifyModal && (
-        <div 
-          className="absolute inset-0 flex items-center justify-center"
-          style={{ backgroundColor: 'rgba(0,0,0,0.8)', zIndex: Z_INDEX.modal + 10 }}
-        >
-          <div 
-            className="w-full max-w-sm mx-6 rounded-2xl overflow-hidden"
-            style={{ backgroundColor: BG_COLORS.secondary }}
-          >
-            {/* Modal Header */}
-            <div 
-              className="flex items-center justify-between p-5"
-              style={{ borderBottom: `1px solid ${BORDER_COLORS.default}` }}
-            >
-              <h3 
-                className="font-bold"
-                style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.xl}px` }}
-              >
-                Verify {secondaryType === 'phone' ? 'Phone' : 'Email'}
-              </h3>
-              <button 
-                onClick={handleSkipVerification}
-                className="p-2"
-                aria-label="Close"
-              >
-                <Close size={24} color={TEXT_COLORS.muted} />
-              </button>
-            </div>
-            
-            {/* Modal Content */}
-            <div className="p-6">
-              {isVerified ? (
-                <div className="text-center py-6">
-                  <div 
-                    className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-                    style={{ backgroundColor: 'rgba(16, 185, 129, 0.15)' }}
-                  >
-                    <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke={STATE_COLORS.success} strokeWidth="2.5">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <p style={{ color: STATE_COLORS.success, fontSize: `${TYPOGRAPHY.fontSize.lg}px`, fontWeight: 600 }}>
-                    Verified!
-                  </p>
-                </div>
-              ) : (
-                <>
-                  <p 
-                    className="text-center mb-6"
-                    style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}
-                  >
-                    We sent a 6-digit code to
-                    <br />
-                    <span style={{ color: TEXT_COLORS.primary, fontWeight: 500 }}>{maskedValue}</span>
-                  </p>
-                  
-                  {verifyError && (
-                    <div 
-                      className="mb-4 p-3 rounded-lg text-center"
-                      style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: STATE_COLORS.error, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
-                    >
-                      {verifyError}
-                    </div>
-                  )}
-                  
-                  <input
-                    type="text"
-                    value={verificationCode}
-                    onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                    placeholder="000000"
-                    maxLength={6}
-                    className="w-full px-5 py-4 rounded-xl outline-none text-center tracking-widest"
-                    style={{
-                      backgroundColor: 'rgba(255,255,255,0.05)',
-                      color: TEXT_COLORS.primary,
-                      border: `2px solid ${BORDER_COLORS.default}`,
-                      fontSize: `${TYPOGRAPHY.fontSize['2xl']}px`,
-                      letterSpacing: '0.5em',
-                    }}
-                    autoFocus
-                  />
-                  
-                  <button
-                    onClick={handleVerify}
-                    disabled={verificationCode.length !== 6 || isVerifying}
-                    className="w-full mt-5 py-4 rounded-xl font-bold flex items-center justify-center gap-2"
-                    style={{
-                      background: verificationCode.length === 6 ? 'url(/wr_blue.png) center center / cover no-repeat' : BG_COLORS.tertiary,
-                      color: verificationCode.length === 6 ? '#fff' : TEXT_COLORS.disabled,
-                      fontSize: `${TYPOGRAPHY.fontSize.lg}px`,
-                      opacity: verificationCode.length === 6 ? 1 : 0.5,
-                    }}
-                  >
-                    {isVerifying ? (
-                      <>
-                        <div 
-                          className="animate-spin rounded-full h-5 w-5 border-2"
-                          style={{ borderColor: '#fff transparent transparent transparent' }}
-                        />
-                        Verifying...
-                      </>
-                    ) : (
-                      'Verify'
-                    )}
-                  </button>
-                  
-                  <button
-                    onClick={() => {/* Resend code logic */}}
-                    className="w-full mt-4 py-3"
-                    style={{ color: STATE_COLORS.active, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}
-                  >
-                    Resend code
-                  </button>
-                </>
-              )}
-            </div>
-            
-            {/* Skip option */}
-            {!isVerified && (
-              <div 
-                className="p-5 text-center"
-                style={{ borderTop: `1px solid ${BORDER_COLORS.default}` }}
-              >
-                <button 
-                  onClick={handleSkipVerification}
-                  style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
-                >
-                  I'll verify later
-                </button>
-                <p 
-                  className="mt-2"
-                  style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}
-                >
-                  Two-step withdrawals won't be active until verified
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ============================================================================
-// STEP: BACKUP METHOD (Required for 2FA on withdrawals)
-// ============================================================================
-
-interface SecondaryMethodStepProps {
-  secondaryType: SecondaryMethodType;
-  setSecondaryType: (type: SecondaryMethodType) => void;
-  phoneValue: string;
-  setPhoneValue: (value: string) => void;
-  secondaryEmail: string;
-  setSecondaryEmail: (value: string) => void;
-  primaryEmail: string;
-  onContinue: () => void;
-  onSkip: () => void;
-  onBack: () => void;
-  isLoading: boolean;
-}
-
-// Format phone number as user types: +1 (555) 123-4567
-function formatPhoneNumber(value: string): string {
-  const digits = value.replace(/\D/g, '');
-  
-  if (digits.length === 0) return '';
-  if (digits.length <= 1) return `+${digits}`;
-  if (digits.length <= 4) return `+${digits.slice(0, 1)} (${digits.slice(1)}`;
-  if (digits.length <= 7) return `+${digits.slice(0, 1)} (${digits.slice(1, 4)}) ${digits.slice(4)}`;
-  if (digits.length <= 11) return `+${digits.slice(0, 1)} (${digits.slice(1, 4)}) ${digits.slice(4, 7)}-${digits.slice(7)}`;
-  return `+${digits.slice(0, 1)} (${digits.slice(1, 4)}) ${digits.slice(4, 7)}-${digits.slice(7, 11)}`;
-}
-
-function SecondaryMethodStep({
-  secondaryType,
-  setSecondaryType,
-  phoneValue,
-  setPhoneValue,
-  secondaryEmail,
-  setSecondaryEmail,
-  primaryEmail,
-  onContinue,
-  onSkip,
-  onBack,
-  isLoading,
-}: SecondaryMethodStepProps): React.ReactElement {
-  const [phoneTouched, setPhoneTouched] = useState(false);
-  const [emailTouched, setEmailTouched] = useState(false);
-  
-  const isValidPhone = phoneValue.replace(/\D/g, '').length >= 10;
-  
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatPhoneNumber(e.target.value);
-    setPhoneValue(formatted);
-  };
-  const isValidSecondaryEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(secondaryEmail) && 
-    secondaryEmail.toLowerCase() !== primaryEmail.toLowerCase();
-  
-  const isValid = secondaryType === 'phone' ? isValidPhone : isValidSecondaryEmail;
-  
-  const showPhoneError = phoneTouched && phoneValue && !isValidPhone;
-  const showEmailError = emailTouched && secondaryEmail && !isValidSecondaryEmail;
-  
-  return (
-    <div className="flex flex-col h-full">
-      {/* Header */}
-      <div 
-        className="flex items-center gap-4 flex-shrink-0"
-        style={{ 
-          padding: `${SPACING.lg}px ${SPACING.xl}px`, 
-          borderBottom: `1px solid ${BORDER_COLORS.default}` 
-        }}
-      >
-        <button onClick={onBack} className="p-2" aria-label="Back">
-          <ChevronLeft size={28} color={TEXT_COLORS.muted} />
-        </button>
-        <h2 
-          className="font-bold" 
-          style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.xl}px` }}
-        >
-          2-Step Withdrawal Security
-        </h2>
-      </div>
-      
-      {/* Content */}
-      <div 
-        className="flex-1 overflow-y-auto" 
-        style={{ padding: SPACING.xl, scrollbarWidth: 'none' }}
-      >
-        <div className="text-center mb-6">
-          <div 
-            className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4"
-            style={{ backgroundColor: 'rgba(16, 185, 129, 0.15)' }}
-          >
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.success} strokeWidth="2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-            </svg>
-          </div>
-          <p style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}>
-            To prevent unauthorized withdrawal, we require 2-Step Authentication for withdrawal. If you don't have access to your phone or secondary email this moment, you can always confirm it (or change it) later. Know that you will not be able to make a withdrawal until you confirm a secondary login method.
-          </p>
-        </div>
-        
-        {/* Method Toggle */}
-        <div 
-          className="flex mb-5 p-1.5 rounded-xl"
-          style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}
-        >
-          <button
-            onClick={() => setSecondaryType('phone')}
-            className="flex-1 py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2"
-            style={{
-              background: secondaryType === 'phone' 
-                ? 'url(/wr_blue.png) center center / cover no-repeat' 
-                : 'transparent',
-              color: secondaryType === 'phone' ? '#fff' : TEXT_COLORS.muted,
-              fontSize: `${TYPOGRAPHY.fontSize.base}px`,
-              textShadow: secondaryType === 'phone' ? '0 1px 2px rgba(0,0,0,0.3)' : 'none',
-            }}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-            </svg>
-            Phone
-          </button>
-          <button
-            onClick={() => setSecondaryType('email')}
-            className="flex-1 py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2"
-            style={{
-              background: secondaryType === 'email' 
-                ? 'url(/wr_blue.png) center center / cover no-repeat' 
-                : 'transparent',
-              color: secondaryType === 'email' ? '#fff' : TEXT_COLORS.muted,
-              fontSize: `${TYPOGRAPHY.fontSize.base}px`,
-              textShadow: secondaryType === 'email' ? '0 1px 2px rgba(0,0,0,0.3)' : 'none',
-            }}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
-            Email
-          </button>
-        </div>
-        
-        {/* Recommended badge for phone */}
-        {secondaryType === 'phone' && (
-          <div 
-            className="mb-4 p-4 rounded-lg flex items-center gap-3"
-            style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)' }}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.success} strokeWidth="2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-            </svg>
-            <span style={{ color: STATE_COLORS.success, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}>
-              Recommended
-            </span>
-          </div>
-        )}
-        
-        {/* Phone Input */}
-        {secondaryType === 'phone' && (
-          <div className="mb-4">
-            <label 
-              className="block font-medium mb-2"
-              style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}
-            >
-              Phone Number
-            </label>
-            <input
-              type="tel"
-              value={phoneValue}
-              onChange={handlePhoneChange}
-              onFocus={() => setPhoneTouched(false)}
-              onBlur={() => setPhoneTouched(true)}
-              placeholder="+1 (555) 123-4567"
-              autoComplete="tel"
-              className="w-full px-5 py-4 rounded-xl outline-none transition-colors"
-              style={{
-                backgroundColor: 'rgba(255,255,255,0.05)',
-                color: TEXT_COLORS.primary,
-                border: `2px solid ${showPhoneError ? STATE_COLORS.error : BORDER_COLORS.default}`,
-                fontSize: `${TYPOGRAPHY.fontSize.lg}px`,
-              }}
-            />
-            {showPhoneError && (
-              <span 
-                className="block mt-1"
-                style={{ color: STATE_COLORS.error, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}
-              >
-                Please enter a valid phone number
-              </span>
-            )}
-          </div>
-        )}
-        
-        {/* Secondary Email Input */}
-        {secondaryType === 'email' && (
-          <div className="mb-4">
-            <label 
-              className="block font-medium mb-2"
-              style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}
-            >
-              Secondary Email Address
-            </label>
-            <input
-              type="email"
-              value={secondaryEmail}
-              onChange={(e) => setSecondaryEmail(e.target.value)}
-              onFocus={() => setEmailTouched(false)}
-              onBlur={() => setEmailTouched(true)}
-              placeholder="secondary@example.com"
-              autoComplete="email"
-              className="w-full px-5 py-4 rounded-xl outline-none transition-colors"
-              style={{
-                backgroundColor: 'rgba(255,255,255,0.05)',
-                color: TEXT_COLORS.primary,
-                border: `2px solid ${showEmailError ? STATE_COLORS.error : BORDER_COLORS.default}`,
-                fontSize: `${TYPOGRAPHY.fontSize.lg}px`,
-              }}
-            />
-            {showEmailError && (
-              <span 
-                className="block mt-1"
-                style={{ color: STATE_COLORS.error, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
-              >
-                {secondaryEmail.toLowerCase() === primaryEmail.toLowerCase() 
-                  ? 'Must be different from your primary email'
-                  : 'Please enter a valid email address'}
-              </span>
-            )}
-            <p 
-              className="mt-2"
-              style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
-            >
-              Must be different from your primary email ({primaryEmail})
-            </p>
-          </div>
-        )}
-        
-      </div>
-      
-      {/* Footer */}
-      <div 
-        className="flex-shrink-0"
-        style={{ padding: SPACING.xl, borderTop: `1px solid ${BORDER_COLORS.default}` }}
-      >
-        <button
-          onClick={onContinue}
-          disabled={!isValid || isLoading}
-          className="w-full py-5 rounded-xl font-bold transition-all flex items-center justify-center gap-2"
-          style={{
-            fontSize: `${TYPOGRAPHY.fontSize.xl}px`,
-            background: isValid ? 'url(/wr_blue.png) center center / cover no-repeat' : BG_COLORS.tertiary,
-            color: isValid ? '#fff' : TEXT_COLORS.disabled,
-            opacity: isValid ? 1 : 0.5,
-          }}
-        >
-          {isLoading ? (
-            <>
-              <div 
-                className="animate-spin rounded-full h-6 w-6 border-2"
-                style={{ borderColor: '#fff transparent transparent transparent' }}
-              />
-              Creating account...
-            </>
-          ) : (
-            'Complete Sign Up'
-          )}
-        </button>
-        
-        <button
-          onClick={onSkip}
-          disabled={isLoading}
-          className="w-full py-4 mt-3 font-medium transition-all"
-          style={{
-            fontSize: `${TYPOGRAPHY.fontSize.base}px`,
-            color: TEXT_COLORS.muted,
-            opacity: isLoading ? 0.5 : 1,
-          }}
-        >
-          I'll do this later
-        </button>
-      </div>
     </div>
   );
 }
@@ -1349,9 +932,6 @@ export function SignUpModal({
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [username, setUsername] = useState('');
-  const [secondaryType, setSecondaryType] = useState<SecondaryMethodType>('phone');
-  const [secondaryPhone, setSecondaryPhone] = useState('');
-  const [secondaryEmail, setSecondaryEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isUsernameValid, setIsUsernameValid] = useState(false);
@@ -1366,9 +946,6 @@ export function SignUpModal({
       setPassword('');
       setConfirmPassword('');
       setUsername('');
-      setSecondaryType('phone');
-      setSecondaryPhone('');
-      setSecondaryEmail('');
       setIsLoading(false);
       setError(null);
       setIsUsernameValid(false);
@@ -1381,23 +958,10 @@ export function SignUpModal({
   }, []);
   
   const handleUsernameContinue = useCallback(() => {
-    // Send verification code to email
-    // In production, this would trigger the backend to send a code
     setStep('emailVerify');
   }, []);
   
-  const handleEmailVerified = useCallback(() => {
-    setStep('secondaryMethod');
-  }, []);
-  
-  const handleResendEmailCode = useCallback(async () => {
-    // In production, this would resend the verification code
-    setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setIsLoading(false);
-  }, []);
-  
-  const handleCreateAccount = useCallback(async (skipSecondary: boolean = false) => {
+  const handleCreateAccount = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     
@@ -1406,10 +970,6 @@ export function SignUpModal({
         email,
         password,
         username,
-        secondaryMethod: skipSecondary ? undefined : {
-          type: secondaryType,
-          value: secondaryType === 'phone' ? secondaryPhone : secondaryEmail,
-        },
       });
       
       if (result.success) {
@@ -1417,30 +977,32 @@ export function SignUpModal({
         onSuccess?.();
       } else {
         setError(result.error?.message || 'Failed to create account');
-        // Go back to appropriate step based on error
         if (result.error?.field === 'username') {
           setStep('username');
         } else if (result.error?.field === 'email' || result.error?.field === 'password') {
           setStep('credentials');
-        } else if (result.error?.field === 'secondaryMethod') {
-          setStep('secondaryMethod');
         }
       }
-    } catch (err) {
+    } catch {
       setError('An unexpected error occurred');
     } finally {
       setIsLoading(false);
     }
-  }, [email, password, username, secondaryType, secondaryPhone, secondaryEmail, signUpWithEmail, onSuccess]);
+  }, [email, password, username, signUpWithEmail, onSuccess]);
   
-  const handleSkipSecondaryMethod = useCallback(() => {
-    handleCreateAccount(true);
+  const handleEmailVerified = useCallback(() => {
+    handleCreateAccount();
   }, [handleCreateAccount]);
+  
+  const handleResendEmailCode = useCallback(async () => {
+    setIsLoading(true);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setIsLoading(false);
+  }, []);
   
   const handleBack = useCallback(() => {
     if (step === 'username') setStep('credentials');
     if (step === 'emailVerify') setStep('username');
-    if (step === 'secondaryMethod') setStep('emailVerify');
   }, [step]);
   
   if (!isOpen) return null;
@@ -1449,7 +1011,7 @@ export function SignUpModal({
     <div 
       className="absolute left-0 right-0 bottom-0 flex flex-col"
       style={{ 
-        top: 'env(safe-area-inset-top, 0px)', 
+        top: '60px', 
         backgroundColor: BG_COLORS.secondary, 
         zIndex: Z_INDEX.modal 
       }}
@@ -1491,28 +1053,10 @@ export function SignUpModal({
         />
       )}
       
-      {step === 'secondaryMethod' && (
-        <SecondaryMethodStep
-          secondaryType={secondaryType}
-          setSecondaryType={setSecondaryType}
-          phoneValue={secondaryPhone}
-          setPhoneValue={setSecondaryPhone}
-          secondaryEmail={secondaryEmail}
-          setSecondaryEmail={setSecondaryEmail}
-          primaryEmail={email}
-          onContinue={() => handleCreateAccount(false)}
-          onSkip={handleSkipSecondaryMethod}
-          onBack={handleBack}
-          isLoading={isLoading}
-        />
-      )}
-      
       {step === 'success' && (
         <SuccessStep
           email={email}
           username={username}
-          secondaryType={(secondaryPhone || secondaryEmail) ? secondaryType : null}
-          secondaryValue={secondaryType === 'phone' ? (secondaryPhone || null) : (secondaryEmail || null)}
           onClose={onClose}
         />
       )}
@@ -1521,4 +1065,3 @@ export function SignUpModal({
 }
 
 export default SignUpModal;
-

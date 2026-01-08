@@ -1326,7 +1326,9 @@ export function PaystackDepositModalVX2({
                 }}
                 className="p-1 rounded hover:bg-white/10"
               >
-                <ChevronLeft className="w-5 h-5" style={{ color: TEXT_COLORS.primary }} />
+                <span style={{ color: TEXT_COLORS.primary, display: 'inline-block' }}>
+                  <ChevronLeft className="w-5 h-5" />
+                </span>
               </button>
             )}
             {showBankSelector && (
@@ -1334,7 +1336,9 @@ export function PaystackDepositModalVX2({
                 onClick={() => setShowBankSelector(false)}
                 className="p-1 rounded hover:bg-white/10"
               >
-                <ChevronLeft className="w-5 h-5" style={{ color: TEXT_COLORS.primary }} />
+                <span style={{ color: TEXT_COLORS.primary, display: 'inline-block' }}>
+                  <ChevronLeft className="w-5 h-5" />
+                </span>
               </button>
             )}
             <h2 
@@ -1348,7 +1352,9 @@ export function PaystackDepositModalVX2({
             onClick={onClose}
             className="p-2 rounded-full hover:bg-white/10"
           >
-            <Close className="w-5 h-5" style={{ color: TEXT_COLORS.muted }} />
+            <span style={{ color: TEXT_COLORS.muted, display: 'inline-block' }}>
+              <Close className="w-5 h-5" />
+            </span>
           </button>
         </div>
         

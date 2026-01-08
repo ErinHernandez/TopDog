@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link'
 import { useRouter } from 'next/router';
+import { getAuth } from 'firebase/auth';
 import { canAccessDevFeatures } from '../lib/devAuth';
 import { useUser } from '../lib/userContext';
 import { DevLink, DevButton, DevSection, DevText } from '../lib/devLinking';
@@ -19,11 +20,31 @@ export default function Navbar() {
   const [draftAnimation, setDraftAnimation] = useState({ shouldAnimate: false, isPulsing: false })
   const [hasStartedPulsing, setHasStartedPulsing] = useState(false)
 
-  const checkDevAccess = () => {
+  const checkDevAccess = async () => {
     const accessToken = sessionStorage.getItem('devAccessToken');
-    console.log('🔧 Dev Access Check:', { userId: user?.uid, accessToken, hasAccess: canAccessDevFeatures(user?.uid || 'NEWUSERNAME', accessToken) });
-    if (canAccessDevFeatures(user?.uid || 'NEWUSERNAME', accessToken)) {
+    const userId = user?.uid || null;
+    
+    // Get Firebase auth token to check custom claims
+    let authToken = null;
+    if (user?.uid) {
+      try {
+        const auth = getAuth();
+        const tokenResult = await auth.currentUser?.getIdTokenResult(true);
+        if (tokenResult) {
+          authToken = tokenResult.claims;
+        }
+      } catch (error) {
+        console.warn('[Navbar] Failed to get auth token for dev access check:', error);
+      }
+    }
+    
+    const hasAccess = canAccessDevFeatures(userId, accessToken, authToken);
+    console.log('🔧 Dev Access Check:', { userId, accessToken: !!accessToken, hasCustomClaim: !!authToken?.developer, hasAccess });
+    
+    if (hasAccess) {
       setHasDevAccess(true);
+    } else {
+      setHasDevAccess(false);
     }
   };
 

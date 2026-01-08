@@ -300,7 +300,8 @@ export function PendingPayments({
         setPayments(prev => prev.filter(p => p.id !== paymentId));
         logger.debug('Payment cancelled', { paymentId });
       } else {
-        logger.error('Failed to cancel payment', { paymentId, error: data.error });
+        const error = new Error(data.error || 'Failed to cancel payment');
+        logger.error('Failed to cancel payment', error);
       }
     } catch (err) {
       logger.error('Cancel payment error', err);

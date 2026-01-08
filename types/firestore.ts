@@ -171,6 +171,9 @@ export interface FirestoreTeam {
   tournamentName: string;
   draftType: DraftType;
   
+  /** Custom team name (optional, falls back to tournamentName) */
+  name?: string;
+  
   roster: TeamPlayer[];
   
   status: TeamStatus;
