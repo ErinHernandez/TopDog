@@ -1,15 +1,21 @@
 /**
- * VX Mobile App Demo Page
+ * VX Mobile App Demo Page - LEGACY/DEPRECATED
  * 
- * Testing page for the VX mobile app (outside draft room)
- * Original preserved at: /mobile
+ * This is the VX mobile app demo - an intermediate migration step.
+ * 
+ * IMPORTANT: This demo is preserved for reference only.
+ * All active development now happens in VX2:
+ * - /testing-grounds/vx2-mobile-app-demo (mobile app with sorting, new UI)
+ * - /testing-grounds/vx2-draft-room (draft room)
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { MobileAppVXDemo } from '../../components/vx/mobile/app';
 
 export default function VXMobileAppDemo() {
+  const [showWarning, setShowWarning] = useState(true);
+  
   useEffect(() => {
     if (typeof window === 'undefined') return;
     
@@ -38,33 +44,78 @@ export default function VXMobileAppDemo() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center p-4 relative">
+      {/* Legacy Warning Banner */}
+      {showWarning && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            backgroundColor: '#78350F',
+            color: '#FCD34D',
+            padding: '12px 16px',
+            zIndex: 99999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+            fontSize: '13px',
+          }}
+        >
+          <div style={{ flex: 1 }}>
+            <strong>LEGACY DEMO</strong> - This is the old VX app shell. 
+            <Link 
+              href="/testing-grounds/vx2-mobile-app-demo"
+              style={{ marginLeft: '8px', color: '#fff', textDecoration: 'underline' }}
+            >
+              Go to VX2 Mobile App (current)
+            </Link>
+          </div>
+          <button 
+            onClick={() => setShowWarning(false)}
+            style={{ 
+              background: 'rgba(0,0,0,0.2)', 
+              border: 'none', 
+              color: '#FCD34D', 
+              padding: '4px 8px',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '12px',
+            }}
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+      
       {/* Header Info */}
       <div className="mb-4 text-center">
         <h1 className="text-white text-xl font-bold mb-2">
-          Version X Mobile App Development
+          Version X Mobile App (Legacy)
         </h1>
         <p className="text-gray-400 text-sm mb-2">
-          Original preserved at:{' '}
+          Current version:{' '}
           <Link
-            href="/mobile"
-            className="text-blue-400 hover:underline"
+            href="/testing-grounds/vx2-mobile-app-demo"
+            className="text-green-400 hover:underline"
           >
-            /mobile
+            VX2 Mobile App
           </Link>
         </p>
         <div className="flex gap-4 justify-center text-xs">
-          <span className="text-purple-400">VX Components: /components/vx/mobile/app/</span>
-          <span className="text-yellow-400">Original: /components/mobile/</span>
+          <span className="text-orange-400">VX Components: /components/vx/mobile/app/</span>
+          <span className="text-green-400">VX2: /components/vx2/</span>
         </div>
       </div>
 
       {/* VX Development Banner */}
       <div
         className="px-4 py-1 text-center text-xs font-bold flex-shrink-0 mb-4 rounded"
-        style={{ backgroundColor: '#7C3AED', color: 'white' }}
+        style={{ backgroundColor: '#78350F', color: '#FCD34D' }}
       >
-        VX APP DEV - Original: /mobile
+        LEGACY - VX APP (use VX2 for active development)
       </div>
 
       {/* Phone Frame with App */}
@@ -73,24 +124,17 @@ export default function VXMobileAppDemo() {
       {/* Quick Links */}
       <div className="mt-4 flex gap-4">
         <Link
-          href="/mobile"
-          className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 text-sm"
+          href="/testing-grounds/vx2-mobile-app-demo"
+          className="px-4 py-2 bg-green-700 text-white rounded hover:bg-green-600 text-sm font-bold"
         >
-          View Original
+          VX2 Mobile App (Current)
         </Link>
         <Link
-          href="/testing-grounds/vx-mobile-demo"
-          className="px-4 py-2 bg-teal-700 text-white rounded hover:bg-teal-600 text-sm"
+          href="/testing-grounds/vx2-draft-room"
+          className="px-4 py-2 bg-green-700 text-white rounded hover:bg-green-600 text-sm"
         >
-          VX Draft Room
+          VX2 Draft Room
         </Link>
-        <a
-          href="/docs/VERSION_X_ARCHITECTURE_PLAN.md"
-          className="px-4 py-2 bg-purple-700 text-white rounded hover:bg-purple-600 text-sm"
-          target="_blank"
-        >
-          VX Plan
-        </a>
       </div>
     </div>
   );

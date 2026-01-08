@@ -26,6 +26,7 @@ import { getDeviceClassFromPreset } from '../core/constants/responsive';
 import type { DeviceClass } from '../core/constants/responsive';
 import { TabBarVX2, TabContentVX2 } from '../navigation';
 import MobilePhoneFrame from './MobilePhoneFrame';
+import AppHeaderVX2 from './AppHeaderVX2';
 import { 
   AutodraftLimitsModalVX2, 
   DepositHistoryModalVX2, 
@@ -34,6 +35,7 @@ import {
   RankingsModalVX2 
 } from '../modals';
 import { useAuth, AuthGateVX2 } from '../auth';
+import { useHeader } from '../core';
 
 // ============================================================================
 // MODAL CONTEXT
@@ -81,6 +83,7 @@ interface InnerShellProps {
 
 function InnerShell({ badgeOverrides, deviceClass = 'standard' }: InnerShellProps): React.ReactElement {
   const { state: authState } = useAuth();
+  const { state: headerState } = useHeader();
   
   // Modal state
   const [showAutodraftLimits, setShowAutodraftLimits] = useState(false);
@@ -108,6 +111,11 @@ function InnerShell({ badgeOverrides, deviceClass = 'standard' }: InnerShellProp
     }, []),
   };
   
+  // Deposit handler that uses modal context
+  const handleDepositClick = useCallback(() => {
+    setShowDeposit(true);
+  }, []);
+  
   return (
     <ModalContext.Provider value={modalContext}>
       <div 
@@ -115,6 +123,14 @@ function InnerShell({ badgeOverrides, deviceClass = 'standard' }: InnerShellProp
         data-device-class={deviceClass}
         style={{ backgroundColor: BG_COLORS.primary }}
       >
+        {/* App Header */}
+        <AppHeaderVX2
+          showBackButton={headerState.showBackButton}
+          onBackClick={headerState.onBackClick || undefined}
+          showDeposit={true}
+          onDepositClick={handleDepositClick}
+        />
+        
         {/* Tab Content Area */}
         <TabContentVX2 />
         

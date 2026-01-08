@@ -98,19 +98,21 @@ const LINK_ORDER_KEY = 'devnav-link-order';
 const DEV_AUTH_OVERRIDE_KEY = 'devnav-auth-override'; // 'logged-in' | 'logged-out' | null
 
 // Default links configuration
+// VX2 components are the current/active development - put them first
 const DEFAULT_LINKS = [
-  { id: 'mobile-demo', href: '/testing-grounds/mobile-apple-demo', label: 'Mobile Demo (Original)', bgColor: '#78350F', bgColorActive: '#4B3621', textColor: '#FCD34D' },
-  { id: 'vx-draft', href: '/testing-grounds/vx-mobile-demo', label: 'VX Draft Room (Original)', bgColor: '#111827', bgColorActive: '#374151', textColor: '#D1D5DB' },
-  { id: 'vx2-shell', href: '/testing-grounds/vx2-mobile-app-demo', label: 'VX2 App Shell', bgColor: '#111827', bgColorActive: '#374151', textColor: '#D1D5DB' },
+  { id: 'vx2-shell', href: '/testing-grounds/vx2-mobile-app-demo', label: 'Mobile App (VX2)', bgColor: '#14532D', bgColorActive: '#1F4D3A', textColor: '#86EFAC' },
+  { id: 'vx2-draft', href: '/testing-grounds/vx2-draft-room', label: 'Draft Room (VX2)', bgColor: '#14532D', bgColorActive: '#1F4D3A', textColor: '#86EFAC' },
+  { id: 'vx2-tablet', href: '/testing-grounds/vx2-tablet-draft-room', label: 'Tablet Draft (VX2)', bgColor: '#14532D', bgColorActive: '#1F4D3A', textColor: '#86EFAC' },
   { id: 'card-sandbox', href: '/testing-grounds/card-sandbox', label: 'Card Sandbox', bgColor: '#1E3A8A', bgColorActive: '#1E3A5F', textColor: '#93C5FD' },
   { id: 'navbar-sandbox', href: '/testing-grounds/navbar-sandbox', label: 'Navbar Sandbox', bgColor: '#5B21B6', bgColorActive: '#4C1D95', textColor: '#C4B5FD' },
-  { id: 'vx2-draft', href: '/testing-grounds/vx2-draft-room', label: 'VX2 Draft Room', bgColor: '#14532D', bgColorActive: '#1F4D3A', textColor: '#86EFAC' },
-  { id: 'vx2-tablet', href: '/testing-grounds/vx2-tablet-draft-room', label: 'VX2 Tablet Draft', bgColor: '#9A3412', bgColorActive: '#7C2D12', textColor: '#FDBA74' },
   { id: 'device-compare', href: '/testing-grounds/device-comparison', label: 'Device Comparison', bgColor: '#14B8A6', bgColorActive: '#0F766E', textColor: '#CCFBF1' },
   { id: 'tournament-sandbox', href: '/testing-grounds/tournament-card-sandbox', label: 'Card Sandbox (Tournament)', bgColor: '#7C3AED', bgColorActive: '#6B21A6', textColor: '#E9D5FF' },
   { id: 'join-modal-desktop', href: '/testing-grounds/join-tournament-modal-desktop', label: 'Join Modal (Desktop)', bgColor: '#0369A1', bgColorActive: '#075985', textColor: '#7DD3FC' },
   { id: 'auth-test', href: '/testing-grounds/vx2-auth-test', label: 'Auth Components Test', bgColor: '#065F46', bgColorActive: '#064E3B', textColor: '#A7F3D0' },
   { id: 'profile', href: '/profile', label: 'User Profile', bgColor: '#1E40AF', bgColorActive: '#1E3A8A', textColor: '#BFDBFE' },
+  // Legacy/deprecated - kept for reference only
+  { id: 'mobile-demo', href: '/testing-grounds/mobile-apple-demo', label: '[Legacy] Mobile Demo', bgColor: '#78350F', bgColorActive: '#4B3621', textColor: '#FCD34D' },
+  { id: 'vx-draft', href: '/testing-grounds/vx-mobile-demo', label: '[Legacy] VX Draft Room', bgColor: '#78350F', bgColorActive: '#4B3621', textColor: '#FCD34D' },
 ];
 
 const MIN_WIDTH = 180;

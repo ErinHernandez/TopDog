@@ -1,8 +1,13 @@
 /**
  * MobileHomeContent - Mobile Homepage Content
  * 
- * Extracted from pages/mobile.js for maintainability.
- * Contains the main mobile app with tab navigation.
+ * DEPRECATED - This component uses old mobile components.
+ * 
+ * For new development, use the VX2 app shell:
+ * - components/vx2/shell/AppShellVX2.tsx
+ * - /testing-grounds/vx2-mobile-app-demo
+ * 
+ * This file is preserved for legacy reference only.
  */
 
 import React, { useState, useEffect } from 'react';

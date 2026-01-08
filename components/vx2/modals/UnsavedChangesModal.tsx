@@ -107,7 +107,7 @@ export function UnsavedChangesModal({
               color: '#fff',
               borderRadius: `${RADIUS.md}px`,
               border: 'none',
-              fontSize: `${TYPOGRAPHY.fontSize.md}px`,
+              fontSize: `${TYPOGRAPHY.fontSize.base}px`,
               cursor: 'pointer',
             }}
           >
@@ -124,7 +124,7 @@ export function UnsavedChangesModal({
               color: '#EF4444',
               borderRadius: `${RADIUS.md}px`,
               border: '1px solid rgba(239, 68, 68, 0.3)',
-              fontSize: `${TYPOGRAPHY.fontSize.md}px`,
+              fontSize: `${TYPOGRAPHY.fontSize.base}px`,
               cursor: 'pointer',
             }}
           >
@@ -141,7 +141,7 @@ export function UnsavedChangesModal({
               color: TEXT_COLORS.secondary,
               borderRadius: `${RADIUS.md}px`,
               border: 'none',
-              fontSize: `${TYPOGRAPHY.fontSize.md}px`,
+              fontSize: `${TYPOGRAPHY.fontSize.base}px`,
               cursor: 'pointer',
             }}
           >

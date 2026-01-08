@@ -1,12 +1,12 @@
 /**
- * VX Mobile Demo Page
+ * VX Mobile Demo Page - LEGACY/DEPRECATED
  * 
- * Development area for Version X mobile-first components.
+ * This is the VX (Version X) draft room - an intermediate migration step.
  * 
- * IMPORTANT: The original mobile demo remains untouched at:
- * /testing-grounds/mobile-apple-demo
- * 
- * This page is for VX migration development only.
+ * IMPORTANT: This demo is preserved for reference only.
+ * All active development now happens in VX2:
+ * - /testing-grounds/vx2-mobile-app-demo (mobile app)
+ * - /testing-grounds/vx2-draft-room (draft room)
  */
 
 import React, { useEffect, useState, useCallback } from 'react';
@@ -15,6 +15,7 @@ import DraftRoomVX from '../../components/vx/mobile/draft/DraftRoomVX';
 import IPhoneStatusBar from '../../components/vx2/shell/iPhoneStatusBar';
 
 export default function VXMobileDemo() {
+  const [showWarning, setShowWarning] = useState(true);
   // Draft control state (lifted to page level for external controls)
   const [isDraftActive, setIsDraftActive] = useState(false);
   const [isDraftPaused, setIsDraftPaused] = useState(false);
@@ -71,7 +72,52 @@ export default function VXMobileDemo() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4 relative">
+      {/* Legacy Warning Banner */}
+      {showWarning && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            backgroundColor: '#78350F',
+            color: '#FCD34D',
+            padding: '12px 16px',
+            zIndex: 99999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+            fontSize: '13px',
+          }}
+        >
+          <div style={{ flex: 1 }}>
+            <strong>LEGACY DEMO</strong> - This is the old VX draft room. 
+            <Link 
+              href="/testing-grounds/vx2-draft-room"
+              style={{ marginLeft: '8px', color: '#fff', textDecoration: 'underline' }}
+            >
+              Go to VX2 Draft Room (current)
+            </Link>
+          </div>
+          <button 
+            onClick={() => setShowWarning(false)}
+            style={{ 
+              background: 'rgba(0,0,0,0.2)', 
+              border: 'none', 
+              color: '#FCD34D', 
+              padding: '4px 8px',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '12px',
+            }}
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+      
       {/* Main Layout: Phone + Controls */}
       <div className="flex items-start gap-8">
         {/* Phone Frame */}

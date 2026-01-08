@@ -320,7 +320,7 @@ export function TabNavigationProvider({
     for (const { guard } of guards) {
       const result = await guard(fromTab, toTab);
       if (!result.allow) {
-        return { allow: false, reason: result.reason };
+        return { allow: false, reason: 'reason' in result ? result.reason : undefined };
       }
     }
     
