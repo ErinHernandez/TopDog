@@ -146,10 +146,17 @@ export default function PaymentMethodIcon({ methodId, size = 'md' }) {
   
   const handleError = (e) => {
     // Replace with fallback on error
+    // SECURITY: Using textContent instead of innerHTML to prevent XSS
     const fallback = document.createElement('div');
     fallback.className = `${sizeClasses[size]} rounded flex items-center justify-center`;
     fallback.style.backgroundColor = config.fallbackColor;
-    fallback.innerHTML = `<span class="font-bold text-xs" style="color: ${config.textColor || '#fff'}">${config.fallbackText}</span>`;
+    
+    const span = document.createElement('span');
+    span.className = 'font-bold text-xs';
+    span.style.color = config.textColor || '#fff';
+    span.textContent = config.fallbackText; // Safe: textContent prevents XSS
+    fallback.appendChild(span);
+    
     e.target.parentNode.replaceChild(fallback, e.target);
   };
   

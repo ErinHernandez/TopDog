@@ -167,9 +167,9 @@ function sortPlayers(players: DraftPlayer[], sortOption: PlayerSortOption): Draf
     case 'adp-desc':
       return sorted.sort((a, b) => (b.adp ?? 999) - (a.adp ?? 999));
     case 'name-asc':
-      return sorted.sort((a, b) => a.name.localeCompare(b.name));
+      return sorted.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
     case 'name-desc':
-      return sorted.sort((a, b) => b.name.localeCompare(a.name));
+      return sorted.sort((a, b) => (b.name || '').localeCompare(a.name || ''));
     case 'proj-asc':
       return sorted.sort((a, b) => (a.projectedPoints ?? 0) - (b.projectedPoints ?? 0));
     case 'proj-desc':

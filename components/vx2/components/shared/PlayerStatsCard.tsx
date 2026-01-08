@@ -23,12 +23,17 @@ import { BYE_WEEKS } from '@/lib/nflConstants';
 import { generatePlayerId } from '../../draft-room/utils';
 import type { SeasonStats } from '@/lib/historicalStats/types';
 import * as historicalService from '@/lib/historicalStats/service';
+import type { Position } from './display/types';
+import { createScopedLogger } from '../../../../lib/clientLogger';
+
+const logger = createScopedLogger('[PlayerStatsCard]');
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-type FantasyPosition = 'QB' | 'RB' | 'WR' | 'TE';
+// Use shared Position type
+type FantasyPosition = Position;
 
 export interface PlayerStatsCardProps {
   /** Player data to display */
@@ -60,7 +65,7 @@ export interface PlayerStatsCardProps {
 // ============================================================================
 
 // Teams with light backgrounds requiring dark text
-const LIGHT_BG_TEAMS = ['DET'];
+const LIGHT_BG_TEAMS = ['DET', 'LAC', 'KC', 'MIA', 'PHI', 'LAR'];
 
 const PX = {
   // Header
@@ -88,8 +93,8 @@ const PX = {
 } as const;
 
 const COLORS = {
-  headerLabel: '#9ca3af',
-  headerLabelDark: '#000000',
+  headerLabel: '#d1d5db',
+  headerLabelDark: '#d1d5db',
   lineColor: '#4b5563',
   lineColorDark: '#000000',
   draftButtonActive: '#ef4444',
@@ -483,7 +488,7 @@ export default function PlayerStatsCard({
         setHistoricalStats(statsMap);
       })
       .catch(err => {
-        console.warn('[PlayerStatsCard] Failed to load historical stats:', err);
+        logger.warn('Failed to load historical stats', { error: String(err) });
         setHistoricalStats(new Map());
       })
       .finally(() => setLoadingStats(false));

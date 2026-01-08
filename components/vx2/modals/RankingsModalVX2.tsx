@@ -16,6 +16,8 @@ import { BG_COLORS, TEXT_COLORS, STATE_COLORS, POSITION_COLORS } from '../core/c
 import { SPACING, RADIUS, TYPOGRAPHY, Z_INDEX } from '../core/constants/sizes';
 import { Close, Plus, Minus, Search } from '../components/icons';
 import { PositionBadge } from '../components/shared';
+import type { Position } from '../components/shared/display/types';
+import { POSITIONS } from '../components/shared/display/types';
 
 // ============================================================================
 // TYPES
@@ -37,10 +39,7 @@ interface Player {
   proj: number | string;
 }
 
-type TabType = 'build' | 'rankings';
-type Position = 'QB' | 'RB' | 'WR' | 'TE';
-
-const POSITIONS: Position[] = ['QB', 'RB', 'WR', 'TE'];
+type TabType = 'build' | 'rankings' | 'excluded';
 
 // ============================================================================
 // SUB-COMPONENTS
@@ -77,6 +76,18 @@ function TabBar({ activeTab, onTabChange }: TabBarProps): React.ReactElement {
         }}
       >
         Rankings
+      </button>
+      <button
+        onClick={() => onTabChange('excluded')}
+        className="flex-1 py-2.5 px-4 font-bold transition-all flex items-center justify-center gap-2"
+        style={{ 
+          fontSize: `${TYPOGRAPHY.fontSize.sm}px`, 
+          backgroundColor: activeTab === 'excluded' ? 'rgba(255,255,255,0.1)' : 'transparent', 
+          color: activeTab === 'excluded' ? TEXT_COLORS.primary : TEXT_COLORS.muted,
+          borderBottom: activeTab === 'excluded' ? `2px solid ${TEXT_COLORS.primary}` : '2px solid transparent'
+        }}
+      >
+        Excluded
       </button>
     </div>
   );
@@ -118,10 +129,12 @@ function PositionFilter({ activePosition, onPositionChange }: PositionFilterProp
 interface PlayerListItemProps {
   player: Player;
   isRanked: boolean;
+  isExcluded: boolean;
   onToggle: () => void;
+  onToggleExclude: () => void;
 }
 
-function PlayerListItem({ player, isRanked, onToggle }: PlayerListItemProps): React.ReactElement {
+function PlayerListItem({ player, isRanked, isExcluded, onToggle, onToggleExclude }: PlayerListItemProps): React.ReactElement {
   const posColor = POSITION_COLORS[player.position.toUpperCase() as keyof typeof POSITION_COLORS] || TEXT_COLORS.muted;
   const adp = typeof player.adp === 'number' ? player.adp.toFixed(1) : player.adp || '-';
   const proj = typeof player.proj === 'number' ? Math.round(player.proj) : player.proj || '-';
@@ -135,6 +148,7 @@ function PlayerListItem({ player, isRanked, onToggle }: PlayerListItemProps): Re
         borderRadius: `${RADIUS.lg}px`,
         padding: `${SPACING.xs}px ${SPACING.md}px`,
         gap: `${SPACING.sm}px`,
+        opacity: isExcluded ? 0.5 : 1,
       }}
     >
       <div className="text-center flex-shrink-0" style={{ width: '28px' }}>
@@ -149,6 +163,22 @@ function PlayerListItem({ player, isRanked, onToggle }: PlayerListItemProps): Re
         <div className="font-semibold" style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>{proj}</div>
         <div style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>Proj</div>
       </div>
+      <button
+        onClick={onToggleExclude}
+        className="flex items-center justify-center transition-all flex-shrink-0"
+        style={{ 
+          width: '32px',
+          height: '32px',
+          borderRadius: `${RADIUS.lg}px`,
+          backgroundColor: isExcluded ? 'rgba(239, 68, 68, 0.25)' : 'rgba(255,255,255,0.05)', 
+          color: isExcluded ? STATE_COLORS.error : TEXT_COLORS.muted,
+          border: isExcluded ? `1px solid ${STATE_COLORS.error}` : '1px solid rgba(255,255,255,0.1)',
+          cursor: 'pointer',
+        }}
+        aria-label={isExcluded ? `Unexclude ${player.name}` : `Exclude ${player.name}`}
+      >
+        <Close size={14} />
+      </button>
       <button
         onClick={onToggle}
         className="flex items-center justify-center transition-all flex-shrink-0"
@@ -370,6 +400,8 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
   const [activeTab, setActiveTab] = useState<TabType>('build');
   const [customRankings, setCustomRankings] = useState<string[]>([]);
   const [originalRankings, setOriginalRankings] = useState<string[]>([]);
+  const [excludedPlayers, setExcludedPlayers] = useState<string[]>([]);
+  const [originalExcluded, setOriginalExcluded] = useState<string[]>([]);
   const [playerPool, setPlayerPool] = useState<Player[]>([]);
   const [positionFilter, setPositionFilter] = useState<Position | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -387,8 +419,9 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const clearLongPressTimer = useRef<NodeJS.Timeout | null>(null);
 
-  const hasChanges = JSON.stringify(customRankings) !== JSON.stringify(originalRankings);
+  const hasChanges = JSON.stringify(customRankings) !== JSON.stringify(originalRankings) || JSON.stringify(excludedPlayers) !== JSON.stringify(originalExcluded);
   const rankedCount = customRankings.length;
+  const excludedCount = excludedPlayers.length;
   const canUndo = undoHistory.length > 0;
 
   useEffect(() => { onUnsavedChangesChange?.(hasChanges); }, [hasChanges, onUnsavedChangesChange]);
@@ -402,7 +435,7 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
   }, [externalCloseAttempt, isOpen, hasChanges, onClose, onExternalCloseHandled]);
 
   const handleClose = useCallback(() => { if (hasChanges) setShowUnsavedWarning(true); else onClose(); }, [hasChanges, onClose]);
-  const handleDiscardAndClose = useCallback(() => { setShowUnsavedWarning(false); setCustomRankings(originalRankings); onClose(); }, [originalRankings, onClose]);
+  const handleDiscardAndClose = useCallback(() => { setShowUnsavedWarning(false); setCustomRankings(originalRankings); setExcludedPlayers(originalExcluded); onClose(); }, [originalRankings, originalExcluded, onClose]);
 
   const loadData = useCallback(async () => {
     setIsLoading(true);
@@ -432,20 +465,30 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
       if (saved) {
         try {
           savedRankings = JSON.parse(saved);
-        } catch (e) {
-          // If JSON is corrupted, use empty array
-          console.error('Error parsing saved rankings:', e);
+        } catch {
+          // If JSON is corrupted, use empty array (this is expected behavior, not an error)
           savedRankings = [];
+        }
+      }
+      const savedExcluded = localStorage.getItem('vx2Excluded');
+      let savedExcludedList: string[] = [];
+      if (savedExcluded) {
+        try {
+          savedExcludedList = JSON.parse(savedExcluded);
+        } catch {
+          savedExcludedList = [];
         }
       }
       // Check if modal is still open before setting state (race condition prevention)
       if (isOpen) {
         setCustomRankings(savedRankings);
         setOriginalRankings(savedRankings);
+        setExcludedPlayers(savedExcludedList);
+        setOriginalExcluded(savedExcludedList);
         setPlayerPool(mockPool);
       }
-    } catch (e) {
-      console.error('Error loading rankings:', e);
+    } catch {
+      // Error handled by showing user-facing error message
       if (isOpen) {
         setError('Failed to load data.');
       }
@@ -462,11 +505,26 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
 
   const getRank = useCallback((name: string) => { const idx = customRankings.indexOf(name); return idx >= 0 ? idx + 1 : undefined; }, [customRankings]);
   const isPlayerRanked = useCallback((name: string) => customRankings.includes(name), [customRankings]);
+  const isPlayerExcluded = useCallback((name: string) => excludedPlayers.includes(name), [excludedPlayers]);
   
   // Helper to save current state to history before making changes
   const pushToHistory = useCallback(() => {
     setUndoHistory(prev => [...prev, customRankings]);
   }, [customRankings]);
+  
+  const togglePlayerExclude = useCallback((name: string) => {
+    pushToHistory();
+    setExcludedPlayers(prev => {
+      const isCurrentlyExcluded = prev.includes(name);
+      if (isCurrentlyExcluded) {
+        return prev.filter(n => n !== name);
+      } else {
+        // Remove from rankings if excluding
+        setCustomRankings(prevRankings => prevRankings.filter(n => n !== name));
+        return [...prev, name];
+      }
+    });
+  }, [pushToHistory]);
 
   const togglePlayerRanking = useCallback((name: string) => { 
     pushToHistory();
@@ -541,13 +599,13 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
     };
   }, []);
 
-  // Players tab always sorted by ADP - order never changes
+  // Players tab always sorted by ADP - order never changes, exclude excluded players
   const filteredPlayers = useMemo(() => {
-    let players = [...playerPool];
+    let players = [...playerPool].filter(p => !excludedPlayers.includes(p.name));
     if (positionFilter) players = players.filter(p => p.position === positionFilter);
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      players = players.filter(p => p.name.toLowerCase().includes(q) || p.team.toLowerCase().includes(q));
+      players = players.filter(p => (p.name?.toLowerCase() || '').includes(q) || (p.team?.toLowerCase() || '').includes(q));
     }
     // Always sort by ADP in Players tab
     players.sort((a, b) => {
@@ -556,13 +614,24 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
       return aAdp - bAdp;
     });
     return players;
-  }, [playerPool, positionFilter, searchQuery]);
+  }, [playerPool, positionFilter, searchQuery, excludedPlayers]);
+  
+  // Excluded players list
+  const excludedPlayersList = useMemo(() => {
+    return excludedPlayers.map(name => playerPool.find(p => p.name === name)).filter((p): p is Player => !!p);
+  }, [excludedPlayers, playerPool]);
+  
+  const filteredExcludedPlayers = useMemo(() => {
+    if (!searchQuery.trim()) return excludedPlayersList;
+    const q = searchQuery.toLowerCase();
+    return excludedPlayersList.filter(p => (p.name?.toLowerCase() || '').includes(q) || (p.team?.toLowerCase() || '').includes(q));
+  }, [excludedPlayersList, searchQuery]);
 
   const rankedPlayers = useMemo(() => customRankings.map(name => playerPool.find(p => p.name === name)).filter((p): p is Player => !!p), [customRankings, playerPool]);
   const filteredRankedPlayers = useMemo(() => {
     if (!searchQuery.trim()) return rankedPlayers;
     const q = searchQuery.toLowerCase();
-    return rankedPlayers.filter(p => p.name.toLowerCase().includes(q) || p.team.toLowerCase().includes(q));
+    return rankedPlayers.filter(p => (p.name?.toLowerCase() || '').includes(q) || (p.team?.toLowerCase() || '').includes(q));
   }, [rankedPlayers, searchQuery]);
 
   const handleSave = useCallback(async () => {
@@ -572,7 +641,9 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
       // Check if modal is still open before setting state (race condition prevention)
       if (!isOpen) return;
       localStorage.setItem('vx2Rankings', JSON.stringify(customRankings));
+      localStorage.setItem('vx2Excluded', JSON.stringify(excludedPlayers));
       setOriginalRankings(customRankings);
+      setOriginalExcluded(excludedPlayers);
       setUndoHistory([]); // Clear history after save
     } catch (e) {
       if (isOpen) {
@@ -583,7 +654,7 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
         setIsSaving(false);
       }
     }
-  }, [isOpen, customRankings]);
+  }, [isOpen, customRankings, excludedPlayers]);
 
 
   if (!isOpen) return null;
@@ -629,7 +700,14 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
                       </div>
                     ) : (
                       filteredPlayers.slice(0, 50).map(player => (
-                        <PlayerListItem key={player.name} player={player} isRanked={isPlayerRanked(player.name)} onToggle={() => togglePlayerRanking(player.name)} />
+                        <PlayerListItem 
+                          key={player.name} 
+                          player={player} 
+                          isRanked={isPlayerRanked(player.name)} 
+                          isExcluded={isPlayerExcluded(player.name)}
+                          onToggle={() => togglePlayerRanking(player.name)} 
+                          onToggleExclude={() => togglePlayerExclude(player.name)}
+                        />
                       ))
                     )}
                     {filteredPlayers.length > 50 && (
@@ -637,7 +715,7 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
                     )}
                   </div>
                 </>
-              ) : (
+              ) : activeTab === 'rankings' ? (
                 <>
                   {rankedPlayers.length === 0 ? (
                     <div className="flex-1 flex flex-col items-center justify-center text-center px-4" style={{ color: TEXT_COLORS.muted }}>
@@ -710,6 +788,65 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
                             </div>
                           );
                         })}
+                      </div>
+                    </>
+                  )}
+                </>
+              ) : (
+                <>
+                  {excludedPlayersList.length === 0 ? (
+                    <div className="flex-1 flex flex-col items-center justify-center text-center px-4" style={{ color: TEXT_COLORS.muted }}>
+                      <svg className="w-16 h-16 mb-4 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
+                      <p className="font-medium mb-2" style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>No excluded players</p>
+                      <p style={{ fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>Go to "Players" tab to exclude players</p>
+                    </div>
+                  ) : filteredExcludedPlayers.length === 0 ? (
+                    <div className="flex-1 flex flex-col items-center justify-center" style={{ color: TEXT_COLORS.muted }}>
+                      <Search size={48} color={TEXT_COLORS.muted} className="mb-3 opacity-50" />
+                      <p style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>No matching players</p>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="mb-3" style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>
+                        {searchQuery.trim() ? `Showing ${filteredExcludedPlayers.length} of ${excludedPlayersList.length}` : `${excludedPlayersList.length} excluded players`}
+                      </p>
+                      <div className="flex-1 overflow-y-auto space-y-1 pr-1" style={{ scrollbarWidth: 'thin' }}>
+                        {filteredExcludedPlayers.map(player => (
+                          <div 
+                            key={player.name}
+                            className="flex items-center transition-all"
+                            style={{ 
+                              backgroundColor: BG_COLORS.secondary,
+                              borderLeft: `4px solid ${POSITION_COLORS[player.position.toUpperCase() as keyof typeof POSITION_COLORS] || TEXT_COLORS.muted}`,
+                              borderRadius: `${RADIUS.lg}px`,
+                              padding: `${SPACING.xs}px ${SPACING.md}px`,
+                              gap: `${SPACING.sm}px`,
+                              opacity: 0.6,
+                            }}
+                          >
+                            <PositionBadge position={player.position as 'QB' | 'RB' | 'WR' | 'TE'} size="sm" />
+                            <div className="flex-1 min-w-0 flex items-center gap-1.5">
+                              <span className="font-semibold truncate" style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>{player.name}</span>
+                              <span className="flex-shrink-0" style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>{player.team}</span>
+                            </div>
+                            <button 
+                              onClick={() => togglePlayerExclude(player.name)} 
+                              className="flex items-center justify-center transition-all flex-shrink-0" 
+                              style={{ 
+                                width: '32px',
+                                height: '32px',
+                                borderRadius: `${RADIUS.lg}px`,
+                                backgroundColor: 'rgba(96, 165, 250, 0.15)', 
+                                color: STATE_COLORS.active,
+                                border: 'none',
+                                cursor: 'pointer',
+                              }} 
+                              aria-label={`Unexclude ${player.name}`}
+                            >
+                              <Plus size={16} />
+                            </button>
+                          </div>
+                        ))}
                       </div>
                     </>
                   )}

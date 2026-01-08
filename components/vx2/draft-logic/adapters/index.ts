@@ -3,6 +3,9 @@
  */
 
 import { MockAdapter, createMockAdapter as _createMockAdapter } from './mockAdapter';
+import { createScopedLogger } from '../../../../lib/clientLogger';
+
+const logger = createScopedLogger('[DraftLogic]');
 
 // Re-export
 export { MockAdapter };
@@ -20,11 +23,11 @@ export function createAdapter(mode: 'mock' | 'firebase' | 'local' = 'mock') {
       return _createMockAdapter();
     case 'firebase':
       // TODO: Implement Firebase adapter
-      console.warn('[DraftLogic] Firebase adapter not implemented, using mock');
+      logger.warn('Firebase adapter not implemented, using mock');
       return _createMockAdapter();
     case 'local':
       // TODO: Implement local adapter
-      console.warn('[DraftLogic] Local adapter not implemented, using mock');
+      logger.warn('Local adapter not implemented, using mock');
       return _createMockAdapter();
     default:
       return _createMockAdapter();

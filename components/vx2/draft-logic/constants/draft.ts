@@ -50,12 +50,13 @@ export function createDefaultSettings(): DraftSettings {
 
 /**
  * Default position limits for best ball autodraft
+ * Default: 3QBs, 6RBs, 8WRs, 3TEs
  */
 export const DEFAULT_POSITION_LIMITS: PositionLimits = {
-  QB: 4,
-  RB: 10,
-  WR: 11,
-  TE: 5,
+  QB: 3,
+  RB: 6,
+  WR: 8,
+  TE: 3,
 } as const;
 
 /**

@@ -64,7 +64,7 @@ function TabButton({
       tabIndex={tabIndex}
       onClick={onPress}
       onKeyDown={onKeyDown}
-      className="flex-1 flex flex-col items-center justify-start relative outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-inset"
+      className="flex-1 flex flex-col items-center justify-center relative outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-inset"
       style={{
         minHeight: `${TAB_BAR.minHeight}px`,
         paddingLeft: `${TAB_BAR.tabPaddingX}px`,
@@ -259,7 +259,7 @@ export default function TabBarVX2({
   
   return (
     <nav
-      className={`vx2-tab-bar flex-shrink-0 ${className}`}
+      className={`vx2-tab-bar flex-shrink-0 flex flex-col ${className}`}
       style={{
         backgroundColor: TAB_BAR_COLORS.background,
         borderTop: `1px solid ${TAB_BAR_COLORS.border}`,
@@ -270,8 +270,8 @@ export default function TabBarVX2({
     >
       {/* Tab Buttons */}
       <div 
-        className="flex"
-        style={{ paddingTop: `${TAB_BAR.paddingTop}px` }}
+        className="flex flex-1 items-center justify-center"
+        style={{ minHeight: 0 }}
       >
         {tabs.map((tab, index) => {
           const isActive = state.activeTab === tab.id;

@@ -7,35 +7,32 @@
  */
 
 import { getCurrentWeek } from '../../../lib/sportsdataio';
+import { 
+  withErrorHandling, 
+  validateMethod, 
+  requireEnvVar,
+  createSuccessResponse,
+} from '../../../lib/apiErrorHandler';
 
 export default async function handler(req, res) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    validateMethod(req, ['GET'], logger);
+    const apiKey = requireEnvVar('SPORTSDATAIO_API_KEY', logger);
 
-  const apiKey = process.env.SPORTSDATAIO_API_KEY;
-  if (!apiKey) {
-    return res.status(500).json({ error: 'API key not configured' });
-  }
-
-  try {
+    logger.info('Fetching current week');
+    
     const current = await getCurrentWeek(apiKey);
     
     if (!current) {
-      return res.status(200).json({
-        ok: true,
+      const response = createSuccessResponse({
         message: 'No current NFL week (offseason)',
         data: null,
-      });
+      }, 200, logger);
+      return res.status(response.statusCode).json(response.body);
     }
     
-    return res.status(200).json({
-      ok: true,
-      data: current,
-    });
-  } catch (err) {
-    console.error('Current Week API error:', err);
-    return res.status(500).json({ error: err.message });
-  }
+    const response = createSuccessResponse({ data: current }, 200, logger);
+    return res.status(response.statusCode).json(response.body);
+  });
 }
 

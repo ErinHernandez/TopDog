@@ -12,11 +12,6 @@ function parseClayProjectionsFixed(dataString, teamName = 'UNKNOWN') {
     if (!line.trim()) return;
     
     const parts = line.trim().split(/\s+/);
-    if (parts.length < 17) {
-      console.log(`⚠️  Skipping line ${index + 1}: insufficient columns (${parts.length})`);
-      return;
-    }
-    
     const position = parts[0];
     
     // Find where the numeric data starts (first number after position)
@@ -27,6 +22,15 @@ function parseClayProjectionsFixed(dataString, teamName = 'UNKNOWN') {
     
     // Reconstruct player name from all parts between position and first number
     const playerName = parts.slice(1, nameEndIndex).join(' ');
+    
+    // Check if we have enough columns after determining where data starts
+    // Header: Pos Player Gm Att Comp Yds TD INT Sk Att Yds TD Tgt Rec Yd TD Pts Rk
+    // We need at least 16 data columns (Gm through Rk) starting at nameEndIndex
+    const minRequiredColumns = nameEndIndex + 16;
+    if (parts.length < minRequiredColumns) {
+      console.log(`⚠️  Skipping line ${index + 1}: insufficient columns (${parts.length} < ${minRequiredColumns})`);
+      return;
+    }
     
     // Skip defensive players
     const defensivePositions = ['DI', 'ED', 'LB', 'CB', 'S', 'FS', 'SS', 'OLB', 'MLB', 'DE', 'DT', 'NT'];
@@ -107,7 +111,7 @@ function parseClayProjectionsFixed(dataString, teamName = 'UNKNOWN') {
             touchdowns: rushingTDs,
             longRush: rushingYards > 0 ? Math.round(15 + Math.random() * 20) : 0,
             yardsPerAttempt: rushingAttempts > 0 ? (rushingYards / rushingAttempts).toFixed(1) : "0.0",
-            yardsPerGame: (rushingYards / games).toFixed(1),
+            yardsPerGame: games > 0 ? (rushingYards / games).toFixed(1) : "0.0",
             firstDowns: Math.round(rushingYards / 10),
             fumbles: 0 // No made-up data
           },
@@ -118,7 +122,7 @@ function parseClayProjectionsFixed(dataString, teamName = 'UNKNOWN') {
             touchdowns: receivingTDs,
             longReception: receivingYards > 0 ? Math.round(Math.max(15, receivingYards / receptions * 1.5)) : 0,
             yardsPerReception: receptions > 0 ? (receivingYards / receptions).toFixed(1) : "0.0",
-            yardsPerGame: (receivingYards / games).toFixed(1),
+            yardsPerGame: games > 0 ? (receivingYards / games).toFixed(1) : "0.0",
             catchPercentage: targets > 0 ? ((receptions / targets) * 100).toFixed(1) : "0.0",
             fumbles: 0 // No made-up data
           } : undefined

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link'
 import { useRouter } from 'next/router';
+import { getAuth } from 'firebase/auth';
 import { canAccessDevFeatures } from '../lib/devAuth';
 import { useUser } from '../lib/userContext';
 import { DevLink, DevButton, DevSection, DevText } from '../lib/devLinking';
@@ -19,11 +20,31 @@ export default function Navbar() {
   const [draftAnimation, setDraftAnimation] = useState({ shouldAnimate: false, isPulsing: false })
   const [hasStartedPulsing, setHasStartedPulsing] = useState(false)
 
-  const checkDevAccess = () => {
+  const checkDevAccess = async () => {
     const accessToken = sessionStorage.getItem('devAccessToken');
-    console.log('🔧 Dev Access Check:', { userId: user?.uid, accessToken, hasAccess: canAccessDevFeatures(user?.uid || 'NEWUSERNAME', accessToken) });
-    if (canAccessDevFeatures(user?.uid || 'NEWUSERNAME', accessToken)) {
+    const userId = user?.uid || null;
+    
+    // Get Firebase auth token to check custom claims
+    let authToken = null;
+    if (user?.uid) {
+      try {
+        const auth = getAuth();
+        const tokenResult = await auth.currentUser?.getIdTokenResult(true);
+        if (tokenResult) {
+          authToken = tokenResult.claims;
+        }
+      } catch (error) {
+        console.warn('[Navbar] Failed to get auth token for dev access check:', error);
+      }
+    }
+    
+    const hasAccess = canAccessDevFeatures(userId, accessToken, authToken);
+    console.log('🔧 Dev Access Check:', { userId, accessToken: !!accessToken, hasCustomClaim: !!authToken?.developer, hasAccess });
+    
+    if (hasAccess) {
       setHasDevAccess(true);
+    } else {
+      setHasDevAccess(false);
     }
   };
 
@@ -151,6 +172,40 @@ export default function Navbar() {
                       marginTop: '2px'
                     }}
                   />
+                  <svg
+                    width="32"
+                    height="32"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    style={{
+                      marginLeft: '8px',
+                      marginRight: '4px',
+                      minWidth: '24px',
+                      width: '24px',
+                      height: '24px',
+                      flexShrink: 0
+                    }}
+                  >
+                    <path
+                      d="M12 2L3 7V10C3 15.55 6.84 20.74 12 22C17.16 20.74 21 15.55 21 10V7L12 2Z"
+                      fill="#FBBF25"
+                      stroke="#18181b"
+                      strokeWidth="1"
+                    />
+                    <path
+                      d="M12 2V8M12 8L8 10M12 8L16 10"
+                      stroke="#18181b"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                    />
+                    <path
+                      d="M9 12L15 12"
+                      stroke="#18181b"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                    />
+                  </svg>
                   <span 
                     className="ml-2 sm:ml-4 md:ml-6 lg:ml-8 text-xl font-medium hidden sm:inline" 
                     style={{ 

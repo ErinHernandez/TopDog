@@ -313,9 +313,9 @@ export function playerMatchesSearch(
   if (!query.trim()) return true;
   
   const normalizedQuery = query.toLowerCase().trim();
-  const name = player.name.toLowerCase();
-  const team = player.team.toLowerCase();
-  const position = player.position.toLowerCase();
+  const name = (player.name?.toLowerCase() || '');
+  const team = (player.team?.toLowerCase() || '');
+  const position = (player.position?.toLowerCase() || '');
   
   return (
     name.includes(normalizedQuery) ||

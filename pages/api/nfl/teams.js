@@ -17,40 +17,58 @@
  */
 
 import { getTeams, getTeamByKey, transformTeam } from '../../../lib/sportsdataio';
+import { 
+  withErrorHandling, 
+  validateMethod, 
+  requireEnvVar,
+  createSuccessResponse,
+  ErrorType,
+  createErrorResponse,
+} from '../../../lib/apiErrorHandler';
 
 export default async function handler(req, res) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    // Validate HTTP method
+    validateMethod(req, ['GET'], logger);
 
-  const apiKey = process.env.SPORTSDATAIO_API_KEY;
-  if (!apiKey) {
-    return res.status(500).json({ error: 'API key not configured' });
-  }
+    // Check required environment variables
+    const apiKey = requireEnvVar('SPORTSDATAIO_API_KEY', logger);
 
-  try {
     const { conference, division, team, refresh } = req.query;
     const forceRefresh = refresh === 'true';
+    
+    logger.info('Fetching teams', {
+      filters: {
+        team,
+        conference,
+        division,
+        refresh: forceRefresh,
+      }
+    });
     
     // Single team lookup
     if (team) {
       const teamData = await getTeamByKey(apiKey, team, forceRefresh);
       
       if (!teamData) {
-        return res.status(404).json({
-          ok: false,
-          error: `Team "${team}" not found`,
-        });
+        logger.warn('Team not found', { team });
+        const errorResponse = createErrorResponse(
+          ErrorType.NOT_FOUND,
+          `Team "${team}" not found`,
+          { team },
+          res.getHeader('X-Request-ID')
+        );
+        return res.status(errorResponse.statusCode).json(errorResponse.body);
       }
       
-      return res.status(200).json({
-        ok: true,
-        data: teamData,
-      });
+      logger.debug('Team found', { team });
+      const response = createSuccessResponse(teamData, 200, logger);
+      return res.status(response.statusCode).json(response.body);
     }
     
     // Get all teams
     let teams = await getTeams(apiKey, forceRefresh);
+    logger.debug('Teams fetched', { count: teams.length });
     
     // Transform and filter out non-NFL teams
     let transformed = teams
@@ -59,16 +77,28 @@ export default async function handler(req, res) {
     
     // Filter by conference
     if (conference) {
+      const beforeCount = transformed.length;
       transformed = transformed.filter(t => 
         t.conference === conference.toUpperCase()
       );
+      logger.debug('Filtered by conference', { 
+        conference: conference.toUpperCase(), 
+        before: beforeCount, 
+        after: transformed.length 
+      });
     }
     
     // Filter by division
     if (division) {
+      const beforeCount = transformed.length;
       transformed = transformed.filter(t => 
         t.division.toLowerCase().includes(division.toLowerCase())
       );
+      logger.debug('Filtered by division', { 
+        division, 
+        before: beforeCount, 
+        after: transformed.length 
+      });
     }
     
     // Sort by conference, division, then name
@@ -78,14 +108,12 @@ export default async function handler(req, res) {
       return a.name.localeCompare(b.name);
     });
     
-    return res.status(200).json({
-      ok: true,
+    const response = createSuccessResponse({
       count: transformed.length,
       data: transformed,
-    });
-  } catch (err) {
-    console.error('Teams API error:', err);
-    return res.status(500).json({ error: err.message });
-  }
+    }, 200, logger);
+    
+    return res.status(response.statusCode).json(response.body);
+  });
 }
 

@@ -10,27 +10,46 @@
  */
 
 import { getProjections } from '../../../lib/sportsdataio';
+import { 
+  withErrorHandling, 
+  validateMethod, 
+  requireEnvVar,
+  createSuccessResponse,
+} from '../../../lib/apiErrorHandler';
 
 export default async function handler(req, res) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    // Validate HTTP method
+    validateMethod(req, ['GET'], logger);
 
-  const apiKey = process.env.SPORTSDATAIO_API_KEY;
-  if (!apiKey) {
-    return res.status(500).json({ error: 'API key not configured' });
-  }
+    // Check required environment variables
+    const apiKey = requireEnvVar('SPORTSDATAIO_API_KEY', logger);
 
-  try {
     const { season, position, limit, refresh } = req.query;
     const forceRefresh = refresh === 'true';
     
+    logger.info('Fetching projections', {
+      filters: {
+        season: season || 'default',
+        position,
+        limit,
+        refresh: forceRefresh,
+      }
+    });
+    
     let projections = await getProjections(apiKey, forceRefresh);
+    logger.debug('Projections fetched', { count: projections.length });
     
     // Filter by position if specified
     if (position) {
+      const beforeCount = projections.length;
       const positions = position.toUpperCase().split(',');
       projections = projections.filter(p => positions.includes(p.Position));
+      logger.debug('Filtered by position', { 
+        positions, 
+        before: beforeCount, 
+        after: projections.length 
+      });
     }
     
     // Sort by PPR fantasy points
@@ -38,18 +57,18 @@ export default async function handler(req, res) {
     
     // Limit results
     if (limit) {
-      projections = projections.slice(0, parseInt(limit));
+      const limitNum = parseInt(limit);
+      projections = projections.slice(0, limitNum);
+      logger.debug('Limited results', { limit: limitNum });
     }
     
-    return res.status(200).json({
-      ok: true,
+    const response = createSuccessResponse({
       season: season || new Date().getFullYear(),
       count: projections.length,
       data: projections,
-    });
-  } catch (err) {
-    console.error('Projections API error:', err);
-    return res.status(500).json({ error: err.message });
-  }
+    }, 200, logger);
+    
+    return res.status(response.statusCode).json(response.body);
+  });
 }
 

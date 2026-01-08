@@ -10,26 +10,40 @@
  */
 
 import { getNews } from '../../../lib/sportsdataio';
+import { 
+  withErrorHandling, 
+  validateMethod, 
+  requireEnvVar,
+  createSuccessResponse,
+} from '../../../lib/apiErrorHandler';
 
 export default async function handler(req, res) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    // Validate HTTP method
+    validateMethod(req, ['GET'], logger);
 
-  const apiKey = process.env.SPORTSDATAIO_API_KEY;
-  if (!apiKey) {
-    return res.status(500).json({ error: 'API key not configured' });
-  }
+    // Check required environment variables
+    const apiKey = requireEnvVar('SPORTSDATAIO_API_KEY', logger);
 
-  try {
     const { player, team, limit = '50', refresh } = req.query;
     const forceRefresh = refresh === 'true';
     
+    logger.info('Fetching news', {
+      filters: {
+        player: player ? '***' : undefined, // Don't log full player names
+        team,
+        limit,
+        refresh: forceRefresh,
+      }
+    });
+    
     let news = await getNews(apiKey, forceRefresh);
+    logger.debug('News fetched', { count: news.length });
     
     // Filter by player name
     if (player) {
       const playerLower = player.toLowerCase();
+      const beforeCount = news.length;
       news = news.filter(n => {
         const title = (n.Title || '').toLowerCase();
         const content = (n.Content || '').toLowerCase();
@@ -38,18 +52,30 @@ export default async function handler(req, res) {
                content.includes(playerLower) ||
                playerName.includes(playerLower);
       });
+      logger.debug('Filtered by player', { 
+        player: '***', 
+        before: beforeCount, 
+        after: news.length 
+      });
     }
     
     // Filter by team
     if (team) {
+      const beforeCount = news.length;
       news = news.filter(n => n.Team === team.toUpperCase());
+      logger.debug('Filtered by team', { 
+        team: team.toUpperCase(), 
+        before: beforeCount, 
+        after: news.length 
+      });
     }
     
     // Sort by date (newest first)
     news.sort((a, b) => new Date(b.Updated) - new Date(a.Updated));
     
     // Limit results
-    news = news.slice(0, parseInt(limit));
+    const limitNum = parseInt(limit);
+    news = news.slice(0, limitNum);
     
     // Transform for cleaner output
     const transformed = news.map(n => ({
@@ -64,14 +90,12 @@ export default async function handler(req, res) {
       categories: n.Categories,
     }));
     
-    return res.status(200).json({
-      ok: true,
+    const response = createSuccessResponse({
       count: transformed.length,
       data: transformed,
-    });
-  } catch (err) {
-    console.error('News API error:', err);
-    return res.status(500).json({ error: err.message });
-  }
+    }, 200, logger);
+    
+    return res.status(response.statusCode).json(response.body);
+  });
 }
 

@@ -9,6 +9,10 @@ import React, { Component, ErrorInfo } from 'react';
 import type { TabId } from '../../core/types';
 import { TEXT_COLORS, BG_COLORS, STATE_COLORS } from '../../core/constants/colors';
 import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
+import { createScopedLogger } from '../../../../lib/clientLogger';
+import { captureReactError } from '../../../../lib/errorTracking';
+
+const logger = createScopedLogger('[TabErrorBoundary]');
 
 // ============================================================================
 // TYPES
@@ -175,21 +179,21 @@ export default class TabErrorBoundary extends Component<
   }
   
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    const errorData = {location:'TabErrorBoundary.tsx:177',message:'TabErrorBoundary caught error',data:{tabId:this.props.tabId,errorMessage:error.message,errorName:error.name,componentStack:errorInfo.componentStack?.substring(0,200)},timestamp:Date.now(),sessionId:'debug-session',runId:'initial',hypothesisId:'F'};
-    console.error('[VX2 DEBUG ERROR] TabErrorBoundary caught error', errorData);
-    // Log the error
-    console.error(`[TabErrorBoundary] Error in tab "${this.props.tabId}":`, error);
-    console.error('Component stack:', errorInfo.componentStack);
+    // Log the error with context using centralized logger
+    logger.error(`Error in tab "${this.props.tabId}"`, error, {
+      tabId: this.props.tabId,
+      componentStack: errorInfo.componentStack?.substring(0, 200),
+    });
     
     // Update state with error info
     this.setState({ errorInfo });
     
-    // TODO: Send to error tracking service (Sentry, etc.)
-    // logTabError({
-    //   tabId: this.props.tabId,
-    //   error,
-    //   componentStack: errorInfo.componentStack,
-    // });
+    // Send to error tracking service (Sentry when configured)
+    captureReactError(
+      error,
+      errorInfo.componentStack ?? undefined,
+      `TabErrorBoundary:${this.props.tabId}`
+    );
   }
   
   componentDidUpdate(prevProps: TabErrorBoundaryProps): void {

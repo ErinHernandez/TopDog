@@ -13,16 +13,79 @@ import {
   ErrorType,
   createErrorResponse,
 } from '../../../lib/apiErrorHandler';
+import { withAuth, verifyUserAccess } from '../../../lib/apiAuth';
+import { createExportRateLimiter, withRateLimit } from '../../../lib/rateLimitConfig';
+import { logSecurityEvent, getClientIP, SecurityEventType } from '../../../lib/securityLogger';
 
-export default function handler(req, res) {
+// Create rate limiter for export
+const exportLimiter = createExportRateLimiter();
+
+const handler = function(req, res) {
   return withErrorHandling(req, res, async (req, res, logger) => {
     const { params } = req.query;
     const [exportType, id, format] = params || [];
+    const clientIP = getClientIP(req);
+    
+    // Check rate limit
+    const rateLimitResult = await exportLimiter.check(req);
+    
+    // Set rate limit headers
+    res.setHeader('X-RateLimit-Limit', exportLimiter.config.maxRequests);
+    res.setHeader('X-RateLimit-Remaining', rateLimitResult.remaining);
+    res.setHeader('X-RateLimit-Reset', Math.floor(rateLimitResult.resetAt / 1000));
+    
+    if (!rateLimitResult.allowed) {
+      // Log rate limit exceeded
+      await logSecurityEvent(
+        SecurityEventType.RATE_LIMIT_EXCEEDED,
+        'medium',
+        { endpoint: '/api/export', exportType },
+        req.user?.uid || null,
+        clientIP
+      );
+      
+      return res.status(429).json({
+        error: 'RATE_LIMIT_EXCEEDED',
+        message: 'Too many export requests. Please try again later.',
+        retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000),
+      });
+    }
 
-    // Set CORS headers for external tool access
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    // CORS Configuration - Secure by default
+    const origin = req.headers.origin;
+    const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',')
+      .map(o => o.trim())
+      .filter(Boolean) || [];
+    
+    // In production, require ALLOWED_ORIGINS to be set
+    if (process.env.NODE_ENV === 'production') {
+      if (allowedOrigins.length === 0) {
+        logger.warn('ALLOWED_ORIGINS not configured in production - denying CORS');
+        return res.status(500).json({
+          error: 'CORS configuration error',
+          message: 'Server configuration error',
+        });
+      }
+      
+      // Only allow specific origins in production
+      if (origin && allowedOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+      } else {
+        // Origin not allowed - deny request
+        logger.warn('CORS request from unauthorized origin', { origin, allowedOrigins });
+        return res.status(403).json({
+          error: 'CORS policy violation',
+          message: 'Origin not allowed',
+        });
+      }
+    } else {
+      // Development: allow all origins (for local testing)
+      res.setHeader('Access-Control-Allow-Origin', '*');
+    }
+    
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
     if (req.method === 'OPTIONS') {
       return res.status(200).end();
@@ -54,6 +117,36 @@ export default function handler(req, res) {
 
     // Check data access restrictions first
     const { userId: requesterId } = req.query;
+    
+    // Verify user access - users can only export their own data
+    if (req.user && requesterId && !verifyUserAccess(req.user.uid, requesterId)) {
+      logger.warn('Export request blocked - unauthorized access', {
+        exportType,
+        id,
+        requestedUserId: requesterId,
+        authenticatedUserId: req.user.uid,
+      });
+      
+      await logSecurityEvent(
+        SecurityEventType.DATA_ACCESS,
+        'high',
+        { 
+          endpoint: '/api/export',
+          exportType,
+          reason: 'unauthorized_user_access',
+          requestedUserId: requesterId,
+          authenticatedUserId: req.user.uid
+        },
+        req.user.uid,
+        clientIP
+      );
+      
+      return res.status(403).json({ 
+        error: 'FORBIDDEN',
+        message: 'Access denied',
+      });
+    }
+    
     const validation = dataAccessControl.validateExportRequest(exportType, id, requesterId);
     
     if (!validation.allowed) {
@@ -144,10 +237,30 @@ export default function handler(req, res) {
       format: exportFormat,
       dataSize: exportData.length,
     });
+    
+    // Log export event
+    await logSecurityEvent(
+      SecurityEventType.DATA_ACCESS,
+      'low',
+      { 
+        endpoint: '/api/export',
+        exportType,
+        format: exportFormat,
+        dataSize: exportData.length 
+      },
+      req.user?.uid || null,
+      clientIP
+    );
 
     return res.status(200).send(exportData);
   });
-}
+};
+
+// Export with authentication and rate limiting
+export default withAuth(
+  withRateLimit(handler, exportLimiter),
+  { required: true, allowAnonymous: false }
+);
 
 // API route examples:
 // GET /api/export/draft/room123?userId=user456&format=csv

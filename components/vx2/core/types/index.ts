@@ -22,6 +22,9 @@ export type {
   DeepLinkRoute,
   ParsedDeepLink,
   TabAnalyticsEvent,
+  NavigationGuardResult,
+  NavigationGuard,
+  RegisteredNavigationGuard,
 } from './navigation';
 
 export { TAB_DISPLAY_NAMES } from './navigation';

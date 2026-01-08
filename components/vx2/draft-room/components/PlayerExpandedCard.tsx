@@ -24,12 +24,17 @@ import { BYE_WEEKS } from '@/lib/nflConstants';
 import { generatePlayerId } from '../utils';
 import type { SeasonStats } from '@/lib/historicalStats/types';
 import * as historicalService from '@/lib/historicalStats/service';
+import type { Position } from '../types';
+import { createScopedLogger } from '../../../../lib/clientLogger';
+
+const logger = createScopedLogger('[PlayerExpandedCard]');
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-type FantasyPosition = 'QB' | 'RB' | 'WR' | 'TE';
+// Use shared Position type from draft-room types
+type FantasyPosition = Position;
 
 interface PlayerData {
   id?: string;
@@ -56,7 +61,7 @@ export interface PlayerExpandedCardProps {
 // ============================================================================
 
 // Teams with light backgrounds requiring dark text
-const LIGHT_BG_TEAMS = ['DET'];
+const LIGHT_BG_TEAMS = ['DET', 'LAC', 'KC', 'MIA', 'PHI', 'LAR'];
 
 const PX = {
   // Header
@@ -472,7 +477,7 @@ export default function PlayerExpandedCard({
         setHistoricalStats(statsMap);
       })
       .catch(err => {
-        console.warn('[PlayerExpandedCard] Failed to load historical stats:', err);
+        logger.warn('Failed to load historical stats', { error: String(err) });
         setHistoricalStats(new Map());
       })
       .finally(() => setLoadingStats(false));

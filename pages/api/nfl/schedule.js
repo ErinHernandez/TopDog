@@ -10,21 +10,23 @@
  */
 
 import { getSchedule } from '../../../lib/sportsdataio';
+import { 
+  withErrorHandling, 
+  validateMethod, 
+  requireEnvVar,
+  createSuccessResponse,
+} from '../../../lib/apiErrorHandler';
 
 export default async function handler(req, res) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    validateMethod(req, ['GET'], logger);
+    const apiKey = requireEnvVar('SPORTSDATAIO_API_KEY', logger);
 
-  const apiKey = process.env.SPORTSDATAIO_API_KEY;
-  if (!apiKey) {
-    return res.status(500).json({ error: 'API key not configured' });
-  }
-
-  try {
     const { season, week, team, refresh } = req.query;
     const seasonYear = parseInt(season) || new Date().getFullYear();
     const forceRefresh = refresh === 'true';
+    
+    logger.info('Fetching schedule', { season: seasonYear, week, team, refresh: forceRefresh });
     
     let schedule = await getSchedule(apiKey, seasonYear, forceRefresh);
     
@@ -44,15 +46,13 @@ export default async function handler(req, res) {
     // Sort by date
     schedule.sort((a, b) => new Date(a.Date) - new Date(b.Date));
     
-    return res.status(200).json({
-      ok: true,
+    const response = createSuccessResponse({
       season: seasonYear,
       count: schedule.length,
       data: schedule,
-    });
-  } catch (err) {
-    console.error('Schedule API error:', err);
-    return res.status(500).json({ error: err.message });
-  }
+    }, 200, logger);
+    
+    return res.status(response.statusCode).json(response.body);
+  });
 }
 

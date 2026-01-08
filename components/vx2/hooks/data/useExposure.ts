@@ -208,9 +208,9 @@ export function useExposure(options: UseExposureOptions = {}): UseExposureResult
     if (filters.searchQuery) {
       const query = filters.searchQuery.toLowerCase();
       result = result.filter(p => 
-        p.name.toLowerCase().includes(query) ||
-        p.team.toLowerCase().includes(query) ||
-        p.position.toLowerCase().includes(query)
+        (p.name?.toLowerCase() || '').includes(query) ||
+        (p.team?.toLowerCase() || '').includes(query) ||
+        (p.position?.toLowerCase() || '').includes(query)
       );
     }
     
@@ -225,7 +225,7 @@ export function useExposure(options: UseExposureOptions = {}): UseExposureResult
           comparison = a.adp - b.adp;
           break;
         case 'name':
-          comparison = a.name.localeCompare(b.name);
+          comparison = (a.name || '').localeCompare(b.name || '');
           break;
         case 'teams':
           comparison = a.teams - b.teams;
@@ -242,8 +242,12 @@ export function useExposure(options: UseExposureOptions = {}): UseExposureResult
     if (allPlayers.length === 0) {
       return { totalPlayers: 0, averageExposure: 0, maxExposure: 0 };
     }
-    const total = allPlayers.reduce((sum, p) => sum + p.exposure, 0);
-    const max = Math.max(...allPlayers.map(p => p.exposure));
+    let total = 0;
+    let max = 0;
+    for (const p of allPlayers) {
+      total += p.exposure;
+      if (p.exposure > max) max = p.exposure;
+    }
     return {
       totalPlayers: allPlayers.length,
       averageExposure: Math.round(total / allPlayers.length * 10) / 10,

@@ -26,6 +26,9 @@ import { POSITION_COLORS, DRAFT_DEFAULTS, TILED_BG_STYLE } from '../constants';
 import { useImageShare } from '../hooks/useImageShare';
 import { Share } from '../../components/icons/actions/Share';
 import ShareOptionsModal from './ShareOptionsModal';
+import { createScopedLogger } from '../../../../lib/clientLogger';
+
+const logger = createScopedLogger('[PicksBar]');
 
 // ============================================================================
 // SCROLLING USERNAME COMPONENT
@@ -527,6 +530,207 @@ interface BlankCardProps {
   onClick?: () => void;
 }
 
+// ============================================================================
+// BLANK CARD SUB-COMPONENTS
+// ============================================================================
+
+/** Position tracker bar showing draft composition by position */
+function PositionTrackerBar({ picks }: { picks: DraftPlayer[] }) {
+  if (picks.length === 0) {
+    return (
+      <div
+        style={{
+          height: PICKS_BAR_PX.trackerHeight,
+          width: PICKS_BAR_PX.trackerEmptyWidth,
+          backgroundColor: CARD_COLORS.emptyTracker,
+          borderRadius: PICKS_BAR_PX.trackerBorderRadius,
+        }}
+      />
+    );
+  }
+
+  const total = picks.length;
+  return (
+    <div
+      style={{
+        display: 'flex',
+        height: PICKS_BAR_PX.trackerHeight,
+        width: PICKS_BAR_PX.trackerWidth,
+        borderRadius: PICKS_BAR_PX.trackerBorderRadius,
+        overflow: 'hidden',
+      }}
+    >
+      {POSITION_ORDER
+        .filter(pos => picks.some(p => p.position === pos))
+        .map((pos) => {
+          const count = picks.filter(p => p.position === pos).length;
+          return (
+            <div
+              key={pos}
+              style={{
+                flex: count / total,
+                backgroundColor: POSITION_COLORS[pos],
+              }}
+            />
+          );
+        })}
+    </div>
+  );
+}
+
+/** Status text shown in center of blank card */
+function BlankCardStatus({ 
+  isCurrent, 
+  isUserPick, 
+  picksAway 
+}: { 
+  isCurrent: boolean; 
+  isUserPick: boolean; 
+  picksAway?: number;
+}) {
+  if (isCurrent) {
+    return (
+      <div
+        style={{
+          fontWeight: 600,
+          color: '#FFFFFF',
+          fontSize: 11,
+          lineHeight: 1.2,
+          textAlign: 'center',
+          marginTop: 6,
+        }}
+      >
+        On The<br />Clock
+      </div>
+    );
+  }
+  
+  if (isUserPick && picksAway !== undefined && picksAway > 0) {
+    return (
+      <div
+        style={{
+          color: '#FFFFFF',
+          fontWeight: 500,
+          fontSize: 11,
+          textAlign: 'center',
+          lineHeight: 1.2,
+        }}
+      >
+        {picksAway === 1 ? 'Up Next' : `${picksAway} away`}
+      </div>
+    );
+  }
+  
+  return null;
+}
+
+/** Shared content area for blank cards (pick number, status, tracker) */
+function BlankCardContent({
+  pickNumber,
+  teamCount,
+  isCurrent,
+  isUserPick,
+  picksAway,
+  participantPicks,
+}: {
+  pickNumber: number;
+  teamCount: number;
+  isCurrent: boolean;
+  isUserPick: boolean;
+  picksAway?: number;
+  participantPicks: DraftPlayer[];
+}) {
+  return (
+    <div
+      style={{
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: PICKS_BAR_PX.contentMinHeight,
+        position: 'relative',
+      }}
+    >
+      {/* Pick Number Row */}
+      <div
+        style={{
+          position: 'absolute',
+          top: PICKS_BAR_PX.pickNumberTop,
+          left: PICKS_BAR_PX.pickNumberMarginLeft,
+          right: PICKS_BAR_PX.pickNumberMarginLeft,
+          display: 'flex',
+          justifyContent: 'space-between',
+          fontSize: PICKS_BAR_PX.pickNumberFontSize,
+          fontWeight: 500,
+          color: '#FFFFFF',
+        }}
+      >
+        <span>{formatPickDisplay(pickNumber, teamCount)}</span>
+        <span></span>
+      </div>
+      
+      {/* Center Content - Status */}
+      <div
+        style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <BlankCardStatus 
+          isCurrent={isCurrent} 
+          isUserPick={isUserPick} 
+          picksAway={picksAway} 
+        />
+      </div>
+      
+      {/* Position Tracker Bar */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          width: '100%',
+          paddingBottom: 5,
+        }}
+      >
+        <PositionTrackerBar picks={participantPicks} />
+      </div>
+    </div>
+  );
+}
+
+/** Derive card styling based on draft state */
+function getBlankCardStyle(
+  isUserPick: boolean,
+  isOnTheClock: boolean,
+  isPreDraft: boolean,
+  timer?: number
+): { cardColor: string; useTiledStyle: boolean; isUrgent: boolean } {
+  const isUrgent = isOnTheClock && timer !== undefined && timer <= 9;
+  
+  // Determine card color
+  let cardColor: string;
+  if (isPreDraft) {
+    cardColor = CARD_COLORS.preDraft;
+  } else if (isOnTheClock && isUserPick) {
+    cardColor = isUrgent ? CARD_COLORS.onTheClockUrgent : CARD_COLORS.onTheClock;
+  } else if (isUserPick) {
+    cardColor = CARD_COLORS.userPick;
+  } else {
+    cardColor = CARD_COLORS.otherPick;
+  }
+  
+  // Use tiled image style for user's picks (except urgent)
+  const useTiledStyle = isUserPick && !isUrgent;
+  
+  return { cardColor, useTiledStyle, isUrgent };
+}
+
+// ============================================================================
+// BLANK CARD MAIN COMPONENT
+// ============================================================================
+
 const BlankCard = React.forwardRef<HTMLDivElement, BlankCardProps>(
   function BlankCard({ 
     pickNumber, 
@@ -544,61 +748,55 @@ const BlankCard = React.forwardRef<HTMLDivElement, BlankCardProps>(
     const isDraftActive = status === 'active';
     const isOnTheClock = isCurrent && isDraftActive;
     
-    // Determine card color
-    // When user is on the clock: blue normally, red when timer <= 9s
-    // Blue for user's other picks, gray for everyone else
-    const getCardColor = (): string => {
-      if (isPreDraft) return CARD_COLORS.preDraft;
-      if (isOnTheClock && isUserPick) {
-        // Match navbar logic: red when urgent (<=9s), blue otherwise
-        return (timer !== undefined && timer <= 9) 
-          ? CARD_COLORS.onTheClockUrgent 
-          : CARD_COLORS.onTheClock;
-      }
-      if (isUserPick) return CARD_COLORS.userPick;
-      return CARD_COLORS.otherPick;
+    const { cardColor, useTiledStyle, isUrgent } = getBlankCardStyle(
+      isUserPick, isOnTheClock, isPreDraft, timer
+    );
+    
+    const borderWidth = PICKS_BAR_PX.cardBorderWidth;
+    const ariaLabel = `Pick ${pickNumber}: ${participantName}${isCurrent ? ' (current)' : ''}`;
+    
+    // Shared card wrapper styles
+    const cardWrapperStyle: React.CSSProperties = {
+      flexShrink: 0,
+      flexGrow: 0,
+      boxSizing: 'border-box',
+      width: PICKS_BAR_PX.cardWidth,
+      minWidth: PICKS_BAR_PX.cardWidth,
+      maxWidth: PICKS_BAR_PX.cardWidth,
+      marginTop: 4,
+      marginBottom: PICKS_BAR_PX.cardMargin,
+      marginLeft: PICKS_BAR_PX.cardMargin,
+      marginRight: PICKS_BAR_PX.cardMargin,
+      borderRadius: PICKS_BAR_PX.cardBorderRadius,
+      cursor: onClick ? 'pointer' : 'default',
     };
     
-    const cardColor = getCardColor();
+    // Header styles
+    const headerBaseStyle: React.CSSProperties = {
+      height: PICKS_BAR_PX.headerHeight + (borderWidth * 2),
+      marginTop: -(borderWidth * 2),
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '0 4px',
+      borderTopLeftRadius: PICKS_BAR_PX.cardBorderRadius,
+      borderTopRightRadius: PICKS_BAR_PX.cardBorderRadius,
+    };
     
-    // Use image styling (tiled wr_blue border) for user's picks:
-    // - Future picks (not on the clock)
-    // - On the clock with timer > 9s (blue tiled)
-    // Use solid border for:
-    // - On the clock with timer <= 9s (red urgent)
-    // - Non-user picks (gray)
-    const isUrgent = isOnTheClock && timer !== undefined && timer <= 9;
-    const usesImageStyle = isUserPick && !isUrgent;
-    
-    // For image-styled cards, use wrapper approach to get rounded corners with image border
-    // Wrapper is larger to account for padding that acts as the "border"
-    const borderWidth = PICKS_BAR_PX.cardBorderWidth;
-    
-    if (usesImageStyle) {
+    if (useTiledStyle) {
+      // Tiled image border style for user picks
       return (
         <div
           ref={ref}
           onClick={onClick}
           role="listitem"
-          aria-label={`Pick ${pickNumber}: ${participantName}${isCurrent ? ' (current)' : ''}`}
+          aria-label={ariaLabel}
           style={{
-            flexShrink: 0,
-            flexGrow: 0,
-            boxSizing: 'border-box',
-            width: PICKS_BAR_PX.cardWidth,
-            minWidth: PICKS_BAR_PX.cardWidth,
-            maxWidth: PICKS_BAR_PX.cardWidth,
-            marginTop: 4,
-            marginBottom: PICKS_BAR_PX.cardMargin,
-            marginLeft: PICKS_BAR_PX.cardMargin,
-            marginRight: PICKS_BAR_PX.cardMargin,
-            borderRadius: PICKS_BAR_PX.cardBorderRadius,
-            ...TILED_BG_STYLE, // Image background acts as border
-            padding: borderWidth, // Creates the "border" width
-            cursor: onClick ? 'pointer' : 'default',
+            ...cardWrapperStyle,
+            ...TILED_BG_STYLE,
+            padding: borderWidth,
           }}
         >
-          {/* Inner card content - fills available space after padding */}
           <div
             style={{
               width: '100%',
@@ -610,20 +808,7 @@ const BlankCard = React.forwardRef<HTMLDivElement, BlankCardProps>(
               flexDirection: 'column',
             }}
           >
-            {/* Header - with tiled background, centered in full colored area */}
-            <div
-              style={{
-                height: PICKS_BAR_PX.headerHeight + (PICKS_BAR_PX.cardBorderWidth * 2),
-                marginTop: -(PICKS_BAR_PX.cardBorderWidth * 2),
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '0 4px',
-                borderTopLeftRadius: PICKS_BAR_PX.cardBorderRadius,
-                borderTopRightRadius: PICKS_BAR_PX.cardBorderRadius,
-                ...TILED_BG_STYLE, // Tiled background for header
-              }}
-            >
+            <div style={{ ...headerBaseStyle, ...TILED_BG_STYLE }}>
               <ScrollingUsername
                 name={participantName}
                 maxChars={PICKS_BAR_PX.headerMaxChars}
@@ -632,167 +817,37 @@ const BlankCard = React.forwardRef<HTMLDivElement, BlankCardProps>(
                 fontWeight={500}
               />
             </div>
-            
-            {/* Content Area - matches standard card */}
-            <div
-              style={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                minHeight: PICKS_BAR_PX.contentMinHeight,
-                position: 'relative',
-              }}
-            >
-              {/* Pick Number Row */}
-              <div
-                style={{
-                  position: 'absolute',
-                  top: PICKS_BAR_PX.pickNumberTop,
-                  left: PICKS_BAR_PX.pickNumberMarginLeft,
-                  right: PICKS_BAR_PX.pickNumberMarginLeft,
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  fontSize: PICKS_BAR_PX.pickNumberFontSize,
-                  fontWeight: 500,
-                  color: '#FFFFFF',
-                }}
-              >
-                <span>{formatPickDisplay(pickNumber, teamCount)}</span>
-                <span></span>
-              </div>
-              
-              {/* Center Content - Status */}
-              <div
-                style={{
-                  flex: 1,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                {isCurrent ? (
-                  <div
-                    style={{
-                      fontWeight: 600,
-                      color: '#FFFFFF',
-                      fontSize: 11,
-                      lineHeight: 1.2,
-                      textAlign: 'center',
-                      marginTop: 6,
-                    }}
-                  >
-                    On The<br />Clock
-                  </div>
-                ) : picksAway !== undefined && picksAway > 0 ? (
-                  <div
-                    style={{
-                      color: '#FFFFFF',
-                      fontWeight: 500,
-                      fontSize: 11,
-                      textAlign: 'center',
-                      lineHeight: 1.2,
-                    }}
-                  >
-                    {picksAway === 1 ? 'Up Next' : `${picksAway} away`}
-                  </div>
-                ) : null}
-              </div>
-              
-              {/* Position Tracker Bar */}
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  width: '100%',
-                  paddingBottom: 5,
-                }}
-              >
-                {participantPicks.length === 0 ? (
-                  <div
-                    style={{
-                      height: PICKS_BAR_PX.trackerHeight,
-                      width: PICKS_BAR_PX.trackerEmptyWidth,
-                      backgroundColor: CARD_COLORS.emptyTracker,
-                      borderRadius: PICKS_BAR_PX.trackerBorderRadius,
-                    }}
-                  />
-                ) : (
-                  <div
-                    style={{
-                      display: 'flex',
-                      height: PICKS_BAR_PX.trackerHeight,
-                      width: PICKS_BAR_PX.trackerWidth,
-                      borderRadius: PICKS_BAR_PX.trackerBorderRadius,
-                      overflow: 'hidden',
-                    }}
-                  >
-                    {POSITION_ORDER
-                      .filter(pos => participantPicks.filter(p => p.position === pos).length > 0)
-                      .map((pos) => {
-                        const count = participantPicks.filter(p => p.position === pos).length;
-                        const total = participantPicks.length;
-                        return (
-                          <div
-                            key={pos}
-                            style={{
-                              flex: count / total,
-                              backgroundColor: POSITION_COLORS[pos],
-                            }}
-                          />
-                        );
-                      })}
-                  </div>
-                )}
-              </div>
-            </div>
+            <BlankCardContent
+              pickNumber={pickNumber}
+              teamCount={teamCount}
+              isCurrent={isCurrent}
+              isUserPick={isUserPick}
+              picksAway={picksAway}
+              participantPicks={participantPicks}
+            />
           </div>
         </div>
       );
     }
     
-    // Standard card for non-user picks, on-the-clock, and pre-draft
+    // Solid border style for non-user picks, urgent, and pre-draft
     return (
       <div
         ref={ref}
         onClick={onClick}
         role="listitem"
-        aria-label={`Pick ${pickNumber}: ${participantName}${isCurrent ? ' (current)' : ''}`}
+        aria-label={ariaLabel}
         style={{
-          flexShrink: 0,
-          flexGrow: 0,
-          boxSizing: 'border-box',
-          width: PICKS_BAR_PX.cardWidth,
-          minWidth: PICKS_BAR_PX.cardWidth,
-          maxWidth: PICKS_BAR_PX.cardWidth,
-          marginTop: 4,
-          marginBottom: PICKS_BAR_PX.cardMargin,
-          marginLeft: PICKS_BAR_PX.cardMargin,
-          marginRight: PICKS_BAR_PX.cardMargin,
-          borderRadius: PICKS_BAR_PX.cardBorderRadius,
-          border: `${PICKS_BAR_PX.cardBorderWidth}px solid ${cardColor}`,
+          ...cardWrapperStyle,
+          border: `${borderWidth}px solid ${cardColor}`,
           backgroundColor: PICKS_BAR_PX.cardBg,
           overflow: 'hidden',
-          cursor: onClick ? 'pointer' : 'default',
           display: 'flex',
           flexDirection: 'column',
           position: 'relative',
         }}
       >
-        {/* Header - Participant Name centered in full colored area (header + outer border) */}
-        <div
-          style={{
-            height: PICKS_BAR_PX.headerHeight + (PICKS_BAR_PX.cardBorderWidth * 2),
-            marginTop: -(PICKS_BAR_PX.cardBorderWidth * 2),
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '0 4px',
-            backgroundColor: cardColor,
-            borderTopLeftRadius: PICKS_BAR_PX.cardBorderRadius,
-            borderTopRightRadius: PICKS_BAR_PX.cardBorderRadius,
-          }}
-        >
+        <div style={{ ...headerBaseStyle, backgroundColor: cardColor }}>
           <ScrollingUsername
             name={participantName}
             maxChars={PICKS_BAR_PX.headerMaxChars}
@@ -801,120 +856,14 @@ const BlankCard = React.forwardRef<HTMLDivElement, BlankCardProps>(
             fontWeight={500}
           />
         </div>
-        
-        {/* Content Area */}
-        <div
-          style={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            minHeight: PICKS_BAR_PX.contentMinHeight,
-            position: 'relative',
-          }}
-        >
-          {/* Pick Number Row - absolutely positioned at top */}
-          <div
-            style={{
-              position: 'absolute',
-              top: PICKS_BAR_PX.pickNumberTop,
-              left: PICKS_BAR_PX.pickNumberMarginLeft,
-              right: PICKS_BAR_PX.pickNumberMarginLeft,
-              display: 'flex',
-              justifyContent: 'space-between',
-              fontSize: PICKS_BAR_PX.pickNumberFontSize,
-              fontWeight: 500,
-              color: '#FFFFFF',
-            }}
-          >
-            <span>{formatPickDisplay(pickNumber, teamCount)}</span>
-            <span></span>
-          </div>
-          
-          {/* Center Content - Timer or Status */}
-          <div
-            style={{
-              flex: 1,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            {isCurrent ? (
-              <div
-                style={{
-                  fontWeight: 600,
-                  color: '#FFFFFF',
-                  fontSize: 11,
-                  lineHeight: 1.2,
-                  textAlign: 'center',
-                  marginTop: 6,
-                }}
-              >
-                On The<br />Clock
-              </div>
-            ) : isUserPick && picksAway !== undefined && picksAway > 0 ? (
-              <div
-                style={{
-                  color: '#FFFFFF',
-                  fontWeight: 500,
-                  fontSize: 11,
-                  textAlign: 'center',
-                  lineHeight: 1.2,
-                }}
-              >
-                {picksAway === 1 ? 'Up Next' : `${picksAway} away`}
-              </div>
-            ) : null}
-          </div>
-          
-          {/* Position Tracker Bar - at bottom with padding */}
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              width: '100%',
-              paddingBottom: 5,
-            }}
-          >
-            {participantPicks.length === 0 ? (
-              <div
-                style={{
-                  height: PICKS_BAR_PX.trackerHeight,
-                  width: PICKS_BAR_PX.trackerEmptyWidth,
-                  backgroundColor: CARD_COLORS.emptyTracker,
-                  borderRadius: PICKS_BAR_PX.trackerBorderRadius,
-                }}
-              />
-            ) : (
-              <div
-                style={{
-                  display: 'flex',
-                  height: PICKS_BAR_PX.trackerHeight,
-                  width: PICKS_BAR_PX.trackerWidth,
-                  borderRadius: PICKS_BAR_PX.trackerBorderRadius,
-                  overflow: 'hidden',
-                }}
-              >
-                {POSITION_ORDER
-                  .filter(pos => participantPicks.filter(p => p.position === pos).length > 0)
-                  .map((pos) => {
-                    const count = participantPicks.filter(p => p.position === pos).length;
-                    const total = participantPicks.length;
-                    return (
-                      <div
-                        key={pos}
-                        style={{
-                          flex: count / total,
-                          backgroundColor: POSITION_COLORS[pos],
-                        }}
-                      />
-                    );
-                  })}
-              </div>
-            )}
-          </div>
-        </div>
+        <BlankCardContent
+          pickNumber={pickNumber}
+          teamCount={teamCount}
+          isCurrent={isCurrent}
+          isUserPick={isUserPick}
+          picksAway={picksAway}
+          participantPicks={participantPicks}
+        />
       </div>
     );
   }
@@ -947,10 +896,10 @@ export default function PicksBar({
   // Image share hook
   const { captureAndShare, isCapturing } = useImageShare({
     onSuccess: (method) => {
-      console.log(`[PicksBar] Share successful via ${method}`);
+      logger.debug('Share successful', { method });
     },
     onError: (error) => {
-      console.error('[PicksBar] Share failed:', error);
+      logger.error('Share failed', error instanceof Error ? error : new Error(String(error)));
     },
   });
   

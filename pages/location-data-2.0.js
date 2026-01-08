@@ -140,6 +140,20 @@ export default function LocationData2() {
     return stateNames[abbreviation] || abbreviation;
   };
 
+  // Function to sanitize SVG content to prevent XSS
+  const sanitizeSVGContent = (svgString) => {
+    if (!svgString) return '';
+    
+    // Remove script tags and event handlers
+    let sanitized = svgString
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      .replace(/on\w+\s*=\s*["'][^"']*["']/gi, '')
+      .replace(/javascript:/gi, '')
+      .replace(/<iframe/gi, '<iframe-disabled');
+    
+    return sanitized;
+  };
+
   // Function to process SVG content and add interactivity
   const processSvgContent = (svgString) => {
     // Extract states first
@@ -211,7 +225,7 @@ export default function LocationData2() {
                 <div 
                   className="svg-container"
                   dangerouslySetInnerHTML={{ 
-                    __html: processSvgContent(svgContent) 
+                    __html: sanitizeSVGContent(processSvgContent(svgContent))
                   }}
                   style={{
                     width: '100%',

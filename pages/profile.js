@@ -1,20 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useUser } from '../lib/userContext';
 import { db } from '../lib/firebase';
 import { collection, query, where, orderBy, getDocs, doc, getDoc } from 'firebase/firestore';
 
 export default function Profile() {
+  const router = useRouter();
+  const { user, loading: authLoading } = useUser();
   const [userBalance, setUserBalance] = useState(0);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const userId = 'NEWUSERNAME'; // In production, this would come from authentication
+  
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/login');
+    }
+  }, [user, authLoading, router]);
+  
+  const userId = user?.uid;
 
   useEffect(() => {
-    fetchUserData();
-  }, []);
+    if (userId) {
+      fetchUserData();
+    } else if (!authLoading) {
+      setLoading(false);
+    }
+  }, [userId, authLoading]);
 
   const fetchUserData = async () => {
+    if (!userId) return;
+    
     try {
       // Fetch user balance
       const userDoc = await getDoc(doc(db, 'users', userId));

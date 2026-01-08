@@ -2,15 +2,26 @@
  * useTransactionHistory - Data hook for deposit/withdrawal history
  * 
  * Provides transaction history with filtering and pagination.
- * Currently uses mock data, designed for easy API integration.
+ * Connected to Firebase Firestore for real-time updates.
  * 
  * @example
  * ```tsx
- * const { transactions, isLoading, error, refetch } = useTransactionHistory();
+ * const { transactions, isLoading, error, refetch } = useTransactionHistory(userId);
  * ```
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { db } from '../../../../lib/firebase';
+import { 
+  collection, 
+  query, 
+  where, 
+  orderBy, 
+  onSnapshot,
+  getDocs,
+  limit,
+  Timestamp,
+} from 'firebase/firestore';
 
 // ============================================================================
 // TYPES
@@ -62,6 +73,18 @@ export interface TransactionFilters {
   startDate?: string;
   /** Date range end */
   endDate?: string;
+}
+
+/**
+ * Hook options
+ */
+export interface UseTransactionHistoryOptions {
+  /** Firebase user ID */
+  userId: string;
+  /** Maximum number of transactions to fetch */
+  maxResults?: number;
+  /** Enable real-time updates */
+  realTime?: boolean;
 }
 
 /**
@@ -192,12 +215,66 @@ const MOCK_TRANSACTIONS: Transaction[] = [
 ];
 
 // ============================================================================
-// MOCK FETCH
+// FIREBASE FETCH
 // ============================================================================
 
-async function fetchTransactionHistory(): Promise<Transaction[]> {
-  await new Promise(resolve => setTimeout(resolve, 200 + Math.random() * 150));
-  return MOCK_TRANSACTIONS;
+/**
+ * Fetch transactions from Firebase
+ */
+async function fetchTransactionsFromFirebase(
+  userId: string,
+  maxResults: number = 100
+): Promise<Transaction[]> {
+  const q = query(
+    collection(db, 'transactions'),
+    where('userId', '==', userId),
+    orderBy('createdAt', 'desc'),
+    limit(maxResults)
+  );
+  
+  const snapshot = await getDocs(q);
+  
+  return snapshot.docs.map(doc => {
+    const data = doc.data();
+    const createdAt = data.createdAt instanceof Timestamp 
+      ? data.createdAt.toDate().toISOString()
+      : data.createdAt;
+    
+    return {
+      id: doc.id,
+      type: data.type,
+      amountCents: data.amountCents,
+      amountFormatted: formatAmount(data.amountCents),
+      status: data.status,
+      createdAt,
+      description: data.description || getDefaultDescription(data.type),
+      paymentMethod: data.paymentMethod,
+      referenceId: data.referenceId,
+    };
+  });
+}
+
+/**
+ * Format amount in cents to display string
+ */
+function formatAmount(amountCents: number): string {
+  const dollars = Math.abs(amountCents) / 100;
+  const prefix = amountCents < 0 ? '-' : '';
+  return `${prefix}$${dollars.toFixed(2)}`;
+}
+
+/**
+ * Get default description for transaction type
+ */
+function getDefaultDescription(type: TransactionType): string {
+  switch (type) {
+    case 'deposit': return 'Deposit';
+    case 'withdrawal': return 'Withdrawal';
+    case 'entry': return 'Tournament Entry';
+    case 'winning': return 'Tournament Winnings';
+    case 'refund': return 'Refund';
+    default: return 'Transaction';
+  }
 }
 
 // ============================================================================
@@ -213,15 +290,38 @@ const DEFAULT_FILTERS: TransactionFilters = {
 
 /**
  * Hook for fetching and managing transaction history
+ * 
+ * @param options - Hook options including userId, or userId string, or undefined for mock data
  */
-export function useTransactionHistory(): UseTransactionHistoryResult {
+export function useTransactionHistory(
+  options?: UseTransactionHistoryOptions | string
+): UseTransactionHistoryResult {
+  // Support: no args (mock data), string userId, or options object
+  const { 
+    userId, 
+    maxResults = 100, 
+    realTime = true 
+  } = !options 
+    ? { userId: '', maxResults: 100, realTime: false }
+    : typeof options === 'string' 
+      ? { userId: options, maxResults: 100, realTime: true }
+      : options;
+  
   const [allTransactions, setAllTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefetching, setIsRefetching] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFiltersState] = useState<TransactionFilters>(DEFAULT_FILTERS);
 
+  // Fetch data (one-time or on-demand)
   const fetchData = useCallback(async (isRefetch = false) => {
+    if (!userId) {
+      // No userId - use mock data for backwards compatibility
+      setAllTransactions(MOCK_TRANSACTIONS);
+      setIsLoading(false);
+      return;
+    }
+    
     try {
       if (isRefetch) {
         setIsRefetching(true);
@@ -230,23 +330,82 @@ export function useTransactionHistory(): UseTransactionHistoryResult {
       }
       setError(null);
       
-      const data = await fetchTransactionHistory();
+      const data = await fetchTransactionsFromFirebase(userId, maxResults);
       setAllTransactions(data);
     } catch (err) {
+      console.error('[useTransactionHistory] Fetch error:', err);
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setIsLoading(false);
       setIsRefetching(false);
     }
-  }, []);
+  }, [userId, maxResults]);
 
+  // Set up real-time listener
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (!userId) {
+      // No userId - use mock data for backwards compatibility
+      setAllTransactions(MOCK_TRANSACTIONS);
+      setIsLoading(false);
+      return;
+    }
+    
+    if (!realTime) {
+      fetchData();
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    const q = query(
+      collection(db, 'transactions'),
+      where('userId', '==', userId),
+      orderBy('createdAt', 'desc'),
+      limit(maxResults)
+    );
+    
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const transactions = snapshot.docs.map(doc => {
+          const data = doc.data();
+          const createdAt = data.createdAt instanceof Timestamp 
+            ? data.createdAt.toDate().toISOString()
+            : data.createdAt || new Date().toISOString();
+          
+          return {
+            id: doc.id,
+            type: data.type as TransactionType,
+            amountCents: data.amountCents,
+            amountFormatted: formatAmount(data.amountCents),
+            status: data.status as TransactionStatus,
+            createdAt,
+            description: data.description || getDefaultDescription(data.type),
+            paymentMethod: data.paymentMethod,
+            referenceId: data.referenceId,
+          };
+        });
+        
+        setAllTransactions(transactions);
+        setIsLoading(false);
+        setError(null);
+      },
+      (err) => {
+        console.error('[useTransactionHistory] Snapshot error:', err);
+        setError(err.message);
+        setIsLoading(false);
+      }
+    );
+    
+    return () => unsubscribe();
+  }, [userId, maxResults, realTime]);
 
   const refetch = useCallback(async () => {
-    await fetchData(true);
-  }, [fetchData]);
+    if (!realTime) {
+      await fetchData(true);
+    }
+    // For real-time, the snapshot listener handles updates automatically
+  }, [fetchData, realTime]);
 
   // Filter transactions
   const transactions = useMemo(() => {

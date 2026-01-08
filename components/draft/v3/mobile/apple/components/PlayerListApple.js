@@ -277,7 +277,7 @@ export default function PlayerListApple({
     players.forEach(player => {
       if (!player || !player.name) return;
       
-      const key = player.name.toLowerCase().trim();
+      const key = (player.name?.toLowerCase() || '').trim();
       if (!seen.has(key)) {
         seen.set(key, true);
         unique.push(player);
@@ -321,9 +321,9 @@ export default function PlayerListApple({
       filtered = filtered.filter(player => {
         const fullTeamName = teamNames[player.team] || '';
         const formattedName = formatPlayerName(player.name);
-        return player.name.toLowerCase().includes(search) ||
+        return (player.name?.toLowerCase() || '').includes(search) ||
                formattedName.toLowerCase().includes(search) ||
-               player.team.toLowerCase().includes(search) ||
+               (player.team?.toLowerCase() || '').includes(search) ||
                fullTeamName.toLowerCase().includes(search);
       });
     }
@@ -340,9 +340,9 @@ export default function PlayerListApple({
           const adpB2 = Math.round(parseFloat(b.adp)) || 999;
           return adpB2 - adpA2;
         case 'name_asc':
-          return a.name.localeCompare(b.name);
+          return (a.name || '').localeCompare(b.name || '');
         case 'name_desc':
-          return b.name.localeCompare(a.name);
+          return (b.name || '').localeCompare(a.name || '');
         case 'rank_asc':
           const rankA = getPlayerCustomRank(a.name, customRankings) || 999;
           const rankB = getPlayerCustomRank(b.name, customRankings) || 999;
@@ -352,12 +352,12 @@ export default function PlayerListApple({
           const rankB2 = getPlayerCustomRank(b.name, customRankings) || 999;
           return rankB2 - rankA2;
         case 'proj_asc':
-          const projA = parseFloat(a.projectedPoints) || (a.name.charCodeAt(0) + 100);
-          const projB = parseFloat(b.projectedPoints) || (b.name.charCodeAt(0) + 100);
+          const projA = parseFloat(a.projectedPoints) || ((a.name?.charCodeAt(0) || 0) + 100);
+          const projB = parseFloat(b.projectedPoints) || ((b.name?.charCodeAt(0) || 0) + 100);
           return projA - projB;
         case 'proj_desc':
-          const projA2 = parseFloat(a.projectedPoints) || (a.name.charCodeAt(0) + 100);
-          const projB2 = parseFloat(b.projectedPoints) || (b.name.charCodeAt(0) + 100);
+          const projA2 = parseFloat(a.projectedPoints) || ((a.name?.charCodeAt(0) || 0) + 100);
+          const projB2 = parseFloat(b.projectedPoints) || ((b.name?.charCodeAt(0) || 0) + 100);
           return projB2 - projA2;
         default:
           return 0;
@@ -797,7 +797,7 @@ function PlayerRowApple({ player, onDraft, onQueue, onSelect, sortDirection, isM
             right: '18px' // Move 4px more right to align under header
           }}
         >
-          {parseFloat(player.projectedPoints) || (player.name.charCodeAt(0) + 100)}
+          {parseFloat(player.projectedPoints) || ((player.name?.charCodeAt(0) || 0) + 100)}
         </div>
 
                 {/* ADP (moved right) */}

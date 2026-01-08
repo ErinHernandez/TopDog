@@ -6,7 +6,8 @@
  * Shows user's drafted teams with search, filtering, and roster view.
  */
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { FixedSizeList as List } from 'react-window';
 import { POSITION_COLORS } from '../../../constants/colors';
 
 // ============================================================================
@@ -280,6 +281,8 @@ interface TeamListViewProps {
 function TeamListView({ teams, onTeamSelect }: TeamListViewProps): React.ReactElement {
   const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const listContainerRef = useRef<HTMLDivElement>(null);
+  const [listHeight, setListHeight] = useState(600);
 
   // Filter teams by search
   const filteredTeams = teams.filter(team => {
@@ -287,6 +290,24 @@ function TeamListView({ teams, onTeamSelect }: TeamListViewProps): React.ReactEl
     const query = searchQuery.toLowerCase();
     return team.name.toLowerCase().includes(query);
   });
+
+  // Calculate list height based on container
+  useEffect(() => {
+    const updateHeight = () => {
+      if (listContainerRef.current) {
+        const container = listContainerRef.current.parentElement;
+        if (container) {
+          const rect = container.getBoundingClientRect();
+          // Subtract header/search area (approximately 200px)
+          setListHeight(Math.max(400, rect.height - 200));
+        }
+      }
+    };
+
+    updateHeight();
+    window.addEventListener('resize', updateHeight);
+    return () => window.removeEventListener('resize', updateHeight);
+  }, []);
 
   return (
     <div 
@@ -303,7 +324,7 @@ function TeamListView({ teams, onTeamSelect }: TeamListViewProps): React.ReactEl
         <input
           ref={searchInputRef}
           type="text"
-          placeholder="Search..."
+          placeholder="Search for player(s)"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           style={{
@@ -324,21 +345,34 @@ function TeamListView({ teams, onTeamSelect }: TeamListViewProps): React.ReactEl
 
       {/* Teams List */}
       <div 
-        className="flex-1 min-h-0 overflow-y-auto"
+        ref={listContainerRef}
+        className="flex-1 min-h-0 overflow-hidden"
         style={{
           paddingLeft: `${MYTEAMS_PX.listPaddingX}px`,
           paddingRight: `${MYTEAMS_PX.listPaddingX}px`,
           paddingTop: `${MYTEAMS_PX.listPaddingTop}px`,
-          paddingBottom: '32px',
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
         }}
       >
         {filteredTeams.length === 0 ? (
           <div className="text-center" style={{ paddingTop: '32px' }}>
             <p style={{ color: MYTEAMS_COLORS.textSecondary }}>No teams found</p>
           </div>
+        ) : filteredTeams.length > 20 ? (
+          // Use virtual scrolling for lists with more than 20 teams
+          <List
+            height={listHeight}
+            itemCount={filteredTeams.length}
+            itemSize={60}
+            itemData={{
+              teams: filteredTeams,
+              onTeamSelect,
+            }}
+            width="100%"
+          >
+            {TeamCardRow}
+          </List>
         ) : (
+          // Use regular rendering for smaller lists
           <div style={{ display: 'flex', flexDirection: 'column', gap: `${MYTEAMS_PX.listGap}px` }}>
             {filteredTeams.map((team) => (
               <button
@@ -385,6 +419,68 @@ function TeamListView({ teams, onTeamSelect }: TeamListViewProps): React.ReactEl
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// VIRTUAL SCROLLING ROW COMPONENT
+// ============================================================================
+
+interface TeamCardRowProps {
+  index: number;
+  style: React.CSSProperties;
+  data: {
+    teams: MockTeam[];
+    onTeamSelect: (team: MockTeam) => void;
+  };
+}
+
+function TeamCardRow({ index, style, data }: TeamCardRowProps): React.ReactElement {
+  const { teams, onTeamSelect } = data;
+  const team = teams[index];
+  
+  return (
+    <div style={{ ...style, paddingBottom: `${MYTEAMS_PX.listGap}px` }}>
+      <button
+        onClick={() => onTeamSelect(team)}
+        className="w-full flex items-center justify-between transition-colors"
+        style={{
+          padding: `${MYTEAMS_PX.cardPadding}px`,
+          backgroundColor: MYTEAMS_COLORS.cardBg,
+          borderRadius: `${MYTEAMS_PX.cardBorderRadius}px`,
+          border: `1px solid ${MYTEAMS_COLORS.cardBorder}`,
+          cursor: 'pointer',
+          textAlign: 'left',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = MYTEAMS_COLORS.cardHover;
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = MYTEAMS_COLORS.cardBg;
+        }}
+      >
+        <div className="flex items-center flex-1 min-w-0">
+          <div
+            className="font-medium truncate"
+            style={{
+              color: MYTEAMS_COLORS.textPrimary,
+              fontSize: `${MYTEAMS_PX.cardFontSize}px`,
+            }}
+          >
+            {team.name}
+          </div>
+        </div>
+        <svg
+          width={MYTEAMS_PX.cardIconSize}
+          height={MYTEAMS_PX.cardIconSize}
+          fill="none"
+          stroke={MYTEAMS_COLORS.textSecondary}
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
     </div>
   );
 }

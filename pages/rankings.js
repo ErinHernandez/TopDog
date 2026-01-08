@@ -261,9 +261,18 @@ export default function Rankings() {
     }));
   };
 
-  const handleCSVUpload = (e) => {
+  const handleCSVUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    // Validate file before processing
+    const { validateFile } = await import('../lib/fileUploadValidation');
+    const validation = await validateFile(file, 'csv', { validateContent: true });
+    
+    if (!validation.valid) {
+      alert(`File validation failed: ${validation.error}`);
+      return;
+    }
 
     const reader = new FileReader();
     reader.onload = (event) => {

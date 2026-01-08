@@ -11,6 +11,9 @@ import React from 'react';
 import { useTabNavigation } from '../core';
 import { HEADER, Z_INDEX, SAFE_AREA } from '../core/constants';
 import { HEADER_COLORS, STATE_COLORS } from '../core/constants/colors';
+import { createScopedLogger } from '../../../lib/clientLogger';
+
+const logger = createScopedLogger('[AppHeader]');
 
 // ============================================================================
 // TYPES
@@ -25,6 +28,8 @@ export interface AppHeaderVX2Props {
   onBackClick?: () => void;
   /** Whether to show deposit button (default: true) */
   showDeposit?: boolean;
+  /** Callback when deposit button is clicked */
+  onDepositClick?: () => void;
   /** Custom content for right side (overrides deposit button) */
   rightContent?: React.ReactNode;
   /** Custom content for left side (overrides back button) */
@@ -94,6 +99,7 @@ export default function AppHeaderVX2({
   showBackButton = false,
   onBackClick,
   showDeposit = true,
+  onDepositClick,
   rightContent,
   leftContent,
   variant = 'default',
@@ -222,7 +228,7 @@ export default function AppHeaderVX2({
             rightContent
           ) : showDeposit ? (
             <button
-              onClick={() => console.log('Deposit clicked')}
+              onClick={onDepositClick}
               className="flex items-center justify-center rounded-full transition-colors"
               style={{
                 width: `${HEADER.depositButtonSize}px`,

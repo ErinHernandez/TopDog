@@ -233,6 +233,15 @@ export interface TabNavigationContextValue {
   // Preloading
   preloadTab: (tabId: TabId) => void;
   isTabPreloaded: (tabId: TabId) => boolean;
+  
+  // Navigation guards
+  registerNavigationGuard: (guard: RegisteredNavigationGuard) => () => void;
+  unregisterNavigationGuard: (guardId: string) => void;
+  
+  // Pending navigation (for guard modals)
+  pendingNavigation: { tabId: TabId; params?: Record<string, string> } | null;
+  confirmPendingNavigation: () => void;
+  cancelPendingNavigation: () => void;
 }
 
 // ============================================================================
@@ -258,6 +267,40 @@ export interface ParsedDeepLink {
   tabId: TabId;
   params: Record<string, string>;
   matched: boolean;
+}
+
+// ============================================================================
+// NAVIGATION GUARDS
+// ============================================================================
+
+/**
+ * Navigation guard result
+ */
+export type NavigationGuardResult = 
+  | { allow: true }
+  | { allow: false; reason?: string };
+
+/**
+ * Navigation guard function type
+ * Called before navigation occurs, can block or allow the navigation
+ */
+export type NavigationGuard = (
+  fromTab: TabId,
+  toTab: TabId
+) => NavigationGuardResult | Promise<NavigationGuardResult>;
+
+/**
+ * Registered navigation guard with metadata
+ */
+export interface RegisteredNavigationGuard {
+  /** Unique identifier for the guard */
+  id: string;
+  /** The guard function */
+  guard: NavigationGuard;
+  /** Which tab this guard applies to (or all if not specified) */
+  tabId?: TabId;
+  /** Priority (higher = checked first) */
+  priority: number;
 }
 
 // ============================================================================

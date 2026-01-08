@@ -15,6 +15,20 @@ import exposurePreloader from '../lib/exposurePreloader'
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
+  
+  // Initialize environment validation on app startup
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Validate environment variables in production
+      if (process.env.NODE_ENV === 'production') {
+        import('../lib/envValidation').then(({ initializeEnvValidation }) => {
+          initializeEnvValidation();
+        }).catch((error) => {
+          console.error('Failed to initialize environment validation:', error);
+        });
+      }
+    }
+  }, []);
   const [isMobileDevice, setIsMobileDevice] = useState(false);
   
   // Detect mobile device for hiding dev nav

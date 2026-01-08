@@ -1949,7 +1949,7 @@ export function DraftRoomAppleDemo() {
     // Priority 2: Check for custom user rankings
     // Load custom rankings (same logic as PlayerListApple)
     try {
-      const { loadCustomRankings, getCustomPlayerRanking } = require('../../../../../../lib/customRankings');
+      const { loadCustomRankings, getCustomPlayerRanking } = require('../../../../../lib/customRankings');
       const customRankings = loadCustomRankings();
       
       if (customRankings && customRankings.length > 0) {

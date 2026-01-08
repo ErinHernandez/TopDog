@@ -29,6 +29,9 @@ import {
   createEmptyPositionCounts,
 } from '../utils';
 import { DRAFT_DEFAULTS } from '../constants';
+import { createScopedLogger } from '../../../../lib/clientLogger';
+
+const logger = createScopedLogger('[useDraftPicks]');
 
 // ============================================================================
 // TYPES
@@ -189,12 +192,12 @@ export function useDraftPicks({
   const makePick = useCallback(async (player: DraftPlayer): Promise<boolean> => {
     // Validate
     if (!canMakePick) {
-      console.warn('[useDraftPicks] Cannot make pick - not your turn');
+      logger.warn('Cannot make pick - not your turn');
       return false;
     }
     
     if (pickedPlayerIdSet.has(player.id)) {
-      console.warn('[useDraftPicks] Cannot make pick - player already picked');
+      logger.warn('Cannot make pick - player already picked');
       return false;
     }
     
@@ -230,7 +233,7 @@ export function useDraftPicks({
   // Force pick - bypasses turn check (for dev tools / auto-pick)
   const forcePickAny = useCallback(async (player: DraftPlayer): Promise<boolean> => {
     if (pickedPlayerIdSet.has(player.id)) {
-      console.warn('[useDraftPicks] Cannot make pick - player already picked');
+      logger.warn('Cannot make pick - player already picked');
       return false;
     }
     

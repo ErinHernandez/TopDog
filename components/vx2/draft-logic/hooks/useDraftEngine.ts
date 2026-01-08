@@ -24,6 +24,9 @@ import { useDraftTimer } from './useDraftTimer';
 import { useDraftQueue } from './useDraftQueue';
 import { useAutodraft } from './useAutodraft';
 import { usePickExecutor } from './usePickExecutor';
+import { createScopedLogger } from '../../../../lib/clientLogger';
+
+const logger = createScopedLogger('[DraftEngine]');
 
 // ============================================================================
 // TYPES
@@ -128,6 +131,17 @@ export function useDraftEngine({
     pickedPlayerIds 
   });
   
+  // Load excluded players from localStorage
+  const excludedPlayers = useMemo(() => {
+    if (typeof window === 'undefined') return [];
+    try {
+      const saved = localStorage.getItem('vx2Excluded');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  }, []);
+
   // Handle timer expiration (autopick)
   const handleTimerExpire = useCallback(() => {
     if (!isMyTurn || status !== 'active') return;
@@ -138,12 +152,13 @@ export function useDraftEngine({
       currentRoster,
       queue.queueIds,
       autodraft.customRankings,
-      autodraft.positionLimits
+      autodraft.positionLimits,
+      excludedPlayers
     );
     
     if (result) {
       // Execute autopick through executor
-      console.log(`[DraftEngine] Autopick: ${result.player.name} (${result.source})`);
+      logger.debug('Autopick', { player: result.player.name, source: result.source });
     }
   }, [
     isMyTurn, 
@@ -152,7 +167,8 @@ export function useDraftEngine({
     currentRoster, 
     queue.queueIds, 
     autodraft.customRankings, 
-    autodraft.positionLimits
+    autodraft.positionLimits,
+    excludedPlayers
   ]);
   
   // Timer
@@ -180,12 +196,13 @@ export function useDraftEngine({
     positionLimits: autodraft.positionLimits,
     draftStatus: status,
     onPickSuccess: (pick) => {
-      console.log(`[DraftEngine] Pick success: ${pick.player.name}`);
+      logger.debug('Pick success', { player: pick.player.name });
       timer.reset();
     },
-    onPickError: (err) => {
-      console.error(`[DraftEngine] Pick error: ${err}`);
-      setError(err);
+    onPickError: (err: unknown) => {
+      const error = err instanceof Error ? err : new Error(String(err));
+      logger.error('Pick error', error);
+      setError(err instanceof Error ? err.message : String(err));
     },
   });
   

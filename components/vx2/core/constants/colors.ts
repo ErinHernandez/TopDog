@@ -87,6 +87,7 @@ export const TEXT_COLORS = {
 export const BORDER_COLORS = {
   default: 'rgba(255, 255, 255, 0.1)',
   light: 'rgba(255, 255, 255, 0.05)',
+  subtle: 'rgba(255, 255, 255, 0.15)',
   focus: '#59c5bf',
   error: '#ef4444',
   success: '#10b981',
@@ -107,6 +108,7 @@ export const STATE_COLORS = {
   success: '#10B981',      // Green for success
   warning: '#F59E0B',      // Amber for warning
   error: '#EF4444',        // Red for error
+  info: '#3B82F6',         // Blue for info states
 } as const;
 
 // ============================================================================
@@ -184,7 +186,7 @@ export const NFL_TEAM_COLORS: Record<string, [string, string]> = {
   'HOU': ['#03202F', '#A71930'],
   'IND': ['#002C5F', '#A2AAAD'],
   'JAX': ['#101820', '#D7A22A'],
-  'KC': ['#E31837', '#FFB81C'],
+  'KC': ['#C99A1A', '#B8142A'],
   'LV': ['#000000', '#A5ACAF'],
   'LAC': ['#0080C6', '#FFC20E'],
   'LAR': ['#003594', '#FFA300'],
@@ -192,15 +194,15 @@ export const NFL_TEAM_COLORS: Record<string, [string, string]> = {
   'MIN': ['#4F2683', '#FFC62F'],
   'NE': ['#002244', '#C60C30'],
   'NO': ['#101820', '#D3BC8D'],
-  'NYG': ['#0B2265', '#A71930'],
+  'NYG': ['#0B2265', '#C60C30'],
   'NYJ': ['#125740', '#000000'],
   'PHI': ['#004C54', '#A5ACAF'],
-  'PIT': ['#FFB612', '#101820'],
+  'PIT': ['#101820', '#FFB612'],
   'SF': ['#AA0000', '#B3995D'],
   'SEA': ['#002244', '#69BE28'],
   'TB': ['#D50A0A', '#FF7900'],
   'TEN': ['#0C2340', '#4B92DB'],
-  'WAS': ['#5A1414', '#FFB612'],
+  'WAS': ['#FFB612', '#5A1414'],
 };
 
 /**

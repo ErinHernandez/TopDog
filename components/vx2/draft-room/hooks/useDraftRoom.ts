@@ -27,11 +27,14 @@ import type {
 } from '../types';
 // Using new draft-logic module for core calculations
 import { 
-  getParticipantForPick, 
+  getParticipantForPick,
   getPickNumbersForParticipant,
   selectAutodraftPlayer,
   getPicksUntilTurn,
 } from '../../draft-logic';
+import { createScopedLogger } from '../../../../lib/clientLogger';
+
+const logger = createScopedLogger('[useDraftRoom]');
 import { DRAFT_DEFAULTS, DEV_FLAGS } from '../constants';
 import { useDraftTimer } from './useDraftTimer';
 import { useDraftQueue } from './useDraftQueue';
@@ -251,7 +254,7 @@ export function useDraftRoom({
     // Skip auto-pick for user's turn - navbar's onGracePeriodEnd will handle it
     // This allows the navbar shake animation to complete first
     if (isMyTurn) {
-      console.log('[useDraftRoom] Timer expired for user - waiting for grace period');
+      logger.debug('Timer expired for user - waiting for grace period');
       return;
     }
     
@@ -268,7 +271,11 @@ export function useDraftRoom({
     );
     
     if (result) {
-      console.log(`[useDraftRoom] Autopick for ${participants[currentParticipantIndex]?.name}: ${result.player.name} (${result.source})`);
+      logger.debug('Autopick', { 
+        participant: participants[currentParticipantIndex]?.name, 
+        player: result.player.name, 
+        source: result.source 
+      });
       // Use forcePickAny since it may not be user's turn in mock mode
       picksHook.forcePickAny(result.player as DraftPlayer);
     }
@@ -324,7 +331,7 @@ export function useDraftRoom({
       return;
     }
     leaveDraftCalledRef.current = true;
-    console.log('[useDraftRoom] Leaving draft...');
+    logger.debug('Leaving draft');
   }, []);
   
   // Dev Tools
@@ -351,7 +358,7 @@ export function useDraftRoom({
     );
     
     if (result) {
-      console.log(`[useDraftRoom] Force pick: ${result.player.name} (${result.source})`);
+      logger.debug('Force pick', { player: result.player.name, source: result.source });
       // Cast to local DraftPlayer type (draft-logic returns compatible shape)
       picksHook.forcePickAny(result.player as DraftPlayer);
     }
@@ -377,7 +384,7 @@ export function useDraftRoom({
     );
     
     if (result) {
-      console.log(`[useDraftRoom] User auto-pick after grace period: ${result.player.name} (${result.source})`);
+      logger.debug('User auto-pick after grace period', { player: result.player.name, source: result.source });
       picksHook.forcePickAny(result.player as DraftPlayer);
     }
   }, [isMyTurn, userParticipantIndex, queueHook.queue, picksHook, availablePlayersHook.filteredPlayers]);

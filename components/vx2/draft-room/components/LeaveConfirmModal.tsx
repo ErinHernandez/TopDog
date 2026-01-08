@@ -1,7 +1,8 @@
 /**
  * LeaveConfirmModal - Confirmation modal for leaving draft
  * 
- * Renders inside the phone frame, not as a browser dialog.
+ * Renders inside the phone frame using absolute positioning.
+ * No portal needed - renders directly in component tree.
  * iOS-native design pattern.
  * 
  * A-Grade Requirements:
@@ -12,6 +13,9 @@
 
 import React, { useEffect, useRef } from 'react';
 import { SPACING, TYPOGRAPHY, RADIUS } from '../../core/constants/sizes';
+import { createScopedLogger } from '../../../../lib/clientLogger';
+
+const logger = createScopedLogger('[LeaveConfirmModal]');
 
 // ============================================================================
 // CONSTANTS
@@ -77,6 +81,7 @@ export default function LeaveConfirmModal({
   
   if (!isOpen) return null;
   
+  // Render modal directly (no portal - stays inside parent container)
   return (
     <div
       role="dialog"
@@ -84,7 +89,7 @@ export default function LeaveConfirmModal({
       aria-labelledby="leave-modal-title"
       aria-describedby="leave-modal-description"
       style={{
-        position: 'fixed',
+        position: 'absolute',
         top: 0,
         left: 0,
         right: 0,
@@ -205,16 +210,15 @@ export default function LeaveConfirmModal({
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              console.log('[LeaveConfirmModal] Leave button clicked - calling onConfirm');
+              logger.debug('Leave button clicked - calling onConfirm');
               try {
                 if (onConfirm && typeof onConfirm === 'function') {
-                  console.log('[LeaveConfirmModal] onConfirm is a function, calling it...');
                   onConfirm();
                 } else {
-                  console.error('[LeaveConfirmModal] onConfirm callback not provided or not a function!', onConfirm);
+                  logger.error('onConfirm callback not provided or not a function', undefined, { onConfirm });
                 }
               } catch (error) {
-                console.error('[LeaveConfirmModal] Error in onConfirm:', error);
+                logger.error('Error in onConfirm', error instanceof Error ? error : new Error(String(error)));
               }
             }}
             onMouseDown={(e) => {
@@ -228,13 +232,13 @@ export default function LeaveConfirmModal({
             onTouchEnd={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              console.log('[LeaveConfirmModal] Leave button touched - calling onConfirm');
+              logger.debug('Leave button touched - calling onConfirm');
               try {
                 if (onConfirm && typeof onConfirm === 'function') {
                   onConfirm();
                 }
               } catch (error) {
-                console.error('[LeaveConfirmModal] Error in onConfirm (touch):', error);
+                logger.error('Error in onConfirm (touch)', error instanceof Error ? error : new Error(String(error)));
               }
             }}
             style={{

@@ -1,0 +1,19 @@
+0 verbose cli /opt/homebrew/Cellar/node/24.7.0/bin/node /opt/homebrew/bin/npm
+1 info using npm@11.5.2
+2 info using node@v24.7.0
+3 silly config load:file:/opt/homebrew/lib/node_modules/npm/npmrc
+4 silly config load:file:/Users/td.d/Documents/bestball-site/.npmrc
+5 silly config load:file:/Users/td.d/.npmrc
+6 silly config load:file:/opt/homebrew/etc/npmrc
+7 verbose title npm install react-window@^1.8.10
+8 verbose argv "install" "react-window@^1.8.10" "--no-audit" "--no-fund"
+9 verbose logfile logs-max:10 dir:/Users/td.d/Documents/bestball-site/.npm-cache/_logs/2026-01-07T02_12_08_602Z-
+10 verbose logfile /Users/td.d/Documents/bestball-site/.npm-cache/_logs/2026-01-07T02_12_08_602Z-debug-0.log
+11 silly logfile done cleaning log files
+12 verbose cwd /Users/td.d/Documents/bestball-site
+13 verbose os Darwin 24.6.0
+14 verbose node v24.7.0
+15 verbose npm  v11.5.2
+16 verbose exit 1
+17 verbose code 1
+18 error A complete log of this run can be found in: /Users/td.d/Documents/bestball-site/.npm-cache/_logs/2026-01-07T02_12_08_602Z-debug-0.log

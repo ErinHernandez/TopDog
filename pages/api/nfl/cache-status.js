@@ -9,41 +9,39 @@
  */
 
 import { getAllCacheStatus, clearAllCaches } from '../../../lib/sportsdataio';
+import { 
+  withErrorHandling, 
+  validateMethod, 
+  createSuccessResponse,
+  createErrorResponse,
+  ErrorType,
+} from '../../../lib/apiErrorHandler';
 
 export default async function handler(req, res) {
-  if (req.method === 'GET') {
-    try {
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    validateMethod(req, ['GET', 'POST'], logger);
+
+    if (req.method === 'GET') {
+      logger.info('Fetching cache status');
       const status = getAllCacheStatus();
       
-      return res.status(200).json({
-        ok: true,
-        caches: status,
-      });
-    } catch (err) {
-      console.error('Cache status error:', err);
-      return res.status(500).json({ error: err.message });
+      const response = createSuccessResponse({ caches: status }, 200, logger);
+      return res.status(response.statusCode).json(response.body);
     }
-  }
-  
-  if (req.method === 'POST') {
-    try {
+    
+    if (req.method === 'POST') {
       const { action } = req.body;
       
       if (action === 'clear') {
+        logger.info('Clearing all caches');
         clearAllCaches();
-        return res.status(200).json({
-          ok: true,
-          message: 'All caches cleared',
-        });
+        const response = createSuccessResponse({ message: 'All caches cleared' }, 200, logger);
+        return res.status(response.statusCode).json(response.body);
       }
       
-      return res.status(400).json({ error: 'Unknown action' });
-    } catch (err) {
-      console.error('Cache action error:', err);
-      return res.status(500).json({ error: err.message });
+      const error = createErrorResponse(ErrorType.VALIDATION, 'Unknown action', 400, logger);
+      return res.status(error.statusCode).json(error.body);
     }
-  }
-  
-  return res.status(405).json({ error: 'Method not allowed' });
+  });
 }
 

@@ -20,15 +20,16 @@
  */
 
 import React, { useCallback } from 'react';
+import { useRouter } from 'next/router';
 import { useUser } from '../../hooks/data';
 import { useModals } from '../../shell/AppShellVX2';
 import { BG_COLORS, TEXT_COLORS, NAVBAR_BLUE } from '../../core/constants/colors';
 import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
 import { TILED_BG_STYLE } from '../../draft-room/constants';
+import { createScopedLogger } from '../../../../lib/clientLogger';
 import { 
   Payment, 
   Rankings, 
-  Customize, 
   Autodraft, 
   UserIcon, 
   History, 
@@ -37,6 +38,8 @@ import {
   Plus,
 } from '../../components/icons';
 import { Skeleton } from '../../components/shared';
+
+const logger = createScopedLogger('[ProfileTab]');
 
 // ============================================================================
 // CONSTANTS
@@ -123,13 +126,6 @@ const REGULAR_MENU_ITEMS: MenuItem[] = [
     path: '/payment-methods',
   },
   {
-    id: 'customization',
-    label: 'Customization',
-    icon: <Customize size={PROFILE_PX.menuIconSize} />,
-    action: 'navigate',
-    path: '/customization',
-  },
-  {
     id: 'account',
     label: 'Account Information',
     icon: <UserIcon size={PROFILE_PX.menuIconSize} />,
@@ -200,23 +196,6 @@ function AvatarBox({ displayName }: AvatarBoxProps): React.ReactElement {
         }}
       >
         {displayName}
-      </div>
-
-      {/* Placeholder content */}
-      <div className="flex-1 flex items-center justify-center">
-        <div 
-          className="text-center leading-tight"
-          style={{
-            fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-            color: TEXT_COLORS.muted,
-          }}
-        >
-          Background
-          <br />
-          Customization
-          <br />
-          Coming Soon
-        </div>
       </div>
     </div>
   );
@@ -320,6 +299,7 @@ export default function ProfileTabVX2({
   onOpenDepositHistory: onOpenDepositHistoryProp,
   onOpenWithdraw: onOpenWithdrawProp,
 }: ProfileTabVX2Props): React.ReactElement {
+  const router = useRouter();
   const { user, isLoading } = useUser();
   const modals = useModals();
   
@@ -338,10 +318,14 @@ export default function ProfileTabVX2({
         if (modals) modals.openWithdraw(); else onOpenWithdrawProp?.();
         break;
       case 'navigate':
-        console.log('Navigate to:', item.path);
+        if (item.path) {
+          router.push(item.path);
+        }
         break;
     }
-  }, [modals, onOpenRankingsProp, onOpenAutodraftLimitsProp, onOpenDepositHistoryProp, onOpenWithdrawProp]);
+  }, [router, modals, onOpenRankingsProp, onOpenAutodraftLimitsProp, onOpenDepositHistoryProp, onOpenWithdrawProp]);
+  
+  // Note: Auth check removed - AuthGateVX2 ensures only logged-in users can access tabs
   
   return (
     <div 
@@ -358,55 +342,44 @@ export default function ProfileTabVX2({
       role="main"
       aria-label="Profile settings"
     >
-      {/* Avatar Box */}
-      <div 
-        className="flex justify-center"
-        style={{ marginBottom: `${PROFILE_PX.boxMarginBottom}px` }}
-      >
-        {isLoading ? (
-          <AvatarBoxSkeleton />
-        ) : (
-          <AvatarBox displayName={user?.displayName || 'Guest'} />
-        )}
-      </div>
-
-      {/* Account Balance */}
-      {!isLoading && user && (
-        <div
-          className="flex flex-col items-center"
-          style={{ marginBottom: `${SPACING.md}px` }}
-        >
-          <div
-            style={{
-              fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-              color: TEXT_COLORS.muted,
-              marginBottom: `${SPACING.xs}px`,
-            }}
-          >
-            Account Balance
-          </div>
-          <div
-            className="font-bold"
-            style={{
-              fontSize: `${TYPOGRAPHY.fontSize['2xl']}px`,
-              color: TEXT_COLORS.primary,
-            }}
-          >
-            {user.balanceFormatted || '$0.00'}
-          </div>
-        </div>
-      )}
-
-      {/* Deposit Button */}
+      {/* Loading State */}
+      {isLoading && <MenuSkeleton />}
+      
+      {/* Authenticated Content */}
       {!isLoading && (
-        <DepositButton onClick={() => console.log('Open deposit flow')} />
-      )}
-
-      {/* Menu Items */}
-      {isLoading ? (
-        <MenuSkeleton />
-      ) : (
         <>
+          {/* Account Balance */}
+          {user && (
+            <div
+              className="flex flex-col items-center"
+              style={{ marginBottom: `${SPACING.md}px` }}
+            >
+              <div
+                style={{
+                  fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
+                  color: TEXT_COLORS.muted,
+                  marginBottom: `${SPACING.xs}px`,
+                }}
+              >
+                Account Balance
+              </div>
+              <div
+                className="font-bold"
+                style={{
+                  fontSize: `${TYPOGRAPHY.fontSize['2xl']}px`,
+                  color: TEXT_COLORS.primary,
+                }}
+              >
+                {user.balanceFormatted || '$0.00'}
+              </div>
+            </div>
+          )}
+
+          {/* Deposit Button */}
+          <DepositButton onClick={() => {
+            modals?.openDeposit();
+          }} />
+
           {/* Regular Menu Items */}
           <nav
             style={{

@@ -16,6 +16,13 @@ import fs from 'fs';
 import path from 'path';
 import { getPlayerId } from '../../../lib/playerPhotos';
 import { FANTASY_POSITIONS } from '../../../lib/playerModel';
+import { 
+  withErrorHandling, 
+  validateMethod, 
+  createSuccessResponse,
+  createErrorResponse,
+  ErrorType,
+} from '../../../lib/apiErrorHandler';
 
 const MANIFEST_PATH = path.join(process.cwd(), 'public', 'players', 'manifest.json');
 const PLAYER_POOL_PATH = path.join(process.cwd(), 'public', 'data', 'player-pool-2025.json');
@@ -34,7 +41,7 @@ function getBaseUrl(req) {
   return `${protocol}://${host}`;
 }
 
-async function loadManifest(req) {
+async function loadManifest(req, logger) {
   const now = Date.now();
   if (manifestCache && (now - manifestCacheTime) < CACHE_TTL) {
     return manifestCache;
@@ -59,7 +66,7 @@ async function loadManifest(req) {
     const response = await fetch(manifestUrl);
     
     if (!response.ok) {
-      console.error(`Headshots manifest not found at: ${manifestUrl}`);
+      logger?.warn('Headshots manifest not found', { url: manifestUrl });
       return null;
     }
     
@@ -68,12 +75,12 @@ async function loadManifest(req) {
     manifestCacheTime = now;
     return manifestCache;
   } catch (error) {
-    console.error('Error loading headshots manifest:', error);
+    logger?.error('Error loading headshots manifest', { error: error.message });
     return null;
   }
 }
 
-async function loadPlayerPool(req) {
+async function loadPlayerPool(req, logger) {
   try {
     // Try filesystem first (works in local dev and build time)
     try {
@@ -94,7 +101,7 @@ async function loadPlayerPool(req) {
     const response = await fetch(poolUrl);
     
     if (!response.ok) {
-      console.error(`Player pool not found at: ${poolUrl}`);
+      logger?.warn('Player pool not found', { url: poolUrl });
       return null;
     }
     
@@ -103,7 +110,7 @@ async function loadPlayerPool(req) {
     const playersArray = Array.isArray(parsed) ? parsed : parsed?.players || [];
     return playersArray;
   } catch (error) {
-    console.error('Error loading player pool:', error);
+    logger?.error('Error loading player pool', { error: error.message });
     return null;
   }
 }
@@ -131,22 +138,26 @@ function transformPlayerHeadshot(poolPlayer, manifest) {
 }
 
 export default async function handler(req, res) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    validateMethod(req, ['GET'], logger);
 
-  try {
-    const manifest = await loadManifest(req);
+    logger.info('Fetching headshots', { query: req.query });
+
+    const manifest = await loadManifest(req, logger);
     if (!manifest) {
-      return res.status(500).json({ error: 'Headshots manifest not available' });
+      const error = createErrorResponse(ErrorType.INTERNAL, 'Headshots manifest not available', 500, logger);
+      return res.status(error.statusCode).json(error.body);
     }
 
-    const playerPool = await loadPlayerPool(req);
+    const playerPool = await loadPlayerPool(req, logger);
     if (!playerPool || (Array.isArray(playerPool) && playerPool.length === 0)) {
-      return res.status(500).json({ 
-        error: 'Player pool not available',
-        details: playerPool === null ? 'Failed to load player pool file' : 'Player pool is empty'
-      });
+      const error = createErrorResponse(
+        ErrorType.INTERNAL, 
+        playerPool === null ? 'Failed to load player pool file' : 'Player pool is empty', 
+        500, 
+        logger
+      );
+      return res.status(error.statusCode).json(error.body);
     }
 
     const { team, position, name, id } = req.query;
@@ -160,24 +171,18 @@ export default async function handler(req, res) {
       });
 
       if (!poolPlayer) {
-        return res.status(404).json({ 
-          ok: false, 
-          error: `Player "${name}" not found` 
-        });
+        const error = createErrorResponse(ErrorType.NOT_FOUND, `Player "${name}" not found`, 404, logger);
+        return res.status(error.statusCode).json(error.body);
       }
 
       const transformed = transformPlayerHeadshot(poolPlayer, manifest);
       if (!transformed) {
-        return res.status(404).json({ 
-          ok: false, 
-          error: `Headshot for "${name}" not found` 
-        });
+        const error = createErrorResponse(ErrorType.NOT_FOUND, `Headshot for "${name}" not found`, 404, logger);
+        return res.status(error.statusCode).json(error.body);
       }
 
-      return res.status(200).json({
-        ok: true,
-        data: transformed,
-      });
+      const response = createSuccessResponse({ data: transformed }, 200, logger);
+      return res.status(response.statusCode).json(response.body);
     }
 
     // Get all players (with headshot URLs)
@@ -209,13 +214,11 @@ export default async function handler(req, res) {
     // Sort by name
     headshots.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
 
-    return res.status(200).json({
-      ok: true,
+    const response = createSuccessResponse({
       count: headshots.length,
       data: headshots,
-    });
-  } catch (err) {
-    console.error('Headshots API error:', err);
-    return res.status(500).json({ error: err.message || 'Internal server error' });
-  }
+    }, 200, logger);
+    
+    return res.status(response.statusCode).json(response.body);
+  });
 }

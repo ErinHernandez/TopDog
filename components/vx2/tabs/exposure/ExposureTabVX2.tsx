@@ -22,6 +22,9 @@ import {
   ErrorState,
 } from '../../components/shared';
 import { SearchInput } from '../../components/shared/inputs';
+import { Rankings } from '../../components/icons';
+import type { Position } from '../../components/shared/display/types';
+import { POSITIONS } from '../../components/shared/display/types';
 
 // ============================================================================
 // CONSTANTS
@@ -37,7 +40,8 @@ const EXPOSURE_PX = {
   rowMinHeight: 36,
 } as const;
 
-type PositionFilter = 'QB' | 'RB' | 'WR' | 'TE';
+// Use shared Position type (PositionFilter is semantically the same as Position)
+type PositionFilter = Position;
 
 // ============================================================================
 // TYPES
@@ -55,7 +59,8 @@ interface PositionFiltersProps {
 }
 
 function PositionFilters({ selected, onChange }: PositionFiltersProps): React.ReactElement {
-  const positions: PositionFilter[] = ['QB', 'RB', 'WR', 'TE'];
+  // Use shared POSITIONS constant
+  const positions: PositionFilter[] = [...POSITIONS];
   
   const handleClick = (pos: PositionFilter) => {
     if (selected.includes(pos)) {
@@ -107,9 +112,10 @@ interface SortHeaderProps {
 function SortHeader({ sortOrder, onToggle }: SortHeaderProps): React.ReactElement {
   return (
     <div
-      className="flex items-center justify-end"
       style={{
-        paddingRight: `${EXPOSURE_PX.headerPaddingX}px`,
+        display: 'flex',
+        justifyContent: 'flex-end',
+        paddingRight: '20px',
         paddingTop: `${SPACING.xs}px`,
         paddingBottom: `${SPACING.xs}px`,
       }}
@@ -117,7 +123,12 @@ function SortHeader({ sortOrder, onToggle }: SortHeaderProps): React.ReactElemen
       <button
         onClick={onToggle}
         className="transition-colors"
-        style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
+        style={{ 
+          color: TEXT_COLORS.secondary, 
+          fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
+          width: '60px',
+          textAlign: 'center',
+        }}
         aria-label={`Sort by exposure ${sortOrder === 'asc' ? 'ascending' : 'descending'}`}
       >
         EXP%
@@ -137,10 +148,9 @@ function ExposureRow({ player, isFirst = false }: ExposureRowProps): React.React
   
   return (
     <div
-      className="flex items-center justify-between"
       style={{
-        paddingLeft: `${EXPOSURE_PX.rowPaddingX}px`,
-        paddingRight: `${EXPOSURE_PX.rowPaddingX}px`,
+        position: 'relative',
+        paddingLeft: '20px',
         paddingTop: `${EXPOSURE_PX.rowPaddingY}px`,
         paddingBottom: `${EXPOSURE_PX.rowPaddingY}px`,
         minHeight: `${EXPOSURE_PX.rowMinHeight}px`,
@@ -149,7 +159,7 @@ function ExposureRow({ player, isFirst = false }: ExposureRowProps): React.React
       }}
     >
       {/* Player Info */}
-      <div className="flex-1 min-w-0">
+      <div>
         <h3 
           className="font-medium truncate"
           style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
@@ -164,14 +174,19 @@ function ExposureRow({ player, isFirst = false }: ExposureRowProps): React.React
         </div>
       </div>
       
-      {/* Exposure */}
+      {/* Exposure - positioned 20px from right edge */}
       <button
         onClick={() => setShowShares(!showShares)}
-        className="font-medium text-right transition-colors"
+        className="font-medium transition-colors"
         style={{
+          position: 'absolute',
+          right: '20px',
+          top: '50%',
+          transform: 'translateY(-50%)',
           color: TEXT_COLORS.primary,
           fontSize: `${TYPOGRAPHY.fontSize.base}px`,
-          minWidth: '80px',
+          width: '60px',
+          textAlign: 'center',
         }}
       >
         {showShares ? `${player.teams} shares` : `${exposurePercent}%`}
@@ -215,9 +230,12 @@ export default function ExposureTabVX2(_props: ExposureTabVX2Props): React.React
   const [selectedPositions, setSelectedPositions] = useState<PositionFilter[]>([]);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   
+  // Note: Auth check removed - AuthGateVX2 ensures only logged-in users can access tabs
+  
   // Auto-reset when all positions are selected
   useEffect(() => {
-    const allPositions: PositionFilter[] = ['QB', 'RB', 'WR', 'TE'];
+    // Use shared POSITIONS constant
+    const allPositions: PositionFilter[] = [...POSITIONS];
     if (selectedPositions.length === allPositions.length && 
         allPositions.every(pos => selectedPositions.includes(pos))) {
       setSelectedPositions([]);
@@ -237,9 +255,9 @@ export default function ExposureTabVX2(_props: ExposureTabVX2Props): React.React
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       result = result.filter(p =>
-        p.name.toLowerCase().includes(query) ||
-        p.position.toLowerCase().includes(query) ||
-        p.team.toLowerCase().includes(query)
+        (p.name?.toLowerCase() || '').includes(query) ||
+        (p.position?.toLowerCase() || '').includes(query) ||
+        (p.team?.toLowerCase() || '').includes(query)
       );
     }
     
@@ -287,11 +305,13 @@ export default function ExposureTabVX2(_props: ExposureTabVX2Props): React.React
           borderBottom: '1px solid rgba(255,255,255,0.1)',
         }}
       >
-        <SearchInput
-          value={searchQuery}
-          onChange={setSearchQuery}
-          placeholder="Search..."
-        />
+        <div style={{ paddingTop: '4px' }}>
+          <SearchInput
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search..."
+          />
+        </div>
         
         {!searchQuery && (
           <PositionFilters

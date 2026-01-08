@@ -105,13 +105,16 @@ export function useDraftTimer({
     };
   }, []);
   
+  // Store interval in ref for cleanup
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  
   // Main countdown effect
   useEffect(() => {
     if (!isActive || effectivePaused || state !== 'running') {
       return;
     }
     
-    const interval = setInterval(() => {
+    const intervalId = setInterval(() => {
       setSecondsRemaining(prev => {
         const newValue = prev - 1;
         
@@ -129,7 +132,14 @@ export function useDraftTimer({
       });
     }, 1000);
     
-    return () => clearInterval(interval);
+    intervalRef.current = intervalId;
+    
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
   }, [isActive, effectivePaused, state]);
   
   // Grace period effect

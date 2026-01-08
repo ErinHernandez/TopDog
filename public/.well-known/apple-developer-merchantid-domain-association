@@ -1,0 +1,17 @@
+# Apple Pay Domain Verification File
+# 
+# IMPORTANT: Replace this placeholder with the actual verification file from Stripe.
+#
+# To get the real file:
+# 1. Go to Stripe Dashboard > Settings > Payment Methods > Apple Pay
+# 2. Click "Add new domain"
+# 3. Download the domain verification file
+# 4. Replace this file's contents with the downloaded file contents
+#
+# The file should contain a long verification string from Apple/Stripe.
+# Do NOT commit this placeholder to production - Apple Pay will not work until
+# you replace it with the real verification file.
+#
+# Example format (actual content will be different):
+# 7B227073704964223A22...
+

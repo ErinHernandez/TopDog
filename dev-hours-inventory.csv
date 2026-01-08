@@ -1,0 +1,851 @@
+File Path,File Name,LOC,Role,Type,Technology,Complexity Score,Complexity Category,Work Type (Primary),Work Type (Secondary),Feature Areas,Base Hours,Adjusted Hours,Total Hours,Hourly Rate,Cost
+"components/AuthModal.js","AuthModal.js",106,frontend,"Component","JavaScript",6,Medium,feature,,"auth, user",1.7,1.7,2.88,90,259.2
+"components/AzureImageAnalyzer.js","AzureImageAnalyzer.js",361,frontend,"Component","JavaScript",6,Medium,feature,,"user",5.78,5.78,9.82,90,883.8
+"components/BadgeTest.js","BadgeTest.js",294,frontend,"Component","JavaScript",3,Simple,feature,,"user",3.76,3.76,6.4,90,576
+"components/BorderColorPicker.js","BorderColorPicker.js",137,frontend,"Component","JavaScript",4,Medium,feature,,"user",2.19,2.19,3.73,90,335.7
+"components/ClayPdfProcessor.js","ClayPdfProcessor.js",251,frontend,"Component","JavaScript",5,Medium,feature,,"user",4.02,4.02,6.83,90,614.7
+"components/CountdownTimer.js","CountdownTimer.js",90,frontend,"Component","JavaScript",3,Simple,feature,,"user",1.15,1.15,1.96,90,176.4
+"components/DevAccessModal.js","DevAccessModal.js",114,frontend,"Component","JavaScript",5,Medium,feature,,"user",1.82,1.82,3.1,90,279
+"components/ExportModal.js","ExportModal.js",266,frontend,"Component","JavaScript",5,Medium,feature,,"user",4.26,4.26,7.24,90,651.6
+"components/Footer.js","Footer.js",139,frontend,"Component","JavaScript",6,Medium,feature,,"user",2.22,2.22,3.78,90,340.2
+"components/FreshCountdownTimer.js","FreshCountdownTimer.js",53,frontend,"Component","JavaScript",3,Simple,feature,,"user",0.68,0.68,1.15,90,103.5
+"components/FullDraftBoard.js","FullDraftBoard.js",500,frontend,"Component","JavaScript",6,Medium,feature,,"draft, user",8,8,13.6,90,1224
+"components/GradientExample.js","GradientExample.js",93,frontend,"Component","JavaScript",4,Medium,feature,,"user",1.49,1.49,2.53,90,227.7
+"components/ImageAnalyzer.js","ImageAnalyzer.js",326,frontend,"Component","JavaScript",6,Medium,feature,,"user",5.22,5.22,8.87,90,798.3
+"components/JoinTournamentModal.js","JoinTournamentModal.js",457,frontend,"Component","JavaScript",7,Complex,integration,infrastructure,"tournament, user",10.97,14.26,24.24,90,2181.6
+"components/LoadingSpinner.js","LoadingSpinner.js",20,frontend,"Component","JavaScript",2,Simple,feature,,"user",0.26,0.26,0.44,90,39.6
+"components/LogoPicker.js","LogoPicker.js",40,frontend,"Component","JavaScript",2,Simple,feature,,"user",0.51,0.51,0.87,90,78.3
+"components/LongDurationTimer.js","LongDurationTimer.js",98,frontend,"Component","JavaScript",3,Simple,feature,,"user",1.25,1.25,2.13,90,191.7
+"components/Modal.js","Modal.js",14,frontend,"Component","JavaScript",2,Simple,feature,,"user",0.18,0.18,0.3,90,27
+"components/Navbar.js","Navbar.js",594,frontend,"Component","JavaScript",7,Complex,feature,,"user",14.26,14.26,24.24,90,2181.6
+"components/PaymentSecurityDashboard.js","PaymentSecurityDashboard.js",325,frontend,"Component","JavaScript",7,Complex,feature,,"payment, user",7.8,7.8,13.26,90,1193.4
+"components/PerformanceMonitor.js","PerformanceMonitor.js",74,frontend,"Component","JavaScript",3,Simple,feature,,"user",0.95,0.95,1.61,90,144.9
+"components/PicksAwayCalendar.js","PicksAwayCalendar.js",60,frontend,"Component","JavaScript",2,Simple,feature,,"user",0.77,0.77,1.31,90,117.9
+"components/RegistrationModal.js","RegistrationModal.js",242,frontend,"Component","JavaScript",4,Medium,integration,infrastructure,"user",3.87,5.03,8.56,90,770.4
+"components/SevenSegmentCountdown.js","SevenSegmentCountdown.js",140,frontend,"Component","JavaScript",3,Simple,feature,,"user",1.79,1.79,3.05,90,274.5
+"components/StrictModeDroppable.js","StrictModeDroppable.js",23,frontend,"Component","JavaScript",2,Simple,feature,,"user",0.29,0.29,0.5,90,45
+"components/dev/DevNav.js","DevNav.js",815,frontend,"Component","JavaScript",7,Complex,integration,infrastructure,"user",19.56,25.43,43.23,90,3890.7
+"components/draft/SCROLLING_ARCHITECTURE.md","SCROLLING_ARCHITECTURE.md",93,frontend,"Component","Other",2,Simple,research,,"draft, user",1.19,0.48,0.81,90,72.9
+"components/draft/SUBHEADER_ISOLATION.md","SUBHEADER_ISOLATION.md",59,frontend,"Component","Other",4,Medium,research,,"draft, user",0.94,0.38,0.64,90,57.6
+"components/draft/mobile/DraftSubHeaderMobile.js","DraftSubHeaderMobile.js",44,frontend,"Component","JavaScript",2,Simple,feature,,"draft, mobile, user",0.56,0.56,0.96,90,86.4
+"components/draft/v2/GLOBAL_ARCHITECTURE.md","GLOBAL_ARCHITECTURE.md",409,frontend,"Component","Other",6,Medium,research,,"draft, user",6.54,2.62,4.45,90,400.5
+"components/draft/v2/README.md","README.md",204,frontend,"Component","Other",6,Medium,research,,"draft, user",3.26,1.31,2.22,90,199.8
+"components/draft/v2/SCALE_REQUIREMENTS.md","SCALE_REQUIREMENTS.md",203,frontend,"Component","Other",6,Medium,research,,"draft, user",3.25,1.3,2.21,90,198.9
+"components/draft/v2/SCALING_GUIDE.md","SCALING_GUIDE.md",407,frontend,"Component","Other",7,Complex,research,,"draft, user",9.77,3.91,6.64,90,597.6
+"components/draft/v2/config/layouts.js","layouts.js",386,frontend,"Component","JavaScript",4,Medium,feature,,"draft, user",6.18,6.18,10.5,90,945
+"components/draft/v2/dev/DevTools.js","DevTools.js",136,frontend,"Component","JavaScript",3,Simple,feature,,"draft, user",1.74,1.74,2.96,90,266.4
+"components/draft/v2/dev/PerformanceMonitor.js","PerformanceMonitor.js",1,frontend,"Component","JavaScript",2,Simple,feature,,"draft, user",0.01,0.01,0.02,90,1.8
+"components/draft/v2/elements/ElementRenderer.js","ElementRenderer.js",140,frontend,"Component","JavaScript",4,Medium,feature,,"draft, user",2.24,2.24,3.81,90,342.9
+"components/draft/v2/layout/DraftLayout.js","DraftLayout.js",102,frontend,"Component","JavaScript",3,Simple,feature,,"draft, user",1.31,1.31,2.22,90,199.8
+"components/draft/v2/providers/DraftProvider.js","DraftProvider.js",408,frontend,"Component","JavaScript",6,Medium,feature,,"draft, user",6.53,6.53,11.1,90,999
+"components/draft/v2/ui/Chat.js","Chat.js",1,frontend,"Component","JavaScript",2,Simple,feature,,"draft, user",0.01,0.01,0.02,90,1.8
+"components/draft/v2/ui/Controls.js","Controls.js",1,frontend,"Component","JavaScript",2,Simple,feature,,"draft, user",0.01,0.01,0.02,90,1.8
+"components/draft/v2/ui/DraftBoard.js","DraftBoard.js",1,frontend,"Component","JavaScript",2,Simple,feature,,"draft, user",0.01,0.01,0.02,90,1.8
+"components/draft/v2/ui/DraftNavbar.js","DraftNavbar.js",253,frontend,"Component","JavaScript",5,Medium,feature,,"draft, user",4.05,4.05,6.88,90,619.2
+"components/draft/v2/ui/DraftStats.js","DraftStats.js",1,frontend,"Component","JavaScript",2,Simple,feature,,"draft, user",0.01,0.01,0.02,90,1.8
+"components/draft/v2/ui/DraftSubHeader.js","DraftSubHeader.js",44,frontend,"Component","JavaScript",2,Simple,feature,,"draft, user",0.56,0.56,0.96,90,86.4
+"components/draft/v2/ui/DraftTimer.js","DraftTimer.js",1,frontend,"Component","JavaScript",2,Simple,feature,,"draft, user",0.01,0.01,0.02,90,1.8
+"components/draft/v2/ui/ErrorBoundary.js","ErrorBoundary.js",97,frontend,"Component","JavaScript",2,Simple,feature,,"draft, user",1.24,1.24,2.11,90,189.9
+"components/draft/v2/ui/FullBoard.js","FullBoard.js",1,frontend,"Component","JavaScript",2,Simple,feature,,"draft, user",0.01,0.01,0.02,90,1.8
+"components/draft/v2/ui/Navbar.js","Navbar.js",175,frontend,"Component","JavaScript",3,Simple,feature,,"draft, user",2.24,2.24,3.81,90,342.9
+"components/draft/v2/ui/PickCards.js","PickCards.js",387,frontend,"Component","JavaScript",5,Medium,feature,,"draft, user",6.19,6.19,10.53,90,947.7
+"components/draft/v2/ui/PickHistory.js","PickHistory.js",1,frontend,"Component","JavaScript",2,Simple,feature,,"draft, user",0.01,0.01,0.02,90,1.8
+"components/draft/v2/ui/PlayerCard.js","PlayerCard.js",1,frontend,"Component","JavaScript",2,Simple,feature,,"draft, user, player",0.01,0.01,0.02,90,1.8
+"components/draft/v2/ui/PlayerList.js","PlayerList.js",299,frontend,"Component","JavaScript",5,Medium,feature,,"draft, user, player",4.78,4.78,8.13,90,731.7
+"components/draft/v2/ui/PlayerSearch.js","PlayerSearch.js",64,frontend,"Component","JavaScript",3,Simple,feature,,"draft, user, player",0.82,0.82,1.39,90,125.1
+"components/draft/v2/ui/QueueManager.js","QueueManager.js",78,frontend,"Component","JavaScript",4,Medium,feature,,"draft, user",1.25,1.25,2.12,90,190.8
+"components/draft/v2/ui/Rankings.js","Rankings.js",1,frontend,"Component","JavaScript",2,Simple,feature,,"draft, user",0.01,0.01,0.02,90,1.8
+"components/draft/v2/ui/RoomInfo.js","RoomInfo.js",109,frontend,"Component","JavaScript",4,Medium,feature,,"draft, user",1.74,1.74,2.96,90,266.4
+"components/draft/v2/ui/Settings.js","Settings.js",1,frontend,"Component","JavaScript",2,Simple,feature,,"draft, user",0.01,0.01,0.02,90,1.8
+"components/draft/v2/ui/TeamRoster.js","TeamRoster.js",1,frontend,"Component","JavaScript",2,Simple,feature,,"draft, user",0.01,0.01,0.02,90,1.8
+"components/draft/v2/ui/stubs.js","stubs.js",135,frontend,"Component","JavaScript",4,Medium,feature,,"draft, user",2.16,2.16,3.67,90,330.3
+"components/draft/v3/DraftNavbarV3.js","DraftNavbarV3.js",198,frontend,"Component","JavaScript",5,Medium,feature,,"draft, user",3.17,3.17,5.39,90,485.1
+"components/draft/v3/DraftRoomV3.js","DraftRoomV3.js",232,frontend,"Component","JavaScript",5,Medium,feature,,"draft, user",3.71,3.71,6.31,90,567.9
+"components/draft/v3/README.md","README.md",179,frontend,"Component","Other",4,Medium,research,,"draft, user",2.86,1.15,1.95,90,175.5
+"components/draft/v3/constants/index.js","index.js",191,frontend,"Component","JavaScript",4,Medium,feature,,"draft, user",3.06,3.06,5.2,90,468
+"components/draft/v3/constants/layout.js","layout.js",270,frontend,"Component","JavaScript",4,Medium,feature,,"draft, user",4.32,4.32,7.34,90,660.6
+"components/draft/v3/constants/navbar.js","navbar.js",254,frontend,"Component","JavaScript",4,Medium,feature,,"draft, user",4.06,4.06,6.91,90,621.9
+"components/draft/v3/constants/positions.js","positions.js",240,frontend,"Component","JavaScript",4,Medium,feature,,"draft, user",3.84,3.84,6.53,90,587.7
+"components/draft/v3/constants/styles.js","styles.js",217,frontend,"Component","JavaScript",4,Medium,feature,,"draft, user",3.47,3.47,5.9,90,531
+"components/draft/v3/layout/FixedElementsLayer.js","FixedElementsLayer.js",336,frontend,"Component","JavaScript",6,Medium,feature,,"draft, user",5.38,5.38,9.14,90,822.6
+"components/draft/v3/layout/HorizontalPicksBar.js","HorizontalPicksBar.js",640,frontend,"Component","JavaScript",5,Medium,feature,,"draft, user",10.24,10.24,17.41,90,1566.9
+"components/draft/v3/layout/ThreeColumnLayout.js","ThreeColumnLayout.js",573,frontend,"Component","JavaScript",6,Medium,feature,,"draft, user",9.17,9.17,15.59,90,1403.1
+"components/draft/v3/mobile/README.md","README.md",116,frontend,"Component","Other",5,Medium,research,,"draft, mobile, user",1.86,0.74,1.26,90,113.4
+"components/draft/v3/mobile/apple/DraftRoomApple.js","DraftRoomApple.js",2203,frontend,"Component","JavaScript",7,Complex,feature,,"draft, mobile, user",52.87,52.87,89.88,90,8089.2
+"components/draft/v3/mobile/apple/components/DraftBoard3Apple.js","DraftBoard3Apple.js",6,frontend,"Component","JavaScript",2,Simple,feature,,"draft, mobile, user",0.08,0.08,0.13,90,11.7
+"components/draft/v3/mobile/apple/components/DraftBoardApple.js","DraftBoardApple.js",544,frontend,"Component","JavaScript",6,Medium,feature,,"draft, mobile, user",8.7,8.7,14.8,90,1332
+"components/draft/v3/mobile/apple/components/DraftBoardContainer.js","DraftBoardContainer.js",189,frontend,"Component","JavaScript",5,Medium,feature,,"draft, mobile, user",3.02,3.02,5.14,90,462.6
+"components/draft/v3/mobile/apple/components/MobileFooterApple.js","MobileFooterApple.js",72,frontend,"Component","JavaScript",2,Simple,feature,,"draft, mobile, user",0.92,0.92,1.57,90,141.3
+"components/draft/v3/mobile/apple/components/MobileNavbarApple.js","MobileNavbarApple.js",242,frontend,"Component","JavaScript",6,Medium,feature,,"draft, mobile, user",3.87,3.87,6.58,90,592.2
+"components/draft/v3/mobile/apple/components/PicksBarApple.js","PicksBarApple.js",697,frontend,"Component","JavaScript",6,Medium,feature,,"draft, mobile, user",11.15,11.15,18.96,90,1706.4
+"components/draft/v3/mobile/apple/components/PlayerListApple.js","PlayerListApple.js",897,frontend,"Component","JavaScript",7,Complex,feature,,"draft, mobile, user, player",21.53,21.53,36.6,90,3294
+"components/draft/v3/mobile/apple/components/PlayerStatsModal.js","PlayerStatsModal.js",220,frontend,"Component","JavaScript",4,Medium,feature,,"draft, mobile, user, player",3.52,3.52,5.98,90,538.2
+"components/draft/v3/mobile/apple/components/PositionBadge.js","PositionBadge.js",142,frontend,"Component","JavaScript",3,Simple,feature,,"draft, mobile, user",1.82,1.82,3.09,90,278.1
+"components/draft/v3/mobile/apple/components/QueuePage.js","QueuePage.js",467,frontend,"Component","JavaScript",6,Medium,feature,,"draft, mobile, user",7.47,7.47,12.7,90,1143
+"components/draft/v3/mobile/apple/components/QuickActionsApple.js","QuickActionsApple.js",110,frontend,"Component","JavaScript",4,Medium,feature,,"draft, mobile, user",1.76,1.76,2.99,90,269.1
+"components/draft/v3/mobile/apple/components/RippleEffect.js","RippleEffect.js",129,frontend,"Component","JavaScript",3,Simple,feature,,"draft, mobile, user",1.65,1.65,2.81,90,252.9
+"components/draft/v3/mobile/apple/components/RosterPage.js","RosterPage.js",389,frontend,"Component","JavaScript",6,Medium,feature,,"draft, mobile, user",6.22,6.22,10.58,90,952.2
+"components/draft/v3/mobile/apple/components/RulesButton.js","RulesButton.js",170,frontend,"Component","JavaScript",5,Medium,feature,,"draft, mobile, user",2.72,2.72,4.62,90,415.8
+"components/draft/v3/mobile/apple/components/TeamRosterModal.js","TeamRosterModal.js",282,frontend,"Component","JavaScript",6,Medium,feature,,"draft, mobile, user",4.51,4.51,7.67,90,690.3
+"components/draft/v3/mobile/shared/components/MobileNavbar.js","MobileNavbar.js",63,frontend,"Component","JavaScript",3,Simple,feature,,"draft, mobile, user",0.81,0.81,1.37,90,123.3
+"components/draft/v3/mobile/shared/constants/mobileSizes.js","mobileSizes.js",74,frontend,"Component","JavaScript",2,Simple,feature,,"draft, mobile, user",0.95,0.95,1.61,90,144.9
+"components/draft/v3/mobile/shared/utils/deviceDetection.js","deviceDetection.js",121,frontend,"Component","JavaScript",4,Medium,feature,,"draft, mobile, user",1.94,1.94,3.29,90,296.1
+"components/draft/v3/ui/DraftSubHeader.js","DraftSubHeader.js",44,frontend,"Component","JavaScript",2,Simple,feature,,"draft, user",0.56,0.56,0.96,90,86.4
+"components/mobile/AutodraftLimitsMobile.js","AutodraftLimitsMobile.js",1,frontend,"Component","JavaScript",2,Simple,feature,,"draft, mobile, user",0.01,0.01,0.02,90,1.8
+"components/mobile/DraftBoardModal.js","DraftBoardModal.js",96,frontend,"Component","JavaScript",4,Medium,feature,,"draft, mobile, user",1.54,1.54,2.61,90,234.9
+"components/mobile/ExposureReport/ExposurePlayerRow.js","ExposurePlayerRow.js",72,frontend,"Component","JavaScript",5,Medium,feature,,"mobile, user, player, exposure",1.15,1.15,1.96,90,176.4
+"components/mobile/ExposureReport/PositionFilterBar.js","PositionFilterBar.js",90,frontend,"Component","JavaScript",5,Medium,feature,,"mobile, user, exposure",1.44,1.44,2.45,90,220.5
+"components/mobile/ExposureReport/index.js","index.js",10,frontend,"Component","JavaScript",2,Simple,feature,,"mobile, user, exposure",0.13,0.13,0.22,90,19.8
+"components/mobile/ExposureReportMobile.js","ExposureReportMobile.js",210,frontend,"Component","JavaScript",5,Medium,feature,,"mobile, user, exposure",3.36,3.36,5.71,90,513.9
+"components/mobile/MobileFooter.js","MobileFooter.js",63,frontend,"Component","JavaScript",3,Simple,feature,,"mobile, user",0.81,0.81,1.37,90,123.3
+"components/mobile/MobileLayout.js","MobileLayout.js",266,frontend,"Component","JavaScript",5,Medium,feature,,"mobile, user",4.26,4.26,7.24,90,651.6
+"components/mobile/PlayerRankingsMobile.js","PlayerRankingsMobile.js",356,frontend,"Component","JavaScript",6,Medium,feature,,"mobile, user, player",5.7,5.7,9.68,90,871.2
+"components/mobile/RankingsMobile.js","RankingsMobile.js",23,frontend,"Component","JavaScript",2,Simple,feature,,"mobile, user",0.29,0.29,0.5,90,45
+"components/mobile/RankingsPageMobile.js","RankingsPageMobile.js",23,frontend,"Component","JavaScript",2,Simple,feature,,"mobile, user",0.29,0.29,0.5,90,45
+"components/mobile/ShareButton.js","ShareButton.js",204,frontend,"Component","JavaScript",3,Simple,feature,,"mobile, user",2.61,2.61,4.44,90,399.6
+"components/mobile/ShareModal.js","ShareModal.js",223,frontend,"Component","JavaScript",3,Simple,feature,,"mobile, user",2.85,2.85,4.85,90,436.5
+"components/mobile/TournamentCardMobile.js","TournamentCardMobile.js",233,frontend,"Component","JavaScript",4,Medium,feature,,"tournament, mobile, user",3.73,3.73,6.34,90,570.6
+"components/mobile/TournamentModalMobile.js","TournamentModalMobile.js",310,frontend,"Component","JavaScript",5,Medium,feature,,"tournament, mobile, user",4.96,4.96,8.43,90,758.7
+"components/mobile/index.js","index.js",44,frontend,"Component","JavaScript",4,Medium,feature,,"mobile, user",0.7,0.7,1.2,90,108
+"components/mobile/modals/TournamentRulesModal.js","TournamentRulesModal.js",298,frontend,"Component","JavaScript",5,Medium,feature,,"tournament, mobile, user",4.77,4.77,8.11,90,729.9
+"components/mobile/modals/index.js","index.js",9,frontend,"Component","JavaScript",3,Simple,feature,,"mobile, user",0.12,0.12,0.2,90,18
+"components/mobile/pages/DepositHistoryContent.js","DepositHistoryContent.js",289,fullstack,"Page","JavaScript",5,Medium,feature,,"mobile, user",5.25,5.25,8.93,100,893
+"components/mobile/pages/MobileHomeContent.js","MobileHomeContent.js",206,fullstack,"Page","JavaScript",6,Medium,feature,,"mobile, user",3.75,3.75,6.37,100,637
+"components/mobile/pages/PaymentPageContent.js","PaymentPageContent.js",310,fullstack,"Page","JavaScript",8,Complex,feature,,"payment, mobile, user",8.45,8.45,14.37,100,1437
+"components/mobile/pages/ProfileCustomizationContent.js","ProfileCustomizationContent.js",242,fullstack,"Page","JavaScript",4,Medium,feature,,"mobile, user",4.4,4.4,7.48,100,748
+"components/mobile/pages/RankingsContent.js","RankingsContent.js",44,fullstack,"Page","JavaScript",2,Simple,feature,,"mobile, user",0.64,0.64,1.09,100,109
+"components/mobile/pages/index.js","index.js",14,fullstack,"Page","JavaScript",3,Simple,feature,,"mobile, user",0.2,0.2,0.35,100,35
+"components/mobile/shared/MobileFooterBase.js","MobileFooterBase.js",205,frontend,"Component","JavaScript",4,Medium,feature,,"mobile, user",3.28,3.28,5.58,90,502.2
+"components/mobile/shared/MobilePhoneFrame.js","MobilePhoneFrame.js",57,frontend,"Component","JavaScript",2,Simple,feature,,"mobile, user",0.73,0.73,1.24,90,111.6
+"components/mobile/shared/PaymentMethodIcon.js","PaymentMethodIcon.js",173,frontend,"Component","JavaScript",6,Medium,feature,,"payment, mobile, user",2.77,2.77,4.71,90,423.9
+"components/mobile/shared/index.js","index.js",16,frontend,"Component","JavaScript",3,Simple,feature,,"mobile, user",0.2,0.2,0.35,90,31.5
+"components/mobile/tabs/ExposureTab.js","ExposureTab.js",19,frontend,"Component","JavaScript",2,Simple,feature,,"mobile, user, exposure",0.24,0.24,0.41,90,36.9
+"components/mobile/tabs/LiveDraftsTab.js","LiveDraftsTab.js",27,frontend,"Component","JavaScript",2,Simple,feature,,"draft, mobile, user",0.35,0.35,0.59,90,53.1
+"components/mobile/tabs/LobbyTab.js","LobbyTab.js",33,frontend,"Component","JavaScript",4,Medium,feature,,"mobile, user",0.53,0.53,0.9,90,81
+"components/mobile/tabs/MyTeams/TeamDetailsView.js","TeamDetailsView.js",353,frontend,"Component","JavaScript",6,Medium,feature,,"mobile, user",5.65,5.65,9.6,90,864
+"components/mobile/tabs/MyTeams/TeamListView.js","TeamListView.js",798,frontend,"Component","JavaScript",6,Medium,feature,,"mobile, user",12.77,12.77,21.71,90,1953.9
+"components/mobile/tabs/MyTeams/index.js","index.js",11,frontend,"Component","JavaScript",2,Simple,feature,,"mobile, user",0.14,0.14,0.24,90,21.6
+"components/mobile/tabs/MyTeams/mockTeamData.js","mockTeamData.js",152,frontend,"Component","JavaScript",4,Medium,feature,,"mobile, user",2.43,2.43,4.13,90,371.7
+"components/mobile/tabs/MyTeamsTab.js","MyTeamsTab.js",46,frontend,"Component","JavaScript",3,Simple,feature,,"mobile, user",0.59,0.59,1,90,90
+"components/mobile/tabs/ProfileTab.js","ProfileTab.js",147,frontend,"Component","JavaScript",6,Medium,feature,,"mobile, user",2.35,2.35,4,90,360
+"components/mobile/tabs/index.js","index.js",14,frontend,"Component","JavaScript",2,Simple,feature,,"mobile, user",0.18,0.18,0.3,90,27
+"components/shared/PlayerDropdown/PlayerDropdown.js","PlayerDropdown.js",324,frontend,"Component","JavaScript",6,Medium,feature,,"user, player",5.18,5.18,8.81,90,792.9
+"components/shared/PlayerDropdown/PlayerDropdownContent.js","PlayerDropdownContent.js",338,frontend,"Component","JavaScript",6,Medium,feature,,"user, player",5.41,5.41,9.19,90,827.1
+"components/shared/PlayerDropdown/PlayerDropdownRow.js","PlayerDropdownRow.js",86,frontend,"Component","JavaScript",4,Medium,feature,,"user, player",1.38,1.38,2.34,90,210.6
+"components/shared/PlayerDropdown/PlayerDropdownStyles.js","PlayerDropdownStyles.js",250,frontend,"Component","JavaScript",4,Medium,feature,,"user, player",4,4,6.8,90,612
+"components/shared/PlayerDropdown/README.md","README.md",202,frontend,"Component","Other",4,Medium,research,,"user, player",3.23,1.29,2.2,90,198
+"components/shared/PlayerDropdown/index.js","index.js",31,frontend,"Component","JavaScript",2,Simple,feature,,"user, player",0.4,0.4,0.67,90,60.3
+"components/shared/PlayerExpandedCard/PlayerExpandedCard.tsx","PlayerExpandedCard.tsx",405,frontend,"Component","TypeScript/TSX",6,Medium,feature,,"user, player",6.48,6.48,11.02,90,991.8
+"components/shared/PlayerExpandedCard/index.ts","index.ts",3,frontend,"Component","TypeScript",2,Simple,feature,,"user, player",0.04,0.04,0.07,90,6.3
+"components/team-logos/Glyph1.js","Glyph1.js",14,frontend,"Component","JavaScript",2,Simple,feature,,"user",0.18,0.18,0.3,90,27
+"components/team-logos/Glyph2.js","Glyph2.js",16,frontend,"Component","JavaScript",2,Simple,feature,,"user",0.2,0.2,0.35,90,31.5
+"components/team-logos/Glyph3.js","Glyph3.js",13,frontend,"Component","JavaScript",2,Simple,feature,,"user",0.17,0.17,0.28,90,25.2
+"components/team-logos/Glyph4.js","Glyph4.js",12,frontend,"Component","JavaScript",2,Simple,feature,,"user",0.15,0.15,0.26,90,23.4
+"components/team-logos/Glyph5.js","Glyph5.js",13,frontend,"Component","JavaScript",2,Simple,feature,,"user",0.17,0.17,0.28,90,25.2
+"components/team-logos/Glyph6.js","Glyph6.js",11,frontend,"Component","JavaScript",2,Simple,feature,,"user",0.14,0.14,0.24,90,21.6
+"components/team-logos/index.js","index.js",15,frontend,"Component","JavaScript",3,Simple,feature,,"user",0.19,0.19,0.33,90,29.7
+"components/v3/Layout/AppShell.js","AppShell.js",70,frontend,"Component","JavaScript",3,Simple,feature,,"user",0.9,0.9,1.52,90,136.8
+"components/v3/Layout/ContentContainer.js","ContentContainer.js",47,frontend,"Component","JavaScript",2,Simple,feature,,"user",0.6,0.6,1.02,90,91.8
+"components/v3/Layout/Navigation.js","Navigation.js",105,frontend,"Component","JavaScript",3,Simple,feature,,"user",1.34,1.34,2.28,90,205.2
+"components/v3/Layout/SubHeader.js","SubHeader.js",34,frontend,"Component","JavaScript",2,Simple,feature,,"user",0.44,0.44,0.74,90,66.6
+"components/v3/UI/Button.js","Button.js",154,frontend,"Component","JavaScript",3,Simple,feature,,"user",1.97,1.97,3.35,90,301.5
+"components/v3/UI/Card.js","Card.js",95,frontend,"Component","JavaScript",2,Simple,feature,,"user",1.22,1.22,2.07,90,186.3
+"components/v3/UI/LoadingState.js","LoadingState.js",129,frontend,"Component","JavaScript",2,Simple,feature,,"user",1.65,1.65,2.81,90,252.9
+"components/v3/UI/SearchBar.js","SearchBar.js",239,frontend,"Component","JavaScript",4,Medium,feature,,"user",3.82,3.82,6.5,90,585
+"components/vx/README.md","README.md",643,frontend,"Component","Other",7,Complex,research,,"vx, user",15.43,6.17,10.49,90,944.1
+"components/vx/constants/animations.ts","animations.ts",179,frontend,"Component","TypeScript",4,Medium,feature,,"vx, user",2.86,2.86,4.87,90,438.3
+"components/vx/constants/colors.ts","colors.ts",158,frontend,"Component","TypeScript",2,Simple,feature,,"vx, user",2.02,2.02,3.44,90,309.6
+"components/vx/constants/index.ts","index.ts",76,frontend,"Component","TypeScript",2,Simple,feature,,"vx, user",0.97,0.97,1.65,90,148.5
+"components/vx/constants/positions.ts","positions.ts",163,frontend,"Component","TypeScript",5,Medium,feature,,"vx, user",2.61,2.61,4.43,90,398.7
+"components/vx/constants/sizes.ts","sizes.ts",218,frontend,"Component","TypeScript",4,Medium,feature,,"vx, user",3.49,3.49,5.93,90,533.7
+"components/vx/hooks/index.ts","index.ts",33,frontend,"Component","TypeScript",2,Simple,feature,,"vx, user",0.42,0.42,0.72,90,64.8
+"components/vx/hooks/useAutoScroll.ts","useAutoScroll.ts",218,frontend,"Component","TypeScript",4,Medium,feature,,"vx, user",3.49,3.49,5.93,90,533.7
+"components/vx/hooks/useLocalStorage.ts","useLocalStorage.ts",139,frontend,"Component","TypeScript",4,Medium,feature,,"vx, user",2.22,2.22,3.78,90,340.2
+"components/vx/hooks/useTimer.ts","useTimer.ts",190,frontend,"Component","TypeScript",4,Medium,feature,,"vx, user",3.04,3.04,5.17,90,465.3
+"components/vx/index.ts","index.ts",341,frontend,"Component","TypeScript",4,Medium,feature,,"vx, user",5.46,5.46,9.28,90,835.2
+"components/vx/mobile/app/MobileAppVX.tsx","MobileAppVX.tsx",682,frontend,"Component","TypeScript/TSX",7,Complex,feature,,"mobile, vx, user",16.37,16.37,27.83,90,2504.7
+"components/vx/mobile/app/TournamentCardVX.tsx","TournamentCardVX.tsx",615,frontend,"Component","TypeScript/TSX",5,Medium,feature,,"tournament, mobile, vx, user",9.84,9.84,16.73,90,1505.7
+"components/vx/mobile/app/index.ts","index.ts",23,frontend,"Component","TypeScript",3,Simple,feature,,"mobile, vx, user",0.29,0.29,0.5,90,45
+"components/vx/mobile/app/tabs/ExposureTabVX.tsx","ExposureTabVX.tsx",454,frontend,"Component","TypeScript/TSX",6,Medium,feature,,"mobile, vx, user, exposure",7.26,7.26,12.35,90,1111.5
+"components/vx/mobile/app/tabs/LiveDraftsTabVX.tsx","LiveDraftsTabVX.tsx",160,frontend,"Component","TypeScript/TSX",4,Medium,feature,,"draft, mobile, vx, user",2.56,2.56,4.35,90,391.5
+"components/vx/mobile/app/tabs/LobbyTabVX.tsx","LobbyTabVX.tsx",133,frontend,"Component","TypeScript/TSX",4,Medium,feature,,"mobile, vx, user",2.13,2.13,3.62,90,325.8
+"components/vx/mobile/app/tabs/MyTeamsTabVX.tsx","MyTeamsTabVX.tsx",689,frontend,"Component","TypeScript/TSX",6,Medium,feature,,"mobile, vx, user",11.02,11.02,18.74,90,1686.6
+"components/vx/mobile/app/tabs/ProfileTabVX.tsx","ProfileTabVX.tsx",358,frontend,"Component","TypeScript/TSX",6,Medium,feature,,"mobile, vx, user",5.73,5.73,9.74,90,876.6
+"components/vx/mobile/app/tabs/index.ts","index.ts",20,frontend,"Component","TypeScript",2,Simple,feature,,"mobile, vx, user",0.26,0.26,0.44,90,39.6
+"components/vx/mobile/app/tabs/modals/AutodraftLimitsModalVX.tsx","AutodraftLimitsModalVX.tsx",349,frontend,"Component","TypeScript/TSX",5,Medium,feature,,"draft, mobile, vx, user",5.58,5.58,9.49,90,854.1
+"components/vx/mobile/app/tabs/modals/DepositHistoryModalVX.tsx","DepositHistoryModalVX.tsx",584,frontend,"Component","TypeScript/TSX",5,Medium,feature,,"mobile, vx, user",9.34,9.34,15.88,90,1429.2
+"components/vx/mobile/app/tabs/modals/RankingsModalVX.tsx","RankingsModalVX.tsx",1083,frontend,"Component","TypeScript/TSX",6,Medium,feature,,"mobile, vx, user",17.33,17.33,29.46,90,2651.4
+"components/vx/mobile/app/tabs/modals/WithdrawModalVX.tsx","WithdrawModalVX.tsx",1000,frontend,"Component","TypeScript/TSX",5,Medium,feature,,"mobile, vx, user",16,16,27.2,90,2448
+"components/vx/mobile/draft/DraftBoardVX.tsx","DraftBoardVX.tsx",516,frontend,"Component","TypeScript/TSX",6,Medium,feature,,"draft, mobile, vx, user",8.26,8.26,14.04,90,1263.6
+"components/vx/mobile/draft/DraftInfoVX.tsx","DraftInfoVX.tsx",408,frontend,"Component","TypeScript/TSX",4,Medium,feature,,"draft, mobile, vx, user",6.53,6.53,11.1,90,999
+"components/vx/mobile/draft/DraftRoomVX.tsx","DraftRoomVX.tsx",555,frontend,"Component","TypeScript/TSX",6,Medium,feature,,"draft, mobile, vx, user",8.88,8.88,15.1,90,1359
+"components/vx/mobile/draft/PicksBarVX.tsx","PicksBarVX.tsx",558,frontend,"Component","TypeScript/TSX",6,Medium,feature,,"draft, mobile, vx, user",8.93,8.93,15.18,90,1366.2
+"components/vx/mobile/draft/PlayerListVX.tsx","PlayerListVX.tsx",606,frontend,"Component","TypeScript/TSX",7,Complex,feature,,"draft, mobile, vx, user, player",14.54,14.54,24.72,90,2224.8
+"components/vx/mobile/draft/PlayerStatsModalVX.tsx","PlayerStatsModalVX.tsx",224,frontend,"Component","TypeScript/TSX",4,Medium,feature,,"draft, mobile, vx, user, player",3.58,3.58,6.09,90,548.1
+"components/vx/mobile/draft/QueuePanelVX.tsx","QueuePanelVX.tsx",259,frontend,"Component","TypeScript/TSX",6,Medium,feature,,"draft, mobile, vx, user",4.14,4.14,7.04,90,633.6
+"components/vx/mobile/draft/QuickActionsVX.tsx","QuickActionsVX.tsx",202,frontend,"Component","TypeScript/TSX",5,Medium,feature,,"draft, mobile, vx, user",3.23,3.23,5.49,90,494.1
+"components/vx/mobile/draft/RosterPanelVX.tsx","RosterPanelVX.tsx",489,frontend,"Component","TypeScript/TSX",6,Medium,feature,,"draft, mobile, vx, user",7.82,7.82,13.3,90,1197
+"components/vx/mobile/draft/TeamRosterModalVX.tsx","TeamRosterModalVX.tsx",295,frontend,"Component","TypeScript/TSX",6,Medium,feature,,"draft, mobile, vx, user",4.72,4.72,8.02,90,721.8
+"components/vx/mobile/draft/index.ts","index.ts",27,frontend,"Component","TypeScript",2,Simple,feature,,"draft, mobile, vx, user",0.35,0.35,0.59,90,53.1
+"components/vx/mobile/index.ts","index.ts",17,frontend,"Component","TypeScript",2,Simple,feature,,"mobile, vx, user",0.22,0.22,0.37,90,33.3
+"components/vx/mobile/navigation/FooterVX.tsx","FooterVX.tsx",259,frontend,"Component","TypeScript/TSX",4,Medium,feature,,"mobile, vx, user",4.14,4.14,7.04,90,633.6
+"components/vx/mobile/navigation/NavbarVX.tsx","NavbarVX.tsx",368,frontend,"Component","TypeScript/TSX",6,Medium,feature,,"mobile, vx, user",5.89,5.89,10.01,90,900.9
+"components/vx/mobile/navigation/index.ts","index.ts",11,frontend,"Component","TypeScript",2,Simple,feature,,"mobile, vx, user",0.14,0.14,0.24,90,21.6
+"components/vx/mobile/shared/AppHeaderVX.tsx","AppHeaderVX.tsx",296,frontend,"Component","TypeScript/TSX",3,Simple,feature,,"mobile, vx, user",3.79,3.79,6.44,90,579.6
+"components/vx/mobile/shared/MobileFooterAppVX.tsx","MobileFooterAppVX.tsx",296,frontend,"Component","TypeScript/TSX",4,Medium,feature,,"mobile, vx, user",4.74,4.74,8.05,90,724.5
+"components/vx/mobile/shared/MobileHeaderVX.tsx","MobileHeaderVX.tsx",197,frontend,"Component","TypeScript/TSX",4,Medium,feature,,"mobile, vx, user",3.15,3.15,5.36,90,482.4
+"components/vx/mobile/shared/MobileLayoutVX.tsx","MobileLayoutVX.tsx",243,frontend,"Component","TypeScript/TSX",3,Simple,feature,,"mobile, vx, user",3.11,3.11,5.29,90,476.1
+"components/vx/mobile/shared/MobilePhoneFrameVX.tsx","MobilePhoneFrameVX.tsx",114,frontend,"Component","TypeScript/TSX",3,Simple,feature,,"mobile, vx, user",1.46,1.46,2.48,90,223.2
+"components/vx/mobile/shared/index.ts","index.ts",34,frontend,"Component","TypeScript",2,Simple,feature,,"mobile, vx, user",0.44,0.44,0.74,90,66.6
+"components/vx/shared/Avatar.tsx","Avatar.tsx",273,frontend,"Component","TypeScript/TSX",4,Medium,feature,,"vx, user",4.37,4.37,7.43,90,668.7
+"components/vx/shared/Badge.tsx","Badge.tsx",258,frontend,"Component","TypeScript/TSX",3,Simple,feature,,"vx, user",3.3,3.3,5.61,90,504.9
+"components/vx/shared/Button.tsx","Button.tsx",255,frontend,"Component","TypeScript/TSX",4,Medium,feature,,"vx, user",4.08,4.08,6.94,90,624.6
+"components/vx/shared/Card.tsx","Card.tsx",210,frontend,"Component","TypeScript/TSX",4,Medium,feature,,"vx, user",3.36,3.36,5.71,90,513.9
+"components/vx/shared/Countdown.tsx","Countdown.tsx",359,frontend,"Component","TypeScript/TSX",4,Medium,feature,,"vx, user",5.74,5.74,9.76,90,878.4
+"components/vx/shared/Divider.tsx","Divider.tsx",161,frontend,"Component","TypeScript/TSX",3,Simple,feature,,"vx, user",2.06,2.06,3.5,90,315
+"components/vx/shared/EmptyState.tsx","EmptyState.tsx",273,frontend,"Component","TypeScript/TSX",3,Simple,feature,,"vx, user",3.49,3.49,5.94,90,534.6
+"components/vx/shared/ErrorBoundary.tsx","ErrorBoundary.tsx",191,frontend,"Component","TypeScript/TSX",3,Simple,feature,,"vx, user",2.44,2.44,4.16,90,374.4
+"components/vx/shared/Icons.tsx","Icons.tsx",413,frontend,"Component","TypeScript/TSX",4,Medium,feature,,"vx, user",6.61,6.61,11.23,90,1010.7
+"components/vx/shared/Input.tsx","Input.tsx",428,frontend,"Component","TypeScript/TSX",4,Medium,feature,,"vx, user",6.85,6.85,11.64,90,1047.6
+"components/vx/shared/LoadingSpinner.tsx","LoadingSpinner.tsx",168,frontend,"Component","TypeScript/TSX",4,Medium,feature,,"vx, user",2.69,2.69,4.57,90,411.3
+"components/vx/shared/Menu.tsx","Menu.tsx",214,frontend,"Component","TypeScript/TSX",4,Medium,feature,,"vx, user",3.42,3.42,5.82,90,523.8
+"components/vx/shared/Modal.tsx","Modal.tsx",397,frontend,"Component","TypeScript/TSX",5,Medium,feature,,"vx, user",6.35,6.35,10.8,90,972
+"components/vx/shared/PositionBadge.tsx","PositionBadge.tsx",302,frontend,"Component","TypeScript/TSX",5,Medium,feature,,"vx, user",4.83,4.83,8.21,90,738.9
+"components/vx/shared/Progress.tsx","Progress.tsx",385,frontend,"Component","TypeScript/TSX",5,Medium,feature,,"vx, user",6.16,6.16,10.47,90,942.3
+"components/vx/shared/Stat.tsx","Stat.tsx",294,frontend,"Component","TypeScript/TSX",3,Simple,feature,,"vx, user",3.76,3.76,6.4,90,576
+"components/vx/shared/Switch.tsx","Switch.tsx",178,frontend,"Component","TypeScript/TSX",3,Simple,feature,,"vx, user",2.28,2.28,3.87,90,348.3
+"components/vx/shared/Tabs.tsx","Tabs.tsx",351,frontend,"Component","TypeScript/TSX",4,Medium,feature,,"vx, user",5.62,5.62,9.55,90,859.5
+"components/vx/shared/TeamLogo.tsx","TeamLogo.tsx",98,frontend,"Component","TypeScript/TSX",3,Simple,feature,,"vx, user",1.25,1.25,2.13,90,191.7
+"components/vx/shared/Toast.tsx","Toast.tsx",274,frontend,"Component","TypeScript/TSX",4,Medium,feature,,"vx, user",4.38,4.38,7.45,90,670.5
+"components/vx/shared/index.ts","index.ts",242,frontend,"Component","TypeScript",4,Medium,feature,,"vx, user",3.87,3.87,6.58,90,592.2
+"components/vx/shared/types.ts","types.ts",61,frontend,"Component","TypeScript",4,Medium,feature,,"vx, user",0.98,0.98,1.66,90,149.4
+"components/vx/shared/utils.ts","utils.ts",197,frontend,"Component","TypeScript",5,Medium,feature,,"vx, user",3.15,3.15,5.36,90,482.4
+"components/vx/testing/index.ts","index.ts",25,frontend,"Component","TypeScript",3,Simple,feature,,"vx, user",0.32,0.32,0.54,90,48.6
+"components/vx/testing/mockData.ts","mockData.ts",282,frontend,"Component","TypeScript",4,Medium,feature,,"vx, user",4.51,4.51,7.67,90,690.3
+"components/vx2/auth/components/AuthGateVX2.tsx","AuthGateVX2.tsx",180,frontend,"Component","TypeScript/TSX",5,Medium,feature,refactoring,"auth, vx2, user",2.88,2.88,4.9,90,441
+"components/vx2/auth/components/EnableBiometricsPrompt.tsx","EnableBiometricsPrompt.tsx",189,frontend,"Component","TypeScript/TSX",5,Medium,feature,refactoring,"auth, vx2, user",3.02,3.02,5.14,90,462.6
+"components/vx2/auth/components/ForgotPasswordModal.tsx","ForgotPasswordModal.tsx",880,frontend,"Component","TypeScript/TSX",6,Medium,feature,refactoring,"auth, vx2, user",14.08,14.08,23.94,90,2154.6
+"components/vx2/auth/components/LoginScreenVX2.tsx","LoginScreenVX2.tsx",858,frontend,"Component","TypeScript/TSX",7,Complex,feature,refactoring,"auth, vx2, user",20.59,20.59,35.01,90,3150.9
+"components/vx2/auth/components/PhoneAuthModal.tsx","PhoneAuthModal.tsx",769,frontend,"Component","TypeScript/TSX",6,Medium,feature,refactoring,"auth, vx2, user",12.3,12.3,20.92,90,1882.8
+"components/vx2/auth/components/ProfileSettingsModal.tsx","ProfileSettingsModal.tsx",1268,frontend,"Component","TypeScript/TSX",8,Complex,feature,refactoring,"auth, vx2, user",30.43,30.43,51.73,90,4655.7
+"components/vx2/auth/components/SignInModal.tsx","SignInModal.tsx",732,frontend,"Component","TypeScript/TSX",7,Complex,feature,refactoring,"auth, vx2, user",17.57,17.57,29.87,90,2688.3
+"components/vx2/auth/components/SignUpModal.tsx","SignUpModal.tsx",1068,frontend,"Component","TypeScript/TSX",6,Medium,feature,refactoring,"auth, vx2, user",17.09,17.09,29.05,90,2614.5
+"components/vx2/auth/components/SignUpScreenVX2.tsx","SignUpScreenVX2.tsx",1114,frontend,"Component","TypeScript/TSX",6,Medium,feature,refactoring,"auth, vx2, user",17.82,17.82,30.3,90,2727
+"components/vx2/auth/components/UsernameInput.tsx","UsernameInput.tsx",503,frontend,"Component","TypeScript/TSX",6,Medium,feature,refactoring,"auth, vx2, user",8.05,8.05,13.68,90,1231.2
+"components/vx2/auth/components/index.ts","index.ts",34,frontend,"Component","TypeScript",3,Simple,feature,refactoring,"auth, vx2, user",0.44,0.44,0.74,90,66.6
+"components/vx2/auth/constants/auth.ts","auth.ts",242,frontend,"Component","TypeScript",5,Medium,feature,refactoring,"auth, vx2, user",3.87,3.87,6.58,90,592.2
+"components/vx2/auth/constants/index.ts","index.ts",7,frontend,"Component","TypeScript",3,Simple,feature,refactoring,"auth, vx2, user",0.09,0.09,0.15,90,13.5
+"components/vx2/auth/context/AuthContext.tsx","AuthContext.tsx",876,frontend,"Component","TypeScript/TSX",7,Complex,feature,refactoring,"auth, vx2, user",21.02,21.02,35.74,90,3216.6
+"components/vx2/auth/context/index.ts","index.ts",7,frontend,"Component","TypeScript",3,Simple,feature,refactoring,"auth, vx2, user",0.09,0.09,0.15,90,13.5
+"components/vx2/auth/hooks/index.ts","index.ts",8,frontend,"Component","TypeScript",3,Simple,feature,refactoring,"auth, vx2, user",0.1,0.1,0.17,90,15.3
+"components/vx2/auth/hooks/useAuth.ts","useAuth.ts",38,frontend,"Component","TypeScript",4,Medium,feature,refactoring,"auth, vx2, user",0.61,0.61,1.03,90,92.7
+"components/vx2/auth/hooks/useUsernameValidation.ts","useUsernameValidation.ts",331,frontend,"Component","TypeScript",5,Medium,feature,refactoring,"auth, vx2, user",5.3,5.3,9,90,810
+"components/vx2/auth/index.ts","index.ts",132,frontend,"Component","TypeScript",4,Medium,feature,refactoring,"auth, vx2, user",2.11,2.11,3.59,90,323.1
+"components/vx2/auth/types/auth.ts","auth.ts",403,frontend,"Component","TypeScript",6,Medium,feature,refactoring,"auth, vx2, user",6.45,6.45,10.96,90,986.4
+"components/vx2/auth/types/index.ts","index.ts",7,frontend,"Component","TypeScript",3,Simple,feature,refactoring,"auth, vx2, user",0.09,0.09,0.15,90,13.5
+"components/vx2/auth/utils/index.ts","index.ts",24,frontend,"Component","TypeScript",3,Simple,feature,refactoring,"auth, vx2, user",0.31,0.31,0.52,90,46.8
+"components/vx2/auth/utils/rateLimiter.ts","rateLimiter.ts",405,frontend,"Component","TypeScript",5,Medium,feature,refactoring,"auth, vx2, user",6.48,6.48,11.02,90,991.8
+"components/vx2/auth/utils/sessionManager.ts","sessionManager.ts",469,frontend,"Component","TypeScript",6,Medium,feature,refactoring,"auth, vx2, user",7.5,7.5,12.76,90,1148.4
+"components/vx2/components/AmountStepper.tsx","AmountStepper.tsx",330,frontend,"Component","TypeScript/TSX",4,Medium,feature,refactoring,"vx2, user",5.28,5.28,8.98,90,808.2
+"components/vx2/components/CurrencyIcon.tsx","CurrencyIcon.tsx",171,frontend,"Component","TypeScript/TSX",5,Medium,feature,refactoring,"vx2, user",2.74,2.74,4.65,90,418.5
+"components/vx2/components/CurrencySelector.tsx","CurrencySelector.tsx",279,frontend,"Component","TypeScript/TSX",5,Medium,feature,refactoring,"vx2, user",4.46,4.46,7.59,90,683.1
+"components/vx2/components/FXWarningBanner.tsx","FXWarningBanner.tsx",181,frontend,"Component","TypeScript/TSX",5,Medium,feature,refactoring,"vx2, user",2.9,2.9,4.92,90,442.8
+"components/vx2/components/PendingPayments.tsx","PendingPayments.tsx",414,frontend,"Component","TypeScript/TSX",6,Medium,feature,refactoring,"payment, vx2, user",6.62,6.62,11.26,90,1013.4
+"components/vx2/components/icons/actions/Close.tsx","Close.tsx",39,frontend,"Component","TypeScript/TSX",2,Simple,feature,refactoring,"vx2, user",0.5,0.5,0.85,90,76.5
+"components/vx2/components/icons/actions/Edit.tsx","Edit.tsx",39,frontend,"Component","TypeScript/TSX",2,Simple,feature,refactoring,"vx2, user",0.5,0.5,0.85,90,76.5
+"components/vx2/components/icons/actions/Grid.tsx","Grid.tsx",41,frontend,"Component","TypeScript/TSX",2,Simple,feature,refactoring,"vx2, user",0.52,0.52,0.89,90,80.1
+"components/vx2/components/icons/actions/Info.tsx","Info.tsx",40,frontend,"Component","TypeScript/TSX",2,Simple,feature,refactoring,"vx2, user",0.51,0.51,0.87,90,78.3
+"components/vx2/components/icons/actions/List.tsx","List.tsx",43,frontend,"Component","TypeScript/TSX",2,Simple,feature,refactoring,"vx2, user",0.55,0.55,0.94,90,84.6
+"components/vx2/components/icons/actions/Minus.tsx","Minus.tsx",39,frontend,"Component","TypeScript/TSX",2,Simple,feature,refactoring,"vx2, user",0.5,0.5,0.85,90,76.5
+"components/vx2/components/icons/actions/Plus.tsx","Plus.tsx",39,frontend,"Component","TypeScript/TSX",2,Simple,feature,refactoring,"vx2, user",0.5,0.5,0.85,90,76.5
+"components/vx2/components/icons/actions/Refresh.tsx","Refresh.tsx",39,frontend,"Component","TypeScript/TSX",2,Simple,feature,refactoring,"vx2, user",0.5,0.5,0.85,90,76.5
+"components/vx2/components/icons/actions/Search.tsx","Search.tsx",40,frontend,"Component","TypeScript/TSX",2,Simple,feature,refactoring,"vx2, user",0.51,0.51,0.87,90,78.3
+"components/vx2/components/icons/actions/Share.tsx","Share.tsx",39,frontend,"Component","TypeScript/TSX",2,Simple,feature,refactoring,"vx2, user",0.5,0.5,0.85,90,76.5
+"components/vx2/components/icons/actions/index.ts","index.ts",16,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"vx2, user",0.2,0.2,0.35,90,31.5
+"components/vx2/components/icons/index.ts","index.ts",28,frontend,"Component","TypeScript",3,Simple,feature,refactoring,"vx2, user",0.36,0.36,0.61,90,54.9
+"components/vx2/components/icons/menu/Autodraft.tsx","Autodraft.tsx",39,frontend,"Component","TypeScript/TSX",4,Medium,feature,refactoring,"draft, vx2, user",0.62,0.62,1.06,90,95.4
+"components/vx2/components/icons/menu/Customize.tsx","Customize.tsx",39,frontend,"Component","TypeScript/TSX",2,Simple,feature,refactoring,"vx2, user",0.5,0.5,0.85,90,76.5
+"components/vx2/components/icons/menu/History.tsx","History.tsx",39,frontend,"Component","TypeScript/TSX",2,Simple,feature,refactoring,"vx2, user",0.5,0.5,0.85,90,76.5
+"components/vx2/components/icons/menu/Logout.tsx","Logout.tsx",39,frontend,"Component","TypeScript/TSX",2,Simple,feature,refactoring,"vx2, user",0.5,0.5,0.85,90,76.5
+"components/vx2/components/icons/menu/Payment.tsx","Payment.tsx",39,frontend,"Component","TypeScript/TSX",4,Medium,feature,refactoring,"payment, vx2, user",0.62,0.62,1.06,90,95.4
+"components/vx2/components/icons/menu/Rankings.tsx","Rankings.tsx",39,frontend,"Component","TypeScript/TSX",2,Simple,feature,refactoring,"vx2, user",0.5,0.5,0.85,90,76.5
+"components/vx2/components/icons/menu/Settings.tsx","Settings.tsx",40,frontend,"Component","TypeScript/TSX",2,Simple,feature,refactoring,"vx2, user",0.51,0.51,0.87,90,78.3
+"components/vx2/components/icons/menu/Support.tsx","Support.tsx",39,frontend,"Component","TypeScript/TSX",2,Simple,feature,refactoring,"vx2, user",0.5,0.5,0.85,90,76.5
+"components/vx2/components/icons/menu/UserIcon.tsx","UserIcon.tsx",38,frontend,"Component","TypeScript/TSX",4,Medium,feature,refactoring,"vx2, user",0.61,0.61,1.03,90,92.7
+"components/vx2/components/icons/menu/Withdraw.tsx","Withdraw.tsx",39,frontend,"Component","TypeScript/TSX",2,Simple,feature,refactoring,"vx2, user",0.5,0.5,0.85,90,76.5
+"components/vx2/components/icons/menu/index.ts","index.ts",16,frontend,"Component","TypeScript",4,Medium,feature,refactoring,"vx2, user",0.26,0.26,0.44,90,39.6
+"components/vx2/components/icons/navigation/ArrowDown.tsx","ArrowDown.tsx",39,frontend,"Component","TypeScript/TSX",2,Simple,feature,refactoring,"vx2, user",0.5,0.5,0.85,90,76.5
+"components/vx2/components/icons/navigation/ArrowUp.tsx","ArrowUp.tsx",39,frontend,"Component","TypeScript/TSX",2,Simple,feature,refactoring,"vx2, user",0.5,0.5,0.85,90,76.5
+"components/vx2/components/icons/navigation/ChevronDown.tsx","ChevronDown.tsx",28,frontend,"Component","TypeScript/TSX",2,Simple,feature,refactoring,"vx2, user",0.36,0.36,0.61,90,54.9
+"components/vx2/components/icons/navigation/ChevronLeft.tsx","ChevronLeft.tsx",39,frontend,"Component","TypeScript/TSX",2,Simple,feature,refactoring,"vx2, user",0.5,0.5,0.85,90,76.5
+"components/vx2/components/icons/navigation/ChevronRight.tsx","ChevronRight.tsx",39,frontend,"Component","TypeScript/TSX",2,Simple,feature,refactoring,"vx2, user",0.5,0.5,0.85,90,76.5
+"components/vx2/components/icons/navigation/ChevronUp.tsx","ChevronUp.tsx",28,frontend,"Component","TypeScript/TSX",2,Simple,feature,refactoring,"vx2, user",0.36,0.36,0.61,90,54.9
+"components/vx2/components/icons/navigation/index.ts","index.ts",12,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"vx2, user",0.15,0.15,0.26,90,23.4
+"components/vx2/components/icons/types.ts","types.ts",40,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"vx2, user",0.51,0.51,0.87,90,78.3
+"components/vx2/components/index.ts","index.ts",22,frontend,"Component","TypeScript",3,Simple,feature,refactoring,"vx2, user",0.28,0.28,0.48,90,43.2
+"components/vx2/components/shared/PlayerStatsCard.tsx","PlayerStatsCard.tsx",635,frontend,"Component","TypeScript/TSX",7,Complex,feature,refactoring,"vx2, user, player",15.24,15.24,25.91,90,2331.9
+"components/vx2/components/shared/display/OptimizedImage.tsx","OptimizedImage.tsx",337,frontend,"Component","TypeScript/TSX",4,Medium,feature,refactoring,"vx2, user",5.39,5.39,9.17,90,825.3
+"components/vx2/components/shared/display/PlayerCard.tsx","PlayerCard.tsx",329,frontend,"Component","TypeScript/TSX",6,Medium,feature,refactoring,"vx2, user, player",5.26,5.26,8.95,90,805.5
+"components/vx2/components/shared/display/PlayerCell.tsx","PlayerCell.tsx",221,frontend,"Component","TypeScript/TSX",6,Medium,feature,refactoring,"vx2, user, player",3.54,3.54,6.01,90,540.9
+"components/vx2/components/shared/display/PositionBadge.tsx","PositionBadge.tsx",95,frontend,"Component","TypeScript/TSX",3,Simple,feature,refactoring,"vx2, user",1.22,1.22,2.07,90,186.3
+"components/vx2/components/shared/display/ProgressBar.tsx","ProgressBar.tsx",136,frontend,"Component","TypeScript/TSX",3,Simple,feature,refactoring,"vx2, user",1.74,1.74,2.96,90,266.4
+"components/vx2/components/shared/display/StatusBadge.tsx","StatusBadge.tsx",110,frontend,"Component","TypeScript/TSX",3,Simple,feature,refactoring,"vx2, user",1.41,1.41,2.39,90,215.1
+"components/vx2/components/shared/display/index.ts","index.ts",33,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"vx2, user",0.42,0.42,0.72,90,64.8
+"components/vx2/components/shared/display/types.ts","types.ts",67,frontend,"Component","TypeScript",3,Simple,feature,refactoring,"vx2, user",0.86,0.86,1.46,90,131.4
+"components/vx2/components/shared/feedback/EmptyState.tsx","EmptyState.tsx",190,frontend,"Component","TypeScript/TSX",6,Medium,feature,refactoring,"vx2, user",3.04,3.04,5.17,90,465.3
+"components/vx2/components/shared/feedback/ErrorState.tsx","ErrorState.tsx",189,frontend,"Component","TypeScript/TSX",4,Medium,feature,refactoring,"vx2, user",3.02,3.02,5.14,90,462.6
+"components/vx2/components/shared/feedback/LoadingSkeleton.tsx","LoadingSkeleton.tsx",217,frontend,"Component","TypeScript/TSX",4,Medium,feature,refactoring,"vx2, user",3.47,3.47,5.9,90,531
+"components/vx2/components/shared/feedback/index.ts","index.ts",26,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"vx2, user",0.33,0.33,0.57,90,51.3
+"components/vx2/components/shared/index.ts","index.ts",16,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"vx2, user",0.2,0.2,0.35,90,31.5
+"components/vx2/components/shared/inputs/SearchInput.tsx","SearchInput.tsx",181,frontend,"Component","TypeScript/TSX",3,Simple,feature,refactoring,"vx2, user",2.32,2.32,3.94,90,354.6
+"components/vx2/components/shared/inputs/index.ts","index.ts",8,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"vx2, user",0.1,0.1,0.17,90,15.3
+"components/vx2/core/constants/colors.ts","colors.ts",215,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"vx2, user",2.75,2.75,4.68,90,421.2
+"components/vx2/core/constants/index.ts","index.ts",85,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"vx2, user",1.09,1.09,1.85,90,166.5
+"components/vx2/core/constants/responsive.ts","responsive.ts",249,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"vx2, user",3.19,3.19,5.42,90,487.8
+"components/vx2/core/constants/sizes.ts","sizes.ts",514,frontend,"Component","TypeScript",3,Simple,feature,refactoring,"vx2, user",6.58,6.58,11.18,90,1006.2
+"components/vx2/core/constants/tablet.ts","tablet.ts",360,frontend,"Component","TypeScript",3,Simple,feature,refactoring,"tablet, vx2, user",4.61,4.61,7.83,90,704.7
+"components/vx2/core/constants/tabs.tsx","tabs.tsx",299,frontend,"Component","TypeScript/TSX",6,Medium,feature,refactoring,"vx2, user",4.78,4.78,8.13,90,731.7
+"components/vx2/core/constants/timing.ts","timing.ts",89,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"vx2, user",1.14,1.14,1.94,90,174.6
+"components/vx2/core/context/HeaderContext.tsx","HeaderContext.tsx",95,frontend,"Component","TypeScript/TSX",3,Simple,feature,refactoring,"vx2, user",1.22,1.22,2.07,90,186.3
+"components/vx2/core/context/TabNavigationContext.tsx","TabNavigationContext.tsx",476,frontend,"Component","TypeScript/TSX",4,Medium,feature,refactoring,"vx2, user",7.62,7.62,12.95,90,1165.5
+"components/vx2/core/context/TabletLayoutContext.tsx","TabletLayoutContext.tsx",293,frontend,"Component","TypeScript/TSX",4,Medium,feature,refactoring,"tablet, vx2, user",4.69,4.69,7.97,90,717.3
+"components/vx2/core/context/index.ts","index.ts",19,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"vx2, user",0.24,0.24,0.41,90,36.9
+"components/vx2/core/index.ts","index.ts",20,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"vx2, user",0.26,0.26,0.44,90,39.6
+"components/vx2/core/types/app.ts","app.ts",170,frontend,"Component","TypeScript",5,Medium,feature,refactoring,"vx2, user",2.72,2.72,4.62,90,415.8
+"components/vx2/core/types/index.ts","index.ts",76,frontend,"Component","TypeScript",4,Medium,feature,refactoring,"vx2, user",1.22,1.22,2.07,90,186.3
+"components/vx2/core/types/navigation.ts","navigation.ts",279,frontend,"Component","TypeScript",6,Medium,feature,refactoring,"vx2, user",4.46,4.46,7.59,90,683.1
+"components/vx2/core/types/tablet.ts","tablet.ts",385,frontend,"Component","TypeScript",6,Medium,feature,refactoring,"tablet, vx2, user",6.16,6.16,10.47,90,942.3
+"components/vx2/core/utils/deviceCapabilities.ts","deviceCapabilities.ts",432,frontend,"Component","TypeScript",6,Medium,feature,refactoring,"vx2, user",6.91,6.91,11.75,90,1057.5
+"components/vx2/core/utils/index.ts","index.ts",45,frontend,"Component","TypeScript",3,Simple,feature,refactoring,"vx2, user",0.58,0.58,0.98,90,88.2
+"components/vx2/draft-logic/adapters/index.ts","index.ts",37,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"draft, vx2, user",0.47,0.47,0.81,90,72.9
+"components/vx2/draft-logic/adapters/mockAdapter.ts","mockAdapter.ts",305,frontend,"Component","TypeScript",5,Medium,feature,refactoring,"draft, vx2, user",4.88,4.88,8.3,90,747
+"components/vx2/draft-logic/constants/draft.ts","draft.ts",159,frontend,"Component","TypeScript",4,Medium,feature,refactoring,"draft, vx2, user",2.54,2.54,4.32,90,388.8
+"components/vx2/draft-logic/constants/index.ts","index.ts",9,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"draft, vx2, user",0.12,0.12,0.2,90,18
+"components/vx2/draft-logic/hooks/index.ts","index.ts",22,frontend,"Component","TypeScript",3,Simple,feature,refactoring,"draft, vx2, user",0.28,0.28,0.48,90,43.2
+"components/vx2/draft-logic/hooks/useAutodraft.ts","useAutodraft.ts",230,frontend,"Component","TypeScript",5,Medium,feature,refactoring,"draft, vx2, user",3.68,3.68,6.26,90,563.4
+"components/vx2/draft-logic/hooks/useDraftEngine.ts","useDraftEngine.ts",398,frontend,"Component","TypeScript",6,Medium,feature,refactoring,"draft, vx2, user",6.37,6.37,10.83,90,974.7
+"components/vx2/draft-logic/hooks/useDraftQueue.ts","useDraftQueue.ts",242,frontend,"Component","TypeScript",5,Medium,feature,refactoring,"draft, vx2, user",3.87,3.87,6.58,90,592.2
+"components/vx2/draft-logic/hooks/useDraftTimer.ts","useDraftTimer.ts",236,frontend,"Component","TypeScript",5,Medium,feature,refactoring,"draft, vx2, user",3.78,3.78,6.42,90,577.8
+"components/vx2/draft-logic/hooks/useDynamicIsland.ts","useDynamicIsland.ts",243,frontend,"Component","TypeScript",5,Medium,feature,refactoring,"draft, vx2, user",3.89,3.89,6.61,90,594.9
+"components/vx2/draft-logic/hooks/usePickExecutor.ts","usePickExecutor.ts",234,frontend,"Component","TypeScript",4,Medium,feature,refactoring,"draft, vx2, user",3.74,3.74,6.36,90,572.4
+"components/vx2/draft-logic/index.ts","index.ts",196,frontend,"Component","TypeScript",4,Medium,feature,refactoring,"draft, vx2, user",3.14,3.14,5.33,90,479.7
+"components/vx2/draft-logic/types/draft.ts","draft.ts",387,frontend,"Component","TypeScript",5,Medium,feature,refactoring,"draft, vx2, user",6.19,6.19,10.53,90,947.7
+"components/vx2/draft-logic/types/index.ts","index.ts",10,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"draft, vx2, user",0.13,0.13,0.22,90,19.8
+"components/vx2/draft-logic/utils/autodraft.ts","autodraft.ts",375,frontend,"Component","TypeScript",6,Medium,feature,refactoring,"draft, vx2, user",6,6,10.2,90,918
+"components/vx2/draft-logic/utils/index.ts","index.ts",66,frontend,"Component","TypeScript",3,Simple,feature,refactoring,"draft, vx2, user",0.84,0.84,1.44,90,129.6
+"components/vx2/draft-logic/utils/snakeDraft.ts","snakeDraft.ts",302,frontend,"Component","TypeScript",4,Medium,feature,refactoring,"draft, vx2, user",4.83,4.83,8.21,90,738.9
+"components/vx2/draft-logic/utils/timer.ts","timer.ts",120,frontend,"Component","TypeScript",3,Simple,feature,refactoring,"draft, vx2, user",1.54,1.54,2.61,90,234.9
+"components/vx2/draft-logic/utils/validation.ts","validation.ts",291,frontend,"Component","TypeScript",4,Medium,feature,refactoring,"draft, vx2, user",4.66,4.66,7.92,90,712.8
+"components/vx2/draft-room/components/DraftBoard.tsx","DraftBoard.tsx",760,frontend,"Component","TypeScript/TSX",6,Medium,feature,refactoring,"draft, vx2, user",12.16,12.16,20.67,90,1860.3
+"components/vx2/draft-room/components/DraftFooter.tsx","DraftFooter.tsx",336,frontend,"Component","TypeScript/TSX",4,Medium,feature,refactoring,"draft, vx2, user",5.38,5.38,9.14,90,822.6
+"components/vx2/draft-room/components/DraftInfo.tsx","DraftInfo.tsx",246,frontend,"Component","TypeScript/TSX",6,Medium,feature,refactoring,"draft, vx2, user",3.94,3.94,6.69,90,602.1
+"components/vx2/draft-room/components/DraftInfoModal.tsx","DraftInfoModal.tsx",398,frontend,"Component","TypeScript/TSX",6,Medium,feature,refactoring,"draft, vx2, user",6.37,6.37,10.83,90,974.7
+"components/vx2/draft-room/components/DraftNavbar.tsx","DraftNavbar.tsx",472,frontend,"Component","TypeScript/TSX",5,Medium,feature,refactoring,"draft, vx2, user",7.55,7.55,12.84,90,1155.6
+"components/vx2/draft-room/components/DraftRoomVX2.tsx","DraftRoomVX2.tsx",566,frontend,"Component","TypeScript/TSX",7,Complex,feature,refactoring,"draft, vx2, user",13.58,13.58,23.09,90,2078.1
+"components/vx2/draft-room/components/DraftStatusBar.tsx","DraftStatusBar.tsx",229,frontend,"Component","TypeScript/TSX",4,Medium,feature,refactoring,"draft, vx2, user",3.66,3.66,6.23,90,560.7
+"components/vx2/draft-room/components/DraftTutorialModal.tsx","DraftTutorialModal.tsx",812,frontend,"Component","TypeScript/TSX",6,Medium,feature,refactoring,"draft, vx2, user",12.99,12.99,22.09,90,1988.1
+"components/vx2/draft-room/components/LeaveConfirmModal.tsx","LeaveConfirmModal.tsx",303,frontend,"Component","TypeScript/TSX",5,Medium,feature,refactoring,"draft, vx2, user",4.85,4.85,8.24,90,741.6
+"components/vx2/draft-room/components/PicksBar.tsx","PicksBar.tsx",1136,frontend,"Component","TypeScript/TSX",7,Complex,feature,refactoring,"draft, vx2, user",27.26,27.26,46.35,90,4171.5
+"components/vx2/draft-room/components/PicksBarCard.tsx","PicksBarCard.tsx",187,frontend,"Component","TypeScript/TSX",4,Medium,feature,refactoring,"draft, vx2, user",2.99,2.99,5.09,90,458.1
+"components/vx2/draft-room/components/PlayerExpandedCard.tsx","PlayerExpandedCard.tsx",622,frontend,"Component","TypeScript/TSX",7,Complex,feature,refactoring,"draft, vx2, user, player",14.93,14.93,25.38,90,2284.2
+"components/vx2/draft-room/components/PlayerList.tsx","PlayerList.tsx",647,frontend,"Component","TypeScript/TSX",7,Complex,feature,refactoring,"draft, vx2, user, player",15.53,15.53,26.4,90,2376
+"components/vx2/draft-room/components/QueueView.tsx","QueueView.tsx",530,frontend,"Component","TypeScript/TSX",6,Medium,feature,refactoring,"draft, vx2, user",8.48,8.48,14.42,90,1297.8
+"components/vx2/draft-room/components/RosterView.tsx","RosterView.tsx",820,frontend,"Component","TypeScript/TSX",7,Complex,feature,refactoring,"draft, vx2, user",19.68,19.68,33.46,90,3011.4
+"components/vx2/draft-room/components/ShareOptionsModal.tsx","ShareOptionsModal.tsx",550,frontend,"Component","TypeScript/TSX",6,Medium,feature,refactoring,"draft, vx2, user",8.8,8.8,14.96,90,1346.4
+"components/vx2/draft-room/components/VirtualizedPlayerList.tsx","VirtualizedPlayerList.tsx",811,frontend,"Component","TypeScript/TSX",7,Complex,feature,refactoring,"draft, vx2, user, player",19.46,19.46,33.09,90,2978.1
+"components/vx2/draft-room/components/index.ts","index.ts",52,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"draft, vx2, user",0.67,0.67,1.13,90,101.7
+"components/vx2/draft-room/constants/index.ts","index.ts",211,frontend,"Component","TypeScript",4,Medium,feature,refactoring,"draft, vx2, user",3.38,3.38,5.74,90,516.6
+"components/vx2/draft-room/hooks/index.ts","index.ts",25,frontend,"Component","TypeScript",3,Simple,feature,refactoring,"draft, vx2, user",0.32,0.32,0.54,90,48.6
+"components/vx2/draft-room/hooks/useAvailablePlayers.ts","useAvailablePlayers.ts",345,frontend,"Component","TypeScript",7,Complex,feature,refactoring,"draft, vx2, user, player",8.28,8.28,14.08,90,1267.2
+"components/vx2/draft-room/hooks/useDraftPicks.ts","useDraftPicks.ts",289,frontend,"Component","TypeScript",5,Medium,feature,refactoring,"draft, vx2, user",4.62,4.62,7.86,90,707.4
+"components/vx2/draft-room/hooks/useDraftQueue.ts","useDraftQueue.ts",228,frontend,"Component","TypeScript",3,Simple,feature,refactoring,"draft, vx2, user",2.92,2.92,4.96,90,446.4
+"components/vx2/draft-room/hooks/useDraftRoom.ts","useDraftRoom.ts",430,frontend,"Component","TypeScript",6,Medium,feature,refactoring,"draft, vx2, user",6.88,6.88,11.7,90,1053
+"components/vx2/draft-room/hooks/useDraftTimer.ts","useDraftTimer.ts",235,frontend,"Component","TypeScript",5,Medium,feature,refactoring,"draft, vx2, user",3.76,3.76,6.39,90,575.1
+"components/vx2/draft-room/hooks/useImageShare.ts","useImageShare.ts",398,frontend,"Component","TypeScript",5,Medium,feature,refactoring,"draft, vx2, user",6.37,6.37,10.83,90,974.7
+"components/vx2/draft-room/index.ts","index.ts",139,frontend,"Component","TypeScript",3,Simple,feature,refactoring,"draft, vx2, user",1.78,1.78,3.02,90,271.8
+"components/vx2/draft-room/types/index.ts","index.ts",209,frontend,"Component","TypeScript",4,Medium,feature,refactoring,"draft, vx2, user",3.34,3.34,5.68,90,511.2
+"components/vx2/draft-room/utils/index.ts","index.ts",326,frontend,"Component","TypeScript",6,Medium,feature,refactoring,"draft, vx2, user",5.22,5.22,8.87,90,798.3
+"components/vx2/hooks/data/index.ts","index.ts",57,frontend,"Component","TypeScript",5,Medium,feature,refactoring,"vx2, user",0.91,0.91,1.55,90,139.5
+"components/vx2/hooks/data/useExposure.ts","useExposure.ts",290,frontend,"Component","TypeScript",4,Medium,feature,refactoring,"vx2, user, exposure",4.64,4.64,7.89,90,710.1
+"components/vx2/hooks/data/useLiveDrafts.ts","useLiveDrafts.ts",195,frontend,"Component","TypeScript",4,Medium,feature,refactoring,"draft, vx2, user",3.12,3.12,5.3,90,477
+"components/vx2/hooks/data/useMyTeams.firebase-example.ts","useMyTeams.firebase-example.ts",347,frontend,"Component","TypeScript",6,Medium,feature,refactoring,"vx2, user",5.55,5.55,9.44,90,849.6
+"components/vx2/hooks/data/useMyTeams.firebase.ts","useMyTeams.firebase.ts",206,frontend,"Component","TypeScript",6,Medium,feature,refactoring,"vx2, user",3.3,3.3,5.6,90,504
+"components/vx2/hooks/data/useMyTeams.seasonal-example.ts","useMyTeams.seasonal-example.ts",404,frontend,"Component","TypeScript",6,Medium,feature,refactoring,"vx2, user",6.46,6.46,10.99,90,989.1
+"components/vx2/hooks/data/useMyTeams.transform.ts","useMyTeams.transform.ts",58,frontend,"Component","TypeScript",4,Medium,feature,refactoring,"vx2, user",0.93,0.93,1.58,90,142.2
+"components/vx2/hooks/data/useMyTeams.ts","useMyTeams.ts",372,frontend,"Component","TypeScript",5,Medium,feature,refactoring,"vx2, user",5.95,5.95,10.12,90,910.8
+"components/vx2/hooks/data/useMyTeamsFirebase.ts","useMyTeamsFirebase.ts",255,frontend,"Component","TypeScript",6,Medium,feature,refactoring,"vx2, user",4.08,4.08,6.94,90,624.6
+"components/vx2/hooks/data/useTournaments.ts","useTournaments.ts",156,frontend,"Component","TypeScript",4,Medium,feature,refactoring,"tournament, vx2, user",2.5,2.5,4.24,90,381.6
+"components/vx2/hooks/data/useTransactionHistory.ts","useTransactionHistory.ts",481,frontend,"Component","TypeScript",6,Medium,feature,refactoring,"vx2, user",7.7,7.7,13.08,90,1177.2
+"components/vx2/hooks/data/useUser.ts","useUser.ts",244,frontend,"Component","TypeScript",6,Medium,feature,refactoring,"vx2, user",3.9,3.9,6.64,90,597.6
+"components/vx2/hooks/index.ts","index.ts",18,frontend,"Component","TypeScript",3,Simple,feature,refactoring,"vx2, user",0.23,0.23,0.39,90,35.1
+"components/vx2/hooks/ui/index.ts","index.ts",62,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"vx2, user",0.79,0.79,1.35,90,121.5
+"components/vx2/hooks/ui/useDebounce.ts","useDebounce.ts",203,frontend,"Component","TypeScript",3,Simple,feature,refactoring,"vx2, user",2.6,2.6,4.42,90,397.8
+"components/vx2/hooks/ui/useDeviceCapabilities.ts","useDeviceCapabilities.ts",154,frontend,"Component","TypeScript",4,Medium,feature,refactoring,"vx2, user",2.46,2.46,4.19,90,377.1
+"components/vx2/hooks/ui/useDeviceClass.ts","useDeviceClass.ts",129,frontend,"Component","TypeScript",4,Medium,feature,refactoring,"vx2, user",2.06,2.06,3.51,90,315.9
+"components/vx2/hooks/ui/useIsTablet.ts","useIsTablet.ts",193,frontend,"Component","TypeScript",6,Medium,feature,refactoring,"tablet, vx2, user",3.09,3.09,5.25,90,472.5
+"components/vx2/hooks/ui/useLongPress.ts","useLongPress.ts",155,frontend,"Component","TypeScript",5,Medium,feature,refactoring,"vx2, user",2.48,2.48,4.22,90,379.8
+"components/vx2/hooks/ui/useReducedMotion.ts","useReducedMotion.ts",255,frontend,"Component","TypeScript",4,Medium,feature,refactoring,"vx2, user",4.08,4.08,6.94,90,624.6
+"components/vx2/hooks/ui/useTabletLayout.ts","useTabletLayout.ts",152,frontend,"Component","TypeScript",4,Medium,feature,refactoring,"tablet, vx2, user",2.43,2.43,4.13,90,371.7
+"components/vx2/hooks/ui/useTabletOrientation.ts","useTabletOrientation.ts",133,frontend,"Component","TypeScript",5,Medium,feature,refactoring,"tablet, vx2, user",2.13,2.13,3.62,90,325.8
+"components/vx2/index.ts","index.ts",16,frontend,"Component","TypeScript",3,Simple,feature,refactoring,"vx2, user",0.2,0.2,0.35,90,31.5
+"components/vx2/marketing/TournamentBoardMarketing.tsx","TournamentBoardMarketing.tsx",358,frontend,"Component","TypeScript/TSX",4,Medium,feature,refactoring,"tournament, vx2, user",5.73,5.73,9.74,90,876.6
+"components/vx2/marketing/index.ts","index.ts",14,frontend,"Component","TypeScript",3,Simple,feature,refactoring,"vx2, user",0.18,0.18,0.3,90,27
+"components/vx2/modals/AutodraftLimitsModalVX2.tsx","AutodraftLimitsModalVX2.tsx",415,frontend,"Component","TypeScript/TSX",6,Medium,feature,refactoring,"draft, vx2, user",6.64,6.64,11.29,90,1016.1
+"components/vx2/modals/ConnectOnboardingModalVX2.tsx","ConnectOnboardingModalVX2.tsx",521,frontend,"Component","TypeScript/TSX",6,Medium,feature,refactoring,"vx2, user",8.34,8.34,14.17,90,1275.3
+"components/vx2/modals/DepositHistoryModalVX2.tsx","DepositHistoryModalVX2.tsx",341,frontend,"Component","TypeScript/TSX",6,Medium,feature,refactoring,"vx2, user",5.46,5.46,9.28,90,835.2
+"components/vx2/modals/DepositModalVX2.tsx","DepositModalVX2.tsx",1258,frontend,"Component","TypeScript/TSX",8,Complex,feature,refactoring,"vx2, user",30.19,30.19,51.33,90,4619.7
+"components/vx2/modals/PayMongoDepositModalVX2.tsx","PayMongoDepositModalVX2.tsx",469,frontend,"Component","TypeScript/TSX",6,Medium,feature,refactoring,"payment, vx2, user",7.5,7.5,12.76,90,1148.4
+"components/vx2/modals/PayMongoWithdrawModalVX2.tsx","PayMongoWithdrawModalVX2.tsx",576,frontend,"Component","TypeScript/TSX",6,Medium,feature,refactoring,"payment, vx2, user",9.22,9.22,15.67,90,1410.3
+"components/vx2/modals/PaymentMethodsModalVX2.tsx","PaymentMethodsModalVX2.tsx",481,frontend,"Component","TypeScript/TSX",7,Complex,feature,refactoring,"payment, vx2, user",11.54,11.54,19.62,90,1765.8
+"components/vx2/modals/PaystackDepositModalVX2.tsx","PaystackDepositModalVX2.tsx",1462,frontend,"Component","TypeScript/TSX",8,Complex,feature,refactoring,"payment, vx2, user",35.09,35.09,59.65,90,5368.5
+"components/vx2/modals/PaystackWithdrawModalVX2.tsx","PaystackWithdrawModalVX2.tsx",1370,frontend,"Component","TypeScript/TSX",7,Complex,feature,refactoring,"payment, vx2, user",32.88,32.88,55.9,90,5031
+"components/vx2/modals/RankingsModalVX2.tsx","RankingsModalVX2.tsx",912,frontend,"Component","TypeScript/TSX",7,Complex,feature,refactoring,"vx2, user",21.89,21.89,37.21,90,3348.9
+"components/vx2/modals/VoucherStep.tsx","VoucherStep.tsx",327,frontend,"Component","TypeScript/TSX",5,Medium,feature,refactoring,"vx2, user",5.23,5.23,8.89,90,800.1
+"components/vx2/modals/WithdrawModalVX2.tsx","WithdrawModalVX2.tsx",745,frontend,"Component","TypeScript/TSX",6,Medium,feature,refactoring,"vx2, user",11.92,11.92,20.26,90,1823.4
+"components/vx2/modals/XenditDepositModalVX2.tsx","XenditDepositModalVX2.tsx",671,frontend,"Component","TypeScript/TSX",6,Medium,feature,refactoring,"payment, vx2, user",10.74,10.74,18.25,90,1642.5
+"components/vx2/modals/XenditWithdrawModalVX2.tsx","XenditWithdrawModalVX2.tsx",577,frontend,"Component","TypeScript/TSX",6,Medium,feature,refactoring,"payment, vx2, user",9.23,9.23,15.69,90,1412.1
+"components/vx2/modals/index.ts","index.ts",27,frontend,"Component","TypeScript",4,Medium,feature,refactoring,"vx2, user",0.43,0.43,0.73,90,65.7
+"components/vx2/navigation/components/TabBarVX2.tsx","TabBarVX2.tsx",300,frontend,"Component","TypeScript/TSX",4,Medium,feature,refactoring,"vx2, user",4.8,4.8,8.16,90,734.4
+"components/vx2/navigation/components/TabContentVX2.tsx","TabContentVX2.tsx",176,frontend,"Component","TypeScript/TSX",5,Medium,feature,refactoring,"vx2, user",2.82,2.82,4.79,90,431.1
+"components/vx2/navigation/components/TabErrorBoundary.tsx","TabErrorBoundary.tsx",243,frontend,"Component","TypeScript/TSX",4,Medium,feature,refactoring,"vx2, user",3.89,3.89,6.61,90,594.9
+"components/vx2/navigation/components/TabLoadingState.tsx","TabLoadingState.tsx",262,frontend,"Component","TypeScript/TSX",6,Medium,feature,refactoring,"vx2, user",4.19,4.19,7.13,90,641.7
+"components/vx2/navigation/components/index.ts","index.ts",18,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"vx2, user",0.23,0.23,0.39,90,35.1
+"components/vx2/navigation/index.ts","index.ts",10,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"vx2, user",0.13,0.13,0.22,90,19.8
+"components/vx2/providers/StripeProvider.tsx","StripeProvider.tsx",285,frontend,"Component","TypeScript/TSX",6,Medium,feature,refactoring,"payment, vx2, user",4.56,4.56,7.75,90,697.5
+"components/vx2/shell/AppHeaderVX2.tsx","AppHeaderVX2.tsx",252,frontend,"Component","TypeScript/TSX",4,Medium,feature,refactoring,"vx2, user",4.03,4.03,6.85,90,616.5
+"components/vx2/shell/AppShellVX2.tsx","AppShellVX2.tsx",208,frontend,"Component","TypeScript/TSX",6,Medium,feature,refactoring,"vx2, user",3.33,3.33,5.66,90,509.4
+"components/vx2/shell/MobilePhoneFrame.tsx","MobilePhoneFrame.tsx",686,frontend,"Component","TypeScript/TSX",5,Medium,feature,refactoring,"mobile, vx2, user",10.98,10.98,18.66,90,1679.4
+"components/vx2/shell/iPhoneStatusBar.tsx","iPhoneStatusBar.tsx",222,frontend,"Component","TypeScript/TSX",3,Simple,feature,refactoring,"vx2, user",2.84,2.84,4.83,90,434.7
+"components/vx2/shell/index.ts","index.ts",16,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"vx2, user",0.2,0.2,0.35,90,31.5
+"components/vx2/tablet/draft-room/CenterPanel/PicksBarPanel.tsx","PicksBarPanel.tsx",371,frontend,"Component","TypeScript/TSX",5,Medium,feature,refactoring,"draft, tablet, vx2, user",5.94,5.94,10.09,90,908.1
+"components/vx2/tablet/draft-room/CenterPanel/index.ts","index.ts",7,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"draft, tablet, vx2, user",0.09,0.09,0.15,90,13.5
+"components/vx2/tablet/draft-room/LeftPanel/PlayerListPanel.tsx","PlayerListPanel.tsx",417,frontend,"Component","TypeScript/TSX",6,Medium,feature,refactoring,"draft, tablet, vx2, user, player",6.67,6.67,11.34,90,1020.6
+"components/vx2/tablet/draft-room/LeftPanel/index.ts","index.ts",7,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"draft, tablet, vx2, user",0.09,0.09,0.15,90,13.5
+"components/vx2/tablet/draft-room/RightPanel/QueueRosterPanel.tsx","QueueRosterPanel.tsx",511,frontend,"Component","TypeScript/TSX",7,Complex,feature,refactoring,"draft, tablet, vx2, user",12.26,12.26,20.85,90,1876.5
+"components/vx2/tablet/draft-room/RightPanel/index.ts","index.ts",7,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"draft, tablet, vx2, user",0.09,0.09,0.15,90,13.5
+"components/vx2/tablet/draft-room/TabletDraftHeader.tsx","TabletDraftHeader.tsx",319,frontend,"Component","TypeScript/TSX",6,Medium,feature,refactoring,"draft, tablet, vx2, user",5.1,5.1,8.68,90,781.2
+"components/vx2/tablet/draft-room/TabletDraftRoomVX2.tsx","TabletDraftRoomVX2.tsx",822,frontend,"Component","TypeScript/TSX",7,Complex,feature,refactoring,"draft, tablet, vx2, user",19.73,19.73,33.54,90,3018.6
+"components/vx2/tablet/draft-room/index.ts","index.ts",18,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"draft, tablet, vx2, user",0.23,0.23,0.39,90,35.1
+"components/vx2/tablet/index.ts","index.ts",69,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"tablet, vx2, user",0.88,0.88,1.5,90,135
+"components/vx2/tablet/orientation/OrientationGuard.tsx","OrientationGuard.tsx",58,frontend,"Component","TypeScript/TSX",4,Medium,feature,refactoring,"tablet, vx2, user",0.93,0.93,1.58,90,142.2
+"components/vx2/tablet/orientation/PortraitBlocker.tsx","PortraitBlocker.tsx",179,frontend,"Component","TypeScript/TSX",4,Medium,feature,refactoring,"tablet, vx2, user",2.86,2.86,4.87,90,438.3
+"components/vx2/tablet/orientation/index.ts","index.ts",16,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"tablet, vx2, user",0.2,0.2,0.35,90,31.5
+"components/vx2/tablet/panels/PanelContainer.tsx","PanelContainer.tsx",161,frontend,"Component","TypeScript/TSX",3,Simple,feature,refactoring,"tablet, vx2, user",2.06,2.06,3.5,90,315
+"components/vx2/tablet/panels/PanelDivider.tsx","PanelDivider.tsx",159,frontend,"Component","TypeScript/TSX",4,Medium,feature,refactoring,"tablet, vx2, user",2.54,2.54,4.32,90,388.8
+"components/vx2/tablet/panels/index.ts","index.ts",19,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"tablet, vx2, user",0.24,0.24,0.41,90,36.9
+"components/vx2/tablet/shell/TabletFrame.tsx","TabletFrame.tsx",135,frontend,"Component","TypeScript/TSX",3,Simple,feature,refactoring,"tablet, vx2, user",1.73,1.73,2.94,90,264.6
+"components/vx2/tablet/shell/TabletHeaderVX2.tsx","TabletHeaderVX2.tsx",183,frontend,"Component","TypeScript/TSX",4,Medium,feature,refactoring,"tablet, vx2, user",2.93,2.93,4.98,90,448.2
+"components/vx2/tablet/shell/TabletShellVX2.tsx","TabletShellVX2.tsx",238,frontend,"Component","TypeScript/TSX",5,Medium,feature,refactoring,"tablet, vx2, user",3.81,3.81,6.47,90,582.3
+"components/vx2/tablet/shell/TabletStatusBar.tsx","TabletStatusBar.tsx",141,frontend,"Component","TypeScript/TSX",4,Medium,feature,refactoring,"tablet, vx2, user",2.26,2.26,3.84,90,345.6
+"components/vx2/tablet/shell/index.ts","index.ts",18,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"tablet, vx2, user",0.23,0.23,0.39,90,35.1
+"components/vx2/tabs/ExposureTab/index.tsx","index.tsx",118,frontend,"Component","TypeScript/TSX",3,Simple,feature,refactoring,"vx2, user, exposure",1.51,1.51,2.57,90,231.3
+"components/vx2/tabs/LiveDraftsTab/index.tsx","index.tsx",93,frontend,"Component","TypeScript/TSX",4,Medium,feature,refactoring,"draft, vx2, user",1.49,1.49,2.53,90,227.7
+"components/vx2/tabs/LobbyTab/index.tsx","index.tsx",127,frontend,"Component","TypeScript/TSX",4,Medium,feature,refactoring,"vx2, user",2.03,2.03,3.45,90,310.5
+"components/vx2/tabs/MyTeamsTab/index.tsx","index.tsx",94,frontend,"Component","TypeScript/TSX",4,Medium,feature,refactoring,"vx2, user",1.5,1.5,2.56,90,230.4
+"components/vx2/tabs/ProfileTab/index.tsx","index.tsx",72,frontend,"Component","TypeScript/TSX",4,Medium,feature,refactoring,"vx2, user",1.15,1.15,1.96,90,176.4
+"components/vx2/tabs/exposure/ExposureTabVX2.tsx","ExposureTabVX2.tsx",367,frontend,"Component","TypeScript/TSX",6,Medium,feature,refactoring,"vx2, user, exposure",5.87,5.87,9.98,90,898.2
+"components/vx2/tabs/exposure/index.ts","index.ts",8,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"vx2, user, exposure",0.1,0.1,0.17,90,15.3
+"components/vx2/tabs/index.ts","index.ts",12,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"vx2, user",0.15,0.15,0.26,90,23.4
+"components/vx2/tabs/live-drafts/LiveDraftsTabVX2.tsx","LiveDraftsTabVX2.tsx",617,frontend,"Component","TypeScript/TSX",7,Complex,feature,refactoring,"draft, vx2, user",14.81,14.81,25.17,90,2265.3
+"components/vx2/tabs/live-drafts/index.ts","index.ts",8,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"draft, vx2, user",0.1,0.1,0.17,90,15.3
+"components/vx2/tabs/lobby/JoinTournamentModal.tsx","JoinTournamentModal.tsx",499,frontend,"Component","TypeScript/TSX",7,Complex,feature,refactoring,"tournament, vx2, user",11.98,11.98,20.36,90,1832.4
+"components/vx2/tabs/lobby/LobbyTabVX2.tsx","LobbyTabVX2.tsx",230,frontend,"Component","TypeScript/TSX",5,Medium,feature,refactoring,"vx2, user",3.68,3.68,6.26,90,563.4
+"components/vx2/tabs/lobby/TournamentCard.tsx","TournamentCard.tsx",424,frontend,"Component","TypeScript/TSX",6,Medium,feature,refactoring,"tournament, vx2, user",6.78,6.78,11.53,90,1037.7
+"components/vx2/tabs/lobby/index.ts","index.ts",11,frontend,"Component","TypeScript",3,Simple,feature,refactoring,"vx2, user",0.14,0.14,0.24,90,21.6
+"components/vx2/tabs/my-teams/CompletedDraftBoardModal.tsx","CompletedDraftBoardModal.tsx",191,frontend,"Component","TypeScript/TSX",5,Medium,feature,refactoring,"draft, vx2, user",3.06,3.06,5.2,90,468
+"components/vx2/tabs/my-teams/MyTeamsTabVX2.tsx","MyTeamsTabVX2.tsx",1736,frontend,"Component","TypeScript/TSX",8,Complex,feature,refactoring,"vx2, user",41.66,41.66,70.83,90,6374.7
+"components/vx2/tabs/my-teams/index.ts","index.ts",9,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"vx2, user",0.12,0.12,0.2,90,18
+"components/vx2/tabs/my-teams/playoff/MatchupDetailView.tsx","MatchupDetailView.tsx",645,frontend,"Component","TypeScript/TSX",5,Medium,feature,refactoring,"vx2, user",10.32,10.32,17.54,90,1578.6
+"components/vx2/tabs/my-teams/playoff/PlayoffPodDetail.tsx","PlayoffPodDetail.tsx",495,frontend,"Component","TypeScript/TSX",6,Medium,feature,refactoring,"vx2, user",7.92,7.92,13.46,90,1211.4
+"components/vx2/tabs/my-teams/playoff/PlayoffPodList.tsx","PlayoffPodList.tsx",360,frontend,"Component","TypeScript/TSX",5,Medium,feature,refactoring,"vx2, user",5.76,5.76,9.79,90,881.1
+"components/vx2/tabs/my-teams/playoff/index.ts","index.ts",11,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"vx2, user",0.14,0.14,0.24,90,21.6
+"components/vx2/tabs/my-teams/sortUtils.ts","sortUtils.ts",560,frontend,"Component","TypeScript",6,Medium,feature,refactoring,"vx2, user",8.96,8.96,15.23,90,1370.7
+"components/vx2/tabs/profile/ProfileTabVX2.tsx","ProfileTabVX2.tsx",437,frontend,"Component","TypeScript/TSX",7,Complex,feature,refactoring,"vx2, user",10.49,10.49,17.83,90,1604.7
+"components/vx2/tabs/profile/index.ts","index.ts",8,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"vx2, user",0.1,0.1,0.17,90,15.3
+"components/vx2/utils/formatting/currency.ts","currency.ts",643,frontend,"Component","TypeScript",6,Medium,feature,refactoring,"vx2, user",10.29,10.29,17.49,90,1574.1
+"components/vx2/utils/formatting/date.ts","date.ts",204,frontend,"Component","TypeScript",4,Medium,feature,refactoring,"vx2, user",3.26,3.26,5.55,90,499.5
+"components/vx2/utils/formatting/index.ts","index.ts",41,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"vx2, user",0.52,0.52,0.89,90,80.1
+"components/vx2/utils/formatting/numbers.ts","numbers.ts",145,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"vx2, user",1.86,1.86,3.16,90,284.4
+"components/vx2/utils/index.ts","index.ts",9,frontend,"Component","TypeScript",2,Simple,feature,refactoring,"vx2, user",0.12,0.12,0.2,90,18
+"pages/404.js","404.js",26,fullstack,"Page","JavaScript",2,Simple,feature,,"user",0.38,0.38,0.64,100,64
+"pages/500.js","500.js",24,fullstack,"Page","JavaScript",2,Simple,feature,,"user",0.35,0.35,0.59,100,59
+"pages/_app.js","_app.js",113,fullstack,"Page","JavaScript",5,Medium,integration,infrastructure,"user",2.05,2.67,4.54,100,454
+"pages/_document.js","_document.js",41,fullstack,"Page","JavaScript",4,Medium,feature,,"user",0.75,0.75,1.27,100,127
+"pages/_error.js","_error.js",37,fullstack,"Page","JavaScript",2,Simple,feature,,"user",0.54,0.54,0.91,100,91
+"pages/admin/clear-picks.js","clear-picks.js",112,fullstack,"Page","JavaScript",4,Medium,feature,,"user",2.04,2.04,3.46,100,346
+"pages/admin/init-dev-tournaments.js","init-dev-tournaments.js",113,fullstack,"Page","JavaScript",4,Medium,feature,,"tournament, user",2.05,2.05,3.49,100,349
+"pages/animation-dev.js","animation-dev.js",10,fullstack,"Page","JavaScript",2,Simple,feature,,"user",0.15,0.15,0.25,100,25
+"pages/api/analytics.js","analytics.js",181,fullstack,"API Route","JavaScript",5,Medium,integration,infrastructure,"user, analytics",3.29,4.28,7.27,100,727
+"pages/api/auth/signup.js","signup.js",337,fullstack,"API Route","JavaScript",6,Medium,integration,infrastructure,"auth, user",6.13,7.97,13.54,100,1354
+"pages/api/auth/username/change.js","change.js",374,fullstack,"API Route","JavaScript",6,Medium,integration,infrastructure,"auth, user",6.8,8.84,15.03,100,1503
+"pages/api/auth/username/check.js","check.js",307,fullstack,"API Route","JavaScript",5,Medium,integration,infrastructure,"auth, user",5.58,7.26,12.34,100,1234
+"pages/api/auth/username/claim.js","claim.js",174,fullstack,"API Route","JavaScript",5,Medium,integration,infrastructure,"auth, user",3.16,4.11,6.99,100,699
+"pages/api/auth/username/reserve.js","reserve.js",325,fullstack,"API Route","JavaScript",7,Complex,integration,infrastructure,"auth, user",8.86,11.52,19.59,100,1959
+"pages/api/auth/verify-admin.ts","verify-admin.ts",64,fullstack,"API Route","TypeScript",4,Medium,feature,,"auth, user",1.16,1.16,1.98,100,198
+"pages/api/azure-vision/analyze.js","analyze.js",78,fullstack,"API Route","JavaScript",3,Simple,feature,,"user",1.13,1.13,1.93,100,193
+"pages/api/azure-vision/clay-pdf.js","clay-pdf.js",53,fullstack,"API Route","JavaScript",4,Medium,feature,,"user",0.96,0.96,1.64,100,164
+"pages/api/create-payment-intent.js","create-payment-intent.js",47,fullstack,"API Route","JavaScript",5,Medium,feature,,"payment, user",0.85,0.85,1.45,100,145
+"pages/api/csrf-token.ts","csrf-token.ts",54,fullstack,"API Route","TypeScript",4,Medium,feature,,"user",0.98,0.98,1.67,100,167
+"pages/api/export/[...params].js","[...params].js",269,fullstack,"API Route","JavaScript",6,Medium,feature,,"user",4.89,4.89,8.31,100,831
+"pages/api/nfl/bye-weeks.js","bye-weeks.js",61,fullstack,"API Route","JavaScript",5,Medium,feature,,"user",1.11,1.11,1.89,100,189
+"pages/api/nfl/cache-status.js","cache-status.js",48,fullstack,"API Route","JavaScript",4,Medium,feature,,"user",0.87,0.87,1.48,100,148
+"pages/api/nfl/current-week.js","current-week.js",39,fullstack,"API Route","JavaScript",5,Medium,feature,,"user",0.71,0.71,1.21,100,121
+"pages/api/nfl/depth-charts.js","depth-charts.js",96,fullstack,"API Route","JavaScript",4,Medium,feature,,"user",1.75,1.75,2.97,100,297
+"pages/api/nfl/fantasy/adp.js","adp.js",67,fullstack,"API Route","JavaScript",5,Medium,feature,,"user",1.22,1.22,2.07,100,207
+"pages/api/nfl/fantasy/index.js","index.js",82,fullstack,"API Route","JavaScript",5,Medium,feature,,"user",1.49,1.49,2.53,100,253
+"pages/api/nfl/fantasy/rankings.js","rankings.js",47,fullstack,"API Route","JavaScript",5,Medium,feature,,"user",0.85,0.85,1.45,100,145
+"pages/api/nfl/fantasy-live.js","fantasy-live.js",104,fullstack,"API Route","JavaScript",5,Medium,feature,,"user",1.89,1.89,3.21,100,321
+"pages/api/nfl/game/[id].js","[id].js",131,fullstack,"API Route","JavaScript",5,Medium,feature,,"user",2.38,2.38,4.05,100,405
+"pages/api/nfl/headshots-sportsdataio.js","headshots-sportsdataio.js",73,fullstack,"API Route","JavaScript",4,Medium,feature,,"user",1.33,1.33,2.26,100,226
+"pages/api/nfl/headshots.js","headshots.js",224,fullstack,"API Route","JavaScript",6,Medium,feature,,"user",4.07,4.07,6.92,100,692
+"pages/api/nfl/injuries.js","injuries.js",102,fullstack,"API Route","JavaScript",4,Medium,feature,,"user",1.85,1.85,3.15,100,315
+"pages/api/nfl/live.js","live.js",51,fullstack,"API Route","JavaScript",5,Medium,feature,,"user",0.93,0.93,1.58,100,158
+"pages/api/nfl/news.js","news.js",102,fullstack,"API Route","JavaScript",4,Medium,feature,,"user",1.85,1.85,3.15,100,315
+"pages/api/nfl/player/[id].js","[id].js",94,fullstack,"API Route","JavaScript",5,Medium,feature,,"user, player",1.71,1.71,2.91,100,291
+"pages/api/nfl/players.js","players.js",106,fullstack,"API Route","JavaScript",4,Medium,feature,,"user, player",1.93,1.93,3.28,100,328
+"pages/api/nfl/projections.js","projections.js",75,fullstack,"API Route","JavaScript",5,Medium,feature,,"user",1.36,1.36,2.32,100,232
+"pages/api/nfl/schedule.js","schedule.js",59,fullstack,"API Route","JavaScript",5,Medium,feature,,"user",1.07,1.07,1.82,100,182
+"pages/api/nfl/scores.js","scores.js",124,fullstack,"API Route","JavaScript",5,Medium,feature,,"user",2.25,2.25,3.83,100,383
+"pages/api/nfl/stats/player.js","player.js",55,fullstack,"API Route","JavaScript",5,Medium,feature,,"user, player",1,1,1.7,100,170
+"pages/api/nfl/stats/redzone.js","redzone.js",104,fullstack,"API Route","JavaScript",5,Medium,feature,,"user",1.89,1.89,3.21,100,321
+"pages/api/nfl/stats/season.js","season.js",84,fullstack,"API Route","JavaScript",5,Medium,feature,,"user",1.53,1.53,2.6,100,260
+"pages/api/nfl/stats/weekly.js","weekly.js",70,fullstack,"API Route","JavaScript",5,Medium,feature,,"user",1.27,1.27,2.16,100,216
+"pages/api/nfl/teams.js","teams.js",120,fullstack,"API Route","JavaScript",4,Medium,feature,,"user",2.18,2.18,3.71,100,371
+"pages/api/paymongo/payment.ts","payment.ts",178,fullstack,"API Route","TypeScript",6,Medium,integration,feature,"payment, user",3.24,4.21,7.15,100,715
+"pages/api/paymongo/payout.ts","payout.ts",195,fullstack,"API Route","TypeScript",6,Medium,feature,,"payment, user",3.55,3.55,6.03,100,603
+"pages/api/paymongo/source.ts","source.ts",199,fullstack,"API Route","TypeScript",6,Medium,feature,,"payment, user",3.62,3.62,6.15,100,615
+"pages/api/paymongo/webhook.ts","webhook.ts",166,fullstack,"API Route","TypeScript",6,Medium,feature,,"payment, user",3.02,3.02,5.13,100,513
+"pages/api/paystack/initialize.ts","initialize.ts",357,fullstack,"API Route","TypeScript",8,Complex,integration,infrastructure,"payment, user",9.74,12.66,21.52,100,2152
+"pages/api/paystack/transfer/initiate.ts","initiate.ts",385,fullstack,"API Route","TypeScript",6,Medium,feature,,"payment, user",7,7,11.9,100,1190
+"pages/api/paystack/transfer/recipient.ts","recipient.ts",352,fullstack,"API Route","TypeScript",6,Medium,feature,,"payment, user",6.4,6.4,10.88,100,1088
+"pages/api/paystack/verify.ts","verify.ts",171,fullstack,"API Route","TypeScript",6,Medium,feature,,"payment, user",3.11,3.11,5.29,100,529
+"pages/api/paystack/webhook.ts","webhook.ts",171,fullstack,"API Route","TypeScript",6,Medium,feature,,"payment, user",3.11,3.11,5.29,100,529
+"pages/api/sportsdataio-nfl-test.js","sportsdataio-nfl-test.js",51,fullstack,"API Route","JavaScript",5,Medium,feature,,"user",0.93,0.93,1.58,100,158
+"pages/api/stripe/cancel-payment.ts","cancel-payment.ts",312,fullstack,"API Route","TypeScript",8,Complex,integration,feature,"payment, user",8.51,11.06,18.81,100,1881
+"pages/api/stripe/connect/account.ts","account.ts",243,fullstack,"API Route","TypeScript",6,Medium,feature,,"payment, user",4.42,4.42,7.51,100,751
+"pages/api/stripe/connect/payout.ts","payout.ts",200,fullstack,"API Route","TypeScript",6,Medium,integration,infrastructure,"payment, user",3.64,4.73,8.04,100,804
+"pages/api/stripe/customer.ts","customer.ts",222,fullstack,"API Route","TypeScript",6,Medium,feature,,"payment, user",4.04,4.04,6.86,100,686
+"pages/api/stripe/exchange-rate.ts","exchange-rate.ts",162,fullstack,"API Route","TypeScript",6,Medium,feature,,"payment, user",2.95,2.95,5.01,100,501
+"pages/api/stripe/payment-intent.ts","payment-intent.ts",425,fullstack,"API Route","TypeScript",8,Complex,integration,feature,"payment, user",11.59,15.07,25.62,100,2562
+"pages/api/stripe/payment-methods.ts","payment-methods.ts",260,fullstack,"API Route","TypeScript",6,Medium,integration,feature,"payment, user",4.73,6.15,10.45,100,1045
+"pages/api/stripe/pending-payments.ts","pending-payments.ts",288,fullstack,"API Route","TypeScript",7,Complex,integration,feature,"payment, user",7.85,10.21,17.36,100,1736
+"pages/api/stripe/setup-intent.ts","setup-intent.ts",166,fullstack,"API Route","TypeScript",6,Medium,feature,,"payment, user",3.02,3.02,5.13,100,513
+"pages/api/stripe/webhook.ts","webhook.ts",738,fullstack,"API Route","TypeScript",6,Medium,integration,infrastructure,"payment, user",13.42,17.44,29.65,100,2965
+"pages/api/user/display-currency.ts","display-currency.ts",321,fullstack,"API Route","TypeScript",5,Medium,feature,,"user",5.84,5.84,9.92,100,992
+"pages/api/vision/analyze.js","analyze.js",123,fullstack,"API Route","JavaScript",5,Medium,feature,,"user",2.24,2.24,3.8,100,380
+"pages/api/xendit/disbursement.ts","disbursement.ts",206,fullstack,"API Route","TypeScript",6,Medium,feature,,"payment, user",3.75,3.75,6.37,100,637
+"pages/api/xendit/ewallet.ts","ewallet.ts",199,fullstack,"API Route","TypeScript",6,Medium,feature,,"payment, user",3.62,3.62,6.15,100,615
+"pages/api/xendit/virtual-account.ts","virtual-account.ts",173,fullstack,"API Route","TypeScript",6,Medium,feature,,"payment, user",3.15,3.15,5.35,100,535
+"pages/api/xendit/webhook.ts","webhook.ts",132,fullstack,"API Route","TypeScript",5,Medium,feature,,"payment, user",2.4,2.4,4.08,100,408
+"pages/autodraft-limits.js","autodraft-limits.js",323,fullstack,"Page","JavaScript",5,Medium,feature,,"draft, user",5.87,5.87,9.98,100,998
+"pages/azure-vision-demo.js","azure-vision-demo.js",99,fullstack,"Page","JavaScript",6,Medium,feature,,"user",1.8,1.8,3.06,100,306
+"pages/badge-test.js","badge-test.js",7,fullstack,"Page","JavaScript",2,Simple,feature,,"user",0.1,0.1,0.17,100,17
+"pages/clay-pdf-demo.js","clay-pdf-demo.js",115,fullstack,"Page","JavaScript",4,Medium,feature,,"user",2.09,2.09,3.55,100,355
+"pages/customer-support.js","customer-support.js",196,fullstack,"Page","JavaScript",5,Medium,feature,,"user",3.56,3.56,6.06,100,606
+"pages/deposit/paymongo/callback.tsx","callback.tsx",181,fullstack,"Page","TypeScript/TSX",6,Medium,feature,,"payment, user",3.29,3.29,5.59,100,559
+"pages/deposit/paystack/callback.tsx","callback.tsx",259,fullstack,"Page","TypeScript/TSX",6,Medium,feature,,"payment, user",4.71,4.71,8.01,100,801
+"pages/deposit/xendit/callback.tsx","callback.tsx",169,fullstack,"Page","TypeScript/TSX",6,Medium,feature,,"payment, user",3.07,3.07,5.22,100,522
+"pages/deposit-history.js","deposit-history.js",169,fullstack,"Page","JavaScript",6,Medium,feature,,"user",3.07,3.07,5.22,100,522
+"pages/deposit.js","deposit.js",1284,fullstack,"Page","JavaScript",8,Complex,feature,,"user",35.02,35.02,59.53,100,5953
+"pages/dev/components.js","components.js",495,fullstack,"Page","JavaScript",6,Medium,feature,,"user",9,9,15.3,100,1530
+"pages/dev/graphics.js","graphics.js",537,fullstack,"Page","JavaScript",5,Medium,feature,,"user",9.76,9.76,16.6,100,1660
+"pages/dev/headshots-test.js","headshots-test.js",279,fullstack,"Page","JavaScript",4,Medium,feature,,"user",5.07,5.07,8.62,100,862
+"pages/dev/position-badges.js","position-badges.js",16,fullstack,"Page","JavaScript",2,Simple,feature,,"user",0.23,0.23,0.4,100,40
+"pages/dev/sportsdataio-test.js","sportsdataio-test.js",807,fullstack,"Page","JavaScript",6,Medium,feature,,"user",14.67,14.67,24.94,100,2494
+"pages/dev-access.js","dev-access.js",122,fullstack,"Page","JavaScript",6,Medium,feature,,"user",2.22,2.22,3.77,100,377
+"pages/dev-draft-navbar.js","dev-draft-navbar.js",37,fullstack,"Page","JavaScript",2,Simple,feature,,"draft, user",0.54,0.54,0.91,100,91
+"pages/dev-scroll-test.js","dev-scroll-test.js",75,fullstack,"Page","JavaScript",3,Simple,feature,,"user",1.09,1.09,1.85,100,185
+"pages/draft/topdog/[roomId]/full-board.js","full-board.js",74,fullstack,"Page","JavaScript",6,Medium,feature,,"draft, user",1.35,1.35,2.29,100,229
+"pages/draft/topdog/[roomId].js","[roomId].js",4700,fullstack,"Page","JavaScript",8,Complex,feature,,"draft, user",128.18,128.18,217.91,100,21791
+"pages/draft/v2/[roomId].js","[roomId].js",45,fullstack,"Page","JavaScript",4,Medium,feature,,"draft, user",0.82,0.82,1.39,100,139
+"pages/draft/v3/[roomId].js","[roomId].js",40,fullstack,"Page","JavaScript",3,Simple,feature,,"draft, user",0.58,0.58,0.99,100,99
+"pages/exposure.js","exposure.js",1171,fullstack,"Page","JavaScript",7,Complex,feature,,"user, exposure",31.94,31.94,54.29,100,5429
+"pages/index.js","index.js",38,fullstack,"Page","JavaScript",2,Simple,feature,,"user",0.55,0.55,0.94,100,94
+"pages/ireland.js","ireland.js",739,fullstack,"Page","JavaScript",7,Complex,feature,,"user",20.15,20.15,34.26,100,3426
+"pages/leaderboard.js","leaderboard.js",194,fullstack,"Page","JavaScript",5,Medium,feature,,"user",3.53,3.53,6,100,600
+"pages/leagues.js","leagues.js",105,fullstack,"Page","JavaScript",4,Medium,feature,,"user",1.91,1.91,3.25,100,325
+"pages/location-data-2.0.js","location-data-2.0.js",404,fullstack,"Page","JavaScript",4,Medium,feature,,"user",7.35,7.35,12.49,100,1249
+"pages/location-research.js","location-research.js",4650,fullstack,"Page","JavaScript",7,Complex,feature,,"user",126.82,126.82,215.59,100,21559
+"pages/mobile/rankings-demo.js","rankings-demo.js",19,fullstack,"Page","JavaScript",2,Simple,feature,,"mobile, user",0.28,0.28,0.47,100,47
+"pages/mobile-deposit-history.js","mobile-deposit-history.js",25,fullstack,"Page","JavaScript",2,Simple,feature,,"mobile, user",0.36,0.36,0.62,100,62
+"pages/mobile-payment.js","mobile-payment.js",25,fullstack,"Page","JavaScript",4,Medium,feature,,"payment, mobile, user",0.45,0.45,0.77,100,77
+"pages/mobile-profile-customization.js","mobile-profile-customization.js",24,fullstack,"Page","JavaScript",4,Medium,feature,,"mobile, user",0.44,0.44,0.74,100,74
+"pages/mobile-rankings.js","mobile-rankings.js",25,fullstack,"Page","JavaScript",2,Simple,feature,,"mobile, user",0.36,0.36,0.62,100,62
+"pages/mobile.js","mobile.js",14,fullstack,"Page","JavaScript",2,Simple,feature,,"mobile, user",0.2,0.2,0.35,100,35
+"pages/monocraft-demo.js","monocraft-demo.js",140,fullstack,"Page","JavaScript",3,Simple,feature,,"user",2.04,2.04,3.46,100,346
+"pages/my-teams.js","my-teams.js",948,fullstack,"Page","JavaScript",7,Complex,feature,,"user",25.85,25.85,43.95,100,4395
+"pages/payment-security-dashboard.js","payment-security-dashboard.js",170,fullstack,"Page","JavaScript",6,Medium,integration,infrastructure,"payment, user",3.09,4.02,6.83,100,683
+"pages/profile-customization.js","profile-customization.js",104,fullstack,"Page","JavaScript",4,Medium,feature,,"user",1.89,1.89,3.21,100,321
+"pages/profile.js","profile.js",177,fullstack,"Page","JavaScript",5,Medium,feature,,"user",3.22,3.22,5.47,100,547
+"pages/rankings.js","rankings.js",815,fullstack,"Page","JavaScript",6,Medium,feature,,"user",14.82,14.82,25.19,100,2519
+"pages/rules.js","rules.js",106,fullstack,"Page","JavaScript",4,Medium,feature,,"user",1.93,1.93,3.28,100,328
+"pages/statistics.js","statistics.js",588,fullstack,"Page","JavaScript",7,Complex,feature,,"user",16.04,16.04,27.26,100,2726
+"pages/tearaway-demo.js","tearaway-demo.js",81,fullstack,"Page","JavaScript",4,Medium,feature,,"user",1.47,1.47,2.5,100,250
+"pages/test-monocraft.js","test-monocraft.js",100,fullstack,"Page","JavaScript",2,Simple,feature,,"user",1.45,1.45,2.47,100,247
+"pages/test-registration.js","test-registration.js",233,fullstack,"Page","JavaScript",4,Medium,feature,,"user",4.24,4.24,7.2,100,720
+"pages/testing-grounds/absolutepixelscard-backup-2024-12-19-14-30.js","absolutepixelscard-backup-2024-12-19-14-30.js",321,fullstack,"Page","JavaScript",5,Medium,feature,,"user",5.84,5.84,9.92,100,992
+"pages/testing-grounds/card-sandbox.js","card-sandbox.js",595,fullstack,"Page","JavaScript",5,Medium,feature,,"user",10.82,10.82,18.39,100,1839
+"pages/testing-grounds/device-comparison.js","device-comparison.js",237,fullstack,"Page","JavaScript",4,Medium,feature,,"user",4.31,4.31,7.33,100,733
+"pages/testing-grounds/full-draft-board-dev.js","full-draft-board-dev.js",310,fullstack,"Page","JavaScript",5,Medium,feature,,"draft, user",5.64,5.64,9.58,100,958
+"pages/testing-grounds/join-tournament-modal-desktop.js","join-tournament-modal-desktop.js",632,fullstack,"Page","JavaScript",7,Complex,feature,,"tournament, user",17.24,17.24,29.3,100,2930
+"pages/testing-grounds/marketing-board.js","marketing-board.js",410,fullstack,"Page","JavaScript",5,Medium,feature,,"user",7.45,7.45,12.67,100,1267
+"pages/testing-grounds/mobile-apple-demo.js","mobile-apple-demo.js",40,fullstack,"Page","JavaScript",2,Simple,feature,,"mobile, user",0.58,0.58,0.99,100,99
+"pages/testing-grounds/navbar-sandbox.js","navbar-sandbox.js",266,fullstack,"Page","JavaScript",4,Medium,feature,,"user",4.84,4.84,8.22,100,822
+"pages/testing-grounds/navbar-theming-demo.js","navbar-theming-demo.js",176,fullstack,"Page","JavaScript",4,Medium,feature,,"user",3.2,3.2,5.44,100,544
+"pages/testing-grounds/player-card.js","player-card.js",1380,fullstack,"Page","JavaScript",6,Medium,feature,,"user, player",25.09,25.09,42.65,100,4265
+"pages/testing-grounds/playoff-teams.tsx","playoff-teams.tsx",658,fullstack,"Page","TypeScript/TSX",4,Medium,feature,,"user",11.96,11.96,20.34,100,2034
+"pages/testing-grounds/team-display-sandbox.js","team-display-sandbox.js",856,fullstack,"Page","JavaScript",7,Complex,feature,,"user",23.35,23.35,39.69,100,3969
+"pages/testing-grounds/tournament-card-sandbox.js","tournament-card-sandbox.js",854,fullstack,"Page","JavaScript",6,Medium,feature,,"tournament, user",15.53,15.53,26.4,100,2640
+"pages/testing-grounds/v3-components-demo.js","v3-components-demo.js",177,fullstack,"Page","JavaScript",5,Medium,feature,,"user",3.22,3.22,5.47,100,547
+"pages/testing-grounds/vx-components.js","vx-components.js",736,fullstack,"Page","JavaScript",6,Medium,feature,,"user",13.38,13.38,22.75,100,2275
+"pages/testing-grounds/vx-mobile-app-demo.js","vx-mobile-app-demo.js",99,fullstack,"Page","JavaScript",3,Simple,feature,,"mobile, user",1.44,1.44,2.45,100,245
+"pages/testing-grounds/vx-mobile-demo.js","vx-mobile-demo.js",216,fullstack,"Page","JavaScript",4,Medium,feature,,"mobile, user",3.93,3.93,6.68,100,668
+"pages/testing-grounds/vx2-auth-test.js","vx2-auth-test.js",295,fullstack,"Page","JavaScript",5,Medium,feature,,"auth, vx2, user",5.36,5.36,9.12,100,912
+"pages/testing-grounds/vx2-draft-room.js","vx2-draft-room.js",358,fullstack,"Page","JavaScript",7,Complex,feature,,"draft, vx2, user",9.76,9.76,16.6,100,1660
+"pages/testing-grounds/vx2-mobile-app-demo.js","vx2-mobile-app-demo.js",437,fullstack,"Page","JavaScript",6,Medium,feature,,"mobile, vx2, user",7.95,7.95,13.51,100,1351
+"pages/testing-grounds/vx2-tablet-app-demo.js","vx2-tablet-app-demo.js",102,fullstack,"Page","JavaScript",4,Medium,feature,,"tablet, vx2, user",1.85,1.85,3.15,100,315
+"pages/testing-grounds/vx2-tablet-draft-room.js","vx2-tablet-draft-room.js",220,fullstack,"Page","JavaScript",6,Medium,feature,,"draft, tablet, vx2, user",4,4,6.8,100,680
+"pages/topdog2/index.js","index.js",256,fullstack,"Page","JavaScript",4,Medium,feature,,"user",4.65,4.65,7.91,100,791
+"pages/tournaments/dev/[id].js","[id].js",397,fullstack,"Page","JavaScript",7,Complex,feature,,"tournament, user",10.83,10.83,18.41,100,1841
+"pages/tournaments/dev/index.js","index.js",363,fullstack,"Page","JavaScript",7,Complex,feature,,"tournament, user",9.9,9.9,16.83,100,1683
+"pages/tournaments/topdog.js","topdog.js",78,fullstack,"Page","JavaScript",4,Medium,feature,,"tournament, user",1.42,1.42,2.41,100,241
+"pages/unregulated-analysis.js","unregulated-analysis.js",962,fullstack,"Page","JavaScript",5,Medium,feature,,"user",17.49,17.49,29.73,100,2973
+"pages/v3-demo.js","v3-demo.js",260,fullstack,"Page","JavaScript",4,Medium,feature,,"user",4.73,4.73,8.04,100,804
+"pages/vision-demo.js","vision-demo.js",62,fullstack,"Page","JavaScript",5,Medium,feature,,"user",1.13,1.13,1.92,100,192
+"lib/adminAuth.js","adminAuth.js",163,backend,"Utility","JavaScript",5,Medium,integration,infrastructure,"auth, user",3.26,4.24,7.2,110,792
+"lib/adp/algorithm.ts","algorithm.ts",398,fullstack,"Utility","TypeScript",5,Medium,feature,,"user",7.24,7.24,12.3,100,1230
+"lib/adp/index.ts","index.ts",165,backend,"Utility","TypeScript",5,Medium,feature,,"user",3.3,3.3,5.61,110,617.1
+"lib/adp/types.ts","types.ts",119,fullstack,"Utility","TypeScript",4,Medium,feature,,"user",2.16,2.16,3.68,100,368
+"lib/adp/useADP.ts","useADP.ts",237,fullstack,"Utility","TypeScript",5,Medium,feature,,"user",4.31,4.31,7.33,100,733
+"lib/analytics/deviceTracking.ts","deviceTracking.ts",478,fullstack,"Utility","TypeScript",6,Medium,feature,,"user, analytics",8.69,8.69,14.77,100,1477
+"lib/analytics/index.ts","index.ts",28,fullstack,"Utility","TypeScript",2,Simple,feature,,"user, analytics",0.41,0.41,0.69,100,69
+"lib/apiAuth.js","apiAuth.js",167,backend,"Utility","JavaScript",5,Medium,integration,infrastructure,"auth, user",3.34,4.34,7.38,110,811.8
+"lib/apiErrorHandler.js","apiErrorHandler.js",350,fullstack,"Utility","JavaScript",4,Medium,feature,,"user",6.36,6.36,10.82,100,1082
+"lib/apiTypes.ts","apiTypes.ts",17,fullstack,"Utility","TypeScript",4,Medium,feature,,"user",0.31,0.31,0.53,100,53
+"lib/autodraftLimits.js","autodraftLimits.js",191,fullstack,"Utility","JavaScript",6,Medium,feature,,"draft, user",3.47,3.47,5.9,100,590
+"lib/azureVision.js","azureVision.js",320,fullstack,"Utility","JavaScript",4,Medium,feature,,"user",5.82,5.82,9.89,100,989
+"lib/bankingSystem.js","bankingSystem.js",16,fullstack,"Utility","JavaScript",3,Simple,feature,,"user",0.23,0.23,0.4,100,40
+"lib/clayDataIntegrator.js","clayDataIntegrator.js",216,fullstack,"Utility","JavaScript",6,Medium,feature,,"user",3.93,3.93,6.68,100,668
+"lib/clearPicks.js","clearPicks.js",75,fullstack,"Utility","JavaScript",5,Medium,feature,,"user",1.36,1.36,2.32,100,232
+"lib/clientLogger.ts","clientLogger.ts",160,fullstack,"Utility","TypeScript",2,Simple,feature,,"user",2.33,2.33,3.96,100,396
+"lib/cloudVision.js","cloudVision.js",174,fullstack,"Utility","JavaScript",6,Medium,feature,,"user",3.16,3.16,5.38,100,538
+"lib/complianceSystem.js","complianceSystem.js",15,fullstack,"Utility","JavaScript",2,Simple,feature,,"user",0.22,0.22,0.37,100,37
+"lib/config/featureFlags.ts","featureFlags.ts",17,fullstack,"Utility","TypeScript",2,Simple,feature,,"user",0.25,0.25,0.42,100,42
+"lib/csrfProtection.js","csrfProtection.js",105,fullstack,"Utility","JavaScript",4,Medium,feature,,"user",1.91,1.91,3.25,100,325
+"lib/csvToPlayerPool.js","csvToPlayerPool.js",26,fullstack,"Utility","JavaScript",3,Simple,feature,,"user, player",0.38,0.38,0.64,100,64
+"lib/customRankings.js","customRankings.js",105,fullstack,"Utility","JavaScript",2,Simple,feature,,"user",1.53,1.53,2.6,100,260
+"lib/dataAccessControl.js","dataAccessControl.js",241,fullstack,"Utility","JavaScript",5,Medium,feature,,"user",4.38,4.38,7.45,100,745
+"lib/dataManager.js","dataManager.js",354,fullstack,"Utility","JavaScript",4,Medium,feature,,"user",6.44,6.44,10.94,100,1094
+"lib/dataValidator.js","dataValidator.js",509,fullstack,"Utility","JavaScript",6,Medium,feature,,"user",9.25,9.25,15.73,100,1573
+"lib/devAuth.js","devAuth.js",147,fullstack,"Utility","JavaScript",6,Medium,feature,,"auth, user",2.67,2.67,4.54,100,454
+"lib/devLinking.js","devLinking.js",38,fullstack,"Utility","JavaScript",2,Simple,feature,,"user",0.55,0.55,0.94,100,94
+"lib/deviceUtils.js","deviceUtils.js",72,fullstack,"Utility","JavaScript",5,Medium,feature,,"user",1.31,1.31,2.23,100,223
+"lib/draftCompletionTracker.js","draftCompletionTracker.js",158,fullstack,"Utility","JavaScript",5,Medium,feature,,"draft, user",2.87,2.87,4.88,100,488
+"lib/draftDataIntegration.js","draftDataIntegration.js",220,fullstack,"Utility","JavaScript",5,Medium,feature,,"draft, user",4,4,6.8,100,680
+"lib/dynamicIsland.ts","dynamicIsland.ts",407,fullstack,"Utility","TypeScript",6,Medium,feature,,"user",7.4,7.4,12.58,100,1258
+"lib/envValidation.js","envValidation.js",167,fullstack,"Utility","JavaScript",6,Medium,feature,,"user",3.04,3.04,5.16,100,516
+"lib/errorTracking.ts","errorTracking.ts",299,fullstack,"Utility","TypeScript",4,Medium,feature,,"user",5.44,5.44,9.24,100,924
+"lib/espnAPI.js","espnAPI.js",432,backend,"Utility","JavaScript",6,Medium,feature,,"user",8.64,8.64,14.69,110,1615.9
+"lib/exportSystem.js","exportSystem.js",394,fullstack,"Utility","JavaScript",6,Medium,feature,,"user",7.16,7.16,12.18,100,1218
+"lib/exposureData.js","exposureData.js",2407,fullstack,"Utility","JavaScript",5,Medium,feature,,"user, exposure",43.76,43.76,74.4,100,7440
+"lib/exposurePreloader.js","exposurePreloader.js",254,backend,"Utility","JavaScript",5,Medium,feature,,"user, exposure",5.08,5.08,8.64,110,950.4
+"lib/fileUploadValidation.js","fileUploadValidation.js",246,fullstack,"Utility","JavaScript",6,Medium,feature,,"user",4.47,4.47,7.6,100,760
+"lib/firebase/firebaseAdmin.ts","firebaseAdmin.ts",35,backend,"Utility","TypeScript",2,Simple,integration,infrastructure,"user",0.56,0.73,1.24,110,136.4
+"lib/firebase.js","firebase.js",235,fullstack,"Utility","JavaScript",5,Medium,integration,infrastructure,"user",4.27,5.55,9.44,100,944
+"lib/fraudDetection.js","fraudDetection.js",489,fullstack,"Utility","JavaScript",6,Medium,feature,,"user",8.89,8.89,15.11,100,1511
+"lib/gradientUtils.js","gradientUtils.js",421,fullstack,"Utility","JavaScript",3,Simple,feature,,"user",6.12,6.12,10.41,100,1041
+"lib/historicalStats/index.ts","index.ts",12,fullstack,"Utility","TypeScript",2,Simple,feature,,"user",0.17,0.17,0.3,100,30
+"lib/historicalStats/service.ts","service.ts",249,backend,"Utility","TypeScript",5,Medium,feature,,"user",4.98,4.98,8.47,110,931.7
+"lib/historicalStats/types.ts","types.ts",208,fullstack,"Utility","TypeScript",4,Medium,feature,,"user",3.78,3.78,6.43,100,643
+"lib/initDevTournaments.js","initDevTournaments.js",59,fullstack,"Utility","JavaScript",5,Medium,integration,infrastructure,"tournament, user",1.07,1.39,2.37,100,237
+"lib/inputSanitization.js","inputSanitization.js",269,fullstack,"Utility","JavaScript",4,Medium,feature,,"user",4.89,4.89,8.31,100,831
+"lib/localeCharacters.js","localeCharacters.js",389,fullstack,"Utility","JavaScript",4,Medium,feature,,"user",7.07,7.07,12.02,100,1202
+"lib/mockData/index.ts","index.ts",10,fullstack,"Utility","TypeScript",2,Simple,feature,,"user",0.15,0.15,0.25,100,25
+"lib/mockData/playoffScenarios.ts","playoffScenarios.ts",105,fullstack,"Utility","TypeScript",2,Simple,feature,,"user",1.53,1.53,2.6,100,260
+"lib/mockData/playoffTeams.ts","playoffTeams.ts",481,fullstack,"Utility","TypeScript",4,Medium,feature,,"user",8.75,8.75,14.87,100,1487
+"lib/mockDrafters.js","mockDrafters.js",304,fullstack,"Utility","JavaScript",4,Medium,feature,,"draft, user",5.53,5.53,9.4,100,940
+"lib/multiApiStatsService.js","multiApiStatsService.js",517,fullstack,"Utility","JavaScript",7,Complex,feature,,"user",14.1,14.1,23.97,100,2397
+"lib/nflConstants.js","nflConstants.js",232,fullstack,"Utility","JavaScript",4,Medium,feature,,"user",4.22,4.22,7.17,100,717
+"lib/nflLogos.js","nflLogos.js",41,fullstack,"Utility","JavaScript",2,Simple,feature,,"user",0.6,0.6,1.01,100,101
+"lib/paymentHealthMonitor.js","paymentHealthMonitor.js",397,backend,"Utility","JavaScript",6,Medium,feature,,"payment, user",7.94,7.94,13.5,110,1485
+"lib/paymentMethodConfig.js","paymentMethodConfig.js",88,backend,"Utility","JavaScript",7,Complex,feature,,"payment, user",2.64,2.64,4.49,110,493.9
+"lib/paymentProcessor.js","paymentProcessor.js",23,backend,"Utility","JavaScript",5,Medium,feature,,"payment, user",0.46,0.46,0.78,110,85.8
+"lib/paymentSecurity.js","paymentSecurity.js",354,backend,"Utility","JavaScript",8,Complex,feature,,"payment, user",10.62,10.62,18.05,110,1985.5
+"lib/paymentSystemIntegration.js","paymentSystemIntegration.js",468,backend,"Utility","JavaScript",8,Complex,feature,,"payment, user",14.04,14.04,23.87,110,2625.7
+"lib/payments/analytics.ts","analytics.ts",288,backend,"Utility","TypeScript",6,Medium,feature,,"payment, user, analytics",5.76,5.76,9.79,110,1076.9
+"lib/payments/index.ts","index.ts",80,backend,"Utility","TypeScript",5,Medium,feature,,"payment, user",1.6,1.6,2.72,110,299.2
+"lib/payments/providers/paymongo.ts","paymongo.ts",305,backend,"Utility","TypeScript",8,Complex,integration,feature,"payment, user",9.15,11.89,20.22,110,2224.2
+"lib/payments/providers/paystack.ts","paystack.ts",221,backend,"Utility","TypeScript",7,Complex,integration,feature,"payment, user",6.63,8.62,14.65,110,1611.5
+"lib/payments/providers/stripe.ts","stripe.ts",234,backend,"Utility","TypeScript",7,Complex,integration,feature,"payment, user",7.02,9.13,15.51,110,1706.1
+"lib/payments/providers/xendit.ts","xendit.ts",413,backend,"Utility","TypeScript",8,Complex,integration,feature,"payment, user",12.39,16.11,27.38,110,3011.8
+"lib/payments/router.ts","router.ts",247,backend,"Utility","TypeScript",7,Complex,feature,,"payment, user",7.41,7.41,12.6,110,1386
+"lib/payments/types.ts","types.ts",747,backend,"Utility","TypeScript",8,Complex,feature,,"payment, user",22.41,22.41,38.1,110,4191
+"lib/paymongo/currencyConfig.ts","currencyConfig.ts",211,backend,"Utility","TypeScript",6,Medium,feature,,"payment, user",4.22,4.22,7.17,110,788.7
+"lib/paymongo/index.ts","index.ts",58,backend,"Utility","TypeScript",5,Medium,feature,,"payment, user",1.16,1.16,1.97,110,216.7
+"lib/paymongo/paymongoService.ts","paymongoService.ts",803,backend,"Utility","TypeScript",7,Complex,integration,infrastructure,"payment, user",24.09,31.32,53.24,110,5856.4
+"lib/paymongo/paymongoTypes.ts","paymongoTypes.ts",368,backend,"Utility","TypeScript",6,Medium,feature,,"payment, user",7.36,7.36,12.51,110,1376.1
+"lib/paystack/currencyConfig.ts","currencyConfig.ts",401,backend,"Utility","TypeScript",6,Medium,feature,,"payment, user",8.02,8.02,13.63,110,1499.3
+"lib/paystack/index.ts","index.ts",53,backend,"Utility","TypeScript",5,Medium,feature,,"payment, user",1.06,1.06,1.8,110,198
+"lib/paystack/paystackService.ts","paystackService.ts",881,backend,"Utility","TypeScript",6,Medium,integration,infrastructure,"payment, user",17.62,22.91,38.94,110,4283.4
+"lib/paystack/paystackTypes.ts","paystackTypes.ts",632,backend,"Utility","TypeScript",8,Complex,integration,infrastructure,"payment, user",18.96,24.65,41.9,110,4609
+"lib/pdfProcessor.js","pdfProcessor.js",209,fullstack,"Utility","JavaScript",6,Medium,feature,,"user",3.8,3.8,6.46,100,646
+"lib/playerData/PlayerDataService.js","PlayerDataService.js",222,fullstack,"Utility","JavaScript",5,Medium,feature,,"user, player",4.04,4.04,6.86,100,686
+"lib/playerData/index.ts","index.ts",268,backend,"Utility","TypeScript",5,Medium,feature,,"user, player",5.36,5.36,9.11,110,1002.1
+"lib/playerData/types.ts","types.ts",110,fullstack,"Utility","TypeScript",3,Simple,feature,,"user, player",1.6,1.6,2.72,100,272
+"lib/playerData/usePlayerData.ts","usePlayerData.ts",276,fullstack,"Utility","TypeScript",5,Medium,feature,,"user, player",5.02,5.02,8.53,100,853
+"lib/playerDataContext.js","playerDataContext.js",317,fullstack,"Utility","JavaScript",6,Medium,feature,,"user, player",5.76,5.76,9.8,100,980
+"lib/playerDatabase.js","playerDatabase.js",209,fullstack,"Utility","JavaScript",6,Medium,feature,,"user, player",3.8,3.8,6.46,100,646
+"lib/playerModel.ts","playerModel.ts",680,fullstack,"Utility","TypeScript",6,Medium,feature,,"user, player",12.36,12.36,21.02,100,2102
+"lib/playerPhotos.js","playerPhotos.js",146,fullstack,"Utility","JavaScript",4,Medium,feature,,"user, player",2.65,2.65,4.51,100,451
+"lib/playerPool/index.ts","index.ts",346,backend,"Utility","TypeScript",6,Medium,feature,,"user, player",6.92,6.92,11.76,110,1293.6
+"lib/playerPool/types.ts","types.ts",127,fullstack,"Utility","TypeScript",5,Medium,feature,,"user, player",2.31,2.31,3.93,100,393
+"lib/playerPool/usePlayerPool.ts","usePlayerPool.ts",240,fullstack,"Utility","TypeScript",4,Medium,feature,,"user, player",4.36,4.36,7.42,100,742
+"lib/playerPool.js","playerPool.js",6750,fullstack,"Utility","JavaScript",7,Complex,feature,,"user, player",184.09,184.09,312.95,100,31295
+"lib/rateLimitConfig.js","rateLimitConfig.js",171,fullstack,"Utility","JavaScript",4,Medium,feature,,"user",3.11,3.11,5.29,100,529
+"lib/rateLimiter.js","rateLimiter.js",366,fullstack,"Utility","JavaScript",6,Medium,integration,infrastructure,"user",6.65,8.65,14.71,100,1471
+"lib/realPdfProcessor.js","realPdfProcessor.js",720,fullstack,"Utility","JavaScript",6,Medium,feature,,"user",13.09,13.09,22.25,100,2225
+"lib/securityLogger.js","securityLogger.js",242,fullstack,"Utility","JavaScript",6,Medium,integration,infrastructure,"user",4.4,5.72,9.72,100,972
+"lib/securityMonitoring.js","securityMonitoring.js",313,fullstack,"Utility","JavaScript",6,Medium,feature,,"user",5.69,5.69,9.67,100,967
+"lib/serverLogger.ts","serverLogger.ts",26,fullstack,"Utility","TypeScript",2,Simple,feature,,"user",0.38,0.38,0.64,100,64
+"lib/shareConfig.js","shareConfig.js",231,fullstack,"Utility","JavaScript",5,Medium,feature,,"user",4.2,4.2,7.14,100,714
+"lib/sportsdataio.js","sportsdataio.js",1774,backend,"Utility","JavaScript",7,Complex,feature,,"user",53.22,53.22,90.47,110,9951.7
+"lib/staticPlayerStats.js","staticPlayerStats.js",20222,fullstack,"Utility","JavaScript",5,Medium,feature,,"user, player",367.67,367.67,625.04,100,62504
+"lib/stripe/currencyConfig.ts","currencyConfig.ts",839,backend,"Utility","TypeScript",8,Complex,feature,,"payment, user",25.17,25.17,42.79,110,4706.9
+"lib/stripe/currencyIcons.ts","currencyIcons.ts",929,fullstack,"Utility","TypeScript",5,Medium,feature,,"payment, user",16.89,16.89,28.71,100,2871
+"lib/stripe/displayCurrency.ts","displayCurrency.ts",306,fullstack,"Utility","TypeScript",5,Medium,integration,infrastructure,"payment, user",5.56,7.23,12.3,100,1230
+"lib/stripe/exchangeRates.ts","exchangeRates.ts",427,backend,"Utility","TypeScript",6,Medium,feature,,"payment, user",8.54,8.54,14.52,110,1597.2
+"lib/stripe/firebaseSchema.ts","firebaseSchema.ts",423,backend,"Utility","TypeScript",8,Complex,integration,infrastructure,"payment, user",12.69,16.5,28.04,110,3084.4
+"lib/stripe/index.ts","index.ts",168,backend,"Utility","TypeScript",7,Complex,integration,infrastructure,"payment, user",5.04,6.55,11.14,110,1225.4
+"lib/stripe/stripeService.ts","stripeService.ts",897,backend,"Utility","TypeScript",8,Complex,integration,infrastructure,"payment, user",26.91,34.98,59.47,110,6541.7
+"lib/stripe/stripeTypes.ts","stripeTypes.ts",494,backend,"Utility","TypeScript",8,Complex,feature,,"payment, user",14.82,14.82,25.19,110,2770.9
+"lib/swr/config.ts","config.ts",200,backend,"Utility","TypeScript",5,Medium,feature,,"user",4,4,6.8,110,748
+"lib/swr/index.ts","index.ts",42,fullstack,"Utility","TypeScript",3,Simple,feature,,"user",0.61,0.61,1.04,100,104
+"lib/swr/usePlayerSWR.ts","usePlayerSWR.ts",719,fullstack,"Utility","TypeScript",6,Medium,feature,,"user, player",13.07,13.07,22.22,100,2222
+"lib/theme.js","theme.js",227,fullstack,"Utility","JavaScript",2,Simple,feature,,"user",3.3,3.3,5.61,100,561
+"lib/tournament/seasonUtils.ts","seasonUtils.ts",137,fullstack,"Utility","TypeScript",5,Medium,feature,,"tournament, user",2.49,2.49,4.23,100,423
+"lib/tournament/tournamentUtils.ts","tournamentUtils.ts",137,fullstack,"Utility","TypeScript",5,Medium,feature,,"tournament, user",2.49,2.49,4.23,100,423
+"lib/tournamentConfig.js","tournamentConfig.js",208,fullstack,"Utility","JavaScript",4,Medium,feature,,"tournament, user",3.78,3.78,6.43,100,643
+"lib/tournamentDataCollector.js","tournamentDataCollector.js",404,fullstack,"Utility","JavaScript",5,Medium,feature,,"tournament, user",7.35,7.35,12.49,100,1249
+"lib/tournamentDatabase.js","tournamentDatabase.js",395,fullstack,"Utility","JavaScript",5,Medium,feature,,"tournament, user",7.18,7.18,12.21,100,1221
+"lib/underdogPlayerPhotos.js","underdogPlayerPhotos.js",11,fullstack,"Utility","JavaScript",2,Simple,feature,,"user, player",0.16,0.16,0.27,100,27
+"lib/userContext.js","userContext.js",113,fullstack,"Utility","JavaScript",4,Medium,integration,infrastructure,"user",2.05,2.67,4.54,100,454
+"lib/userMetrics.js","userMetrics.js",944,backend,"Utility","JavaScript",6,Medium,feature,,"user",18.88,18.88,32.1,110,3531
+"lib/userRegistration.js","userRegistration.js",215,fullstack,"Utility","JavaScript",6,Medium,integration,infrastructure,"user",3.91,5.08,8.64,100,864
+"lib/userStats.js","userStats.js",499,fullstack,"Utility","JavaScript",6,Medium,integration,infrastructure,"user",9.07,11.79,20.05,100,2005
+"lib/usernameChangePolicy.js","usernameChangePolicy.js",158,fullstack,"Utility","JavaScript",6,Medium,integration,infrastructure,"user",2.87,3.73,6.35,100,635
+"lib/usernameSimilarity.js","usernameSimilarity.js",239,fullstack,"Utility","JavaScript",6,Medium,integration,infrastructure,"user",4.35,5.65,9.6,100,960
+"lib/usernameSuggestions.js","usernameSuggestions.js",173,fullstack,"Utility","JavaScript",5,Medium,integration,infrastructure,"user",3.15,4.09,6.95,100,695
+"lib/usernameValidation.js","usernameValidation.js",654,fullstack,"Utility","JavaScript",6,Medium,integration,infrastructure,"user",11.89,15.46,26.28,100,2628
+"lib/vipAccountManager.js","vipAccountManager.js",871,fullstack,"Utility","JavaScript",5,Medium,feature,,"user",15.84,15.84,26.92,100,2692
+"lib/webauthn.ts","webauthn.ts",349,fullstack,"Utility","TypeScript",4,Medium,feature,,"auth, user",6.35,6.35,10.79,100,1079
+"lib/xendit/currencyConfig.ts","currencyConfig.ts",210,backend,"Utility","TypeScript",6,Medium,feature,,"payment, user",4.2,4.2,7.14,110,785.4
+"lib/xendit/index.ts","index.ts",54,backend,"Utility","TypeScript",5,Medium,feature,,"payment, user",1.08,1.08,1.84,110,202.4
+"lib/xendit/xenditService.ts","xenditService.ts",684,backend,"Utility","TypeScript",6,Medium,integration,infrastructure,"payment, user",13.68,17.78,30.23,110,3325.3
+"lib/xendit/xenditTypes.ts","xenditTypes.ts",361,backend,"Utility","TypeScript",6,Medium,feature,,"payment, user",7.22,7.22,12.27,110,1349.7
+"hooks/useDisplayCurrency.ts","useDisplayCurrency.ts",283,frontend,"Hook","TypeScript",6,Medium,feature,,"user",4.53,4.53,7.7,90,693
+"hooks/useHistoricalStats.ts","useHistoricalStats.ts",343,frontend,"Hook","TypeScript",5,Medium,feature,,"user",5.49,5.49,9.33,90,839.7
+"hooks/useIsMobileDevice.js","useIsMobileDevice.js",56,frontend,"Hook","JavaScript",5,Medium,feature,,"mobile, user",0.9,0.9,1.52,90,136.8
+"hooks/usePlayerDropdown.js","usePlayerDropdown.js",201,frontend,"Hook","JavaScript",4,Medium,feature,,"user, player",3.22,3.22,5.47,90,492.3
+"hooks/useShare.js","useShare.js",113,frontend,"Hook","JavaScript",3,Simple,feature,,"user",1.45,1.45,2.46,90,221.4
+"hooks/useStripeExchangeRate.ts","useStripeExchangeRate.ts",215,frontend,"Hook","TypeScript",6,Medium,feature,,"payment, user",3.44,3.44,5.85,90,526.5
+"hooks/useTournamentDataCollection.js","useTournamentDataCollection.js",122,frontend,"Hook","JavaScript",5,Medium,feature,,"tournament, user",1.95,1.95,3.32,90,298.8
+"hooks/useUserPreferences.js","useUserPreferences.js",91,frontend,"Hook","JavaScript",4,Medium,feature,,"user",1.46,1.46,2.48,90,223.2
+"types/api.ts","api.ts",404,fullstack,"Type","TypeScript",6,Medium,feature,,"user",7.35,7.35,12.49,100,1249
+"types/firestore.ts","firestore.ts",223,fullstack,"Type","TypeScript",4,Medium,feature,,"user",4.05,4.05,6.89,100,689
+"types/index.ts","index.ts",106,fullstack,"Type","TypeScript",4,Medium,feature,,"user",1.93,1.93,3.28,100,328
+"types/player.ts","player.ts",348,fullstack,"Type","TypeScript",6,Medium,feature,,"user, player",6.33,6.33,10.76,100,1076
+"scripts/add_missing_star_players.js","add_missing_star_players.js",145,infrastructure,"Script","JavaScript",3,Simple,infrastructure,,"user, player",2.9,3.48,5.92,120,710.4
+"scripts/analyze_integrated_data.js","analyze_integrated_data.js",150,infrastructure,"Script","JavaScript",4,Medium,infrastructure,,"user",3.75,4.5,7.65,120,918
+"scripts/calculateADP.js","calculateADP.js",617,infrastructure,"Script","JavaScript",6,Medium,integration,infrastructure,"user",15.43,20.05,34.09,120,4090.8
+"scripts/check_historical_data.js","check_historical_data.js",113,infrastructure,"Script","JavaScript",5,Medium,infrastructure,,"user",2.83,3.39,5.76,120,691.2
+"scripts/clear-and-repopulate-draft-room-data.js","clear-and-repopulate-draft-room-data.js",232,infrastructure,"Script","JavaScript",2,Simple,infrastructure,,"draft, user",4.64,5.57,9.47,120,1136.4
+"scripts/clear_player_data.js","clear_player_data.js",106,infrastructure,"Script","JavaScript",4,Medium,infrastructure,,"user, player",2.65,3.18,5.41,120,649.2
+"scripts/convert_ppr_to_half_ppr.js","convert_ppr_to_half_ppr.js",95,infrastructure,"Script","JavaScript",4,Medium,infrastructure,,"user",2.38,2.85,4.85,120,582
+"scripts/create-blue-logo.js","create-blue-logo.js",32,infrastructure,"Script","JavaScript",2,Simple,infrastructure,,"user",0.64,0.77,1.31,120,157.2
+"scripts/debug_espn_errors.js","debug_espn_errors.js",202,infrastructure,"Script","JavaScript",6,Medium,infrastructure,,"user",5.05,6.06,10.3,120,1236
+"scripts/debug_falcons_data.js","debug_falcons_data.js",96,infrastructure,"Script","JavaScript",2,Simple,infrastructure,,"user",1.92,2.3,3.92,120,470.4
+"scripts/debug_malik_nabers.js","debug_malik_nabers.js",69,infrastructure,"Script","JavaScript",2,Simple,infrastructure,,"user",1.38,1.66,2.82,120,338.4
+"scripts/debug_player_categorization.js","debug_player_categorization.js",128,infrastructure,"Script","JavaScript",4,Medium,infrastructure,,"user, player",3.2,3.84,6.53,120,783.6
+"scripts/debug_teams_structure.js","debug_teams_structure.js",143,infrastructure,"Script","JavaScript",5,Medium,infrastructure,,"user",3.58,4.29,7.29,120,874.8
+"scripts/deep_espn_exploration.js","deep_espn_exploration.js",179,infrastructure,"Script","JavaScript",6,Medium,infrastructure,,"user",4.47,5.37,9.13,120,1095.6
+"scripts/demo_data_restrictions.js","demo_data_restrictions.js",123,infrastructure,"Script","JavaScript",3,Simple,infrastructure,,"user",2.46,2.95,5.02,120,602.4
+"scripts/demo_tournament_data.js","demo_tournament_data.js",152,infrastructure,"Script","JavaScript",5,Medium,infrastructure,,"tournament, user",3.8,4.56,7.75,120,930
+"scripts/download-currency-icons.js","download-currency-icons.js",292,infrastructure,"Script","JavaScript",4,Medium,infrastructure,,"user",7.3,8.76,14.89,120,1786.8
+"scripts/download-player-images.js","download-player-images.js",539,infrastructure,"Script","JavaScript",7,Complex,infrastructure,,"user, player",20.21,24.26,41.23,120,4947.6
+"scripts/explore_espn_data_availability.js","explore_espn_data_availability.js",151,infrastructure,"Script","JavaScript",6,Medium,infrastructure,,"user",3.78,4.53,7.7,120,924
+"scripts/explore_espn_stats.js","explore_espn_stats.js",170,infrastructure,"Script","JavaScript",6,Medium,infrastructure,,"user",4.25,5.1,8.67,120,1040.4
+"scripts/extract_clay_projections_2025.js","extract_clay_projections_2025.js",198,infrastructure,"Script","JavaScript",3,Simple,infrastructure,,"user",3.96,4.75,8.08,120,969.6
+"scripts/extract_underdog_draftkings_data.js","extract_underdog_draftkings_data.js",277,infrastructure,"Script","JavaScript",6,Medium,feature,,"draft, user",6.93,6.93,11.77,120,1412.4
+"scripts/final_database_summary.js","final_database_summary.js",121,infrastructure,"Script","JavaScript",4,Medium,infrastructure,,"user",3.03,3.63,6.17,120,740.4
+"scripts/final_espn_test.js","final_espn_test.js",153,infrastructure,"Script","JavaScript",6,Medium,infrastructure,,"user",3.83,4.59,7.8,120,936
+"scripts/fix-clay-rankings-v2.js","fix-clay-rankings-v2.js",254,infrastructure,"Script","JavaScript",2,Simple,infrastructure,,"user",5.08,6.1,10.36,120,1243.2
+"scripts/fix-clay-rankings.js","fix-clay-rankings.js",189,infrastructure,"Script","JavaScript",2,Simple,infrastructure,,"user",3.78,4.54,7.71,120,925.2
+"scripts/fix_all_tbd_issues.js","fix_all_tbd_issues.js",215,infrastructure,"Script","JavaScript",4,Medium,infrastructure,,"user",5.38,6.45,10.97,120,1316.4
+"scripts/fix_clay_ppr_conversion.js","fix_clay_ppr_conversion.js",136,infrastructure,"Script","JavaScript",4,Medium,infrastructure,,"user",3.4,4.08,6.94,120,832.8
+"scripts/fix_data_structure_issues.js","fix_data_structure_issues.js",152,infrastructure,"Script","JavaScript",4,Medium,infrastructure,,"user",3.8,4.56,7.75,120,930
+"scripts/fix_receptions_targets_validation.js","fix_receptions_targets_validation.js",103,infrastructure,"Script","JavaScript",3,Simple,infrastructure,,"user",2.06,2.47,4.2,120,504
+"scripts/generate-blur-placeholder.js","generate-blur-placeholder.js",40,infrastructure,"Script","JavaScript",3,Simple,infrastructure,,"user",0.8,0.96,1.63,120,195.6
+"scripts/generate-currency-icons.js","generate-currency-icons.js",177,infrastructure,"Script","JavaScript",4,Medium,infrastructure,,"user",4.43,5.31,9.03,120,1083.6
+"scripts/generate-pwa-icons.js","generate-pwa-icons.js",85,infrastructure,"Script","JavaScript",4,Medium,infrastructure,,"user",2.13,2.55,4.33,120,519.6
+"scripts/generateFullPlayerPool.js","generateFullPlayerPool.js",312,infrastructure,"Script","JavaScript",6,Medium,infrastructure,,"user, player",7.8,9.36,15.91,120,1909.2
+"scripts/generatePlayerPool.js","generatePlayerPool.js",299,infrastructure,"Script","JavaScript",5,Medium,infrastructure,,"user, player",7.48,8.97,15.25,120,1830
+"scripts/generateStaticPlayerData.js","generateStaticPlayerData.js",702,infrastructure,"Script","JavaScript",6,Medium,infrastructure,,"user, player",17.55,21.06,35.8,120,4296
+"scripts/generate_detailed_projections.js","generate_detailed_projections.js",170,infrastructure,"Script","JavaScript",4,Medium,infrastructure,,"user",4.25,5.1,8.67,120,1040.4
+"scripts/image_to_svg.js","image_to_svg.js",102,infrastructure,"Script","JavaScript",3,Simple,infrastructure,,"user",2.04,2.45,4.16,120,499.2
+"scripts/ingest-historical-data.js","ingest-historical-data.js",560,infrastructure,"Script","JavaScript",7,Complex,infrastructure,,"user",21,25.2,42.84,120,5140.8
+"scripts/integrate-all-clay-data.js","integrate-all-clay-data.js",278,infrastructure,"Script","JavaScript",5,Medium,infrastructure,,"user",6.95,8.34,14.18,120,1701.6
+"scripts/integrate_all_sources.js","integrate_all_sources.js",219,infrastructure,"Script","JavaScript",6,Medium,infrastructure,,"user",5.48,6.57,11.17,120,1340.4
+"scripts/integrate_clay_data.js","integrate_clay_data.js",162,infrastructure,"Script","JavaScript",4,Medium,infrastructure,,"user",4.05,4.86,8.26,120,991.2
+"scripts/integrate_extracted_data.js","integrate_extracted_data.js",302,infrastructure,"Script","JavaScript",6,Medium,infrastructure,,"user",7.55,9.06,15.4,120,1848
+"scripts/manage_data.js","manage_data.js",207,infrastructure,"Script","JavaScript",6,Medium,infrastructure,,"user",5.18,6.21,10.56,120,1267.2
+"scripts/measure-dev-hours.js","measure-dev-hours.js",654,infrastructure,"Script","JavaScript",8,Complex,integration,infrastructure,"user",24.53,31.88,54.2,120,6504
+"scripts/merge-amonra-data.js","merge-amonra-data.js",131,infrastructure,"Script","JavaScript",4,Medium,infrastructure,,"user",3.28,3.93,6.68,120,801.6
+"scripts/missing-players-report.js","missing-players-report.js",236,infrastructure,"Script","JavaScript",6,Medium,infrastructure,,"user, player",5.9,7.08,12.04,120,1444.8
+"scripts/optimize-player-images.js","optimize-player-images.js",259,infrastructure,"Script","JavaScript",4,Medium,infrastructure,,"user, player",6.48,7.77,13.21,120,1585.2
+"scripts/optimize-tournament-bg.js","optimize-tournament-bg.js",65,infrastructure,"Script","JavaScript",3,Simple,infrastructure,,"tournament, user",1.3,1.56,2.65,120,318
+"scripts/parseCleanedRankings.js","parseCleanedRankings.js",316,infrastructure,"Script","JavaScript",6,Medium,infrastructure,,"user",7.9,9.48,16.12,120,1934.4
+"scripts/parse_clay_data_with_team.js","parse_clay_data_with_team.js",173,infrastructure,"Script","JavaScript",2,Simple,infrastructure,,"user",3.46,4.15,7.06,120,847.2
+"scripts/parse_clay_final.js","parse_clay_final.js",241,infrastructure,"Script","JavaScript",3,Simple,infrastructure,,"user",4.82,5.78,9.83,120,1179.6
+"scripts/parse_clay_fixed_names.js","parse_clay_fixed_names.js",171,infrastructure,"Script","JavaScript",2,Simple,infrastructure,,"user",3.42,4.1,6.98,120,837.6
+"scripts/parse_clay_projections_2025.js","parse_clay_projections_2025.js",253,infrastructure,"Script","JavaScript",3,Simple,infrastructure,,"user",5.06,6.07,10.32,120,1238.4
+"scripts/parse_clay_simple.js","parse_clay_simple.js",269,infrastructure,"Script","JavaScript",3,Simple,infrastructure,,"user",5.38,6.46,10.98,120,1317.6
+"scripts/parse_falcons_data.js","parse_falcons_data.js",407,infrastructure,"Script","JavaScript",5,Medium,infrastructure,,"user",10.18,12.21,20.76,120,2491.2
+"scripts/parse_mixed_player_data.js","parse_mixed_player_data.js",171,infrastructure,"Script","JavaScript",2,Simple,infrastructure,,"user, player",3.42,4.1,6.98,120,837.6
+"scripts/ppr_conversion_status.js","ppr_conversion_status.js",126,infrastructure,"Script","JavaScript",3,Simple,infrastructure,,"user",2.52,3.02,5.14,120,616.8
+"scripts/process-vecteezy-icons.js","process-vecteezy-icons.js",335,infrastructure,"Script","JavaScript",4,Medium,infrastructure,,"user",8.38,10.05,17.08,120,2049.6
+"scripts/remove_all_clay_projections.js","remove_all_clay_projections.js",100,infrastructure,"Script","JavaScript",2,Simple,infrastructure,,"user",2,2.4,4.08,120,489.6
+"scripts/remove_clay_projections_wr.js","remove_clay_projections_wr.js",96,infrastructure,"Script","JavaScript",2,Simple,infrastructure,,"user",1.92,2.3,3.92,120,470.4
+"scripts/replace-currency-icons.js","replace-currency-icons.js",389,infrastructure,"Script","JavaScript",4,Medium,infrastructure,,"user",9.73,11.67,19.84,120,2380.8
+"scripts/show_database_summary.js","show_database_summary.js",81,infrastructure,"Script","JavaScript",4,Medium,infrastructure,,"user",2.03,2.43,4.13,120,495.6
+"scripts/simple-stats-generator.js","simple-stats-generator.js",167,infrastructure,"Script","JavaScript",4,Medium,infrastructure,,"user",4.18,5.01,8.52,120,1022.4
+"scripts/test-clay-pdf.js","test-clay-pdf.js",86,infrastructure,"Script","JavaScript",4,Medium,infrastructure,,"user",2.15,2.58,4.39,120,526.8
+"scripts/test-integration-amonra.js","test-integration-amonra.js",122,infrastructure,"Script","JavaScript",2,Simple,infrastructure,,"user",2.44,2.93,4.98,120,597.6
+"scripts/test-real-clay-pdf.js","test-real-clay-pdf.js",90,infrastructure,"Script","JavaScript",5,Medium,infrastructure,,"user",2.25,2.7,4.59,120,550.8
+"scripts/test-sportsdataio-headshots.js","test-sportsdataio-headshots.js",112,infrastructure,"Script","JavaScript",4,Medium,infrastructure,,"user",2.8,3.36,5.71,120,685.2
+"scripts/test_bijan.js","test_bijan.js",35,infrastructure,"Script","JavaScript",2,Simple,infrastructure,,"user",0.7,0.84,1.43,120,171.6
+"scripts/test_column_mapping.js","test_column_mapping.js",35,infrastructure,"Script","JavaScript",2,Simple,infrastructure,,"user",0.7,0.84,1.43,120,171.6
+"scripts/test_espn_api.js","test_espn_api.js",170,infrastructure,"Script","JavaScript",6,Medium,infrastructure,,"user",4.25,5.1,8.67,120,1040.4
+"scripts/test_updated_espn_api.js","test_updated_espn_api.js",140,infrastructure,"Script","JavaScript",5,Medium,infrastructure,,"user",3.5,4.2,7.14,120,856.8
+"scripts/underdog_api_extractor.js","underdog_api_extractor.js",1,infrastructure,"Script","JavaScript",2,Simple,infrastructure,,"user",0.02,0.02,0.04,120,4.8
+"scripts/update-player-pool-sportsdataio.js","update-player-pool-sportsdataio.js",271,infrastructure,"Script","JavaScript",6,Medium,infrastructure,,"user, player",6.78,8.13,13.82,120,1658.4
+"scripts/update-player-pool-with-database.js","update-player-pool-with-database.js",233,infrastructure,"Script","JavaScript",4,Medium,infrastructure,,"user, player",5.83,6.99,11.88,120,1425.6
+"scripts/update-player-pool-with-images.js","update-player-pool-with-images.js",141,infrastructure,"Script","JavaScript",4,Medium,infrastructure,,"user, player",3.53,4.23,7.19,120,862.8
+"scripts/update-static-stats-with-database.js","update-static-stats-with-database.js",275,infrastructure,"Script","JavaScript",4,Medium,infrastructure,,"user",6.88,8.25,14.03,120,1683.6
+"scripts/update_clay_projections.js","update_clay_projections.js",180,infrastructure,"Script","JavaScript",5,Medium,infrastructure,,"user",4.5,5.4,9.18,120,1101.6
+"scripts/update_draftkings_approach.js","update_draftkings_approach.js",141,infrastructure,"Script","JavaScript",4,Medium,infrastructure,,"draft, user",3.53,4.23,7.19,120,862.8
+"scripts/validate-currency-icons.js","validate-currency-icons.js",314,infrastructure,"Script","JavaScript",6,Medium,infrastructure,,"user",7.85,9.42,16.01,120,1921.2
+"scripts/validate-firestore-rules.js","validate-firestore-rules.js",94,infrastructure,"Script","JavaScript",4,Medium,infrastructure,,"user",2.35,2.82,4.79,120,574.8
+"scripts/validate-historical-data.js","validate-historical-data.js",453,infrastructure,"Script","JavaScript",4,Medium,infrastructure,,"user",11.33,13.59,23.1,120,2772
+"scripts/verify_wr_projections.js","verify_wr_projections.js",108,infrastructure,"Script","JavaScript",2,Simple,infrastructure,,"user",2.16,2.59,4.41,120,529.2
+"styles/device-sizing.css","device-sizing.css",365,frontend,"Style","CSS",4,Medium,feature,,"user",5.84,5.84,9.93,90,893.7
+"styles/globals.css","globals.css",789,frontend,"Style","CSS",5,Medium,feature,,"user",12.62,12.62,21.46,90,1931.4
+"styles/legacy-support.css","legacy-support.css",440,frontend,"Style","CSS",4,Medium,feature,,"legacy, user",7.04,7.04,11.97,90,1077.3
+"next.config.js","next.config.js",170,infrastructure,"Config","JavaScript",7,Complex,infrastructure,,"user",6.38,7.65,13.01,120,1561.2
+"tailwind.config.js","tailwind.config.js",17,infrastructure,"Config","JavaScript",2,Simple,infrastructure,,"user",0.34,0.41,0.69,120,82.8
+"postcss.config.js","postcss.config.js",6,infrastructure,"Config","JavaScript",2,Simple,infrastructure,,"user",0.12,0.14,0.24,120,28.8
+"babel.config.js","babel.config.js",25,infrastructure,"Config","JavaScript",2,Simple,infrastructure,,"user",0.5,0.6,1.02,120,122.4
+"jest.config.js","jest.config.js",4,infrastructure,"Config","JavaScript",2,Simple,infrastructure,,"user",0.08,0.1,0.16,120,19.2
+"tsconfig.json","tsconfig.json",81,fullstack,"Other","Other",2,Simple,feature,,"user",1.18,1.18,2,100,200
+"package.json","package.json",87,fullstack,"Other","Other",6,Medium,infrastructure,,"user",1.58,1.9,3.23,100,323
+"firestore.rules","firestore.rules",10,fullstack,"Other","Other",2,Simple,feature,,"user",0.15,0.15,0.25,100,25
+"firestore.indexes.json","firestore.indexes.json",185,fullstack,"Other","Other",5,Medium,feature,,"user",3.36,3.36,5.72,100,572

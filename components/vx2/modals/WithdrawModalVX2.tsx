@@ -4,13 +4,16 @@
  * 
  * A-Grade Requirements Met:
  * - TypeScript: Full type coverage
- * - Multi-step flow: Amount → Confirm → Code → Success
+ * - Multi-step flow: Amount → Biometric (optional) → Confirm → Processing → Success
  * - Global accessibility (no ID requirements)
  * - Free withdrawals
- * - 6-digit code security
+ * - Biometric authentication option (Face ID / Touch ID)
  * - Constants: All values from VX2 constants
  * - Accessibility: ARIA labels
  * - Icons: Uses VX2 icon library
+ * 
+ * Note: Secondary verification (SMS/email code) is NOT required for withdrawals.
+ * Security is handled by biometric auth (if available) + Stripe Connect verification.
  */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
@@ -18,6 +21,14 @@ import { BG_COLORS, TEXT_COLORS, STATE_COLORS } from '../core/constants/colors';
 import { SPACING, RADIUS, TYPOGRAPHY, Z_INDEX } from '../core/constants/sizes';
 import { Close, ChevronLeft, Plus } from '../components/icons';
 import { formatDollars } from '../utils/formatting';
+import {
+  isPlatformAuthenticatorAvailable,
+  authenticateWithBiometric,
+  getBiometricTypeName,
+} from '../../../lib/webauthn';
+import { createScopedLogger } from '../../../lib/clientLogger';
+
+const logger = createScopedLogger('[WithdrawModal]');
 
 // ============================================================================
 // TYPES
@@ -26,6 +37,10 @@ import { formatDollars } from '../utils/formatting';
 export interface WithdrawModalVX2Props {
   isOpen: boolean;
   onClose: () => void;
+  userId: string;
+  userEmail: string;
+  userBalance?: number;
+  onSuccess?: (payoutId: string, amount: number) => void;
 }
 
 interface PayoutMethod {
@@ -36,7 +51,7 @@ interface PayoutMethod {
   isDefault: boolean;
 }
 
-type WithdrawStep = 'amount' | 'confirm' | 'code' | 'success';
+type WithdrawStep = 'amount' | 'biometric' | 'confirm' | 'processing' | 'success';
 
 // ============================================================================
 // CONSTANTS
@@ -45,14 +60,17 @@ type WithdrawStep = 'amount' | 'confirm' | 'code' | 'success';
 const LIMITS = { minWithdrawal: 10, fee: 0 };
 const QUICK_AMOUNTS = [50, 100, 250, 500];
 
-// Mock data
-const MOCK_BALANCE = 425.00;
-const MOCK_PAYOUT_METHODS: PayoutMethod[] = [
-  { id: 'pp_1', type: 'paypal', label: 'PayPal', detail: 'j***e@email.com', isDefault: true },
-];
-const MOCK_USER_CONTACT = { type: 'email' as const, masked: 'j***e@email.com' };
+// ============================================================================
+// CONNECT STATUS TYPES
+// ============================================================================
 
-const generateMockCode = () => Math.floor(100000 + Math.random() * 900000).toString();
+interface ConnectAccountStatus {
+  hasAccount: boolean;
+  accountId?: string;
+  payoutsEnabled?: boolean;
+  onboardingComplete?: boolean;
+  onboardingUrl?: string;
+}
 
 // ============================================================================
 // ICONS
@@ -299,135 +317,162 @@ function ConfirmStep({ amount, method, onConfirm, onBack, isLoading }: ConfirmSt
           className="w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2"
           style={{ backgroundColor: STATE_COLORS.active, color: '#000', fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}
         >
-          {isLoading ? (<><div className="animate-spin rounded-full h-5 w-5 border-2" style={{ borderColor: '#000 transparent transparent transparent' }} />Sending code...</>) : 'Continue'}
+          {isLoading ? (<><div className="animate-spin rounded-full h-5 w-5 border-2" style={{ borderColor: '#000 transparent transparent transparent' }} />Processing...</>) : 'Confirm Withdrawal'}
         </button>
-        <p className="text-center mt-3" style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>We'll send a confirmation code to verify this withdrawal</p>
       </div>
     </div>
   );
 }
 
 // ============================================================================
-// CODE STEP
+// PROCESSING STEP
 // ============================================================================
 
-interface CodeStepProps {
-  contact: { type: 'email' | 'phone'; masked: string };
-  onVerify: (code: string) => void;
-  onResend: () => void;
-  onBack: () => void;
-  isVerifying: boolean;
+interface ProcessingStepProps {
+  amount: number;
   error: string | null;
-  attemptsRemaining: number;
+  onRetry: () => void;
+  onBack: () => void;
 }
 
-function CodeStep({ contact, onVerify, onResend, onBack, isVerifying, error, attemptsRemaining }: CodeStepProps): React.ReactElement {
-  const [code, setCode] = useState(['', '', '', '', '', '']);
-  const [resendCooldown, setResendCooldown] = useState(60);
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+function ProcessingStep({ amount, error, onRetry, onBack }: ProcessingStepProps): React.ReactElement {
+  return (
+    <div className="flex flex-col h-full">
+      {error && (
+        <div className="px-4 py-3 flex-shrink-0">
+          <button onClick={onBack} className="p-2" aria-label="Back"><ChevronLeft size={24} color={TEXT_COLORS.muted} /></button>
+        </div>
+      )}
 
-  useEffect(() => {
-    if (resendCooldown > 0) {
-      const timer = setTimeout(() => setResendCooldown(r => r - 1), 1000);
-      return () => clearTimeout(timer);
-    }
-    return undefined;
-  }, [resendCooldown]);
+      <div className="flex-1 flex flex-col items-center justify-center px-6">
+        {error ? (
+          <>
+            <div className="w-16 h-16 rounded-full flex items-center justify-center mb-6" style={{ backgroundColor: 'rgba(239, 68, 68, 0.15)' }}>
+              <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke={STATE_COLORS.error} strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </div>
+            <h3 className="font-bold mb-2" style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.xl}px` }}>Withdrawal Failed</h3>
+            <p className="text-center mb-6" style={{ color: STATE_COLORS.error, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>{error}</p>
+            <button
+              onClick={onRetry}
+              className="w-full py-4 rounded-xl font-bold"
+              style={{ backgroundColor: STATE_COLORS.active, color: '#000', fontSize: `${TYPOGRAPHY.fontSize.base}px` }}
+            >
+              Try Again
+            </button>
+          </>
+        ) : (
+          <>
+            <div className="w-16 h-16 rounded-full flex items-center justify-center mb-6" style={{ backgroundColor: 'rgba(96, 165, 250, 0.15)' }}>
+              <div className="animate-spin rounded-full h-8 w-8 border-3" style={{ borderColor: `${STATE_COLORS.active} transparent transparent transparent`, borderWidth: '3px' }} />
+            </div>
+            <h3 className="font-bold mb-2" style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.xl}px` }}>Processing Withdrawal</h3>
+            <p className="text-center" style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+              Sending {formatDollars(amount)} to your account...
+            </p>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
 
-  useEffect(() => {
-    const fullCode = code.join('');
-    if (fullCode.length === 6 && code.every(d => d !== '')) onVerify(fullCode);
-    return undefined;
-  }, [code, onVerify]);
+// ============================================================================
+// BIOMETRIC STEP
+// ============================================================================
 
-  const handleChange = (index: number, value: string) => {
-    const digit = value.replace(/\D/g, '').slice(-1);
-    if (!digit && value) return;
-    const newCode = [...code];
-    newCode[index] = digit;
-    setCode(newCode);
-    if (digit && index < 5) setTimeout(() => inputRefs.current[index + 1]?.focus(), 0);
-  };
+interface BiometricStepProps {
+  isLoading: boolean;
+  error: string | null;
+  onRetry: () => void;
+  onBack: () => void;
+  onSkip: () => void;
+}
 
-  const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
-    if (e.key === 'Backspace' && !code[index] && index > 0) inputRefs.current[index - 1]?.focus();
-  };
-
-  const handlePaste = (e: React.ClipboardEvent) => {
-    e.preventDefault();
-    const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
-    const newCode = [...code];
-    for (let i = 0; i < pastedData.length; i++) newCode[i] = pastedData[i];
-    setCode(newCode);
-    if (pastedData.length === 6) inputRefs.current[5]?.focus();
-  };
-
-  const handleResend = () => { setResendCooldown(60); setCode(['', '', '', '', '', '']); onResend(); inputRefs.current[0]?.focus(); };
-
+function BiometricStep({ isLoading, error, onRetry, onBack, onSkip }: BiometricStepProps): React.ReactElement {
+  const biometricName = getBiometricTypeName();
+  
   return (
     <div className="flex flex-col h-full">
       <div className="px-4 py-3 flex-shrink-0">
-        <button onClick={onBack} className="p-2" aria-label="Back"><ChevronLeft size={24} color={TEXT_COLORS.muted} /></button>
+        <button onClick={onBack} className="p-2" aria-label="Back">
+          <ChevronLeft size={24} color={TEXT_COLORS.muted} />
+        </button>
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center px-6">
-        <div className="w-16 h-16 rounded-full flex items-center justify-center mb-6" style={{ backgroundColor: 'rgba(96, 165, 250, 0.15)' }}>
-          <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke={STATE_COLORS.active} strokeWidth={2}>
-            {contact.type === 'email' ? <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /> : <path strokeLinecap="round" strokeLinejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />}
+        {/* Security Badge */}
+        <div className="flex items-center gap-2 mb-4 px-3 py-1.5 rounded-full" style={{ backgroundColor: 'rgba(96, 165, 250, 0.1)' }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.active} strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+          <span style={{ color: STATE_COLORS.active, fontSize: `${TYPOGRAPHY.fontSize.xs}px`, fontWeight: 500 }}>Security Check</span>
+        </div>
+
+        {/* Face ID Icon */}
+        <div className="w-20 h-20 rounded-full flex items-center justify-center mb-6" style={{ backgroundColor: 'rgba(96, 165, 250, 0.15)' }}>
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.active} strokeWidth="1.5">
+            <path d="M7 3H5C3.89543 3 3 3.89543 3 5V7" strokeLinecap="round"/>
+            <path d="M17 3H19C20.1046 3 21 3.89543 21 5V7" strokeLinecap="round"/>
+            <path d="M7 21H5C3.89543 21 3 20.1046 3 19V17" strokeLinecap="round"/>
+            <path d="M17 21H19C20.1046 21 21 20.1046 21 19V17" strokeLinecap="round"/>
+            <circle cx="9" cy="10" r="1" fill={STATE_COLORS.active}/>
+            <circle cx="15" cy="10" r="1" fill={STATE_COLORS.active}/>
+            <path d="M9 15C9 15 10.5 17 12 17C13.5 17 15 15 15 15" strokeLinecap="round"/>
           </svg>
         </div>
 
-        <h3 className="font-bold mb-2" style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.xl}px` }}>Check your {contact.type}</h3>
-        <p className="text-center mb-8" style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>We sent a 6-digit code to<br /><span style={{ color: TEXT_COLORS.primary }}>{contact.masked}</span></p>
+        <h3 className="font-bold mb-2" style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.xl}px` }}>
+          {isLoading ? 'Authenticating...' : 'Verify Your Identity'}
+        </h3>
+        <p className="text-center mb-6" style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+          {isLoading 
+            ? `Use ${biometricName} or your device passcode to continue`
+            : `For your security, please verify with ${biometricName} or your device passcode`
+          }
+        </p>
 
-        <div className="flex gap-2 mb-6" onPaste={handlePaste}>
-          {code.map((digit, index) => (
-            <input
-              key={index}
-              ref={(el) => { inputRefs.current[index] = el; }}
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              maxLength={1}
-              autoComplete="off"
-              value={digit}
-              onChange={(e) => handleChange(index, e.target.value)}
-              onKeyDown={(e) => handleKeyDown(index, e)}
-              disabled={isVerifying}
-              className="w-12 h-14 text-center font-bold rounded-lg outline-none transition-all"
-              style={{
-                fontSize: `${TYPOGRAPHY.fontSize['2xl']}px`,
-                backgroundColor: 'rgba(255,255,255,0.05)',
-                color: TEXT_COLORS.primary,
-                border: error ? `2px solid ${STATE_COLORS.error}` : digit ? `2px solid ${STATE_COLORS.active}` : '2px solid rgba(255,255,255,0.1)',
-              }}
-            />
-          ))}
-        </div>
+        {isLoading && (
+          <div className="flex items-center gap-3 mb-6">
+            <div className="animate-spin rounded-full h-6 w-6 border-2" style={{ borderColor: `${STATE_COLORS.active} transparent transparent transparent` }} />
+            <span style={{ color: TEXT_COLORS.secondary }}>Waiting for authentication...</span>
+          </div>
+        )}
 
         {error && (
-          <div className="text-center mb-4 px-4 py-2 rounded-lg" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: STATE_COLORS.error, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
-            {error}
-            {attemptsRemaining > 0 && attemptsRemaining < 5 && <span className="block mt-1" style={{ fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>{attemptsRemaining} attempts remaining</span>}
+          <div className="w-full mb-6">
+            <div className="text-center mb-4 px-4 py-3 rounded-lg" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: STATE_COLORS.error, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+              {error}
+            </div>
+            <button
+              onClick={onRetry}
+              className="w-full py-4 rounded-xl font-bold transition-all"
+              style={{ backgroundColor: STATE_COLORS.active, color: '#000', fontSize: `${TYPOGRAPHY.fontSize.base}px` }}
+            >
+              Try Again
+            </button>
           </div>
         )}
 
-        {isVerifying && (
-          <div className="flex items-center gap-2 mb-4">
-            <div className="animate-spin rounded-full h-4 w-4 border-2" style={{ borderColor: `${STATE_COLORS.active} transparent transparent transparent` }} />
-            <span style={{ color: TEXT_COLORS.secondary }}>Verifying...</span>
-          </div>
+        {!isLoading && !error && (
+          <p className="text-center" style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>
+            Your biometric data never leaves your device
+          </p>
         )}
-
-        <div className="text-center">
-          <p style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>Didn't receive it?</p>
-          {resendCooldown > 0 ? (
-            <p style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>Resend in {resendCooldown}s</p>
-          ) : (
-            <button onClick={handleResend} className="font-semibold" style={{ color: STATE_COLORS.active, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>Resend Code</button>
-          )}
-        </div>
       </div>
+      
+      {/* Skip option - only if there's an error */}
+      {error && (
+        <div className="flex-shrink-0 text-center pb-6">
+          <button
+            onClick={onSkip}
+            style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
+          >
+            Continue without biometrics
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -460,78 +505,238 @@ function SuccessStep({ amount, method, onClose }: SuccessStepProps): React.React
 // MAIN COMPONENT
 // ============================================================================
 
-export default function WithdrawModalVX2({ isOpen, onClose }: WithdrawModalVX2Props): React.ReactElement | null {
+export default function WithdrawModalVX2({ 
+  isOpen, 
+  onClose,
+  userId,
+  userEmail,
+  userBalance = 0,
+  onSuccess,
+}: WithdrawModalVX2Props): React.ReactElement | null {
   const [step, setStep] = useState<WithdrawStep>('amount');
   const [amount, setAmount] = useState('');
-  const [selectedMethod, setSelectedMethod] = useState<PayoutMethod | null>(MOCK_PAYOUT_METHODS.find(m => m.isDefault) || null);
+  const [selectedMethod, setSelectedMethod] = useState<PayoutMethod | null>(null);
+  const [payoutMethods, setPayoutMethods] = useState<PayoutMethod[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [codeError, setCodeError] = useState<string | null>(null);
-  const [attemptsRemaining, setAttemptsRemaining] = useState(5);
-  const [mockCode, setMockCode] = useState('');
+  const [processingError, setProcessingError] = useState<string | null>(null);
+  const [biometricAvailable, setBiometricAvailable] = useState(false);
+  const [biometricError, setBiometricError] = useState<string | null>(null);
+  
+  // Connect status
+  const [connectStatus, setConnectStatus] = useState<ConnectAccountStatus | null>(null);
+  const [showConnectOnboarding, setShowConnectOnboarding] = useState(false);
+  const [isCheckingConnect, setIsCheckingConnect] = useState(true);
+  const [payoutId, setPayoutId] = useState<string | null>(null);
+
+  // Check Connect account status on mount
+  useEffect(() => {
+    if (isOpen && userId) {
+      checkConnectStatus();
+    }
+  }, [isOpen, userId]);
+
+  const checkConnectStatus = async () => {
+    setIsCheckingConnect(true);
+    try {
+      const response = await fetch(`/api/stripe/connect/account?userId=${userId}`);
+      const data = await response.json();
+      
+      if (data.success && data.data) {
+        setConnectStatus(data.data);
+        
+        // If Connect is set up, create a placeholder payout method
+        if (data.data.onboardingComplete || data.data.payoutsEnabled) {
+          setPayoutMethods([{
+            id: data.data.accountId || 'connect_account',
+            type: 'bank',
+            label: 'Bank Account',
+            detail: 'Stripe Connect',
+            isDefault: true,
+          }]);
+          setSelectedMethod({
+            id: data.data.accountId || 'connect_account',
+            type: 'bank',
+            label: 'Bank Account',
+            detail: 'Stripe Connect',
+            isDefault: true,
+          });
+        }
+      }
+    } catch (err) {
+      logger.error('Failed to check Connect status', err);
+    } finally {
+      setIsCheckingConnect(false);
+    }
+  };
+
+  // Check if biometrics are available on mount
+  useEffect(() => {
+    async function checkBiometrics() {
+      const available = await isPlatformAuthenticatorAvailable();
+      setBiometricAvailable(available);
+    }
+    checkBiometrics();
+  }, []);
 
   useEffect(() => {
     if (!isOpen) {
       setStep('amount');
       setAmount('');
-      setSelectedMethod(MOCK_PAYOUT_METHODS.find(m => m.isDefault) || null);
+      setSelectedMethod(null);
       setIsLoading(false);
-      setIsVerifying(false);
-      setCodeError(null);
-      setAttemptsRemaining(5);
+      setProcessingError(null);
+      setBiometricError(null);
+      setPayoutId(null);
     }
   }, [isOpen]);
 
-  const handleContinueToConfirm = useCallback(() => setStep('confirm'), []);
+  // Handle continue from amount - check if Connect is set up first
+  const handleContinueToConfirm = useCallback(async () => {
+    // Check if Connect account is set up
+    if (!connectStatus?.onboardingComplete && !connectStatus?.payoutsEnabled) {
+      setShowConnectOnboarding(true);
+      return;
+    }
+    
+    // If biometric is available, require it for security
+    if (biometricAvailable) {
+      setStep('biometric');
+      setIsLoading(true);
+      setBiometricError(null);
+      
+      try {
+        // This triggers Face ID/Touch ID with automatic passcode fallback
+        const result = await authenticateWithBiometric(userId);
+        
+        if (result.success) {
+          setStep('confirm');
+        } else {
+          setBiometricError(result.error || 'Authentication failed');
+          setStep('biometric'); // Stay on biometric step to show error
+        }
+      } catch (err) {
+        setBiometricError('Authentication was cancelled');
+        setStep('biometric');
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      // No biometric required, go directly to confirm
+      setStep('confirm');
+    }
+  }, [biometricAvailable, connectStatus, userId]);
+  
+  // Retry biometric authentication
+  const handleRetryBiometric = useCallback(async () => {
+    setIsLoading(true);
+    setBiometricError(null);
+    
+    try {
+      const result = await authenticateWithBiometric(userId);
+      
+      if (result.success) {
+        setStep('confirm');
+      } else {
+        setBiometricError(result.error || 'Authentication failed');
+      }
+    } catch (err) {
+      setBiometricError('Authentication was cancelled');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [userId]);
 
   const handleConfirm = useCallback(async () => {
-    setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    // Check if modal is still open before setting state (race condition prevention)
+    setStep('processing');
+    setProcessingError(null);
+    
+    // Check if modal is still open before processing (race condition prevention)
     if (!isOpen) return;
-    const code = generateMockCode();
-    setMockCode(code);
-    console.log('Withdrawal confirmation code:', code);
-    setIsLoading(false);
-    setStep('code');
-  }, [isOpen]);
-
-  const handleVerifyCode = useCallback(async (enteredCode: string) => {
-    setIsVerifying(true);
-    setCodeError(null);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    // Check if modal is still open before setting state (race condition prevention)
-    if (!isOpen) return;
-    if (enteredCode === mockCode || enteredCode === '123456') {
-      setIsVerifying(false);
-      setStep('success');
-    } else {
-      setAttemptsRemaining(prev => prev - 1);
-      setCodeError('Incorrect code. Please try again.');
-      setIsVerifying(false);
+    
+    // Process the actual payout directly (no verification code required)
+    try {
+      const amountCents = Math.round(parseFloat(amount) * 100);
+      
+      const response = await fetch('/api/stripe/connect/payout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+          amountCents,
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (data.success && data.data?.payoutId) {
+        setPayoutId(data.data.payoutId);
+        setStep('success');
+        onSuccess?.(data.data.payoutId, amountCents);
+      } else {
+        throw new Error(data.error || 'Payout failed');
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Withdrawal failed';
+      setProcessingError(message);
     }
-  }, [mockCode, isOpen]);
+  }, [isOpen, amount, userId, onSuccess]);
 
-  const handleResendCode = useCallback(async () => {
-    const code = generateMockCode();
-    setMockCode(code);
-    setCodeError(null);
-    setAttemptsRemaining(5);
-    console.log('New withdrawal confirmation code:', code);
+  const handleRetryWithdrawal = useCallback(() => {
+    setProcessingError(null);
+    setStep('confirm');
+  }, []);
+  
+  // Handle Connect onboarding completion
+  const handleConnectComplete = useCallback(() => {
+    setShowConnectOnboarding(false);
+    checkConnectStatus();
   }, []);
 
   const handleBack = useCallback(() => {
+    if (step === 'biometric') setStep('amount');
     if (step === 'confirm') setStep('amount');
-    if (step === 'code') setStep('confirm');
+    if (step === 'processing') setStep('confirm');
   }, [step]);
+  
+  // Skip biometric and go directly to confirm
+  const handleSkipBiometric = useCallback(() => {
+    setBiometricError(null);
+    setStep('confirm');
+  }, []);
 
   if (!isOpen) return null;
+  
+  // Show loading while checking Connect status
+  if (isCheckingConnect) {
+    return (
+      <div className="absolute left-0 right-0 bottom-0 flex flex-col items-center justify-center" style={{ top: '60px', backgroundColor: BG_COLORS.secondary, zIndex: Z_INDEX.modal }}>
+        <span className="animate-spin w-8 h-8 border-3 border-white/30 border-t-white rounded-full" style={{ borderWidth: '3px' }} />
+        <p className="mt-4" style={{ color: TEXT_COLORS.secondary }}>Checking payout account...</p>
+      </div>
+    );
+  }
+  
+  // Show Connect onboarding if needed
+  if (showConnectOnboarding) {
+    // Import dynamically to avoid circular deps
+    const ConnectOnboardingModalVX2 = require('./ConnectOnboardingModalVX2').default;
+    return (
+      <ConnectOnboardingModalVX2
+        isOpen={true}
+        onClose={() => setShowConnectOnboarding(false)}
+        userId={userId}
+        userEmail={userEmail}
+        onComplete={handleConnectComplete}
+      />
+    );
+  }
 
   return (
     <div className="absolute left-0 right-0 bottom-0 flex flex-col" style={{ top: '60px', backgroundColor: BG_COLORS.secondary, zIndex: Z_INDEX.modal }}>
-      {step === 'amount' && <AmountStep balance={MOCK_BALANCE} amount={amount} setAmount={setAmount} selectedMethod={selectedMethod} setSelectedMethod={setSelectedMethod} payoutMethods={MOCK_PAYOUT_METHODS} onContinue={handleContinueToConfirm} onClose={onClose} />}
+      {step === 'amount' && <AmountStep balance={userBalance} amount={amount} setAmount={setAmount} selectedMethod={selectedMethod} setSelectedMethod={setSelectedMethod} payoutMethods={payoutMethods} onContinue={handleContinueToConfirm} onClose={onClose} />}
+      {step === 'biometric' && <BiometricStep isLoading={isLoading} error={biometricError} onRetry={handleRetryBiometric} onBack={handleBack} onSkip={handleSkipBiometric} />}
       {step === 'confirm' && selectedMethod && <ConfirmStep amount={parseFloat(amount)} method={selectedMethod} onConfirm={handleConfirm} onBack={handleBack} isLoading={isLoading} />}
-      {step === 'code' && <CodeStep contact={MOCK_USER_CONTACT} onVerify={handleVerifyCode} onResend={handleResendCode} onBack={handleBack} isVerifying={isVerifying} error={codeError} attemptsRemaining={attemptsRemaining} />}
+      {step === 'processing' && <ProcessingStep amount={parseFloat(amount)} error={processingError} onRetry={handleRetryWithdrawal} onBack={handleBack} />}
       {step === 'success' && selectedMethod && <SuccessStep amount={parseFloat(amount)} method={selectedMethod} onClose={onClose} />}
     </div>
   );

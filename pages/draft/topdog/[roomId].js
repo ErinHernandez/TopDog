@@ -17,7 +17,7 @@ import PicksAwayCalendar from '../../../components/PicksAwayCalendar';
 import { getCustomPlayerRanking, loadCustomRankings } from '../../../lib/customRankings';
 // Static player stats data (pre-downloaded)
 import { getPlayerStats, hasPlayerStats, getStatsMetadata } from '../../../lib/staticPlayerStats';
-import { createPositionGradient, createQueueGradient, createPickedPlayerGradient } from '../../../lib/gradientUtils';
+import { createPositionGradient, createQueueGradient, createPickedPlayerGradient, getPositionEndColor } from '../../../lib/gradientUtils';
 import RippleEffect from '../../../components/draft/v3/mobile/apple/components/RippleEffect';
 import DraftNavbar from '../../../components/draft/v2/ui/DraftNavbar';
 import { POSITION_COLORS, FLEX_POSITIONS } from '../../../components/draft/v3/constants/positions';
@@ -506,17 +506,29 @@ export default function DraftRoom() {
     const stored = localStorage.getItem('draftRankings');
     console.log('Loading rankings from localStorage:', stored);
     if (stored) {
-      const parsedRankings = JSON.parse(stored);
-      console.log('Parsed rankings:', parsedRankings);
-      setRankings(parsedRankings);
-      
-      if (parsedRankings.length > 0) {
+      try {
+        const parsedRankings = JSON.parse(stored);
+        console.log('Parsed rankings:', parsedRankings);
+        if (Array.isArray(parsedRankings)) {
+          setRankings(parsedRankings);
+          
+          if (parsedRankings.length > 0) {
         // If custom rankings exist, use them for sorting
         console.log('Setting sortBy to rankings');
         setSortBy('rankings');
       } else {
-        // If no custom rankings, use ADP
-        console.log('Setting sortBy to adp');
+            // If no custom rankings, use ADP
+            console.log('Setting sortBy to adp');
+            setSortBy('adp');
+          }
+        } else {
+          console.warn('Invalid rankings data in localStorage, not an array');
+          setRankings([]);
+          setSortBy('adp');
+        }
+      } catch (error) {
+        console.error('Error parsing rankings from localStorage:', error);
+        setRankings([]);
         setSortBy('adp');
       }
     } else {
@@ -633,7 +645,7 @@ export default function DraftRoom() {
 
   const handleRankingsUpload = (e) => {
     e.preventDefault();
-    const lines = rankingsText
+    const lines = (rankingsText || '')
       .split(/\n|,/)
       .map(l => l.trim())
       .filter(Boolean);
@@ -1739,23 +1751,13 @@ export default function DraftRoom() {
       return false;
     }
     
-    const matchesSearch = player.name.toLowerCase().includes(playerSearch.toLowerCase()) ||
-                         player.team.toLowerCase().includes(playerSearch.toLowerCase());
-    // Debug logging for search filtering
-    if (!matchesSearch && playerSearch) {
-      console.log(`[SEARCH FILTER] Player ${player.name} (${player.team}) filtered out by search term: "${playerSearch}"`);
-    }
+    // Cache toLowerCase() result for playerSearch to avoid repeated calls
+    const playerSearchLower = playerSearch.toLowerCase();
+    const matchesSearch = (player.name?.toLowerCase() || '').includes(playerSearchLower) ||
+                         (player.team?.toLowerCase() || '').includes(playerSearchLower);
     // Safeguard: if no position filters are selected, show all players
     const effectivePositionFilters = positionFilters.length === 0 ? ['ALL'] : positionFilters;
     const matchesPosition = effectivePositionFilters.includes('ALL') || effectivePositionFilters.includes(player.position);
-    // Debug logging for position filtering
-    if (!matchesPosition) {
-      console.log(`[POSITION FILTER] Player ${player.name} (${player.position}) filtered out. Current filters:`, positionFilters, 'Effective filters:', effectivePositionFilters);
-    }
-    // Debug logging for all players to see what&apos;s happening
-    if (player.name && player.name.includes('Josh Allen')) {
-      console.log(`[DEBUG] Josh Allen - position: ${player.position}, filters: ${positionFilters}, effective filters: ${effectivePositionFilters}, includes ALL: ${effectivePositionFilters.includes('ALL')}, includes position: ${effectivePositionFilters.includes(player.position)}, matchesPosition: ${matchesPosition}`);
-    }
     return matchesSearch && matchesPosition;
   }).sort((a, b) => {
     if (sortBy === 'adp') {
@@ -1764,8 +1766,10 @@ export default function DraftRoom() {
       return adpSortDirection === 'asc' ? adpA - adpB : adpB - adpA;
     } else if (sortBy === 'rankings') {
       // Convert -1 (not found) to 9999 for unranked players
-      const aRank = customRankings.indexOf(a.name) !== -1 ? customRankings.indexOf(a.name) : 9999;
-      const bRank = customRankings.indexOf(b.name) !== -1 ? customRankings.indexOf(b.name) : 9999;
+      const aIndex = customRankings.indexOf(a.name);
+      const aRank = aIndex !== -1 ? aIndex : 9999;
+      const bIndex = customRankings.indexOf(b.name);
+      const bRank = bIndex !== -1 ? bIndex : 9999;
       
       // If both players have ranks (including 9999 for unranked), sort by rank
       if (aRank !== bRank) {
@@ -2509,10 +2513,10 @@ export default function DraftRoom() {
                     {(() => {
                       if (isOnTheClock) {
                         // Always show static username, never "Your Turn"
-                        const cleanUsername = staticUsername.replace(/[,\s]/g, '').toUpperCase().substring(0, 18);
+                        const cleanUsername = (staticUsername || '').replace(/[,\s]/g, '').toUpperCase().substring(0, 18);
                         return cleanUsername;
                       } else {
-                        const cleanUsername = staticUsername.replace(/[,\s]/g, '').toUpperCase().substring(0, 18);
+                        const cleanUsername = (staticUsername || '').replace(/[,\s]/g, '').toUpperCase().substring(0, 18);
                         return cleanUsername;
                       }
                     })()}
@@ -2719,7 +2723,7 @@ export default function DraftRoom() {
                     const mockDrafterNames = room?.mockDrafters || [];
                     const isMockDrafter = mockDrafterNames.includes(currentPicker);
                     
-                    const cleanPicker = currentPicker.replace(/[,\s]/g, '').toUpperCase().substring(0, 18);
+                    const cleanPicker = (currentPicker || '').replace(/[,\s]/g, '').toUpperCase().substring(0, 18);
                     return cleanPicker;
                   })() : 'Get Ready!'}
                 </div>
@@ -3356,7 +3360,7 @@ export default function DraftRoom() {
                 >
                   <div>
                     <h2 className="font-bold" style={{ color: 'white', fontSize: '16px' }}>
-                      {selectedTeam.replace(/[,\s]/g, '').toUpperCase().substring(0, 18)}
+                      {(selectedTeam || '').replace(/[,\s]/g, '').toUpperCase().substring(0, 18)}
                     </h2>
 
                   </div>
@@ -3376,7 +3380,7 @@ export default function DraftRoom() {
                           selectedTeam === team ? 'bg-[#3c3c3c] text-[#c7c7c7]' : 'text-gray-300'
                         }`}
                       >
-                        <div className="font-medium" style={{ fontSize: '20px' }}>{team.replace(/[,\s]/g, '').toUpperCase().substring(0, 18)}</div>
+                        <div className="font-medium" style={{ fontSize: '20px' }}>{(team || '').replace(/[,\s]/g, '').toUpperCase().substring(0, 18)}</div>
                         <div className="text-xs opacity-75">
                           
                         </div>

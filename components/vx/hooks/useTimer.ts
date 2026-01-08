@@ -71,7 +71,7 @@ export default function useTimer({
   // Timer effect
   useEffect(() => {
     if (isRunning && time > 0) {
-      intervalRef.current = setInterval(() => {
+      const intervalId = setInterval(() => {
         setTime(prevTime => {
           const newTime = prevTime - 1;
           onTickRef.current?.(newTime);
@@ -86,11 +86,13 @@ export default function useTimer({
           return newTime;
         });
       }, interval);
+      intervalRef.current = intervalId;
     }
 
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
+        intervalRef.current = null;
       }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps -- time excluded to avoid resetting interval on each tick

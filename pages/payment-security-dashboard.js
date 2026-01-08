@@ -2,33 +2,104 @@
 import React, { useState, useEffect } from 'react';
 import PaymentSecurityDashboard from '../components/PaymentSecurityDashboard';
 import { paymentSystem } from '../lib/paymentSystemIntegration';
+import { useAuthContext } from '../components/vx2/auth/context/AuthContext';
+import { getAuth } from 'firebase/auth';
 
 export default function PaymentSecurityDashboardPage() {
   const [systemStatus, setSystemStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { user, isAuthenticated } = useAuthContext();
 
   useEffect(() => {
-    // Check if user has admin access (in production, implement proper auth)
-    const isAdmin = process.env.NODE_ENV === 'development' || 
-                   (typeof window !== 'undefined' && window.location.search.includes('admin=true'));
-    
-    if (!isAdmin) {
-      setError('Access denied. Admin privileges required.');
-      setLoading(false);
-      return;
-    }
+    const checkAdminAccess = async () => {
+      // In development, allow access for testing (but still try to verify)
+      if (process.env.NODE_ENV === 'development') {
+        if (user) {
+          try {
+            const auth = getAuth();
+            const token = await auth.currentUser?.getIdToken();
+            if (token) {
+              const response = await fetch('/api/auth/verify-admin', {
+                headers: {
+                  'Authorization': `Bearer ${token}`,
+                },
+              });
+              
+              if (response.ok) {
+                const data = await response.json();
+                if (data.isAdmin) {
+                  // Admin verified, continue
+                } else {
+                  // In dev, still allow but warn
+                  console.warn('[PaymentSecurityDashboard] User is not admin, but allowing in dev mode');
+                }
+              }
+            }
+          } catch (err) {
+            console.warn('[PaymentSecurityDashboard] Admin check error, allowing in dev mode:', err);
+          }
+        }
+      } else {
+        // Production: strict admin verification required
+        if (!isAuthenticated || !user) {
+          setError('Authentication required. Please sign in.');
+          setLoading(false);
+          return;
+        }
+        
+        try {
+          const auth = getAuth();
+          const token = await auth.currentUser?.getIdToken();
+          
+          if (!token) {
+            setError('Authentication token required.');
+            setLoading(false);
+            return;
+          }
+          
+          const response = await fetch('/api/auth/verify-admin', {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+          });
+          
+          if (!response.ok) {
+            const data = await response.json();
+            setError(data.error || 'Access denied. Admin privileges required.');
+            setLoading(false);
+            return;
+          }
+          
+          const data = await response.json();
+          if (!data.isAdmin) {
+            setError('Access denied. Admin privileges required.');
+            setLoading(false);
+            return;
+          }
+          
+          // Admin verified, continue
+        } catch (err) {
+          console.error('[PaymentSecurityDashboard] Admin verification error:', err);
+          setError('Failed to verify admin access. Please try again.');
+          setLoading(false);
+          return;
+        }
+      }
 
-    // Initialize system status
-    try {
-      const status = paymentSystem.getSystemStatus();
-      setSystemStatus(status);
-      setLoading(false);
-    } catch (err) {
-      setError('Failed to load payment system status');
-      setLoading(false);
-    }
-  }, []);
+      // Initialize system status
+      try {
+        const status = paymentSystem.getSystemStatus();
+        setSystemStatus(status);
+        setLoading(false);
+      } catch (err) {
+        setError('Failed to load payment system status');
+        setLoading(false);
+      }
+    };
+    
+    checkAdminAccess();
+  }, [user, isAuthenticated]);
 
   if (loading) {
     return (

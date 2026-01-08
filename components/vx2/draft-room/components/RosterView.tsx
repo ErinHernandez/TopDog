@@ -23,6 +23,9 @@ import PlayerExpandedCard from './PlayerExpandedCard';
 import { useImageShare } from '../hooks/useImageShare';
 import { Share } from '../../components/icons/actions/Share';
 import ShareOptionsModal from './ShareOptionsModal';
+import { createScopedLogger } from '../../../../lib/clientLogger';
+
+const logger = createScopedLogger('[RosterView]');
 
 // ============================================================================
 // PIXEL-PERFECT CONSTANTS (matched from VX RosterPanelVX.tsx)
@@ -601,10 +604,10 @@ export default function RosterView({
   // Image share hook
   const { captureAndShare, isCapturing } = useImageShare({
     onSuccess: (method) => {
-      console.log(`[RosterView] Share successful via ${method}`);
+      logger.debug('Share successful', { method });
     },
     onError: (error) => {
-      console.error('[RosterView] Share failed:', error);
+      logger.error('Share failed', error instanceof Error ? error : new Error(String(error)));
     },
   });
   

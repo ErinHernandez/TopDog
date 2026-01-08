@@ -11,6 +11,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { useFirebaseTeams } from '../../../../lib/config/featureFlags';
+import { useMyTeamsWithFirebase } from './useMyTeams.firebase';
 
 // ============================================================================
 // TYPES
@@ -59,6 +61,16 @@ export interface MyTeam {
   totalTeams?: number;
   /** Total projected points */
   projectedPoints: number;
+  /** Actual points scored (if available) */
+  pointsScored?: number;
+  /** Projected points for this week */
+  projectedPointsThisWeek?: number;
+  /** Projected points for rest of season */
+  projectedPointsRestOfSeason?: number;
+  /** Last week's score */
+  lastWeekScore?: number;
+  /** Last 4 weeks average score */
+  last4WeeksScore?: number;
   /** Draft completion date */
   draftedAt: string;
   /** All players on roster */
@@ -302,8 +314,17 @@ async function fetchMyTeams(): Promise<MyTeam[]> {
 
 /**
  * Hook for fetching and managing user's teams
+ * 
+ * Uses feature flag to toggle between mock data (default) and Firebase.
+ * Set useFirebaseTeams: true in lib/tournamentConfig.js to enable Firebase.
  */
 export function useMyTeams(): UseMyTeamsResult {
+  // Check feature flag - if Firebase is enabled, use Firebase hook
+  if (useFirebaseTeams) {
+    return useMyTeamsWithFirebase();
+  }
+
+  // Default: Use mock data (existing implementation below)
   const [teams, setTeams] = useState<MyTeam[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefetching, setIsRefetching] = useState(false);

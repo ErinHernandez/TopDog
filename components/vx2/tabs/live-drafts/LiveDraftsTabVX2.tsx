@@ -32,6 +32,7 @@ import {
   EmptyState, 
   ErrorState,
 } from '../../components/shared';
+import { List } from '../../components/icons';
 
 // ============================================================================
 // CONSTANTS
@@ -441,7 +442,7 @@ export default function LiveDraftsTabVX2({
     onJoinDraft?.();
   }, [onJoinDraft]);
   
-  // Filter drafts by type (for now, all drafts are live - slow drafts will be added later)
+  // Filter drafts by type - must be before any early returns (Rules of Hooks)
   const filteredDrafts = useMemo(() => {
     if (draftType === 'slow') {
       // Return empty array for now - slow drafts will be implemented later
@@ -449,6 +450,8 @@ export default function LiveDraftsTabVX2({
     }
     return drafts;
   }, [drafts, draftType]);
+  
+  // Note: Auth check removed - AuthGateVX2 ensures only logged-in users can access tabs
   
   // Loading State
   if (isLoading) {
