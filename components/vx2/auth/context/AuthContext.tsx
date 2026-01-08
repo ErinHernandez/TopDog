@@ -262,15 +262,14 @@ export function AuthProvider({
   onAuthStateChange,
 }: AuthProviderProps): React.ReactElement {
   // Build-time detection: return children without auth initialization
+  // IMPORTANT: Keep this in sync with useAuthContext detection logic
   const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build' || 
                        process.env.NEXT_PHASE === 'phase-export';
   const isSSR = typeof window === 'undefined';
   
-  // Vercel-specific build detection
-  const isVercelBuild = process.env.VERCEL === '1' && 
-                        (process.env.VERCEL_ENV === 'production' || 
-                         process.env.VERCEL_ENV === 'preview' ||
-                         !process.env.VERCEL_ENV); // During build, VERCEL_ENV may not be set yet
+  // Vercel-specific build detection - simplified to match useAuthContext
+  // VERCEL=1 is always set during Vercel builds, regardless of VERCEL_ENV
+  const isVercelBuild = process.env.VERCEL === '1';
   
   if (isBuildPhase || isSSR || isVercelBuild) {
     // During build or SSR, return children without auth context
@@ -960,8 +959,7 @@ export function useAuthContext(): AuthContextValue {
   const isPrerender = isSSR && (process.env.NODE_ENV === 'production' || process.env.NEXT_PHASE);
   
   // Vercel-specific build detection
-  // Vercel sets VERCEL=1 and VERCEL_ENV during builds
-  // During build, VERCEL_ENV may not be set yet, so check for VERCEL=1 alone
+  // Vercel sets VERCEL=1 during builds - simplified check to match AuthProvider
   const isVercelBuild = process.env.VERCEL === '1';
   
   // Check if we're in a build/prerender/SSR environment BEFORE accessing context
