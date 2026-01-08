@@ -950,8 +950,8 @@ function createBuildTimeSafeDefaults(): AuthContextValue {
  * @throws Error if used outside of AuthProvider (except during build phase)
  */
 export function useAuthContext(): AuthContextValue {
-  const context = React.useContext(AuthContext);
-  
+  // CRITICAL: Check for build/prerender phase BEFORE calling useContext
+  // This prevents any evaluation of the context during build time
   // Build-time detection: return safe defaults during build/prerender
   // Check multiple conditions to catch all build/prerender scenarios
   const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build' || 
@@ -961,10 +961,20 @@ export function useAuthContext(): AuthContextValue {
   
   // Vercel-specific build detection
   // Vercel sets VERCEL=1 and VERCEL_ENV during builds
-  const isVercelBuild = process.env.VERCEL === '1' && 
-                        (process.env.VERCEL_ENV === 'production' || 
-                         process.env.VERCEL_ENV === 'preview' ||
-                         !process.env.VERCEL_ENV); // During build, VERCEL_ENV may not be set yet
+  // During build, VERCEL_ENV may not be set yet, so check for VERCEL=1 alone
+  const isVercelBuild = process.env.VERCEL === '1';
+  
+  // Check if we're in a build/prerender/SSR environment BEFORE accessing context
+  const isBuildOrSSR = isBuildPhase || isPrerender || isSSR || isVercelBuild;
+  
+  // If we're in any build/SSR scenario OR window doesn't exist, return safe defaults immediately
+  // This prevents useContext from being called during build/prerender
+  if (isBuildOrSSR || typeof window === 'undefined') {
+    return createBuildTimeSafeDefaults();
+  }
+  
+  // Only call useContext if we're confirmed to be in client-side runtime
+  const context = React.useContext(AuthContext);
   
   // If no context is available, check if we're in a safe environment to return defaults
   if (!context) {
@@ -972,11 +982,8 @@ export function useAuthContext(): AuthContextValue {
     // Only throw errors if we're 100% certain we're in client-side runtime with window available
     // This prevents ANY build failures from useAuthContext calls
     
-    // Check if we're in a build/prerender/SSR environment
-    const isBuildOrSSR = isBuildPhase || isPrerender || isSSR || isVercelBuild;
-    
-    // If we're in any build/SSR scenario OR window doesn't exist, return safe defaults
-    if (isBuildOrSSR || typeof window === 'undefined') {
+    // Double-check build conditions (shouldn't be needed since we checked above, but extra safety)
+    if (typeof window === 'undefined' || isBuildOrSSR) {
       return createBuildTimeSafeDefaults();
     }
     
