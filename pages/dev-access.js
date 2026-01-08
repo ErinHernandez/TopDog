@@ -16,6 +16,12 @@ export const config = {
   runtime: 'nodejs',
 };
 
+// Force dynamic rendering - prevent any static analysis or prerendering
+export const dynamic = 'force-dynamic';
+
+// Disable static optimization
+export const revalidate = 0;
+
 // Lazy load Firebase auth to avoid build-time evaluation
 // This function is only called on the client side
 const getAuth = () => {
