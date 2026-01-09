@@ -22,6 +22,7 @@
 import React, { useCallback } from 'react';
 import { useRouter } from 'next/router';
 import { useUser } from '../../hooks/data';
+import { useAuth } from '../../auth';
 import { useModals } from '../../shell/AppShellVX2';
 import { BG_COLORS, TEXT_COLORS, NAVBAR_BLUE } from '../../core/constants/colors';
 import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
@@ -309,6 +310,7 @@ export default function ProfileTabVX2({
 }: ProfileTabVX2Props): React.ReactElement {
   const router = useRouter();
   const { user, isLoading } = useUser();
+  const { profile } = useAuth();
   const modals = useModals();
   
   const handleMenuClick = useCallback((item: MenuItem) => {
@@ -376,7 +378,7 @@ export default function ProfileTabVX2({
                 borderStyle: 'solid',
                 borderColor: PROFILE_COLORS.boxBorder, // Fixed border color (not customizable)
                 borderTopWidth: `${PROFILE_PX.boxTopBorderWidth}px`,
-                backgroundColor: user?.preferences?.cellBackgroundColor || PROFILE_COLORS.boxBg, // Customizable inner area
+                backgroundColor: profile?.preferences?.cellBackgroundColor || PROFILE_COLORS.boxBg, // Customizable inner area
                 borderRadius: `${PROFILE_PX.boxBorderRadius}px`,
                 position: 'relative',
                 display: 'flex',
@@ -408,7 +410,7 @@ export default function ProfileTabVX2({
                   zIndex: 10,
                 }}
               >
-                {user?.username || 'Username'}
+                {profile?.username || 'Username'}
               </div>
               
               {/* Customizable inner area (where player name would go) */}

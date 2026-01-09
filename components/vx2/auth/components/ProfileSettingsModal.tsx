@@ -63,7 +63,7 @@ function ProfileTabContent({ onEditName, onAddEmail, onAddPhone }: ProfileTabCon
   
   // Get inner cell background color from user preferences (default to dark gray)
   // Borders are fixed and not customizable
-  const innerCellColor = profile?.preferences?.cellBackgroundColor || user?.preferences?.cellBackgroundColor || BG_COLORS.tertiary;
+  const innerCellColor = profile?.preferences?.cellBackgroundColor || BG_COLORS.tertiary;
   
   // Fixed border color (not customizable) - matches unpicked player card border in horizontal scrolling pick bar
   const fixedBorderColor = '#6B7280'; // Gray for unpicked cards (CARD_COLORS.otherPick from PicksBar)
