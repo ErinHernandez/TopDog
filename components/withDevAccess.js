@@ -153,6 +153,23 @@ export default function withDevAccess(WrappedComponent, options = {}) {
           return;
         }
         
+        // Check Vercel immediately (before auth check)
+        // This allows immediate access on Vercel without waiting for auth
+        const devToken = typeof window !== 'undefined' 
+          ? sessionStorage.getItem('devAccessToken') 
+          : null;
+        
+        // Check if we have access via Vercel detection or other means
+        const immediateAccess = canAccessDevFeatures(null, devToken, null);
+        if (immediateAccess) {
+          setAccessState({
+            isLoading: false,
+            hasAccess: true,
+            user: null,
+          });
+          return;
+        }
+        
         try {
           const auth = getAuth();
           
@@ -163,19 +180,14 @@ export default function withDevAccess(WrappedComponent, options = {}) {
                 ? sessionStorage.getItem('devAccessToken') 
                 : null;
               
-              if (devToken && canAccessDevFeatures(null, devToken, null)) {
-                setAccessState({
-                  isLoading: false,
-                  hasAccess: true,
-                  user: null,
-                });
-              } else {
-                setAccessState({
-                  isLoading: false,
-                  hasAccess: false,
-                  user: null,
-                });
-              }
+              // Always check canAccessDevFeatures - it will handle Vercel detection
+              const hasAccess = canAccessDevFeatures(null, devToken, null);
+              
+              setAccessState({
+                isLoading: false,
+                hasAccess,
+                user: null,
+              });
               return;
             }
             
