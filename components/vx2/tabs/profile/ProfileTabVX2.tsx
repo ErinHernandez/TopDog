@@ -370,7 +370,12 @@ export default function ProfileTabVX2({
             }}
           >
             <button
-              onClick={() => router.push('/profile-customization')}
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                router.push('/profile-customization');
+              }}
               style={{
                 width: `${PROFILE_PX.boxWidth}px`,
                 height: `${PROFILE_PX.boxHeight}px`,

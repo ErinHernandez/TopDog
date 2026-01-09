@@ -31,7 +31,12 @@
     },
     "superstatic": {
       "path-to-regexp": "6.2.2"
-    }
+    },
+    "uuid": "^11.0.0",
+    "source-map": "^0.7.4",
+    "sourcemap-codec": "npm:@jridgewell/sourcemap-codec@^1.4.15",
+    "rollup-plugin-terser": "npm:@rollup/plugin-terser@^7.0.2",
+    "whatwg-encoding": "npm:@exodus/bytes@^1.0.0"
   },
   "dependencies": {
     "@azure/cognitiveservices-computervision": "^8.2.0",

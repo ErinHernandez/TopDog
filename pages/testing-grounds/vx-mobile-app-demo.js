@@ -10,8 +10,14 @@
  */
 
 import React, { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { MobileAppVXDemo } from '../../components/vx/mobile/app';
+
+// Disable SSR for this legacy component to avoid build errors
+const MobileAppVXDemo = dynamic(
+  () => import('../../components/vx/mobile/app').then(mod => ({ default: mod.MobileAppVXDemo })),
+  { ssr: false }
+);
 
 function VXMobileAppDemo() {
   const [showWarning, setShowWarning] = useState(true);
