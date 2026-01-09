@@ -19,8 +19,8 @@ const {
 
 describe('currencyConfig', () => {
   describe('CURRENCY_CONFIG', () => {
-    it('should have 27 currencies defined', () => {
-      expect(Object.keys(CURRENCY_CONFIG).length).toBe(27);
+    it('should have 54 currencies defined', () => {
+      expect(Object.keys(CURRENCY_CONFIG).length).toBe(54);
     });
 
     it('should have USD defined with correct properties', () => {
@@ -62,9 +62,8 @@ describe('currencyConfig', () => {
       expect(COUNTRY_TO_CURRENCY.DE).toBe('EUR');
     });
 
-    it('should map Japan to undefined (not in our supported list)', () => {
-      // JPY is not in our supported currencies for this implementation
-      expect(COUNTRY_TO_CURRENCY.JP).toBeUndefined();
+    it('should map Japan to JPY', () => {
+      expect(COUNTRY_TO_CURRENCY.JP).toBe('JPY');
     });
   });
 
@@ -184,7 +183,7 @@ describe('currencyConfig', () => {
     it('should return array of currency options', () => {
       const options = getCurrencyOptions();
       expect(Array.isArray(options)).toBe(true);
-      expect(options.length).toBe(27);
+      expect(options.length).toBe(54);
     });
 
     it('should have correct structure for each option', () => {

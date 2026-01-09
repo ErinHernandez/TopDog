@@ -56,9 +56,11 @@ describe('currencyFormatting', () => {
     });
 
     it('should handle zero-decimal currencies', () => {
-      // For KRW, 5000 should display as 5,000 (not 50)
+      // For KRW, 5000 should display as ₩5,000 (not 50)
+      // Intl.NumberFormat formats as "₩5,000" - check for formatted output
       const result = formatSmallestUnit(5000, { currency: 'KRW' });
-      expect(result).toContain('5,000') || expect(result).toContain('5000');
+      expect(result).toMatch(/5[\s,]*000/); // Matches "5,000" or "5 000" (locale-dependent)
+      expect(result).toContain('₩'); // Currency symbol
     });
 
     it('should handle negative amounts', () => {
@@ -92,8 +94,10 @@ describe('currencyFormatting', () => {
     });
 
     it('should handle zero-decimal currencies', () => {
+      // Intl.NumberFormat formats as "₩5,000" - check for formatted output
       const result = formatDisplayAmount(5000, { currency: 'KRW' });
-      expect(result).toContain('5,000') || expect(result).toContain('5000');
+      expect(result).toMatch(/5[\s,]*000/); // Matches "5,000" or "5 000" (locale-dependent)
+      expect(result).toContain('₩'); // Currency symbol
     });
   });
 

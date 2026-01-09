@@ -41,6 +41,8 @@ export interface DraftInfoProps {
   onScrollPositionChange?: (position: number) => void;
   /** Callback when tutorial button is tapped */
   onTutorial?: () => void;
+  /** Callback when exit draft button is tapped */
+  onLeave?: () => void;
 }
 
 // ============================================================================
@@ -118,6 +120,7 @@ export default function DraftInfo({
   initialScrollPosition = 0,
   onScrollPositionChange,
   onTutorial,
+  onLeave,
 }: DraftInfoProps): React.ReactElement {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   
@@ -156,23 +159,42 @@ export default function DraftInfo({
         msOverflowStyle: 'none',
       }}
     >
-      {/* Tutorial Link */}
-      {onTutorial && (
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: INFO_PX.sectionGap }}>
-          <button
-            onClick={onTutorial}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#3B82F6',
-              fontSize: TYPOGRAPHY.fontSize.base,
-              fontWeight: TYPOGRAPHY.fontWeight.medium,
-              cursor: 'pointer',
-              padding: 0,
-            }}
-          >
-            Tutorial
-          </button>
+      {/* Exit Draft and Tutorial Links */}
+      {(onLeave || onTutorial) && (
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: INFO_PX.sectionGap }}>
+          {onLeave && (
+            <button
+              onClick={onLeave}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#3B82F6',
+                fontSize: TYPOGRAPHY.fontSize.base,
+                fontWeight: TYPOGRAPHY.fontWeight.medium,
+                cursor: 'pointer',
+                padding: 0,
+              }}
+            >
+              Exit Draft
+            </button>
+          )}
+          {!onLeave && <div />}
+          {onTutorial && (
+            <button
+              onClick={onTutorial}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#3B82F6',
+                fontSize: TYPOGRAPHY.fontSize.base,
+                fontWeight: TYPOGRAPHY.fontWeight.medium,
+                cursor: 'pointer',
+                padding: 0,
+              }}
+            >
+              Tutorial
+            </button>
+          )}
         </div>
       )}
       

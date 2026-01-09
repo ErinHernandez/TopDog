@@ -1725,7 +1725,7 @@ export default function DraftRoom() {
     .map(p => p.player);
   
   // Get truly available players (not drafted) - MULTIPLE LAYERS OF PROTECTION
-  const trulyAvailablePlayers = PLAYER_POOL.filter(p => {
+  const trulyAvailablePlayersRaw = PLAYER_POOL.filter(p => {
     // Layer 0: Basic object validation
     if (!p || typeof p !== 'object' || typeof p.name !== 'string') {
       console.error(`[FILTER] Invalid player object found in PLAYER_POOL:`, p);
@@ -1745,6 +1745,22 @@ export default function DraftRoom() {
       return false;
     }
     
+    return true;
+  });
+  
+  // Deduplicate trulyAvailablePlayers immediately to prevent propagation of duplicates
+  const seenNames = new Set();
+  const trulyAvailablePlayers = trulyAvailablePlayersRaw.filter(player => {
+    if (!player || typeof player !== 'object' || typeof player.name !== 'string') {
+      return false;
+    }
+    if (seenNames.has(player.name)) {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn(`[FILTER] Duplicate player ${player.name} found in trulyAvailablePlayers, removing`);
+      }
+      return false;
+    }
+    seenNames.add(player.name);
     return true;
   });
   
@@ -1839,13 +1855,15 @@ export default function DraftRoom() {
     console.log('✅ No drafted players found in filtered list');
   }
   
-  // Additional safety check: verify no duplicates
+  // Additional safety check: verify no duplicates (should not happen after earlier deduplication)
   const playerNames = finalFilteredPlayers
     .filter(player => player && typeof player === 'object' && typeof player.name === 'string')
     .map(p => p.name);
   const uniqueNames = new Set(playerNames);
   if (playerNames.length !== uniqueNames.size) {
-    console.warn('⚠️ Duplicate players found in filtered list, removing duplicates');
+    const duplicateCount = playerNames.length - uniqueNames.size;
+    const duplicateNames = playerNames.filter((name, index) => playerNames.indexOf(name) !== index);
+    console.warn(`⚠️ Duplicate players found in filtered list (${duplicateCount} duplicates):`, [...new Set(duplicateNames)].slice(0, 10));
     const seen = new Set();
     finalFilteredPlayers = finalFilteredPlayers.filter(player => {
       // Validate player object before checking
@@ -1859,6 +1877,9 @@ export default function DraftRoom() {
       seen.add(player.name);
       return true;
     });
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[FILTER] Removed ${duplicateCount} duplicate(s) from filtered list. Final count: ${finalFilteredPlayers.length}`);
+    }
   }
   
   if (process.env.NODE_ENV === 'development') {

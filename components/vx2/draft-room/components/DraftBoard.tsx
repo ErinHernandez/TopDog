@@ -24,6 +24,8 @@ import { useImageShare } from '../hooks/useImageShare';
 import { Share } from '../../components/icons/actions/Share';
 import ShareOptionsModal from './ShareOptionsModal';
 import { createScopedLogger } from '../../../../lib/clientLogger';
+import { useCustomizationPreferences } from '../../customization/hooks/useCustomizationPreferences';
+import { generateBackgroundStyle, generateOverlayStyle } from '@/lib/customization/patterns';
 
 const logger = createScopedLogger('[DraftBoard]');
 
@@ -300,6 +302,7 @@ function PickCell({
   isNextUserPick,
 }: PickCellProps): React.ReactElement {
   const { pick, isUserPick, isCurrentPick, pickNumber, round } = pickData;
+  const { preferences } = useCustomizationPreferences();
   
   // Determine cell styling
   const getCellStyle = (): React.CSSProperties => {
@@ -309,6 +312,7 @@ function PickCell({
       margin: BOARD_PX.cellMargin,
       marginTop: round === 1 ? BOARD_PX.firstRowMarginTop : BOARD_PX.cellMargin,
       borderRadius: BOARD_PX.cellBorderRadius,
+      position: 'relative', // Required for absolute positioned overlay
     };
     
     if (pick) {
@@ -322,11 +326,25 @@ function PickCell({
     }
     
     if (isUserPick) {
-      return {
+      // Apply customization for user's unpicked cells
+      const borderColor = preferences?.borderColor || userBorderColor;
+      const baseStyle = {
         ...base,
-        border: `${BOARD_PX.cellBorderWidth}px solid ${userBorderColor}`,
+        border: `${BOARD_PX.cellBorderWidth}px solid ${borderColor}`,
         backgroundColor: 'transparent',
       };
+
+      // Apply background customization (flag or solid color)
+      if (preferences && preferences.backgroundType !== 'none') {
+        const bgStyle = generateBackgroundStyle(
+          preferences.backgroundType,
+          preferences.backgroundFlagCode,
+          preferences.backgroundSolidColor
+        );
+        Object.assign(baseStyle, bgStyle);
+      }
+
+      return baseStyle;
     }
     
     return {
@@ -338,12 +356,27 @@ function PickCell({
   
   return (
     <div style={getCellStyle()}>
+      {/* Overlay layer for user's unpicked cells */}
+      {isUserPick && !pick && preferences?.overlayEnabled && (
+        <div
+          className="absolute inset-0 pointer-events-none z-10"
+          style={generateOverlayStyle(
+            `/customization/images/${preferences.overlayImageId}.svg`,
+            preferences.overlayPattern,
+            preferences.overlaySize,
+            preferences.overlayPattern === 'placement'
+              ? { x: preferences.overlayPositionX ?? 50, y: preferences.overlayPositionY ?? 50 }
+              : undefined
+          )}
+        />
+      )}
       <div
         style={{
           display: 'flex',
           flexDirection: 'column',
           height: BOARD_PX.cellHeight,
           padding: '2px 3px',
+          position: 'relative',
         }}
       >
         {/* Pick number - top left */}

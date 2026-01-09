@@ -14,19 +14,27 @@
 const admin = require('firebase-admin');
 
 // Initialize Firebase Admin if not already initialized
+// Uses FIREBASE_SERVICE_ACCOUNT environment variable (standardized across all firebase-admin usage)
 if (!admin.apps.length) {
-  if (!process.env.FIREBASE_ADMIN_SDK_KEY) {
-    throw new Error('FIREBASE_ADMIN_SDK_KEY environment variable is required for server-side Firebase operations');
-  }
-
   try {
-    const serviceAccount = JSON.parse(process.env.FIREBASE_ADMIN_SDK_KEY);
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-    });
+    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT || '{}');
+    if (serviceAccount.project_id) {
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+      });
+    } else {
+      // Don't throw during build - gracefully handle missing config
+      // This allows the app to build even if service account isn't available
+      if (process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE !== 'phase-production-build') {
+        console.error('FIREBASE_SERVICE_ACCOUNT environment variable is required for server-side Firebase operations');
+      }
+    }
   } catch (error) {
-    console.error('Failed to initialize Firebase Admin:', error);
-    throw new Error('Failed to initialize Firebase Admin SDK');
+    // Don't throw during build - gracefully handle parse errors
+    if (process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE !== 'phase-production-build') {
+      console.error('Failed to initialize Firebase Admin:', error);
+      throw new Error('Failed to initialize Firebase Admin SDK');
+    }
   }
 }
 

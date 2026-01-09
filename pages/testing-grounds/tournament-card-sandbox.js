@@ -18,7 +18,6 @@ import { TournamentCard } from '../../components/vx2/tabs/lobby/TournamentCard';
 import MobilePhoneFrame from '../../components/vx2/shell/MobilePhoneFrame';
 import { DEVICE_PRESETS, BG_COLORS } from '../../components/vx2/core/constants';
 import DevNav from '../../components/dev/DevNav';
-import withDevAccess from '../../components/withDevAccess';
 
 // ============================================================================
 // VIEW MODES
@@ -852,5 +851,4 @@ const styleOverrides = {
   );
 }
 
-// Protect with dev access - requires developer authentication
-export default withDevAccess(TournamentCardSandbox);
+export default TournamentCardSandbox;

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import SevenSegmentCountdown from '../../components/SevenSegmentCountdown';
-import withDevAccess from '../../components/withDevAccess';
 
 function PlayerCardTest() {
   const [draftingTeam, setDraftingTeam] = useState('NEWUSERNAME');
@@ -1380,5 +1379,4 @@ function PlayerCardTest() {
   );
 }
 
-// Protect with dev access - requires developer authentication
-export default withDevAccess(PlayerCardTest);
+export default PlayerCardTest;

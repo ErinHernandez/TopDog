@@ -103,10 +103,6 @@ const nextConfig = {
   // Mark firebase-admin as server-only (not bundled for client)
   // This works for both webpack builds and Turbopack dev mode
   serverExternalPackages: ['firebase-admin'],
-  // Ignore TypeScript errors during build (temp fix for landing page)
-  typescript: {
-    ignoreBuildErrors: true,
-  },
   async redirects() {
     return [
       {

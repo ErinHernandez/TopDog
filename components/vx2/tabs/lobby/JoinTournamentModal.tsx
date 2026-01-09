@@ -23,7 +23,7 @@ import React, { useState } from 'react';
 import { type Tournament, useUser } from '../../hooks/data';
 import { BG_COLORS, TEXT_COLORS } from '../../core/constants/colors';
 import { SPACING, RADIUS, TYPOGRAPHY, Z_INDEX } from '../../core/constants/sizes';
-import { Close, ChevronDown, Plus } from '../../components/icons';
+import { Close, Plus } from '../../components/icons';
 import Switch from '../../../vx/shared/Switch';
 import TournamentRulesModal from '../../../mobile/modals/TournamentRulesModal';
 import { formatCents } from '../../utils/formatting';
@@ -82,7 +82,6 @@ export default function JoinTournamentModal({
   const [numberOfEntries, setNumberOfEntries] = useState(1);
   const [autopilotEnabled, setAutopilotEnabled] = useState(false);
   const [showRulesModal, setShowRulesModal] = useState(false);
-  const [showDetails, setShowDetails] = useState(false);
 
   // Calculated values
   const totalCostCents = tournament.entryFeeCents * numberOfEntries;
@@ -107,7 +106,7 @@ export default function JoinTournamentModal({
         onClick={onClose}
       >
         <div 
-          className="w-80 mx-4"
+          className="w-96 mx-4"
           style={{ 
             backgroundColor: BG_COLORS.secondary,
             borderRadius: `${RADIUS.xl}px`,
@@ -318,7 +317,7 @@ export default function JoinTournamentModal({
             </div>
 
             {/* Total Cost */}
-            <div className="text-center" style={{ marginBottom: `${SPACING.md}px` }}>
+            <div className="text-center" style={{ marginBottom: `${SPACING.sm}px` }}>
               <span style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px`, color: TEXT_COLORS.muted }}>Total: </span>
               <span 
                 style={{ 
@@ -331,53 +330,48 @@ export default function JoinTournamentModal({
               </span>
             </div>
 
-            {/* Tournament Details Toggle */}
-            <button
-              onClick={() => setShowDetails(!showDetails)}
-              className="w-full flex items-center justify-between"
-              style={{
-                padding: `${SPACING.sm}px`,
-                backgroundColor: 'rgba(255,255,255,0.05)',
+            {/* Deposit Button */}
+            <div className="text-center" style={{ marginBottom: `${SPACING.md}px` }}>
+              <button
+                onClick={() => {
+                  modals?.openDeposit();
+                  onClose();
+                }}
+                className="flex items-center justify-center gap-2 font-semibold transition-all mx-auto"
+                style={{
+                  padding: `${SPACING.sm}px ${SPACING.md}px`,
+                  background: WR_BLUE_BG,
+                  borderRadius: `${RADIUS.md}px`,
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
+                  color: '#fff',
+                }}
+              >
+                <Plus size={16} color="#fff" />
+                Deposit Funds
+              </button>
+            </div>
+
+            {/* Tournament Details Section */}
+            <div 
+              id="tournament-details"
+              style={{ 
+                backgroundColor: 'rgba(255,255,255,0.03)',
                 borderRadius: `${RADIUS.sm}px`,
-                border: 'none',
-                cursor: 'pointer',
+                padding: `${SPACING.md}px`,
                 marginBottom: `${SPACING.md}px`,
               }}
-              aria-expanded={showDetails}
-              aria-controls="tournament-details"
             >
-              <span style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px`, color: TEXT_COLORS.secondary }}>
+              {/* Section Header */}
+              <div style={{ 
+                fontSize: `${TYPOGRAPHY.fontSize.sm}px`, 
+                color: TEXT_COLORS.secondary,
+                marginBottom: `${SPACING.sm}px`,
+                fontWeight: '600',
+              }}>
                 Tournament Details
-              </span>
-              <span
-                style={{
-                  transform: showDetails ? 'rotate(180deg)' : 'rotate(0deg)',
-                  transition: 'transform 150ms',
-                  display: 'inline-block',
-                }}
-              >
-                <ChevronDown 
-                  size={16} 
-                  color={TEXT_COLORS.muted} 
-                />
-              </span>
-            </button>
-
-            {/* Collapsible Details */}
-            {showDetails && (
-              <div 
-                id="tournament-details"
-                style={{ 
-                  backgroundColor: 'rgba(255,255,255,0.03)',
-                  borderRadius: `${RADIUS.sm}px`,
-                  padding: `${SPACING.md}px`,
-                  marginBottom: `${SPACING.md}px`,
-                  maxHeight: '200px',
-                  overflowY: 'auto',
-                  scrollbarWidth: 'none',
-                  msOverflowStyle: 'none',
-                }}
-              >
+              </div>
                 {/* Basic Info */}
                 <InfoRow label="Game Type" value="Best Ball" />
                 <InfoRow label="Draft Size" value="12 players" />
@@ -419,8 +413,7 @@ export default function JoinTournamentModal({
                     QB: 1 | RB: 2 | WR: 3 | TE: 1 | FLEX: 1 | BN: 10
                   </div>
                 </div>
-              </div>
-            )}
+            </div>
 
             {/* Info Message */}
             <p 

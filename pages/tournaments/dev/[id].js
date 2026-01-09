@@ -5,8 +5,6 @@ import Link from 'next/link';
 import { db } from '../../../lib/firebase';
 import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { devTournamentTemplates, tournamentStatuses, tournamentFormats } from '../../../lib/tournamentConfig';
-import { canAccessDevFeatures } from '../../../lib/devAuth';
-import DevAccessModal from '../../../components/DevAccessModal';
 
 export default function DevTournamentDetail() {
   const router = useRouter();
@@ -15,35 +13,13 @@ export default function DevTournamentDetail() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState({});
-  const [hasDevAccess, setHasDevAccess] = useState(false);
-  const [showAccessModal, setShowAccessModal] = useState(false);
 
   useEffect(() => {
-    checkDevAccess();
-  }, []);
-
-  useEffect(() => {
-    if (id && hasDevAccess) {
+    if (id) {
       fetchTournament();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps -- fetchTournament is stable
-  }, [id, hasDevAccess]);
-
-  const checkDevAccess = () => {
-    if (typeof window === 'undefined') return;
-    const accessToken = sessionStorage.getItem('devAccessToken');
-    const userId = 'Not Todd Middleton'; // Replace with real user ID in production
-    
-    if (canAccessDevFeatures(userId, accessToken)) {
-      setHasDevAccess(true);
-    } else {
-      setShowAccessModal(true);
-    }
-  };
-
-  const handleAccessGranted = (accessToken) => {
-    setHasDevAccess(true);
-  };
+  }, [id]);
 
   const fetchTournament = async () => {
     try {
@@ -102,39 +78,6 @@ export default function DevTournamentDetail() {
     }
   };
 
-  if (!hasDevAccess) {
-    return (
-      <>
-        <Head>
-          <title>Development Access Required - TopDog.dog</title>
-          <meta name="description" content="Development access required" />
-        </Head>
-        
-        <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-          <div className="text-center">
-            <div className="text-white text-xl mb-4">Development Access Required</div>
-            <div className="text-gray-400 mb-6">You need development access to view this page.</div>
-            <button
-              onClick={() => setShowAccessModal(true)}
-              className="px-6 py-3 rounded-lg font-bold transition-colors"
-              style={{ backgroundColor: '#c4b5fd', color: '#111827' }}
-            >
-              Request Access
-            </button>
-          </div>
-        </div>
-
-        <DevAccessModal
-          open={showAccessModal}
-          onClose={() => {
-            setShowAccessModal(false);
-            router.push('/tournaments/dev');
-          }}
-          onAccessGranted={handleAccessGranted}
-        />
-      </>
-    );
-  }
 
   if (loading) {
     return (

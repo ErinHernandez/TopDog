@@ -13,7 +13,6 @@ import React, { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import DraftRoomVX from '../../components/vx/mobile/draft/DraftRoomVX';
 import IPhoneStatusBar from '../../components/vx2/shell/iPhoneStatusBar';
-import withDevAccess from '../../components/withDevAccess';
 
 function VXMobileDemo() {
   const [showWarning, setShowWarning] = useState(true);
@@ -261,5 +260,4 @@ function VXMobileDemo() {
   );
 }
 
-// Protect with dev access - requires developer authentication
-export default withDevAccess(VXMobileDemo);
+export default VXMobileDemo;

@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link'
 import { useRouter } from 'next/router';
 import { getAuth } from 'firebase/auth';
-import { canAccessDevFeatures } from '../lib/devAuth';
 import { useUser } from '../lib/userContext';
 import { DevLink, DevButton, DevSection, DevText } from '../lib/devLinking';
 
@@ -13,43 +12,11 @@ export default function Navbar() {
   // All hooks must be called before any early returns
   const [showProfileDropdown, setShowProfileDropdown] = useState(false)
   const [showDevDropdown, setShowDevDropdown] = useState(false)
-  const [hasDevAccess, setHasDevAccess] = useState(false)
   const dropdownRef = useRef(null)
   const devDropdownRef = useRef(null)
   const [draftAnimation, setDraftAnimation] = useState({ shouldAnimate: false, isPulsing: false })
   const [hasStartedPulsing, setHasStartedPulsing] = useState(false)
 
-  const checkDevAccess = async () => {
-    const accessToken = sessionStorage.getItem('devAccessToken');
-    const userId = user?.uid || null;
-    
-    // Get Firebase auth token to check custom claims
-    let authToken = null;
-    if (user?.uid) {
-      try {
-        const auth = getAuth();
-        const tokenResult = await auth.currentUser?.getIdTokenResult(true);
-        if (tokenResult) {
-          authToken = tokenResult.claims;
-        }
-      } catch (error) {
-        console.warn('[Navbar] Failed to get auth token for dev access check:', error);
-      }
-    }
-    
-    const hasAccess = canAccessDevFeatures(userId, accessToken, authToken);
-    
-    if (hasAccess) {
-      setHasDevAccess(true);
-    } else {
-      setHasDevAccess(false);
-    }
-  };
-
-  useEffect(() => {
-    checkDevAccess()
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- checkDevAccess is stable, only run when user changes
-  }, [user])
 
   // Listen for draft animation events
   useEffect(() => {
@@ -99,10 +66,8 @@ export default function Navbar() {
     : 'Deposit'
 
   const handleLogoClick = (e) => {
-    if (hasDevAccess) {
-      e.preventDefault();
-      setShowDevDropdown(!showDevDropdown);
-    }
+    e.preventDefault();
+    setShowDevDropdown(!showDevDropdown);
   };
 
   return (
@@ -159,8 +124,8 @@ export default function Navbar() {
                     alt="TopDog.dog Logo" 
                     className="h-12 sm:h-14 md:h-16 lg:h-20 w-auto" 
                     style={{
-                      cursor: hasDevAccess ? 'pointer' : 'default',
-                      filter: hasDevAccess ? 'drop-shadow(0 0 4px rgba(59, 130, 246, 0.5))' : 'none',
+                      cursor: 'pointer',
+                      filter: 'drop-shadow(0 0 4px rgba(59, 130, 246, 0.5))',
                       transition: 'all 0.3s ease',
                       minHeight: '48px',
                       maxHeight: '80px',
@@ -219,7 +184,7 @@ export default function Navbar() {
                 </Link>
                 
                 {/* Dev Dropdown */}
-                {showDevDropdown && hasDevAccess && (
+                {showDevDropdown && (
                   <div className="absolute top-full left-0 mt-2 w-72 sm:w-80 rounded-lg shadow-xl py-2 z-50 max-h-96 overflow-y-auto" style={{ background: 'url(/wr_blue.png) no-repeat center center', backgroundSize: 'cover', border: '2px solid #59c5bf' }}>
                     <div className="px-4 py-2 border-b" style={{ borderColor: '#59c5bf' }}>
                       <h3 className="text-sm font-semibold" style={{ background: 'url(/wr_blue.png) no-repeat center center', backgroundSize: 'cover', WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Development Tools</h3>
@@ -255,9 +220,6 @@ export default function Navbar() {
                         </Link>
                         <Link href="/tournaments/topdog" className="block px-4 py-1 text-xs text-gray-300 hover:bg-[#3c3c3c] hover:text-[#c7c7c7]">
                           TopDog Tournaments
-                        </Link>
-                        <Link href="/leagues" className="block px-4 py-1 text-xs text-gray-300 hover:bg-[#3c3c3c] hover:text-[#c7c7c7]">
-                          Leagues
                         </Link>
                         <Link href="/leaderboard" className="block px-4 py-1 text-xs text-gray-300 hover:bg-[#3c3c3c] hover:text-[#c7c7c7]">
                           Leaderboard
@@ -553,7 +515,7 @@ export default function Navbar() {
                       </div>
 
                       {/* Development Section (if dev access) */}
-                      {hasDevAccess && (
+                      {(
                         <div className="px-4 py-2 zoom-resistant" style={{ position: 'relative', overflow: 'visible' }}>
                           <h4 className="text-xs font-semibold mb-2" style={{ 
                             position: 'relative', 

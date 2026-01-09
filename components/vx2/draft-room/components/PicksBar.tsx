@@ -582,13 +582,37 @@ function PositionTrackerBar({ picks }: { picks: DraftPlayer[] }) {
 function BlankCardStatus({ 
   isCurrent, 
   isUserPick, 
-  picksAway 
+  picksAway,
+  timer
 }: { 
   isCurrent: boolean; 
   isUserPick: boolean; 
   picksAway?: number;
+  timer?: number;
 }) {
   if (isCurrent) {
+    // Show timer instead of "On The Clock" text
+    if (timer !== undefined && timer !== null) {
+      return (
+        <div
+          style={{
+            fontWeight: 700,
+            color: '#FFFFFF',
+            fontSize: 24,
+            lineHeight: 1.2,
+            textAlign: 'center',
+            marginTop: 6,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+          aria-label={`${timer} seconds remaining${isUserPick ? ', your turn' : ''}`}
+          aria-live="polite"
+        >
+          {timer}
+        </div>
+      );
+    }
+    
+    // Fallback to "On The Clock" if timer not available
     return (
       <div
         style={{
@@ -632,6 +656,7 @@ function BlankCardContent({
   isUserPick,
   picksAway,
   participantPicks,
+  timer,
 }: {
   pickNumber: number;
   teamCount: number;
@@ -639,6 +664,7 @@ function BlankCardContent({
   isUserPick: boolean;
   picksAway?: number;
   participantPicks: DraftPlayer[];
+  timer?: number;
 }) {
   return (
     <div
@@ -681,7 +707,8 @@ function BlankCardContent({
         <BlankCardStatus 
           isCurrent={isCurrent} 
           isUserPick={isUserPick} 
-          picksAway={picksAway} 
+          picksAway={picksAway}
+          timer={timer}
         />
       </div>
       
@@ -824,6 +851,7 @@ const BlankCard = React.forwardRef<HTMLDivElement, BlankCardProps>(
               isUserPick={isUserPick}
               picksAway={picksAway}
               participantPicks={participantPicks}
+              timer={timer}
             />
           </div>
         </div>
@@ -863,6 +891,7 @@ const BlankCard = React.forwardRef<HTMLDivElement, BlankCardProps>(
           isUserPick={isUserPick}
           picksAway={picksAway}
           participantPicks={participantPicks}
+          timer={timer}
         />
       </div>
     );
@@ -946,6 +975,18 @@ export default function PicksBar({
     }
     return slots;
   }, [totalPicks, picksMap, teamCount]);
+  
+  // Find the user's next upcoming pick (for picksAway calculation)
+  const nextUserPickNumber = useMemo(() => {
+    if (status !== 'active') return null;
+    for (let i = currentPickNumber + 1; i <= totalPicks; i++) {
+      const participantIndex = getParticipantForPick(i, teamCount);
+      if (participantIndex === userParticipantIndex && !picksMap.has(i)) {
+        return i; // Found the next blank user pick
+      }
+    }
+    return null; // No more user picks remaining
+  }, [currentPickNumber, userParticipantIndex, teamCount, totalPicks, picksMap, status]);
   
   // Track if this is the initial render
   const isInitialRender = useRef(true);
@@ -1054,7 +1095,11 @@ export default function PicksBar({
               );
             }
             
-            const picksAway = isUserPick && !isCurrent ? pickNumber - currentPickNumber : undefined;
+            // Only show picksAway for the user's next upcoming pick, not all future picks
+            const isNextUserPick = pickNumber === nextUserPickNumber;
+            const picksAway = isNextUserPick && !isCurrent && status === 'active' 
+              ? pickNumber - currentPickNumber 
+              : undefined;
             
             return (
               <BlankCard

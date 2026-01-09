@@ -22,6 +22,11 @@ import { useState, useEffect, useCallback } from 'react';
 export type DraftStatus = 'your-turn' | 'waiting' | 'complete' | 'paused';
 
 /**
+ * Draft speed type - fast (30 sec) or slow (longer time per pick)
+ */
+export type DraftSpeed = 'fast' | 'slow';
+
+/**
  * Live draft data structure
  */
 export interface LiveDraft {
@@ -45,6 +50,8 @@ export interface LiveDraft {
   teamCount: number;
   /** When the draft started */
   startedAt?: string;
+  /** Draft speed type */
+  draftSpeed?: DraftSpeed;
 }
 
 /**
@@ -92,6 +99,7 @@ function toRomanNumeral(num: number): string {
 // ============================================================================
 
 const MOCK_DRAFTS: LiveDraft[] = [
+  // Fast drafts (30 sec)
   {
     id: 'draft-1',
     tournamentName: 'TopDog International',
@@ -99,10 +107,11 @@ const MOCK_DRAFTS: LiveDraft[] = [
     pickNumber: 42,
     totalPicks: 216,
     status: 'your-turn',
-    timeLeftSeconds: 45,
+    timeLeftSeconds: 25,
     draftPosition: 3,
     teamCount: 12,
     startedAt: new Date(Date.now() - 1800000).toISOString(), // 30 min ago
+    draftSpeed: 'fast',
   },
   {
     id: 'draft-2',
@@ -114,6 +123,7 @@ const MOCK_DRAFTS: LiveDraft[] = [
     draftPosition: 7,
     teamCount: 12,
     startedAt: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
+    draftSpeed: 'fast',
   },
   {
     id: 'draft-3',
@@ -125,6 +135,45 @@ const MOCK_DRAFTS: LiveDraft[] = [
     draftPosition: 11,
     teamCount: 12,
     startedAt: new Date(Date.now() - 5400000).toISOString(), // 1.5 hours ago
+    draftSpeed: 'fast',
+  },
+  // Slow drafts (for dev purposes)
+  {
+    id: 'slow-draft-1',
+    tournamentName: 'TopDog Premier League',
+    teamName: `The TopDog International   ${toRomanNumeral(4)}`,
+    pickNumber: 15,
+    totalPicks: 216,
+    status: 'your-turn',
+    timeLeftSeconds: 14400, // 4 hours (slow draft)
+    draftPosition: 2,
+    teamCount: 12,
+    startedAt: new Date(Date.now() - 86400000 * 2).toISOString(), // 2 days ago
+    draftSpeed: 'slow',
+  },
+  {
+    id: 'slow-draft-2',
+    tournamentName: 'TopDog Championship',
+    teamName: `The TopDog International   ${toRomanNumeral(5)}`,
+    pickNumber: 38,
+    totalPicks: 216,
+    status: 'waiting',
+    draftPosition: 5,
+    teamCount: 12,
+    startedAt: new Date(Date.now() - 86400000 * 5).toISOString(), // 5 days ago
+    draftSpeed: 'slow',
+  },
+  {
+    id: 'slow-draft-3',
+    tournamentName: 'TopDog Elite Series',
+    teamName: `The TopDog International   ${toRomanNumeral(6)}`,
+    pickNumber: 72,
+    totalPicks: 216,
+    status: 'waiting',
+    draftPosition: 9,
+    teamCount: 12,
+    startedAt: new Date(Date.now() - 86400000 * 7).toISOString(), // 7 days ago
+    draftSpeed: 'slow',
   },
 ];
 

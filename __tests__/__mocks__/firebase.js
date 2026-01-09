@@ -158,46 +158,9 @@ export const mockFirebase = {
   getAuth: jest.fn().mockReturnValue(createMockAuth()),
 };
 
-// Helper to setup Firebase mocks
-export const setupFirebaseMocks = (config = {}) => {
-  const {
-    currentUser = mockUser,
-    firestoreData = {},
-  } = config;
-
-  jest.mock('firebase/app', () => ({
-    initializeApp: mockFirebase.initializeApp,
-    getApps: mockFirebase.getApps,
-  }));
-
-  jest.mock('firebase/firestore', () => ({
-    getFirestore: jest.fn().mockReturnValue(createMockFirestore(firestoreData)),
-    connectFirestoreEmulator: jest.fn(),
-    collection: jest.fn(),
-    doc: jest.fn(),
-    getDoc: jest.fn(),
-    setDoc: jest.fn(),
-    updateDoc: jest.fn(),
-    deleteDoc: jest.fn(),
-    query: jest.fn(),
-    where: jest.fn(),
-    orderBy: jest.fn(),
-    limit: jest.fn(),
-  }));
-
-  jest.mock('firebase/auth', () => ({
-    getAuth: jest.fn().mockReturnValue(createMockAuth(currentUser)),
-    signInWithEmailAndPassword: jest.fn(),
-    signOut: jest.fn(),
-    onAuthStateChanged: jest.fn(),
-    signInAnonymously: jest.fn(),
-  }));
-
-  return {
-    mockFirestore: createMockFirestore(firestoreData),
-    mockAuth: createMockAuth(currentUser),
-  };
-};
+// NOTE: setupFirebaseMocks was removed because it attempted to call jest.mock() inside a function,
+// which violates Jest's requirements (jest.mock() must be at module top level).
+// If dynamic mock setup is needed, test files should call jest.mock() directly with factory functions.
 
 export default {
   mockUser,
@@ -206,5 +169,4 @@ export default {
   createMockFirestore,
   createMockAuth,
   createMockAdminAuth,
-  setupFirebaseMocks,
 };

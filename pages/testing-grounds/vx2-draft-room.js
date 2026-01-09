@@ -12,7 +12,6 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { DraftRoomVX2 } from '../../components/vx2/draft-room';
 import { useIsMobileDevice } from '../../hooks/useIsMobileDevice';
-import withDevAccess from '../../components/withDevAccess';
 
 function VX2DraftRoomPage() {
   const router = useRouter();
@@ -28,6 +27,17 @@ function VX2DraftRoomPage() {
   // Force re-render manually when needed
   const [, forceUpdate] = useState({});
   
+  // Get roomId from query params, fallback to test roomId for testing
+  const roomId = (router.query.roomId && typeof router.query.roomId === 'string' ? router.query.roomId : null) || 'test-room-123';
+  
+  // Get initial pick number and team count from query params
+  const initialPickNumber = router.query.pickNumber 
+    ? parseInt(router.query.pickNumber, 10) 
+    : 1;
+  const teamCount = router.query.teamCount 
+    ? parseInt(router.query.teamCount, 10) 
+    : 12;
+  
   // Check if mobile user is authorized to access draft room
   // (must come from clicking "Join Tournament" which sets the session flag)
   React.useEffect(() => {
@@ -39,17 +49,19 @@ function VX2DraftRoomPage() {
       return;
     }
     
-    // On mobile, check if user came from the app (has session flag)
+    // On mobile, check if user came from the app (has session flag) OR has roomId in query
     if (typeof window === 'undefined') return;
     const cameFromApp = sessionStorage.getItem('topdog_joined_draft');
-    if (!cameFromApp) {
-      // Direct access on mobile - redirect to app demo (lobby)
+    const hasRoomId = router.query.roomId;
+    
+    if (!cameFromApp && !hasRoomId) {
+      // Direct access on mobile without roomId - redirect to app demo (lobby)
       router.replace('/testing-grounds/vx2-mobile-app-demo');
       return;
     }
     
-    // Clear the flag so refreshing the page will redirect
-    if (typeof window !== 'undefined') {
+    // Clear the flag so refreshing the page will redirect (unless roomId is in query)
+    if (typeof window !== 'undefined' && !hasRoomId) {
       sessionStorage.removeItem('topdog_joined_draft');
     }
     setIsAuthorized(true);
@@ -148,11 +160,13 @@ function VX2DraftRoomPage() {
         }}>
           <DraftRoomVX2
             key={draftKey}
-            roomId="test-room-123"
+            roomId={roomId}
             useAbsolutePosition={true}
             onLeave={handleLeaveDraft}
             fastMode={false}
             onDevToolsReady={handleMobileDevToolsReady}
+            initialPickNumber={initialPickNumber}
+            teamCount={teamCount}
           />
         </div>
       </>
@@ -184,11 +198,13 @@ function VX2DraftRoomPage() {
             {/* DraftRoomVX2 renders its own status bar that syncs with navbar background */}
             <DraftRoomVX2
               key={draftKey}
-              roomId="test-room-123"
+              roomId={roomId}
               useAbsolutePosition={true}
               onLeave={handleLeaveDraft}
               fastMode={fastMode}
               onDevToolsReady={handleDevToolsReady}
+              initialPickNumber={initialPickNumber}
+              teamCount={teamCount}
             />
           </div>
 
@@ -364,5 +380,4 @@ function VX2DraftRoomPage() {
   );
 }
 
-// Protect with dev access - requires developer authentication
-export default withDevAccess(VX2DraftRoomPage);
+export default VX2DraftRoomPage;

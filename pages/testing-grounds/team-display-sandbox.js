@@ -8,7 +8,6 @@ import { createTeamGradient } from '@/lib/gradientUtils';
 import { BYE_WEEKS } from '@/lib/nflConstants';
 import { generatePlayerId } from '../../components/vx2/draft-room/utils';
 import * as historicalService from '@/lib/historicalStats/service';
-import withDevAccess from '../../components/withDevAccess';
 
 // ============================================================================
 // PlayerExpandedCardNoDraft - Same as PlayerExpandedCard but without draft button
@@ -854,5 +853,4 @@ function TeamDisplaySandbox() {
   );
 }
 
-// Protect with dev access - requires developer authentication
-export default withDevAccess(TeamDisplaySandbox);
+export default TeamDisplaySandbox;

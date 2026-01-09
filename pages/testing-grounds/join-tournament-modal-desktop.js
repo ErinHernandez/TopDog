@@ -17,7 +17,6 @@ import { SPACING, RADIUS, TYPOGRAPHY, Z_INDEX } from '../../components/vx2/core/
 import { Close, ChevronDown, Plus } from '../../components/vx2/components/icons';
 import Switch from '../../components/vx/shared/Switch';
 import { formatCents } from '../../components/vx2/utils/formatting';
-import withDevAccess from '../../components/withDevAccess';
 
 // ============================================================================
 // CONSTANTS
@@ -630,5 +629,4 @@ function JoinTournamentModalDesktopPage() {
   );
 }
 
-// Protect with dev access - requires developer authentication
-export default withDevAccess(JoinTournamentModalDesktopPage);
+export default JoinTournamentModalDesktopPage;

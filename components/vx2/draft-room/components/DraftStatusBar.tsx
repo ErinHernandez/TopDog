@@ -59,6 +59,8 @@ export const HEADER_HEIGHT = 54; // Combined status bar + timer area
 export interface DraftStatusBarProps {
   /** Timer seconds remaining */
   timerSeconds: number;
+  /** Hide the timer (when it's rendered in the pick card) */
+  hideTimer?: boolean;
   /** Whether it's the current user's turn */
   isUserTurn: boolean;
   /** Callback when grace period ends (after shake animation) */
@@ -76,6 +78,7 @@ export default function DraftStatusBar({
   isUserTurn,
   onGracePeriodEnd,
   onLeave,
+  hideTimer = false,
 }: DraftStatusBarProps): React.ReactElement {
   // Shake animation state
   const [shakeKey, setShakeKey] = useState(0);
@@ -124,9 +127,21 @@ export default function DraftStatusBar({
 
   const backgroundStyle = getBackgroundStyle();
 
+  // Handle click anywhere in safe area to leave draft
+  const handleSafeAreaClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    // The button stops propagation, so if we reach here, the click wasn't on the button
+    // The timer area has pointerEvents: 'none', so clicks pass through to this container
+    // Clicks anywhere else in the safe area will also trigger this handler
+    logger.debug('Safe area clicked - leaving draft');
+    if (onLeave) {
+      onLeave();
+    }
+  };
+
   return (
     <div
       key={shakeKey}
+      onClick={onLeave ? handleSafeAreaClick : undefined}
       style={{
         position: 'relative',
         height: `${HEADER_HEIGHT}px`,
@@ -137,90 +152,42 @@ export default function DraftStatusBar({
         transition: 'background-color 0.15s ease',
         animation: shouldShake ? 'header-shake 0.6s ease-in-out' : 'none',
         transformOrigin: 'center center',
+        cursor: onLeave ? 'pointer' : 'default',
+        WebkitTapHighlightColor: 'transparent',
       }}
       role="banner"
-      aria-label="Draft header"
+      aria-label={onLeave ? "Draft header - tap anywhere to leave draft" : "Draft header"}
     >
-      {/* Centered Timer - large and prominent */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          pointerEvents: 'none', // Allow clicks through to other elements
-          zIndex: 1,
-        }}
-      >
+      {/* Centered Timer - large and prominent (hidden when shown in pick card) */}
+      {!hideTimer && (
         <div
           style={{
-            fontSize: '32px',
-            fontWeight: 700,
-            fontVariantNumeric: 'tabular-nums',
-            color: '#FFFFFF',
-            pointerEvents: 'none',
-          }}
-          aria-label={`${timerSeconds} seconds remaining`}
-          aria-live="polite"
-        >
-          {timerSeconds}
-        </div>
-      </div>
-      
-      {/* Exit Button - positioned in lower-left area */}
-      {onLeave && (
-        <button
-          type="button"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            logger.debug('Exit button clicked');
-            if (onLeave) {
-              onLeave();
-            }
-          }}
-          aria-label="Leave draft"
-          style={{
             position: 'absolute',
-            left: 16,
-            bottom: 4,
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            width: 26,
-            height: 26,
-            borderRadius: 13,
-            background: 'transparent',
-            border: 'none',
-            cursor: 'pointer',
-            WebkitTapHighlightColor: 'transparent',
-            zIndex: 100,
-            pointerEvents: 'auto',
-          }}
-          onTouchStart={(e) => {
-            e.stopPropagation();
+            pointerEvents: 'none', // Allow clicks through to parent container
+            zIndex: 1,
           }}
         >
-          <svg
-            width={18}
-            height={18}
-            viewBox="0 0 24 24"
-            fill="none"
-            style={{ pointerEvents: 'none' }}
+          <div
+            style={{
+              fontSize: '32px',
+              fontWeight: 700,
+              fontVariantNumeric: 'tabular-nums',
+              color: '#FFFFFF',
+              pointerEvents: 'none',
+            }}
+            aria-label={`${timerSeconds} seconds remaining`}
+            aria-live="polite"
           >
-            <path
-              d="M15 19L8 12L15 5"
-              stroke="#FFFFFF"
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
+            {timerSeconds}
+          </div>
+        </div>
       )}
     </div>
   );

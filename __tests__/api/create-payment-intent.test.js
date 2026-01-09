@@ -9,8 +9,7 @@
  * - Error handling
  */
 
-import { createMockRequest, createMockResponse } from '../factories';
-import { createMockStripe, MockStripeError } from '../__mocks__/stripe';
+// Factories and mocks are required in beforeEach after jest.resetModules()
 
 // Mock Stripe
 jest.mock('stripe', () => {
@@ -51,6 +50,9 @@ describe('/api/create-payment-intent', () => {
   let handler;
   let mockStripe;
   let originalEnv;
+  let createMockRequest;
+  let createMockResponse;
+  let MockStripeError;
 
   beforeAll(() => {
     originalEnv = process.env.STRIPE_SECRET_KEY;
@@ -68,8 +70,23 @@ describe('/api/create-payment-intent', () => {
     // Set up environment
     process.env.STRIPE_SECRET_KEY = 'sk_test_12345';
 
+    // Re-require mocks and factories after resetModules() clears the cache
+    // Use jest.requireActual to bypass Jest's module mocking for our mock files
+    const factories = jest.requireActual('../factories');
+    const stripeMocks = jest.requireActual('../__mocks__/stripe');
+    
     // Create mock Stripe instance
-    mockStripe = createMockStripe();
+    const createMockStripeFn = stripeMocks.createMockStripe || (stripeMocks.default && stripeMocks.default.createMockStripe);
+    if (!createMockStripeFn || typeof createMockStripeFn !== 'function') {
+      throw new Error('createMockStripe not found. Available: ' + Object.keys(stripeMocks).join(', '));
+    }
+    mockStripe = createMockStripeFn();
+    
+    // Assign factories and mocks to describe-level variables for use in tests
+    createMockRequest = factories.createMockRequest || (factories.default && factories.default.createMockRequest);
+    createMockResponse = factories.createMockResponse || (factories.default && factories.default.createMockResponse);
+    MockStripeError = stripeMocks.MockStripeError || (stripeMocks.default && stripeMocks.default.MockStripeError);
+    
     const Stripe = require('stripe');
     Stripe.mockImplementation(() => mockStripe);
 

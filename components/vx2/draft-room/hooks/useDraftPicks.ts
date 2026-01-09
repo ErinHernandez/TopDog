@@ -20,16 +20,21 @@
  * ```
  */
 
-import { useState, useCallback, useMemo } from 'react';
-import type { DraftPick, DraftPlayer, Participant, PositionCounts } from '../types';
+import { useState, useCallback, useMemo, useEffect } from 'react';
+import type { DraftPick, DraftPlayer, Participant, PositionCounts, Position } from '../types';
 import { 
   getParticipantForPick, 
   getRoundForPick, 
   getPickInRound,
   createEmptyPositionCounts,
 } from '../utils';
-import { DRAFT_DEFAULTS } from '../constants';
+import { DRAFT_DEFAULTS, DEV_FLAGS } from '../constants';
 import { createScopedLogger } from '../../../../lib/clientLogger';
+import { db } from '../../../../lib/firebase';
+import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { generatePlayerId } from '../utils';
+import { usePlayerPool } from '../../../../lib/playerPool/usePlayerPool';
+import type { PoolPlayer } from '../../../../lib/playerPool/types';
 
 const logger = createScopedLogger('[useDraftPicks]');
 
@@ -48,6 +53,8 @@ export interface UseDraftPicksOptions {
   userParticipantIndex: number;
   /** Callback when a pick is made */
   onPickMade?: (pick: DraftPick) => void;
+  /** Initial picks to populate (for drafts started mid-way) */
+  initialPicks?: DraftPick[];
 }
 
 export interface UseDraftPicksResult {
@@ -102,10 +109,143 @@ export function useDraftPicks({
   currentPickNumber,
   userParticipantIndex,
   onPickMade,
+  initialPicks = [],
 }: UseDraftPicksOptions): UseDraftPicksResult {
-  const [picks, setPicks] = useState<DraftPick[]>([]);
-  const [isLoading] = useState(false);
-  const [error] = useState<string | null>(null);
+  const [picks, setPicks] = useState<DraftPick[]>(initialPicks);
+  const [isLoading, setIsLoading] = useState(!DEV_FLAGS.useMockData); // Loading in production until Firebase loads
+  const [error, setError] = useState<string | null>(null);
+  
+  // Load player pool to convert Firebase player names to DraftPlayer objects
+  const { players: poolPlayers } = usePlayerPool();
+  
+  // Create player lookup map by name
+  const playerMapByName = useMemo(() => {
+    const map = new Map<string, DraftPlayer>();
+    for (const poolPlayer of poolPlayers) {
+      const draftPlayer: DraftPlayer = {
+        id: poolPlayer.id || generatePlayerId(poolPlayer.name),
+        name: poolPlayer.name,
+        position: poolPlayer.position as Position,
+        team: poolPlayer.team,
+        adp: poolPlayer.adp ?? 999,
+        projectedPoints: poolPlayer.projection ?? 0,
+        byeWeek: poolPlayer.byeWeek ?? 0,
+      };
+      map.set(poolPlayer.name, draftPlayer);
+    }
+    return map;
+  }, [poolPlayers]);
+  
+  // Convert Firebase pick data to DraftPick format
+  const convertFirebasePick = useCallback((firebasePick: any, teamCount: number): DraftPick | null => {
+    // Extract player name (Firebase stores as string)
+    let playerName: string;
+    if (typeof firebasePick.player === 'string') {
+      playerName = firebasePick.player;
+    } else if (firebasePick.player?.name) {
+      playerName = firebasePick.player.name;
+    } else {
+      logger.warn('Invalid player data in Firebase pick', { pick: firebasePick });
+      return null;
+    }
+    
+    // Look up player in pool
+    const player = playerMapByName.get(playerName);
+    if (!player) {
+      logger.warn('Player not found in pool', { playerName, pickNumber: firebasePick.pickNumber });
+      return null;
+    }
+    
+    // Find participant index
+    const participantIndex = participants.findIndex(p => 
+      p.id === firebasePick.participantId || 
+      p.name === firebasePick.picker ||
+      p.id === firebasePick.pickerId
+    );
+    
+    if (participantIndex === -1) {
+      logger.warn('Participant not found for pick', { 
+        pickNumber: firebasePick.pickNumber,
+        participantId: firebasePick.participantId,
+        picker: firebasePick.picker
+      });
+      return null;
+    }
+    
+    return {
+      id: firebasePick.id || `pick-${firebasePick.pickNumber}`,
+      pickNumber: firebasePick.pickNumber,
+      round: getRoundForPick(firebasePick.pickNumber, teamCount),
+      pickInRound: getPickInRound(firebasePick.pickNumber, teamCount),
+      player,
+      participantId: participants[participantIndex].id,
+      participantIndex,
+      timestamp: firebasePick.timestamp?.toMillis?.() || firebasePick.timestamp || Date.now(),
+    };
+  }, [playerMapByName, participants]);
+  
+  // Load real picks from Firebase (PRODUCTION MODE)
+  useEffect(() => {
+    // Only load from Firebase if not in mock mode
+    if (DEV_FLAGS.useMockData) {
+      // In mock mode, use initialPicks if provided
+      if (initialPicks.length > 0 && (picks.length === 0 || picks.length < initialPicks.length)) {
+        logger.debug('Initializing picks with mock picks', { 
+          initialPicksCount: initialPicks.length, 
+          currentPicksCount: picks.length,
+          willSetPicks: initialPicks.length
+        });
+        setPicks(initialPicks);
+        setIsLoading(false);
+      }
+      return;
+    }
+    
+    // PRODUCTION MODE: Load picks from Firebase
+    if (!roomId) return;
+    
+    setIsLoading(true);
+    const picksQuery = query(
+      collection(db, 'draftRooms', roomId, 'picks'),
+      orderBy('pickNumber')
+    );
+    
+    const unsubscribe = onSnapshot(
+      picksQuery,
+      (snapshot) => {
+        const teamCount = participants.length || DRAFT_DEFAULTS.teamCount;
+        const firebasePicks = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        // Convert Firebase picks to DraftPick format
+        const convertedPicks: DraftPick[] = [];
+        for (const firebasePick of firebasePicks) {
+          const converted = convertFirebasePick(firebasePick, teamCount);
+          if (converted) {
+            convertedPicks.push(converted);
+          }
+        }
+        
+        // Sort by pick number to ensure order
+        convertedPicks.sort((a, b) => a.pickNumber - b.pickNumber);
+        
+        logger.debug('Loaded picks from Firebase', { 
+          count: convertedPicks.length,
+          roomId 
+        });
+        
+        setPicks(convertedPicks);
+        setIsLoading(false);
+        setError(null);
+      },
+      (err) => {
+        logger.error('Error loading picks from Firebase', err);
+        setError(err.message);
+        setIsLoading(false);
+      }
+    );
+    
+    return () => unsubscribe();
+  }, [roomId, initialPicks, picks.length, participants, convertFirebasePick]);
   
   const teamCount = participants.length || DRAFT_DEFAULTS.teamCount;
   

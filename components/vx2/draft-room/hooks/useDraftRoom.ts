@@ -24,6 +24,7 @@ import type {
   Participant,
   DraftPlayer,
   DraftTab,
+  Position,
 } from '../types';
 // Using new draft-logic module for core calculations
 import { 
@@ -40,6 +41,9 @@ import { useDraftTimer } from './useDraftTimer';
 import { useDraftQueue } from './useDraftQueue';
 import { useAvailablePlayers } from './useAvailablePlayers';
 import { useDraftPicks } from './useDraftPicks';
+import { usePlayerPool } from '../../../../lib/playerPool/usePlayerPool';
+import type { DraftPick } from '../types';
+import { getPickInRound, getRoundForPick, generatePlayerId } from '../utils';
 
 // ============================================================================
 // TYPES
@@ -54,6 +58,10 @@ export interface UseDraftRoomOptions {
   initialStatus?: DraftStatus;
   /** Enable fast timer mode (for dev tools) */
   fastMode?: boolean;
+  /** Initial pick number to start at (default: 1) */
+  initialPickNumber?: number;
+  /** Team count (default: 12) */
+  teamCount?: number;
 }
 
 export interface UseDraftRoomResult {
@@ -129,20 +137,90 @@ function createMockParticipants(): Participant[] {
   }));
 }
 
-function createMockRoom(roomId: string): DraftRoom {
+function createMockRoom(roomId: string, initialPickNumber: number = 1, teamCount: number = DRAFT_DEFAULTS.teamCount): DraftRoom {
   return {
     id: roomId,
-    status: 'active',
-    currentPickNumber: 1,
+    status: initialPickNumber > 1 ? 'active' : 'waiting',
+    currentPickNumber: initialPickNumber,
     settings: {
-  teamCount: DRAFT_DEFAULTS.teamCount,
-  rosterSize: DRAFT_DEFAULTS.rosterSize,
-  pickTimeSeconds: DRAFT_DEFAULTS.pickTimeSeconds,
-  gracePeriodSeconds: DRAFT_DEFAULTS.gracePeriodSeconds,
+      teamCount: teamCount,
+      rosterSize: DRAFT_DEFAULTS.rosterSize,
+      pickTimeSeconds: DRAFT_DEFAULTS.pickTimeSeconds,
+      gracePeriodSeconds: DRAFT_DEFAULTS.gracePeriodSeconds,
     },
     participants: createMockParticipants(),
     startedAt: Date.now(),
-};
+  };
+}
+
+/**
+ * Generate mock picks for all picks prior to the initial pick number
+ * Ensures the draft board shows complete history when starting mid-draft
+ */
+/**
+ * Generate mock picks for all picks prior to the initial pick number
+ * Ensures the draft board shows complete history when starting mid-draft
+ */
+function generateMockPicks(
+  initialPickNumber: number,
+  participants: Participant[],
+  teamCount: number,
+  allPlayers: DraftPlayer[]
+): DraftPick[] {
+  if (initialPickNumber <= 1 || allPlayers.length === 0 || participants.length === 0) {
+    return [];
+  }
+
+  const picks: DraftPick[] = [];
+  const usedPlayerIds = new Set<string>();
+  
+  // Sort players by ADP for realistic mock draft order
+  const sortedPlayers = [...allPlayers].sort((a, b) => (a.adp || 999) - (b.adp || 999));
+  
+  // Generate picks for picks 1 to (initialPickNumber - 1)
+  // This ensures all previous picks are populated - no empty slots before current pick
+  for (let pickNum = 1; pickNum < initialPickNumber; pickNum++) {
+    // Find next available player (not already picked)
+    const player = sortedPlayers.find(p => !usedPlayerIds.has(p.id));
+    
+    if (!player) {
+      logger.warn(`No available players for mock pick ${pickNum}`, { 
+        totalPlayers: allPlayers.length, 
+        usedPlayers: usedPlayerIds.size 
+      });
+      break; // Break instead of continue to avoid gaps
+    }
+    
+    // Get participant for this pick (snake draft logic)
+    const participantIndex = getParticipantForPick(pickNum, teamCount);
+    const participant = participants[participantIndex];
+    
+    if (!participant) {
+      logger.warn(`No participant found for pick ${pickNum}`, { 
+        participantIndex, 
+        totalParticipants: participants.length 
+      });
+      break; // Break instead of continue to avoid gaps
+    }
+    
+    // Create pick
+    const pick: DraftPick = {
+      id: `pick-${pickNum}`,
+      pickNumber: pickNum,
+      round: getRoundForPick(pickNum, teamCount),
+      pickInRound: getPickInRound(pickNum, teamCount),
+      player,
+      participantId: participant.id,
+      participantIndex,
+      timestamp: Date.now() - (initialPickNumber - pickNum) * 30000, // Spread out timestamps
+    };
+    
+    picks.push(pick);
+    usedPlayerIds.add(player.id);
+  }
+  
+  logger.debug(`Generated ${picks.length} mock picks for picks 1-${initialPickNumber - 1}`);
+  return picks;
 }
 
 // ============================================================================
@@ -153,11 +231,13 @@ export function useDraftRoom({
   roomId,
   initialStatus = 'loading',
   fastMode = false,
+  initialPickNumber = 1,
+  teamCount = DRAFT_DEFAULTS.teamCount,
 }: UseDraftRoomOptions): UseDraftRoomResult {
   // Room state (mock for now)
   const [room, setRoom] = useState<DraftRoom | null>(null);
   const [status, setStatus] = useState<DraftStatus>(initialStatus);
-  const [currentPickNumber, setCurrentPickNumber] = useState(1);
+  const [currentPickNumber, setCurrentPickNumber] = useState(initialPickNumber);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isPaused, setIsPaused] = useState(false);
@@ -181,58 +261,102 @@ export function useDraftRoom({
     return scrollPositions[tab] ?? 0;
   }, [scrollPositions]);
   
-  // Load mock room on mount - starts in 'waiting' state, user must click Start Draft
+  // Load mock room on mount - starts at the specified pick number
   useEffect(() => {
     if (!DEV_FLAGS.useMockData) return;
     
     const timer = setTimeout(() => {
-      const mockRoom = createMockRoom(roomId);
+      const mockRoom = createMockRoom(roomId, initialPickNumber, teamCount);
       setRoom(mockRoom);
-      setStatus('waiting'); // Start in waiting state, not active
+      // If we're starting at a pick > 1, the draft is already active
+      const initialStatus = initialPickNumber > 1 ? 'active' : 'waiting';
+      setStatus(initialStatus);
+      setCurrentPickNumber(initialPickNumber);
       setIsLoading(false);
     }, 500);
     
     return () => clearTimeout(timer);
-  }, [roomId]);
+  }, [roomId, initialPickNumber, teamCount]);
+  
+  // Load player pool to generate mock picks
+  const { players: poolPlayers, loading: poolLoading } = usePlayerPool();
   
   // Derived values - memoized to stabilize hook dependencies
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const participants = useMemo(() => room?.participants ?? [], [room?.participants]);
-  const teamCount = room?.settings.teamCount ?? DRAFT_DEFAULTS.teamCount;
+  // Use room's teamCount if available, otherwise use the parameter or default
+  const effectiveTeamCount = room?.settings.teamCount ?? teamCount;
+  
+  // Convert pool players to DraftPlayer format for mock picks
+  const allPlayersForPicks = useMemo(() => {
+    if (poolPlayers.length === 0) return [];
+    return poolPlayers.map(poolPlayer => ({
+      id: poolPlayer.id || generatePlayerId(poolPlayer.name),
+      name: poolPlayer.name,
+      position: poolPlayer.position as Position,
+      team: poolPlayer.team,
+      adp: poolPlayer.adp ?? 999,
+      projectedPoints: poolPlayer.projection ?? 0,
+      byeWeek: poolPlayer.byeWeek ?? 0,
+    }));
+  }, [poolPlayers]);
+  
+  // Generate mock picks for all previous picks when starting mid-draft (MOCK MODE ONLY)
+  // In production, real picks will be loaded from Firebase via useDraftPicks
+  // This ensures all picks 1 through (initialPickNumber - 1) are populated in mock mode
+  // No empty slots should exist before the current pick
+  const initialPicks = useMemo(() => {
+    // Only generate mock picks in dev/mock mode
+    if (!DEV_FLAGS.useMockData) {
+      return []; // Real picks will be loaded from Firebase
+    }
+    
+    // Only generate if starting mid-draft and we have the necessary data
+    if (initialPickNumber <= 1 || !room || allPlayersForPicks.length === 0 || participants.length === 0) {
+      return [];
+    }
+    
+    const mockPicks = generateMockPicks(initialPickNumber, participants, effectiveTeamCount, allPlayersForPicks);
+    if (mockPicks.length > 0) {
+      logger.debug(`Generated ${mockPicks.length} mock picks for mid-draft start at pick ${initialPickNumber} (MOCK MODE)`);
+    }
+    return mockPicks;
+  }, [initialPickNumber, room, participants, effectiveTeamCount, allPlayersForPicks]);
   
   const userParticipantIndex = useMemo(() => {
     const index = participants.findIndex(p => p.isUser);
     return index >= 0 ? index : 0;
   }, [participants]);
   
-  const currentParticipantIndex = getParticipantForPick(currentPickNumber, teamCount);
+  const currentParticipantIndex = getParticipantForPick(currentPickNumber, effectiveTeamCount);
   const isMyTurn = currentParticipantIndex === userParticipantIndex;
   const currentPicker = participants[currentParticipantIndex] ?? null;
   
   const myPickNumbers = useMemo(() => {
     return getPickNumbersForParticipant(
       userParticipantIndex,
-      teamCount, 
+      effectiveTeamCount, 
       room?.settings.rosterSize ?? DRAFT_DEFAULTS.rosterSize
     );
-  }, [userParticipantIndex, teamCount, room?.settings.rosterSize]);
+  }, [userParticipantIndex, effectiveTeamCount, room?.settings.rosterSize]);
   
   // Use draft-logic utility for picks until turn calculation
   const picksUntilMyTurn = useMemo(() => {
     return getPicksUntilTurn(
       currentPickNumber,
       userParticipantIndex,
-      teamCount,
+      effectiveTeamCount,
       room?.settings.rosterSize ?? DRAFT_DEFAULTS.rosterSize
     );
-  }, [currentPickNumber, userParticipantIndex, teamCount, room?.settings.rosterSize]);
+  }, [currentPickNumber, userParticipantIndex, effectiveTeamCount, room?.settings.rosterSize]);
   
-  // Initialize picks hook
+  // Initialize picks hook with initial picks if starting mid-draft
   const picksHook = useDraftPicks({
     roomId,
     participants,
     currentPickNumber,
     userParticipantIndex,
+    initialPicks: initialPicks,
     onPickMade: () => {
       setCurrentPickNumber(prev => prev + 1);
     },

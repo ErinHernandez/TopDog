@@ -25,7 +25,7 @@ import {
   PlayerStatsCard,
 } from '../../components/shared';
 import { SearchInput } from '../../components/shared/inputs';
-import { ChevronRight, ChevronLeft, Edit, Share, Close, Grid, UserIcon, Undo, Save, Check } from '../../components/icons';
+import { ChevronRight, ChevronLeft, Share, Close, Grid, UserIcon, Undo, Save, Check } from '../../components/icons';
 import { usePlayerPool } from '../../../../lib/playerPool/usePlayerPool';
 import ShareOptionsModal from '../../draft-room/components/ShareOptionsModal';
 import { isNFLSeasonActive } from '../../../../lib/tournament/seasonUtils';
@@ -91,11 +91,10 @@ export interface MyTeamsTabVX2Props {
 interface TeamCardProps {
   team: MyTeam;
   onSelect: () => void;
-  onNameChange?: (teamId: string, newName: string) => void;
   pointsBack?: number | null;
   pointsAhead?: number | null;
   showPointsDiff?: boolean;
-  sortMethod?: 'rank' | 'projectedPoints' | 'pointsScored' | 'pointsBackOfFirst' | 'pointsBackOfPlayoffs';
+  sortMethod?: 'rank' | 'projectedPoints' | 'pointsScored' | 'pointsBackOfFirst' | 'pointsBackOfPlayoffs' | 'draftedAt';
   isCustomSort?: boolean;
   index?: number;
   totalTeams?: number;
@@ -112,7 +111,6 @@ interface TeamCardProps {
 function TeamCard({ 
   team, 
   onSelect, 
-  onNameChange, 
   pointsBack, 
   pointsAhead, 
   showPointsDiff, 
@@ -161,48 +159,22 @@ function TeamCard({
         return `${rank}th`;
     }
   }, []);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedName, setEditedName] = useState(team.name);
-  const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (isEditing && inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.select();
+  // Format draft date: ISO string -> "MMM D, YYYY" (e.g., "Jan 8, 2025")
+  const formatDraftDate = useCallback((dateString: string): string => {
+    try {
+      const date = new Date(dateString);
+      const month = date.toLocaleDateString('en-US', { month: 'short' });
+      const day = date.getDate();
+      const year = date.getFullYear();
+      return `${month} ${day}, ${year}`;
+    } catch {
+      return '';
     }
-  }, [isEditing]);
-  
-  useEffect(() => {
-    setEditedName(team.name);
-  }, [team.name]);
-
-  const handleDoubleClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsEditing(true);
-  };
-
-  const handleBlur = () => {
-    if (editedName.trim() && editedName !== team.name && onNameChange) {
-      onNameChange(team.id, editedName.trim());
-    } else {
-      setEditedName(team.name);
-    }
-    setIsEditing(false);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleBlur();
-    } else if (e.key === 'Escape') {
-      setEditedName(team.name);
-      setIsEditing(false);
-    }
-  };
+  }, []);
 
   const handleClick = (e: React.MouseEvent) => {
-    if (!isEditing) {
-      onSelect();
-    }
+    onSelect();
   };
   
   return (
@@ -231,7 +203,8 @@ function TeamCard({
       aria-label={`View ${team.name}`}
     >
       <div className="flex items-center flex-1 min-w-0">
-        {!isEditing && (
+        {/* Standing - only shown when season has started and rank is available */}
+        {seasonStarted && team.rank && team.rank >= 1 && team.rank <= 12 && (
           <div
             className="p-1 mr-2 flex items-center justify-center"
             style={{
@@ -240,67 +213,40 @@ function TeamCard({
               height: '28px',
             }}
           >
-            {seasonStarted && team.rank && team.rank >= 1 && team.rank <= 12 ? (
-              <span
-                style={{
-                  fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-                  color: TEXT_COLORS.primary,
-                  fontWeight: 600,
-                }}
-              >
-                {formatRank(team.rank)}
-              </span>
-            ) : (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDoubleClick(e);
-                }}
-                className="flex items-center justify-center transition-all active:scale-95"
-                aria-label="Edit team name"
-                style={{
-                  borderRadius: `${RADIUS.md}px`,
-                }}
-              >
-                <Edit size={18} color={TEXT_COLORS.muted} />
-              </button>
-            )}
+            <span
+              style={{
+                fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
+                color: TEXT_COLORS.primary,
+                fontWeight: 600,
+              }}
+            >
+              {formatRank(team.rank)}
+            </span>
           </div>
         )}
         <div className="flex-1 text-left min-w-0">
-          {isEditing ? (
-            <input
-              ref={inputRef}
-              type="text"
-              value={editedName}
-              onChange={(e) => setEditedName(e.target.value)}
-              onBlur={handleBlur}
-              onKeyDown={handleKeyDown}
-              className="w-full font-medium bg-transparent border-none outline-none"
+          <div className="flex items-center gap-3" style={{ minWidth: 0, flex: 1 }}>
+            <h3 
+              className="font-medium flex-shrink-0"
               style={{ 
                 color: TEXT_COLORS.primary, 
                 fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-                borderBottom: `1px solid ${TEXT_COLORS.primary}`,
               }}
-              onClick={(e) => e.stopPropagation()}
-            />
-          ) : (
-            <div className="flex items-center gap-3" style={{ minWidth: 0, flex: 1 }}>
-              <h3 
-                className="font-medium flex-shrink-0"
-                style={{ 
-                  color: TEXT_COLORS.primary, 
-                  fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-                  cursor: seasonStarted ? 'pointer' : 'default',
+            >
+              {formattedName}
+            </h3>
+            {sortMethod === 'draftedAt' && team.draftedAt && (
+              <span
+                style={{
+                  fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
+                  color: TEXT_COLORS.muted,
+                  marginLeft: 'auto',
+                  whiteSpace: 'nowrap',
                 }}
-                onDoubleClick={seasonStarted ? handleDoubleClick : undefined}
-                onClick={seasonStarted ? (e) => {
-                  e.stopPropagation();
-                  handleDoubleClick(e);
-                } : undefined}
               >
-                {formattedName}
-              </h3>
+                {formatDraftDate(team.draftedAt)}
+              </span>
+            )}
               {showPointsDiff && (pointsBack !== null || pointsAhead !== null) && (
                 <div className="flex flex-col" style={{ fontSize: `${TYPOGRAPHY.fontSize.xs}px`, color: TEXT_COLORS.muted, marginLeft: 'auto', textAlign: 'right' }}>
                   {pointsBack !== null && pointsBack > 0 && (
@@ -312,7 +258,6 @@ function TeamCard({
                 </div>
               )}
             </div>
-          )}
         </div>
       </div>
       {isCustomSort ? (
@@ -537,12 +482,11 @@ interface TeamListViewProps {
   teams: MyTeam[];
   isLoading: boolean;
   onSelect: (team: MyTeam) => void;
-  onNameChange?: (teamId: string, newName: string) => void;
   sortState: TeamSortState;
   onSortChange: (sort: TeamSortState) => void;
 }
 
-function TeamListView({ teams, isLoading, onSelect, onNameChange, sortState, onSortChange }: TeamListViewProps): React.ReactElement {
+function TeamListView({ teams, isLoading, onSelect, sortState, onSortChange }: TeamListViewProps): React.ReactElement {
   const { players: allPlayers } = usePlayerPool();
   const { user: authUser } = useAuth();
   const userId = authUser?.uid || null;
@@ -1202,7 +1146,6 @@ function TeamListView({ teams, isLoading, onSelect, onNameChange, sortState, onS
                   key={team.id} 
                   team={team} 
                   onSelect={() => onSelect(team)}
-                  onNameChange={onNameChange}
                   pointsBack={pointsDiff?.pointsBack ?? null}
                   pointsAhead={pointsDiff?.pointsAhead ?? null}
                   showPointsDiff={sortState.primary === 'rank' || sortState.primary === 'projectedPoints' || sortState.primary === 'pointsScored' || sortState.primary === 'pointsBackOfFirst' || sortState.primary === 'pointsBackOfPlayoffs'}
@@ -1212,6 +1155,7 @@ function TeamListView({ teams, isLoading, onSelect, onNameChange, sortState, onS
                     sortState.primary === 'pointsScored' ? 'pointsScored' : 
                     sortState.primary === 'pointsBackOfFirst' ? 'pointsBackOfFirst' : 
                     sortState.primary === 'pointsBackOfPlayoffs' ? 'pointsBackOfPlayoffs' : 
+                    sortState.primary === 'draftedAt' ? 'draftedAt' :
                     undefined
                   }
                   isCustomSort={isCustomSort}
@@ -1815,23 +1759,6 @@ export default function MyTeamsTabVX2({
     }
   }, [onSelectTeam]);
   
-  const handleNameChange = useCallback((teamId: string, newName: string) => {
-    setTeams(prevTeams => 
-      prevTeams.map(team => 
-        team.id === teamId ? { ...team, name: newName } : team
-      )
-    );
-    // Update selected team if it's the one being edited
-    if (selectedTeam?.id === teamId) {
-      const updatedTeam = { ...selectedTeam, name: newName };
-      if (onSelectTeam) {
-        onSelectTeam(updatedTeam);
-      } else {
-        setInternalSelectedTeam(updatedTeam);
-      }
-    }
-  }, [selectedTeam, onSelectTeam]);
-  
   const handleBack = useCallback(() => {
     if (onSelectTeam) {
       onSelectTeam(null);
@@ -1879,7 +1806,6 @@ export default function MyTeamsTabVX2({
       teams={teams}
       isLoading={isLoading}
       onSelect={handleSelectTeam}
-      onNameChange={handleNameChange}
       sortState={sortState.teamList}
       onSortChange={handleSortChange}
     />

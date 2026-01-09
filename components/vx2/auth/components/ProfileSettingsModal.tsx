@@ -10,6 +10,7 @@
  */
 
 import React, { useState, useCallback, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../../core/constants/colors';
 import { SPACING, TYPOGRAPHY, Z_INDEX } from '../../core/constants/sizes';
 import { Close, ChevronLeft, Edit } from '../../components/icons';
@@ -45,6 +46,7 @@ interface ProfileTabContentProps {
 
 function ProfileTabContent({ onEditName, onAddEmail, onAddPhone }: ProfileTabContentProps): React.ReactElement {
   const { user, profile, sendVerificationEmail } = useAuth();
+  const router = useRouter();
   const [emailSent, setEmailSent] = useState(false);
   
   const handleResendVerification = async () => {
@@ -59,8 +61,98 @@ function ProfileTabContent({ onEditName, onAddEmail, onAddPhone }: ProfileTabCon
     ? `${profile.firstName} ${profile.lastName}`
     : profile?.displayName || null;
   
+  // Get inner cell background color from user preferences (default to dark gray)
+  // Borders are fixed and not customizable
+  const innerCellColor = profile?.preferences?.cellBackgroundColor || user?.preferences?.cellBackgroundColor || BG_COLORS.tertiary;
+  
+  // Fixed border color (not customizable) - matches unpicked player card border in horizontal scrolling pick bar
+  const fixedBorderColor = '#6B7280'; // Gray for unpicked cards (CARD_COLORS.otherPick from PicksBar)
+  
   return (
     <div className="space-y-6">
+      {/* Customization Section */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <span 
+              className="font-medium block"
+              style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}
+            >
+              Profile Customization
+            </span>
+            <span 
+              className="block mt-1"
+              style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
+            >
+              Customize player cell backgrounds
+            </span>
+          </div>
+          <button
+            onClick={() => router.push('/profile-customization')}
+            className="px-3 py-1.5 rounded-lg font-medium text-sm"
+            style={{ 
+              backgroundColor: STATE_COLORS.active, 
+              color: '#000',
+            }}
+          >
+            Customize
+          </button>
+        </div>
+        
+        {/* Example Player Box */}
+        <div className="flex justify-center">
+          <div 
+            className="flex-shrink-0 text-sm font-medium flex flex-col"
+            style={{ 
+              width: '120px',
+              height: '140px',
+              borderWidth: '6px',
+              borderStyle: 'solid',
+              borderColor: fixedBorderColor, // Fixed border color - matches unpicked card border
+              borderTopWidth: '32px', 
+              backgroundColor: innerCellColor, // Customizable inner area
+              borderRadius: '11px', 
+              overflow: 'visible'
+            }}
+          >
+            {/* Username in border area */}
+            <div 
+              className="absolute left-0 right-0 font-bold text-center truncate whitespace-nowrap overflow-hidden"
+              style={{ 
+                fontSize: '12px', 
+                color: '#000',
+                backgroundColor: 'transparent',
+                zIndex: 10,
+                padding: '2px',
+                top: '-16px', 
+                transform: 'translateY(-50%)',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                maxWidth: '100%',
+                width: '100%',
+                textTransform: 'uppercase'
+              }}
+            >
+              {profile?.username || 'Username'}
+            </div>
+            
+            {/* Customizable inner area (where player name would go) */}
+            <div className="flex-1 flex items-center justify-center">
+              <div 
+                className="text-center"
+                style={{
+                  fontSize: '12px',
+                  color: TEXT_COLORS.muted,
+                }}
+              >
+                Player Name
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Avatar & Username */}
       <div className="flex items-center gap-4">
         <div 

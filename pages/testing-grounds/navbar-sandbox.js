@@ -9,7 +9,6 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { DraftNavbar, DraftInfoModal, DraftTutorialModal } from '../../components/vx2/draft-room';
 import IPhoneStatusBar from '../../components/vx2/shell/iPhoneStatusBar';
-import withDevAccess from '../../components/withDevAccess';
 
 function NavbarSandboxPage() {
   const router = useRouter();
@@ -264,5 +263,4 @@ function NavbarSandboxPage() {
   );
 }
 
-// Protect with dev access - requires developer authentication
-export default withDevAccess(NavbarSandboxPage);
+export default NavbarSandboxPage;

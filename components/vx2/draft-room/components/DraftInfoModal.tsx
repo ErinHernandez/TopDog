@@ -13,6 +13,7 @@
 import React, { useEffect, useRef } from 'react';
 import { SPACING } from '../../core/constants/sizes';
 import { POSITION_COLORS } from '../../core/constants/colors';
+import { DRAFT_DEFAULTS } from '../constants';
 
 // ============================================================================
 // CONSTANTS
@@ -174,9 +175,9 @@ export default function DraftInfoModal({
   
   const {
     format = 'Snake',
-    teams = 12,
-    rounds = 18,
-    pickTime = 30,
+    teams = DRAFT_DEFAULTS.teamCount,
+    rounds = DRAFT_DEFAULTS.rosterSize,
+    pickTime = DRAFT_DEFAULTS.pickTimeSeconds,
     scoring = 'Best Ball',
   } = draftInfo;
   

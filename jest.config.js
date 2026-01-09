@@ -2,6 +2,20 @@ module.exports = {
   testEnvironment: "jsdom",
   setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
 
+  // Test file matching patterns
+  testMatch: [
+    '**/__tests__/**/*.test.[jt]s?(x)',
+    '**/?(*.)+(spec|test).[jt]s?(x)'
+  ],
+
+  // Paths to ignore when looking for test files
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/.next/',
+    '/__tests__/__mocks__/',
+    '/__tests__/factories/',
+  ],
+
   // Code coverage configuration
   collectCoverageFrom: [
     "components/**/*.{js,jsx,ts,tsx}",

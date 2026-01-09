@@ -80,7 +80,6 @@ export default function Footer() {
           <div className="flex flex-col" style={{ width: '150px' }}>
             <h4 className="text-base font-semibold mb-4" style={{ color: '#59c5bf' }}>Product</h4>
             <ul className="space-y-2">
-              <li><Link href="/leagues" className="text-sm text-gray-300 hover:text-white transition-colors">Leagues</Link></li>
               <li><Link href="/tournaments/topdog" className="text-sm text-gray-300 hover:text-white transition-colors">Draft</Link></li>
               <li><Link href="/profile" className="text-sm text-gray-300 hover:text-white transition-colors">Profile</Link></li>
             </ul>

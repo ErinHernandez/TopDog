@@ -13,7 +13,6 @@
 
 import React, { useState, useRef, useCallback } from 'react';
 import Head from 'next/head';
-import withDevAccess from '../../components/withDevAccess';
 import TournamentBoardMarketing, {
   HomepageHeroBoard,
   SocialMediaBoard,
@@ -408,5 +407,4 @@ function MarketingBoardPage() {
   );
 }
 
-// Protect with dev access - requires developer authentication
-export default withDevAccess(MarketingBoardPage);
+export default MarketingBoardPage;

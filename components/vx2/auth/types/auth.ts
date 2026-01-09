@@ -91,6 +91,8 @@ export interface UserPreferences {
   emailUpdates: boolean;
   publicProfile: boolean;
   borderColor: string;
+  /** Customizable background color for player cell inner area (not borders) */
+  cellBackgroundColor?: string;
   theme?: 'light' | 'dark' | 'auto';
   language?: string;
   /** Enable Dynamic Island / Live Activity for draft timer */

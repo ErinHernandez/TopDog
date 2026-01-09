@@ -148,7 +148,7 @@ export default function AppHeaderVX2({
     >
       {/* Inner content container with fixed height */}
       <div
-        className="flex items-center justify-between w-full"
+        className="flex items-center w-full"
         style={{
           height: `${HEADER.height}px`,
           paddingLeft: `${HEADER.paddingX}px`,
@@ -173,69 +173,6 @@ export default function AppHeaderVX2({
               aria-label="Go back"
             >
               <BackIcon />
-            </button>
-          ) : (
-            // Empty spacer for layout balance
-            <div style={{ width: `${HEADER.buttonSize}px` }} />
-          )}
-        </div>
-
-        {/* CENTER SECTION - Logo or Title */}
-        <div className="flex-1 flex items-center justify-center">
-          {title ? (
-            <h1 
-              className="text-white font-bold text-center truncate"
-              style={{ fontSize: `${HEADER.titleFontSize}px` }}
-            >
-              {title}
-            </h1>
-          ) : !hideLogo ? (
-            <button
-              onClick={handleLogoClick}
-              className="flex items-center justify-center"
-              style={{
-                background: 'none',
-                border: 'none',
-                padding: 0,
-                cursor: 'pointer',
-                maxHeight: `${HEADER.logoHeight}px`,
-                maxWidth: `${HEADER.logoMaxWidth}px`,
-              }}
-              aria-label="Go to Lobby"
-            >
-              <img
-                src="/logo.png"
-                alt="TopDog"
-                style={{
-                  height: `${HEADER.logoHeight}px`,
-                  width: 'auto',
-                  display: 'block',
-                  objectFit: 'contain',
-                }}
-              />
-            </button>
-          ) : null}
-        </div>
-
-        {/* RIGHT SECTION - Deposit button or custom content */}
-        <div 
-          className="flex items-center justify-end"
-          style={{ minWidth: `${HEADER.buttonSize}px` }}
-        >
-          {rightContent ? (
-            rightContent
-          ) : showDeposit ? (
-            <button
-              onClick={onDepositClick}
-              className="flex items-center justify-center rounded-full transition-colors"
-              style={{
-                width: `${HEADER.depositButtonSize}px`,
-                height: `${HEADER.depositButtonSize}px`,
-                backgroundColor: HEADER_COLORS.depositButton,
-              }}
-              aria-label="Deposit funds"
-            >
-              <DepositIcon />
             </button>
           ) : (
             // Empty spacer for layout balance

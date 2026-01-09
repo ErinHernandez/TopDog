@@ -36,6 +36,7 @@ import {
   Withdraw,
   ChevronRight,
   Plus,
+  Customize,
 } from '../../components/icons';
 import { Skeleton } from '../../components/shared';
 
@@ -71,7 +72,7 @@ const PROFILE_PX = {
 } as const;
 
 const PROFILE_COLORS = {
-  boxBorder: '#ef4444', // Red border
+  boxBorder: '#6B7280', // Gray border - matches unpicked card border in horizontal scrolling pick bar
   boxBg: '#18181a',
   menuItemBg: BG_COLORS.secondary,
   menuItemHover: 'rgba(75, 85, 99, 1)',
@@ -158,6 +159,13 @@ const PLAY_RELATED_MENU_ITEMS: MenuItem[] = [
     label: 'Autodraft Limits',
     icon: <Autodraft size={PROFILE_PX.menuIconSize} />,
     action: 'autodraft',
+  },
+  {
+    id: 'customization',
+    label: 'Customization',
+    icon: <Customize size={PROFILE_PX.menuIconSize} />,
+    action: 'navigate',
+    path: '/profile-customization',
   },
 ];
 
@@ -348,6 +356,84 @@ export default function ProfileTabVX2({
       {/* Authenticated Content */}
       {!isLoading && (
         <>
+          {/* Example Player Card Box */}
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              paddingTop: `${SPACING.lg}px`,
+              paddingBottom: `${SPACING.lg}px`,
+              marginBottom: `${SPACING.lg}px`,
+            }}
+          >
+            <button
+              onClick={() => router.push('/profile-customization')}
+              style={{
+                width: `${PROFILE_PX.boxWidth}px`,
+                height: `${PROFILE_PX.boxHeight}px`,
+                borderWidth: `${PROFILE_PX.boxBorderWidth}px`,
+                borderStyle: 'solid',
+                borderColor: PROFILE_COLORS.boxBorder, // Fixed border color (not customizable)
+                borderTopWidth: `${PROFILE_PX.boxTopBorderWidth}px`,
+                backgroundColor: user?.preferences?.cellBackgroundColor || PROFILE_COLORS.boxBg, // Customizable inner area
+                borderRadius: `${PROFILE_PX.boxBorderRadius}px`,
+                position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
+                cursor: 'pointer',
+                padding: 0,
+                outline: 'none',
+              }}
+              aria-label="Customize player cell background"
+              className="transition-opacity active:opacity-80"
+            >
+              {/* Username in border area */}
+              <div
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  fontSize: `${PROFILE_PX.usernameFontSize}px`,
+                  color: '#FFFFFF',
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                  textTransform: 'uppercase',
+                  top: `${PROFILE_PX.usernameTop}px`,
+                  transform: 'translateY(-50%)',
+                  padding: '2px',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  zIndex: 10,
+                }}
+              >
+                {user?.username || 'Username'}
+              </div>
+              
+              {/* Customizable inner area (where player name would go) */}
+              <div
+                style={{
+                  flex: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
+                    color: TEXT_COLORS.muted,
+                    textAlign: 'center',
+                    fontStyle: 'italic',
+                  }}
+                >
+                  Customize
+                </div>
+              </div>
+            </button>
+          </div>
+
           {/* Account Balance */}
           {user && (
             <div

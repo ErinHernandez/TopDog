@@ -18,6 +18,7 @@ export { useLiveDrafts } from './useLiveDrafts';
 export type { 
   LiveDraft, 
   DraftStatus,
+  DraftSpeed,
   UseLiveDraftsResult,
 } from './useLiveDrafts';
 

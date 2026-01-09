@@ -12,6 +12,7 @@
  */
 
 import React, { useEffect, useRef } from 'react';
+import type { DraftStatus } from '../types';
 import { SPACING, TYPOGRAPHY, RADIUS } from '../../core/constants/sizes';
 import { createScopedLogger } from '../../../../lib/clientLogger';
 
@@ -41,10 +42,16 @@ const MODAL_COLORS = {
 export interface LeaveConfirmModalProps {
   /** Whether modal is visible */
   isOpen: boolean;
-  /** Called when user confirms leaving */
+  /** Draft status to determine if withdrawal is available */
+  draftStatus?: DraftStatus;
+  /** Called when user confirms leaving (during active draft) */
   onConfirm: () => void;
+  /** Called when user wants to withdraw entry (before draft starts) */
+  onWithdraw?: () => void;
   /** Called when user cancels */
   onCancel: () => void;
+  /** Whether to show hint about top bar exit option */
+  showTopBarHint?: boolean;
 }
 
 // ============================================================================
@@ -53,9 +60,15 @@ export interface LeaveConfirmModalProps {
 
 export default function LeaveConfirmModal({
   isOpen,
+  draftStatus = 'loading',
   onConfirm,
+  onWithdraw,
   onCancel,
+  showTopBarHint = false,
 }: LeaveConfirmModalProps): React.ReactElement | null {
+  // Determine if we're before draft starts (can withdraw)
+  const isBeforeDraftStart = draftStatus === 'loading' || draftStatus === 'waiting';
+  const canWithdraw = isBeforeDraftStart && !!onWithdraw;
   const stayButtonRef = useRef<HTMLButtonElement>(null);
   
   // Focus stay button when modal opens
@@ -187,7 +200,20 @@ export default function LeaveConfirmModal({
             marginBottom: 28,
           }}
         >
-          Are you sure you want to exit the draft room?
+          {canWithdraw
+            ? 'You can leave the draft room or withdraw your entry. Withdrawing will remove you from this draft and refund your entry fee.'
+            : (
+              <>
+                Are you sure you want to exit the draft room? You can return later, but draft will continue while you're gone.
+                {showTopBarHint && (
+                  <>
+                    <br />
+                    <br />
+                    You can also click the area at the very top of the screen to exit.
+                  </>
+                )}
+              </>
+            )}
         </p>
         
         {/* Buttons - Stacked */}
@@ -204,7 +230,66 @@ export default function LeaveConfirmModal({
             pointerEvents: 'auto',
           }}
         >
-          {/* Primary: Leave Button */}
+          {/* Primary: Withdraw Button (only before draft starts) */}
+          {canWithdraw && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                logger.debug('Withdraw button clicked - calling onWithdraw');
+                try {
+                  if (onWithdraw && typeof onWithdraw === 'function') {
+                    onWithdraw();
+                  } else {
+                    logger.error('onWithdraw callback not provided or not a function', undefined, { onWithdraw });
+                  }
+                } catch (error) {
+                  logger.error('Error in onWithdraw', error instanceof Error ? error : new Error(String(error)));
+                }
+              }}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              onTouchStart={(e) => {
+                e.stopPropagation();
+              }}
+              onTouchEnd={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                logger.debug('Withdraw button touched - calling onWithdraw');
+                try {
+                  if (onWithdraw && typeof onWithdraw === 'function') {
+                    onWithdraw();
+                  }
+                } catch (error) {
+                  logger.error('Error in onWithdraw (touch)', error instanceof Error ? error : new Error(String(error)));
+                }
+              }}
+              style={{
+                width: '100%',
+                height: 52,
+                backgroundColor: MODAL_COLORS.primaryButton,
+                border: 'none',
+                borderRadius: 12,
+                color: MODAL_COLORS.primaryButtonText,
+                fontSize: 16,
+                fontWeight: 600,
+                cursor: 'pointer',
+                pointerEvents: 'auto',
+                position: 'relative',
+                zIndex: 10000,
+                WebkitTapHighlightColor: 'transparent',
+                userSelect: 'none',
+                touchAction: 'manipulation',
+              }}
+            >
+              Withdraw Entry
+            </button>
+          )}
+
+          {/* Primary: Leave Button (during active draft or as secondary option before start) */}
           <button
             type="button"
             onClick={(e) => {
@@ -244,7 +329,7 @@ export default function LeaveConfirmModal({
             style={{
               width: '100%',
               height: 52,
-              backgroundColor: MODAL_COLORS.primaryButton,
+              backgroundColor: canWithdraw ? MODAL_COLORS.secondaryButton : MODAL_COLORS.primaryButton,
               border: 'none',
               borderRadius: 12,
               color: MODAL_COLORS.primaryButtonText,
@@ -259,7 +344,7 @@ export default function LeaveConfirmModal({
               touchAction: 'manipulation',
             }}
           >
-            Yes, Leave Draft Room
+            {canWithdraw ? 'Leave Draft Room' : 'Yes, Leave Draft Room'}
           </button>
           
           {/* Secondary: Stay Button */}
@@ -293,7 +378,7 @@ export default function LeaveConfirmModal({
               touchAction: 'manipulation',
             }}
           >
-            Stay in Room
+            Stay
           </button>
         </div>
       </div>

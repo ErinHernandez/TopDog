@@ -16,7 +16,6 @@ import {
 } from '../../components/vx2/auth';
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS } from '../../components/vx2/core/constants/colors';
 import MobilePhoneFrame from '../../components/vx2/shell/MobilePhoneFrame';
-import withDevAccess from '../../components/withDevAccess';
 
 // ============================================================================
 // AUTH STATUS COMPONENT
@@ -300,5 +299,4 @@ export async function getServerSideProps() {
   };
 }
 
-// Protect with dev access - requires developer authentication
-export default withDevAccess(AuthTestPage);
+export default AuthTestPage;

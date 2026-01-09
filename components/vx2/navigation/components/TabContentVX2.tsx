@@ -9,6 +9,7 @@
  */
 
 import React, { useEffect, useRef, useCallback, useState } from 'react';
+import { useRouter } from 'next/router';
 import { useTabNavigation } from '../../core';
 import type { TabId } from '../../core/types';
 import { useDebouncedCallback } from '../../hooks/ui/useDebounce';
@@ -122,6 +123,20 @@ export default function TabContentVX2({
     window.location.reload();
   }, []);
   
+  // Router for navigation
+  const router = useRouter();
+  
+  // Handle entering a draft room
+  const handleEnterDraft = useCallback((draft: { id: string; pickNumber: number; teamCount: number }) => {
+    logger.debug('Entering draft', { draftId: draft.id, pickNumber: draft.pickNumber });
+    const params = new URLSearchParams({
+      roomId: draft.id,
+      pickNumber: draft.pickNumber.toString(),
+      teamCount: draft.teamCount.toString(),
+    });
+    router.push(`/testing-grounds/vx2-draft-room?${params.toString()}`);
+  }, [router]);
+  
   // Get the active tab component
   const TabComponent = TAB_COMPONENTS[state.activeTab];
   
@@ -130,6 +145,16 @@ export default function TabContentVX2({
   if (!TabComponent) {
     logger.error('Tab component not found', undefined, { activeTab: state.activeTab });
   }
+  
+  // Render tab content with appropriate props
+  const renderTabContent = () => {
+    switch (state.activeTab) {
+      case 'live-drafts':
+        return <LiveDraftsTab onEnterDraft={handleEnterDraft} />;
+      default:
+        return TabComponent ? <TabComponent /> : null;
+    }
+  };
   
   return (
     <div 
@@ -160,7 +185,7 @@ export default function TabContentVX2({
         fallback={errorComponent}
       >
         {TabComponent ? (
-          <TabComponent />
+          renderTabContent()
         ) : (
           <div style={{ padding: '20px', color: '#fff' }}>
             <p>Error: Tab component not found for "{state.activeTab}"</p>

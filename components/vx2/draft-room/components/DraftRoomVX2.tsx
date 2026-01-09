@@ -11,9 +11,9 @@
  * - Loading/Error/Empty states: Proper handling
  */
 
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import type { DraftTab } from '../types';
-import { DRAFT_LAYOUT } from '../constants';
+import { DRAFT_LAYOUT, DRAFT_DEFAULTS } from '../constants';
 import { BG_COLORS, TEXT_COLORS } from '../../core/constants/colors';
 import { SPACING, TYPOGRAPHY, RADIUS } from '../../core/constants/sizes';
 import { createScopedLogger } from '../../../../lib/clientLogger';
@@ -73,6 +73,10 @@ export interface DraftRoomVX2Props {
   useAbsolutePosition?: boolean;
   /** Enable fast timer mode (3 seconds per pick) */
   fastMode?: boolean;
+  /** Initial pick number to start at (default: 1) */
+  initialPickNumber?: number;
+  /** Team count (default: 12) */
+  teamCount?: number;
   /** Callback to expose dev tools to parent */
   onDevToolsReady?: (devTools: {
     startDraft: () => void;
@@ -208,9 +212,16 @@ interface TabContentProps {
   activeTab: DraftTab;
   draftRoom: ReturnType<typeof useDraftRoom>;
   onTutorial?: () => void;
+  onLeave?: () => void;
+  onLeaveFromLink?: () => void;
+  draftSettings: {
+    teamCount: number;
+    rosterSize: number;
+    pickTimeSeconds: number;
+  };
 }
 
-function TabContent({ activeTab, draftRoom, onTutorial }: TabContentProps): React.ReactElement {
+function TabContent({ activeTab, draftRoom, onTutorial, onLeave, onLeaveFromLink, draftSettings }: TabContentProps): React.ReactElement {
   switch (activeTab) {
     case 'players':
       return (
@@ -276,10 +287,11 @@ function TabContent({ activeTab, draftRoom, onTutorial }: TabContentProps): Reac
     case 'info':
       return (
         <DraftInfo 
-          settings={draftRoom.room?.settings}
+          settings={draftSettings}
           initialScrollPosition={draftRoom.getScrollPosition('info')}
           onScrollPositionChange={(pos) => draftRoom.saveScrollPosition('info', pos)}
           onTutorial={onTutorial}
+          onLeave={onLeaveFromLink || onLeave}
         />
       );
     
@@ -298,6 +310,8 @@ export default function DraftRoomVX2({
   onLeave,
   useAbsolutePosition = false,
   fastMode = false,
+  initialPickNumber = 1,
+  teamCount = 12,
   onDevToolsReady,
 }: DraftRoomVX2Props): React.ReactElement {
   // Initialize draft room hook
@@ -305,6 +319,8 @@ export default function DraftRoomVX2({
     roomId,
     userId,
     fastMode,
+    initialPickNumber,
+    teamCount,
   });
   
   // Expose dev tools to parent - always keep ref updated
@@ -319,6 +335,7 @@ export default function DraftRoomVX2({
   
   // Leave confirmation modal state
   const [showLeaveModal, setShowLeaveModal] = useState(false);
+  const [showTopBarHint, setShowTopBarHint] = useState(false);
   
   // Info and tutorial modal state
   const [showInfoModal, setShowInfoModal] = useState(false);
@@ -326,6 +343,16 @@ export default function DraftRoomVX2({
   
   // Track if we've already auto-shown tutorial for this draft session
   const hasAutoShownTutorial = useRef(false);
+  
+  // Compute draft settings once - used by both DraftInfo tab and DraftInfoModal
+  // This ensures they always show the same values
+  const draftSettings = useMemo(() => {
+    return {
+      teamCount: draftRoom.room?.settings?.teamCount ?? DRAFT_DEFAULTS.teamCount,
+      rosterSize: draftRoom.room?.settings?.rosterSize ?? DRAFT_DEFAULTS.rosterSize,
+      pickTimeSeconds: draftRoom.room?.settings?.pickTimeSeconds ?? DRAFT_DEFAULTS.pickTimeSeconds,
+    };
+  }, [draftRoom.room?.settings?.teamCount, draftRoom.room?.settings?.rosterSize, draftRoom.room?.settings?.pickTimeSeconds]);
   
   // Auto-show tutorial when draft becomes active (first time only per draft)
   useEffect(() => {
@@ -358,9 +385,17 @@ export default function DraftRoomVX2({
     localStorage.setItem(TUTORIAL_DISABLED_KEY, checked ? 'true' : 'false');
   }, []);
   
-  // Show leave confirmation modal
+  // Show leave confirmation modal (from top bar)
   const handleLeaveClick = useCallback(() => {
     logger.debug('Leave button clicked - opening modal');
+    setShowTopBarHint(false);
+    setShowLeaveModal(true);
+  }, []);
+
+  // Show leave confirmation modal (from Exit Draft link)
+  const handleLeaveFromLink = useCallback(() => {
+    logger.debug('Leave from Exit Draft link - opening modal with hint');
+    setShowTopBarHint(true);
     setShowLeaveModal(true);
   }, []);
   
@@ -380,7 +415,7 @@ export default function DraftRoomVX2({
     };
   }, []);
 
-  // Confirm leaving
+  // Confirm leaving (during active draft)
   const handleLeaveConfirm = useCallback(() => {
     logger.debug('Leave confirmed, cleaning up', { hasOnLeave: !!onLeave });
     // Call leave draft cleanup
@@ -411,10 +446,44 @@ export default function DraftRoomVX2({
       logger.warn('onLeave callback not provided');
     }
   }, [draftRoom, onLeave]);
+
+  // Handle withdrawal (before draft starts)
+  const handleWithdraw = useCallback(() => {
+    logger.debug('Withdraw confirmed, cleaning up', { hasOnLeave: !!onLeave });
+    // Call leave draft cleanup (same as leaving, but this is withdrawal)
+    draftRoom.leaveDraft();
+    // TODO: Add withdrawal-specific logic here (e.g., remove from participants, refund entry fee)
+    // Close modal first
+    setShowLeaveModal(false);
+    // Trigger navigation - use setTimeout to ensure it happens after state update
+    if (onLeave) {
+      logger.debug('Scheduling onLeave callback after withdrawal');
+      // Clear any existing timeout
+      if (leaveTimeoutRef.current) {
+        clearTimeout(leaveTimeoutRef.current);
+      }
+      // Use setTimeout to ensure navigation happens after modal closes
+      leaveTimeoutRef.current = setTimeout(() => {
+        // Only call onLeave if component is still mounted
+        if (isMountedRef.current) {
+          try {
+            logger.debug('Calling onLeave callback after withdrawal');
+            onLeave();
+          } catch (error) {
+            logger.error('Error in onLeave callback after withdrawal', error as Error);
+          }
+        }
+        leaveTimeoutRef.current = null;
+      }, 0);
+    } else {
+      logger.warn('onLeave callback not provided for withdrawal');
+    }
+  }, [draftRoom, onLeave]);
   
   // Cancel leaving
   const handleLeaveCancel = useCallback(() => {
     setShowLeaveModal(false);
+    setShowTopBarHint(false);
   }, []);
   
   // Info button handler
@@ -479,6 +548,7 @@ export default function DraftRoomVX2({
           isUserTurn={draftRoom.isMyTurn && draftRoom.status === 'active'}
           onGracePeriodEnd={handleGracePeriodEnd}
           onLeave={handleLeaveClick}
+          hideTimer={draftRoom.status === 'active'} // Hide timer in status bar when draft is active (timer shown in pick card)
         />
       </div>
       
@@ -517,7 +587,14 @@ export default function DraftRoomVX2({
             overflow: 'hidden',
           }}
         >
-          <TabContent activeTab={draftRoom.activeTab} draftRoom={draftRoom} onTutorial={() => setShowTutorialModal(true)} />
+          <TabContent 
+            activeTab={draftRoom.activeTab} 
+            draftRoom={draftRoom} 
+            onTutorial={() => setShowTutorialModal(true)}
+            onLeave={handleLeaveClick}
+            onLeaveFromLink={handleLeaveFromLink}
+            draftSettings={draftSettings}
+          />
         </main>
       </div>
       
@@ -532,8 +609,11 @@ export default function DraftRoomVX2({
       {/* Leave Confirmation Modal */}
       <LeaveConfirmModal
         isOpen={showLeaveModal}
+        draftStatus={draftRoom.status}
         onConfirm={handleLeaveConfirm}
+        onWithdraw={handleWithdraw}
         onCancel={handleLeaveCancel}
+        showTopBarHint={showTopBarHint}
       />
       
       {/* Info Modal */}
@@ -543,9 +623,9 @@ export default function DraftRoomVX2({
         onTutorial={handleTutorialClick}
         draftInfo={{
           format: 'Snake',
-          teams: draftRoom.room?.settings.teamCount ?? 12,
-          rounds: draftRoom.room?.settings.rosterSize ?? 18,
-          pickTime: draftRoom.room?.settings.pickTimeSeconds ?? 30,
+          teams: draftSettings.teamCount,
+          rounds: draftSettings.rosterSize,
+          pickTime: draftSettings.pickTimeSeconds,
           scoring: 'Best Ball',
         }}
       />

@@ -56,7 +56,7 @@ const LIVE_DRAFTS_PX = {
 
 export interface LiveDraftsTabVX2Props {
   /** Callback when user taps a draft to enter */
-  onEnterDraft?: (draftId: string) => void;
+  onEnterDraft?: (draft: LiveDraft) => void;
   /** Callback when user wants to join a new draft */
   onJoinDraft?: () => void;
 }
@@ -75,32 +75,33 @@ function TabSwitcher({ selected, onSelect }: TabSwitcherProps): React.ReactEleme
     <div
       className="flex rounded-lg overflow-hidden"
       style={{
-        backgroundColor: 'rgba(255,255,255,0.05)',
-        marginBottom: `${SPACING.md}px`,
+        backgroundColor: 'rgba(255,255,255,0.06)',
+        padding: '3px',
+        gap: '3px',
       }}
     >
       <button
         onClick={() => onSelect('live')}
-        className="flex-1 py-2.5 px-3 font-bold transition-all"
+        className="flex-1 py-2.5 px-3 font-semibold transition-all"
         style={{
           fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-          backgroundColor: selected === 'live' ? 'rgba(255,255,255,0.1)' : 'transparent',
+          backgroundColor: selected === 'live' ? 'rgba(255,255,255,0.12)' : 'transparent',
           color: selected === 'live' ? TEXT_COLORS.primary : TEXT_COLORS.muted,
-          opacity: selected === 'live' ? 1 : 0.8,
-          borderBottom: selected === 'live' ? `2px solid ${STATE_COLORS.active}` : '2px solid transparent',
+          borderRadius: `${RADIUS.md}px`,
+          letterSpacing: '-0.01em',
         }}
       >
         Fast Drafts (30 Sec)
       </button>
       <button
         onClick={() => onSelect('slow')}
-        className="flex-1 py-2.5 px-3 font-bold transition-all"
+        className="flex-1 py-2.5 px-3 font-semibold transition-all"
         style={{
           fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-          backgroundColor: selected === 'slow' ? 'rgba(255,255,255,0.1)' : 'transparent',
+          backgroundColor: selected === 'slow' ? 'rgba(255,255,255,0.12)' : 'transparent',
           color: selected === 'slow' ? TEXT_COLORS.primary : TEXT_COLORS.muted,
-          opacity: selected === 'slow' ? 1 : 0.8,
-          borderBottom: selected === 'slow' ? `2px solid ${STATE_COLORS.active}` : '2px solid transparent',
+          borderRadius: `${RADIUS.md}px`,
+          letterSpacing: '-0.01em',
         }}
       >
         Slow Drafts
@@ -123,10 +124,10 @@ function DraftProgressBar({ value, totalRounds, currentRound, color }: DraftProg
     <div
       className="relative"
       style={{
-        height: '4px',
-        borderRadius: '2px',
-        backgroundColor: 'rgba(255, 255, 255, 0.1)',
-        marginBottom: '16px', // Add space below for the label
+        height: '5px',
+        borderRadius: '3px',
+        backgroundColor: 'rgba(255, 255, 255, 0.12)',
+        marginBottom: '18px',
       }}
       role="progressbar"
       aria-valuenow={clampedValue}
@@ -138,8 +139,9 @@ function DraftProgressBar({ value, totalRounds, currentRound, color }: DraftProg
         className="absolute inset-y-0 left-0 transition-all duration-300 ease-out"
         style={{
           width: `${clampedValue}%`,
-          backgroundColor: 'rgba(200, 200, 200, 0.5)',
-          borderRadius: '2px',
+          backgroundColor: color,
+          borderRadius: '3px',
+          boxShadow: `0 0 4px ${color}40`,
         }}
       />
       
@@ -158,21 +160,27 @@ function DraftProgressBar({ value, totalRounds, currentRound, color }: DraftProg
               left: `${roundPosition}%`,
               top: '50%',
               transform: 'translateX(-50%) translateY(-50%)',
-              zIndex: 1,
+              zIndex: 2,
             }}
           >
             {/* Round dot - positioned at progress bar center */}
             <div
               style={{
-                width: '6px',
-                height: '6px',
+                width: isCurrentRound ? '8px' : '6px',
+                height: isCurrentRound ? '8px' : '6px',
                 borderRadius: '50%',
                 backgroundColor: isCurrentRound 
-                  ? 'rgba(255, 255, 255, 1)' 
+                  ? '#FFFFFF' 
                   : isPastRound 
-                    ? 'rgba(200, 200, 200, 0.5)' 
-                    : 'rgba(255, 255, 255, 0.3)',
-                border: `1px solid ${isCurrentRound ? 'rgba(255, 255, 255, 1)' : isPastRound ? 'rgba(200, 200, 200, 0.7)' : 'rgba(255, 255, 255, 0.5)'}`,
+                    ? color 
+                    : 'rgba(255, 255, 255, 0.4)',
+                border: isCurrentRound 
+                  ? `2px solid ${color}` 
+                  : isPastRound 
+                    ? `1px solid ${color}` 
+                    : '1px solid rgba(255, 255, 255, 0.5)',
+                boxShadow: isCurrentRound ? `0 0 6px ${color}80` : 'none',
+                transition: 'all 0.2s ease',
               }}
             />
             {/* Round label - only for current round, positioned absolutely below dot */}
@@ -183,12 +191,13 @@ function DraftProgressBar({ value, totalRounds, currentRound, color }: DraftProg
                   top: '100%',
                   left: '50%',
                   transform: 'translateX(-50%)',
-                  marginTop: '8px',
-                  fontSize: '10px',
-                  color: 'rgba(255, 255, 255, 0.7)',
-                  fontWeight: 500,
+                  marginTop: '10px',
+                  fontSize: '11px',
+                  color: 'rgba(255, 255, 255, 0.85)',
+                  fontWeight: 600,
                   whiteSpace: 'nowrap',
                   lineHeight: 1,
+                  letterSpacing: '-0.01em',
                 }}
               >
                 Round {roundNumber}
@@ -210,6 +219,7 @@ function DraftCard({ draft, onEnter }: DraftCardProps): React.ReactElement {
   const isYourTurn = draft.status === 'your-turn';
   const progress = (draft.pickNumber / draft.totalPicks) * 100;
   const picksAway = calculatePicksAway(draft);
+  const isSlowDraft = draft.draftSpeed === 'slow';
   
   return (
     <button
@@ -218,17 +228,19 @@ function DraftCard({ draft, onEnter }: DraftCardProps): React.ReactElement {
       style={{
         padding: `${LIVE_DRAFTS_PX.cardPadding}px`,
         borderRadius: `${LIVE_DRAFTS_PX.cardBorderRadius}px`,
-        height: '105px',
+        height: '110px',
         display: 'flex',
         flexDirection: 'column' as const,
         ...(isYourTurn 
           ? {
               ...TILED_BG_STYLE,
-              border: '1px solid rgba(255,255,255,0.3)',
+              border: '1px solid rgba(255,255,255,0.35)',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
             }
           : {
               backgroundColor: BG_COLORS.secondary,
-              border: '1px solid rgba(255,255,255,0.1)',
+              border: '1px solid rgba(255,255,255,0.12)',
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)',
             }
         ),
       }}
@@ -239,7 +251,7 @@ function DraftCard({ draft, onEnter }: DraftCardProps): React.ReactElement {
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            backgroundColor: 'rgba(0, 0, 0, 0.45)',
             borderRadius: `${LIVE_DRAFTS_PX.cardBorderRadius}px`,
             zIndex: 0,
           }}
@@ -247,14 +259,15 @@ function DraftCard({ draft, onEnter }: DraftCardProps): React.ReactElement {
       )}
       <div className="relative z-10 h-full flex flex-col justify-between">
       {/* Info Row - Team Name on left, Badge/Timer or Picks Away on right */}
-      <div className="flex items-start justify-between">
+      <div className="flex items-center justify-between mb-3">
         {/* Team Name on left */}
-        <div className="flex items-center min-w-0">
+        <div className="flex items-center min-w-0 flex-1">
           <span
-            className="font-medium"
+            className="font-semibold truncate"
             style={{
-              color: TEXT_COLORS.primary,
-              fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
+              color: isYourTurn ? '#FFFFFF' : TEXT_COLORS.primary,
+              fontSize: `${TYPOGRAPHY.fontSize.sm + 1}px`,
+              letterSpacing: '-0.01em',
             }}
           >
             {draft.teamName}
@@ -262,22 +275,23 @@ function DraftCard({ draft, onEnter }: DraftCardProps): React.ReactElement {
         </div>
         
         {/* Badge/Timer or Picks Away on right */}
-        <div className="flex-shrink-0 ml-2">
+        <div className="flex-shrink-0 ml-3">
           {isYourTurn ? (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2.5">
               {/* On the Clock badge */}
               <span
-                className="inline-flex flex-col items-center font-semibold uppercase tracking-wide"
+                className="inline-flex flex-col items-center font-bold uppercase tracking-wider"
                 style={{
                   ...TILED_BG_STYLE,
                   color: '#FFFFFF',
-                  paddingLeft: `${SPACING.sm}px`,
-                  paddingRight: `${SPACING.sm}px`,
-                  paddingTop: '2px',
-                  paddingBottom: '2px',
-                  borderRadius: `${RADIUS.sm}px`,
-                  fontSize: `${TYPOGRAPHY.fontSize.xs + 1}px`,
-                  lineHeight: 1.2,
+                  paddingLeft: `${SPACING.sm + 2}px`,
+                  paddingRight: `${SPACING.sm + 2}px`,
+                  paddingTop: '3px',
+                  paddingBottom: '3px',
+                  borderRadius: `${RADIUS.md}px`,
+                  fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
+                  lineHeight: 1.3,
+                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.3)',
                 }}
               >
                 <span>ON THE</span>
@@ -288,22 +302,28 @@ function DraftCard({ draft, onEnter }: DraftCardProps): React.ReactElement {
                 <span 
                   style={{ 
                     color: '#FFFFFF',
-                    fontSize: '20px',
-                    fontWeight: 700,
+                    fontSize: isSlowDraft ? '18px' : '24px',
+                    fontWeight: 800,
                     fontVariantNumeric: 'tabular-nums',
                     lineHeight: 1,
+                    textShadow: '0 1px 2px rgba(0, 0, 0, 0.4)',
+                    letterSpacing: isSlowDraft ? '-0.02em' : '0',
                   }}
                 >
-                  {draft.timeLeftSeconds}
+                  {formatTime(
+                    isSlowDraft ? draft.timeLeftSeconds : Math.min(draft.timeLeftSeconds, 30),
+                    isSlowDraft
+                  )}
                 </span>
               )}
             </div>
           ) : picksAway > 0 ? (
             <span 
-              className="font-bold"
+              className="font-semibold"
               style={{ 
-                color: TEXT_COLORS.secondary,
+                color: TEXT_COLORS.muted,
                 fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
+                letterSpacing: '-0.01em',
               }}
             >
               {picksAway} pick{picksAway !== 1 ? 's' : ''} away
@@ -317,7 +337,7 @@ function DraftCard({ draft, onEnter }: DraftCardProps): React.ReactElement {
         value={progress}
         totalRounds={Math.ceil(draft.totalPicks / draft.teamCount)}
         currentRound={Math.ceil(draft.pickNumber / draft.teamCount)}
-        color={isYourTurn ? POSITION_COLORS.RB : STATE_COLORS.active}
+        color={isYourTurn ? '#FFFFFF' : STATE_COLORS.active}
       />
       </div>
     </button>
@@ -374,10 +394,33 @@ function JoinDraftButton({ onClick }: { onClick: () => void }): React.ReactEleme
 // UTILITIES
 // ============================================================================
 
-function formatTime(seconds: number): string {
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
+/**
+ * Format time for display - handles fast (seconds/minutes) and slow (hours/days) drafts
+ */
+function formatTime(seconds: number, isSlowDraft: boolean = false): string {
+  if (isSlowDraft) {
+    // For slow drafts, format as hours/days
+    const days = Math.floor(seconds / 86400);
+    const hours = Math.floor((seconds % 86400) / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    
+    if (days > 0) {
+      return `${days}d ${hours}h`;
+    } else if (hours > 0) {
+      return `${hours}h ${minutes}m`;
+    } else {
+      return `${minutes}m`;
+    }
+  } else {
+    // For fast drafts, format as M:SS or SS
+    if (seconds >= 60) {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${mins}:${secs.toString().padStart(2, '0')}`;
+    } else {
+      return `${seconds}`;
+    }
+  }
 }
 
 /**
@@ -434,8 +477,8 @@ export default function LiveDraftsTabVX2({
   const { drafts, isLoading, error, refetch } = useLiveDrafts();
   const [draftType, setDraftType] = useState<DraftType>('live');
   
-  const handleEnterDraft = useCallback((draftId: string) => {
-    onEnterDraft?.(draftId);
+  const handleEnterDraft = useCallback((draft: LiveDraft) => {
+    onEnterDraft?.(draft);
   }, [onEnterDraft]);
   
   const handleJoinDraft = useCallback(() => {
@@ -445,10 +488,9 @@ export default function LiveDraftsTabVX2({
   // Filter drafts by type - must be before any early returns (Rules of Hooks)
   const filteredDrafts = useMemo(() => {
     if (draftType === 'slow') {
-      // Return empty array for now - slow drafts will be implemented later
-      return [];
+      return drafts.filter(draft => draft.draftSpeed === 'slow');
     }
-    return drafts;
+    return drafts.filter(draft => draft.draftSpeed === 'fast' || !draft.draftSpeed); // Default to fast if not specified
   }, [drafts, draftType]);
   
   // Note: Auth check removed - AuthGateVX2 ensures only logged-in users can access tabs
@@ -599,7 +641,7 @@ export default function LiveDraftsTabVX2({
             <DraftCard
               key={draft.id}
               draft={draft}
-              onEnter={() => handleEnterDraft(draft.id)}
+              onEnter={() => handleEnterDraft(draft)}
             />
           ))}
         </div>
