@@ -1,33 +1,29 @@
-import { useEffect } from 'react';
-import { useRouter } from 'next/router';
-import { useAuth } from '@/components/vx2/auth/hooks/useAuth';
-import { ProfileCustomizationPage } from '@/components/vx2/customization/ProfileCustomizationPage';
-import { BG_COLORS } from '@/components/vx2/core/constants/colors';
+/**
+ * Profile Customization Page - Mobile Only
+ * 
+ * Mobile-optimized customization page using MobilePhoneFrame.
+ * All customization features: flags, overlays, patterns, colors.
+ */
+
+import React from 'react';
+import Head from 'next/head';
+import { AuthProvider } from '@/components/vx2/auth/context/AuthContext';
+import ProfileCustomizationContent from '../components/mobile/pages/ProfileCustomizationContent';
+import DevNav from '../components/dev/DevNav';
 
 export default function ProfileCustomizationRoute() {
-  const { user, isLoading } = useAuth();
-  const router = useRouter();
+  return (
+    <>
+      <Head>
+        <title>Profile Customization - TopDog.dog</title>
+        <meta name="description" content="Customize your TopDog.dog profile settings" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+      </Head>
 
-  useEffect(() => {
-    if (!isLoading && !user) {
-      router.push('/');
-    }
-  }, [user, isLoading, router]);
-
-  if (isLoading) {
-    return (
-      <div
-        className="min-h-screen flex items-center justify-center"
-        style={{ backgroundColor: BG_COLORS.primary }}
-      >
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
-      </div>
-    );
-  }
-
-  if (!user) {
-    return null;
-  }
-
-  return <ProfileCustomizationPage />;
+      <AuthProvider>
+        <ProfileCustomizationContent />
+        <DevNav />
+      </AuthProvider>
+    </>
+  );
 }

@@ -1,3 +1,4 @@
+import React from 'react';
 import { OverlayPattern } from '@/lib/customization/types';
 import { cn } from '@/lib/utils';
 
@@ -16,21 +17,30 @@ const PATTERNS: { value: OverlayPattern; label: string; description: string }[] 
 
 export function PatternPicker({ selected, onSelect }: PatternPickerProps) {
   return (
-    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+    <div className="grid grid-cols-2 gap-3 sm:gap-2 sm:grid-cols-3">
       {PATTERNS.map((pattern) => (
         <button
           key={pattern.value}
           type="button"
           onClick={() => onSelect(pattern.value)}
           className={cn(
-            'p-3 rounded-lg border-2 text-left transition-all',
+            'p-4 sm:p-3 rounded-lg border-2 text-left transition-all min-h-[64px] sm:min-h-0',
             selected === pattern.value
-              ? 'border-blue-500 bg-blue-50'
-              : 'border-gray-200 hover:border-gray-300'
+              ? 'border-blue-500 bg-blue-900/20 border-blue-400'
+              : 'border-gray-600 hover:border-gray-500'
           )}
+          style={
+            selected === pattern.value
+              ? {
+                  backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                }
+              : {
+                  backgroundColor: '#1F2937',
+                }
+          }
         >
-          <div className="font-medium text-sm">{pattern.label}</div>
-          <div className="text-xs text-gray-500">{pattern.description}</div>
+          <div className="font-medium text-sm" style={{ color: 'inherit' }}>{pattern.label}</div>
+          <div className="text-xs mt-0.5" style={{ color: 'rgba(156, 163, 175, 0.8)' }}>{pattern.description}</div>
         </button>
       ))}
     </div>

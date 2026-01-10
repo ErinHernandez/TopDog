@@ -54,6 +54,8 @@ function MyApp({ Component, pageProps }) {
   const isVX2DraftRoom = router.pathname === '/testing-grounds/vx2-draft-room';
   const isVXMobileDemo = router.pathname === '/testing-grounds/vx-mobile-demo';
   const isTestingGrounds = router.pathname.startsWith('/testing-grounds/');
+  const isProfileCustomization = router.pathname === '/profile-customization';
+  const isMobileProfileCustomization = router.pathname === '/mobile-profile-customization';
 
   useEffect(() => {
     // Initialize Firebase authentication in the background
@@ -100,11 +102,11 @@ function MyApp({ Component, pageProps }) {
       <UserProvider>
         <PlayerDataProvider>
           <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-            {!isLandingPage && !isDraftRoom && !isDevDraftNavbar && !isMobileDemo && !isTestingGrounds && <Navbar />}
+            {!isLandingPage && !isDraftRoom && !isDevDraftNavbar && !isMobileDemo && !isTestingGrounds && !isProfileCustomization && !isMobileProfileCustomization && <Navbar />}
             <div style={{ flex: '1' }}>
               <Component {...pageProps} />
             </div>
-            {!isLandingPage && !isDraftRoom && !isDevDraftNavbar && !isMobileDemo && !isTestingGrounds && <Footer />}
+            {!isLandingPage && !isDraftRoom && !isDevDraftNavbar && !isMobileDemo && !isTestingGrounds && !isProfileCustomization && !isMobileProfileCustomization && <Footer />}
             {isTestingGrounds && !isMobileDevice && <DevNav />}
           </div>
         </PlayerDataProvider>

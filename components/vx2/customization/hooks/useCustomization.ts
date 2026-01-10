@@ -1,4 +1,11 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+/**
+ * useCustomization Hook
+ * 
+ * Manages customization preferences with Firebase persistence.
+ * Integrates with location tracking for flag unlocking.
+ */
+
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useAuth } from '@/components/vx2/auth/hooks/useAuth';
 import {
   CustomizationPreferences,
@@ -17,6 +24,8 @@ import {
   hasLocationConsent,
   grantLocationConsent,
 } from '@/lib/customization/geolocation';
+import { useLocationConsent } from '@/components/vx2/location/hooks/useLocationConsent';
+import { trackLocation } from '@/lib/location/locationService';
 
 interface UseCustomizationReturn {
   // Saved state
@@ -45,6 +54,7 @@ interface UseCustomizationReturn {
 
 export function useCustomization(): UseCustomizationReturn {
   const { user } = useAuth();
+  const { isGranted: locationConsentGranted, grantConsent } = useLocationConsent();
 
   // Saved preferences from Firebase
   const [preferences, setPreferences] = useState<CustomizationPreferences>(DEFAULT_PREFERENCES);
@@ -59,8 +69,21 @@ export function useCustomization(): UseCustomizationReturn {
   const [availableFlags, setAvailableFlags] = useState<FlagOption[]>([]);
   const [flagsLoading, setFlagsLoading] = useState(true);
 
-  // Location consent
+  // Location consent (use the enhanced hook value)
   const [locationConsent, setLocationConsent] = useState(false);
+
+  // Track if we've attempted auto-detection to prevent multiple attempts
+  const hasAutoDetectedRef = useRef(false);
+
+  // Sync location consent from the enhanced hook
+  useEffect(() => {
+    setLocationConsent(locationConsentGranted);
+  }, [locationConsentGranted]);
+
+  // Reset auto-detection ref when user changes
+  useEffect(() => {
+    hasAutoDetectedRef.current = false;
+  }, [user?.uid]);
 
   // Subscribe to preferences
   useEffect(() => {
@@ -92,24 +115,66 @@ export function useCustomization(): UseCustomizationReturn {
       return;
     }
 
-    const unsubscribe = subscribeToLocations(user.uid, (locations) => {
-      if (locations) {
-        setLocationConsent(locations.consentGiven);
+    const unsubscribe = subscribeToLocations(user.uid, async (locations) => {
+      if (locations && (locations.countries?.length > 0 || locations.states?.length > 0)) {
+        setLocationConsent(locations.consentGiven ?? false);
         const flags: FlagOption[] = [
-          ...locations.countries.map((c) => ({
+          ...(locations.countries || []).map((c) => ({
             code: c.code,
             name: c.name,
             type: 'country' as const,
           })),
-          ...locations.states.map((s) => ({
+          ...(locations.states || []).map((s) => ({
             code: `US-${s.code}`,
             name: s.name,
             type: 'state' as const,
           })),
         ];
         setAvailableFlags(flags);
+        setFlagsLoading(false);
+      } else {
+        // No locations exist - automatically detect and record location
+        // This ensures users always have at least their country flag (and state if US)
+        if (!hasAutoDetectedRef.current) {
+          hasAutoDetectedRef.current = true;
+          
+          try {
+            // Automatically grant consent (IP-based geolocation doesn't require explicit consent)
+            await grantLocationConsent(user.uid);
+            setLocationConsent(true);
+
+            // Detect location using IP-based geolocation (no permission needed)
+            // Wrap in try-catch to handle network errors gracefully
+            try {
+              const location = await detectLocation();
+              if (location.country) {
+                // Record the location visit - this will trigger the subscription again with new data
+                await recordLocationVisit(user.uid, location);
+                // Don't set flagsLoading to false yet - wait for subscription to fire with new data
+              } else {
+                // If detection fails, show empty state
+                setAvailableFlags([]);
+                setFlagsLoading(false);
+              }
+            } catch (detectErr) {
+              // Location detection failed (network error, API down, etc.)
+              console.warn('Location detection failed, user can still use customization:', detectErr);
+              // Don't block the UI - allow user to proceed without flags
+              setAvailableFlags([]);
+              setFlagsLoading(false);
+            }
+          } catch (err) {
+            // Grant consent or other error
+            console.error('Auto-location setup failed:', err);
+            setAvailableFlags([]);
+            setFlagsLoading(false);
+          }
+        } else {
+          // Already attempted detection, show empty state
+          setAvailableFlags([]);
+          setFlagsLoading(false);
+        }
       }
-      setFlagsLoading(false);
     });
 
     return unsubscribe;
@@ -145,19 +210,31 @@ export function useCustomization(): UseCustomizationReturn {
     setDraft(preferences);
   }, [preferences]);
 
-  // Enable location tracking
+  // Enable location tracking (uses enhanced system)
   const enableLocationTracking = useCallback(async () => {
     if (!user?.uid) return;
 
-    await grantLocationConsent(user.uid);
-    setLocationConsent(true);
+    try {
+      // Grant consent via the enhanced system
+      await grantConsent();
+      setLocationConsent(true);
 
-    // Detect and record current location
-    const location = await detectLocation();
-    if (location.country) {
-      await recordLocationVisit(user.uid, location);
+      // Also grant via legacy system for backward compatibility
+      await grantLocationConsent(user.uid);
+
+      // Detect and record current location
+      const location = await detectLocation();
+      if (location.country) {
+        await recordLocationVisit(user.uid, location);
+      }
+
+      // Also track via the new system
+      await trackLocation(user.uid);
+    } catch (err) {
+      console.error('Error enabling location tracking:', err);
+      setError(err as Error);
     }
-  }, [user?.uid]);
+  }, [user?.uid, grantConsent]);
 
   return {
     preferences,
@@ -175,3 +252,5 @@ export function useCustomization(): UseCustomizationReturn {
     enableLocationTracking,
   };
 }
+
+export default useCustomization;

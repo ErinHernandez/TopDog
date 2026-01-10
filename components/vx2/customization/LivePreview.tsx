@@ -1,4 +1,5 @@
-import { CustomizationPreferences } from '@/lib/customization/types';
+import React from 'react';
+import { CustomizationPreferences, DEFAULT_PREFERENCES } from '@/lib/customization/types';
 import { generateBackgroundStyle, generateOverlayStyle } from '@/lib/customization/patterns';
 import { useAuth } from '@/components/vx2/auth/hooks/useAuth';
 
@@ -9,6 +10,11 @@ interface LivePreviewProps {
 export function LivePreview({ preferences }: LivePreviewProps) {
   const { user } = useAuth();
   const username = user?.displayName || 'Username';
+
+  // Use grey as default, fallback from DEFAULT_PREFERENCES if borderColor is missing or old gold
+  const borderColor = preferences.borderColor && preferences.borderColor !== '#FFD700' 
+    ? preferences.borderColor 
+    : DEFAULT_PREFERENCES.borderColor;
 
   const backgroundStyle = generateBackgroundStyle(
     preferences.backgroundType,
@@ -29,7 +35,7 @@ export function LivePreview({ preferences }: LivePreviewProps) {
 
   return (
     <div className="flex flex-col items-center">
-      <p className="text-sm text-gray-600 mb-2">Preview</p>
+      <p className="text-sm mb-2" style={{ color: '#9CA3AF' }}>Preview</p>
 
       {/* Cell preview - exact dimensions from ProfileTabVX2 */}
       <div
@@ -38,13 +44,13 @@ export function LivePreview({ preferences }: LivePreviewProps) {
           width: 120,
           height: 140,
           borderRadius: 8,
-          border: `3px solid ${preferences.borderColor}`,
+          border: `3px solid ${borderColor}`,
         }}
       >
         {/* Username banner */}
         <div
           className="absolute top-0 left-0 right-0 text-center text-xs font-medium text-white py-1 truncate px-1"
-          style={{ backgroundColor: preferences.borderColor }}
+          style={{ backgroundColor: borderColor }}
         >
           {username}
         </div>

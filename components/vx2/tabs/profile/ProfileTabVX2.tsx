@@ -226,9 +226,17 @@ interface MenuItemButtonProps {
 }
 
 function MenuItemButton({ item, onClick }: MenuItemButtonProps): React.ReactElement {
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('[ProfileTab] MenuItemButton clicked:', item.id, item.label);
+    onClick();
+  };
+  
   return (
     <button
-      onClick={onClick}
+      type="button"
+      onClick={handleClick}
       className="w-full flex items-center justify-between font-semibold transition-colors active:scale-[0.98]"
       style={{
         backgroundColor: PROFILE_COLORS.menuItemBg,
@@ -329,7 +337,12 @@ export default function ProfileTabVX2({
         break;
       case 'navigate':
         if (item.path) {
-          router.push(item.path);
+          console.log('[ProfileTab] Navigating to:', item.path);
+          router.push(item.path).catch((error) => {
+            console.error('[ProfileTab] Navigation error, using fallback:', error);
+            // Fallback to window.location on error
+            window.location.href = item.path;
+          });
         }
         break;
     }

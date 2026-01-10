@@ -45,33 +45,55 @@ if (admin.apps.length === 0) {
  * @returns {Promise<{ uid: string | null, error?: string }>}
  */
 async function verifyAuth(authHeader) {
-  if (!authHeader?.startsWith('Bearer ')) {
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  
+  // Handle missing authorization header
+  if (!authHeader) {
+    if (isDevelopment) {
+      // In development, allow requests without auth header
+      return { uid: 'dev-uid' };
+    }
     return { uid: null, error: 'Missing authorization header' };
   }
   
-  const token = authHeader.split('Bearer ')[1];
+  if (!authHeader.startsWith('Bearer ')) {
+    return { uid: null, error: 'Invalid authorization header format' };
+  }
   
-  try {
-    // For development without Firebase Admin
-    if (process.env.NODE_ENV === 'development' && token === 'dev-token') {
+  // Extract token (handle multiple spaces or edge cases)
+  const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+  
+  // For development: accept dev-token as valid authentication
+  if (isDevelopment && token === 'dev-token') {
+    return { uid: 'dev-uid' };
+  }
+  
+  // If Firebase Admin is not initialized, allow in development
+  if (!firebaseAdminInitialized) {
+    if (isDevelopment) {
+      // In development, if Firebase Admin isn't configured, allow any token
+      // This handles the case where FIREBASE_SERVICE_ACCOUNT is not set
       return { uid: 'dev-uid' };
     }
-    
-    // Check if Firebase Admin was initialized successfully
-    if (!firebaseAdminInitialized) {
-      return { 
-        uid: null, 
-        error: 'Authentication service unavailable' 
-      };
-    }
-    
-    // Verify with Firebase Admin
+    return { 
+      uid: null, 
+      error: 'Authentication service unavailable' 
+    };
+  }
+  
+  // Verify with Firebase Admin for production tokens
+  try {
     const adminAuth = admin.auth();
     const decodedToken = await adminAuth.verifyIdToken(token);
-    
     return { uid: decodedToken.uid };
   } catch (error) {
-    console.error('Token verification error:', error);
+    // In development, if token verification fails for any reason,
+    // fall back to dev-uid for easier development
+    if (isDevelopment) {
+      console.warn('[Analytics] Token verification failed in development, allowing as dev-uid:', error.message || error);
+      return { uid: 'dev-uid' };
+    }
+    console.error('Token verification error:', error.message || error);
     return { uid: null, error: 'Invalid token' };
   }
 }
@@ -136,6 +158,16 @@ const handler = async function(req, res) {
     const authResult = await verifyAuth(authHeader);
     
     if (!authResult.uid) {
+      // In development, log more details for debugging
+      if (process.env.NODE_ENV === 'development') {
+        logger.debug('Analytics auth failed', {
+          hasAuthHeader: !!authHeader,
+          authHeaderPrefix: authHeader?.substring(0, 20),
+          error: authResult.error,
+          firebaseAdminInitialized
+        });
+      }
+      
       const error = createErrorResponse(
         ErrorType.UNAUTHORIZED,
         authResult.error || 'Authentication required',
@@ -148,14 +180,24 @@ const handler = async function(req, res) {
     const { event, userId, sessionId, timestamp } = req.body;
 
     // Validate that userId in body matches authenticated user (if provided)
+    // In development, be more lenient with dev-uid
     if (userId && userId !== authResult.uid) {
-      const error = createErrorResponse(
-        ErrorType.FORBIDDEN,
-        'User ID mismatch',
-        403,
-        logger
-      );
-      return res.status(error.statusCode).json(error.body);
+      // In development, if we're using dev-uid, allow any userId or no userId
+      if (process.env.NODE_ENV === 'development' && authResult.uid === 'dev-uid') {
+        // Allow any userId in development mode
+        logger.debug('Development mode: allowing userId mismatch', { 
+          providedUserId: userId, 
+          authUid: authResult.uid 
+        });
+      } else {
+        const error = createErrorResponse(
+          ErrorType.FORBIDDEN,
+          'User ID mismatch',
+          403,
+          logger
+        );
+        return res.status(error.statusCode).json(error.body);
+      }
     }
 
     // Log analytics event with authenticated user ID

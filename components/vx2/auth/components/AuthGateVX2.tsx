@@ -8,6 +8,8 @@
  * - Signs out anonymous users automatically
  * - Shows loading state during auth initialization
  * - Supports dev auth override for testing (via DevNav toggle)
+ * - DEV BYPASS: Auto-login on mobile devices (for dev purposes)
+ * - DEV BYPASS: Auto-login on Vercel deployments (until further notice)
  * 
  * This is the ONLY entry point to the app for unauthenticated users.
  * No close button, no escape - must authenticate to access the app.
@@ -18,6 +20,7 @@ import { useAuth } from '../hooks/useAuth';
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS } from '../../core/constants/colors';
 import { LoginScreenVX2 } from './LoginScreenVX2';
 import { SignUpScreenVX2 } from './SignUpScreenVX2';
+import { useIsMobileDevice } from '../../../../hooks/useIsMobileDevice';
 
 // ============================================================================
 // CONSTANTS
@@ -80,8 +83,22 @@ function LoadingSpinner(): React.ReactElement {
 
 export function AuthGateVX2({ children }: AuthGateVX2Props): React.ReactElement {
   const { state: authState, signOut } = useAuth();
+  const { isMobile } = useIsMobileDevice();
   const [currentView, setCurrentView] = useState<AuthView>('login');
   const [devAuthOverride, setDevAuthOverride] = useState<DevAuthOverride>(null);
+  const [isVercelDeployment, setIsVercelDeployment] = useState(false);
+  
+  // Check if running on Vercel deployment (runtime, not build)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Check if hostname contains vercel.app (client-side detection)
+      const hostname = window.location.hostname;
+      const isVercelHost = hostname.includes('vercel.app') || 
+                          hostname.endsWith('.vercel.app') ||
+                          hostname.includes('.vercel-dns.com');
+      setIsVercelDeployment(isVercelHost);
+    }
+  }, []);
   
   // Load dev auth override on mount and listen for changes
   useEffect(() => {
@@ -109,12 +126,14 @@ export function AuthGateVX2({ children }: AuthGateVX2Props): React.ReactElement 
     };
   }, []);
   
-  // Handle anonymous users - sign them out automatically
+  // Handle anonymous users - sign them out automatically (only if not bypassing auth)
   useEffect(() => {
-    if (authState.user?.isAnonymous) {
+    // Don't sign out if we're bypassing auth for mobile/Vercel
+    const bypassAuth = isMobile || isVercelDeployment;
+    if (!bypassAuth && authState.user?.isAnonymous) {
       signOut();
     }
-  }, [authState.user?.isAnonymous, signOut]);
+  }, [authState.user?.isAnonymous, signOut, isMobile, isVercelDeployment]);
   
   // Handle successful authentication
   const handleAuthSuccess = useCallback(() => {
@@ -136,6 +155,14 @@ export function AuthGateVX2({ children }: AuthGateVX2Props): React.ReactElement 
   
   // 0. Dev auth override - bypass real auth for testing
   if (devAuthOverride === 'logged-in') {
+    return <>{children}</>;
+  }
+  
+  // DEV BYPASS: Auto-login on mobile devices (for dev purposes)
+  // DEV BYPASS: Auto-login on Vercel deployments (until further notice)
+  const bypassAuth = isMobile || isVercelDeployment;
+  
+  if (bypassAuth) {
     return <>{children}</>;
   }
   

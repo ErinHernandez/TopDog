@@ -1,13 +1,21 @@
-import { useState } from 'react';
+/**
+ * Profile Customization Page
+ * 
+ * Enterprise-grade customization interface with location-based features.
+ * Allows users to personalize their draft room cell appearance.
+ */
+
+import React, { useState } from 'react';
 import { useCustomization } from './hooks/useCustomization';
 import { FlagGrid } from './FlagGrid';
 import { PatternPicker } from './PatternPicker';
 import { OverlayControls } from './OverlayControls';
 import { LivePreview } from './LivePreview';
 import AppHeaderVX2 from '@/components/vx2/shell/AppHeaderVX2';
-import { BG_COLORS } from '@/components/vx2/core/constants/colors';
-import { SPACING } from '@/components/vx2/core/constants/sizes';
-// Simple icon components
+import { BG_COLORS, TEXT_COLORS, BORDER_COLORS, STATE_COLORS } from '@/components/vx2/core/constants/colors';
+import { SPACING, RADIUS } from '@/components/vx2/core/constants/sizes';
+
+// Icons
 function MapPinIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -80,8 +88,6 @@ export function ProfileCustomizationPage() {
     isLoading,
     availableFlags,
     flagsLoading,
-    locationConsent,
-    enableLocationTracking,
   } = useCustomization();
 
   const [activeSection, setActiveSection] = useState<'background' | 'overlay'>('background');
@@ -89,7 +95,7 @@ export function ProfileCustomizationPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen" style={{ backgroundColor: BG_COLORS.primary }}>
-        <AppHeaderVX2 title="Customization" showBackButton />
+        <AppHeaderVX2 title="Customization" />
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
         </div>
@@ -99,150 +105,161 @@ export function ProfileCustomizationPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: BG_COLORS.primary }}>
-      <AppHeaderVX2 title="Customization" showBackButton />
+      <AppHeaderVX2 title="Customization" />
 
-      <div className="flex flex-col lg:flex-row" style={{ padding: SPACING.lg }}>
+      <div className="flex flex-col lg:flex-row" style={{ padding: '16px', paddingTop: '16px' }}>
+        {/* Preview - Show at top on mobile, sidebar on desktop */}
+        <div className="w-full mb-6 lg:w-64 lg:ml-8 lg:mt-0 lg:mb-0 order-first lg:order-last">
+          <div className="lg:sticky lg:top-4">
+            <LivePreview preferences={draft} />
+          </div>
+        </div>
+
         {/* Main controls */}
-        <div className="flex-1 space-y-6">
-          {/* Location consent banner */}
-          {!locationConsent && (
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <MapPinIcon className="w-5 h-5 text-amber-600 mt-0.5" />
-                <div className="flex-1">
-                  <p className="text-sm text-amber-800">
-                    Enable location detection to unlock flag backgrounds based on places you visit.
-                  </p>
-                  <div className="mt-3 flex gap-2">
-                    <button
-                      onClick={enableLocationTracking}
-                      className="px-3 py-1.5 bg-amber-600 text-white text-sm rounded hover:bg-amber-700"
-                    >
-                      Enable
-                    </button>
-                    <button className="px-3 py-1.5 text-amber-700 text-sm hover:bg-amber-100 rounded">
-                      Not now
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
+        <div className="flex-1 space-y-4 lg:space-y-6">
           {/* Section tabs */}
-          <div className="flex border-b border-gray-200">
+          <div 
+            className="flex border-b"
+            style={{ borderColor: BORDER_COLORS.light }}
+          >
             <button
               onClick={() => setActiveSection('background')}
-              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 -mb-px ${
-                activeSection === 'background'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
+              className={`flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors flex-1 lg:flex-initial min-h-[48px]`}
+              style={{
+                borderColor: activeSection === 'background' ? STATE_COLORS.info : 'transparent',
+                color: activeSection === 'background' ? STATE_COLORS.info : TEXT_COLORS.secondary,
+              }}
             >
               <PaletteIcon className="w-4 h-4" />
-              Background
+              <span className="lg:inline">Background</span>
             </button>
             <button
               onClick={() => setActiveSection('overlay')}
-              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 -mb-px ${
-                activeSection === 'overlay'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
+              className={`flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors flex-1 lg:flex-initial min-h-[48px]`}
+              style={{
+                borderColor: activeSection === 'overlay' ? STATE_COLORS.info : 'transparent',
+                color: activeSection === 'overlay' ? STATE_COLORS.info : TEXT_COLORS.secondary,
+              }}
             >
               <LayersIcon className="w-4 h-4" />
-              Overlay
+              <span className="lg:inline">Overlay</span>
             </button>
           </div>
 
           {/* Background Section */}
           {activeSection === 'background' && (
-            <div className="space-y-4">
+            <div className="space-y-4 lg:space-y-6">
               {/* Background type selector */}
-              <div className="flex gap-2">
-                {(['none', 'flag', 'solid'] as const).map((type) => (
-                  <button
-                    key={type}
-                    onClick={() => updateDraft({ backgroundType: type })}
-                    className={`px-4 py-2 rounded text-sm capitalize ${
-                      draft.backgroundType === type
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    {type}
-                  </button>
-                ))}
+              <div>
+                <label 
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: TEXT_COLORS.secondary }}
+                >
+                  Background Type
+                </label>
+                <div className="flex gap-2">
+                  {(['none', 'flag', 'solid'] as const).map((type) => (
+                    <button
+                      key={type}
+                      onClick={() => updateDraft({ backgroundType: type })}
+                      className={`flex-1 lg:flex-initial px-4 py-3 lg:py-2 rounded-lg text-sm capitalize transition-colors min-h-[48px]`}
+                      style={{
+                        backgroundColor: draft.backgroundType === type 
+                          ? STATE_COLORS.info 
+                          : BG_COLORS.tertiary,
+                        color: draft.backgroundType === type 
+                          ? '#FFFFFF' 
+                          : TEXT_COLORS.secondary,
+                      }}
+                    >
+                      {type}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* Flag selector */}
               {draft.backgroundType === 'flag' && (
-                <FlagGrid
-                  flags={availableFlags}
-                  selectedCode={draft.backgroundFlagCode}
-                  onSelect={(code) => updateDraft({ backgroundFlagCode: code })}
-                  isLoading={flagsLoading}
-                />
+                <div>
+                  <FlagGrid
+                    flags={availableFlags}
+                    selectedCode={draft.backgroundFlagCode}
+                    onSelect={(code) => updateDraft({ backgroundFlagCode: code })}
+                    isLoading={flagsLoading}
+                  />
+                </div>
               )}
 
               {/* Solid color picker */}
               {draft.backgroundType === 'solid' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label 
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: TEXT_COLORS.secondary }}
+                  >
                     Background Color
                   </label>
-                  <input
-                    type="color"
-                    value={draft.backgroundSolidColor || '#ffffff'}
-                    onChange={(e) => updateDraft({ backgroundSolidColor: e.target.value })}
-                    className="w-16 h-10 rounded border border-gray-300 cursor-pointer"
-                  />
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="color"
+                      value={draft.backgroundSolidColor || '#ffffff'}
+                      onChange={(e) => updateDraft({ backgroundSolidColor: e.target.value })}
+                      className="w-16 h-10 rounded border cursor-pointer"
+                      style={{ borderColor: BORDER_COLORS.default }}
+                    />
+                    <span 
+                      className="text-sm font-mono"
+                      style={{ color: TEXT_COLORS.muted }}
+                    >
+                      {draft.backgroundSolidColor || '#ffffff'}
+                    </span>
+                  </div>
                 </div>
               )}
-
-              {/* Border color */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Border Color
-                </label>
-                <input
-                  type="color"
-                  value={draft.borderColor}
-                  onChange={(e) => updateDraft({ borderColor: e.target.value })}
-                  className="w-16 h-10 rounded border border-gray-300 cursor-pointer"
-                />
-              </div>
             </div>
           )}
 
           {/* Overlay Section */}
           {activeSection === 'overlay' && (
-            <div className="space-y-4">
+            <div className="space-y-4 lg:space-y-6">
               {/* Enable toggle */}
-              <label className="flex items-center gap-3">
+              <label className="flex items-center gap-3 cursor-pointer min-h-[48px]">
                 <input
                   type="checkbox"
                   checked={draft.overlayEnabled}
                   onChange={(e) => updateDraft({ overlayEnabled: e.target.checked })}
-                  className="w-5 h-5 rounded border-gray-300"
+                  className="w-6 h-6 lg:w-5 lg:h-5 rounded"
+                  style={{ accentColor: STATE_COLORS.info }}
                 />
-                <span className="text-sm font-medium text-gray-700">Enable overlay</span>
+                <span 
+                  className="text-sm font-medium"
+                  style={{ color: TEXT_COLORS.primary }}
+                >
+                  Enable overlay
+                </span>
               </label>
 
               {draft.overlayEnabled && (
                 <>
-                  {/* Image selector (just hotdog for now) */}
+                  {/* Image selector */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label 
+                      className="block text-sm font-medium mb-2"
+                      style={{ color: TEXT_COLORS.secondary }}
+                    >
                       Image
                     </label>
                     <div className="flex gap-2">
                       <button
-                        className={`p-3 rounded border-2 ${
-                          draft.overlayImageId === 'hotdog'
-                            ? 'border-blue-500 bg-blue-50'
-                            : 'border-gray-200'
-                        }`}
+                        className={`p-3 rounded-lg border-2 transition-colors`}
+                        style={{
+                          borderColor: draft.overlayImageId === 'hotdog' 
+                            ? STATE_COLORS.info 
+                            : BORDER_COLORS.light,
+                          backgroundColor: draft.overlayImageId === 'hotdog'
+                            ? 'rgba(59, 130, 246, 0.1)'
+                            : BG_COLORS.tertiary,
+                        }}
                       >
                         <img
                           src="/customization/images/hotdog.svg"
@@ -256,7 +273,10 @@ export function ProfileCustomizationPage() {
 
                   {/* Pattern picker */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label 
+                      className="block text-sm font-medium mb-2"
+                      style={{ color: TEXT_COLORS.secondary }}
+                    >
                       Pattern
                     </label>
                     <PatternPicker
@@ -282,31 +302,38 @@ export function ProfileCustomizationPage() {
           )}
 
           {/* Save/Reset buttons */}
-          <div className="flex gap-3 pt-4 border-t border-gray-200">
+          <div 
+            className="flex flex-col sm:flex-row gap-3 pt-4 border-t"
+            style={{ borderColor: BORDER_COLORS.light }}
+          >
             <button
               onClick={save}
               disabled={!isDirty || isSaving}
-              className="px-6 py-2 bg-blue-500 text-white rounded font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-600"
+              className="flex-1 sm:flex-initial px-6 py-3 lg:py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-h-[48px]"
+              style={{
+                backgroundColor: STATE_COLORS.info,
+                color: '#FFFFFF',
+              }}
             >
               {isSaving ? 'Saving...' : 'Save Changes'}
             </button>
             <button
               onClick={reset}
               disabled={!isDirty}
-              className="px-6 py-2 bg-gray-100 text-gray-700 rounded font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-200"
+              className="flex-1 sm:flex-initial px-6 py-3 lg:py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-h-[48px]"
+              style={{
+                backgroundColor: BG_COLORS.tertiary,
+                color: TEXT_COLORS.secondary,
+              }}
             >
               Reset
             </button>
-          </div>
-        </div>
-
-        {/* Preview sidebar */}
-        <div className="lg:w-64 lg:ml-8 mt-8 lg:mt-0">
-          <div className="sticky top-4">
-            <LivePreview preferences={draft} />
           </div>
         </div>
       </div>
     </div>
   );
 }
+
+
+export default ProfileCustomizationPage;

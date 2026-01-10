@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { FlagOption } from '@/lib/customization/types';
 import { getFlagUrl, getFlagDisplayName } from '@/lib/customization/flags';
 import { cn } from '@/lib/utils';
@@ -23,7 +23,7 @@ export function FlagGrid({ flags, selectedCode, onSelect, isLoading }: FlagGridP
 
   if (flags.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
+      <div className="text-center py-8" style={{ color: 'rgba(156, 163, 175, 0.8)' }}>
         <p>No flags unlocked yet.</p>
         <p className="text-sm mt-1">Enable location tracking to unlock flags from places you visit.</p>
       </div>
@@ -38,8 +38,8 @@ export function FlagGrid({ flags, selectedCode, onSelect, isLoading }: FlagGridP
     <div className="space-y-4">
       {countries.length > 0 && (
         <div>
-          <h4 className="text-sm font-medium text-gray-600 mb-2">Countries</h4>
-          <div className="grid grid-cols-4 gap-2">
+          <h4 className="text-sm font-medium mb-2" style={{ color: 'rgba(209, 213, 219, 0.9)' }}>Countries</h4>
+          <div className="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-4 gap-2 sm:gap-3">
             {countries.map((flag) => (
               <FlagItem
                 key={flag.code}
@@ -54,8 +54,8 @@ export function FlagGrid({ flags, selectedCode, onSelect, isLoading }: FlagGridP
 
       {states.length > 0 && (
         <div>
-          <h4 className="text-sm font-medium text-gray-600 mb-2">US States</h4>
-          <div className="grid grid-cols-4 gap-2">
+          <h4 className="text-sm font-medium mb-2" style={{ color: 'rgba(209, 213, 219, 0.9)' }}>US States</h4>
+          <div className="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-4 gap-2 sm:gap-3">
             {states.map((flag) => (
               <FlagItem
                 key={flag.code}
@@ -89,8 +89,8 @@ function FlagItem({
       className={cn(
         'relative aspect-[3/2] rounded overflow-hidden border-2 transition-all',
         isSelected
-          ? 'border-blue-500 ring-2 ring-blue-200'
-          : 'border-gray-200 hover:border-gray-300'
+          ? 'border-blue-500 ring-2 ring-blue-200 dark:ring-blue-800'
+          : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
       )}
       aria-label={`Select ${flag.name} flag`}
       aria-pressed={isSelected}

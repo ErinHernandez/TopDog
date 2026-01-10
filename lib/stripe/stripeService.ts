@@ -843,10 +843,6 @@ export async function assessPaymentRisk(
       riskScore += 25;
       factors.push('country_mismatch');
     }
-    if (context.vpnDetected) {
-      riskScore += 30;
-      factors.push('vpn_usage');
-    }
     
     // New device risk
     if (context.newDevice) {

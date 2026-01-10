@@ -483,8 +483,6 @@ export interface RiskContext {
   ipAddress?: string;
   /** Device ID */
   deviceId?: string;
-  /** Whether VPN was detected */
-  vpnDetected?: boolean;
   /** Whether this is a new device */
   newDevice?: boolean;
   /** Session ID */

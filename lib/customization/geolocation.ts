@@ -9,32 +9,137 @@ export interface GeolocationResult {
 }
 
 export async function detectLocation(): Promise<GeolocationResult> {
+  // Only run in browser environment
+  if (typeof window === 'undefined') {
+    return { country: null, state: null, error: 'Server-side execution not supported' };
+  }
+
+  // Try ipapi.co first (1000 requests/day free)
   try {
-    // Using ipapi.co - free tier allows 1000 requests/day
-    // Alternative: https://ipinfo.io/json or https://api.bigdatacloud.net/data/country-by-ip
+    // Create abort controller for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    
     const response = await fetch('https://ipapi.co/json/', {
       headers: { Accept: 'application/json' },
+      signal: controller.signal,
     });
+    
+    clearTimeout(timeoutId);
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+    if (response.ok) {
+      const data = await response.json();
+
+      if (data.country_code) {
+        return {
+          country: { code: data.country_code, name: data.country_name || data.country_code },
+          state:
+            data.country_code === 'US' && data.region_code
+              ? { code: data.region_code, name: data.region || data.region_code }
+              : null,
+        };
+      }
     }
-
-    const data = await response.json();
-
-    return {
-      country: data.country_code
-        ? { code: data.country_code, name: data.country_name }
-        : null,
-      state:
-        data.country_code === 'US' && data.region_code
-          ? { code: data.region_code, name: data.region }
-          : null,
-    };
   } catch (e) {
-    console.error('Location detection failed:', e);
-    return { country: null, state: null, error: 'Detection failed' };
+    // Log but continue to fallback
+    console.log('ipapi.co failed, trying fallback:', e instanceof Error ? e.message : 'Unknown error');
   }
+
+  // Fallback to BigDataCloud
+  try {
+    // First get the client IP
+    const ipController = new AbortController();
+    const ipTimeoutId = setTimeout(() => ipController.abort(), 10000);
+    
+    const ipResponse = await fetch('https://api.bigdatacloud.net/data/client-ip', {
+      signal: ipController.signal,
+    });
+    
+    clearTimeout(ipTimeoutId);
+    
+    if (!ipResponse.ok) {
+      throw new Error('Failed to get IP');
+    }
+    
+    const ipData = await ipResponse.json();
+    
+    // Then get location by IP
+    const geoController = new AbortController();
+    const geoTimeoutId = setTimeout(() => geoController.abort(), 10000);
+    
+    const geoResponse = await fetch(
+      `https://api.bigdatacloud.net/data/country-by-ip?ip=${ipData.ipString}`,
+      {
+        signal: geoController.signal,
+      }
+    );
+    
+    clearTimeout(geoTimeoutId);
+    
+    if (geoResponse.ok) {
+      const geoData = await geoResponse.json();
+      
+      if (geoData.country?.isoAlpha2) {
+        const stateCode = geoData.location?.principalSubdivisionCode?.split('-')[1];
+        
+        return {
+          country: {
+            code: geoData.country.isoAlpha2,
+            name: geoData.country.name || geoData.country.isoAlpha2,
+          },
+          state:
+            geoData.country.isoAlpha2 === 'US' && stateCode
+              ? {
+                  code: stateCode,
+                  name: geoData.location?.principalSubdivision || stateCode,
+                }
+              : null,
+        };
+      }
+    }
+  } catch (e) {
+    console.log('BigDataCloud fallback failed:', e instanceof Error ? e.message : 'Unknown error');
+  }
+
+  // Final fallback: try ipinfo.io
+  try {
+    const infoController = new AbortController();
+    const infoTimeoutId = setTimeout(() => infoController.abort(), 10000);
+    
+    const response = await fetch('https://ipinfo.io/json', {
+      headers: { Accept: 'application/json' },
+      signal: infoController.signal,
+    });
+    
+    clearTimeout(infoTimeoutId);
+
+    if (response.ok) {
+      const data = await response.json();
+      
+      if (data.country) {
+        // ipinfo.io uses lowercase country codes, convert to uppercase
+        const countryCode = data.country.toUpperCase();
+        const stateCode = data.region; // e.g., "CA" for California
+        
+        return {
+          country: {
+            code: countryCode,
+            name: data.country_name || countryCode,
+          },
+          state:
+            countryCode === 'US' && stateCode
+              ? { code: stateCode, name: data.region || stateCode }
+              : null,
+        };
+      }
+    }
+  } catch (e) {
+    console.log('ipinfo.io fallback failed:', e instanceof Error ? e.message : 'Unknown error');
+  }
+
+  // All methods failed
+  console.error('All location detection methods failed');
+  return { country: null, state: null, error: 'All detection methods failed' };
 }
 
 export async function recordLocationVisit(

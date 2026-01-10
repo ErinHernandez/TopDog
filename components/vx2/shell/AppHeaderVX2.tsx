@@ -7,8 +7,9 @@
  * - Better accessibility
  */
 
-import React from 'react';
-import { useTabNavigation } from '../core';
+import React, { useContext } from 'react';
+import { useRouter } from 'next/router';
+import { TabNavigationContext } from '../core/context/TabNavigationContext';
 import { HEADER, Z_INDEX } from '../core/constants';
 import { HEADER_COLORS, STATE_COLORS } from '../core/constants/colors';
 import { createScopedLogger } from '../../../lib/clientLogger';
@@ -105,7 +106,9 @@ export default function AppHeaderVX2({
   variant = 'default',
   hideLogo = false,
 }: AppHeaderVX2Props): React.ReactElement {
-  const { navigateToTab } = useTabNavigation();
+  // Try to get tab navigation context (may not be available in standalone pages)
+  const tabNavigationContext = useContext(TabNavigationContext);
+  const router = useRouter();
 
   // Determine background based on variant
   const getBackgroundStyle = (): React.CSSProperties => {
@@ -123,8 +126,14 @@ export default function AppHeaderVX2({
   };
 
   // Handle logo click - navigate to Lobby
+  // Use tab navigation if available, otherwise use router
   const handleLogoClick = () => {
-    navigateToTab('lobby');
+    if (tabNavigationContext?.navigateToTab) {
+      tabNavigationContext.navigateToTab('lobby');
+    } else {
+      // Fallback for standalone pages - navigate to home
+      router.push('/');
+    }
   };
 
   // Handle back click

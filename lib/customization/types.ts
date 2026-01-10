@@ -43,7 +43,7 @@ export interface FlagOption {
 }
 
 export const DEFAULT_PREFERENCES: CustomizationPreferences = {
-  borderColor: '#FFD700',
+  borderColor: '#9CA3AF',
   backgroundType: 'none',
   overlayEnabled: false,
   overlayImageId: 'hotdog',

@@ -187,5 +187,22 @@ service cloud.firestore {
          resource.data.hostId == request.auth.uid);
       allow delete: if isAdmin();
     }
+    
+    // ========================================================================
+    // USER LOCATIONS (Consent & Security Tracking)
+    // ========================================================================
+    
+    // Location consent and tracking data - only owner can access
+    match /userLocations/{userId} {
+      // Only owner can read their location data
+      allow read: if isOwner(userId);
+      
+      // Only owner can create/update their location consent and data
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      
+      // No deletions allowed (data retention policy)
+      allow delete: if isAdmin();
+    }
   }
 } 

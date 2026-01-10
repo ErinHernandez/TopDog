@@ -9,6 +9,19 @@
 export { AppShellVX2 } from './shell';
 export type { AppShellVX2Props } from './shell';
 
+// Location - Consent and tracking
+export {
+  LocationConsentModal,
+  LocationSecurityBanner,
+  LocationSettingsSection,
+  useLocationConsent,
+  useLocationTracking,
+} from './location';
+
+// Customization
+export { ProfileCustomizationPage } from './customization/ProfileCustomizationPage';
+export { useCustomization } from './customization/hooks/useCustomization';
+
 // Note: For other modules, import directly from their paths:
 // import { useTournaments } from '@/components/vx2/hooks';
 // import { DraftRoomVX2 } from '@/components/vx2/draft-room';

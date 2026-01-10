@@ -21,7 +21,7 @@ export default function MobilePhoneFrame({
   className = ''
 }) {
   return (
-    <div className={`bg-gray-100 min-h-screen flex items-center justify-center p-4 ${className}`}>
+    <div className={`bg-gray-900 min-h-screen flex items-center justify-center p-4 ${className}`}>
       <div 
         className="bg-black rounded-3xl p-1"
         style={{ 
