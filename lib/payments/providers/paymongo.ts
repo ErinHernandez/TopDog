@@ -65,7 +65,7 @@ class PayMongoProvider implements PaymentProvider {
     if (!PAYMONGO_COUNTRIES.includes(country as typeof PAYMONGO_COUNTRIES[number])) {
       return [];
     }
-    return PAYMONGO_PAYMENT_METHODS.filter(m => m.countries.includes(country));
+    return PAYMONGO_PAYMENT_METHODS.filter((m: PaymentMethod) => m.countries.includes(country));
   }
   
   /**
@@ -139,7 +139,7 @@ class PayMongoProvider implements PaymentProvider {
         status: 'pending',
       };
       
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('[PayMongoProvider] createPayment error:', error);
       return {
         success: false,
@@ -163,7 +163,7 @@ class PayMongoProvider implements PaymentProvider {
         status: result.status,
         error: result.error,
       };
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         success: false,
         status: 'failed',
@@ -232,7 +232,7 @@ class PayMongoProvider implements PaymentProvider {
         status: 'pending',
       };
       
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('[PayMongoProvider] createTransfer error:', error);
       return {
         success: false,

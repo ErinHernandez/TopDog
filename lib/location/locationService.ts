@@ -13,7 +13,7 @@ import {
   serverTimestamp,
   Timestamp 
 } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { getDb } from '@/lib/firebase-utils';
 import { getCurrentLocation, formatLocationCode, isValidLocation } from './geolocationProvider';
 import type { 
   GeoLocation, 
@@ -30,6 +30,7 @@ const COLLECTION = 'userLocations';
  */
 export async function trackLocation(userId: string): Promise<GeoLocation | null> {
   try {
+    const db = getDb();
     // Check consent first
     const docRef = doc(db, COLLECTION, userId);
     const docSnap = await getDoc(docRef);
@@ -72,7 +73,7 @@ export async function trackLocation(userId: string): Promise<GeoLocation | null>
     await updateKnownLocation(userId, location);
     
     return location;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error tracking location:', error);
     return null;
   }
@@ -86,6 +87,7 @@ async function updateKnownLocation(
   location: GeoLocation
 ): Promise<void> {
   try {
+    const db = getDb();
     const docRef = doc(db, COLLECTION, userId);
     const docSnap = await getDoc(docRef);
     
@@ -120,7 +122,7 @@ async function updateKnownLocation(
       'security.knownLocations': knownLocations,
       updatedAt: serverTimestamp(),
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error updating known location:', error);
   }
 }
@@ -130,6 +132,7 @@ async function updateKnownLocation(
  */
 export async function getUserLocations(userId: string): Promise<UserLocations> {
   try {
+    const db = getDb();
     const docRef = doc(db, COLLECTION, userId);
     const docSnap = await getDoc(docRef);
     
@@ -143,7 +146,7 @@ export async function getUserLocations(userId: string): Promise<UserLocations> {
       countries: data.locations?.countries || [],
       states: data.locations?.states || [],
     };
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error getting user locations:', error);
     return { countries: [], states: [] };
   }
@@ -154,6 +157,7 @@ export async function getUserLocations(userId: string): Promise<UserLocations> {
  */
 export async function getKnownLocations(userId: string): Promise<KnownLocation[]> {
   try {
+    const db = getDb();
     const docRef = doc(db, COLLECTION, userId);
     const docSnap = await getDoc(docRef);
     
@@ -163,7 +167,7 @@ export async function getKnownLocations(userId: string): Promise<KnownLocation[]
     
     const data = docSnap.data() as UserLocationDocument;
     return data.security?.knownLocations || [];
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error getting known locations:', error);
     return [];
   }
@@ -177,6 +181,7 @@ export async function markLocationTrusted(
   locationCode: string
 ): Promise<void> {
   try {
+    const db = getDb();
     const docRef = doc(db, COLLECTION, userId);
     const docSnap = await getDoc(docRef);
     
@@ -195,7 +200,7 @@ export async function markLocationTrusted(
         updatedAt: serverTimestamp(),
       });
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error marking location trusted:', error);
   }
 }
@@ -208,6 +213,7 @@ export async function untrustLocation(
   locationCode: string
 ): Promise<void> {
   try {
+    const db = getDb();
     const docRef = doc(db, COLLECTION, userId);
     const docSnap = await getDoc(docRef);
     
@@ -226,7 +232,7 @@ export async function untrustLocation(
         updatedAt: serverTimestamp(),
       });
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error untrusting location:', error);
   }
 }
@@ -244,7 +250,7 @@ export async function getUnlockedFlags(userId: string): Promise<string[]> {
   flags.push(...locations.countries);
   
   // Add state flags with US- prefix
-  locations.states.forEach(state => {
+  locations.states.forEach((state: string) => {
     flags.push(`US-${state}`);
   });
   

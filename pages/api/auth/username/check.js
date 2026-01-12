@@ -31,6 +31,7 @@ import { initializeApp, getApps } from 'firebase/app';
 import { createUsernameCheckLimiter } from '../../../../lib/rateLimiter';
 import { generateUsernameSuggestions } from '../../../../lib/usernameSuggestions';
 import { findSimilarUsernames, generateSimilarityWarnings } from '../../../../lib/usernameSimilarity';
+import { logger } from '../../../../lib/structuredLogger.js';
 
 // ============================================================================
 // FIREBASE INITIALIZATION
@@ -288,7 +289,10 @@ export default async function handler(req, res) {
     });
     
   } catch (error) {
-    console.error('Username check error:', error);
+    logger.error('Username check error', error, {
+      component: 'auth',
+      operation: 'username-check',
+    });
     
     // Ensure consistent timing even on errors
     const elapsed = Date.now() - startTime;

@@ -60,11 +60,11 @@ export function LivePreview({ preferences }: LivePreviewProps) {
 
         {/* Overlay layer */}
         {preferences.overlayEnabled && (
-          <div className="absolute inset-0 pointer-events-none" style={overlayStyle} />
+          <div className="absolute inset-0 pointer-events-none" style={{ ...overlayStyle, zIndex: 10 }} />
         )}
 
         {/* "Your Pick" text */}
-        <div className="absolute inset-0 flex items-center justify-center">
+        <div className="absolute inset-0 flex items-center justify-center" style={{ zIndex: 20 }}>
           <span className="text-xs text-gray-400 font-medium">Your Pick</span>
         </div>
       </div>

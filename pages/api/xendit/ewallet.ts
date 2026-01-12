@@ -18,6 +18,7 @@ import {
 import { validateDepositAmount } from '../../../lib/xendit/currencyConfig';
 import type { XenditEWalletChannel } from '../../../lib/xendit/xenditTypes';
 import { captureError } from '../../../lib/errorTracking';
+import { logger } from '../../../lib/structuredLogger';
 
 // ============================================================================
 // TYPES
@@ -182,15 +183,18 @@ export default async function handler(
     });
     
   } catch (error) {
-    await captureError(error instanceof Error ? error : new Error('Unknown error'), {
+    const err = error instanceof Error ? error : new Error('Unknown error');
+    logger.error('E-wallet charge creation error', err, {
+      component: 'xendit',
+      operation: 'createEWalletCharge',
+    });
+    await captureError(err, {
       tags: { component: 'xendit', operation: 'createEWalletCharge' },
     });
     
-    console.error('[Xendit E-Wallet API] Error:', error);
-    
     res.status(500).json({
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to create e-wallet charge',
+      error: err.message || 'Failed to create e-wallet charge',
     });
   }
 }

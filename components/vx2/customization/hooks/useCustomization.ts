@@ -52,6 +52,14 @@ interface UseCustomizationReturn {
   enableLocationTracking: () => Promise<void>;
 }
 
+// Dev flags for development mode
+const DEV_FLAGS: FlagOption[] = [
+  { code: 'US', name: 'United States', type: 'country' },
+  { code: 'US-SC', name: 'South Carolina', type: 'state' },
+  { code: 'US-NY', name: 'New York', type: 'state' },
+  { code: 'IE', name: 'Ireland', type: 'country' },
+];
+
 export function useCustomization(): UseCustomizationReturn {
   const { user } = useAuth();
   const { isGranted: locationConsentGranted, grantConsent } = useLocationConsent();
@@ -111,6 +119,10 @@ export function useCustomization(): UseCustomizationReturn {
   // Subscribe to locations
   useEffect(() => {
     if (!user?.uid) {
+      // In dev mode, show dev flags even without user
+      if (process.env.NODE_ENV === 'development') {
+        setAvailableFlags(DEV_FLAGS);
+      }
       setFlagsLoading(false);
       return;
     }
@@ -130,7 +142,18 @@ export function useCustomization(): UseCustomizationReturn {
             type: 'state' as const,
           })),
         ];
-        setAvailableFlags(flags);
+        
+        // In dev mode, merge dev flags with user flags (avoid duplicates)
+        const finalFlags = process.env.NODE_ENV === 'development'
+          ? [
+              ...DEV_FLAGS,
+              ...flags.filter(
+                (f) => !DEV_FLAGS.some((df) => df.code === f.code)
+              ),
+            ]
+          : flags;
+        
+        setAvailableFlags(finalFlags);
         setFlagsLoading(false);
       } else {
         // No locations exist - automatically detect and record location
@@ -152,26 +175,26 @@ export function useCustomization(): UseCustomizationReturn {
                 await recordLocationVisit(user.uid, location);
                 // Don't set flagsLoading to false yet - wait for subscription to fire with new data
               } else {
-                // If detection fails, show empty state
-                setAvailableFlags([]);
+                // If detection fails, show dev flags in dev mode, otherwise empty
+                setAvailableFlags(process.env.NODE_ENV === 'development' ? DEV_FLAGS : []);
                 setFlagsLoading(false);
               }
             } catch (detectErr) {
               // Location detection failed (network error, API down, etc.)
               console.warn('Location detection failed, user can still use customization:', detectErr);
-              // Don't block the UI - allow user to proceed without flags
-              setAvailableFlags([]);
+              // Don't block the UI - allow user to proceed with dev flags in dev mode
+              setAvailableFlags(process.env.NODE_ENV === 'development' ? DEV_FLAGS : []);
               setFlagsLoading(false);
             }
           } catch (err) {
             // Grant consent or other error
             console.error('Auto-location setup failed:', err);
-            setAvailableFlags([]);
+            setAvailableFlags(process.env.NODE_ENV === 'development' ? DEV_FLAGS : []);
             setFlagsLoading(false);
           }
         } else {
-          // Already attempted detection, show empty state
-          setAvailableFlags([]);
+          // Already attempted detection, show dev flags in dev mode, otherwise empty
+          setAvailableFlags(process.env.NODE_ENV === 'development' ? DEV_FLAGS : []);
           setFlagsLoading(false);
         }
       }

@@ -260,7 +260,10 @@ export default function DraftProvider({ roomId, children }) {
         setCurrentPick(prev => prev + 1);
         setIsMyTurn(false);
         
-        console.log('🔧 Development pick:', pickData);
+        // Log development pick (structured logger in production)
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🔧 Development pick:', pickData);
+        }
         return pickData;
       }
       
@@ -311,7 +314,15 @@ export default function DraftProvider({ roomId, children }) {
       return result;
       
     } catch (error) {
-      console.error('Pick failed:', error);
+      // Log error (will use structured logger in production)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Pick failed:', error);
+      } else {
+        // In production, use structured logger
+        const { logger, logDraftEvent } = require('../../lib/structuredLogger');
+        logger.error('Pick failed', error, { roomId, userId: userName, playerName });
+        logDraftEvent('Pick failed', { roomId, userId: userName, error: error.message });
+      }
       throw error;
     } finally {
       pickInProgress.current = false;

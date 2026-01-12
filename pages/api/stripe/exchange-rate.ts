@@ -89,9 +89,7 @@ const handler = async function(
     if (!sanitizedCurrency) {
       const error = createErrorResponse(
         ErrorType.VALIDATION,
-        'currency query parameter is required',
-        400,
-        logger
+        'currency query parameter is required'
       );
       return res.status(error.statusCode).json(error.body);
     }
@@ -102,9 +100,7 @@ const handler = async function(
     if (!/^[A-Z]{3}$/.test(normalizedCurrency)) {
       const error = createErrorResponse(
         ErrorType.VALIDATION,
-        'currency must be a valid 3-letter ISO 4217 code',
-        400,
-        logger
+        'currency must be a valid 3-letter ISO 4217 code'
       );
       return res.status(error.statusCode).json(error.body);
     }
@@ -147,9 +143,7 @@ const handler = async function(
       
       const errorResponse = createErrorResponse(
         ErrorType.INTERNAL,
-        err.message || 'Failed to fetch exchange rate',
-        500,
-        logger
+        err.message || 'Failed to fetch exchange rate'
       );
       return res.status(errorResponse.statusCode).json(errorResponse.body);
     }

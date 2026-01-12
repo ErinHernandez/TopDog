@@ -1,5 +1,6 @@
 import { analyzeImageFromBase64, detectText, detectDocumentText, detectLabels, detectFaces, detectObjects } from '../../../lib/cloudVision';
 import { RateLimiter } from '../../../lib/rateLimiter';
+import { logger } from '../../../lib/structuredLogger.js';
 
 export const config = {
   api: {
@@ -130,7 +131,10 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error('Vision API error:', error);
+    logger.error('Vision API error', error, {
+      component: 'cloud-vision',
+      operation: 'analyze-image',
+    });
     res.status(500).json({ 
       error: 'Failed to analyze image',
       details: error.message 

@@ -24,6 +24,7 @@ import type {
   PaystackTransferRecipient,
 } from '../../../../lib/paystack/paystackTypes';
 import { captureError } from '../../../../lib/errorTracking';
+import { logger } from '../../../../lib/structuredLogger';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../../../lib/firebase';
 
@@ -86,7 +87,13 @@ export default async function handler(
         });
     }
   } catch (error) {
-    console.error('[Paystack Recipient] Error:', error);
+    logger.error('Recipient operation error', error as Error, {
+      component: 'paystack',
+      operation: 'recipient',
+      method: req.method,
+      query: req.query,
+      body: req.body,
+    });
     await captureError(error as Error, {
       tags: { component: 'paystack', operation: 'recipient' },
       extra: { method: req.method, query: req.query, body: req.body },

@@ -158,6 +158,17 @@ function VX2MobileAppDemo() {
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        {/* Preload tournament card background images for faster loading on mobile */}
+        <link rel="preload" as="image" href="/do_riding_football_III.webp" type="image/webp" />
+        <link rel="preload" as="image" href="/do_riding_football_III.png" type="image/png" />
+        {/* Preload critical UI assets */}
+        <link rel="preload" as="image" href="/wr_blue.png" type="image/png" />
+        {/* DNS prefetch for external resources */}
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+        {/* Mobile optimization hints */}
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="mobile-web-app-capable" content="yes" />
       </Head>
 
       {/* 

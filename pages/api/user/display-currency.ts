@@ -23,6 +23,7 @@ import {
   createSuccessResponse,
   createErrorResponse,
   ErrorType,
+  type ScopedLogger,
 } from '../../../lib/apiErrorHandler';
 import {
   getDisplayCurrency,
@@ -97,10 +98,8 @@ const handler = async function(
         return handleDelete(req, res, logger);
       default:
         const error = createErrorResponse(
-          ErrorType.VALIDATION,
-          'Method not supported',
-          405,
-          logger
+          ErrorType.METHOD_NOT_ALLOWED,
+          'Method not supported'
         );
         return res.status(error.statusCode).json(error.body);
     }
@@ -114,7 +113,7 @@ const handler = async function(
 async function handleGet(
   req: AuthenticatedRequest,
   res: NextApiResponse,
-  logger: { info: (msg: string, data?: Record<string, unknown>) => void }
+  logger: ScopedLogger
 ) {
   const { userId, country } = req.query as Partial<GetDisplayCurrencyQuery>;
   
@@ -122,9 +121,7 @@ async function handleGet(
   if (req.user && !verifyUserAccess(req.user.uid, userId || '')) {
     const error = createErrorResponse(
       ErrorType.FORBIDDEN,
-      'Access denied',
-      403,
-      logger
+      'Access denied'
     );
     return res.status(error.statusCode).json(error.body);
   }
@@ -132,9 +129,7 @@ async function handleGet(
   if (!userId || !country) {
     const error = createErrorResponse(
       ErrorType.VALIDATION,
-      'userId and country are required query parameters',
-      400,
-      logger
+      'userId and country are required query parameters'
     );
     return res.status(error.statusCode).json(error.body);
   }
@@ -164,9 +159,7 @@ async function handleGet(
     
     const errorResponse = createErrorResponse(
       ErrorType.INTERNAL,
-      err.message || 'Failed to resolve display currency',
-      500,
-      logger
+      err.message || 'Failed to resolve display currency'
     );
     return res.status(errorResponse.statusCode).json(errorResponse.body);
   }
@@ -179,7 +172,7 @@ async function handleGet(
 async function handlePut(
   req: AuthenticatedRequest,
   res: NextApiResponse,
-  logger: { info: (msg: string, data?: Record<string, unknown>) => void }
+  logger: ScopedLogger
 ) {
   const { userId, country, currency } = req.body as Partial<SetDisplayCurrencyBody>;
   
@@ -187,9 +180,7 @@ async function handlePut(
   if (req.user && !verifyUserAccess(req.user.uid, userId || '')) {
     const error = createErrorResponse(
       ErrorType.FORBIDDEN,
-      'Access denied',
-      403,
-      logger
+      'Access denied'
     );
     return res.status(error.statusCode).json(error.body);
   }
@@ -197,9 +188,7 @@ async function handlePut(
   if (!userId || !country || !currency) {
     const error = createErrorResponse(
       ErrorType.VALIDATION,
-      'userId, country, and currency are required',
-      400,
-      logger
+      'userId, country, and currency are required'
     );
     return res.status(error.statusCode).json(error.body);
   }
@@ -211,9 +200,7 @@ async function handlePut(
   if (!CURRENCY_CONFIG[currencyUpper]) {
     const error = createErrorResponse(
       ErrorType.VALIDATION,
-      `Unsupported currency: ${currency}`,
-      400,
-      logger
+      `Unsupported currency: ${currency}`
     );
     return res.status(error.statusCode).json(error.body);
   }
@@ -243,9 +230,7 @@ async function handlePut(
     
     const errorResponse = createErrorResponse(
       ErrorType.INTERNAL,
-      err.message || 'Failed to set display currency',
-      500,
-      logger
+      err.message || 'Failed to set display currency'
     );
     return res.status(errorResponse.statusCode).json(errorResponse.body);
   }
@@ -258,7 +243,7 @@ async function handlePut(
 async function handleDelete(
   req: AuthenticatedRequest,
   res: NextApiResponse,
-  logger: { info: (msg: string, data?: Record<string, unknown>) => void }
+  logger: ScopedLogger
 ) {
   const { userId, country } = req.body as Partial<ResetDisplayCurrencyBody>;
   
@@ -266,9 +251,7 @@ async function handleDelete(
   if (req.user && !verifyUserAccess(req.user.uid, userId || '')) {
     const error = createErrorResponse(
       ErrorType.FORBIDDEN,
-      'Access denied',
-      403,
-      logger
+      'Access denied'
     );
     return res.status(error.statusCode).json(error.body);
   }
@@ -276,9 +259,7 @@ async function handleDelete(
   if (!userId || !country) {
     const error = createErrorResponse(
       ErrorType.VALIDATION,
-      'userId and country are required',
-      400,
-      logger
+      'userId and country are required'
     );
     return res.status(error.statusCode).json(error.body);
   }
@@ -310,9 +291,7 @@ async function handleDelete(
     
     const errorResponse = createErrorResponse(
       ErrorType.INTERNAL,
-      err.message || 'Failed to reset display currency',
-      500,
-      logger
+      err.message || 'Failed to reset display currency'
     );
     return res.status(errorResponse.statusCode).json(errorResponse.body);
   }

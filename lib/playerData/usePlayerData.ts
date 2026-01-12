@@ -47,7 +47,7 @@ export function useRegistry(): UseRegistryResult {
   useEffect(() => {
     getRegistry()
       .then(setRegistry)
-      .catch(setError)
+      .catch((err: unknown) => setError(err instanceof Error ? err : new Error(String(err))))
       .finally(() => setLoading(false));
   }, []);
   
@@ -71,7 +71,7 @@ export function useCareerStats(): UseCareerStatsResult {
   useEffect(() => {
     getCareerStats()
       .then(setCareerStats)
-      .catch(setError)
+      .catch((err: unknown) => setError(err instanceof Error ? err : new Error(String(err))))
       .finally(() => setLoading(false));
   }, []);
   
@@ -95,7 +95,7 @@ export function useRosters(): UseRostersResult {
   useEffect(() => {
     getRosters()
       .then(setRosters)
-      .catch(setError)
+      .catch((err: unknown) => setError(err instanceof Error ? err : new Error(String(err))))
       .finally(() => setLoading(false));
   }, []);
   
@@ -130,7 +130,7 @@ export function useFullPlayer(playerId: string): UseFullPlayerResult {
     setLoading(true);
     getFullPlayer(playerId)
       .then(p => setPlayer(p ?? null))
-      .catch(setError)
+      .catch((err: unknown) => setError(err instanceof Error ? err : new Error(String(err))))
       .finally(() => setLoading(false));
   }, [playerId]);
   
@@ -154,7 +154,7 @@ export function useAllPlayers(): UseAllPlayersResult {
   useEffect(() => {
     getAllFullPlayers()
       .then(setPlayers)
-      .catch(setError)
+      .catch((err: unknown) => setError(err instanceof Error ? err : new Error(String(err))))
       .finally(() => setLoading(false));
   }, []);
   
@@ -178,7 +178,7 @@ export function usePlayersByPosition(position: Position | 'ALL'): UsePlayersByPo
   
   const players = useMemo(() => {
     if (position === 'ALL') return allPlayers;
-    return allPlayers.filter(p => p.position === position);
+    return allPlayers.filter((p: FullPlayer) => p.position === position);
   }, [allPlayers, position]);
   
   return { players, loading };
@@ -197,7 +197,7 @@ export function usePlayersByTeam(team: string): UsePlayersByTeamResult {
   
   const players = useMemo(() => {
     if (!team) return allPlayers;
-    return allPlayers.filter(p => p.team === team);
+    return allPlayers.filter((p: FullPlayer) => p.team === team);
   }, [allPlayers, team]);
   
   return { players, loading };
@@ -263,7 +263,7 @@ export function usePlayerSearch(query: string): UsePlayerSearchResult {
     const q = query.toLowerCase().trim();
     if (!q) return [];
     
-    return players.filter(p => 
+    return players.filter((p: FullPlayer) => 
       p.name.toLowerCase().includes(q) ||
       p.team.toLowerCase().includes(q) ||
       p.college.toLowerCase().includes(q)

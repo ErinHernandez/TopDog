@@ -39,6 +39,7 @@ import {
 import { initializeApp, getApps } from 'firebase/app';
 import { isApprovedCountry } from '../../../lib/localeCharacters.js';
 import { createSignupLimiter } from '../../../lib/rateLimiter.js';
+import { logger } from '../../../lib/structuredLogger.js';
 
 // ============================================================================
 // FIREBASE INITIALIZATION
@@ -301,7 +302,10 @@ export default async function handler(req, res) {
     });
     
   } catch (error) {
-    console.error('Signup error:', error);
+    logger.error('Signup error', error, {
+      component: 'auth',
+      operation: 'signup',
+    });
     
     // Ensure consistent timing even on errors
     const elapsed = Date.now() - startTime;

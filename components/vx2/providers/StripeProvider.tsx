@@ -35,9 +35,10 @@ let stripeLoadError: Error | null = null;
 
 if (stripePublishableKey) {
   try {
-    stripePromise = loadStripe(stripePublishableKey).catch((error) => {
-      console.warn('[StripeProvider] Failed to load Stripe.js:', error.message);
-      stripeLoadError = error;
+    stripePromise = loadStripe(stripePublishableKey).catch((error: unknown): Stripe | null => {
+      const err = error instanceof Error ? error : new Error(String(error));
+      console.warn('[StripeProvider] Failed to load Stripe.js:', err.message);
+      stripeLoadError = err;
       return null;
     });
   } catch (error) {

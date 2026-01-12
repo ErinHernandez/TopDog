@@ -56,7 +56,7 @@ export function usePlayerPool(): UsePlayerPoolResult {
     try {
       const loaded = await getPlayerPool();
       setPool(loaded);
-    } catch (e) {
+    } catch (e: unknown) {
       setError(e instanceof Error ? e : new Error('Failed to load player pool'));
     } finally {
       setLoading(false);
@@ -141,7 +141,7 @@ export function useAvailablePlayers(
     }
     
     // Apply sort
-    const sorted = [...filtered].sort((a, b) => {
+    const sorted = [...filtered].sort((a: PoolPlayer, b: PoolPlayer) => {
       switch (sortBy) {
         case 'projection':
           return b.projection - a.projection;
@@ -226,7 +226,7 @@ export function useRoster(
       TE: roster.filter(p => p.position === 'TE').length,
     };
     
-    const totalProjection = roster.reduce((sum, p) => sum + p.projection, 0);
+    const totalProjection = roster.reduce((sum: number, p: PoolPlayer) => sum + p.projection, 0);
     
     return {
       roster,

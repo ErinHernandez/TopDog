@@ -83,10 +83,16 @@ function LoadingSpinner(): React.ReactElement {
 
 export function AuthGateVX2({ children }: AuthGateVX2Props): React.ReactElement {
   const { state: authState, signOut } = useAuth();
-  const { isMobile } = useIsMobileDevice();
+  const { isMobile, isLoaded: isMobileLoaded } = useIsMobileDevice();
   const [currentView, setCurrentView] = useState<AuthView>('login');
   const [devAuthOverride, setDevAuthOverride] = useState<DevAuthOverride>(null);
   const [isVercelDeployment, setIsVercelDeployment] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+  
+  // Track mount state to prevent hydration mismatch
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
   
   // Check if running on Vercel deployment (runtime, not build)
   useEffect(() => {
@@ -102,6 +108,8 @@ export function AuthGateVX2({ children }: AuthGateVX2Props): React.ReactElement 
   
   // Load dev auth override on mount and listen for changes
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     // Load initial value from localStorage
     try {
       const saved = localStorage.getItem(DEV_AUTH_OVERRIDE_KEY);
@@ -160,7 +168,8 @@ export function AuthGateVX2({ children }: AuthGateVX2Props): React.ReactElement 
   
   // DEV BYPASS: Auto-login on mobile devices (for dev purposes)
   // DEV BYPASS: Auto-login on Vercel deployments (until further notice)
-  const bypassAuth = isMobile || isVercelDeployment;
+  // Only use mobile detection after mount to prevent hydration mismatch
+  const bypassAuth = (isMounted && isMobileLoaded && isMobile) || isVercelDeployment;
   
   if (bypassAuth) {
     return <>{children}</>;

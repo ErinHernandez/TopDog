@@ -15,6 +15,7 @@
 
 import { getADP, getPlayerADP, getADPByPosition, transformADP } from '../../../../lib/sportsdataio';
 import { RateLimiter } from '../../../../lib/rateLimiter';
+import { logger } from '../../../../lib/structuredLogger.js';
 
 // Rate limiter (60 per minute)
 const rateLimiter = new RateLimiter({
@@ -72,7 +73,10 @@ export default async function handler(req, res) {
       data,
     });
   } catch (err) {
-    console.error('ADP API error:', err);
+    logger.error('ADP API error', err, {
+      component: 'nfl-api',
+      operation: 'fantasy-adp',
+    });
     return res.status(500).json({ error: err.message });
   }
 }

@@ -65,7 +65,7 @@ function getCountryOptions(): CountryOption[] {
     code: c.code,
     name: c.name,
     dialCode: COUNTRY_DIAL_CODES[c.code] || '+1',
-    flag: c.flag,
+    flag: '', // Flag not available in approvedCountries
   }));
 }
 

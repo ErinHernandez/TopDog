@@ -19,8 +19,8 @@ class ErrorBoundary extends React.Component {
     return { hasError: true };
   }
 
-  componentDidCatch(error, errorInfo) {
-    // Log error for monitoring (would integrate with logging service)
+  async componentDidCatch(error, errorInfo) {
+    // Log error for monitoring
     console.error('ErrorBoundary caught an error:', error, errorInfo);
     
     this.setState({
@@ -28,8 +28,21 @@ class ErrorBoundary extends React.Component {
       errorInfo
     });
 
-    // In production, send to error tracking service
-    if (process.env.NODE_ENV === 'production' && window.gtag) {
+    // Send to error tracking service (Sentry)
+    try {
+      const { captureReactError } = await import('../../../lib/errorTracking');
+      await captureReactError(
+        error,
+        errorInfo.componentStack,
+        'DraftRoomErrorBoundary'
+      );
+    } catch (err) {
+      // Error tracking not available - log locally only
+      console.error('Failed to send error to tracking service:', err);
+    }
+
+    // Also send to Google Analytics if available
+    if (process.env.NODE_ENV === 'production' && typeof window !== 'undefined' && window.gtag) {
       window.gtag('event', 'exception', {
         description: error.toString(),
         fatal: false

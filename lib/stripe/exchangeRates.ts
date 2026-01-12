@@ -251,7 +251,7 @@ async function fetchExchangeRate(currency: string): Promise<StripeExchangeRate> 
       expiresAt: now + CACHE_TTL_MS,
     };
     
-  } catch (error) {
+  } catch (error: unknown) {
     console.warn('[ExchangeRates] API fetch failed, using fallback rate:', error);
     
     // Use fallback rate

@@ -1,10 +1,51 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <rect x="10" y="40" width="80" height="20" rx="10" fill="#8B4513"/>
-  <rect x="15" y="42" width="70" height="16" rx="8" fill="#D2691E"/>
-  <circle cx="25" cy="50" r="3" fill="#FFD700"/>
-  <circle cx="35" cy="50" r="3" fill="#FFD700"/>
-  <circle cx="45" cy="50" r="3" fill="#FFD700"/>
-  <circle cx="55" cy="50" r="3" fill="#FFD700"/>
-  <circle cx="65" cy="50" r="3" fill="#FFD700"/>
-  <circle cx="75" cy="50" r="3" fill="#FFD700"/>
+  <defs>
+    <!-- Bun gradient -->
+    <linearGradient id="bunGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#F4D03F;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#E8B928;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#D4A017;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Sausage gradient -->
+    <linearGradient id="sausageGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#CD853F;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#8B4513;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#654321;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Bun shadow -->
+    <filter id="bunShadow">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="1.5"/>
+      <feOffset dx="0" dy="1" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Top bun -->
+  <ellipse cx="50" cy="32" rx="42" ry="18" fill="url(#bunGradient)" filter="url(#bunShadow)"/>
+  <ellipse cx="50" cy="30" rx="40" ry="16" fill="#F4D03F" opacity="0.6"/>
+  
+  <!-- Bottom bun -->
+  <ellipse cx="50" cy="68" rx="42" ry="18" fill="url(#bunGradient)" filter="url(#bunShadow)"/>
+  
+  <!-- Sausage -->
+  <ellipse cx="50" cy="50" rx="38" ry="14" fill="url(#sausageGradient)"/>
+  <ellipse cx="50" cy="48" rx="36" ry="12" fill="#A0522D" opacity="0.4"/>
+  
+  <!-- Mustard streaks -->
+  <path d="M 18 48 Q 30 45, 50 48 Q 70 51, 82 48" stroke="#FFD700" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M 20 52 Q 32 49, 50 52 Q 68 55, 80 52" stroke="#FFD700" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.8"/>
+  
+  <!-- Sesame seeds on top bun -->
+  <ellipse cx="30" cy="28" rx="2.5" ry="1.5" fill="#FFF8DC" transform="rotate(-25 30 28)"/>
+  <ellipse cx="45" cy="24" rx="2.5" ry="1.5" fill="#FFF8DC" transform="rotate(15 45 24)"/>
+  <ellipse cx="60" cy="26" rx="2.5" ry="1.5" fill="#FFF8DC" transform="rotate(-15 60 26)"/>
+  <ellipse cx="70" cy="30" rx="2.5" ry="1.5" fill="#FFF8DC" transform="rotate(25 70 30)"/>
 </svg>

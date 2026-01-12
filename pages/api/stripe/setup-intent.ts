@@ -55,7 +55,7 @@ const handler = async function(
   req: AuthenticatedRequest, 
   res: NextApiResponse
 ) {
-  return withErrorHandling(req, res, async (req, res, logger) => {
+  return withErrorHandling(req, res, async (req: AuthenticatedRequest, res, logger) => {
     validateMethod(req, ['POST'], logger);
     
     // Check rate limit
@@ -82,9 +82,7 @@ const handler = async function(
     if (req.user && !verifyUserAccess(req.user.uid, userId || '')) {
       const error = createErrorResponse(
         ErrorType.FORBIDDEN,
-        'Access denied',
-        403,
-        logger
+        'Access denied'
       );
       return res.status(error.statusCode).json(error.body);
     }
@@ -92,9 +90,7 @@ const handler = async function(
     if (!userId || !email) {
       const error = createErrorResponse(
         ErrorType.VALIDATION,
-        'userId and email are required',
-        400,
-        logger
+        'userId and email are required'
       );
       return res.status(error.statusCode).json(error.body);
     }
@@ -146,9 +142,7 @@ const handler = async function(
       
       const errorResponse = createErrorResponse(
         ErrorType.STRIPE,
-        err.message || 'Failed to create setup intent',
-        500,
-        logger
+        err.message || 'Failed to create setup intent'
       );
       return res.status(errorResponse.statusCode).json(errorResponse.body);
     }

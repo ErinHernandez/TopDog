@@ -8,7 +8,7 @@
  */
 
 import crypto from 'crypto';
-import { db } from '../firebase';
+import { getDb } from '../firebase-utils';
 import { doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 import { captureError } from '../errorTracking';
 import type {
@@ -164,7 +164,7 @@ export async function verifyTransaction(
       status,
       data: response.data,
     };
-  } catch (error) {
+  } catch (error: unknown) {
     return {
       success: false,
       status: 'failed',
@@ -262,6 +262,7 @@ export async function createTransferRecipient(
   });
   
   // Store recipient in user's data
+  const db = getDb();
   const userRef = doc(db, 'users', userId);
   const userDoc = await getDoc(userRef);
   
@@ -303,6 +304,7 @@ export async function initiateTransfer(
   const { userId, ...transferRequest } = request;
   
   // Verify user has sufficient balance
+  const db = getDb();
   const userRef = doc(db, 'users', userId);
   const userDoc = await getDoc(userRef);
   
@@ -397,6 +399,7 @@ export async function getOrCreateCustomer(
   lastName?: string
 ): Promise<PaystackCustomer> {
   // Check if user already has a customer code
+  const db = getDb();
   const userRef = doc(db, 'users', userId);
   const userDoc = await getDoc(userRef);
   
@@ -409,7 +412,7 @@ export async function getOrCreateCustomer(
           `/customer/${userData.paystackCustomerCode}`
         );
         return response.data;
-      } catch (error) {
+      } catch (error: unknown) {
         // Customer might not exist, create new
         console.warn('[PaystackService] Stored customer code invalid, creating new');
       }
@@ -507,7 +510,7 @@ export async function handleChargeSuccess(
     
     console.log(`[Paystack] Converting ${localAmountDisplay} ${currency} to USD: rate=${exchangeRate}, usdAmount=${usdAmount.toFixed(2)}`);
     actions.push(`converted_${currency}_to_usd`);
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[Paystack] Failed to get exchange rate, cannot process deposit:', error);
     return { success: false, actions: ['exchange_rate_failed'] };
   }
@@ -558,6 +561,7 @@ async function updateTransactionWithBalanceCredit(
   transactionId: string,
   status: TransactionStatus
 ): Promise<void> {
+  const db = getDb();
   const transactionRef = doc(db, 'transactions', transactionId);
   
   await updateDoc(transactionRef, {
@@ -671,6 +675,7 @@ export async function handleTransferFailed(
       actions.push('balance_restored_usd');
       
       // Mark balance as restored to prevent double-restoration
+      const db = getDb();
       const transactionRef = doc(db, 'transactions', existingTx.id);
       await updateDoc(transactionRef, {
         'metadata.balanceRestored': true,
@@ -689,7 +694,7 @@ export async function handleTransferFailed(
         const usdAmount = convertToUSD(localAmountDisplay, rateData.rate);
         await updateUserBalance(userId, usdAmount * 100, 'add');
         actions.push('balance_restored_converted');
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('[Paystack] Failed to get exchange rate for balance restoration:', error);
         actions.push('balance_restoration_failed');
         return { success: false, actions };
@@ -718,6 +723,7 @@ export async function createPaystackTransaction(
     updatedAt: now,
   };
   
+  const db = getDb();
   const docRef = await addDoc(collection(db, 'transactions'), transaction);
   
   return {
@@ -734,6 +740,7 @@ export async function updateTransactionStatus(
   status: TransactionStatus,
   errorMessage?: string
 ): Promise<void> {
+  const db = getDb();
   const transactionRef = doc(db, 'transactions', transactionId);
   
   const updates: Partial<UnifiedTransaction> = {
@@ -754,6 +761,7 @@ export async function updateTransactionStatus(
 export async function findTransactionByReference(
   reference: string
 ): Promise<UnifiedTransaction | null> {
+  const db = getDb();
   const q = query(
     collection(db, 'transactions'),
     where('providerReference', '==', reference),
@@ -779,6 +787,7 @@ export async function findTransactionByReference(
 export async function findTransactionByTransferCode(
   transferCode: string
 ): Promise<UnifiedTransaction | null> {
+  const db = getDb();
   const q = query(
     collection(db, 'transactions'),
     where('metadata.paystackTransferCode', '==', transferCode),
@@ -810,6 +819,7 @@ async function updateUserBalance(
   amount: number,
   operation: 'add' | 'subtract'
 ): Promise<number> {
+  const db = getDb();
   const userRef = doc(db, 'users', userId);
   const userDoc = await getDoc(userRef);
   

@@ -16,6 +16,7 @@
 
 import { getWeeklyFantasyStats, getCurrentWeek } from '../../../../lib/sportsdataio';
 import { RateLimiter } from '../../../../lib/rateLimiter';
+import { logger } from '../../../../lib/structuredLogger.js';
 
 // Rate limiter (60 per minute)
 const rateLimiter = new RateLimiter({
@@ -75,7 +76,10 @@ export default async function handler(req, res) {
       data: stats,
     });
   } catch (err) {
-    console.error('Weekly Stats API error:', err);
+    logger.error('Weekly Stats API error', err, {
+      component: 'nfl-api',
+      operation: 'weekly-stats',
+    });
     return res.status(500).json({ error: err.message });
   }
 }

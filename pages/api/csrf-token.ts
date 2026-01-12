@@ -12,6 +12,7 @@ import {
   generateCSRFToken, 
   setCSRFTokenCookie 
 } from '../../lib/csrfProtection';
+import { logger } from '../../lib/structuredLogger';
 
 interface CSRFTokenResponse {
   csrfToken: string;
@@ -43,7 +44,10 @@ export default async function handler(
       message: 'CSRF token generated successfully'
     });
   } catch (error) {
-    console.error('Error generating CSRF token:', error);
+    logger.error('Error generating CSRF token', error as Error, {
+      component: 'csrf',
+      operation: 'generate-token',
+    });
     return res.status(500).json({
       csrfToken: '',
       message: 'Failed to generate CSRF token'

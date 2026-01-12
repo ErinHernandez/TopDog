@@ -121,8 +121,8 @@ export async function getPlayersByADP(
 ): Promise<Array<{ playerId: string } & PlayerADP>> {
   const adp = await getLiveADP(year);
   return Object.entries(adp.players)
-    .map(([playerId, data]) => ({ playerId, ...data }))
-    .sort((a, b) => a.adp - b.adp);
+    .map(([playerId, data]: [string, PlayerADP]) => ({ playerId, ...data }))
+    .sort((a: { playerId: string } & PlayerADP, b: { playerId: string } & PlayerADP) => a.adp - b.adp);
 }
 
 /**
@@ -134,7 +134,7 @@ export async function getPlayersInADPRange(
   year: string = CURRENT_YEAR
 ): Promise<Array<{ playerId: string } & PlayerADP>> {
   const players = await getPlayersByADP(year);
-  return players.filter(p => p.adp >= minADP && p.adp <= maxADP);
+  return players.filter((p: { playerId: string } & PlayerADP) => p.adp >= minADP && p.adp <= maxADP);
 }
 
 // ============================================================================

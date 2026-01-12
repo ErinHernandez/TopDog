@@ -9,7 +9,7 @@
  * All users (including US) can change their currency preference.
  */
 
-import { db } from '../firebase';
+import { getDb } from '../firebase-utils';
 import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { COUNTRY_TO_CURRENCY, CURRENCY_CONFIG, getCurrencyConfig } from './currencyConfig';
 
@@ -81,6 +81,7 @@ export async function getDisplayCurrency(
   
   try {
     // Fetch user data from Firebase
+    const db = getDb();
     const userRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userRef);
     const userData = userDoc.exists() ? userDoc.data() as UserCurrencyData : {};
@@ -125,7 +126,7 @@ export async function getDisplayCurrency(
       symbol: config.symbol,
       name: config.name,
     };
-  } catch (error) {
+  } catch (error: unknown) {
     // Fallback on error - use local detection
     console.error('[displayCurrency] Error fetching user data:', error);
     const localCurrency = COUNTRY_TO_CURRENCY[countryUpper] || 'USD';
@@ -217,6 +218,7 @@ export async function setDisplayCurrencyPreference(
     }
   }
   
+  const db = getDb();
   const userRef = doc(db, 'users', userId);
   await updateDoc(userRef, {
     displayCurrencyPreference: currency ? currency.toUpperCase() : null,
@@ -249,6 +251,7 @@ export async function updateLastDepositCurrency(
     return;
   }
   
+  const db = getDb();
   const userRef = doc(db, 'users', userId);
   await updateDoc(userRef, {
     lastDepositCurrency: currencyUpper,

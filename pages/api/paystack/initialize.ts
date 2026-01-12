@@ -24,6 +24,7 @@ import {
 } from '../../../lib/paystack/currencyConfig';
 import { isPaystackCountry } from '../../../lib/payments/types';
 import { captureError } from '../../../lib/errorTracking';
+import { logger } from '../../../lib/structuredLogger';
 import type { PaystackChannel } from '../../../lib/paystack/paystackTypes';
 import { withAuth } from '../../../lib/apiAuth';
 import { createPaymentRateLimiter, withRateLimit } from '../../../lib/rateLimitConfig';
@@ -331,7 +332,11 @@ const handler = async function(
     });
     
   } catch (error) {
-    console.error('[Paystack Initialize] Error:', error);
+    logger.error('Payment initialization error', error as Error, { 
+      component: 'paystack', 
+      operation: 'initialize',
+      body: req.body,
+    });
     await captureError(error as Error, {
       tags: { component: 'paystack', operation: 'initialize' },
       extra: { body: req.body },

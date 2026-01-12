@@ -18,7 +18,7 @@ export const POSITION_COLORS = {
   RB: '#0fba80',  // Green
   WR: '#FBBF25',  // Yellow/Gold
   TE: '#7C3AED',  // Purple
-  FLEX: null,     // Uses gradient (RB + WR + TE)
+  FLEX: null as null,     // Uses gradient (RB + WR + TE)
   BN: '#6B7280',  // Gray (bench)
 } as const;
 

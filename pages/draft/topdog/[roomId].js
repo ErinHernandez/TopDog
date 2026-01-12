@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState, useRef } from 'react';
 import { db } from '../../../lib/firebase';
 import {
-  doc, getDoc, updateDoc, arrayUnion, onSnapshot, collection, addDoc, query, orderBy, setDoc, arrayRemove, getDocs, deleteDoc
+  doc, getDoc, updateDoc, arrayUnion, onSnapshot, collection, addDoc, query, orderBy, setDoc, arrayRemove, getDocs, deleteDoc, runTransaction, serverTimestamp
 } from 'firebase/firestore';
 import Link from 'next/link';
 import React from 'react';
@@ -1102,23 +1102,30 @@ export default function DraftRoom() {
   };
 
   const makePick = async (player) => {
-    console.log('🎯 MAKE PICK CALLED:', {
-      player,
-      pickLoading,
-      pickInProgress: pickInProgressRef.current,
-      isMyTurn,
-      isDraftActive,
-      currentPickNumber,
-      currentRound
-    });
+    // Use structured logger in production, console.log in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🎯 MAKE PICK CALLED:', {
+        player,
+        pickLoading,
+        pickInProgress: pickInProgressRef.current,
+        isMyTurn,
+        isDraftActive,
+        currentPickNumber,
+        currentRound
+      });
+    }
     
     if (!isMyTurn) {
-      console.log('❌ PICK BLOCKED: Not your turn');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('❌ PICK BLOCKED: Not your turn');
+      }
       return;
     }
     
     if (pickLoading || pickInProgressRef.current) {
-      console.log('❌ PICK BLOCKED: Pick already in progress');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('❌ PICK BLOCKED: Pick already in progress');
+      }
       return;
     }
     
@@ -1134,20 +1141,73 @@ export default function DraftRoom() {
       pickInProgressRef.current = true;
       setPickLoading(true);
       
-      // Use the calculated currentPickNumber to ensure proper sequencing
-      const pickRef = doc(db, 'draftRooms', roomId, 'picks', String(currentPickNumber));
-      await setDoc(pickRef, {
-        pickNumber: currentPickNumber,
-        round: currentRound,
-        user: userName,
-        player,
-        roomId: roomId,
-        timestamp: Date.now(),
+      // Use Firestore transaction to ensure atomicity and prevent race conditions
+      await runTransaction(db, async (transaction) => {
+        const roomRef = doc(db, 'draftRooms', roomId);
+        const roomDoc = await transaction.get(roomRef);
+        
+        if (!roomDoc.exists()) {
+          throw new Error('Draft room not found');
+        }
+        
+        const roomData = roomDoc.data();
+        
+        // Validate it's actually the current pick (prevents race conditions)
+        if (roomData.currentPick !== currentPickNumber) {
+          throw new Error(`Pick number mismatch: expected ${roomData.currentPick}, got ${currentPickNumber}`);
+        }
+        
+        // Validate it's the user's turn
+        const currentPickerIndex = (currentPickNumber - 1) % draftOrder.length;
+        const expectedPicker = draftOrder[currentPickerIndex];
+        if (expectedPicker !== userName) {
+          throw new Error(`Not your turn: expected ${expectedPicker}, got ${userName}`);
+        }
+        
+        // Create the pick document
+        const pickRef = doc(db, 'draftRooms', roomId, 'picks', String(currentPickNumber));
+        const pickData = {
+          pickNumber: currentPickNumber,
+          round: currentRound,
+          user: userName,
+          player,
+          roomId: roomId,
+          timestamp: serverTimestamp(),
+        };
+        
+        // Atomically: add pick and update room state
+        transaction.set(pickRef, pickData);
+        transaction.update(roomRef, {
+          currentPick: currentPickNumber + 1,
+          lastPickAt: serverTimestamp(),
+        });
+        
+        return pickData;
       });
-      console.log(`[ROOM ${roomId}] Pick made: ${player} by ${userName} (pick #${currentPickNumber})`);
+      
+      // Log successful pick (structured logger in production)
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[ROOM ${roomId}] Pick made: ${player} by ${userName} (pick #${currentPickNumber})`);
+      } else {
+        // In production, use structured logger
+        const { logDraftEvent, logger } = await import('../../../lib/structuredLogger');
+        logDraftEvent('Pick made', { 
+          roomId, 
+          userId: userName, 
+          playerName: player, 
+          pickNumber: currentPickNumber 
+        });
+      }
     } catch (error) {
-      console.error(`[ROOM ${roomId}] Error making pick:`, error);
-      alert('Error making pick. Please try again.');
+      // Log error (structured logger in production)
+      if (process.env.NODE_ENV === 'development') {
+        console.error(`[ROOM ${roomId}] Error making pick:`, error);
+      } else {
+        const { logger, logDraftEvent } = await import('../../../lib/structuredLogger');
+        logger.error('Pick failed', error, { roomId, userId: userName, playerName: player });
+        logDraftEvent('Pick failed', { roomId, userId: userName, error: error.message });
+      }
+      alert(`Error making pick: ${error.message}. Please try again.`);
     } finally {
       setPickLoading(false);
       pickInProgressRef.current = false;
@@ -1156,23 +1216,28 @@ export default function DraftRoom() {
 
   // Auto-pick function that bypasses turn checks
   const makeAutoPick = async (player, picker = null, pickNumber = null) => {
-    console.log('🤖 AUTO PICK CALLED:', {
-      player,
-      picker,
-      pickLoading,
-      pickInProgress: pickInProgressRef.current,
-      isDraftActive,
-      currentPickNumber,
-      currentRound,
-      userName
-    });
+    // Use structured logger in production, console.log in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🤖 AUTO PICK CALLED:', {
+        player,
+        picker,
+        pickLoading,
+        pickInProgress: pickInProgressRef.current,
+        isDraftActive,
+        currentPickNumber,
+        currentRound,
+        userName
+      });
+    }
     
     if (pickLoading || !isDraftActive || pickInProgressRef.current) {
-      console.log('❌ AUTO PICK BLOCKED:', {
-        reason: pickLoading ? 'pick loading' : 
-                !isDraftActive ? 'draft not active' : 
-                'pick in progress'
-      });
+      if (process.env.NODE_ENV === 'development') {
+        console.log('❌ AUTO PICK BLOCKED:', {
+          reason: pickLoading ? 'pick loading' : 
+                  !isDraftActive ? 'draft not active' : 
+                  'pick in progress'
+        });
+      }
       return;
     }
     
@@ -1187,19 +1252,72 @@ export default function DraftRoom() {
       const actualPickNumber = pickNumber || (picks.length + 1);
       const actualRound = Math.ceil(actualPickNumber / draftOrder.length);
       
-      // Use the calculated pick number to ensure proper sequencing
-      const pickRef = doc(db, 'draftRooms', roomId, 'picks', String(actualPickNumber));
-      await setDoc(pickRef, {
-        pickNumber: actualPickNumber,
-        round: actualRound,
-        user: actualPicker,
-        player,
-        roomId: roomId,
-        timestamp: Date.now(),
+      // Use Firestore transaction to ensure atomicity and prevent race conditions
+      await runTransaction(db, async (transaction) => {
+        const roomRef = doc(db, 'draftRooms', roomId);
+        const roomDoc = await transaction.get(roomRef);
+        
+        if (!roomDoc.exists()) {
+          throw new Error('Draft room not found');
+        }
+        
+        const roomData = roomDoc.data();
+        
+        // Validate it's actually the current pick (prevents race conditions)
+        if (roomData.currentPick !== actualPickNumber) {
+          throw new Error(`Auto-pick number mismatch: expected ${roomData.currentPick}, got ${actualPickNumber}`);
+        }
+        
+        // Validate it's the correct picker's turn
+        const currentPickerIndex = (actualPickNumber - 1) % draftOrder.length;
+        const expectedPicker = draftOrder[currentPickerIndex];
+        if (expectedPicker !== actualPicker) {
+          throw new Error(`Auto-pick wrong picker: expected ${expectedPicker}, got ${actualPicker}`);
+        }
+        
+        // Create the pick document
+        const pickRef = doc(db, 'draftRooms', roomId, 'picks', String(actualPickNumber));
+        const pickData = {
+          pickNumber: actualPickNumber,
+          round: actualRound,
+          user: actualPicker,
+          player,
+          roomId: roomId,
+          timestamp: serverTimestamp(),
+        };
+        
+        // Atomically: add pick and update room state
+        transaction.set(pickRef, pickData);
+        transaction.update(roomRef, {
+          currentPick: actualPickNumber + 1,
+          lastPickAt: serverTimestamp(),
+        });
+        
+        return pickData;
       });
-      console.log(`[ROOM ${roomId}] Auto-pick made: ${player} by ${actualPicker} (pick #${actualPickNumber})`);
+      
+      // Log successful auto-pick (structured logger in production)
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[ROOM ${roomId}] Auto-pick made: ${player} by ${actualPicker} (pick #${actualPickNumber})`);
+      } else {
+        const { logDraftEvent } = await import('../../../lib/structuredLogger');
+        logDraftEvent('Auto-pick made', { 
+          roomId, 
+          userId: actualPicker, 
+          playerName: player, 
+          pickNumber: actualPickNumber 
+        });
+      }
     } catch (error) {
-      console.error(`[ROOM ${roomId}] Error making auto-pick:`, error);
+      // Log auto-pick error (structured logger in production)
+      if (process.env.NODE_ENV === 'development') {
+        console.error(`[ROOM ${roomId}] Error making auto-pick:`, error);
+      } else {
+        const { logger, logDraftEvent } = await import('../../../lib/structuredLogger');
+        logger.error('Auto-pick failed', error, { roomId, userId: actualPicker, playerName: player });
+        logDraftEvent('Auto-pick failed', { roomId, userId: actualPicker, error: error.message });
+      }
+      // Auto-pick errors are logged but don't alert user (handled by timer)
     } finally {
       setPickLoading(false);
       pickInProgressRef.current = false;

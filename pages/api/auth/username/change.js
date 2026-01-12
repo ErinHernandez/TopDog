@@ -41,6 +41,7 @@ import { validateUsername } from '../../../../lib/usernameValidation.js';
 import { checkUsernameAvailability } from '../../../../lib/usernameValidation.js';
 import { usernameChangePolicy } from '../../../../lib/usernameChangePolicy.js';
 import { createSignupLimiter } from '../../../../lib/rateLimiter.js';
+import { logger } from '../../../../lib/structuredLogger.js';
 
 // Use require for firebase-admin to ensure Turbopack compatibility
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -63,12 +64,18 @@ if (admin.apps.length === 0) {
     const serviceAccountEnv = process.env.FIREBASE_SERVICE_ACCOUNT;
     if (!serviceAccountEnv) {
       firebaseAdminInitError = new Error('FIREBASE_SERVICE_ACCOUNT environment variable is not set');
-      console.error('Firebase Admin initialization failed:', firebaseAdminInitError.message);
+      logger.error('Firebase Admin initialization failed', firebaseAdminInitError, {
+        component: 'auth',
+        operation: 'firebase-admin-init',
+      });
     } else {
       const serviceAccount = JSON.parse(serviceAccountEnv);
       if (!serviceAccount.project_id) {
         firebaseAdminInitError = new Error('FIREBASE_SERVICE_ACCOUNT is missing project_id');
-        console.error('Firebase Admin initialization failed:', firebaseAdminInitError.message);
+        logger.error('Firebase Admin initialization failed', firebaseAdminInitError, {
+          component: 'auth',
+          operation: 'firebase-admin-init',
+        });
       } else {
         admin.initializeApp({
           credential: admin.credential.cert(serviceAccount),
@@ -78,7 +85,10 @@ if (admin.apps.length === 0) {
     }
   } catch (error) {
     firebaseAdminInitError = error;
-    console.error('Firebase Admin initialization failed:', error.message);
+    logger.error('Firebase Admin initialization failed', error, {
+      component: 'auth',
+      operation: 'firebase-admin-init',
+    });
   }
 } else {
   // Admin app already exists
@@ -125,7 +135,11 @@ async function verifyAuth(authHeader) {
     
     // Check if Firebase Admin was initialized successfully
     if (!firebaseAdminInitialized) {
-      console.error('Firebase Admin not initialized, cannot verify token');
+      logger.error('Firebase Admin not initialized, cannot verify token', null, {
+        component: 'auth',
+        operation: 'token-verification',
+        error: firebaseAdminInitError?.message || 'Authentication service unavailable',
+      });
       return { 
         uid: null, 
         error: firebaseAdminInitError?.message || 'Authentication service unavailable' 
@@ -138,7 +152,10 @@ async function verifyAuth(authHeader) {
     
     return { uid: decodedToken.uid };
   } catch (error) {
-    console.error('Token verification error:', error);
+    logger.error('Token verification error', error, {
+      component: 'auth',
+      operation: 'token-verification',
+    });
     return { uid: null, error: 'Invalid token' };
   }
 }
@@ -334,7 +351,10 @@ const handler = async function(req, res) {
     });
     
   } catch (error) {
-    console.error('Username change error:', error);
+    logger.error('Username change error', error, {
+      component: 'auth',
+      operation: 'username-change',
+    });
     
     if (error.message === 'USERNAME_TAKEN') {
       return res.status(409).json({

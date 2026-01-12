@@ -38,6 +38,7 @@ import {
 } from 'firebase/firestore';
 import { initializeApp as initializeClientApp, getApps as getClientApps } from 'firebase/app';
 import { verifyAdminAccess } from '../../../../lib/adminAuth.js';
+import { logger } from '../../../../lib/structuredLogger.js';
 
 // Use require for firebase-admin to ensure Turbopack compatibility
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -57,7 +58,11 @@ if (admin.apps.length === 0) {
       });
     }
   } catch (error) {
-    console.warn('Firebase Admin initialization skipped:', error.message);
+    logger.warn('Firebase Admin initialization skipped', {
+      component: 'auth',
+      operation: 'firebase-admin-init',
+      error: error.message || String(error),
+    });
   }
 }
 
@@ -296,7 +301,10 @@ const handler = async function(req, res) {
     });
     
   } catch (error) {
-    console.error('Username reservation error:', error);
+    logger.error('Username reservation error', error, {
+      component: 'auth',
+      operation: 'username-reserve',
+    });
     
     await logSecurityEvent(
       SecurityEventType.SUSPICIOUS_ACTIVITY,

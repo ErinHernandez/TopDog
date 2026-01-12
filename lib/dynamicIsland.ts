@@ -135,7 +135,7 @@ function sendToNative(action: string, payload: Record<string, unknown>): void {
       payload,
       timestamp: Date.now(),
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.warn('[DynamicIsland] Failed to send to native:', error);
   }
 }
@@ -152,7 +152,7 @@ export function onNativeBridgeMessage(callback: NativeBridgeCallback): () => voi
 if (typeof window !== 'undefined') {
   // @ts-ignore - Custom event from native app
   window.handleDynamicIslandResponse = (data: DraftTimerActivityState) => {
-    nativeCallbacks.forEach(cb => cb(data));
+    nativeCallbacks.forEach((cb: NativeBridgeCallback) => cb(data));
   };
 }
 
@@ -214,7 +214,7 @@ export async function startDraftTimerActivity(
         currentActivityId = activityId;
         return activityId;
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('[DynamicIsland] Failed to create notification:', error);
     }
   }
@@ -276,7 +276,7 @@ export async function updateDraftTimerActivity(
         localStorage.setItem('topdog_draft_activity', JSON.stringify(merged));
         return true;
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('[DynamicIsland] Failed to update notification:', error);
     }
   }
@@ -306,9 +306,9 @@ export async function endDraftTimerActivity(
         const notifications = await registration.getNotifications({ 
           tag: `draft-timer-${targetId.split('-')[1]}` 
         });
-        notifications.forEach(n => n.close());
+        notifications.forEach((n: Notification) => n.close());
       }
-    } catch (error) {
+    } catch (error: unknown) {
       // Ignore errors when clearing
     }
   }

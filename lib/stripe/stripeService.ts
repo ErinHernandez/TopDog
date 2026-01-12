@@ -6,7 +6,7 @@
  */
 
 import Stripe from 'stripe';
-import { db } from '../firebase';
+import { getDb } from '../firebase-utils';
 import { doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 import { captureError } from '../errorTracking';
 import type {
@@ -76,6 +76,7 @@ export async function getOrCreateCustomer(
   
   try {
     // Check if user already has a Stripe customer ID in Firebase
+    const db = getDb();
     const userRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userRef);
     
@@ -89,7 +90,7 @@ export async function getOrCreateCustomer(
           if (!customer.deleted) {
             return customer as Stripe.Customer;
           }
-        } catch (err) {
+        } catch (err: unknown) {
           // Customer might have been deleted, create a new one
           console.warn('[StripeService] Stored customer ID invalid, creating new customer');
         }
@@ -131,7 +132,7 @@ export async function getOrCreateCustomer(
     }, { merge: true });
     
     return customer;
-  } catch (error) {
+  } catch (error: unknown) {
     await captureError(error as Error, {
       tags: { component: 'stripe', operation: 'getOrCreateCustomer' },
       extra: { userId, email },
@@ -170,7 +171,7 @@ export async function getCustomerWithPaymentMethods(
         ? typedCustomer.invoice_settings.default_payment_method
         : undefined,
     };
-  } catch (error) {
+  } catch (error: unknown) {
     await captureError(error as Error, {
       tags: { component: 'stripe', operation: 'getCustomerWithPaymentMethods' },
       extra: { customerId },
@@ -194,7 +195,7 @@ export async function setDefaultPaymentMethod(
         default_payment_method: paymentMethodId,
       },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     await captureError(error as Error, {
       tags: { component: 'stripe', operation: 'setDefaultPaymentMethod' },
       extra: { customerId, paymentMethodId },
@@ -213,7 +214,7 @@ export async function detachPaymentMethod(
   
   try {
     await stripe.paymentMethods.detach(paymentMethodId);
-  } catch (error) {
+  } catch (error: unknown) {
     await captureError(error as Error, {
       tags: { component: 'stripe', operation: 'detachPaymentMethod' },
       extra: { paymentMethodId },
@@ -337,7 +338,7 @@ export async function createPaymentIntent(
     }
     
     return response;
-  } catch (error) {
+  } catch (error: unknown) {
     await captureError(error as Error, {
       tags: { component: 'stripe', operation: 'createPaymentIntent' },
       extra: { userId, amountCents, currency: currencyUpper },
@@ -380,7 +381,7 @@ export async function createSetupIntent(
       clientSecret: setupIntent.client_secret!,
       setupIntentId: setupIntent.id,
     };
-  } catch (error) {
+  } catch (error: unknown) {
     await captureError(error as Error, {
       tags: { component: 'stripe', operation: 'createSetupIntent' },
       extra: { userId, customerId },
@@ -410,6 +411,7 @@ export async function getOrCreateConnectAccount(
   
   try {
     // Check if user already has a Connect account
+    const db = getDb();
     const userRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userRef);
     
@@ -443,7 +445,7 @@ export async function getOrCreateConnectAccount(
     }, { merge: true });
     
     return getConnectAccountStatus(account.id);
-  } catch (error) {
+  } catch (error: unknown) {
     await captureError(error as Error, {
       tags: { component: 'stripe', operation: 'getOrCreateConnectAccount' },
       extra: { userId, email },
@@ -488,7 +490,7 @@ export async function getConnectAccountStatus(
     }
     
     return status;
-  } catch (error) {
+  } catch (error: unknown) {
     await captureError(error as Error, {
       tags: { component: 'stripe', operation: 'getConnectAccountStatus' },
       extra: { accountId },
@@ -521,6 +523,7 @@ export async function createPayout(
   
   try {
     // Get user's Connect account
+    const db = getDb();
     const userRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userRef);
     
@@ -591,7 +594,7 @@ export async function createPayout(
       status: 'pending',
       arrivalDate: undefined, // Will be updated via webhook
     };
-  } catch (error) {
+  } catch (error: unknown) {
     await captureError(error as Error, {
       tags: { component: 'stripe', operation: 'createPayout' },
       extra: { userId, amountCents, currency: currencyUpper },
@@ -649,13 +652,14 @@ export async function createTransaction(
     if (input.referenceId) transaction.referenceId = input.referenceId;
     if (input.metadata) transaction.metadata = input.metadata;
     
+    const db = getDb();
     const docRef = await addDoc(collection(db, 'transactions'), transaction);
     
     return {
       id: docRef.id,
       ...transaction,
     };
-  } catch (error) {
+  } catch (error: unknown) {
     await captureError(error as Error, {
       tags: { component: 'stripe', operation: 'createTransaction' },
       extra: { userId: input.userId, type: input.type },
@@ -673,6 +677,7 @@ export async function updateTransactionStatus(
   errorMessage?: string
 ): Promise<void> {
   try {
+    const db = getDb();
     const transactionRef = doc(db, 'transactions', transactionId);
     
     const updates: Partial<Transaction> = {
@@ -685,7 +690,7 @@ export async function updateTransactionStatus(
     }
     
     await updateDoc(transactionRef, updates);
-  } catch (error) {
+  } catch (error: unknown) {
     await captureError(error as Error, {
       tags: { component: 'stripe', operation: 'updateTransactionStatus' },
       extra: { transactionId, status },
@@ -701,6 +706,7 @@ export async function findTransactionByPaymentIntent(
   paymentIntentId: string
 ): Promise<Transaction | null> {
   try {
+    const db = getDb();
     const q = query(
       collection(db, 'transactions'),
       where('stripePaymentIntentId', '==', paymentIntentId)
@@ -717,7 +723,7 @@ export async function findTransactionByPaymentIntent(
       id: doc.id,
       ...doc.data(),
     } as Transaction;
-  } catch (error) {
+  } catch (error: unknown) {
     await captureError(error as Error, {
       tags: { component: 'stripe', operation: 'findTransactionByPaymentIntent' },
       extra: { paymentIntentId },
@@ -733,6 +739,7 @@ export async function findTransactionByTransfer(
   transferId: string
 ): Promise<Transaction | null> {
   try {
+    const db = getDb();
     const q = query(
       collection(db, 'transactions'),
       where('stripeTransferId', '==', transferId)
@@ -749,7 +756,7 @@ export async function findTransactionByTransfer(
       id: doc.id,
       ...doc.data(),
     } as Transaction;
-  } catch (error) {
+  } catch (error: unknown) {
     await captureError(error as Error, {
       tags: { component: 'stripe', operation: 'findTransactionByTransfer' },
       extra: { transferId },
@@ -771,6 +778,7 @@ export async function updateUserBalance(
   operation: 'add' | 'subtract'
 ): Promise<number> {
   try {
+    const db = getDb();
     const userRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userRef);
     
@@ -796,7 +804,7 @@ export async function updateUserBalance(
     }, { merge: true });
     
     return newBalance;
-  } catch (error) {
+  } catch (error: unknown) {
     await captureError(error as Error, {
       tags: { component: 'stripe', operation: 'updateUserBalance' },
       extra: { userId, amountCents, operation },
@@ -820,6 +828,7 @@ export async function assessPaymentRisk(
 ): Promise<RiskAssessment> {
   try {
     // Get user data for risk assessment
+    const db = getDb();
     const userRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userRef);
     
@@ -879,7 +888,7 @@ export async function assessPaymentRisk(
       factors,
       recommendation,
     };
-  } catch (error) {
+  } catch (error: unknown) {
     // Don't fail the payment if risk assessment fails, just log
     console.error('[StripeService] Risk assessment failed:', error);
     return {

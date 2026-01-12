@@ -953,8 +953,8 @@ export default function PicksBar({
   }, [picks]);
   
   // Get picks for each participant (for position tracker)
-  const participantPicks = useMemo(() => {
-    const result: DraftPlayer[][] = participants.map(() => []);
+  const participantPicks = useMemo((): DraftPlayer[][] => {
+    const result: DraftPlayer[][] = participants.map((): DraftPlayer[] => []);
     picks.forEach(pick => {
       if (pick.participantIndex >= 0 && pick.participantIndex < participants.length) {
         result[pick.participantIndex].push(pick.player);

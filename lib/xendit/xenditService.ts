@@ -8,7 +8,7 @@
  */
 
 import crypto from 'crypto';
-import { db } from '../firebase';
+import { getDb } from '../firebase-utils';
 import { doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 import { captureError } from '../errorTracking';
 import type {
@@ -208,6 +208,7 @@ export async function createDisbursement(
   const { userId, ...disbursementRequest } = request;
   
   // Verify user has sufficient balance
+  const db = getDb();
   const userRef = doc(db, 'users', userId);
   const userDoc = await getDoc(userRef);
   
@@ -255,6 +256,7 @@ export async function saveDisbursementAccount(
   userId: string,
   account: Omit<XenditSavedDisbursementAccount, 'id' | 'createdAt'>
 ): Promise<XenditSavedDisbursementAccount> {
+  const db = getDb();
   const userRef = doc(db, 'users', userId);
   const userDoc = await getDoc(userRef);
   
@@ -291,6 +293,7 @@ export async function saveDisbursementAccount(
  * Get saved disbursement accounts for a user
  */
 export async function getSavedDisbursementAccounts(userId: string): Promise<XenditSavedDisbursementAccount[]> {
+  const db = getDb();
   const userRef = doc(db, 'users', userId);
   const userDoc = await getDoc(userRef);
   
@@ -305,6 +308,7 @@ export async function getSavedDisbursementAccounts(userId: string): Promise<Xend
  * Delete a saved disbursement account
  */
 export async function deleteDisbursementAccount(userId: string, accountId: string): Promise<void> {
+  const db = getDb();
   const userRef = doc(db, 'users', userId);
   const userDoc = await getDoc(userRef);
   
@@ -499,6 +503,7 @@ export async function createXenditTransaction(
     updatedAt: now,
   };
   
+  const db = getDb();
   const docRef = await addDoc(collection(db, 'transactions'), transaction);
   
   return {
@@ -515,6 +520,7 @@ export async function updateTransactionStatus(
   status: TransactionStatus,
   errorMessage?: string
 ): Promise<void> {
+  const db = getDb();
   const transactionRef = doc(db, 'transactions', transactionId);
   
   const updates: Partial<UnifiedTransaction> = {
@@ -535,6 +541,7 @@ export async function updateTransactionStatus(
 export async function findTransactionByVAPaymentId(
   paymentId: string
 ): Promise<UnifiedTransaction | null> {
+  const db = getDb();
   const q = query(
     collection(db, 'transactions'),
     where('providerReference', '==', paymentId),
@@ -560,6 +567,7 @@ export async function findTransactionByVAPaymentId(
 export async function findTransactionByEWalletChargeId(
   chargeId: string
 ): Promise<UnifiedTransaction | null> {
+  const db = getDb();
   const q = query(
     collection(db, 'transactions'),
     where('metadata.xenditChargeId', '==', chargeId),
@@ -585,6 +593,7 @@ export async function findTransactionByEWalletChargeId(
 export async function findTransactionByDisbursementId(
   disbursementId: string
 ): Promise<UnifiedTransaction | null> {
+  const db = getDb();
   const q = query(
     collection(db, 'transactions'),
     where('metadata.xenditDisbursementId', '==', disbursementId),
@@ -616,6 +625,7 @@ async function updateUserBalance(
   amount: number,
   operation: 'add' | 'subtract'
 ): Promise<number> {
+  const db = getDb();
   const userRef = doc(db, 'users', userId);
   const userDoc = await getDoc(userRef);
   

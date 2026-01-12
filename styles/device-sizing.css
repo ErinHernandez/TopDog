@@ -150,6 +150,13 @@
   
   .vx2-tournament-card {
     padding: 16px !important;
+    min-height: 400px !important; /* Ensure minimum height on mobile */
+  }
+  
+  /* Ensure background images render on mobile */
+  .vx2-tournament-card > div[aria-hidden="true"] {
+    display: block !important;
+    visibility: visible !important;
   }
   
   .vx2-tournament-title {

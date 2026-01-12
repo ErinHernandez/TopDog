@@ -15,7 +15,9 @@ import {
   createSuccessResponse,
   createErrorResponse,
   ErrorType,
+  type ScopedLogger,
 } from '../../../lib/apiErrorHandler';
+import { createScopedLogger } from '../../../lib/serverLogger';
 import {
   getCustomerWithPaymentMethods,
   detachPaymentMethod,
@@ -51,10 +53,8 @@ async function handler(
         return handleSetDefaultPaymentMethod(req, res, logger);
       default:
         const error = createErrorResponse(
-          ErrorType.VALIDATION,
-          'Method not allowed',
-          405,
-          logger
+          ErrorType.METHOD_NOT_ALLOWED,
+          'Method not allowed'
         );
         return res.status(error.statusCode).json(error.body);
     }
@@ -74,17 +74,15 @@ export default withCSRFProtection(withAuth(withRateLimit(handler, paymentMethods
 async function handleListPaymentMethods(
   req: NextApiRequest,
   res: NextApiResponse,
-  logger: { info: (msg: string, data?: unknown) => void }
+  logger: ScopedLogger
 ) {
   const { userId } = req.query;
   
   if (!userId || typeof userId !== 'string') {
-    const error = createErrorResponse(
-      ErrorType.VALIDATION,
-      'userId query parameter is required',
-      400,
-      logger
-    );
+      const error = createErrorResponse(
+        ErrorType.VALIDATION,
+        'userId query parameter is required'
+      );
     return res.status(error.statusCode).json(error.body);
   }
   
@@ -140,9 +138,7 @@ async function handleListPaymentMethods(
     
     const errorResponse = createErrorResponse(
       ErrorType.STRIPE,
-      err.message || 'Failed to list payment methods',
-      500,
-      logger
+      err.message || 'Failed to list payment methods'
     );
     return res.status(errorResponse.statusCode).json(errorResponse.body);
   }
@@ -154,16 +150,14 @@ async function handleListPaymentMethods(
 async function handleDetachPaymentMethod(
   req: NextApiRequest,
   res: NextApiResponse,
-  logger: { info: (msg: string, data?: unknown) => void }
+  logger: ScopedLogger
 ) {
   const { userId, paymentMethodId } = req.body;
   
   if (!userId || !paymentMethodId) {
     const error = createErrorResponse(
       ErrorType.VALIDATION,
-      'userId and paymentMethodId are required',
-      400,
-      logger
+      'userId and paymentMethodId are required'
     );
     return res.status(error.statusCode).json(error.body);
   }
@@ -191,9 +185,7 @@ async function handleDetachPaymentMethod(
     
     const errorResponse = createErrorResponse(
       ErrorType.STRIPE,
-      err.message || 'Failed to remove payment method',
-      500,
-      logger
+      err.message || 'Failed to remove payment method'
     );
     return res.status(errorResponse.statusCode).json(errorResponse.body);
   }
@@ -205,16 +197,14 @@ async function handleDetachPaymentMethod(
 async function handleSetDefaultPaymentMethod(
   req: NextApiRequest,
   res: NextApiResponse,
-  logger: { info: (msg: string, data?: unknown) => void }
+  logger: ScopedLogger
 ) {
   const { userId, paymentMethodId } = req.body;
   
   if (!userId || !paymentMethodId) {
     const error = createErrorResponse(
       ErrorType.VALIDATION,
-      'userId and paymentMethodId are required',
-      400,
-      logger
+      'userId and paymentMethodId are required'
     );
     return res.status(error.statusCode).json(error.body);
   }
@@ -228,9 +218,7 @@ async function handleSetDefaultPaymentMethod(
     if (!paymentData?.stripeCustomerId) {
       const error = createErrorResponse(
         ErrorType.NOT_FOUND,
-        'No Stripe customer found',
-        404,
-        logger
+        'No Stripe customer found'
       );
       return res.status(error.statusCode).json(error.body);
     }
@@ -249,9 +237,7 @@ async function handleSetDefaultPaymentMethod(
     
     const errorResponse = createErrorResponse(
       ErrorType.STRIPE,
-      err.message || 'Failed to set default payment method',
-      500,
-      logger
+      err.message || 'Failed to set default payment method'
     );
     return res.status(errorResponse.statusCode).json(errorResponse.body);
   }

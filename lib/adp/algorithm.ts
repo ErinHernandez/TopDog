@@ -63,11 +63,11 @@ export function filterPicksByPhase(
   
   // Pre-fast launch: Use slow drafts
   if (!launchTime || now < launchTime) {
-    return picks.filter(p => p.draftType === 'slow');
+    return picks.filter((p: DraftPick) => p.draftType === 'slow');
   }
   
   // Post-fast launch: Use fast drafts only
-  return picks.filter(p => p.draftType === 'fast');
+  return picks.filter((p: DraftPick) => p.draftType === 'fast');
 }
 
 /**
@@ -124,7 +124,7 @@ function mean(values: number[]): number {
 function standardDeviation(values: number[]): number {
   if (values.length < 2) return 0;
   const avg = mean(values);
-  const squareDiffs = values.map(v => Math.pow(v - avg, 2));
+  const squareDiffs = values.map((v: number) => Math.pow(v - avg, 2));
   return Math.sqrt(mean(squareDiffs));
 }
 
@@ -139,7 +139,7 @@ function removeOutliers(
     return { filtered: picks, removed: 0 };
   }
   
-  const positions = picks.map(p => p.pickNumber);
+  const positions = picks.map((p: DraftPick) => p.pickNumber);
   const avg = mean(positions);
   const stdDev = standardDeviation(positions);
   
@@ -148,7 +148,7 @@ function removeOutliers(
     return { filtered: picks, removed: 0 };
   }
   
-  const filtered = picks.filter(p => 
+  const filtered = picks.filter((p: DraftPick) => 
     Math.abs(p.pickNumber - avg) <= threshold * stdDev
   );
   
@@ -202,7 +202,7 @@ export function calculateADP(
   
   // Filter picks by age
   const maxAgeMs = params.maxAgeDays * 24 * 60 * 60 * 1000;
-  const recentPicks = picks.filter(p => now - p.timestamp <= maxAgeMs);
+  const recentPicks = picks.filter((p: DraftPick) => now - p.timestamp <= maxAgeMs);
   
   // Group picks by player
   const picksByPlayer = new Map<string, DraftPick[]>();
@@ -213,10 +213,10 @@ export function calculateADP(
   }
   
   // Get unique draft IDs for count
-  const uniqueDraftIds = new Set(recentPicks.map(p => p.draftId));
+  const uniqueDraftIds = new Set(recentPicks.map((p: DraftPick) => p.draftId));
   
   // Find date range
-  const timestamps = recentPicks.map(p => p.timestamp);
+  const timestamps = recentPicks.map((p: DraftPick) => p.timestamp);
   const minTimestamp = timestamps.length > 0 ? Math.min(...timestamps) : now;
   const maxTimestamp = timestamps.length > 0 ? Math.max(...timestamps) : now;
   
@@ -262,7 +262,7 @@ export function calculateADP(
     totalOutliersRemoved += removed;
     
     // Calculate stats from filtered picks
-    const positions = filtered.map(p => p.pickNumber);
+    const positions = filtered.map((p: DraftPick) => p.pickNumber);
     const highPick = positions.length > 0 ? Math.min(...positions) : 0;
     const lowPick = positions.length > 0 ? Math.max(...positions) : 0;
     const stdDev = positions.length > 0 ? standardDeviation(positions) : 0;
@@ -301,8 +301,8 @@ export function calculateADP(
   const executionTimeMs = Date.now() - startTime;
   
   // Determine blend mode - cache filter results to avoid iterating twice
-  const slowPicksArray = recentPicks.filter(p => p.draftType === 'slow');
-  const fastPicksArray = recentPicks.filter(p => p.draftType === 'fast');
+  const slowPicksArray = recentPicks.filter((p: DraftPick) => p.draftType === 'slow');
+  const fastPicksArray = recentPicks.filter((p: DraftPick) => p.draftType === 'fast');
   const slowPicks = slowPicksArray.length;
   const fastPicks = fastPicksArray.length;
   let blendMode: 'seed-only' | 'slow-only' | 'blended' | 'fast-only';
@@ -354,8 +354,8 @@ export function calculateADP(
  */
 export function getADPRankings(adp: LiveADP): Array<{ playerId: string } & PlayerADP> {
   return Object.entries(adp.players)
-    .map(([playerId, data]) => ({ playerId, ...data }))
-    .sort((a, b) => a.adp - b.adp);
+    .map(([playerId, data]: [string, PlayerADP]) => ({ playerId, ...data }))
+    .sort((a: { playerId: string } & PlayerADP, b: { playerId: string } & PlayerADP) => a.adp - b.adp);
 }
 
 /**
@@ -375,9 +375,9 @@ export function getBiggestRisers(
   limit: number = 10
 ): Array<{ playerId: string } & PlayerADP> {
   return Object.entries(adp.players)
-    .map(([playerId, data]) => ({ playerId, ...data }))
-    .filter(p => p.change < 0 && p.pickCount >= 10) // Only include players with enough data
-    .sort((a, b) => a.change - b.change) // Most negative first
+    .map(([playerId, data]: [string, PlayerADP]) => ({ playerId, ...data }))
+    .filter((p: { playerId: string } & PlayerADP) => p.change < 0 && p.pickCount >= 10) // Only include players with enough data
+    .sort((a: { playerId: string } & PlayerADP, b: { playerId: string } & PlayerADP) => a.change - b.change) // Most negative first
     .slice(0, limit);
 }
 
@@ -389,9 +389,9 @@ export function getBiggestFallers(
   limit: number = 10
 ): Array<{ playerId: string } & PlayerADP> {
   return Object.entries(adp.players)
-    .map(([playerId, data]) => ({ playerId, ...data }))
-    .filter(p => p.change > 0 && p.pickCount >= 10)
-    .sort((a, b) => b.change - a.change) // Most positive first
+    .map(([playerId, data]: [string, PlayerADP]) => ({ playerId, ...data }))
+    .filter((p: { playerId: string } & PlayerADP) => p.change > 0 && p.pickCount >= 10)
+    .sort((a: { playerId: string } & PlayerADP, b: { playerId: string } & PlayerADP) => b.change - a.change) // Most positive first
     .slice(0, limit);
 }
 

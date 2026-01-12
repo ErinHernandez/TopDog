@@ -17,6 +17,7 @@ import {
 } from '../../../lib/xendit';
 import { validateWithdrawalAmount } from '../../../lib/xendit/currencyConfig';
 import { captureError } from '../../../lib/errorTracking';
+import { logger } from '../../../lib/structuredLogger';
 import { db } from '../../../lib/firebase';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 
@@ -189,15 +190,18 @@ export default async function handler(
     }
     
   } catch (error) {
-    await captureError(error instanceof Error ? error : new Error('Unknown error'), {
+    const err = error instanceof Error ? error : new Error('Unknown error');
+    logger.error('Disbursement creation error', err, {
+      component: 'xendit',
+      operation: 'createDisbursement',
+    });
+    await captureError(err, {
       tags: { component: 'xendit', operation: 'createDisbursement' },
     });
     
-    console.error('[Xendit Disbursement API] Error:', error);
-    
     res.status(500).json({
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to create disbursement',
+      error: err.message || 'Failed to create disbursement',
     });
   }
 }

@@ -12,6 +12,7 @@
 
 import { getPlayerStatsByName } from '../../../../lib/sportsdataio';
 import { RateLimiter } from '../../../../lib/rateLimiter';
+import { logger } from '../../../../lib/structuredLogger.js';
 
 // Rate limiter (60 per minute)
 const rateLimiter = new RateLimiter({
@@ -60,7 +61,10 @@ export default async function handler(req, res) {
       data: stats,
     });
   } catch (err) {
-    console.error('Player Stats API error:', err);
+    logger.error('Player Stats API error', err, {
+      component: 'nfl-api',
+      operation: 'player-stats',
+    });
     return res.status(500).json({ error: err.message });
   }
 }

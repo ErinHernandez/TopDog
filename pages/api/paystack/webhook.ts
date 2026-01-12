@@ -28,6 +28,7 @@ import type {
   TransferWebhookData,
 } from '../../../lib/paystack/paystackTypes';
 import { captureError } from '../../../lib/errorTracking';
+import { logger } from '../../../lib/structuredLogger';
 
 // ============================================================================
 // CONFIGURATION
@@ -95,7 +96,7 @@ export default async function handler(
     const signature = req.headers['x-paystack-signature'] as string;
     
     if (!signature) {
-      console.warn('[Paystack Webhook] Missing signature header');
+      logger.warn('Missing signature header', { component: 'paystack', operation: 'webhook' });
       return res.status(401).json({
         received: false,
         error: 'Missing signature',
@@ -106,7 +107,7 @@ export default async function handler(
     const isValid = verifyWebhookSignature(rawBody, signature);
     
     if (!isValid) {
-      console.warn('[Paystack Webhook] Invalid signature');
+      logger.warn('Invalid signature', { component: 'paystack', operation: 'webhook' });
       return res.status(401).json({
         received: false,
         error: 'Invalid signature',
@@ -117,7 +118,7 @@ export default async function handler(
     const payload = JSON.parse(rawBody) as PaystackWebhookPayload;
     const { event, data } = payload;
     
-    console.log(`[Paystack Webhook] Received event: ${event}`);
+    logger.info('Received webhook event', { component: 'paystack', operation: 'webhook', event });
     
     // Handle events
     let result: { success: boolean; actions: string[] };
@@ -142,7 +143,7 @@ export default async function handler(
         
       default:
         // Log unhandled events
-        console.log(`[Paystack Webhook] Unhandled event type: ${event}`);
+        logger.info('Unhandled event type', { component: 'paystack', operation: 'webhook', event });
         result = { success: true, actions: ['unhandled_event'] };
     }
     
@@ -154,7 +155,7 @@ export default async function handler(
     });
     
   } catch (error) {
-    console.error('[Paystack Webhook] Error:', error);
+    logger.error('Webhook processing error', error as Error, { component: 'paystack', operation: 'webhook' });
     await captureError(error as Error, {
       tags: { component: 'paystack', operation: 'webhook' },
     });

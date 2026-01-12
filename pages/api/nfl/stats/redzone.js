@@ -16,6 +16,7 @@
 import { getPlayerRedZoneStats } from '../../../../lib/sportsdataio';
 import { POSITIONS } from '../../../../components/draft/v3/constants/positions';
 import { RateLimiter } from '../../../../lib/rateLimiter';
+import { logger } from '../../../../lib/structuredLogger.js';
 
 // Rate limiter (60 per minute)
 const rateLimiter = new RateLimiter({
@@ -109,7 +110,10 @@ export default async function handler(req, res) {
       data: transformed,
     });
   } catch (err) {
-    console.error('Red Zone Stats API error:', err);
+    logger.error('Red Zone Stats API error', err, {
+      component: 'nfl-api',
+      operation: 'redzone-stats',
+    });
     return res.status(500).json({ error: err.message });
   }
 }

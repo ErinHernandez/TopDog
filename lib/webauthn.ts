@@ -95,7 +95,7 @@ function saveCredential(userId: string, credential: StoredCredential): void {
 // Remove credential for a user
 export function removeCredential(userId: string, credentialId: string): void {
   const credentials = getStoredCredentials(userId);
-  const filtered = credentials.filter(c => c.id !== credentialId);
+  const filtered = credentials.filter((c: StoredCredential) => c.id !== credentialId);
   localStorage.setItem(`${CREDENTIALS_STORAGE_KEY}_${userId}`, JSON.stringify(filtered));
 }
 
@@ -201,7 +201,7 @@ export async function registerBiometric(
     setLastBiometricUserId(userId);
 
     return { success: true, credential: storedCredential };
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Biometric registration error:', error);
     
     if (error instanceof DOMException) {
@@ -247,7 +247,7 @@ export async function authenticateWithBiometric(
     const challenge = generateChallenge();
     
     // Convert stored credentials to allowed credentials
-    const allowCredentials: PublicKeyCredentialDescriptor[] = credentials.map(cred => ({
+    const allowCredentials: PublicKeyCredentialDescriptor[] = credentials.map((cred: StoredCredential) => ({
       id: base64urlToBuffer(cred.rawId),
       type: 'public-key' as const,
       transports: ['internal'] as AuthenticatorTransport[],
@@ -278,7 +278,7 @@ export async function authenticateWithBiometric(
       userId: targetUserId,
       credentialId: assertion.id,
     };
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Biometric authentication error:', error);
     
     if (error instanceof DOMException) {

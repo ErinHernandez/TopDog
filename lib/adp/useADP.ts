@@ -44,7 +44,7 @@ export function useLiveADP(): UseLiveADPResult {
     
     getLiveADP()
       .then(setADP)
-      .catch(setError)
+      .catch((err: unknown) => setError(err instanceof Error ? err : new Error(String(err))))
       .finally(() => setLoading(false));
   }, [refreshKey]);
   
@@ -81,7 +81,7 @@ export function usePlayerADP(playerId: string): UsePlayerADPResult {
     setLoading(true);
     getPlayerADP(playerId)
       .then(data => setPlayerADP(data ?? null))
-      .catch(setError)
+      .catch((err: unknown) => setError(err instanceof Error ? err : new Error(String(err))))
       .finally(() => setLoading(false));
   }, [playerId]);
   
@@ -123,7 +123,7 @@ export function useADPRange(minADP: number, maxADP: number): UseADPRangeResult {
   const { rankings, loading } = useADPRankings();
   
   const players = useMemo(() => {
-    return rankings.filter(p => p.adp >= minADP && p.adp <= maxADP);
+    return rankings.filter((p: { playerId: string } & PlayerADP) => p.adp >= minADP && p.adp <= maxADP);
   }, [rankings, minADP, maxADP]);
   
   return { players, loading };

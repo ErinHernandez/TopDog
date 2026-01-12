@@ -1,5 +1,6 @@
 import { processPdfWithAzureVision, processMultiplePdfPages } from '../../../lib/pdfProcessor';
 import { RateLimiter } from '../../../lib/rateLimiter';
+import { logger } from '../../../lib/structuredLogger.js';
 
 export const config = {
   api: {
@@ -43,12 +44,23 @@ export default async function handler(req, res) {
 
     if (processMultiple && startPage && endPage) {
       // Process multiple pages
-      console.log(`Processing Clay PDF pages ${startPage} to ${endPage}...`);
+      logger.info('Processing Clay PDF pages', {
+        component: 'azure-vision',
+        operation: 'clay-pdf',
+        startPage,
+        endPage,
+        analysisType: finalAnalysisType,
+      });
       result = await processMultiplePdfPages(pdfPath, startPage, endPage, finalAnalysisType);
     } else {
       // Process single page
       const page = pageNumber || 1;
-      console.log(`Processing Clay PDF page ${page}...`);
+      logger.info('Processing Clay PDF page', {
+        component: 'azure-vision',
+        operation: 'clay-pdf',
+        page,
+        analysisType: finalAnalysisType,
+      });
       result = await processPdfWithAzureVision(pdfPath, page, finalAnalysisType);
     }
 
@@ -60,7 +72,10 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error('Clay PDF processing error:', error);
+    logger.error('Clay PDF processing error', error, {
+      component: 'azure-vision',
+      operation: 'clay-pdf',
+    });
     res.status(500).json({ 
       error: 'Failed to process Clay PDF',
       details: error.message 

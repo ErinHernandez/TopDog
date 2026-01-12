@@ -20,7 +20,7 @@ import {
   getConnectAccountStatus,
   logPaymentEvent,
 } from '../../../../lib/stripe';
-import { db } from '../../../../lib/firebase';
+import { getDb } from '../../../../lib/firebase-utils';
 import { doc, getDoc } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -48,9 +48,7 @@ export default async function handler(
     if (!userId || !amountCents) {
       const error = createErrorResponse(
         ErrorType.VALIDATION,
-        'userId and amountCents are required',
-        400,
-        logger
+        'userId and amountCents are required'
       );
       return res.status(error.statusCode).json(error.body);
     }
@@ -59,9 +57,7 @@ export default async function handler(
     if (amountCents < MIN_PAYOUT_CENTS) {
       const error = createErrorResponse(
         ErrorType.VALIDATION,
-        `Minimum withdrawal is $${(MIN_PAYOUT_CENTS / 100).toFixed(2)}`,
-        400,
-        logger
+        `Minimum withdrawal is $${(MIN_PAYOUT_CENTS / 100).toFixed(2)}`
       );
       return res.status(error.statusCode).json(error.body);
     }
@@ -69,9 +65,7 @@ export default async function handler(
     if (amountCents > MAX_PAYOUT_CENTS) {
       const error = createErrorResponse(
         ErrorType.VALIDATION,
-        `Maximum withdrawal is $${(MAX_PAYOUT_CENTS / 100).toFixed(2)}`,
-        400,
-        logger
+        `Maximum withdrawal is $${(MAX_PAYOUT_CENTS / 100).toFixed(2)}`
       );
       return res.status(error.statusCode).json(error.body);
     }
@@ -80,15 +74,14 @@ export default async function handler(
     
     try {
       // Verify user has sufficient balance
+      const db = getDb();
       const userRef = doc(db, 'users', userId);
       const userDoc = await getDoc(userRef);
       
       if (!userDoc.exists()) {
         const error = createErrorResponse(
           ErrorType.NOT_FOUND,
-          'User not found',
-          404,
-          logger
+          'User not found'
         );
         return res.status(error.statusCode).json(error.body);
       }
@@ -97,12 +90,10 @@ export default async function handler(
       const currentBalance = (userData.balance || 0) * 100; // Convert to cents
       
       if (currentBalance < amountCents) {
-        const error = createErrorResponse(
-          ErrorType.VALIDATION,
-          'Insufficient balance',
-          400,
-          logger
-        );
+      const error = createErrorResponse(
+        ErrorType.VALIDATION,
+        'Insufficient balance'
+      );
         return res.status(error.statusCode).json(error.body);
       }
       
@@ -112,9 +103,7 @@ export default async function handler(
       if (!paymentData?.stripeConnectAccountId) {
         const error = createErrorResponse(
           ErrorType.VALIDATION,
-          'No payout account configured. Please complete the payout setup first.',
-          400,
-          logger
+          'No payout account configured. Please complete the payout setup first.'
         );
         return res.status(error.statusCode).json(error.body);
       }
@@ -127,9 +116,7 @@ export default async function handler(
       if (!accountStatus.payoutsEnabled) {
         const error = createErrorResponse(
           ErrorType.VALIDATION,
-          'Payout account setup is not complete. Please finish the onboarding process.',
-          400,
-          logger
+          'Payout account setup is not complete. Please finish the onboarding process.'
         );
         return res.status(error.statusCode).json({
           ...error.body,
@@ -141,9 +128,7 @@ export default async function handler(
       if (userData.paymentFlagged) {
         const error = createErrorResponse(
           ErrorType.FORBIDDEN,
-          'Withdrawals are temporarily unavailable for your account. Please contact support.',
-          403,
-          logger
+          'Withdrawals are temporarily unavailable for your account. Please contact support.'
         );
         return res.status(error.statusCode).json(error.body);
       }
@@ -188,9 +173,7 @@ export default async function handler(
       
       const errorResponse = createErrorResponse(
         ErrorType.STRIPE,
-        err.message || 'Failed to process withdrawal',
-        500,
-        logger
+        err.message || 'Failed to process withdrawal'
       );
       return res.status(errorResponse.statusCode).json(errorResponse.body);
     }

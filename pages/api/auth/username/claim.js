@@ -34,6 +34,7 @@ import {
 } from 'firebase/firestore';
 import { initializeApp, getApps } from 'firebase/app';
 import { RateLimiter } from '../../../../lib/rateLimiter';
+import { logger } from '../../../../lib/structuredLogger.js';
 
 // ============================================================================
 // FIREBASE INITIALIZATION
@@ -185,7 +186,10 @@ export default async function handler(req, res) {
     });
     
   } catch (error) {
-    console.error('Username claim error:', error);
+    logger.error('Username claim error', error, {
+      component: 'auth',
+      operation: 'username-claim',
+    });
     
     return res.status(500).json({
       success: false,

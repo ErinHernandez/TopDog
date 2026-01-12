@@ -43,7 +43,24 @@ const withPWA = require('next-pwa')({
         },
       },
     },
-    // Other static assets (images, fonts)
+    // Tournament card background images - StaleWhileRevalidate for cache-busting
+    // These may be updated, so allow network updates while serving cached version
+    // Matches both with and without query parameters (cache-busting)
+    {
+      urlPattern: /\/do_riding_football.*\.(webp|png)(\?.*)?$/,
+      handler: 'StaleWhileRevalidate',
+      options: {
+        cacheName: 'topdog-tournament-images',
+        expiration: {
+          maxEntries: 10,
+          maxAgeSeconds: 60 * 60 * 24 * 7, // 7 days - shorter cache for updateable assets
+        },
+        cacheableResponse: {
+          statuses: [0, 200],
+        },
+      },
+    },
+    // Other static assets (images, fonts) - Cache First
     {
       urlPattern: /\.(png|jpg|jpeg|svg|gif|webp|ttf|woff|woff2)$/,
       handler: 'CacheFirst',
@@ -158,6 +175,50 @@ const nextConfig = {
               "frame-ancestors 'none'",
               "upgrade-insecure-requests",
             ].join('; '),
+          },
+        ],
+      },
+      {
+        // Cache-busting headers for tournament card images (mobile optimization)
+        source: '/do_riding_football_III.(webp|png)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=604800, stale-while-revalidate=86400, must-revalidate',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+        ],
+      },
+      {
+        // Mobile-optimized cache headers for critical assets
+        source: '/wr_blue.png',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        // Service worker - no cache to ensure updates
+        source: '/sw.js',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          },
+        ],
+      },
+      {
+        // Workbox service worker - no cache
+        source: '/workbox-:hash.js',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-store, no-cache, must-revalidate, proxy-revalidate',
           },
         ],
       },

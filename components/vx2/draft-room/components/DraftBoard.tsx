@@ -377,6 +377,7 @@ function PickCell({
           height: BOARD_PX.cellHeight,
           padding: '2px 3px',
           position: 'relative',
+          zIndex: 20,
         }}
       >
         {/* Pick number - top left */}

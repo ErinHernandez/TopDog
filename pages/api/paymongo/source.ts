@@ -18,6 +18,7 @@ import {
 import { toSmallestUnit, validateDepositAmount } from '../../../lib/paymongo/currencyConfig';
 import type { PayMongoSourceType } from '../../../lib/paymongo/paymongoTypes';
 import { captureError } from '../../../lib/errorTracking';
+import { logger } from '../../../lib/structuredLogger';
 
 // ============================================================================
 // TYPES
@@ -165,15 +166,18 @@ export default async function handler(
     });
     
   } catch (error) {
-    await captureError(error instanceof Error ? error : new Error('Unknown error'), {
+    const err = error instanceof Error ? error : new Error('Unknown error');
+    logger.error('Payment source creation error', err, {
+      component: 'paymongo',
+      operation: 'createSource',
+    });
+    await captureError(err, {
       tags: { component: 'paymongo', operation: 'createSource' },
     });
     
-    console.error('[PayMongo Source API] Error:', error);
-    
     res.status(500).json({
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to create payment source',
+      error: err.message || 'Failed to create payment source',
     });
   }
 }

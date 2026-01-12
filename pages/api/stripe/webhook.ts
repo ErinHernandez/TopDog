@@ -31,7 +31,8 @@ import {
   type PaymentMethodType,
 } from '../../../lib/stripe';
 import { captureError } from '../../../lib/errorTracking';
-import { db } from '../../../lib/firebase';
+import { logger } from '../../../lib/structuredLogger';
+import { getDb } from '../../../lib/firebase-utils';
 import { doc, updateDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 
 // ============================================================================
@@ -114,7 +115,12 @@ export default async function handler(
   }
   
   if (!STRIPE_WEBHOOK_SECRET) {
-    console.error('[Webhook] STRIPE_WEBHOOK_SECRET not configured');
+    // Configuration error - log in both dev and prod
+    const { logger } = await import('../../../lib/structuredLogger');
+    logger.error('Webhook secret not configured', new Error('STRIPE_WEBHOOK_SECRET missing'), {
+      component: 'stripe',
+      operation: 'webhook_config',
+    });
     return res.status(500).json({ error: 'Webhook secret not configured' });
   }
   
@@ -137,17 +143,31 @@ export default async function handler(
       );
     } catch (err) {
       const error = err as Error;
-      console.error('[Webhook] Signature verification failed:', error.message);
+      // Log signature verification failure
+      logger.error('Webhook signature verification failed', error, {
+          component: 'stripe',
+          operation: 'webhook_verification',
+        });
+      }
       return res.status(400).json({ error: 'Invalid signature' });
     }
     
-    console.log('[Webhook] Received event:', event.type, event.id);
+    // Log webhook event
+    logger.info('Webhook received', { 
+      eventType: event.type, 
+      eventId: event.id 
+    });
     
     // Process event
     const result = await processEvent(event);
     
     if (!result.success) {
-      console.error('[Webhook] Event processing failed:', result.error);
+      // Log webhook processing failure
+      logger.error('Webhook processing failed', new Error(result.error || 'Unknown error'), {
+          eventType: event.type,
+          eventId: event.id,
+        });
+      }
       // Still return 200 to prevent retries for handled errors
     }
     
@@ -158,8 +178,14 @@ export default async function handler(
       ...result,
     });
   } catch (error) {
-    console.error('[Webhook] Unhandled error:', error);
-    await captureError(error as Error, {
+    // Log unhandled error
+    const err = error as Error;
+    logger.error('Webhook unhandled error', err, {
+        component: 'stripe',
+        operation: 'webhook',
+      });
+    }
+    await captureError(err, {
       tags: { component: 'stripe', operation: 'webhook' },
     });
     return res.status(500).json({ error: 'Webhook processing failed' });
@@ -227,7 +253,9 @@ async function processEvent(event: Stripe.Event): Promise<ProcessingResult> {
         );
         
       default:
-        console.log('[Webhook] Unhandled event type:', event.type);
+        // Log unhandled event
+        logger.warn('Unhandled webhook event', { eventType: event.type, eventId: event.id });
+        }
         return { success: true, actions: ['ignored'] };
     }
   } catch (error) {
@@ -365,7 +393,13 @@ async function handlePaymentIntentSucceeded(
     await updateLastDepositCurrency(userId, currency);
     actions.push('last_deposit_currency_updated');
   } catch (e) {
-    console.warn('[Webhook] Failed to update lastDepositCurrency:', e);
+    // Log warning
+    logger.warn('Failed to update lastDepositCurrency', {
+      error: e instanceof Error ? e.message : String(e),
+      component: 'stripe',
+      operation: 'update-last-deposit-currency',
+    });
+    }
     // Don't fail the whole operation for this
   }
   
@@ -420,6 +454,7 @@ async function handlePaymentIntentRequiresAction(
   const existingTx = await findTransactionByPaymentIntent(paymentIntent.id);
   if (existingTx) {
     // Update existing transaction with voucher URL
+    const db = getDb();
     const transactionRef = doc(db, 'transactions', existingTx.id);
     await updateDoc(transactionRef, {
       status: 'pending',
@@ -622,6 +657,7 @@ async function handleAccountUpdated(
   }
   
   // Update user's Connect status in Firebase
+  const db = getDb();
   const userRef = doc(db, 'users', userId);
   
   await updateDoc(userRef, {
@@ -662,6 +698,7 @@ async function handleDisputeCreated(
   const userId = transaction.userId;
   
   // Flag user account
+  const db = getDb();
   const userRef = doc(db, 'users', userId);
   await updateDoc(userRef, {
     paymentFlagged: true,
@@ -674,7 +711,7 @@ async function handleDisputeCreated(
   await logPaymentEvent(userId, 'payment_disputed', {
     transactionId: transaction.id,
     amountCents: dispute.amount,
-    severity: 'critical',
+    severity: 'critical' as const,
     metadata: {
       disputeId: dispute.id,
       reason: dispute.reason,
@@ -684,7 +721,14 @@ async function handleDisputeCreated(
   actions.push('dispute_logged');
   
   // Alert should be sent (via existing security system)
-  console.error('[CRITICAL] Dispute received for user:', userId, 'amount:', dispute.amount);
+  // Log critical dispute (structured logger in production)
+  const { logger } = await import('../../../lib/structuredLogger');
+  logger.error('CRITICAL: Dispute received', new Error('Chargeback dispute'), {
+    userId,
+    amount: dispute.amount,
+    currency: dispute.currency,
+    disputeId: dispute.id,
+  });
   
   return { success: true, actions };
 }

@@ -103,8 +103,8 @@ export function useUsernameValidation(
       minLength: reqs.minLength,
       maxLength: reqs.maxLength,
       allowedCharacters: reqs.allowedCharacters,
-      allowedCharactersDescription: reqs.allowedCharactersDescription,
-      examples: reqs.examples || [],
+      allowedCharactersDescription: reqs.description || '',
+      examples: [],
     };
   }, [countryCode]);
 

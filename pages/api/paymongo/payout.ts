@@ -17,6 +17,7 @@ import {
 } from '../../../lib/paymongo';
 import { toSmallestUnit, validateWithdrawalAmount, toDisplayAmount } from '../../../lib/paymongo/currencyConfig';
 import { captureError } from '../../../lib/errorTracking';
+import { logger } from '../../../lib/structuredLogger';
 import { db } from '../../../lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 
@@ -178,15 +179,18 @@ export default async function handler(
     });
     
   } catch (error) {
-    await captureError(error instanceof Error ? error : new Error('Unknown error'), {
+    const err = error instanceof Error ? error : new Error('Unknown error');
+    logger.error('Payout creation error', err, {
+      component: 'paymongo',
+      operation: 'createPayout',
+    });
+    await captureError(err, {
       tags: { component: 'paymongo', operation: 'createPayout' },
     });
     
-    console.error('[PayMongo Payout API] Error:', error);
-    
     res.status(500).json({
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to create payout',
+      error: err.message || 'Failed to create payout',
     });
   }
 }

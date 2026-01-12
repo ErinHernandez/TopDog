@@ -13,7 +13,7 @@ import {
   serverTimestamp,
   Timestamp 
 } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { getDb } from '@/lib/firebase-utils';
 import type { 
   LocationConsent, 
   ConsentStatus, 
@@ -34,6 +34,7 @@ const MIN_HOURS_BETWEEN_PROMPTS = 24;
  */
 export async function getConsent(userId: string): Promise<LocationConsent> {
   try {
+    const db = getDb();
     const docRef = doc(db, COLLECTION, userId);
     const docSnap = await getDoc(docRef);
     
@@ -64,7 +65,7 @@ export async function getConsent(userId: string): Promise<LocationConsent> {
       lastPromptAt: consent.lastPromptAt?.toDate?.() ?? consent.lastPromptAt,
       dontAskAgain: consent.dontAskAgain || false,
     };
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error getting consent:', error);
     return {
       status: 'pending',
@@ -82,6 +83,7 @@ export async function updateConsent(
   status: ConsentStatus,
   dontAskAgain = false
 ): Promise<void> {
+  const db = getDb();
   const docRef = doc(db, COLLECTION, userId);
   const now = serverTimestamp();
   
@@ -131,6 +133,7 @@ export async function updateConsent(
  * Increment prompt count (when user sees but dismisses consent modal)
  */
 export async function incrementPromptCount(userId: string): Promise<void> {
+  const db = getDb();
   const docRef = doc(db, COLLECTION, userId);
   const docSnap = await getDoc(docRef);
   const now = serverTimestamp();
@@ -219,6 +222,7 @@ export async function revokeConsent(userId: string): Promise<void> {
  * Reset consent state (for testing/admin purposes)
  */
 export async function resetConsent(userId: string): Promise<void> {
+  const db = getDb();
   const docRef = doc(db, COLLECTION, userId);
   const now = serverTimestamp();
   

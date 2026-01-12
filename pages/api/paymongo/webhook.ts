@@ -30,6 +30,7 @@ import type {
   PayMongoPayoutAttributes,
 } from '../../../lib/paymongo/paymongoTypes';
 import { captureError } from '../../../lib/errorTracking';
+import { logger } from '../../../lib/structuredLogger';
 
 // ============================================================================
 // CONFIG
@@ -63,7 +64,7 @@ export default async function handler(
     const signature = req.headers['paymongo-signature'] as string;
     
     if (!signature) {
-      console.warn('[PayMongo Webhook] Missing signature');
+      logger.warn('Missing signature', { component: 'paymongo', operation: 'webhook' });
       res.status(400).json({ error: 'Missing signature' });
       return;
     }
@@ -72,7 +73,7 @@ export default async function handler(
     const isValid = verifyWebhookSignature(rawBody, signature);
     
     if (!isValid) {
-      console.warn('[PayMongo Webhook] Invalid signature');
+      logger.warn('Invalid signature', { component: 'paymongo', operation: 'webhook' });
       res.status(401).json({ error: 'Invalid signature' });
       return;
     }
@@ -82,7 +83,10 @@ export default async function handler(
     const eventType = payload.data.attributes.type;
     const eventData = payload.data.attributes.data;
     
-    console.log(`[PayMongo Webhook] Processing ${eventType}`, { 
+    logger.info('Processing webhook event', { 
+      component: 'paymongo',
+      operation: 'webhook',
+      eventType,
       eventId: payload.data.id,
       dataId: eventData.id,
     });
@@ -130,16 +134,28 @@ export default async function handler(
       case 'source.failed':
       case 'source.cancelled':
         // Handle source expiration/failure
-        console.log(`[PayMongo Webhook] Source ${eventType}`, { dataId: eventData.id });
+        logger.info('Source event', { 
+          component: 'paymongo',
+          operation: 'webhook',
+          eventType,
+          dataId: eventData.id,
+        });
         result = { success: true, actions: ['source_terminated'] };
         break;
         
       default:
-        console.log(`[PayMongo Webhook] Unhandled event type: ${eventType}`);
+        logger.info('Unhandled event type', { 
+          component: 'paymongo',
+          operation: 'webhook',
+          eventType,
+        });
         result = { success: true, actions: ['unhandled_event'] };
     }
     
-    console.log(`[PayMongo Webhook] ${eventType} processed`, { 
+    logger.info('Webhook event processed', { 
+      component: 'paymongo',
+      operation: 'webhook',
+      eventType,
       success: result.success, 
       actions: result.actions,
     });
@@ -147,11 +163,11 @@ export default async function handler(
     res.status(200).json({ received: true, ...result });
     
   } catch (error) {
-    await captureError(error instanceof Error ? error : new Error('Unknown error'), {
+    const err = error instanceof Error ? error : new Error('Unknown error');
+    logger.error('Webhook processing error', err, { component: 'paymongo', operation: 'webhook' });
+    await captureError(err, {
       tags: { component: 'paymongo', operation: 'webhook' },
     });
-    
-    console.error('[PayMongo Webhook] Error:', error);
     
     // Return 200 to prevent PayMongo from retrying
     // We log the error for investigation

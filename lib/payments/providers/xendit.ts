@@ -65,7 +65,7 @@ class XenditProvider implements PaymentProvider {
     if (!XENDIT_COUNTRIES.includes(country as typeof XENDIT_COUNTRIES[number])) {
       return [];
     }
-    return XENDIT_PAYMENT_METHODS.filter(m => m.countries.includes(country));
+    return XENDIT_PAYMENT_METHODS.filter((m: PaymentMethod) => m.countries.includes(country));
   }
   
   /**
@@ -89,7 +89,7 @@ class XenditProvider implements PaymentProvider {
         };
       }
       
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('[XenditProvider] createPayment error:', error);
       return {
         success: false,
@@ -113,7 +113,7 @@ class XenditProvider implements PaymentProvider {
         success: charge.status === 'SUCCEEDED',
         status: mapXenditStatus(charge.status),
       };
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         success: false,
         status: 'failed',
@@ -177,7 +177,7 @@ class XenditProvider implements PaymentProvider {
         status: 'pending',
       };
       
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('[XenditProvider] createTransfer error:', error);
       return {
         success: false,

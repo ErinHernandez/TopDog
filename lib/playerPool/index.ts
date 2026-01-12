@@ -53,7 +53,7 @@ export async function getPlayerPool(): Promise<PlayerPool> {
   
   // Start loading
   cachePromise = fetch(POOL_PATH)
-    .then(response => {
+    .then((response: Response) => {
       if (!response.ok) {
         throw new Error(`Failed to load player pool: ${response.status}`);
       }
@@ -63,7 +63,7 @@ export async function getPlayerPool(): Promise<PlayerPool> {
       cachedPool = pool;
       return pool;
     })
-    .catch(error => {
+    .catch((error: unknown) => {
       cachePromise = null; // Allow retry on error
       throw error;
     });
@@ -288,10 +288,10 @@ export async function verifyPoolIntegrity(): Promise<boolean> {
     const msgBuffer = new TextEncoder().encode(playerDataString);
     const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const actualChecksum = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    const actualChecksum = hashArray.map((b: number) => b.toString(16).padStart(2, '0')).join('');
     
     return actualChecksum === expectedChecksum;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Integrity verification failed:', error);
     return false;
   }
@@ -328,10 +328,10 @@ export function getADPStats(players: PoolPlayer[]): { min: number; max: number; 
     return { min: 0, max: 0, avg: 0 };
   }
   
-  const adps = players.map(p => p.adp);
+  const adps = players.map((p: PoolPlayer) => p.adp);
   const min = Math.min(...adps);
   const max = Math.max(...adps);
-  const avg = adps.reduce((a, b) => a + b, 0) / adps.length;
+  const avg = adps.reduce((a: number, b: number) => a + b, 0) / adps.length;
   
   return { min, max, avg: Math.round(avg * 10) / 10 };
 }

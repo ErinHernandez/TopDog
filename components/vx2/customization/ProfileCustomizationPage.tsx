@@ -170,6 +170,7 @@ export function ProfileCustomizationPage() {
                         color: draft.backgroundType === type 
                           ? '#FFFFFF' 
                           : TEXT_COLORS.secondary,
+                        border: `1px solid ${BORDER_COLORS.default}`,
                       }}
                     >
                       {type}

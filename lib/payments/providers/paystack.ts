@@ -41,7 +41,7 @@ export const paystackProvider: PaymentProvider = {
   },
   
   getPaymentMethodsForCountry(country: string): PaymentMethod[] {
-    return PAYSTACK_PAYMENT_METHODS.filter(m => m.countries.includes(country));
+    return PAYSTACK_PAYMENT_METHODS.filter((m: PaymentMethod) => m.countries.includes(country));
   },
   
   async createPayment(request: CreatePaymentRequest): Promise<CreatePaymentResponse> {
@@ -95,10 +95,10 @@ export const paystackProvider: PaymentProvider = {
         channels,
         callback_url: `${process.env.NEXT_PUBLIC_APP_URL || ''}/deposit/paystack/callback`,
         metadata: {
-          custom_fields: Object.entries(metadata || {}).map(([key, value]) => ({
+          custom_fields: Object.entries(metadata || {}).map(([key, value]: [string, unknown]) => ({
             display_name: key,
             variable_name: key,
-            value: value,
+            value: typeof value === 'string' || typeof value === 'number' ? value : String(value),
           })),
         },
         userId,
@@ -125,7 +125,7 @@ export const paystackProvider: PaymentProvider = {
         authorizationUrl: result.authorizationUrl,
         status: 'pending',
       };
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to initialize payment',
@@ -203,7 +203,7 @@ export const paystackProvider: PaymentProvider = {
         providerTransferId: result.transferCode,
         status: mappedStatus,
       };
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to initiate transfer',

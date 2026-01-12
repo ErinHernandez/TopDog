@@ -43,7 +43,7 @@ async function loadFile<T>(path: string): Promise<T | null> {
     const data = await response.json();
     cache.set(fullPath, data);
     return data as T;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error(`[HistoricalStats] Failed to load: ${fullPath}`, error);
     return null;
   }
@@ -92,7 +92,7 @@ export async function searchPlayers(query: string): Promise<HistoricalPlayer[]> 
   const normalizedQuery = query.toLowerCase().trim();
   if (!normalizedQuery) return [];
   
-  return Object.values(index.players).filter(player =>
+  return Object.values(index.players).filter((player: HistoricalPlayer) =>
     player.name.toLowerCase().includes(normalizedQuery)
   );
 }
@@ -106,7 +106,7 @@ export async function getPlayersByPosition(
   const index = await getPlayerIndex();
   if (!index) return [];
   
-  return Object.values(index.players).filter(player => 
+  return Object.values(index.players).filter((player: HistoricalPlayer) => 
     player.position === position
   );
 }
@@ -145,7 +145,7 @@ export async function getPlayerAllSeasons(
   }
   
   // Sort by season descending (most recent first)
-  return results.sort((a, b) => b.season - a.season);
+  return results.sort((a: SeasonStats, b: SeasonStats) => b.season - a.season);
 }
 
 /**
@@ -160,8 +160,8 @@ export async function getTopPerformers(
   if (!seasonData) return [];
   
   return Object.values(seasonData.players)
-    .filter(p => p.position === position)
-    .sort((a, b) => b.fantasy.halfPprPpg - a.fantasy.halfPprPpg)
+    .filter((p: SeasonStats) => p.position === position)
+    .sort((a: SeasonStats, b: SeasonStats) => b.fantasy.halfPprPpg - a.fantasy.halfPprPpg)
     .slice(0, limit);
 }
 

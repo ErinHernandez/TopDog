@@ -18,6 +18,7 @@ import {
 } from '../../../lib/paystack';
 import { formatPaystackAmount } from '../../../lib/paystack/currencyConfig';
 import { captureError } from '../../../lib/errorTracking';
+import { logger } from '../../../lib/structuredLogger';
 // Note: Firebase imports removed - balance updates handled by webhook only
 
 // ============================================================================
@@ -149,7 +150,12 @@ export default async function handler(
     });
     
   } catch (error) {
-    console.error('[Paystack Verify] Error:', error);
+    logger.error('Transaction verification error', error as Error, { 
+      component: 'paystack', 
+      operation: 'verify',
+      query: req.query,
+      body: req.body,
+    });
     await captureError(error as Error, {
       tags: { component: 'paystack', operation: 'verify' },
       extra: { query: req.query, body: req.body },

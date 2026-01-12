@@ -18,6 +18,7 @@ import {
 import { validateDepositAmount, formatIdrAmount } from '../../../lib/xendit/currencyConfig';
 import type { XenditBankCode } from '../../../lib/xendit/xenditTypes';
 import { captureError } from '../../../lib/errorTracking';
+import { logger } from '../../../lib/structuredLogger';
 
 // ============================================================================
 // TYPES
@@ -156,15 +157,18 @@ export default async function handler(
     });
     
   } catch (error) {
-    await captureError(error instanceof Error ? error : new Error('Unknown error'), {
+    const err = error instanceof Error ? error : new Error('Unknown error');
+    logger.error('Virtual account creation error', err, {
+      component: 'xendit',
+      operation: 'createVirtualAccount',
+    });
+    await captureError(err, {
       tags: { component: 'xendit', operation: 'createVirtualAccount' },
     });
     
-    console.error('[Xendit VA API] Error:', error);
-    
     res.status(500).json({
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to create virtual account',
+      error: err.message || 'Failed to create virtual account',
     });
   }
 }

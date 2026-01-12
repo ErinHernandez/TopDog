@@ -51,12 +51,12 @@ export async function getBrowserLocation(): Promise<GeoLocation | null> {
             source: 'browser',
             accuracy: 'high',
           });
-        } catch (error) {
+        } catch (error: unknown) {
           console.error('Reverse geocoding failed:', error);
           resolve(null);
         }
       },
-      (error) => {
+      (error: GeolocationPositionError) => {
         // User denied permission or other error
         console.log('Browser geolocation failed:', error.message);
         resolve(null);
@@ -100,7 +100,7 @@ export async function getIPLocation(): Promise<GeoLocation | null> {
         };
       }
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.log('ipapi.co failed, trying fallback:', error);
   }
   
@@ -127,7 +127,7 @@ export async function getIPLocation(): Promise<GeoLocation | null> {
       source: 'ip',
       accuracy: 'low',
     };
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('All IP geolocation methods failed:', error);
     return null;
   }

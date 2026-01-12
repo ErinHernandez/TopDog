@@ -22,6 +22,7 @@ import {
 } from '../../../../lib/paystack/currencyConfig';
 import type { PaystackTransferRecipient } from '../../../../lib/paystack/paystackTypes';
 import { captureError } from '../../../../lib/errorTracking';
+import { logger } from '../../../../lib/structuredLogger';
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp, runTransaction } from 'firebase/firestore';
 import { db } from '../../../../lib/firebase';
 import { getStripeExchangeRate, convertToUSD } from '../../../../lib/stripe/exchangeRates';
@@ -203,9 +204,20 @@ export default async function handler(
       exchangeRate = rateData.rate;
       usdAmountToDebit = convertToUSD(localTotalWithFeeDisplay, exchangeRate);
       
-      console.log(`[Paystack Transfer] Converting ${localTotalWithFeeDisplay} ${currency} to USD: rate=${exchangeRate}, usdAmount=${usdAmountToDebit.toFixed(2)}`);
+      logger.info('Converting currency to USD', {
+        component: 'paystack',
+        operation: 'transfer-initiate',
+        localAmount: localTotalWithFeeDisplay,
+        currency: currency.toUpperCase(),
+        exchangeRate,
+        usdAmount: usdAmountToDebit.toFixed(2),
+      });
     } catch (error) {
-      console.error('[Paystack Transfer] Failed to get exchange rate:', error);
+      logger.error('Failed to get exchange rate', error as Error, {
+        component: 'paystack',
+        operation: 'transfer-initiate',
+        currency: currency.toUpperCase(),
+      });
       return res.status(500).json({
         ok: false,
         error: {
@@ -367,7 +379,11 @@ export default async function handler(
     }
     
   } catch (error) {
-    console.error('[Paystack Transfer] Error:', error);
+    logger.error('Transfer initiation error', error as Error, {
+      component: 'paystack',
+      operation: 'transfer-initiate',
+      body: req.body,
+    });
     await captureError(error as Error, {
       tags: { component: 'paystack', operation: 'transfer-initiate' },
       extra: { body: req.body },

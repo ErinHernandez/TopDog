@@ -15,6 +15,7 @@ import {
   createSuccessResponse,
   createErrorResponse,
   ErrorType,
+  type ScopedLogger,
 } from '../../../../lib/apiErrorHandler';
 import {
   getOrCreateConnectAccount,
@@ -84,7 +85,7 @@ export default withCSRFProtection(
 async function handleCreateAccount(
   req: AuthenticatedRequest,
   res: NextApiResponse,
-  logger: { info: (msg: string, data?: unknown) => void }
+  logger: ScopedLogger
 ) {
   const { userId, email, country = 'US' } = req.body;
   
@@ -99,9 +100,7 @@ async function handleCreateAccount(
   if (req.user && sanitizedUserId && !verifyUserAccess(req.user.uid, sanitizedUserId)) {
     const error = createErrorResponse(
       ErrorType.FORBIDDEN,
-      'Access denied',
-      403,
-      logger
+      'Access denied'
     );
     return res.status(error.statusCode).json(error.body);
   }
@@ -109,9 +108,7 @@ async function handleCreateAccount(
   if (!sanitizedUserId || !sanitizedEmail) {
     const error = createErrorResponse(
       ErrorType.VALIDATION,
-      'userId and email are required',
-      400,
-      logger
+      'userId and email are required'
     );
     return res.status(error.statusCode).json(error.body);
   }
@@ -154,9 +151,7 @@ async function handleCreateAccount(
     
     const errorResponse = createErrorResponse(
       ErrorType.STRIPE,
-      errorMessage,
-      500,
-      logger
+      errorMessage
     );
     return res.status(errorResponse.statusCode).json(errorResponse.body);
   }
@@ -168,7 +163,7 @@ async function handleCreateAccount(
 async function handleGetAccountStatus(
   req: AuthenticatedRequest,
   res: NextApiResponse,
-  logger: { info: (msg: string, data?: unknown) => void }
+  logger: ScopedLogger
 ) {
   const { userId } = req.query;
   
@@ -179,9 +174,7 @@ async function handleGetAccountStatus(
   if (req.user && sanitizedUserId && !verifyUserAccess(req.user.uid, sanitizedUserId)) {
     const error = createErrorResponse(
       ErrorType.FORBIDDEN,
-      'Access denied',
-      403,
-      logger
+      'Access denied'
     );
     return res.status(error.statusCode).json(error.body);
   }
@@ -189,9 +182,7 @@ async function handleGetAccountStatus(
   if (!sanitizedUserId) {
     const error = createErrorResponse(
       ErrorType.VALIDATION,
-      'userId query parameter is required',
-      400,
-      logger
+      'userId query parameter is required'
     );
     return res.status(error.statusCode).json(error.body);
   }
@@ -232,9 +223,7 @@ async function handleGetAccountStatus(
     
     const errorResponse = createErrorResponse(
       ErrorType.STRIPE,
-      err.message || 'Failed to get payout account status',
-      500,
-      logger
+      err.message || 'Failed to get payout account status'
     );
     return res.status(errorResponse.statusCode).json(errorResponse.body);
   }

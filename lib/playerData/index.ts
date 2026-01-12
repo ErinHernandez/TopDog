@@ -178,7 +178,7 @@ export async function getAllFullPlayers(): Promise<FullPlayer[]> {
  */
 export async function getPlayersByPosition(position: Position): Promise<FullPlayer[]> {
   const players = await getAllFullPlayers();
-  return players.filter(p => p.position === position);
+  return players.filter((p: FullPlayer) => p.position === position);
 }
 
 /**
@@ -186,7 +186,7 @@ export async function getPlayersByPosition(position: Position): Promise<FullPlay
  */
 export async function getPlayersByTeam(team: string): Promise<FullPlayer[]> {
   const players = await getAllFullPlayers();
-  return players.filter(p => p.team === team);
+  return players.filter((p: FullPlayer) => p.team === team);
 }
 
 /**
@@ -194,7 +194,7 @@ export async function getPlayersByTeam(team: string): Promise<FullPlayer[]> {
  */
 export async function getPlayersByCollege(college: string): Promise<FullPlayer[]> {
   const players = await getAllFullPlayers();
-  return players.filter(p => p.college.toLowerCase() === college.toLowerCase());
+  return players.filter((p: FullPlayer) => p.college.toLowerCase() === college.toLowerCase());
 }
 
 // ============================================================================
@@ -222,7 +222,7 @@ export async function getCareerTotals(playerId: string): Promise<SeasonStats | u
   const seasons = Object.values(stats);
   if (seasons.length === 0) return undefined;
   
-  return seasons.reduce((totals, season) => ({
+  return seasons.reduce((totals: SeasonStats, season: SeasonStats) => ({
     games: totals.games + season.games,
     passYards: (totals.passYards ?? 0) + (season.passYards ?? 0),
     passTd: (totals.passTd ?? 0) + (season.passTd ?? 0),
@@ -246,7 +246,7 @@ export async function getAverageFantasyPoints(playerId: string): Promise<number 
   const seasons = Object.values(stats);
   if (seasons.length === 0) return undefined;
   
-  const total = seasons.reduce((sum, s) => sum + s.fantasyPts, 0);
+  const total = seasons.reduce((sum: number, s: SeasonStats) => sum + s.fantasyPts, 0);
   return Math.round((total / seasons.length) * 10) / 10;
 }
 

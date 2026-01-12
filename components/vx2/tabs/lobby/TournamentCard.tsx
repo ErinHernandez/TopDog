@@ -54,6 +54,7 @@ const CARD_PX = {
 
 const CARD_COLORS = {
   background: 'url(/do_riding_football_III.webp)',
+  backgroundFallbackPng: 'url(/do_riding_football_III.png)', // PNG fallback for iOS/older browsers
   backgroundFallback: '#0a0a1a',
   border: 'rgba(75, 85, 99, 0.5)',
   text: TEXT_COLORS.primary,
@@ -159,6 +160,7 @@ export function TournamentCard({
   styleOverrides = {},
 }: TournamentCardProps): React.ReactElement {
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [useFallback, setUseFallback] = useState(false);
   
   const fillPercentage = tournament.maxEntries 
     ? Math.round((tournament.currentEntries / tournament.maxEntries) * 100)
@@ -174,7 +176,7 @@ export function TournamentCard({
   const bgUrlMatch = resolvedBackground.match(/url\(['"]?([^'"]+)['"]?\)/);
   const bgUrl = bgUrlMatch ? bgUrlMatch[1] : null;
   
-  // Preload the full image
+  // Preload the full image with fallback support
   useEffect(() => {
     if (!bgUrl || bgUrl.startsWith('data:')) {
       // Skip preload for data URIs or gradients
@@ -182,9 +184,54 @@ export function TournamentCard({
       return;
     }
     
+    // Try WebP first
     const img = new Image();
-    img.onload = () => setImageLoaded(true);
-    img.onerror = () => setImageLoaded(true); // Show anyway on error
+    
+    // If WebP fails, try PNG fallback (for iOS/older browsers)
+    const tryFallback = () => {
+      if (bgUrl && (bgUrl.endsWith('.webp') || bgUrl.includes('.webp'))) {
+        // Replace .webp with .png for fallback
+        const pngUrl = bgUrl.replace('.webp', '.png').split('?')[0]; // Remove query params if any
+        
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[TournamentCard] WebP failed, trying PNG fallback:', pngUrl);
+        }
+        
+        const fallbackImg = new Image();
+        fallbackImg.onload = () => {
+          if (process.env.NODE_ENV === 'development') {
+            console.log('[TournamentCard] PNG fallback loaded successfully');
+          }
+          setImageLoaded(true);
+          setUseFallback(true);
+        };
+        fallbackImg.onerror = () => {
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('[TournamentCard] Both WebP and PNG failed to load, using fallback color');
+          }
+          // If PNG also fails, show with fallback color
+          setImageLoaded(true);
+          setUseFallback(true);
+        };
+        fallbackImg.src = pngUrl;
+      } else {
+        // For non-WebP images, just show anyway
+        setImageLoaded(true);
+      }
+    };
+    
+    img.onload = () => {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[TournamentCard] Background image loaded:', bgUrl);
+      }
+      setImageLoaded(true);
+    };
+    img.onerror = () => {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('[TournamentCard] Background image failed to load:', bgUrl);
+      }
+      tryFallback();
+    };
     img.src = bgUrl;
     
     // If already cached, onload fires synchronously
@@ -222,6 +269,8 @@ export function TournamentCard({
         flexDirection: 'column',
         overflow: 'hidden',
         position: 'relative',
+        minHeight: '400px', // Ensure minimum height on mobile
+        isolation: 'isolate', // Create new stacking context for z-index
       }}
       role="article"
       aria-label={`${tournament.title} tournament`}
@@ -232,6 +281,12 @@ export function TournamentCard({
         style={{
           position: 'absolute',
           inset: 0,
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          width: '100%',
+          height: '100%',
           backgroundImage: `url(${BLUR_PLACEHOLDER})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
@@ -247,7 +302,15 @@ export function TournamentCard({
         style={{
           position: 'absolute',
           inset: 0,
-          backgroundImage: colors.background,
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          width: '100%',
+          height: '100%',
+          backgroundImage: useFallback && bgUrl && (bgUrl.endsWith('.webp') || bgUrl.includes('.webp'))
+            ? CARD_COLORS.backgroundFallbackPng 
+            : colors.background,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -255,11 +318,21 @@ export function TournamentCard({
           zIndex: 1,
           opacity: imageLoaded ? 1 : 0,
           transition: 'opacity 0.3s ease-out',
+          willChange: 'opacity', // Optimize for mobile
+          WebkitTransform: 'translateZ(0)', // Force hardware acceleration on mobile
+          transform: 'translateZ(0)',
         }}
       />
       
       {/* Content layer */}
-      <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', flex: 1 }}>
+      <div style={{ 
+        position: 'relative', 
+        zIndex: 2, 
+        display: 'flex', 
+        flexDirection: 'column', 
+        flex: 1,
+        minHeight: 0, // Important for flexbox on mobile
+      }}>
       {/* Tournament Title */}
       <div style={{ marginTop: '12px' }}>
         <h2 

@@ -237,12 +237,12 @@ export function useHeadshots(options: HeadshotsOptions = {}): UseHeadshotsReturn
     // Filter by position if specified
     if (position) {
       const positions = Array.isArray(position) ? position : [position];
-      players = players.filter(p => positions.includes(p.position?.toUpperCase()));
+      players = players.filter((p: PlayerPoolEntry) => positions.includes(p.position?.toUpperCase()));
     }
     
     // Filter by team if specified
     if (team) {
-      players = players.filter(p => p.team?.toUpperCase() === team.toUpperCase());
+      players = players.filter((p: PlayerPoolEntry) => p.team?.toUpperCase() === team.toUpperCase());
     }
     
     // Get SportsDataIO headshots map (actual headshot URLs)
@@ -250,7 +250,7 @@ export function useHeadshots(options: HeadshotsOptions = {}): UseHeadshotsReturn
     const sportsDataIOHeadshotsMap: Record<string, string> = typedHeadshots?.headshotsMap || {};
     
     // Generate headshot URLs - prioritize SportsDataIO, fallback to player pool photoUrl
-    return players.map(player => {
+    return players.map((player: PlayerPoolEntry) => {
       // Use player.id from pool (matches actual file names in /players/ directory)
       const playerId = player.id || (player.name ? getPlayerId(player.name) : null);
       
@@ -493,7 +493,7 @@ export function useInjuries(options: InjuriesOptions = {}): UseInjuriesReturn {
   // Create lookup map by player name
   const injuriesMap: Record<string, InjuryReport> = {};
   if (data) {
-    data.forEach(injury => {
+    data.forEach((injury: InjuryReport) => {
       if (injury.name) {
         injuriesMap[injury.name] = injury;
       }
@@ -571,7 +571,7 @@ export function useTeams(options: TeamsOptions = {}): UseTeamsReturn {
   // Create lookup map by team abbreviation
   const teamsMap: Record<string, NFLTeamInfo> = {};
   if (data) {
-    data.forEach(team => {
+    data.forEach((team: NFLTeamInfo) => {
       const key = team.key || '';
       if (key) {
         teamsMap[key] = team;
@@ -617,7 +617,7 @@ export function useByeWeeks(options: ByeWeeksOptions = {}): UseByeWeeksReturn {
   // Create lookup map by team abbreviation
   const byeWeeksMap: Record<string, number> = {};
   if (data) {
-    data.forEach(item => {
+    data.forEach((item: ByeWeekItem) => {
       const teamKey = item.team || item.Team;
       const byeWeek = item.bye || item.Week;
       if (teamKey && byeWeek !== undefined) {
@@ -691,7 +691,7 @@ export async function prefetchPlayerData(): Promise<void> {
   ];
   
   await Promise.allSettled(
-    endpoints.map(url => fetcher(url))
+    endpoints.map((url: string) => fetcher(url))
   );
 }
 

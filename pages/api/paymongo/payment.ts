@@ -17,6 +17,7 @@ import {
   updateTransactionStatus,
 } from '../../../lib/paymongo';
 import { captureError } from '../../../lib/errorTracking';
+import { logger } from '../../../lib/structuredLogger';
 import { withAuth } from '../../../lib/apiAuth';
 import { createPaymentRateLimiter, withRateLimit } from '../../../lib/rateLimitConfig';
 import { withCSRFProtection } from '../../../lib/csrfProtection';
@@ -153,15 +154,18 @@ const handler = async function(
     });
     
   } catch (error) {
-    await captureError(error instanceof Error ? error : new Error('Unknown error'), {
+    const err = error instanceof Error ? error : new Error('Unknown error');
+    logger.error('Payment creation error', err, {
+      component: 'paymongo',
+      operation: 'createPayment',
+    });
+    await captureError(err, {
       tags: { component: 'paymongo', operation: 'createPayment' },
     });
     
-    console.error('[PayMongo Payment API] Error:', error);
-    
     res.status(500).json({
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to create payment',
+      error: err.message || 'Failed to create payment',
     });
   }
 };

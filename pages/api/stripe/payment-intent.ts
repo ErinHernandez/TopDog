@@ -242,9 +242,7 @@ const handler = async function(
     if (!amountCents || !userId) {
       const error = createErrorResponse(
         ErrorType.VALIDATION,
-        'amountCents and userId are required',
-        400,
-        logger
+        'amountCents and userId are required'
       );
       return res.status(error.statusCode).json(error.body);
     }
@@ -256,9 +254,7 @@ const handler = async function(
     if (!amountValidation.isValid) {
       const error = createErrorResponse(
         ErrorType.VALIDATION,
-        amountValidation.error || 'Invalid amount',
-        400,
-        logger
+        amountValidation.error || 'Invalid amount'
       );
       return res.status(error.statusCode).json(error.body);
     }
@@ -318,9 +314,7 @@ const handler = async function(
         
         const error = createErrorResponse(
           ErrorType.FORBIDDEN,
-          'Transaction cannot be processed at this time',
-          403,
-          logger
+          'Transaction cannot be processed at this time'
         );
         return res.status(error.statusCode).json(error.body);
       }
@@ -405,9 +399,7 @@ const handler = async function(
       
       const errorResponse = createErrorResponse(
         ErrorType.STRIPE,
-        err.message || 'Failed to create payment intent',
-        500,
-        logger
+        err.message || 'Failed to create payment intent'
       );
       return res.status(errorResponse.statusCode).json(errorResponse.body);
     }

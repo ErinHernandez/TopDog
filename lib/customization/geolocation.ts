@@ -1,4 +1,5 @@
 import { doc, runTransaction, Timestamp, getDoc, setDoc } from 'firebase/firestore';
+import type { Firestore } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { UserLocations } from './types';
 
@@ -40,7 +41,7 @@ export async function detectLocation(): Promise<GeolocationResult> {
         };
       }
     }
-  } catch (e) {
+  } catch (e: unknown) {
     // Log but continue to fallback
     console.log('ipapi.co failed, trying fallback:', e instanceof Error ? e.message : 'Unknown error');
   }
@@ -97,7 +98,7 @@ export async function detectLocation(): Promise<GeolocationResult> {
         };
       }
     }
-  } catch (e) {
+  } catch (e: unknown) {
     console.log('BigDataCloud fallback failed:', e instanceof Error ? e.message : 'Unknown error');
   }
 
@@ -133,7 +134,7 @@ export async function detectLocation(): Promise<GeolocationResult> {
         };
       }
     }
-  } catch (e) {
+  } catch (e: unknown) {
     console.log('ipinfo.io fallback failed:', e instanceof Error ? e.message : 'Unknown error');
   }
 
@@ -148,6 +149,9 @@ export async function recordLocationVisit(
 ): Promise<void> {
   if (!location.country) return;
 
+  if (!db) {
+    throw new Error('Firebase db not initialized');
+  }
   const docRef = doc(db, 'userLocations', userId);
   const now = Timestamp.now();
 
@@ -203,12 +207,18 @@ export async function recordLocationVisit(
 }
 
 export async function hasLocationConsent(userId: string): Promise<boolean> {
+  if (!db) {
+    throw new Error('Firebase db not initialized');
+  }
   const docRef = doc(db, 'userLocations', userId);
   const docSnap = await getDoc(docRef);
   return docSnap.exists() && docSnap.data()?.consentGiven === true;
 }
 
 export async function grantLocationConsent(userId: string): Promise<void> {
+  if (!db) {
+    throw new Error('Firebase db not initialized');
+  }
   const docRef = doc(db, 'userLocations', userId);
   await setDoc(docRef, { consentGiven: true, updatedAt: Timestamp.now() }, { merge: true });
 }

@@ -12,14 +12,16 @@
     // Allow JavaScript files during gradual migration
     "allowJs": true,
     "checkJs": false,
-    // Strict type checking - TEMPORARILY RELAXED for PWA build
-    // TODO: Re-enable strict mode and fix VX2 type issues
-    "strict": false,
-    "strictNullChecks": false,
+    // Strict type checking - ENABLING INCREMENTALLY (Tier 2)
+    // Phase 1: Enable noImplicitAny to catch missing type annotations
+    // Phase 2: Enable strictNullChecks for null safety
+    // Phase 3: Enable full strict mode
+    "strict": false, // Will enable after Phase 1 & 2
+    "strictNullChecks": false, // Phase 2
     "strictFunctionTypes": false,
     "strictBindCallApply": false,
     "strictPropertyInitialization": false,
-    "noImplicitAny": false,
+    "noImplicitAny": true, // ✅ Phase 1: Enabled - catches missing types
     "noImplicitThis": false,
     "noImplicitReturns": false,
     "noUnusedLocals": false,

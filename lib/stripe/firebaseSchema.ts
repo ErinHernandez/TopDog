@@ -10,7 +10,7 @@
  * - audit_log/{logId} - Security audit trail
  */
 
-import { db } from '../firebase';
+import { getDb } from '../firebase-utils';
 import { 
   doc, 
   setDoc, 
@@ -79,6 +79,7 @@ export async function initializeUserPaymentData(
   userId: string,
   data: Partial<UserPaymentData>
 ): Promise<void> {
+  const db = getDb();
   const userRef = doc(db, 'users', userId);
   const userDoc = await getDoc(userRef);
   
@@ -102,6 +103,7 @@ export async function initializeUserPaymentData(
  * Get user's payment data (Stripe)
  */
 export async function getUserPaymentData(userId: string): Promise<UserPaymentData | null> {
+  const db = getDb();
   const userRef = doc(db, 'users', userId);
   const userDoc = await getDoc(userRef);
   
@@ -131,6 +133,7 @@ export interface UserPaystackData {
  * Get user's Paystack data
  */
 export async function getUserPaystackData(userId: string): Promise<UserPaystackData | null> {
+  const db = getDb();
   const userRef = doc(db, 'users', userId);
   const userDoc = await getDoc(userRef);
   
@@ -304,6 +307,7 @@ export async function createAuditLog(
     timestamp: serverTimestamp(),
   };
   
+  const db = getDb();
   const docRef = await addDoc(collection(db, 'audit_log'), logData);
   return docRef.id;
 }

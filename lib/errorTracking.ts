@@ -154,15 +154,20 @@ export async function captureError(
   const Sentry = await initSentry();
   if (!Sentry) return null;
   
-  return Sentry.withScope((scope) => {
+  return Sentry.withScope((scope: {
+    setTag: (key: string, value: string) => void;
+    setExtra: (key: string, value: unknown) => void;
+    setLevel: (level: string) => void;
+    setFingerprint: (fingerprint: string[]) => void;
+  }) => {
     if (context?.tags) {
-      Object.entries(context.tags).forEach(([key, value]) => {
+      Object.entries(context.tags).forEach(([key, value]: [string, string]) => {
         scope.setTag(key, value);
       });
     }
     
     if (context?.extra) {
-      Object.entries(context.extra).forEach(([key, value]) => {
+      Object.entries(context.extra).forEach(([key, value]: [string, unknown]) => {
         scope.setExtra(key, value);
       });
     }
@@ -194,9 +199,13 @@ export async function captureMessage(
   const Sentry = await initSentry();
   if (!Sentry) return null;
   
-  return Sentry.withScope((scope) => {
+  return Sentry.withScope((scope: {
+    setTag: (key: string, value: string) => void;
+    setExtra: (key: string, value: unknown) => void;
+    captureMessage: (message: string, level?: string) => string | null;
+  }) => {
     if (context?.tags) {
-      Object.entries(context.tags).forEach(([key, value]) => {
+      Object.entries(context.tags).forEach(([key, value]: [string, string]) => {
         scope.setTag(key, value);
       });
     }
@@ -286,10 +295,10 @@ export function withErrorTracking<T extends (...args: unknown[]) => Promise<unkn
   fn: T,
   context?: ErrorContext
 ): T {
-  return (async (...args: Parameters<T>) => {
+  return (async (...args: Parameters<T>): Promise<Awaited<ReturnType<T>>> => {
     try {
-      return await fn(...args);
-    } catch (error) {
+      return await fn(...args) as Awaited<ReturnType<T>>;
+    } catch (error: unknown) {
       await captureError(error as Error, context);
       throw error;
     }

@@ -14,7 +14,7 @@ import {
   serverTimestamp,
   Timestamp 
 } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { getDb } from '@/lib/firebase-utils';
 import { formatLocationCode } from './geolocationProvider';
 import type { 
   GeoLocation, 
@@ -38,6 +38,7 @@ export async function checkLoginSecurity(
   currentLocation: GeoLocation
 ): Promise<SecurityCheck> {
   try {
+    const db = getDb();
     const docRef = doc(db, COLLECTION, userId);
     const docSnap = await getDoc(docRef);
     
@@ -91,7 +92,7 @@ export async function checkLoginSecurity(
       riskScore: Math.min(riskScore, 100),
       action,
     };
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error checking login security:', error);
     // On error, allow but flag
     return {
@@ -109,7 +110,7 @@ export async function checkLoginSecurity(
 function getRecentLocationChanges(locations: KnownLocation[]): number {
   const oneDayAgo = Date.now() - (24 * 60 * 60 * 1000);
   
-  return locations.filter(loc => {
+  return locations.filter((loc: KnownLocation) => {
     const lastSeen = loc.lastSeen instanceof Timestamp
       ? loc.lastSeen.toDate()
       : new Date(loc.lastSeen as unknown as string);
@@ -132,6 +133,7 @@ export async function logSuspiciousAttempt(
   reason: string
 ): Promise<void> {
   try {
+    const db = getDb();
     const docRef = doc(db, COLLECTION, userId);
     
     const attempt: SuspiciousAttempt = {
@@ -145,7 +147,7 @@ export async function logSuspiciousAttempt(
       'security.suspiciousAttempts': arrayUnion(attempt),
       updatedAt: serverTimestamp(),
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error logging suspicious attempt:', error);
   }
 }
@@ -157,6 +159,7 @@ export async function getSuspiciousAttempts(
   userId: string
 ): Promise<SuspiciousAttempt[]> {
   try {
+    const db = getDb();
     const docRef = doc(db, COLLECTION, userId);
     const docSnap = await getDoc(docRef);
     
@@ -166,7 +169,7 @@ export async function getSuspiciousAttempts(
     
     const data = docSnap.data() as UserLocationDocument;
     return data.security?.suspiciousAttempts || [];
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error getting suspicious attempts:', error);
     return [];
   }
@@ -190,6 +193,7 @@ export async function analyzeAccountSharing(
   userId: string
 ): Promise<AccountSharingIndicators> {
   try {
+    const db = getDb();
     const docRef = doc(db, COLLECTION, userId);
     const docSnap = await getDoc(docRef);
     
@@ -233,7 +237,7 @@ export async function analyzeAccountSharing(
       riskScore: Math.min(riskScore, 100),
       recommendation,
     };
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error analyzing account sharing:', error);
     return {
       multipleSimultaneousLocations: false,

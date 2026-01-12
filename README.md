@@ -2,6 +2,9 @@
 
 A fantasy football draft website with tournament types: TopDog and development tournaments.
 
+**Status:** ✅ Enterprise-Grade Platform  
+**Philosophy:** Enterprise grade = reliability for critical features (drafts, payments)
+
 ## Features
 
 - **Tournament Types**: TopDog tournament
@@ -9,6 +12,17 @@ A fantasy football draft website with tournament types: TopDog and development t
 - **User Management**: Balance tracking, statistics, and profile management
 - **Payment Integration**: Stripe-powered deposit system with geolocation verification
 - **Location Verification**: Geolocation approval required for deposits (US states only)
+
+## Enterprise-Grade Infrastructure
+
+- ✅ **Error Tracking**: Sentry configured for production error monitoring
+- ✅ **CI/CD**: GitHub Actions workflow for automated testing and deployment
+- ✅ **Structured Logging**: All API routes use structured JSON logging
+- ✅ **TypeScript**: Strict mode enabled (`noImplicitAny`) with 106+ errors fixed
+- ✅ **Test Coverage**: Draft state machine tests for critical logic
+- ✅ **API Versioning**: v1 structure for safe API evolution
+- ✅ **Monitoring**: Health check endpoint for uptime monitoring
+- ✅ **Database Transactions**: Firestore transactions for critical operations
 
 ## Setup
 
@@ -79,6 +93,8 @@ The deposit system requires geolocation verification. Users must be located in a
 - `npm run build`: Build for production
 - `npm start`: Start production server
 - `npm run lint`: Run ESLint
+- `npm test`: Run tests
+- `npm run test:coverage`: Run tests with coverage
 
 ## Project Structure
 
@@ -86,10 +102,36 @@ The deposit system requires geolocation verification. Users must be located in a
 bestball-site/
 ├── components/          # React components
 ├── lib/                # Utility functions and Firebase config
+│   ├── structuredLogger.ts    # Server-side structured logging
+│   ├── clientLogger.ts        # Client-side logging
+│   └── apiErrorHandler.js     # API error handling
 ├── pages/              # Next.js pages and API routes
-├── public/             # Static assets
+│   ├── api/            # API routes
+│   │   ├── v1/         # Versioned API endpoints
+│   │   └── _template.ts # API route template
+│   └── ...
+├── __tests__/          # Test files
+├── docs/               # Documentation
 └── styles/             # CSS styles
 ```
+
+## Documentation
+
+### For Developers
+- **[Developer Guide](DEVELOPER_GUIDE.md)** - Complete developer guide with best practices
+- **[API Route Template](docs/API_ROUTE_TEMPLATE.md)** - Guide for creating new API routes
+- **[Next Steps & Quick Wins](NEXT_STEPS_AND_QUICK_WINS.md)** - Incremental improvements guide
+
+### Enterprise-Grade Status
+- **[Complete Summary](ENTERPRISE_GRADE_COMPLETE_SUMMARY.md)** - Full transformation summary
+- **[All Tiers Status](ALL_TIERS_IMPLEMENTATION_STATUS.md)** - Master status document
+- **[Tier 1 & Tier 2 Report](TIER1_TIER2_COMPLETE_FINAL_REPORT.md)** - Detailed completion report
+
+### Setup Guides
+- **[Sentry Setup](TIER1_ERROR_TRACKING_SETUP.md)** - Error tracking configuration
+- **[CI/CD Setup](TIER1_CICD_SETUP.md)** - GitHub Actions workflow
+- **[Monitoring Setup](docs/MONITORING_SETUP.md)** - Uptime monitoring
+- **[API Versioning](docs/API_VERSIONING_POLICY.md)** - API versioning policy
 
 ## License
 

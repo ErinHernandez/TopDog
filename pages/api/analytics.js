@@ -16,6 +16,7 @@ import {
 } from '../../lib/apiErrorHandler';
 import { createAnalyticsRateLimiter, withRateLimit } from '../../lib/rateLimitConfig';
 import { logRateLimitExceeded, getClientIP } from '../../lib/securityLogger';
+import { logger } from '../../lib/structuredLogger.js';
 
 // Use require for firebase-admin to ensure Turbopack compatibility
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -33,7 +34,11 @@ if (admin.apps.length === 0) {
       firebaseAdminInitialized = true;
     }
   } catch (error) {
-    console.warn('Firebase Admin initialization failed for analytics:', error.message);
+    logger.warn('Firebase Admin initialization failed for analytics', {
+      component: 'analytics',
+      operation: 'firebase-admin-init',
+      error: error.message || String(error),
+    });
   }
 } else {
   firebaseAdminInitialized = true;
@@ -90,10 +95,17 @@ async function verifyAuth(authHeader) {
     // In development, if token verification fails for any reason,
     // fall back to dev-uid for easier development
     if (isDevelopment) {
-      console.warn('[Analytics] Token verification failed in development, allowing as dev-uid:', error.message || error);
+      logger.warn('Token verification failed in development, allowing as dev-uid', {
+        component: 'analytics',
+        operation: 'token-verification',
+        error: error.message || String(error),
+      });
       return { uid: 'dev-uid' };
     }
-    console.error('Token verification error:', error.message || error);
+    logger.error('Token verification error', error, {
+      component: 'analytics',
+      operation: 'token-verification',
+    });
     return { uid: null, error: 'Invalid token' };
   }
 }

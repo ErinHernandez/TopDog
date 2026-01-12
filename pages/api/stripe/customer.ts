@@ -15,6 +15,7 @@ import {
   createSuccessResponse,
   createErrorResponse,
   ErrorType,
+  type ScopedLogger,
 } from '../../../lib/apiErrorHandler';
 import {
   getOrCreateCustomer,
@@ -74,7 +75,7 @@ export default withCSRFProtection(
 async function handleCreateCustomer(
   req: AuthenticatedRequest,
   res: NextApiResponse,
-  logger: { info: (msg: string, data?: unknown) => void }
+  logger: ScopedLogger
 ) {
   const { userId, email, name } = req.body;
   
@@ -82,9 +83,7 @@ async function handleCreateCustomer(
   if (req.user && !verifyUserAccess(req.user.uid, userId || '')) {
     const error = createErrorResponse(
       ErrorType.FORBIDDEN,
-      'Access denied',
-      403,
-      logger
+      'Access denied'
     );
     return res.status(error.statusCode).json(error.body);
   }
@@ -92,9 +91,7 @@ async function handleCreateCustomer(
   if (!userId || !email) {
     const error = createErrorResponse(
       ErrorType.VALIDATION,
-      'userId and email are required',
-      400,
-      logger
+      'userId and email are required'
     );
     return res.status(error.statusCode).json(error.body);
   }
@@ -122,9 +119,7 @@ async function handleCreateCustomer(
     
     const errorResponse = createErrorResponse(
       ErrorType.STRIPE,
-      err.message || 'Failed to create customer',
-      500,
-      logger
+      err.message || 'Failed to create customer'
     );
     return res.status(errorResponse.statusCode).json(errorResponse.body);
   }
@@ -136,7 +131,7 @@ async function handleCreateCustomer(
 async function handleGetCustomer(
   req: AuthenticatedRequest,
   res: NextApiResponse,
-  logger: { info: (msg: string, data?: unknown) => void }
+  logger: ScopedLogger
 ) {
   const { userId } = req.query;
   
@@ -144,9 +139,7 @@ async function handleGetCustomer(
   if (req.user && typeof userId === 'string' && !verifyUserAccess(req.user.uid, userId)) {
     const error = createErrorResponse(
       ErrorType.FORBIDDEN,
-      'Access denied',
-      403,
-      logger
+      'Access denied'
     );
     return res.status(error.statusCode).json(error.body);
   }
@@ -154,9 +147,7 @@ async function handleGetCustomer(
   if (!userId || typeof userId !== 'string') {
     const error = createErrorResponse(
       ErrorType.VALIDATION,
-      'userId query parameter is required',
-      400,
-      logger
+      'userId query parameter is required'
     );
     return res.status(error.statusCode).json(error.body);
   }
@@ -170,9 +161,7 @@ async function handleGetCustomer(
     if (!paymentData?.stripeCustomerId) {
       const error = createErrorResponse(
         ErrorType.NOT_FOUND,
-        'No Stripe customer found for this user',
-        404,
-        logger
+        'No Stripe customer found for this user'
       );
       return res.status(error.statusCode).json(error.body);
     }
@@ -211,9 +200,7 @@ async function handleGetCustomer(
     
     const errorResponse = createErrorResponse(
       ErrorType.STRIPE,
-      err.message || 'Failed to retrieve customer',
-      500,
-      logger
+      err.message || 'Failed to retrieve customer'
     );
     return res.status(errorResponse.statusCode).json(errorResponse.body);
   }

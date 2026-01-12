@@ -62,7 +62,7 @@ export const stripeProvider: PaymentProvider = {
   
   getPaymentMethodsForCountry(country: string): PaymentMethod[] {
     return STRIPE_PAYMENT_METHODS.filter(
-      m => m.countries.includes('*') || m.countries.includes(country)
+      (m: PaymentMethod) => m.countries.includes('*') || m.countries.includes(country)
     );
   },
   
@@ -117,7 +117,7 @@ export const stripeProvider: PaymentProvider = {
         clientSecret: result.clientSecret,
         status: mapStripeStatus(result.status),
       };
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to create payment',
@@ -143,7 +143,7 @@ export const stripeProvider: PaymentProvider = {
         success: paymentIntent.status === 'succeeded',
         status,
       };
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         success: false,
         status: 'failed',
@@ -188,7 +188,7 @@ export const stripeProvider: PaymentProvider = {
         providerTransferId: result.payoutId,
         status: result.status === 'paid' ? 'completed' : 'pending',
       };
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to create transfer',

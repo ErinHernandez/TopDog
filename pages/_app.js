@@ -30,6 +30,12 @@ function MyApp({ Component, pageProps }) {
     }
   }, []);
   const [isMobileDevice, setIsMobileDevice] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+  
+  // Track mount state to prevent hydration mismatch
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
   
   // Detect mobile device for hiding dev nav
   useEffect(() => {
@@ -107,7 +113,7 @@ function MyApp({ Component, pageProps }) {
               <Component {...pageProps} />
             </div>
             {!isLandingPage && !isDraftRoom && !isDevDraftNavbar && !isMobileDemo && !isTestingGrounds && !isProfileCustomization && !isMobileProfileCustomization && <Footer />}
-            {isTestingGrounds && !isMobileDevice && <DevNav />}
+            {isTestingGrounds && isMounted && !isMobileDevice && <DevNav />}
           </div>
         </PlayerDataProvider>
       </UserProvider>

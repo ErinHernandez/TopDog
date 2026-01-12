@@ -11,7 +11,7 @@
  * @module lib/payments/analytics
  */
 
-import { db } from '../firebase';
+import { getDb } from '../firebase-utils';
 import { doc, setDoc, increment, serverTimestamp, collection, addDoc } from 'firebase/firestore';
 import { isPaystackCountry, PAYSTACK_COUNTRIES } from './types';
 
@@ -105,6 +105,7 @@ export async function trackPaymentEvent(data: PaymentAnalyticsData): Promise<voi
     };
     
     // Store in analytics collection
+    const db = getDb();
     await addDoc(collection(db, 'payment_analytics'), eventData);
     
     // Update aggregate counters
@@ -119,6 +120,7 @@ export async function trackPaymentEvent(data: PaymentAnalyticsData): Promise<voi
  * Update aggregate counters for monitoring
  */
 async function updateAggregates(data: PaymentAnalyticsData): Promise<void> {
+  const db = getDb();
   const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
   const month = today.substring(0, 7); // YYYY-MM
   

@@ -8,7 +8,7 @@
  */
 
 import crypto from 'crypto';
-import { db } from '../firebase';
+import { getDb } from '../firebase-utils';
 import { doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 import { captureError } from '../errorTracking';
 import type {
@@ -221,7 +221,7 @@ export async function verifyPayment(
       status,
       payment,
     };
-  } catch (error) {
+  } catch (error: unknown) {
     return {
       success: false,
       status: 'failed',
@@ -246,6 +246,7 @@ export async function createPayout(
   const { userId, ...payoutRequest } = request;
   
   // Verify user has sufficient balance
+  const db = getDb();
   const userRef = doc(db, 'users', userId);
   const userDoc = await getDoc(userRef);
   
@@ -313,6 +314,7 @@ export async function saveBankAccount(
   userId: string,
   bankAccount: Omit<PayMongoSavedBankAccount, 'id' | 'createdAt'>
 ): Promise<PayMongoSavedBankAccount> {
+  const db = getDb();
   const userRef = doc(db, 'users', userId);
   const userDoc = await getDoc(userRef);
   
@@ -349,6 +351,7 @@ export async function saveBankAccount(
  * Get saved bank accounts for a user
  */
 export async function getSavedBankAccounts(userId: string): Promise<PayMongoSavedBankAccount[]> {
+  const db = getDb();
   const userRef = doc(db, 'users', userId);
   const userDoc = await getDoc(userRef);
   
@@ -363,6 +366,7 @@ export async function getSavedBankAccounts(userId: string): Promise<PayMongoSave
  * Delete a saved bank account
  */
 export async function deleteBankAccount(userId: string, accountId: string): Promise<void> {
+  const db = getDb();
   const userRef = doc(db, 'users', userId);
   const userDoc = await getDoc(userRef);
   
@@ -601,6 +605,7 @@ export async function createPayMongoTransaction(
     updatedAt: now,
   };
   
+  const db = getDb();
   const docRef = await addDoc(collection(db, 'transactions'), transaction);
   
   return {
@@ -617,6 +622,7 @@ export async function updateTransactionStatus(
   status: TransactionStatus,
   errorMessage?: string
 ): Promise<void> {
+  const db = getDb();
   const transactionRef = doc(db, 'transactions', transactionId);
   
   const updates: Partial<UnifiedTransaction> = {
@@ -637,6 +643,7 @@ export async function updateTransactionStatus(
 export async function findTransactionBySourceId(
   sourceId: string
 ): Promise<UnifiedTransaction | null> {
+  const db = getDb();
   const q = query(
     collection(db, 'transactions'),
     where('metadata.paymongoSourceId', '==', sourceId),
@@ -662,6 +669,7 @@ export async function findTransactionBySourceId(
 export async function findTransactionByPaymentId(
   paymentId: string
 ): Promise<UnifiedTransaction | null> {
+  const db = getDb();
   const q = query(
     collection(db, 'transactions'),
     where('providerReference', '==', paymentId),
@@ -687,6 +695,7 @@ export async function findTransactionByPaymentId(
 export async function findTransactionByPayoutId(
   payoutId: string
 ): Promise<UnifiedTransaction | null> {
+  const db = getDb();
   const q = query(
     collection(db, 'transactions'),
     where('metadata.paymongoPayoutId', '==', payoutId),
@@ -718,6 +727,7 @@ async function updateUserBalance(
   amount: number,
   operation: 'add' | 'subtract'
 ): Promise<number> {
+  const db = getDb();
   const userRef = doc(db, 'users', userId);
   const userDoc = await getDoc(userRef);
   

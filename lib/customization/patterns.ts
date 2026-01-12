@@ -60,9 +60,9 @@ function generateScatteredStyle(imageUrl: string, size: number): React.CSSProper
   const itemSize = `${Math.max(size * 0.25, 8)}%`;
 
   return {
-    backgroundImage: positions.map(() => `url(${imageUrl})`).join(', '),
+    backgroundImage: positions.map((_: string) => `url(${imageUrl})`).join(', '),
     backgroundPosition: positions.join(', '),
-    backgroundSize: positions.map(() => itemSize).join(', '),
+    backgroundSize: positions.map((_: string) => itemSize).join(', '),
     backgroundRepeat: 'no-repeat',
   };
 }
