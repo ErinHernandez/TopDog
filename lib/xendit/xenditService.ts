@@ -452,6 +452,13 @@ export async function handleEWalletCapture(
 
 /**
  * Process disbursement callback
+ * 
+ * Handles disbursement status updates from Xendit webhooks:
+ * - COMPLETED: Mark transaction as completed
+ * - FAILED: Mark transaction as failed and restore balance
+ * - PENDING: Update transaction to processing status
+ * 
+ * Includes transaction recovery for missing transactions.
  */
 export async function handleDisbursementCallback(
   data: DisbursementCallback
@@ -459,27 +466,185 @@ export async function handleDisbursementCallback(
   const actions: string[] = [];
   
   // Extract user ID from external_id
+  // Format: userId_reference
   const [userId] = data.external_id.split('_');
   if (!userId) {
+    await captureError(
+      new Error('Disbursement callback missing userId in external_id'),
+      {
+        tags: { component: 'xendit', operation: 'handleDisbursementCallback' },
+        extra: {
+          disbursementId: data.id,
+          externalId: data.external_id,
+          status: data.status,
+        },
+      }
+    );
     return { success: false, actions: ['missing_user_id'] };
   }
   
+  // Find existing transaction
   const existingTx = await findTransactionByDisbursementId(data.id);
   
   if (data.status === 'COMPLETED') {
     if (existingTx) {
-      await updateTransactionStatus(existingTx.id, 'completed');
-      actions.push('disbursement_completed');
+      try {
+        await updateTransactionStatus(existingTx.id, 'completed');
+        actions.push('disbursement_completed');
+      } catch (updateError) {
+        await captureError(
+          updateError instanceof Error ? updateError : new Error('Unknown error'),
+          {
+            tags: { component: 'xendit', operation: 'handleDisbursementCallback', severity: 'warning' },
+            extra: {
+              disbursementId: data.id,
+              userId,
+              transactionId: existingTx.id,
+              status: 'COMPLETED',
+              updateError: updateError instanceof Error ? updateError.message : 'Unknown error',
+            },
+          }
+        );
+        actions.push('disbursement_completed_with_update_error');
+      }
+    } else {
+      // Transaction missing - log for investigation
+      await captureError(
+        new Error('Disbursement completed but transaction not found'),
+        {
+          tags: { component: 'xendit', operation: 'handleDisbursementCallback', severity: 'warning' },
+          extra: {
+            disbursementId: data.id,
+            userId,
+            status: 'COMPLETED',
+            amount: data.amount,
+            externalId: data.external_id,
+          },
+        }
+      );
+      actions.push('transaction_missing');
     }
   } else if (data.status === 'FAILED') {
     if (existingTx) {
-      await updateTransactionStatus(existingTx.id, 'failed', data.failure_code);
-      actions.push('disbursement_failed');
-      
-      // Restore user balance
-      await updateUserBalance(userId, data.amount, 'add');
-      actions.push('balance_restored');
+      try {
+        await updateTransactionStatus(existingTx.id, 'failed', data.failure_code);
+        actions.push('disbursement_failed');
+        
+        // Restore user balance only if transaction was pending
+        // (balance was already debited when disbursement was created)
+        if (existingTx.status === 'pending') {
+          try {
+            await updateUserBalance(userId, data.amount, 'add');
+            actions.push('balance_restored');
+          } catch (balanceError) {
+            await captureError(
+              balanceError instanceof Error ? balanceError : new Error('Unknown error'),
+              {
+                tags: { component: 'xendit', operation: 'handleDisbursementCallback', severity: 'critical' },
+                extra: {
+                  disbursementId: data.id,
+                  userId,
+                  transactionId: existingTx.id,
+                  amount: data.amount,
+                  failureCode: data.failure_code,
+                  balanceError: balanceError instanceof Error ? balanceError.message : 'Unknown error',
+                },
+              }
+            );
+            actions.push('disbursement_failed_balance_restore_error');
+          }
+        } else {
+          // Transaction already failed or completed - balance may have already been restored
+          actions.push('disbursement_failed_no_balance_restore');
+        }
+      } catch (updateError) {
+        await captureError(
+          updateError instanceof Error ? updateError : new Error('Unknown error'),
+          {
+            tags: { component: 'xendit', operation: 'handleDisbursementCallback', severity: 'warning' },
+            extra: {
+              disbursementId: data.id,
+              userId,
+              transactionId: existingTx.id,
+              status: 'FAILED',
+              updateError: updateError instanceof Error ? updateError.message : 'Unknown error',
+            },
+          }
+        );
+        actions.push('disbursement_failed_with_update_error');
+      }
+    } else {
+      // Transaction missing - log for investigation
+      // Cannot restore balance without transaction record
+      await captureError(
+        new Error('Disbursement failed but transaction not found - cannot restore balance'),
+        {
+          tags: { component: 'xendit', operation: 'handleDisbursementCallback', severity: 'critical' },
+          extra: {
+            disbursementId: data.id,
+            userId,
+            status: 'FAILED',
+            amount: data.amount,
+            failureCode: data.failure_code,
+            externalId: data.external_id,
+          },
+        }
+      );
+      actions.push('transaction_missing_critical');
     }
+  } else if (data.status === 'PENDING') {
+    // Update status but don't change balance
+    if (existingTx) {
+      try {
+        await updateTransactionStatus(existingTx.id, 'processing');
+        actions.push('disbursement_pending');
+      } catch (updateError) {
+        await captureError(
+          updateError instanceof Error ? updateError : new Error('Unknown error'),
+          {
+            tags: { component: 'xendit', operation: 'handleDisbursementCallback', severity: 'warning' },
+            extra: {
+              disbursementId: data.id,
+              userId,
+              transactionId: existingTx.id,
+              status: 'PENDING',
+              updateError: updateError instanceof Error ? updateError.message : 'Unknown error',
+            },
+          }
+        );
+        actions.push('disbursement_pending_with_update_error');
+      }
+    } else {
+      // Transaction missing for PENDING status - less critical but log it
+      await captureError(
+        new Error('Disbursement pending but transaction not found'),
+        {
+          tags: { component: 'xendit', operation: 'handleDisbursementCallback', severity: 'warning' },
+          extra: {
+            disbursementId: data.id,
+            userId,
+            status: 'PENDING',
+            externalId: data.external_id,
+          },
+        }
+      );
+      actions.push('transaction_missing_pending');
+    }
+  } else {
+    // Unknown status - log for investigation
+    await captureError(
+      new Error(`Unknown disbursement status: ${data.status}`),
+      {
+        tags: { component: 'xendit', operation: 'handleDisbursementCallback', severity: 'warning' },
+        extra: {
+          disbursementId: data.id,
+          userId,
+          status: data.status,
+          externalId: data.external_id,
+        },
+      }
+    );
+    actions.push('unknown_status');
   }
   
   return { success: true, actions };

@@ -32,6 +32,14 @@ import { createUsernameCheckLimiter } from '../../../../lib/rateLimiter';
 import { generateUsernameSuggestions } from '../../../../lib/usernameSuggestions';
 import { findSimilarUsernames, generateSimilarityWarnings } from '../../../../lib/usernameSimilarity';
 import { logger } from '../../../../lib/structuredLogger.js';
+import { 
+  withErrorHandling, 
+  validateMethod, 
+  validateBody,
+  createErrorResponse,
+  createSuccessResponse,
+  ErrorType 
+} from '../../../../lib/apiErrorHandler.js';
 
 // ============================================================================
 // FIREBASE INITIALIZATION
@@ -145,17 +153,12 @@ const rateLimiter = createUsernameCheckLimiter();
 const MIN_RESPONSE_TIME_MS = 100;
 
 export default async function handler(req, res) {
-  const startTime = Date.now();
+  const startTime = Date.now(); // Track start time for timing attack prevention
   
-  // Only allow POST
-  if (req.method !== 'POST') {
-    return res.status(405).json({ 
-      error: 'Method not allowed',
-      message: 'Use POST request' 
-    });
-  }
-  
-  try {
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    // Validate HTTP method
+    validateMethod(req, ['POST'], logger);
+    
     // Step 0: Rate limiting
     const rateLimitResult = await rateLimiter.check(req);
     
@@ -171,30 +174,31 @@ export default async function handler(req, res) {
         await new Promise(resolve => setTimeout(resolve, MIN_RESPONSE_TIME_MS - elapsed));
       }
       
-      return res.status(429).json({
+      const errorResponse = createErrorResponse(
+        ErrorType.RATE_LIMIT,
+        'Too many requests. Please try again later.',
+        { retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000) },
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({
         isAvailable: false,
-        message: 'Too many requests. Please try again later.',
+        message: errorResponse.body.message,
         error: 'RATE_LIMIT_EXCEEDED',
-        retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000), // seconds
+        retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000),
       });
     }
+    
+    // Validate required body fields
+    validateBody(req, ['username'], logger);
     
     const { username, countryCode = 'US' } = req.body;
     
-    // Validate request
-    if (!username || typeof username !== 'string') {
-      // Ensure consistent timing
-      const elapsed = Date.now() - startTime;
-      if (elapsed < MIN_RESPONSE_TIME_MS) {
-        await new Promise(resolve => setTimeout(resolve, MIN_RESPONSE_TIME_MS - elapsed));
-      }
-      
-      return res.status(400).json({
-        isAvailable: false,
-        message: 'Username unavailable',
-        error: 'INVALID_REQUEST',
-      });
-    }
+    logger.info('Checking username availability', {
+      component: 'auth',
+      operation: 'username-check',
+      username,
+      countryCode,
+    });
     
     const normalizedUsername = username.toLowerCase().trim();
     
@@ -208,13 +212,15 @@ export default async function handler(req, res) {
         await new Promise(resolve => setTimeout(resolve, MIN_RESPONSE_TIME_MS - elapsed));
       }
       
-      return res.status(200).json({
+      // Use success response (200) to prevent enumeration - username format errors are not security-sensitive
+      const response = createSuccessResponse({
         isAvailable: false,
         message: 'Username unavailable',
         errors: validation.errors,
         warnings: validation.warnings,
         isVIPReserved: false,
-      });
+      }, 200, logger);
+      return res.status(response.statusCode).json(response.body);
     }
     
     // Step 2: Check VIP reservations
@@ -261,13 +267,14 @@ export default async function handler(req, res) {
         await new Promise(resolve => setTimeout(resolve, MIN_RESPONSE_TIME_MS - elapsed));
       }
       
-      return res.status(200).json({
+      const response = createSuccessResponse({
         isAvailable: false,
         message: 'Username unavailable',
         suggestions: suggestions.length > 0 ? suggestions : undefined,
         isVIPReserved,
         warnings: validation.warnings,
-      });
+      }, 200, logger);
+      return res.status(response.statusCode).json(response.body);
     }
     
     // Step 5: Check for similar usernames (warnings only, don't block)
@@ -282,29 +289,12 @@ export default async function handler(req, res) {
     }
     
     // Step 6: Username is available
-    return res.status(200).json({
+    const response = createSuccessResponse({
       isAvailable: true,
       message: 'Username is available',
       warnings: allWarnings.length > 0 ? allWarnings : undefined,
-    });
-    
-  } catch (error) {
-    logger.error('Username check error', error, {
-      component: 'auth',
-      operation: 'username-check',
-    });
-    
-    // Ensure consistent timing even on errors
-    const elapsed = Date.now() - startTime;
-    if (elapsed < MIN_RESPONSE_TIME_MS) {
-      await new Promise(resolve => setTimeout(resolve, MIN_RESPONSE_TIME_MS - elapsed));
-    }
-    
-    return res.status(500).json({
-      isAvailable: false,
-      message: 'Error checking username availability',
-      error: 'SERVER_ERROR',
-    });
-  }
+    }, 200, logger);
+    return res.status(response.statusCode).json(response.body);
+  });
 }
 

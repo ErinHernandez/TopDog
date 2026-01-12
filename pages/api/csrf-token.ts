@@ -13,6 +13,13 @@ import {
   setCSRFTokenCookie 
 } from '../../lib/csrfProtection';
 import { logger } from '../../lib/structuredLogger';
+import { 
+  withErrorHandling, 
+  validateMethod,
+  createSuccessResponse,
+  createErrorResponse,
+  ErrorType 
+} from '../../lib/apiErrorHandler';
 
 interface CSRFTokenResponse {
   csrfToken: string;
@@ -23,15 +30,15 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<CSRFTokenResponse>
 ) {
-  // Only allow GET requests
-  if (req.method !== 'GET') {
-    return res.status(405).json({
-      csrfToken: '',
-      message: 'Method not allowed'
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    // Validate HTTP method
+    validateMethod(req, ['GET'], logger);
+    
+    logger.info('Generating CSRF token', {
+      component: 'csrf',
+      operation: 'generate-token',
     });
-  }
-
-  try {
+    
     // Generate new CSRF token
     const token = generateCSRFToken();
     
@@ -39,19 +46,12 @@ export default async function handler(
     setCSRFTokenCookie(res, token);
     
     // Return token in response (client needs this for header)
-    return res.status(200).json({
+    const response = createSuccessResponse({
       csrfToken: token,
-      message: 'CSRF token generated successfully'
-    });
-  } catch (error) {
-    logger.error('Error generating CSRF token', error as Error, {
-      component: 'csrf',
-      operation: 'generate-token',
-    });
-    return res.status(500).json({
-      csrfToken: '',
-      message: 'Failed to generate CSRF token'
-    });
-  }
+      message: 'CSRF token generated successfully',
+    }, 200, logger);
+    
+    return res.status(response.statusCode).json(response.body);
+  });
 }
 

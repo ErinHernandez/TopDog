@@ -13,6 +13,15 @@
 import { getPlayerStatsByName } from '../../../../lib/sportsdataio';
 import { RateLimiter } from '../../../../lib/rateLimiter';
 import { logger } from '../../../../lib/structuredLogger.js';
+import { 
+  withErrorHandling, 
+  validateMethod, 
+  validateQueryParams,
+  requireEnvVar,
+  createSuccessResponse,
+  createErrorResponse,
+  ErrorType 
+} from '../../../../lib/apiErrorHandler.js';
 
 // Rate limiter (60 per minute)
 const rateLimiter = new RateLimiter({
@@ -22,26 +31,36 @@ const rateLimiter = new RateLimiter({
 });
 
 export default async function handler(req, res) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
-  const apiKey = process.env.SPORTSDATAIO_API_KEY;
-  if (!apiKey) {
-    return res.status(500).json({ error: 'API key not configured' });
-  }
-
-  try {
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    // Validate HTTP method
+    validateMethod(req, ['GET'], logger);
+    
+    // Check required environment variable
+    const apiKey = requireEnvVar('SPORTSDATAIO_API_KEY', logger);
+    
     // Rate limiting
     const rateLimitResult = await rateLimiter.check(req);
     if (!rateLimitResult.allowed) {
-      return res.status(429).json({ error: 'Rate limit exceeded' });
+      const errorResponse = createErrorResponse(
+        ErrorType.RATE_LIMIT,
+        'Rate limit exceeded',
+        { retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000) },
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({ error: errorResponse.body.message });
     }
+    
+    // Validate required query parameters
+    validateQueryParams(req, ['name'], logger);
+    
     const { name, season, refresh } = req.query;
     
-    if (!name) {
-      return res.status(400).json({ error: 'Player name required' });
-    }
+    logger.info('Fetching player stats', {
+      component: 'nfl-api',
+      operation: 'player-stats',
+      playerName: name,
+      season,
+    });
     
     const seasonYear = parseInt(season) || new Date().getFullYear();
     const forceRefresh = refresh === 'true';
@@ -49,23 +68,25 @@ export default async function handler(req, res) {
     const stats = await getPlayerStatsByName(apiKey, name, seasonYear, forceRefresh);
     
     if (!stats) {
-      return res.status(404).json({
+      const errorResponse = createErrorResponse(
+        ErrorType.NOT_FOUND,
+        `Player "${name}" not found in ${seasonYear} stats`,
+        { playerName: name, season: seasonYear },
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({
         ok: false,
-        error: `Player "${name}" not found in ${seasonYear} stats`,
+        error: errorResponse.body.message,
       });
     }
     
-    return res.status(200).json({
+    const response = createSuccessResponse({
       ok: true,
       season: seasonYear,
       data: stats,
-    });
-  } catch (err) {
-    logger.error('Player Stats API error', err, {
-      component: 'nfl-api',
-      operation: 'player-stats',
-    });
-    return res.status(500).json({ error: err.message });
-  }
+    }, 200, logger);
+    
+    return res.status(response.statusCode).json(response.body);
+  });
 }
 

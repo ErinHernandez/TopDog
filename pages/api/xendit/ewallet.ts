@@ -19,6 +19,14 @@ import { validateDepositAmount } from '../../../lib/xendit/currencyConfig';
 import type { XenditEWalletChannel } from '../../../lib/xendit/xenditTypes';
 import { captureError } from '../../../lib/errorTracking';
 import { logger } from '../../../lib/structuredLogger';
+import { 
+  withErrorHandling, 
+  validateMethod, 
+  validateBody,
+  createErrorResponse,
+  createSuccessResponse,
+  ErrorType 
+} from '../../../lib/apiErrorHandler';
 
 // ============================================================================
 // TYPES
@@ -87,29 +95,52 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<CreateEWalletResponse>
 ): Promise<void> {
-  // Only allow POST
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', ['POST']);
-    res.status(405).json({ success: false, error: 'Method not allowed' });
-    return;
-  }
-  
-  try {
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    // Validate HTTP method
+    validateMethod(req, ['POST'], logger);
+    
+    // Validate required body fields
+    validateBody(req, ['amount', 'channelCode', 'userId'], logger);
+    
     const body = req.body as CreateEWalletBody;
     
-    // Validate request
+    // Additional validation using custom validator
     const validation = validateRequest(body);
     if (!validation.valid) {
-      res.status(400).json({ success: false, error: validation.error });
-      return;
+      const errorResponse = createErrorResponse(
+        ErrorType.VALIDATION,
+        validation.error || 'Invalid request',
+        {},
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({ 
+        success: false, 
+        error: errorResponse.body.message 
+      });
     }
     
     // Validate amount limits
     const amountValidation = validateDepositAmount(body.amount);
     if (!amountValidation.isValid) {
-      res.status(400).json({ success: false, error: amountValidation.error });
-      return;
+      const errorResponse = createErrorResponse(
+        ErrorType.VALIDATION,
+        amountValidation.error || 'Invalid amount',
+        { amount: body.amount },
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({ 
+        success: false, 
+        error: errorResponse.body.message 
+      });
     }
+    
+    logger.info('Creating e-wallet charge', {
+      component: 'xendit',
+      operation: 'createEWalletCharge',
+      userId: body.userId,
+      channelCode: body.channelCode,
+      amount: body.amount,
+    });
     
     // Generate reference
     const reference = generateReference('EW');
@@ -172,7 +203,7 @@ export default async function handler(
       },
     });
     
-    res.status(200).json({
+    const response = createSuccessResponse({
       success: true,
       chargeId: result.chargeId,
       status: result.status,
@@ -180,23 +211,10 @@ export default async function handler(
       mobileDeeplink: result.mobileDeeplink,
       qrString: result.qrString,
       transactionId: transaction.id,
-    });
+    }, 200, logger);
     
-  } catch (error) {
-    const err = error instanceof Error ? error : new Error('Unknown error');
-    logger.error('E-wallet charge creation error', err, {
-      component: 'xendit',
-      operation: 'createEWalletCharge',
-    });
-    await captureError(err, {
-      tags: { component: 'xendit', operation: 'createEWalletCharge' },
-    });
-    
-    res.status(500).json({
-      success: false,
-      error: err.message || 'Failed to create e-wallet charge',
-    });
-  }
+    return res.status(response.statusCode).json(response.body);
+  });
 }
 
 

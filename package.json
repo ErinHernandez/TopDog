@@ -41,7 +41,7 @@
   "dependencies": {
     "@azure/cognitiveservices-computervision": "^8.2.0",
     "@google-cloud/vision": "^5.3.3",
-    "@sentry/nextjs": "^10.32.1",
+    "@sentry/nextjs": "^10.33.0",
     "@stripe/react-stripe-js": "^5.4.1",
     "@stripe/stripe-js": "^8.6.0",
     "canvas": "^3.1.2",

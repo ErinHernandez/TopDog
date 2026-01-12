@@ -127,18 +127,113 @@ Payment errors are already tracked via API error handlers. Verify they're workin
 
 ---
 
-## Step 8: Configure Alerts (Optional but Recommended)
+## Step 8.1: Configure Sentry Environments (REQUIRED FIRST STEP)
 
-1. Go to Sentry Dashboard > Alerts
-2. Create alert for:
-   - **Error rate spike** (>10 errors/minute)
-   - **New error types** (first occurrence)
-   - **Critical errors** (errors with "fatal" level)
+Before setting up alerts, configure environments to prevent alerts from preview deployments and local dev errors.
 
-3. Set up notifications:
-   - Email (free)
-   - Slack (if you have workspace)
-   - PagerDuty (if you have account)
+### In Sentry Dashboard
+
+1. Go to Sentry > Settings > Projects > [Your Project] > Environments
+2. Add these environments:
+   - `production` (alerts enabled)
+   - `preview` (alerts disabled)
+   - `development` (alerts disabled)
+
+### In Code (Already Updated)
+
+The Sentry config files have been updated to use Vercel environment variables:
+- `sentry.client.config.ts` - Uses `NEXT_PUBLIC_VERCEL_ENV`
+- `sentry.server.config.ts` - Uses `VERCEL_ENV`
+- `sentry.edge.config.ts` - Uses `VERCEL_ENV`
+
+**Why:** Without this, you'll get alerts for preview deployments and local dev errors, causing alert fatigue.
+
+---
+
+## Step 8.5: Configure Sentry Alerts (Recommended)
+
+**Important:** Configure Sentry environments first (see Step 8.1). Start with Tier 1 alerts only. Add others after you understand your baseline.
+
+### Recommended Alert Thresholds (for new apps)
+
+For a new fantasy football app, use these thresholds:
+- Normal: 0-2 errors per hour
+- Concerning: 5+ errors per hour
+- Critical: 10+ errors per hour
+
+### Tier 1: Immediate Action (Start Here)
+
+| Alert | Condition | Action |
+|-------|-----------|--------|
+| Fatal Error | Level = fatal | Email + Slack immediately |
+| Payment Error | Tag:component = Payment AND Level = error | Email + Slack immediately |
+| Auth Error | Tag:component = Auth AND Level = error | Email within 5 min |
+
+### Tier 2: Investigate Soon (Add After 1 Week)
+
+| Alert | Condition | Action |
+|-------|-----------|--------|
+| Error Spike | > 5 errors in 10 minutes | Email |
+| New Error Type | First seen in production | Email |
+
+### Tier 3: Review Daily (Add After 1 Month)
+
+| Alert | Condition | Action |
+|-------|-----------|--------|
+| High Error Volume | > 50 errors in 1 hour | Email digest |
+| Unresolved Issues | Issue unresolved > 24 hours | Daily email |
+
+### Alert Configuration Steps
+
+1. Go to https://sentry.io > Your Project > Alerts
+2. Click "Create Alert Rule"
+3. Configure condition based on Tier 1 examples above
+4. Set notification channels:
+   - **Email:** Required (free)
+   - **Slack:** Optional (requires Slack workspace integration)
+   - **PagerDuty:** Optional (requires PagerDuty account)
+5. Test alert using `/api/test-sentry` endpoint (see testing section below)
+6. Verify notification is received
+
+### Testing Specific Alert Types
+
+**Test Error Spike Alert (Tier 2):**
+```bash
+# Trigger 15 errors in rapid succession (should trigger spike alert)
+for i in {1..15}; do
+  curl -X POST https://your-domain.com/api/test-sentry \
+    -H "Content-Type: application/json" \
+    -d '{"type": "error", "message": "Spike test '$i'"}'
+  sleep 1
+done
+```
+
+**Test Payment Error Alert (Tier 1):**
+```bash
+# Trigger a payment-tagged error
+curl -X POST https://your-domain.com/api/test-sentry \
+  -H "Content-Type: application/json" \
+  -d '{"type": "error", "component": "Payment", "message": "Test payment error"}'
+```
+
+**Test Fatal Error Alert (Tier 1):**
+```bash
+# Trigger a fatal error
+curl -X POST https://your-domain.com/api/test-sentry \
+  -H "Content-Type: application/json" \
+  -d '{"type": "fatal", "message": "Test fatal error"}'
+```
+
+**Note:** Update your `/api/test-sentry` endpoint to support these parameters (optional enhancement).
+
+### Alert Best Practices
+
+- **Start with Tier 1 only** - Add Tier 2/3 after you understand your baseline
+- Use different channels for different severity levels
+- Test alerts after configuration
+- Review alert effectiveness weekly
+- Adjust thresholds based on actual error rates
+- Don't create too many alerts initially - you'll get alert fatigue
 
 ---
 

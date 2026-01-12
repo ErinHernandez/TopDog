@@ -29,6 +29,13 @@ import type {
 } from '../../../lib/paystack/paystackTypes';
 import { captureError } from '../../../lib/errorTracking';
 import { logger } from '../../../lib/structuredLogger';
+import { 
+  withErrorHandling, 
+  validateMethod, 
+  createErrorResponse,
+  createSuccessResponse,
+  ErrorType 
+} from '../../../lib/apiErrorHandler';
 
 // ============================================================================
 // CONFIGURATION
@@ -80,92 +87,105 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<WebhookResponse>
 ) {
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST');
-    return res.status(405).json({
-      received: false,
-      error: 'Only POST is allowed',
-    });
-  }
-  
-  try {
-    // Read raw body
-    const rawBody = await readRawBody(req);
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    // Validate HTTP method
+    validateMethod(req, ['POST'], logger);
     
-    // Get signature from headers
-    const signature = req.headers['x-paystack-signature'] as string;
-    
-    if (!signature) {
-      logger.warn('Missing signature header', { component: 'paystack', operation: 'webhook' });
-      return res.status(401).json({
-        received: false,
-        error: 'Missing signature',
+    try {
+      // Read raw body (must be done before signature verification)
+      const rawBody = await readRawBody(req);
+      
+      // Get signature from headers
+      const signature = req.headers['x-paystack-signature'] as string;
+      
+      if (!signature) {
+        logger.warn('Missing signature header', { component: 'paystack', operation: 'webhook' });
+        const errorResponse = createErrorResponse(
+          ErrorType.UNAUTHORIZED,
+          'Missing signature',
+          {},
+          res.getHeader('X-Request-ID') as string
+        );
+        return res.status(errorResponse.statusCode).json({
+          received: false,
+          error: errorResponse.body.message,
+        });
+      }
+      
+      // Verify signature
+      const isValid = verifyWebhookSignature(rawBody, signature);
+      
+      if (!isValid) {
+        logger.warn('Invalid signature', { component: 'paystack', operation: 'webhook' });
+        const errorResponse = createErrorResponse(
+          ErrorType.UNAUTHORIZED,
+          'Invalid signature',
+          {},
+          res.getHeader('X-Request-ID') as string
+        );
+        return res.status(errorResponse.statusCode).json({
+          received: false,
+          error: errorResponse.body.message,
+        });
+      }
+      
+      // Parse body
+      const payload = JSON.parse(rawBody) as PaystackWebhookPayload;
+      const { event, data } = payload;
+      
+      logger.info('Received webhook event', { component: 'paystack', operation: 'webhook', event });
+      
+      // Handle events
+      let result: { success: boolean; actions: string[] };
+      
+      switch (event) {
+        case 'charge.success':
+          result = await handleChargeSuccess(data as ChargeSuccessWebhookData);
+          break;
+          
+        case 'charge.failed':
+          result = await handleChargeFailed(data as ChargeFailedWebhookData);
+          break;
+          
+        case 'transfer.success':
+          result = await handleTransferSuccess(data as TransferWebhookData);
+          break;
+          
+        case 'transfer.failed':
+        case 'transfer.reversed':
+          result = await handleTransferFailed(data as TransferWebhookData);
+          break;
+          
+        default:
+          // Log unhandled events
+          logger.info('Unhandled event type', { component: 'paystack', operation: 'webhook', event });
+          result = { success: true, actions: ['unhandled_event'] };
+      }
+      
+      // Respond to Paystack with success
+      const response = createSuccessResponse({
+        received: true,
+        event,
+        actions: result.actions,
+      }, 200, logger);
+      
+      return res.status(response.statusCode).json(response.body);
+      
+    } catch (error) {
+      // For webhooks, we must always return 200 to prevent retries
+      // Log the error for investigation but don't let it propagate
+      logger.error('Webhook processing error', error as Error, { component: 'paystack', operation: 'webhook' });
+      await captureError(error as Error, {
+        tags: { component: 'paystack', operation: 'webhook' },
+      });
+      
+      // Always return 200 to prevent Paystack from retrying
+      // This is a webhook-specific requirement
+      return res.status(200).json({
+        received: true,
+        error: 'Processing error - logged for investigation',
       });
     }
-    
-    // Verify signature
-    const isValid = verifyWebhookSignature(rawBody, signature);
-    
-    if (!isValid) {
-      logger.warn('Invalid signature', { component: 'paystack', operation: 'webhook' });
-      return res.status(401).json({
-        received: false,
-        error: 'Invalid signature',
-      });
-    }
-    
-    // Parse body
-    const payload = JSON.parse(rawBody) as PaystackWebhookPayload;
-    const { event, data } = payload;
-    
-    logger.info('Received webhook event', { component: 'paystack', operation: 'webhook', event });
-    
-    // Handle events
-    let result: { success: boolean; actions: string[] };
-    
-    switch (event) {
-      case 'charge.success':
-        result = await handleChargeSuccess(data as ChargeSuccessWebhookData);
-        break;
-        
-      case 'charge.failed':
-        result = await handleChargeFailed(data as ChargeFailedWebhookData);
-        break;
-        
-      case 'transfer.success':
-        result = await handleTransferSuccess(data as TransferWebhookData);
-        break;
-        
-      case 'transfer.failed':
-      case 'transfer.reversed':
-        result = await handleTransferFailed(data as TransferWebhookData);
-        break;
-        
-      default:
-        // Log unhandled events
-        logger.info('Unhandled event type', { component: 'paystack', operation: 'webhook', event });
-        result = { success: true, actions: ['unhandled_event'] };
-    }
-    
-    // Respond to Paystack
-    return res.status(200).json({
-      received: true,
-      event,
-      actions: result.actions,
-    });
-    
-  } catch (error) {
-    logger.error('Webhook processing error', error as Error, { component: 'paystack', operation: 'webhook' });
-    await captureError(error as Error, {
-      tags: { component: 'paystack', operation: 'webhook' },
-    });
-    
-    // Always return 200 to prevent Paystack from retrying
-    // Log the error for manual investigation
-    return res.status(200).json({
-      received: true,
-      error: 'Processing error - logged for investigation',
-    });
-  }
+  });
 }
 

@@ -14,7 +14,7 @@ const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 if (SENTRY_DSN) {
   Sentry.init({
     dsn: SENTRY_DSN,
-    environment: process.env.NODE_ENV || 'development',
+    environment: process.env.NEXT_PUBLIC_VERCEL_ENV || process.env.NODE_ENV || 'development',
     
     // Performance monitoring - 10% of transactions in production
     tracesSampleRate: IS_PRODUCTION ? 0.1 : 1.0,

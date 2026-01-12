@@ -28,12 +28,23 @@ import {
   findTransactionByTransfer,
   logPaymentEvent,
   updateLastDepositCurrency,
+  findEventByStripeId,
+  markEventAsProcessed,
+  markEventAsFailed,
+  createOrUpdateWebhookEvent,
   type PaymentMethodType,
 } from '../../../lib/stripe';
 import { captureError } from '../../../lib/errorTracking';
 import { logger } from '../../../lib/structuredLogger';
 import { getDb } from '../../../lib/firebase-utils';
 import { doc, updateDoc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { 
+  withErrorHandling, 
+  validateMethod,
+  createSuccessResponse,
+  createErrorResponse,
+  ErrorType 
+} from '../../../lib/apiErrorHandler';
 
 // ============================================================================
 // CONFIG
@@ -109,28 +120,41 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST');
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-  
-  if (!STRIPE_WEBHOOK_SECRET) {
-    // Configuration error - log in both dev and prod
-    const { logger } = await import('../../../lib/structuredLogger');
-    logger.error('Webhook secret not configured', new Error('STRIPE_WEBHOOK_SECRET missing'), {
-      component: 'stripe',
-      operation: 'webhook_config',
-    });
-    return res.status(500).json({ error: 'Webhook secret not configured' });
-  }
-  
-  try {
+  // Wrap with error handling, but customize for webhooks (always return 200)
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    // Validate HTTP method
+    validateMethod(req, ['POST'], logger);
+    
+    if (!STRIPE_WEBHOOK_SECRET) {
+      // Configuration error - log in both dev and prod
+      logger.error('Webhook secret not configured', new Error('STRIPE_WEBHOOK_SECRET missing'), {
+        component: 'stripe',
+        operation: 'webhook_config',
+      });
+      // For webhooks, always return 200 even on configuration errors to prevent retries
+      const errorResponse = createErrorResponse(
+        ErrorType.CONFIGURATION,
+        'Webhook secret not configured',
+        {},
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(200).json({ received: false, error: errorResponse.body.message });
+    }
+    
     // Get raw body for signature verification
     const rawBody = await buffer(req);
     const signature = req.headers['stripe-signature'];
     
     if (!signature) {
-      return res.status(400).json({ error: 'Missing stripe-signature header' });
+      logger.warn('Missing signature header', { component: 'stripe', operation: 'webhook' });
+      // For webhooks, always return 200 even on validation errors to prevent retries
+      const errorResponse = createErrorResponse(
+        ErrorType.VALIDATION,
+        'Missing stripe-signature header',
+        {},
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(200).json({ received: false, error: errorResponse.body.message });
     }
     
     // Verify webhook signature
@@ -145,51 +169,94 @@ export default async function handler(
       const error = err as Error;
       // Log signature verification failure
       logger.error('Webhook signature verification failed', error, {
-          component: 'stripe',
-          operation: 'webhook_verification',
-        });
-      }
-      return res.status(400).json({ error: 'Invalid signature' });
+        component: 'stripe',
+        operation: 'webhook_verification',
+      });
+      // For webhooks, always return 200 even on signature errors to prevent retries
+      const errorResponse = createErrorResponse(
+        ErrorType.UNAUTHORIZED,
+        'Invalid signature',
+        {},
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(200).json({ received: false, error: errorResponse.body.message });
     }
+    
+    // Check for duplicate event (idempotency)
+    const existingEvent = await findEventByStripeId(event.id);
+    if (existingEvent?.status === 'processed') {
+      logger.info('Duplicate webhook event - already processed', { 
+        component: 'stripe',
+        operation: 'webhook',
+        eventType: event.type, 
+        eventId: event.id,
+        processedAt: existingEvent.processedAt,
+      });
+      
+      const successResponse = createSuccessResponse({
+        received: true,
+        eventId: event.id,
+        eventType: event.type,
+        success: true,
+        actions: ['already_processed'],
+      }, 200, logger);
+      
+      return res.status(successResponse.statusCode).json(successResponse.body);
+    }
+    
+    // Create or update event record for tracking
+    await createOrUpdateWebhookEvent(event.id, event.type, {
+      livemode: event.livemode,
+      apiVersion: event.api_version,
+    });
     
     // Log webhook event
     logger.info('Webhook received', { 
+      component: 'stripe',
+      operation: 'webhook',
       eventType: event.type, 
-      eventId: event.id 
+      eventId: event.id,
+      isRetry: existingEvent?.status === 'failed',
+      retryCount: existingEvent?.retryCount || 0,
     });
     
     // Process event
-    const result = await processEvent(event);
+    const result = await processEvent(event, logger);
     
     if (!result.success) {
       // Log webhook processing failure
       logger.error('Webhook processing failed', new Error(result.error || 'Unknown error'), {
-          eventType: event.type,
-          eventId: event.id,
-        });
-      }
+        component: 'stripe',
+        operation: 'webhook',
+        eventType: event.type,
+        eventId: event.id,
+      });
       // Still return 200 to prevent retries for handled errors
     }
     
-    return res.status(200).json({ 
+    const successResponse = createSuccessResponse({
       received: true,
       eventId: event.id,
       eventType: event.type,
       ...result,
-    });
-  } catch (error) {
-    // Log unhandled error
+    }, 200, logger);
+    
+    return res.status(successResponse.statusCode).json(successResponse.body);
+  }).catch(async (error) => {
+    // Custom error handler for webhooks: always return 200
     const err = error as Error;
-    logger.error('Webhook unhandled error', err, {
-        component: 'stripe',
-        operation: 'webhook',
-      });
-    }
+    logger.error('Webhook processing error (caught by wrapper)', err, { 
+      component: 'stripe', 
+      operation: 'webhook' 
+    });
     await captureError(err, {
       tags: { component: 'stripe', operation: 'webhook' },
     });
-    return res.status(500).json({ error: 'Webhook processing failed' });
-  }
+    return res.status(200).json({
+      received: true,
+      error: err.message || 'Processing error - logged for investigation',
+    });
+  });
 }
 
 // ============================================================================
@@ -202,68 +269,107 @@ interface ProcessingResult {
   error?: string;
 }
 
-async function processEvent(event: Stripe.Event): Promise<ProcessingResult> {
+async function processEvent(
+  event: Stripe.Event,
+  logger: { info: (message: string, context?: Record<string, unknown>) => void; error: (message: string, error: unknown, context?: Record<string, unknown>) => void; warn: (message: string, context?: Record<string, unknown>) => void }
+): Promise<ProcessingResult> {
   try {
+    // Process event based on type
+    let result: ProcessingResult;
+    
     switch (event.type) {
       case 'payment_intent.succeeded':
-        return await handlePaymentIntentSucceeded(
+        result = await handlePaymentIntentSucceeded(
           event.data.object as Stripe.PaymentIntent
         );
+        break;
         
       case 'payment_intent.payment_failed':
-        return await handlePaymentIntentFailed(
+        result = await handlePaymentIntentFailed(
           event.data.object as Stripe.PaymentIntent
         );
+        break;
       
       // NEW: Handle async payments that require action (OXXO, Boleto vouchers)
       case 'payment_intent.requires_action':
-        return await handlePaymentIntentRequiresAction(
+        result = await handlePaymentIntentRequiresAction(
           event.data.object as Stripe.PaymentIntent
         );
+        break;
       
       // NEW: Handle payments being processed (bank transfers, SEPA)
       case 'payment_intent.processing':
-        return await handlePaymentIntentProcessing(
+        result = await handlePaymentIntentProcessing(
           event.data.object as Stripe.PaymentIntent
         );
+        break;
         
       case 'transfer.created':
-        return await handleTransferCreated(
+        result = await handleTransferCreated(
           event.data.object as Stripe.Transfer
         );
+        break;
         
       case 'transfer.failed' as Stripe.Event.Type:
-        return await handleTransferFailed(
+        result = await handleTransferFailed(
           event.data.object as Stripe.Transfer
         );
+        break;
         
       case 'account.updated':
-        return await handleAccountUpdated(
+        result = await handleAccountUpdated(
           event.data.object as Stripe.Account
         );
+        break;
         
       case 'charge.dispute.created':
-        return await handleDisputeCreated(
+        result = await handleDisputeCreated(
           event.data.object as Stripe.Dispute
         );
+        break;
         
       case 'charge.refunded':
-        return await handleChargeRefunded(
+        result = await handleChargeRefunded(
           event.data.object as Stripe.Charge
         );
+        break;
         
       default:
         // Log unhandled event
         logger.warn('Unhandled webhook event', { eventType: event.type, eventId: event.id });
-        }
-        return { success: true, actions: ['ignored'] };
+        result = { success: true, actions: ['ignored'] };
+        break;
     }
+    
+    // Mark event as processed if successful
+    if (result.success) {
+      await markEventAsProcessed(event.id, {
+        eventType: event.type,
+        actions: result.actions,
+      });
+    } else {
+      // Mark event as failed
+      await markEventAsFailed(event.id, result.error || 'Unknown error', {
+        eventType: event.type,
+        actions: result.actions,
+      });
+    }
+    
+    return result;
   } catch (error) {
     const err = error as Error;
+    
+    // Mark event as failed
+    await markEventAsFailed(event.id, err.message, {
+      eventType: event.type,
+      errorStack: err.stack,
+    });
+    
     await captureError(err, {
       tags: { component: 'stripe', operation: 'webhook_process' },
       extra: { eventType: event.type, eventId: event.id },
     });
+    
     return { success: false, error: err.message };
   }
 }

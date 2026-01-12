@@ -22,6 +22,14 @@ import { withAuth } from '../../../lib/apiAuth';
 import { createPaymentRateLimiter, withRateLimit } from '../../../lib/rateLimitConfig';
 import { withCSRFProtection } from '../../../lib/csrfProtection';
 import { logPaymentTransaction, getClientIP } from '../../../lib/securityLogger';
+import { 
+  withErrorHandling, 
+  validateMethod, 
+  validateBody,
+  createErrorResponse,
+  createSuccessResponse,
+  ErrorType 
+} from '../../../lib/apiErrorHandler';
 
 // ============================================================================
 // TYPES
@@ -54,60 +62,73 @@ const handler = async function(
   req: NextApiRequest,
   res: NextApiResponse<CreatePaymentResponse>
 ): Promise<void> {
-  // Only allow POST
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', ['POST']);
-    res.status(405).json({ success: false, error: 'Method not allowed' });
-    return;
-  }
-  
-  // Check rate limit
-  const rateLimitResult = await paymentCreateLimiter.check(req);
-  const clientIP = getClientIP(req);
-  
-  // Set rate limit headers
-  res.setHeader('X-RateLimit-Limit', paymentCreateLimiter.config.maxRequests);
-  res.setHeader('X-RateLimit-Remaining', rateLimitResult.remaining);
-  res.setHeader('X-RateLimit-Reset', Math.floor(rateLimitResult.resetAt / 1000));
-  
-  if (!rateLimitResult.allowed) {
-    res.status(429).json({ 
-      success: false, 
-      error: 'Rate limit exceeded. Please try again later.' 
-    });
-    return;
-  }
-  
-  try {
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    // Validate HTTP method
+    validateMethod(req, ['POST'], logger);
+    
+    // Check rate limit
+    const rateLimitResult = await paymentCreateLimiter.check(req);
+    const clientIP = getClientIP(req);
+    
+    // Set rate limit headers
+    res.setHeader('X-RateLimit-Limit', paymentCreateLimiter.config.maxRequests);
+    res.setHeader('X-RateLimit-Remaining', rateLimitResult.remaining);
+    res.setHeader('X-RateLimit-Reset', Math.floor(rateLimitResult.resetAt / 1000));
+    
+    if (!rateLimitResult.allowed) {
+      const errorResponse = createErrorResponse(
+        ErrorType.RATE_LIMIT,
+        'Rate limit exceeded. Please try again later.',
+        {},
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({ 
+        success: false, 
+        error: errorResponse.body.message 
+      });
+    }
+    
+    // Validate required body fields
+    validateBody(req, ['sourceId', 'userId'], logger);
+    
     const body = req.body as CreatePaymentBody;
     
-    // Validate request
-    if (!body.sourceId || typeof body.sourceId !== 'string') {
-      res.status(400).json({ success: false, error: 'Source ID is required' });
-      return;
-    }
-    
-    if (!body.userId || typeof body.userId !== 'string') {
-      res.status(400).json({ success: false, error: 'User ID is required' });
-      return;
-    }
+    logger.info('Creating payment from source', {
+      component: 'paymongo',
+      operation: 'createPayment',
+      userId: body.userId,
+      sourceId: body.sourceId,
+    });
     
     // Get the source to verify it's chargeable
     const source = await getSource(body.sourceId);
     
     if (source.attributes.status !== 'chargeable') {
-      res.status(400).json({ 
+      const errorResponse = createErrorResponse(
+        ErrorType.VALIDATION,
+        `Source is not chargeable. Current status: ${source.attributes.status}`,
+        { sourceId: body.sourceId, status: source.attributes.status },
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({ 
         success: false, 
-        error: `Source is not chargeable. Current status: ${source.attributes.status}` 
+        error: errorResponse.body.message 
       });
-      return;
     }
     
     // Verify user matches
     const sourceUserId = source.attributes.metadata?.firebaseUserId;
     if (sourceUserId !== body.userId) {
-      res.status(403).json({ success: false, error: 'User mismatch' });
-      return;
+      const errorResponse = createErrorResponse(
+        ErrorType.FORBIDDEN,
+        'User mismatch',
+        { sourceUserId, requestUserId: body.userId },
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({ 
+        success: false, 
+        error: errorResponse.body.message 
+      });
     }
     
     // Find existing transaction
@@ -147,27 +168,14 @@ const handler = async function(
       );
     }
     
-    res.status(200).json({
+    const response = createSuccessResponse({
       success: true,
       paymentId: result.paymentId,
       status: result.status,
-    });
+    }, 200, logger);
     
-  } catch (error) {
-    const err = error instanceof Error ? error : new Error('Unknown error');
-    logger.error('Payment creation error', err, {
-      component: 'paymongo',
-      operation: 'createPayment',
-    });
-    await captureError(err, {
-      tags: { component: 'paymongo', operation: 'createPayment' },
-    });
-    
-    res.status(500).json({
-      success: false,
-      error: err.message || 'Failed to create payment',
-    });
-  }
+    return res.status(response.statusCode).json(response.body);
+  });
 };
 
 // Export with authentication, CSRF protection, and rate limiting

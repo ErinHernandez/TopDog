@@ -30,6 +30,14 @@ import { withAuth } from '../../../lib/apiAuth';
 import { createPaymentRateLimiter, withRateLimit } from '../../../lib/rateLimitConfig';
 import { withCSRFProtection } from '../../../lib/csrfProtection';
 import { logPaymentTransaction, getClientIP } from '../../../lib/securityLogger';
+import { 
+  withErrorHandling, 
+  validateMethod, 
+  validateBody,
+  createErrorResponse,
+  createSuccessResponse,
+  ErrorType 
+} from '../../../lib/apiErrorHandler';
 
 // ============================================================================
 // TYPES
@@ -95,34 +103,38 @@ const handler = async function(
   req: NextApiRequest,
   res: NextApiResponse<InitializeResponse>
 ) {
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST');
-    return res.status(405).json({
-      ok: false,
-      error: { code: 'method_not_allowed', message: 'Only POST is allowed' },
-    });
-  }
-  
-  // Check rate limit
-  const rateLimitResult = await paymentInitLimiter.check(req);
-  const clientIP = getClientIP(req);
-  
-  // Set rate limit headers
-  res.setHeader('X-RateLimit-Limit', paymentInitLimiter.config.maxRequests);
-  res.setHeader('X-RateLimit-Remaining', rateLimitResult.remaining);
-  res.setHeader('X-RateLimit-Reset', Math.floor(rateLimitResult.resetAt / 1000));
-  
-  if (!rateLimitResult.allowed) {
-    return res.status(429).json({
-      ok: false,
-      error: { 
-        code: 'rate_limit_exceeded', 
-        message: 'Too many requests. Please try again later.' 
-      },
-    });
-  }
-  
-  try {
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    // Validate HTTP method
+    validateMethod(req, ['POST'], logger);
+    
+    // Check rate limit
+    const rateLimitResult = await paymentInitLimiter.check(req);
+    const clientIP = getClientIP(req);
+    
+    // Set rate limit headers
+    res.setHeader('X-RateLimit-Limit', paymentInitLimiter.config.maxRequests);
+    res.setHeader('X-RateLimit-Remaining', rateLimitResult.remaining);
+    res.setHeader('X-RateLimit-Reset', Math.floor(rateLimitResult.resetAt / 1000));
+    
+    if (!rateLimitResult.allowed) {
+      const errorResponse = createErrorResponse(
+        ErrorType.RATE_LIMIT,
+        'Too many requests. Please try again later.',
+        {},
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({
+        ok: false,
+        error: { 
+          code: 'rate_limit_exceeded', 
+          message: errorResponse.body.message 
+        },
+      });
+    }
+    
+    // Validate required body fields
+    validateBody(req, ['amountSmallestUnit', 'userId', 'email'], logger);
+    
     const {
       amountSmallestUnit,
       currency: requestCurrency,
@@ -137,25 +149,17 @@ const handler = async function(
       metadata,
     } = req.body as InitializeRequest;
     
-    // Validate required fields
-    if (!userId) {
-      return res.status(400).json({
-        ok: false,
-        error: { code: 'missing_user_id', message: 'User ID is required' },
-      });
-    }
-    
-    if (!email) {
-      return res.status(400).json({
-        ok: false,
-        error: { code: 'missing_email', message: 'Email is required' },
-      });
-    }
-    
+    // Additional validation
     if (!amountSmallestUnit || amountSmallestUnit <= 0) {
-      return res.status(400).json({
+      const errorResponse = createErrorResponse(
+        ErrorType.VALIDATION,
+        'Valid amount is required',
+        {},
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({
         ok: false,
-        error: { code: 'invalid_amount', message: 'Valid amount is required' },
+        error: { code: 'invalid_amount', message: errorResponse.body.message },
       });
     }
     
@@ -170,11 +174,17 @@ const handler = async function(
     
     // Validate currency
     if (!isPaystackCurrency(currency)) {
-      return res.status(400).json({
+      const errorResponse = createErrorResponse(
+        ErrorType.VALIDATION,
+        `Currency ${currency} is not supported. Use NGN, GHS, ZAR, or KES.`,
+        { currency },
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({
         ok: false,
         error: {
           code: 'invalid_currency',
-          message: `Currency ${currency} is not supported. Use NGN, GHS, ZAR, or KES.`,
+          message: errorResponse.body.message,
         },
       });
     }
@@ -182,11 +192,26 @@ const handler = async function(
     // Validate amount
     const validation = validatePaystackAmount(amountSmallestUnit, currency);
     if (!validation.isValid) {
-      return res.status(400).json({
+      const errorResponse = createErrorResponse(
+        ErrorType.VALIDATION,
+        validation.error || 'Invalid amount',
+        { amountSmallestUnit, currency },
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({
         ok: false,
-        error: { code: 'invalid_amount', message: validation.error || 'Invalid amount' },
+        error: { code: 'invalid_amount', message: errorResponse.body.message },
       });
     }
+    
+    logger.info('Initializing payment', {
+      component: 'paystack',
+      operation: 'initialize',
+      userId,
+      amountSmallestUnit,
+      currency,
+      channel,
+    });
     
     // Generate reference
     const reference = generateReference('TD');
@@ -207,9 +232,15 @@ const handler = async function(
     if (channel === 'ussd' && ussdType) {
       // USSD charge (Nigeria only)
       if (currency !== 'NGN') {
-        return res.status(400).json({
+        const errorResponse = createErrorResponse(
+          ErrorType.VALIDATION,
+          'USSD is only available in Nigeria (NGN)',
+          { currency, channel },
+          res.getHeader('X-Request-ID') as string
+        );
+        return res.status(errorResponse.statusCode).json({
           ok: false,
-          error: { code: 'invalid_channel', message: 'USSD is only available in Nigeria (NGN)' },
+          error: { code: 'invalid_channel', message: errorResponse.body.message },
         });
       }
       
@@ -232,9 +263,15 @@ const handler = async function(
     } else if (channel === 'mobile_money' && mobileMoneyPhone && mobileMoneyProvider) {
       // Mobile Money charge (Ghana, Kenya)
       if (!['GHS', 'KES'].includes(currency)) {
-        return res.status(400).json({
+        const errorResponse = createErrorResponse(
+          ErrorType.VALIDATION,
+          'Mobile Money is only available in Ghana (GHS) and Kenya (KES)',
+          { currency, channel },
+          res.getHeader('X-Request-ID') as string
+        );
+        return res.status(errorResponse.statusCode).json({
           ok: false,
-          error: { code: 'invalid_channel', message: 'Mobile Money is only available in Ghana (GHS) and Kenya (KES)' },
+          error: { code: 'invalid_channel', message: errorResponse.body.message },
         });
       }
       
@@ -318,7 +355,7 @@ const handler = async function(
       clientIP
     );
     
-    return res.status(200).json({
+    const response = createSuccessResponse({
       ok: true,
       data: {
         reference: result.reference,
@@ -329,26 +366,10 @@ const handler = async function(
         transactionId: transaction.id,
         channel,
       },
-    });
+    }, 200, logger);
     
-  } catch (error) {
-    logger.error('Payment initialization error', error as Error, { 
-      component: 'paystack', 
-      operation: 'initialize',
-      body: req.body,
-    });
-    await captureError(error as Error, {
-      tags: { component: 'paystack', operation: 'initialize' },
-      extra: { body: req.body },
-    });
-    
-    const message = error instanceof Error ? error.message : 'Failed to initialize payment';
-    
-    return res.status(500).json({
-      ok: false,
-      error: { code: 'initialization_failed', message },
-    });
-  }
+    return res.status(response.statusCode).json(response.body);
+  });
 };
 
 // Export with authentication, CSRF protection, and rate limiting

@@ -9,9 +9,17 @@ import {
   updateDoc, 
   addDoc,
   serverTimestamp,
-  runTransaction 
+  runTransaction,
+  limit as firestoreLimit
 } from 'firebase/firestore';
 import { usePlayerData } from '../../../../lib/playerDataContext';
+import { 
+  LatencyTracker, 
+  measureLatency, 
+  compensateTimer 
+} from '../../../../lib/draft/latencyCompensation';
+// Note: Query optimization utilities available for future use
+// import { optimizeDraftPicksQuery } from '../../../../lib/firebase/queryOptimization';
 
 /**
  * DraftContext - Centralized state management for draft room
@@ -74,10 +82,64 @@ export default function DraftProvider({ roomId, children }) {
   const pickInProgress = useRef(false);
   const lastPickTime = useRef(0);
   
+  // Latency compensation
+  const latencyTracker = useRef(new LatencyTracker(10));
+  const [compensatedTimer, setCompensatedTimer] = useState(30);
+  const latencyMeasurementInterval = useRef(null);
+  
   // Real-time listeners
   const roomUnsubscribe = useRef(null);
   const picksUnsubscribe = useRef(null);
 
+  /**
+   * Initialize latency measurement
+   */
+  useEffect(() => {
+    if (!roomId) return;
+    
+    // Measure latency periodically
+    const measureLatencyPeriodically = async () => {
+      try {
+        const measurement = await measureLatency('/api/health');
+        latencyTracker.current.addMeasurement(measurement);
+      } catch (error) {
+        console.warn('Latency measurement failed:', error);
+      }
+    };
+    
+    // Initial measurement
+    measureLatencyPeriodically();
+    
+    // Measure every 10 seconds
+    latencyMeasurementInterval.current = setInterval(measureLatencyPeriodically, 10000);
+    
+    return () => {
+      if (latencyMeasurementInterval.current) {
+        clearInterval(latencyMeasurementInterval.current);
+      }
+    };
+  }, [roomId]);
+  
+  /**
+   * Apply latency compensation to timer
+   */
+  useEffect(() => {
+    if (timer === null || timer === undefined) return;
+    
+    const estimatedLatency = latencyTracker.current.getEstimatedLatency();
+    const compensated = compensateTimer(timer * 1000, estimatedLatency); // Convert seconds to ms, then compensate
+    setCompensatedTimer(Math.max(0, Math.floor(compensated / 1000))); // Convert back to seconds
+    
+    // Log compensation in development
+    if (process.env.NODE_ENV === 'development' && estimatedLatency > 0) {
+      console.log('⏱️ Timer compensation:', {
+        serverTimer: timer,
+        estimatedLatency: Math.round(estimatedLatency),
+        compensatedTimer: Math.floor(compensated / 1000),
+      });
+    }
+  }, [timer]);
+  
   /**
    * Initialize draft room listeners
    */
@@ -150,9 +212,32 @@ export default function DraftProvider({ roomId, children }) {
     
     // Listen to picks (only in production mode)
     if (!isDevMode) {
+      // Use optimized query with proper ordering for index usage
+      const picksCollection = collection(db, 'draftRooms', roomId, 'picks');
+      
+      // Optimize query: order by pickNumber for efficient index usage
+      // This ensures the query uses the composite index we created
+      const optimizedPicksQuery = query(
+        picksCollection,
+        orderBy('pickNumber', 'asc')
+        // Note: We don't limit here because we need all picks for the draft
+        // But the query is optimized with proper ordering for index usage
+      );
+      
+      // Track query performance in development
+      const queryStartTime = process.env.NODE_ENV === 'development' ? performance.now() : null;
+      
       picksUnsubscribe.current = onSnapshot(
-        query(collection(db, 'draftRooms', roomId, 'picks'), orderBy('pickNumber')),
+        optimizedPicksQuery,
         (snapshot) => {
+          // Measure query performance in development
+          if (queryStartTime && process.env.NODE_ENV === 'development') {
+            const duration = performance.now() - queryStartTime;
+            if (duration > 500) {
+              console.warn(`⚠️ Slow draft picks query: ${duration.toFixed(2)}ms`);
+            }
+          }
+          
           const picksData = snapshot.docs.map(doc => ({ 
             id: doc.id, 
             ...doc.data() 
@@ -379,7 +464,9 @@ export default function DraftProvider({ roomId, children }) {
     draftOrder,
     currentPick,
     currentRound,
-    timer,
+    timer: compensatedTimer, // Use compensated timer for display (accounts for latency)
+    serverTimer: timer, // Keep raw server timer for reference
+    latencyStats: latencyTracker.current.getStats(), // Expose latency stats for debugging
     isLoading,
     error,
     

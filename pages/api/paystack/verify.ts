@@ -19,6 +19,15 @@ import {
 import { formatPaystackAmount } from '../../../lib/paystack/currencyConfig';
 import { captureError } from '../../../lib/errorTracking';
 import { logger } from '../../../lib/structuredLogger';
+import { 
+  withErrorHandling, 
+  validateMethod, 
+  validateQueryParams,
+  validateBody,
+  createErrorResponse,
+  createSuccessResponse,
+  ErrorType 
+} from '../../../lib/apiErrorHandler';
 // Note: Firebase imports removed - balance updates handled by webhook only
 
 // ============================================================================
@@ -66,36 +75,55 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<VerifyResponse>
 ) {
-  if (!['GET', 'POST'].includes(req.method || '')) {
-    res.setHeader('Allow', 'GET, POST');
-    return res.status(405).json({
-      ok: false,
-      error: { code: 'method_not_allowed', message: 'Only GET and POST are allowed' },
-    });
-  }
-  
-  try {
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    // Validate HTTP method
+    validateMethod(req, ['GET', 'POST'], logger);
+    
     // Get reference from query or body
-    const reference = req.method === 'GET'
-      ? (req.query.reference as string)
-      : (req.body as VerifyRequest)?.reference;
+    let reference: string | undefined;
+    
+    if (req.method === 'GET') {
+      validateQueryParams(req, ['reference'], logger);
+      reference = req.query.reference as string;
+    } else {
+      validateBody(req, ['reference'], logger);
+      reference = (req.body as VerifyRequest)?.reference;
+    }
     
     if (!reference) {
-      return res.status(400).json({
+      const errorResponse = createErrorResponse(
+        ErrorType.VALIDATION,
+        'Transaction reference is required',
+        {},
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({
         ok: false,
-        error: { code: 'missing_reference', message: 'Transaction reference is required' },
+        error: { code: 'missing_reference', message: errorResponse.body.message },
       });
     }
+    
+    logger.info('Verifying transaction', { 
+      component: 'paystack', 
+      operation: 'verify',
+      reference,
+    });
     
     // Verify with Paystack
     const verifyResult = await verifyTransaction(reference);
     
     if (!verifyResult.data) {
-      return res.status(404).json({
+      const errorResponse = createErrorResponse(
+        ErrorType.NOT_FOUND,
+        verifyResult.error || 'Transaction not found',
+        { reference },
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({
         ok: false,
         error: {
           code: 'transaction_not_found',
-          message: verifyResult.error || 'Transaction not found',
+          message: errorResponse.body.message,
         },
       });
     }
@@ -125,6 +153,13 @@ export default async function handler(
             newStatus,
             paystackData.gateway_response
           );
+          logger.info('Transaction status updated', {
+            component: 'paystack',
+            operation: 'verify',
+            transactionId: transaction.id,
+            oldStatus: transaction.status,
+            newStatus,
+          });
         }
         // For success, we let the webhook handle it to ensure single source of truth
         // The webhook will update status AND credit balance atomically
@@ -134,7 +169,7 @@ export default async function handler(
     // Format response
     const status = isSuccess ? 'success' : isFailed ? 'failed' : isPending ? 'pending' : 'processing';
     
-    return res.status(200).json({
+    const response = createSuccessResponse({
       ok: true,
       data: {
         reference: paystackData.reference,
@@ -147,27 +182,10 @@ export default async function handler(
         gatewayResponse: paystackData.gateway_response,
         paidAt: paystackData.paid_at || undefined,
       },
-    });
+    }, 200, logger);
     
-  } catch (error) {
-    logger.error('Transaction verification error', error as Error, { 
-      component: 'paystack', 
-      operation: 'verify',
-      query: req.query,
-      body: req.body,
-    });
-    await captureError(error as Error, {
-      tags: { component: 'paystack', operation: 'verify' },
-      extra: { query: req.query, body: req.body },
-    });
-    
-    const message = error instanceof Error ? error.message : 'Verification failed';
-    
-    return res.status(500).json({
-      ok: false,
-      error: { code: 'verification_failed', message },
-    });
-  }
+    return res.status(response.statusCode).json(response.body);
+  });
 }
 
 // NOTE: Balance crediting has been removed from this endpoint.

@@ -545,17 +545,115 @@ export async function handlePaymentFailed(
 
 /**
  * Process payout.paid webhook
+ * 
+ * Handles successful payout completion:
+ * - Extracts userId from metadata
+ * - Updates existing transaction to completed status
+ * - Creates transaction record if missing (recovery scenario)
+ * - Logs all actions for audit trail
  */
 export async function handlePayoutPaid(
   data: PayMongoPayoutAttributes & { id: string }
 ): Promise<{ success: boolean; actions: string[] }> {
   const actions: string[] = [];
   
-  const existingTx = await findTransactionByPayoutId(data.id);
-  if (existingTx) {
-    await updateTransactionStatus(existingTx.id, 'completed');
-    actions.push('payout_completed');
+  // Extract userId from metadata
+  const userId = data.metadata?.firebaseUserId;
+  if (!userId) {
+    // Log error but don't fail - payout succeeded, just missing userId for tracking
+    await captureError(
+      new Error('Payout paid webhook missing userId in metadata'),
+      {
+        tags: { component: 'paymongo', operation: 'handlePayoutPaid' },
+        extra: {
+          payoutId: data.id,
+          metadata: data.metadata,
+        },
+      }
+    );
+    return { success: false, actions: ['missing_user_id'] };
   }
+  
+  // Find existing transaction
+  const existingTx = await findTransactionByPayoutId(data.id);
+  
+  if (!existingTx) {
+    // Transaction missing - this is a recovery scenario
+    // Create transaction record to maintain audit trail
+    await captureError(
+      new Error('Payout paid but transaction not found - creating recovery transaction'),
+      {
+        tags: { component: 'paymongo', operation: 'handlePayoutPaid', severity: 'warning' },
+        extra: {
+          payoutId: data.id,
+          userId,
+          amount: data.amount,
+          currency: data.currency,
+          paidAt: data.paid_at,
+        },
+      }
+    );
+    
+    try {
+      await createPayMongoTransaction({
+        userId,
+        type: 'withdrawal',
+        amountSmallestUnit: data.amount,
+        currency: data.currency.toUpperCase(),
+        status: 'completed',
+        provider: 'paymongo',
+        providerReference: data.id,
+        description: 'Withdrawal to bank account',
+        metadata: {
+          paymongoPayoutId: data.id,
+          paidAt: data.paid_at,
+          recovered: true, // Flag as recovered transaction
+          recoveryReason: 'Transaction record missing on payout.paid webhook',
+        },
+      });
+      actions.push('transaction_recovered');
+    } catch (recoveryError) {
+      // Log critical error if recovery transaction creation fails
+      await captureError(
+        recoveryError instanceof Error ? recoveryError : new Error('Unknown error'),
+        {
+          tags: { component: 'paymongo', operation: 'handlePayoutPaid', severity: 'critical' },
+          extra: {
+            payoutId: data.id,
+            userId,
+            recoveryError: recoveryError instanceof Error ? recoveryError.message : 'Unknown error',
+          },
+        }
+      );
+      return { success: false, actions: ['recovery_transaction_failed'] };
+    }
+  } else {
+    // Update existing transaction to completed
+    try {
+      await updateTransactionStatus(existingTx.id, 'completed');
+      actions.push('payout_completed');
+    } catch (updateError) {
+      // Log error if status update fails
+      await captureError(
+        updateError instanceof Error ? updateError : new Error('Unknown error'),
+        {
+          tags: { component: 'paymongo', operation: 'handlePayoutPaid', severity: 'warning' },
+          extra: {
+            payoutId: data.id,
+            userId,
+            transactionId: existingTx.id,
+            updateError: updateError instanceof Error ? updateError.message : 'Unknown error',
+          },
+        }
+      );
+      // Don't fail - payout succeeded, just couldn't update transaction
+      actions.push('payout_completed_with_update_error');
+    }
+  }
+  
+  // Note: Balance is not credited here because it was already debited
+  // when the payout was created. The payout.paid event just confirms
+  // the payout was successfully processed by PayMongo.
   
   return { success: true, actions };
 }

@@ -23,8 +23,15 @@ import type {
   TransferRecipientType,
   PaystackTransferRecipient,
 } from '../../../../lib/paystack/paystackTypes';
-import { captureError } from '../../../../lib/errorTracking';
-import { logger } from '../../../../lib/structuredLogger';
+import { 
+  withErrorHandling,
+  validateMethod,
+  validateBody,
+  createSuccessResponse,
+  createErrorResponse,
+  ErrorType,
+  type ScopedLogger,
+} from '../../../../lib/apiErrorHandler';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../../../lib/firebase';
 
@@ -71,41 +78,37 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<RecipientResponse>
 ) {
-  try {
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    validateMethod(req, ['POST', 'GET', 'DELETE'], logger);
+    
+    logger.info('Paystack transfer recipient request', {
+      component: 'paystack',
+      operation: 'recipient',
+      method: req.method,
+    });
+    
     switch (req.method) {
       case 'POST':
-        return await handleCreate(req, res);
+        return await handleCreate(req, res, logger);
       case 'GET':
-        return await handleList(req, res);
+        return await handleList(req, res, logger);
       case 'DELETE':
-        return await handleDelete(req, res);
+        return await handleDelete(req, res, logger);
       default:
+        // This should never happen due to validateMethod, but TypeScript needs it
+        const response = createErrorResponse(
+          ErrorType.METHOD_NOT_ALLOWED,
+          'Method not allowed',
+          { allowedMethods: ['POST', 'GET', 'DELETE'] },
+          logger
+        );
         res.setHeader('Allow', 'POST, GET, DELETE');
-        return res.status(405).json({
+        return res.status(response.statusCode).json({
           ok: false,
           error: { code: 'method_not_allowed', message: 'Method not allowed' },
         });
     }
-  } catch (error) {
-    logger.error('Recipient operation error', error as Error, {
-      component: 'paystack',
-      operation: 'recipient',
-      method: req.method,
-      query: req.query,
-      body: req.body,
-    });
-    await captureError(error as Error, {
-      tags: { component: 'paystack', operation: 'recipient' },
-      extra: { method: req.method, query: req.query, body: req.body },
-    });
-    
-    const message = error instanceof Error ? error.message : 'Operation failed';
-    
-    return res.status(500).json({
-      ok: false,
-      error: { code: 'operation_failed', message },
-    });
-  }
+  });
 }
 
 // ============================================================================
@@ -114,7 +117,8 @@ export default async function handler(
 
 async function handleCreate(
   req: NextApiRequest,
-  res: NextApiResponse<RecipientResponse>
+  res: NextApiResponse<RecipientResponse>,
+  logger: ScopedLogger
 ) {
   const {
     userId,
@@ -127,22 +131,16 @@ async function handleCreate(
   } = req.body as CreateRecipientRequest;
   
   // Validation
-  if (!userId) {
-    return res.status(400).json({
-      ok: false,
-      error: { code: 'missing_user_id', message: 'User ID is required' },
-    });
-  }
-  
-  if (!type || !name || !accountNumber) {
-    return res.status(400).json({
-      ok: false,
-      error: { code: 'missing_fields', message: 'Type, name, and account number are required' },
-    });
-  }
+  validateBody(req, ['userId', 'type', 'name', 'accountNumber', 'country'], logger);
   
   if (!country || !['NG', 'GH', 'ZA', 'KE'].includes(country)) {
-    return res.status(400).json({
+    const response = createErrorResponse(
+      ErrorType.VALIDATION,
+      'Valid country (NG, GH, ZA, KE) is required',
+      { country },
+      logger
+    );
+    return res.status(response.statusCode).json({
       ok: false,
       error: { code: 'invalid_country', message: 'Valid country (NG, GH, ZA, KE) is required' },
     });
@@ -150,7 +148,13 @@ async function handleCreate(
   
   // For bank transfers, bank code is required
   if ((type === 'nuban' || type === 'basa') && !bankCode) {
-    return res.status(400).json({
+    const response = createErrorResponse(
+      ErrorType.VALIDATION,
+      'Bank code is required for bank transfers',
+      { type },
+      logger
+    );
+    return res.status(response.statusCode).json({
       ok: false,
       error: { code: 'missing_bank_code', message: 'Bank code is required for bank transfers' },
     });
@@ -172,11 +176,25 @@ async function handleCreate(
       paystackType = 'mobile_money';
       break;
     default:
-      return res.status(400).json({
+      const invalidTypeResponse = createErrorResponse(
+        ErrorType.VALIDATION,
+        'Invalid recipient type',
+        { type, allowedTypes: ['nuban', 'basa', 'mobile_money'] },
+        logger
+      );
+      return res.status(invalidTypeResponse.statusCode).json({
         ok: false,
         error: { code: 'invalid_type', message: 'Invalid recipient type' },
       });
   }
+  
+  logger.info('Creating Paystack transfer recipient', {
+    component: 'paystack',
+    operation: 'create_recipient',
+    type: paystackType,
+    country,
+    userId,
+  });
   
   // Create recipient with Paystack
   const result = await createTransferRecipient({
@@ -208,7 +226,22 @@ async function handleCreate(
     await setDoc(userRef, {
       defaultPaystackRecipient: result.recipientCode,
     }, { merge: true });
+    
+    logger.info('Set recipient as default', {
+      component: 'paystack',
+      operation: 'set_default_recipient',
+      recipientCode: result.recipientCode,
+      userId,
+    });
   }
+  
+  logger.info('Transfer recipient created successfully', {
+    component: 'paystack',
+    operation: 'create_recipient',
+    recipientCode: result.recipientCode,
+    country,
+    userId,
+  });
   
   return res.status(200).json({
     ok: true,
@@ -222,7 +255,8 @@ async function handleCreate(
 
 async function handleList(
   req: NextApiRequest,
-  res: NextApiResponse<RecipientResponse>
+  res: NextApiResponse<RecipientResponse>,
+  logger: ScopedLogger
 ) {
   const userId = req.query.userId as string;
   const listBanksFor = req.query.banks as string; // 'nigeria', 'ghana', 'south_africa', 'kenya'
@@ -245,13 +279,32 @@ async function handleList(
     
     const country = countryMap[listBanksFor];
     if (!country) {
-      return res.status(400).json({
+      const response = createErrorResponse(
+        ErrorType.VALIDATION,
+        'Invalid country for bank list',
+        { listBanksFor, allowedCountries: ['NG', 'GH', 'ZA', 'KE', 'nigeria', 'ghana', 'south_africa', 'kenya'] },
+        logger
+      );
+      return res.status(response.statusCode).json({
         ok: false,
         error: { code: 'invalid_country', message: 'Invalid country for bank list' },
       });
     }
     
+    logger.info('Fetching bank list', {
+      component: 'paystack',
+      operation: 'list_banks',
+      country,
+    });
+    
     const banks = await listBanks(country);
+    
+    logger.info('Bank list fetched', {
+      component: 'paystack',
+      operation: 'list_banks',
+      country,
+      bankCount: banks.length,
+    });
     
     return res.status(200).json({
       ok: true,
@@ -263,7 +316,21 @@ async function handleList(
   
   // If resolving account number
   if (resolve && accountNumber && bankCode) {
+    logger.info('Resolving account number', {
+      component: 'paystack',
+      operation: 'resolve_account',
+      bankCode,
+      accountNumber: '***', // Don't log full account number
+    });
+    
     const resolved = await resolveAccountNumber(accountNumber, bankCode);
+    
+    logger.info('Account number resolved', {
+      component: 'paystack',
+      operation: 'resolve_account',
+      bankCode,
+      resolved: true,
+    });
     
     return res.status(200).json({
       ok: true,
@@ -275,23 +342,48 @@ async function handleList(
   
   // List user's recipients
   if (!userId) {
-    return res.status(400).json({
+    const response = createErrorResponse(
+      ErrorType.VALIDATION,
+      'User ID is required',
+      {},
+      logger
+    );
+    return res.status(response.statusCode).json({
       ok: false,
       error: { code: 'missing_user_id', message: 'User ID is required' },
     });
   }
   
+  logger.info('Fetching user recipients', {
+    component: 'paystack',
+    operation: 'list_recipients',
+    userId,
+  });
+  
   const userRef = doc(db, 'users', userId);
   const userDoc = await getDoc(userRef);
   
   if (!userDoc.exists()) {
-    return res.status(404).json({
+    const response = createErrorResponse(
+      ErrorType.NOT_FOUND,
+      'User not found',
+      { userId },
+      logger
+    );
+    return res.status(response.statusCode).json({
       ok: false,
       error: { code: 'user_not_found', message: 'User not found' },
     });
   }
   
   const recipients = (userDoc.data().paystackTransferRecipients || []) as PaystackTransferRecipient[];
+  
+  logger.info('User recipients fetched', {
+    component: 'paystack',
+    operation: 'list_recipients',
+    userId,
+    recipientCount: recipients.length,
+  });
   
   return res.status(200).json({
     ok: true,
@@ -305,31 +397,55 @@ async function handleList(
 
 async function handleDelete(
   req: NextApiRequest,
-  res: NextApiResponse<RecipientResponse>
+  res: NextApiResponse<RecipientResponse>,
+  logger: ScopedLogger
 ) {
+  validateBody(req, ['userId', 'recipientCode'], logger);
+  
   const { userId, recipientCode } = req.body as {
     userId: string;
     recipientCode: string;
   };
   
-  if (!userId || !recipientCode) {
-    return res.status(400).json({
-      ok: false,
-      error: { code: 'missing_fields', message: 'User ID and recipient code are required' },
-    });
-  }
+  logger.info('Deleting transfer recipient', {
+    component: 'paystack',
+    operation: 'delete_recipient',
+    userId,
+    recipientCode,
+  });
   
   const userRef = doc(db, 'users', userId);
   const userDoc = await getDoc(userRef);
   
   if (!userDoc.exists()) {
-    return res.status(404).json({
+    const response = createErrorResponse(
+      ErrorType.NOT_FOUND,
+      'User not found',
+      { userId },
+      logger
+    );
+    return res.status(response.statusCode).json({
       ok: false,
       error: { code: 'user_not_found', message: 'User not found' },
     });
   }
   
   const recipients = (userDoc.data().paystackTransferRecipients || []) as PaystackTransferRecipient[];
+  const recipientExists = recipients.some(r => r.code === recipientCode);
+  
+  if (!recipientExists) {
+    const response = createErrorResponse(
+      ErrorType.NOT_FOUND,
+      'Recipient not found',
+      { recipientCode, userId },
+      logger
+    );
+    return res.status(response.statusCode).json({
+      ok: false,
+      error: { code: 'recipient_not_found', message: 'Recipient not found' },
+    });
+  }
+  
   const updatedRecipients = recipients.filter(r => r.code !== recipientCode);
   
   // Check if we removed the default
@@ -344,11 +460,32 @@ async function handleDelete(
   if (removedDefault && updatedRecipients.length > 0) {
     updates.defaultPaystackRecipient = updatedRecipients[0].code;
     updatedRecipients[0].isDefault = true;
+    
+    logger.info('Default recipient updated after deletion', {
+      component: 'paystack',
+      operation: 'delete_recipient',
+      userId,
+      newDefault: updatedRecipients[0].code,
+    });
   } else if (removedDefault) {
     updates.defaultPaystackRecipient = null;
+    
+    logger.info('Default recipient removed (no remaining recipients)', {
+      component: 'paystack',
+      operation: 'delete_recipient',
+      userId,
+    });
   }
   
   await setDoc(userRef, updates, { merge: true });
+  
+  logger.info('Transfer recipient deleted successfully', {
+    component: 'paystack',
+    operation: 'delete_recipient',
+    userId,
+    recipientCode,
+    remainingRecipients: updatedRecipients.length,
+  });
   
   return res.status(200).json({
     ok: true,

@@ -36,6 +36,7 @@ import type {
 } from './paystackTypes';
 import { validatePaystackAmount, formatPaystackAmount, getCurrencyForPaystackCountry } from './currencyConfig';
 import { getStripeExchangeRate, convertToUSD } from '../stripe/exchangeRates';
+import { withPaystackRetry } from './retryUtils';
 import type { TransactionStatus, UnifiedTransaction } from '../payments/types';
 
 // ============================================================================
@@ -58,41 +59,72 @@ if (!PAYSTACK_SECRET_KEY) {
 
 /**
  * Make authenticated request to Paystack API
+ * 
+ * Automatically retries on transient errors with exponential backoff.
+ * Uses withPaystackRetry for automatic retry handling.
  */
 async function paystackRequest<T>(
   endpoint: string,
   options: {
     method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
     body?: unknown;
+    skipRetry?: boolean; // Option to skip retry for idempotency-sensitive operations
   } = {}
 ): Promise<PaystackApiResponse<T>> {
-  const { method = 'GET', body } = options;
+  const { method = 'GET', body, skipRetry = false } = options;
   
   if (!PAYSTACK_SECRET_KEY) {
     throw new Error('PAYSTACK_SECRET_KEY is not configured');
   }
   
-  const response = await fetch(`${PAYSTACK_BASE_URL}${endpoint}`, {
-    method,
-    headers: {
-      'Authorization': `Bearer ${PAYSTACK_SECRET_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: body ? JSON.stringify(body) : undefined,
-  });
-  
-  const data = await response.json();
-  
-  if (!response.ok || !data.status) {
-    const error = new Error(data.message || 'Paystack API error');
-    await captureError(error, {
-      tags: { component: 'paystack', operation: endpoint },
-      extra: { status: response.status, response: data },
+  // Inner function that makes the actual request
+  const makeRequest = async (): Promise<PaystackApiResponse<T>> => {
+    const response = await fetch(`${PAYSTACK_BASE_URL}${endpoint}`, {
+      method,
+      headers: {
+        'Authorization': `Bearer ${PAYSTACK_SECRET_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: body ? JSON.stringify(body) : undefined,
     });
-    throw error;
+    
+    const data = await response.json();
+    
+    if (!response.ok || !data.status) {
+      // Create error with status code for retry logic
+      const error = new Error(data.message || 'Paystack API error') as Error & { status?: number };
+      error.status = response.status;
+      
+      // Log error (retry logic will handle retries)
+      await captureError(error, {
+        tags: { component: 'paystack', operation: endpoint },
+        extra: { status: response.status, response: data },
+      });
+      
+      throw error;
+    }
+    
+    return data as PaystackApiResponse<T>;
+  };
+
+  // Use retry logic unless explicitly skipped
+  if (skipRetry) {
+    return makeRequest();
   }
-  
-  return data as PaystackApiResponse<T>;
+
+  // Retry with Paystack-specific configuration
+  return withPaystackRetry(makeRequest, {
+    logger: {
+      warn: (message: string, context?: Record<string, unknown>) => {
+        // Log retry warnings (structured logging will be added by caller if needed)
+        console.warn(`[PaystackService] ${message}`, context);
+      },
+      error: (message: string, error: unknown, context?: Record<string, unknown>) => {
+        // Log retry errors
+        console.error(`[PaystackService] ${message}`, error, context);
+      },
+    },
+  });
 }
 
 // ============================================================================

@@ -1,6 +1,14 @@
 import { analyzeImageFromBase64, detectText, detectDocumentText, detectLabels, detectFaces, detectObjects } from '../../../lib/cloudVision';
 import { RateLimiter } from '../../../lib/rateLimiter';
 import { logger } from '../../../lib/structuredLogger.js';
+import { 
+  withErrorHandling, 
+  validateMethod, 
+  validateBody,
+  createErrorResponse,
+  createSuccessResponse,
+  ErrorType 
+} from '../../../lib/apiErrorHandler.js';
 
 export const config = {
   api: {
@@ -18,24 +26,35 @@ const rateLimiter = new RateLimiter({
 });
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
-  try {
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    // Validate HTTP method
+    validateMethod(req, ['POST'], logger);
+    
     // Rate limiting
     const rateLimitResult = await rateLimiter.check(req);
     if (!rateLimitResult.allowed) {
-      return res.status(429).json({
-        error: 'Too many requests',
+      const errorResponse = createErrorResponse(
+        ErrorType.RATE_LIMIT,
+        'Too many requests',
+        { retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000) },
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({
+        error: errorResponse.body.message,
         retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000),
       });
     }
+    
+    // Validate required body fields
+    validateBody(req, ['imageData'], logger);
+    
     const { imageData, imageType, analysisType } = req.body;
-
-    if (!imageData) {
-      return res.status(400).json({ error: 'Image data is required' });
-    }
+    
+    logger.info('Analyzing image with Cloud Vision', {
+      component: 'cloud-vision',
+      operation: 'analyze-image',
+      analysisType: analysisType || 'full',
+    });
 
     let result;
 
@@ -124,20 +143,12 @@ export default async function handler(req, res) {
         break;
     }
 
-    res.status(200).json({ 
-      success: true, 
+    const response = createSuccessResponse({
+      success: true,
       result,
-      analysisType: analysisType || 'full'
-    });
-
-  } catch (error) {
-    logger.error('Vision API error', error, {
-      component: 'cloud-vision',
-      operation: 'analyze-image',
-    });
-    res.status(500).json({ 
-      error: 'Failed to analyze image',
-      details: error.message 
-    });
-  }
+      analysisType: analysisType || 'full',
+    }, 200, logger);
+    
+    return res.status(response.statusCode).json(response.body);
+  });
 } 

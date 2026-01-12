@@ -11,6 +11,13 @@
 
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { logger } from '../../lib/structuredLogger';
+import { 
+  withErrorHandling, 
+  validateMethod,
+  createSuccessResponse,
+  createErrorResponse,
+  ErrorType 
+} from '../../lib/apiErrorHandler';
 
 // ============================================================================
 // TYPES
@@ -41,23 +48,18 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<HealthResponse>
 ): Promise<void> {
-  // Only allow GET
-  if (req.method !== 'GET') {
-    res.setHeader('Allow', 'GET');
-    res.status(405).json({
-      status: 'error',
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-      environment: process.env.NODE_ENV || 'unknown',
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    // Validate HTTP method
+    validateMethod(req, ['GET'], logger);
+    
+    const startTime = Date.now();
+    const checks: HealthResponse['checks'] = {};
+    let overallStatus: 'ok' | 'degraded' | 'error' = 'ok';
+    
+    logger.debug('Health check request', {
+      component: 'health',
+      method: req.method,
     });
-    return;
-  }
-
-  const startTime = Date.now();
-  const checks: HealthResponse['checks'] = {};
-  let overallStatus: 'ok' | 'degraded' | 'error' = 'ok';
-
-  try {
     // Basic health check - application is running
     // In a more sophisticated setup, you could check:
     // - Database connectivity
@@ -116,10 +118,12 @@ export default async function handler(
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
+    // Add server timestamp for latency compensation
+    res.setHeader('X-Server-Time', Date.now().toString());
 
     const statusCode = overallStatus === 'ok' ? 200 : overallStatus === 'degraded' ? 200 : 503;
     
-    res.status(statusCode).json({
+    const response = createSuccessResponse({
       status: overallStatus,
       timestamp: new Date().toISOString(),
       uptime: Math.floor(process.uptime()),
@@ -128,21 +132,8 @@ export default async function handler(
       responseTimeMs: responseTime,
       checks,
       performance: Object.keys(performance).length > 0 ? performance : undefined,
-    });
-
-  } catch (error) {
-    logger.error('Health check failed', error as Error, {
-      component: 'health',
-    });
-
-    res.status(503).json({
-      status: 'error',
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-      environment: process.env.NODE_ENV || 'unknown',
-      checks: {
-        api: 'error',
-      },
-    });
-  }
+    }, statusCode, logger);
+    
+    return res.status(response.statusCode).json(response.body);
+  });
 }

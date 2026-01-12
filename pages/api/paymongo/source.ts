@@ -19,6 +19,14 @@ import { toSmallestUnit, validateDepositAmount } from '../../../lib/paymongo/cur
 import type { PayMongoSourceType } from '../../../lib/paymongo/paymongoTypes';
 import { captureError } from '../../../lib/errorTracking';
 import { logger } from '../../../lib/structuredLogger';
+import { 
+  withErrorHandling, 
+  validateMethod, 
+  validateBody,
+  createErrorResponse,
+  createSuccessResponse,
+  ErrorType 
+} from '../../../lib/apiErrorHandler';
 
 // ============================================================================
 // TYPES
@@ -85,22 +93,37 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<CreateSourceResponse>
 ): Promise<void> {
-  // Only allow POST
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', ['POST']);
-    res.status(405).json({ success: false, error: 'Method not allowed' });
-    return;
-  }
-  
-  try {
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    // Validate HTTP method
+    validateMethod(req, ['POST'], logger);
+    
+    // Validate required body fields
+    validateBody(req, ['amount', 'type', 'userId', 'email'], logger);
+    
     const body = req.body as CreateSourceBody;
     
-    // Validate request
+    // Additional validation using custom validator
     const validation = validateRequest(body);
     if (!validation.valid) {
-      res.status(400).json({ success: false, error: validation.error });
-      return;
+      const errorResponse = createErrorResponse(
+        ErrorType.VALIDATION,
+        validation.error || 'Invalid request',
+        {},
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({ 
+        success: false, 
+        error: errorResponse.body.message 
+      });
     }
+    
+    logger.info('Creating payment source', {
+      component: 'paymongo',
+      operation: 'createSource',
+      userId: body.userId,
+      type: body.type,
+      amount: body.amount,
+    });
     
     // Convert to centavos
     const amountCentavos = toSmallestUnit(body.amount);
@@ -108,8 +131,16 @@ export default async function handler(
     // Validate amount limits
     const amountValidation = validateDepositAmount(amountCentavos);
     if (!amountValidation.isValid) {
-      res.status(400).json({ success: false, error: amountValidation.error });
-      return;
+      const errorResponse = createErrorResponse(
+        ErrorType.VALIDATION,
+        amountValidation.error || 'Invalid amount',
+        { amount: body.amount, amountCentavos },
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({ 
+        success: false, 
+        error: errorResponse.body.message 
+      });
     }
     
     // Generate reference
@@ -158,28 +189,15 @@ export default async function handler(
       },
     });
     
-    res.status(200).json({
+    const response = createSuccessResponse({
       success: true,
       sourceId: result.sourceId,
       checkoutUrl: result.checkoutUrl,
       transactionId: transaction.id,
-    });
+    }, 200, logger);
     
-  } catch (error) {
-    const err = error instanceof Error ? error : new Error('Unknown error');
-    logger.error('Payment source creation error', err, {
-      component: 'paymongo',
-      operation: 'createSource',
-    });
-    await captureError(err, {
-      tags: { component: 'paymongo', operation: 'createSource' },
-    });
-    
-    res.status(500).json({
-      success: false,
-      error: err.message || 'Failed to create payment source',
-    });
-  }
+    return res.status(response.statusCode).json(response.body);
+  });
 }
 
 // ============================================================================

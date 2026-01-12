@@ -1,6 +1,13 @@
 import { processPdfWithAzureVision, processMultiplePdfPages } from '../../../lib/pdfProcessor';
 import { RateLimiter } from '../../../lib/rateLimiter';
 import { logger } from '../../../lib/structuredLogger.js';
+import { 
+  withErrorHandling, 
+  validateMethod,
+  createErrorResponse,
+  createSuccessResponse,
+  ErrorType 
+} from '../../../lib/apiErrorHandler.js';
 
 export const config = {
   api: {
@@ -18,16 +25,21 @@ const rateLimiter = new RateLimiter({
 });
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
-  try {
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    // Validate HTTP method
+    validateMethod(req, ['POST'], logger);
+    
     // Rate limiting
     const rateLimitResult = await rateLimiter.check(req);
     if (!rateLimitResult.allowed) {
-      return res.status(429).json({
-        error: 'Too many PDF processing requests',
+      const errorResponse = createErrorResponse(
+        ErrorType.RATE_LIMIT,
+        'Too many PDF processing requests',
+        { retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000) },
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({
+        error: errorResponse.body.message,
         retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000),
       });
     }
@@ -64,21 +76,13 @@ export default async function handler(req, res) {
       result = await processPdfWithAzureVision(pdfPath, page, finalAnalysisType);
     }
 
-    res.status(200).json({ 
-      success: true, 
+    const response = createSuccessResponse({
+      success: true,
       result,
       analysisType: finalAnalysisType,
-      source: 'Clay Projections PDF'
-    });
-
-  } catch (error) {
-    logger.error('Clay PDF processing error', error, {
-      component: 'azure-vision',
-      operation: 'clay-pdf',
-    });
-    res.status(500).json({ 
-      error: 'Failed to process Clay PDF',
-      details: error.message 
-    });
-  }
+      source: 'Clay Projections PDF',
+    }, 200, logger);
+    
+    return res.status(response.statusCode).json(response.body);
+  });
 } 

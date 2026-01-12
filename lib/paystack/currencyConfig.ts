@@ -301,6 +301,98 @@ export function calculateTransferFee(
 }
 
 /**
+ * Validate transfer fee against expected ranges
+ * 
+ * Validates that the calculated fee is within expected ranges for the currency
+ * and recipient type. Allows 10% tolerance for future fee changes.
+ * 
+ * @param feeSmallestUnit - Calculated fee in smallest unit
+ * @param amountSmallestUnit - Transfer amount in smallest unit
+ * @param currency - Currency code (NGN, GHS, ZAR, KES)
+ * @param recipientType - Recipient type (bank or mobile_money)
+ * @returns Validation result with expected range
+ */
+export function validateTransferFee(
+  feeSmallestUnit: number,
+  amountSmallestUnit: number,
+  currency: string,
+  recipientType?: 'bank' | 'mobile_money'
+): { isValid: boolean; expectedRange?: { min: number; max: number }; error?: string } {
+  const config = getPaystackCurrencyConfig(currency);
+  const displayAmount = toDisplayAmount(amountSmallestUnit, currency);
+  const feeDisplay = toDisplayAmount(feeSmallestUnit, currency);
+  
+  let expectedMin: number;
+  let expectedMax: number;
+  
+  switch (currency.toUpperCase()) {
+    case 'NGN':
+      // ₦10-₦50 based on amount
+      if (displayAmount <= 5000) {
+        expectedMin = 1000; // ₦10
+        expectedMax = 1000;
+      } else if (displayAmount <= 50000) {
+        expectedMin = 2500; // ₦25
+        expectedMax = 2500;
+      } else {
+        expectedMin = 5000; // ₦50
+        expectedMax = 5000;
+      }
+      break;
+      
+    case 'GHS':
+      // GH₵1 for mobile money, GH₵8 for bank accounts
+      expectedMin = recipientType === 'mobile_money' ? 100 : 800;
+      expectedMax = recipientType === 'mobile_money' ? 100 : 800;
+      break;
+      
+    case 'ZAR':
+      // R3 flat
+      expectedMin = 300; // R3
+      expectedMax = 300;
+      break;
+      
+    case 'KES':
+      // KSh20-KSh60 based on amount
+      if (displayAmount <= 1500) {
+        expectedMin = 2000; // KSh20
+        expectedMax = 2000;
+      } else if (displayAmount <= 20000) {
+        expectedMin = 4000; // KSh40
+        expectedMax = 4000;
+      } else {
+        expectedMin = 6000; // KSh60
+        expectedMax = 6000;
+      }
+      break;
+      
+    default:
+      return {
+        isValid: false,
+        error: `Unsupported currency for fee validation: ${currency}`,
+      };
+  }
+  
+  // Allow 10% tolerance for fee changes
+  const tolerance = expectedMax * 0.1;
+  const minAllowed = Math.max(0, expectedMin - tolerance);
+  const maxAllowed = expectedMax + tolerance;
+  
+  if (feeSmallestUnit < minAllowed || feeSmallestUnit > maxAllowed) {
+    return {
+      isValid: false,
+      expectedRange: { min: expectedMin, max: expectedMax },
+      error: `Fee ${feeDisplay} ${config.symbol} is outside expected range ${toDisplayAmount(expectedMin, currency)}-${toDisplayAmount(expectedMax, currency)} ${config.symbol}`,
+    };
+  }
+  
+  return {
+    isValid: true,
+    expectedRange: { min: expectedMin, max: expectedMax },
+  };
+}
+
+/**
  * Calculate transaction fee (for deposits)
  * 
  * Nigeria:

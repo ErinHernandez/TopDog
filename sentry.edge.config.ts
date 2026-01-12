@@ -13,7 +13,7 @@ const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 if (SENTRY_DSN) {
   Sentry.init({
     dsn: SENTRY_DSN,
-    environment: process.env.NODE_ENV || 'development',
+    environment: process.env.VERCEL_ENV || process.env.NODE_ENV || 'development',
     
     // Lower sample rate for edge (higher volume)
     tracesSampleRate: IS_PRODUCTION ? 0.05 : 0.5,

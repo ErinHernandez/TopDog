@@ -63,13 +63,14 @@
 
 ### Error Tracking
 - **[TIER1_ERROR_TRACKING_SETUP.md](TIER1_ERROR_TRACKING_SETUP.md)** - Sentry setup guide
+- **[docs/SENTRY_ALERTS_SETUP.md](docs/SENTRY_ALERTS_SETUP.md)** - Sentry alerts configuration guide
 
 ### CI/CD
 - **[TIER1_CICD_SETUP.md](TIER1_CICD_SETUP.md)** - GitHub Actions setup
 - **[GITHUB_ACTIONS_EXPLAINED.md](GITHUB_ACTIONS_EXPLAINED.md)** - How GitHub Actions works
 
 ### Monitoring
-- **[docs/MONITORING_SETUP.md](docs/MONITORING_SETUP.md)** - Uptime monitoring setup
+- **[docs/MONITORING_SETUP.md](docs/MONITORING_SETUP.md)** - Uptime monitoring setup (includes Vercel Logs)
 
 ### Testing
 - **[TIER1_TESTING_GUIDE.md](TIER1_TESTING_GUIDE.md)** - Testing guide
@@ -80,6 +81,9 @@
 ## 📚 Technical Documentation
 
 ### API Development
+- **[API_STANDARDIZATION_MASTER.md](API_STANDARDIZATION_MASTER.md)** - ⭐ **MASTER DOCUMENT** - Complete API standardization summary
+- **[API_STANDARDIZATION_COMPLETE.md](API_STANDARDIZATION_COMPLETE.md)** - API standardization completion report
+- **[API_STANDARDIZATION_PROGRESS.md](API_STANDARDIZATION_PROGRESS.md)** - API standardization progress tracking
 - **[docs/API_ROUTE_TEMPLATE.md](docs/API_ROUTE_TEMPLATE.md)** - API route creation guide
 - **[docs/API_VERSIONING_POLICY.md](docs/API_VERSIONING_POLICY.md)** - API versioning policy
 - **[pages/api/_template.ts](pages/api/_template.ts)** - API route template file
@@ -116,9 +120,10 @@
 - `TIER1_TIER2_COMPLETE_FINAL_REPORT.md` - Final report
 
 ### Setup & Configuration
-- `TIER1_ERROR_TRACKING_SETUP.md` - Sentry
+- `TIER1_ERROR_TRACKING_SETUP.md` - Sentry setup
+- `docs/SENTRY_ALERTS_SETUP.md` - Sentry alerts configuration
 - `TIER1_CICD_SETUP.md` - CI/CD
-- `docs/MONITORING_SETUP.md` - Monitoring
+- `docs/MONITORING_SETUP.md` - Monitoring (UptimeRobot, Vercel Logs)
 
 ### Development Guides
 - `docs/API_ROUTE_TEMPLATE.md` - API routes
@@ -142,6 +147,7 @@
 ### Need to...
 - **Create a new API route?** → `docs/API_ROUTE_TEMPLATE.md`
 - **Set up error tracking?** → `TIER1_ERROR_TRACKING_SETUP.md`
+- **Configure Sentry alerts?** → `docs/SENTRY_ALERTS_SETUP.md`
 - **Set up monitoring?** → `docs/MONITORING_SETUP.md`
 - **Understand the transformation?** → `ENTERPRISE_GRADE_COMPLETE_SUMMARY.md`
 - **See what's next?** → `NEXT_STEPS_AND_QUICK_WINS.md`

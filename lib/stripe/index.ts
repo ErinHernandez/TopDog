@@ -38,6 +38,12 @@ export {
   findTransactionByPaymentIntent,
   findTransactionByTransfer,
   
+  // Webhook event tracking
+  findEventByStripeId,
+  markEventAsProcessed,
+  markEventAsFailed,
+  createOrUpdateWebhookEvent,
+  
   // Balance operations
   updateUserBalance,
   

@@ -15,6 +15,14 @@ import { createScopedLogger } from '../../../lib/serverLogger';
 import { withAuth, verifyUserAccess } from '../../../lib/apiAuth';
 import { createPaymentRateLimiter, withRateLimit } from '../../../lib/rateLimitConfig';
 import { sanitizeID } from '../../../lib/inputSanitization';
+import { 
+  withErrorHandling, 
+  validateMethod, 
+  validateQueryParams,
+  createSuccessResponse,
+  createErrorResponse,
+  ErrorType 
+} from '../../../lib/apiErrorHandler';
 
 const logger = createScopedLogger('[API:PendingPayments]');
 
@@ -152,62 +160,80 @@ const handler = async function(
   req: AuthenticatedRequest,
   res: NextApiResponse<ApiResponse>
 ) {
-  // Only allow GET
-  if (req.method !== 'GET') {
-    return res.status(405).json({
-      ok: false,
-      error: {
-        code: 'METHOD_NOT_ALLOWED',
-        message: 'Only GET requests are allowed',
-      },
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    // Validate HTTP method
+    validateMethod(req, ['GET'], logger);
+    
+    // Check rate limit
+    const rateLimitResult = await pendingPaymentsLimiter.check(req);
+    
+    // Set rate limit headers
+    res.setHeader('X-RateLimit-Limit', pendingPaymentsLimiter.config.maxRequests);
+    res.setHeader('X-RateLimit-Remaining', rateLimitResult.remaining);
+    res.setHeader('X-RateLimit-Reset', Math.floor(rateLimitResult.resetAt / 1000));
+    
+    if (!rateLimitResult.allowed) {
+      const errorResponse = createErrorResponse(
+        ErrorType.RATE_LIMIT,
+        'Too many requests. Please try again later.',
+        {},
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({
+        ok: false,
+        error: {
+          code: 'RATE_LIMIT_EXCEEDED',
+          message: errorResponse.body.message,
+        },
+      });
+    }
+    
+    // Validate required query parameters
+    validateQueryParams(req, ['userId'], logger);
+    
+    const { userId } = req.query;
+    
+    // Sanitize and validate input
+    const sanitizedUserId = typeof userId === 'string' ? sanitizeID(userId) : null;
+    
+    // Verify user access
+    if (req.user && sanitizedUserId && !verifyUserAccess(req.user.uid, sanitizedUserId)) {
+      const errorResponse = createErrorResponse(
+        ErrorType.FORBIDDEN,
+        'Access denied',
+        {},
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({
+        ok: false,
+        error: {
+          code: 'FORBIDDEN',
+          message: errorResponse.body.message,
+        },
+      });
+    }
+    
+    if (!sanitizedUserId) {
+      const errorResponse = createErrorResponse(
+        ErrorType.VALIDATION,
+        'userId is required and must be valid',
+        {},
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({
+        ok: false,
+        error: {
+          code: 'INVALID_REQUEST',
+          message: errorResponse.body.message,
+        },
+      });
+    }
+    
+    logger.info('Fetching pending payments', {
+      component: 'stripe',
+      operation: 'pending-payments',
+      userId: sanitizedUserId,
     });
-  }
-  
-  // Check rate limit
-  const rateLimitResult = await pendingPaymentsLimiter.check(req);
-  
-  // Set rate limit headers
-  res.setHeader('X-RateLimit-Limit', pendingPaymentsLimiter.config.maxRequests);
-  res.setHeader('X-RateLimit-Remaining', rateLimitResult.remaining);
-  res.setHeader('X-RateLimit-Reset', Math.floor(rateLimitResult.resetAt / 1000));
-  
-  if (!rateLimitResult.allowed) {
-    return res.status(429).json({
-      ok: false,
-      error: {
-        code: 'RATE_LIMIT_EXCEEDED',
-        message: 'Too many requests. Please try again later.',
-      },
-    });
-  }
-  
-  const { userId } = req.query;
-  
-  // Sanitize and validate input
-  const sanitizedUserId = typeof userId === 'string' ? sanitizeID(userId) : null;
-  
-  // Verify user access
-  if (req.user && sanitizedUserId && !verifyUserAccess(req.user.uid, sanitizedUserId)) {
-    return res.status(403).json({
-      ok: false,
-      error: {
-        code: 'FORBIDDEN',
-        message: 'Access denied',
-      },
-    });
-  }
-  
-  if (!sanitizedUserId) {
-    return res.status(400).json({
-      ok: false,
-      error: {
-        code: 'INVALID_REQUEST',
-        message: 'userId is required and must be valid',
-      },
-    });
-  }
-  
-  try {
     logger.debug('Fetching pending payments', { userId: sanitizedUserId });
     
     // First, get user's Stripe customer ID from Firebase
@@ -261,22 +287,13 @@ const handler = async function(
       count: pendingPayments.length,
     });
     
-    return res.status(200).json({
+    const response = createSuccessResponse({
       ok: true,
       data: { payments: pendingPayments },
-    });
+    }, 200, logger);
     
-  } catch (error) {
-    logger.error('Error fetching pending payments', { userId: sanitizedUserId, error });
-    
-    return res.status(500).json({
-      ok: false,
-      error: {
-        code: 'INTERNAL_ERROR',
-        message: 'Failed to fetch pending payments',
-      },
-    });
-  }
+    return res.status(response.statusCode).json(response.body);
+  });
 };
 
 // Export with authentication and rate limiting

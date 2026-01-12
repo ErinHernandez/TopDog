@@ -16,8 +16,15 @@ import {
   generateReference,
 } from '../../../lib/paymongo';
 import { toSmallestUnit, validateWithdrawalAmount, toDisplayAmount } from '../../../lib/paymongo/currencyConfig';
-import { captureError } from '../../../lib/errorTracking';
-import { logger } from '../../../lib/structuredLogger';
+import { 
+  withErrorHandling,
+  validateMethod,
+  validateBody,
+  createSuccessResponse,
+  createErrorResponse,
+  ErrorType,
+  type ScopedLogger,
+} from '../../../lib/apiErrorHandler';
 import { db } from '../../../lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 
@@ -57,39 +64,70 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<CreatePayoutResponse>
 ): Promise<void> {
-  // Only allow POST
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', ['POST']);
-    res.status(405).json({ success: false, error: 'Method not allowed' });
-    return;
-  }
-  
-  try {
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    validateMethod(req, ['POST'], logger);
+    
+    logger.info('PayMongo payout request', {
+      component: 'paymongo',
+      operation: 'createPayout',
+    });
+    
     const body = req.body as CreatePayoutBody;
     
-    // Validate request
-    if (!body.amount || typeof body.amount !== 'number' || body.amount <= 0) {
-      res.status(400).json({ success: false, error: 'Invalid amount' });
-      return;
+    // Validate required fields
+    validateBody(req, ['amount', 'userId', 'bankAccountId'], logger);
+    
+    // Validate amount type and value
+    if (typeof body.amount !== 'number' || body.amount <= 0) {
+      const response = createErrorResponse(
+        ErrorType.VALIDATION,
+        'Invalid amount. Must be a positive number',
+        { amount: body.amount },
+        logger
+      );
+      return res.status(response.statusCode).json({ 
+        success: false, 
+        error: 'Invalid amount' 
+      });
     }
     
-    if (!body.userId || typeof body.userId !== 'string') {
-      res.status(400).json({ success: false, error: 'User ID is required' });
-      return;
+    // Validate userId type
+    if (typeof body.userId !== 'string') {
+      const response = createErrorResponse(
+        ErrorType.VALIDATION,
+        'User ID must be a string',
+        {},
+        logger
+      );
+      return res.status(response.statusCode).json({ 
+        success: false, 
+        error: 'User ID is required' 
+      });
     }
     
-    if (!body.bankAccountId) {
-      res.status(400).json({ success: false, error: 'Bank account is required' });
-      return;
-    }
+    logger.info('Validating payout request', {
+      component: 'paymongo',
+      operation: 'createPayout',
+      userId: body.userId,
+      amount: body.amount,
+      bankAccountId: body.bankAccountId,
+    });
     
     // Get user balance
     const userRef = doc(db, 'users', body.userId);
     const userDoc = await getDoc(userRef);
     
     if (!userDoc.exists()) {
-      res.status(404).json({ success: false, error: 'User not found' });
-      return;
+      const response = createErrorResponse(
+        ErrorType.NOT_FOUND,
+        'User not found',
+        { userId: body.userId },
+        logger
+      );
+      return res.status(response.statusCode).json({ 
+        success: false, 
+        error: 'User not found' 
+      });
     }
     
     const userData = userDoc.data();
@@ -101,8 +139,21 @@ export default async function handler(
     
     const amountValidation = validateWithdrawalAmount(amountCentavos, balanceCentavos);
     if (!amountValidation.isValid) {
-      res.status(400).json({ success: false, error: amountValidation.error });
-      return;
+      const response = createErrorResponse(
+        ErrorType.VALIDATION,
+        amountValidation.error || 'Invalid withdrawal amount',
+        { 
+          amount: body.amount,
+          amountCentavos,
+          balance: currentBalance,
+          balanceCentavos,
+        },
+        logger
+      );
+      return res.status(response.statusCode).json({ 
+        success: false, 
+        error: amountValidation.error 
+      });
     }
     
     // Get bank account details
@@ -112,31 +163,94 @@ export default async function handler(
     
     if (body.bankAccountId === 'new') {
       if (!body.newBankAccount) {
-        res.status(400).json({ success: false, error: 'New bank account details required' });
-        return;
+        const response = createErrorResponse(
+          ErrorType.VALIDATION,
+          'New bank account details required when bankAccountId is "new"',
+          {},
+          logger
+        );
+        return res.status(response.statusCode).json({ 
+          success: false, 
+          error: 'New bank account details required' 
+        });
+      }
+      
+      // Validate new bank account fields
+      if (!body.newBankAccount.bankCode || !body.newBankAccount.accountNumber || !body.newBankAccount.accountHolderName) {
+        const response = createErrorResponse(
+          ErrorType.VALIDATION,
+          'Bank code, account number, and account holder name are required for new bank accounts',
+          {},
+          logger
+        );
+        return res.status(response.statusCode).json({ 
+          success: false, 
+          error: 'New bank account details required' 
+        });
       }
       
       bankCode = body.newBankAccount.bankCode;
       accountNumber = body.newBankAccount.accountNumber;
       accountHolderName = body.newBankAccount.accountHolderName;
       
+      logger.info('Using new bank account for payout', {
+        component: 'paymongo',
+        operation: 'createPayout',
+        userId: body.userId,
+        saveForFuture: body.newBankAccount.saveForFuture,
+      });
+      
       // TODO: Save for future if requested
+      // Note: This TODO should be addressed in a future update
+      // Implementation would involve saving the bank account to user's saved accounts
     } else {
+      logger.info('Fetching saved bank account', {
+        component: 'paymongo',
+        operation: 'createPayout',
+        userId: body.userId,
+        bankAccountId: body.bankAccountId,
+      });
+      
       const savedAccounts = await getSavedBankAccounts(body.userId);
       const account = savedAccounts.find(a => a.id === body.bankAccountId);
       
       if (!account) {
-        res.status(404).json({ success: false, error: 'Bank account not found' });
-        return;
+        const response = createErrorResponse(
+          ErrorType.NOT_FOUND,
+          'Bank account not found',
+          { userId: body.userId, bankAccountId: body.bankAccountId },
+          logger
+        );
+        return res.status(response.statusCode).json({ 
+          success: false, 
+          error: 'Bank account not found' 
+        });
       }
       
       bankCode = account.bankCode;
       accountNumber = account.accountNumber;
       accountHolderName = account.accountHolderName;
+      
+      logger.info('Using saved bank account for payout', {
+        component: 'paymongo',
+        operation: 'createPayout',
+        userId: body.userId,
+        bankAccountId: body.bankAccountId,
+      });
     }
     
     // Generate reference
     const reference = generateReference('PAY');
+    
+    logger.info('Creating PayMongo payout', {
+      component: 'paymongo',
+      operation: 'createPayout',
+      userId: body.userId,
+      amountCentavos,
+      reference,
+      bankCode,
+      accountNumberMasked: `****${accountNumber.slice(-4)}`,
+    });
     
     // Create payout
     const result = await createPayout({
@@ -151,6 +265,15 @@ export default async function handler(
         firebaseUserId: body.userId,
         reference,
       },
+    });
+    
+    logger.info('PayMongo payout created', {
+      component: 'paymongo',
+      operation: 'createPayout',
+      userId: body.userId,
+      payoutId: result.payoutId,
+      status: result.status,
+      reference,
     });
     
     // Create transaction record
@@ -171,28 +294,24 @@ export default async function handler(
       },
     });
     
-    res.status(200).json({
-      success: true,
+    logger.info('PayMongo payout transaction created', {
+      component: 'paymongo',
+      operation: 'createPayout',
+      userId: body.userId,
       payoutId: result.payoutId,
       transactionId: transaction.id,
       status: result.status,
     });
     
-  } catch (error) {
-    const err = error instanceof Error ? error : new Error('Unknown error');
-    logger.error('Payout creation error', err, {
-      component: 'paymongo',
-      operation: 'createPayout',
-    });
-    await captureError(err, {
-      tags: { component: 'paymongo', operation: 'createPayout' },
-    });
+    const response = createSuccessResponse({
+      success: true,
+      payoutId: result.payoutId,
+      transactionId: transaction.id,
+      status: result.status,
+    }, 200, logger);
     
-    res.status(500).json({
-      success: false,
-      error: err.message || 'Failed to create payout',
-    });
-  }
+    return res.status(response.statusCode).json(response.body);
+  });
 }
 
 

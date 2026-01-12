@@ -39,6 +39,19 @@ import {
 import { initializeApp as initializeClientApp, getApps as getClientApps } from 'firebase/app';
 import { verifyAdminAccess } from '../../../../lib/adminAuth.js';
 import { logger } from '../../../../lib/structuredLogger.js';
+import { sanitizeUsername, sanitizeString } from '../../../../lib/inputSanitization.js';
+import { logSecurityEvent, SecurityEventType, getClientIP } from '../../../../lib/securityLogger.js';
+import { createAuthRateLimiter } from '../../../../lib/rateLimitConfig.js';
+import { withCSRFProtection } from '../../../../lib/csrfProtection.js';
+import { withRateLimit } from '../../../../lib/rateLimitConfig.js';
+import { 
+  withErrorHandling, 
+  validateMethod, 
+  validateBody,
+  createErrorResponse,
+  createSuccessResponse,
+  ErrorType 
+} from '../../../../lib/apiErrorHandler.js';
 
 // Use require for firebase-admin to ensure Turbopack compatibility
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -109,42 +122,43 @@ function generateReservationId(username) {
 // ============================================================================
 
 const handler = async function(req, res) {
-  // Only allow POST
-  if (req.method !== 'POST') {
-    return res.status(405).json({ 
-      error: 'Method not allowed',
-      message: 'Use POST request' 
-    });
-  }
-  
   const clientIP = getClientIP(req);
   
-  // Check rate limit
-  const rateLimitResult = await reserveUsernameLimiter.check(req);
-  
-  // Set rate limit headers
-  res.setHeader('X-RateLimit-Limit', reserveUsernameLimiter.config.maxRequests);
-  res.setHeader('X-RateLimit-Remaining', rateLimitResult.remaining);
-  res.setHeader('X-RateLimit-Reset', Math.floor(rateLimitResult.resetAt / 1000));
-  
-  if (!rateLimitResult.allowed) {
-    await logSecurityEvent(
-      SecurityEventType.RATE_LIMIT_EXCEEDED,
-      'medium',
-      { endpoint: '/api/auth/username/reserve' },
-      null,
-      clientIP
-    );
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    // Validate HTTP method
+    validateMethod(req, ['POST'], logger);
     
-    return res.status(429).json({
-      success: false,
-      error: 'RATE_LIMIT_EXCEEDED',
-      message: 'Too many requests. Please try again later.',
-      retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000),
-    });
-  }
-  
-  try {
+    // Check rate limit
+    const rateLimitResult = await reserveUsernameLimiter.check(req);
+    
+    // Set rate limit headers
+    res.setHeader('X-RateLimit-Limit', reserveUsernameLimiter.config.maxRequests);
+    res.setHeader('X-RateLimit-Remaining', rateLimitResult.remaining);
+    res.setHeader('X-RateLimit-Reset', Math.floor(rateLimitResult.resetAt / 1000));
+    
+    if (!rateLimitResult.allowed) {
+      await logSecurityEvent(
+        SecurityEventType.RATE_LIMIT_EXCEEDED,
+        'medium',
+        { endpoint: '/api/auth/username/reserve' },
+        null,
+        clientIP
+      );
+      
+      const errorResponse = createErrorResponse(
+        ErrorType.RATE_LIMIT,
+        'Too many requests. Please try again later.',
+        { retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000) },
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({
+        success: false,
+        error: 'RATE_LIMIT_EXCEEDED',
+        message: errorResponse.body.message,
+        retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000),
+      });
+    }
+    
     // Verify admin authentication
     const adminCheck = await verifyAdminToken(req.headers.authorization);
     
@@ -160,12 +174,21 @@ const handler = async function(req, res) {
         clientIP
       );
       
-      return res.status(403).json({
+      const errorResponse = createErrorResponse(
+        ErrorType.FORBIDDEN,
+        'Admin access required',
+        {},
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({
         success: false,
         error: 'UNAUTHORIZED',
-        message: 'Admin access required',
+        message: errorResponse.body.message,
       });
     }
+    
+    // Validate required body fields
+    validateBody(req, ['username', 'reservedFor'], logger);
     
     const { 
       username, 
@@ -183,22 +206,42 @@ const handler = async function(req, res) {
       ? Math.max(1, Math.min(365, expiresInDays)) 
       : DEFAULT_EXPIRY_DAYS;
     
-    // Validate request
+    // Additional validation after sanitization
     if (!sanitizedUsername) {
-      return res.status(400).json({
+      const errorResponse = createErrorResponse(
+        ErrorType.VALIDATION,
+        'Username is required and must be valid',
+        {},
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({
         success: false,
         error: 'INVALID_REQUEST',
-        message: 'Username is required',
+        message: errorResponse.body.message,
       });
     }
     
     if (!sanitizedReservedFor) {
-      return res.status(400).json({
+      const errorResponse = createErrorResponse(
+        ErrorType.VALIDATION,
+        'Reserved for (VIP name) is required and must be valid',
+        {},
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({
         success: false,
         error: 'INVALID_REQUEST',
-        message: 'Reserved for (VIP name) is required and must be valid',
+        message: errorResponse.body.message,
       });
     }
+    
+    logger.info('Processing VIP username reservation', {
+      component: 'auth',
+      operation: 'username-reserve',
+      username: sanitizedUsername,
+      reservedFor: sanitizedReservedFor,
+      adminUid: adminCheck.uid,
+    });
     
     const normalizedUsername = sanitizedUsername.toLowerCase().trim();
     
@@ -211,10 +254,16 @@ const handler = async function(req, res) {
     const usersSnapshot = await getDocs(usersQuery);
     
     if (!usersSnapshot.empty) {
+      const errorResponse = createErrorResponse(
+        ErrorType.VALIDATION,
+        'This username is already registered by a user',
+        { username: normalizedUsername },
+        res.getHeader('X-Request-ID') as string
+      );
       return res.status(409).json({
         success: false,
         error: 'USERNAME_TAKEN',
-        message: 'This username is already registered by a user',
+        message: errorResponse.body.message,
       });
     }
     
@@ -228,10 +277,22 @@ const handler = async function(req, res) {
     
     if (!vipSnapshot.empty) {
       const existing = vipSnapshot.docs[0].data();
+      const errorResponse = createErrorResponse(
+        ErrorType.VALIDATION,
+        `Username already reserved for ${existing.reservedFor}`,
+        {
+          existingReservation: {
+            reservedFor: existing.reservedFor,
+            reservedAt: existing.reservedAt?.toDate?.() || existing.reservedAt,
+            expiresAt: existing.expiresAt?.toDate?.() || existing.expiresAt,
+          },
+        },
+        res.getHeader('X-Request-ID') as string
+      );
       return res.status(409).json({
         success: false,
         error: 'ALREADY_RESERVED',
-        message: `Username already reserved for ${existing.reservedFor}`,
+        message: errorResponse.body.message,
         existingReservation: {
           reservedFor: existing.reservedFor,
           reservedAt: existing.reservedAt?.toDate?.() || existing.reservedAt,
@@ -288,7 +349,7 @@ const handler = async function(req, res) {
       clientIP
     );
     
-    return res.status(201).json({
+    const response = createSuccessResponse({
       success: true,
       message: 'Username reserved successfully',
       reservation: {
@@ -298,31 +359,10 @@ const handler = async function(req, res) {
         expiresAt: expiresAt?.toISOString() || null,
         priority,
       },
-    });
+    }, 201, logger);
     
-  } catch (error) {
-    logger.error('Username reservation error', error, {
-      component: 'auth',
-      operation: 'username-reserve',
-    });
-    
-    await logSecurityEvent(
-      SecurityEventType.SUSPICIOUS_ACTIVITY,
-      'medium',
-      { 
-        endpoint: '/api/auth/username/reserve',
-        error: error.message
-      },
-      null,
-      clientIP
-    );
-    
-    return res.status(500).json({
-      success: false,
-      error: 'SERVER_ERROR',
-      message: 'Error reserving username',
-    });
-  }
+    return res.status(response.statusCode).json(response.body);
+  });
 };
 
 // Export with CSRF protection and rate limiting

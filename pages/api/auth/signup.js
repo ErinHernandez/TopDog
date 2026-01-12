@@ -40,6 +40,14 @@ import { initializeApp, getApps } from 'firebase/app';
 import { isApprovedCountry } from '../../../lib/localeCharacters.js';
 import { createSignupLimiter } from '../../../lib/rateLimiter.js';
 import { logger } from '../../../lib/structuredLogger.js';
+import { 
+  withErrorHandling, 
+  validateMethod, 
+  validateBody,
+  createErrorResponse,
+  createSuccessResponse,
+  ErrorType 
+} from '../../../lib/apiErrorHandler.js';
 
 // ============================================================================
 // FIREBASE INITIALIZATION
@@ -138,16 +146,12 @@ function validateUsername(username) {
 // ============================================================================
 
 export default async function handler(req, res) {
-  const startTime = Date.now();
+  const startTime = Date.now(); // Track start time for timing attack prevention
   
-  if (req.method !== 'POST') {
-    return res.status(405).json({ 
-      error: 'Method not allowed',
-      message: 'Use POST request' 
-    });
-  }
-  
-  try {
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    // Validate HTTP method
+    validateMethod(req, ['POST'], logger);
+    
     // Step 0: Rate limiting
     const rateLimitResult = await rateLimiter.check(req);
     
@@ -163,13 +167,22 @@ export default async function handler(req, res) {
         await new Promise(resolve => setTimeout(resolve, MIN_RESPONSE_TIME_MS - elapsed));
       }
       
-      return res.status(429).json({
+      const errorResponse = createErrorResponse(
+        ErrorType.RATE_LIMIT,
+        'Too many signup attempts. Please try again later.',
+        { retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000) },
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({
         success: false,
         error: 'RATE_LIMIT_EXCEEDED',
-        message: 'Too many signup attempts. Please try again later.',
-        retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000), // seconds
+        message: errorResponse.body.message,
+        retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000),
       });
     }
+    
+    // Validate required body fields
+    validateBody(req, ['uid', 'username'], logger);
     
     const { 
       uid, 
@@ -179,20 +192,13 @@ export default async function handler(req, res) {
       displayName 
     } = req.body;
     
-    // Validate UID
-    if (!uid || typeof uid !== 'string') {
-      // Ensure consistent timing
-      const elapsed = Date.now() - startTime;
-      if (elapsed < MIN_RESPONSE_TIME_MS) {
-        await new Promise(resolve => setTimeout(resolve, MIN_RESPONSE_TIME_MS - elapsed));
-      }
-      
-      return res.status(400).json({
-        success: false,
-        error: 'INVALID_REQUEST',
-        message: 'Invalid request',
-      });
-    }
+    logger.info('Processing user signup', {
+      component: 'auth',
+      operation: 'signup',
+      uid,
+      username,
+      countryCode,
+    });
     
     // Validate country
     if (!isApprovedCountry(countryCode)) {
@@ -202,10 +208,16 @@ export default async function handler(req, res) {
         await new Promise(resolve => setTimeout(resolve, MIN_RESPONSE_TIME_MS - elapsed));
       }
       
-      return res.status(403).json({
+      const errorResponse = createErrorResponse(
+        ErrorType.FORBIDDEN,
+        'This service is not available in your country',
+        { countryCode },
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({
         success: false,
         error: 'COUNTRY_NOT_ALLOWED',
-        message: 'This service is not available in your country',
+        message: errorResponse.body.message,
       });
     }
     
@@ -219,10 +231,16 @@ export default async function handler(req, res) {
         await new Promise(resolve => setTimeout(resolve, MIN_RESPONSE_TIME_MS - elapsed));
       }
       
-      return res.status(400).json({
+      const errorResponse = createErrorResponse(
+        ErrorType.VALIDATION,
+        'Username unavailable',
+        { errors: validation.errors },
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({
         success: false,
         error: 'INVALID_USERNAME',
-        message: 'Username unavailable',
+        message: errorResponse.body.message,
         errors: validation.errors,
       });
     }
@@ -230,35 +248,37 @@ export default async function handler(req, res) {
     const normalizedUsername = validation.normalized;
     
     // Use transaction for atomic operations
-    const result = await runTransaction(db, async (transaction) => {
-      // Check if username exists
-      const usersQuery = query(
-        collection(db, 'users'),
-        where('username', '==', normalizedUsername)
-      );
-      const usersSnapshot = await getDocs(usersQuery);
-      
-      if (!usersSnapshot.empty) {
-        throw new Error('USERNAME_TAKEN');
-      }
-      
-      // Check VIP reservation
-      const vipQuery = query(
-        collection(db, 'vip_reservations'),
-        where('usernameLower', '==', normalizedUsername),
-        where('claimed', '==', false)
-      );
-      const vipSnapshot = await getDocs(vipQuery);
-      
-      if (!vipSnapshot.empty) {
-        const reservation = vipSnapshot.docs[0].data();
-        const expiresAt = reservation.expiresAt?.toDate?.() || reservation.expiresAt;
+    let result;
+    try {
+      result = await runTransaction(db, async (transaction) => {
+        // Check if username exists
+        const usersQuery = query(
+          collection(db, 'users'),
+          where('username', '==', normalizedUsername)
+        );
+        const usersSnapshot = await getDocs(usersQuery);
         
-        // Check if not expired
-        if (!expiresAt || new Date(expiresAt) > new Date()) {
-          throw new Error('USERNAME_VIP_RESERVED');
+        if (!usersSnapshot.empty) {
+          throw new Error('USERNAME_TAKEN');
         }
-      }
+        
+        // Check VIP reservation
+        const vipQuery = query(
+          collection(db, 'vip_reservations'),
+          where('usernameLower', '==', normalizedUsername),
+          where('claimed', '==', false)
+        );
+        const vipSnapshot = await getDocs(vipQuery);
+        
+        if (!vipSnapshot.empty) {
+          const reservation = vipSnapshot.docs[0].data();
+          const expiresAt = reservation.expiresAt?.toDate?.() || reservation.expiresAt;
+          
+          // Check if not expired
+          if (!expiresAt || new Date(expiresAt) > new Date()) {
+            throw new Error('USERNAME_VIP_RESERVED');
+          }
+        }
       
       // Create user profile
       const userProfile = {
@@ -287,10 +307,43 @@ export default async function handler(req, res) {
       const userRef = doc(db, 'users', uid);
       transaction.set(userRef, userProfile);
       
-      return userProfile;
-    });
+        return userProfile;
+      });
+    } catch (transactionError) {
+      // Handle specific transaction errors with consistent timing
+      const elapsed = Date.now() - startTime;
+      if (elapsed < MIN_RESPONSE_TIME_MS) {
+        await new Promise(resolve => setTimeout(resolve, MIN_RESPONSE_TIME_MS - elapsed));
+      }
+      
+      // Handle specific errors with generic messages to prevent enumeration
+      if (transactionError.message === 'USERNAME_TAKEN') {
+        return res.status(409).json({
+          success: false,
+          error: 'USERNAME_TAKEN',
+          message: 'Username unavailable',
+        });
+      }
+      
+      if (transactionError.message === 'USERNAME_VIP_RESERVED') {
+        return res.status(403).json({
+          success: false,
+          error: 'USERNAME_VIP_RESERVED',
+          message: 'Username unavailable',
+        });
+      }
+      
+      // Re-throw other errors to let withErrorHandling handle them
+      throw transactionError;
+    }
     
-    return res.status(201).json({
+    // Ensure consistent timing before success response
+    const elapsed = Date.now() - startTime;
+    if (elapsed < MIN_RESPONSE_TIME_MS) {
+      await new Promise(resolve => setTimeout(resolve, MIN_RESPONSE_TIME_MS - elapsed));
+    }
+    
+    const response = createSuccessResponse({
       success: true,
       message: 'User profile created successfully',
       profile: {
@@ -299,42 +352,9 @@ export default async function handler(req, res) {
         displayName: result.displayName,
         countryCode: result.countryCode,
       },
-    });
+    }, 201, logger);
     
-  } catch (error) {
-    logger.error('Signup error', error, {
-      component: 'auth',
-      operation: 'signup',
-    });
-    
-    // Ensure consistent timing even on errors
-    const elapsed = Date.now() - startTime;
-    if (elapsed < MIN_RESPONSE_TIME_MS) {
-      await new Promise(resolve => setTimeout(resolve, MIN_RESPONSE_TIME_MS - elapsed));
-    }
-    
-    // Handle specific errors with generic messages to prevent enumeration
-    if (error.message === 'USERNAME_TAKEN') {
-      return res.status(409).json({
-        success: false,
-        error: 'USERNAME_TAKEN',
-        message: 'Username unavailable',
-      });
-    }
-    
-    if (error.message === 'USERNAME_VIP_RESERVED') {
-      return res.status(403).json({
-        success: false,
-        error: 'USERNAME_VIP_RESERVED',
-        message: 'Username unavailable',
-      });
-    }
-    
-    return res.status(500).json({
-      success: false,
-      error: 'SERVER_ERROR',
-      message: 'Error creating user profile',
-    });
-  }
+    return res.status(response.statusCode).json(response.body);
+  });
 }
 

@@ -42,6 +42,14 @@ import { checkUsernameAvailability } from '../../../../lib/usernameValidation.js
 import { usernameChangePolicy } from '../../../../lib/usernameChangePolicy.js';
 import { createSignupLimiter } from '../../../../lib/rateLimiter.js';
 import { logger } from '../../../../lib/structuredLogger.js';
+import { 
+  withErrorHandling, 
+  validateMethod, 
+  validateBody,
+  createErrorResponse,
+  createSuccessResponse,
+  ErrorType 
+} from '../../../../lib/apiErrorHandler.js';
 
 // Use require for firebase-admin to ensure Turbopack compatibility
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -165,17 +173,13 @@ async function verifyAuth(authHeader) {
 // ============================================================================
 
 const handler = async function(req, res) {
-  const startTime = Date.now();
+  const startTime = Date.now(); // Track start time for timing attack prevention
   const clientIP = getClientIP(req);
   
-  if (req.method !== 'POST') {
-    return res.status(405).json({ 
-      error: 'Method not allowed',
-      message: 'Use POST request' 
-    });
-  }
-  
-  try {
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    // Validate HTTP method
+    validateMethod(req, ['POST'], logger);
+    
     // Step 0: Rate limiting
     const rateLimitResult = await rateLimiter.check(req);
     
@@ -190,10 +194,16 @@ const handler = async function(req, res) {
         await new Promise(resolve => setTimeout(resolve, MIN_RESPONSE_TIME_MS - elapsed));
       }
       
-      return res.status(429).json({
+      const errorResponse = createErrorResponse(
+        ErrorType.RATE_LIMIT,
+        'Too many requests. Please try again later.',
+        { retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000) },
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({
         success: false,
         error: 'RATE_LIMIT_EXCEEDED',
-        message: 'Too many requests. Please try again later.',
+        message: errorResponse.body.message,
         retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000),
       });
     }
@@ -206,31 +216,47 @@ const handler = async function(req, res) {
         endpoint: '/api/auth/username/change',
       });
       
-      return res.status(401).json({
+      const errorResponse = createErrorResponse(
+        ErrorType.UNAUTHORIZED,
+        authResult.error || 'Authentication required',
+        {},
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({
         success: false,
         error: 'UNAUTHORIZED',
-        message: authResult.error || 'Authentication required',
+        message: errorResponse.body.message,
       });
     }
+    
+    // Validate required body fields
+    validateBody(req, ['newUsername'], logger);
     
     const { newUsername, countryCode = 'US' } = req.body;
     
-    // Step 2: Validate request
-    if (!newUsername || typeof newUsername !== 'string') {
-      return res.status(400).json({
-        success: false,
-        error: 'INVALID_REQUEST',
-        message: 'New username is required',
-      });
-    }
+    logger.info('Processing username change', {
+      component: 'auth',
+      operation: 'username-change',
+      userId: authResult.uid,
+      newUsername,
+    });
     
     // Step 3: Check cooldown policy
     const canChange = await usernameChangePolicy.canChangeUsername(authResult.uid);
     if (!canChange.allowed) {
-      return res.status(403).json({
+      const errorResponse = createErrorResponse(
+        ErrorType.FORBIDDEN,
+        canChange.reason || 'Username change cooldown is active',
+        {
+          retryAfterDays: canChange.retryAfterDays,
+          retryAfterDate: canChange.retryAfterDate?.toISOString(),
+        },
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({
         success: false,
         error: 'COOLDOWN_ACTIVE',
-        message: canChange.reason || 'Username change cooldown is active',
+        message: errorResponse.body.message,
         retryAfterDays: canChange.retryAfterDays,
         retryAfterDate: canChange.retryAfterDate?.toISOString(),
       });
@@ -239,10 +265,16 @@ const handler = async function(req, res) {
     // Step 4: Validate new username format
     const validation = validateUsername(newUsername, countryCode);
     if (!validation.isValid) {
-      return res.status(400).json({
+      const errorResponse = createErrorResponse(
+        ErrorType.VALIDATION,
+        'Username unavailable',
+        { errors: validation.errors },
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({
         success: false,
         error: 'INVALID_USERNAME',
-        message: 'Username unavailable',
+        message: errorResponse.body.message,
         errors: validation.errors,
       });
     }
@@ -252,10 +284,16 @@ const handler = async function(req, res) {
     // Step 5: Check if new username is available
     const availability = await checkUsernameAvailability(normalizedNewUsername);
     if (!availability.isAvailable) {
+      const errorResponse = createErrorResponse(
+        ErrorType.VALIDATION,
+        'Username unavailable',
+        { suggestions: availability.suggestions },
+        res.getHeader('X-Request-ID') as string
+      );
       return res.status(409).json({
         success: false,
         error: 'USERNAME_TAKEN',
-        message: 'Username unavailable',
+        message: errorResponse.body.message,
         suggestions: availability.suggestions,
       });
     }
@@ -265,10 +303,16 @@ const handler = async function(req, res) {
     const userDoc = await getDoc(userRef);
     
     if (!userDoc.exists()) {
-      return res.status(404).json({
+      const errorResponse = createErrorResponse(
+        ErrorType.NOT_FOUND,
+        'User not found',
+        { userId: authResult.uid },
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({
         success: false,
         error: 'USER_NOT_FOUND',
-        message: 'User not found',
+        message: errorResponse.body.message,
       });
     }
     
@@ -277,10 +321,16 @@ const handler = async function(req, res) {
     
     // Step 7: Check if username is actually changing
     if (oldUsername === normalizedNewUsername) {
-      return res.status(400).json({
+      const errorResponse = createErrorResponse(
+        ErrorType.VALIDATION,
+        'New username is the same as current username',
+        {},
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({
         success: false,
         error: 'NO_CHANGE',
-        message: 'New username is the same as current username',
+        message: errorResponse.body.message,
       });
     }
     
@@ -288,46 +338,80 @@ const handler = async function(req, res) {
     // Note: Username availability was already checked above.
     // We can't query inside transactions, so we rely on the pre-check.
     // The transaction ensures atomicity of the user document update.
-    await runTransaction(db, async (transaction) => {
-      // Re-read user document to get latest data
-      const currentUserDoc = await transaction.get(userRef);
-      if (!currentUserDoc.exists()) {
-        throw new Error('USER_NOT_FOUND');
+    try {
+      await runTransaction(db, async (transaction) => {
+        // Re-read user document to get latest data
+        const currentUserDoc = await transaction.get(userRef);
+        if (!currentUserDoc.exists()) {
+          throw new Error('USER_NOT_FOUND');
+        }
+        
+        const currentUserData = currentUserDoc.data();
+        
+        // Double-check username hasn't changed (defense against race conditions)
+        if (currentUserData.username !== oldUsername) {
+          throw new Error('USERNAME_CHANGED');
+        }
+        
+        // Update user profile
+        const currentChangeCount = currentUserData.usernameChangeCount || 0;
+        transaction.update(userRef, {
+          username: normalizedNewUsername,
+          previousUsername: oldUsername,
+          lastUsernameChange: serverTimestamp(),
+          usernameChangeCount: currentChangeCount + 1,
+          updatedAt: serverTimestamp(),
+        });
+        
+        // Create audit record
+        const auditRef = doc(collection(db, 'username_change_audit'), `${authResult.uid}_${Date.now()}`);
+        transaction.set(auditRef, {
+          uid: authResult.uid,
+          oldUsername,
+          newUsername: normalizedNewUsername,
+          changeType: 'user_request',
+          changedBy: authResult.uid,
+          changedAt: serverTimestamp(),
+          reason: 'User requested username change',
+          metadata: {
+            changeCount: currentChangeCount + 1,
+            countryCode,
+          },
+        });
+      });
+    } catch (transactionError) {
+      // Handle specific transaction errors
+      if (transactionError.message === 'USERNAME_CHANGED') {
+        const errorResponse = createErrorResponse(
+          ErrorType.VALIDATION,
+          'Username was changed by another process. Please refresh and try again.',
+          {},
+          res.getHeader('X-Request-ID') as string
+        );
+        return res.status(409).json({
+          success: false,
+          error: 'USERNAME_CHANGED',
+          message: errorResponse.body.message,
+        });
       }
       
-      const currentUserData = currentUserDoc.data();
-      
-      // Double-check username hasn't changed (defense against race conditions)
-      if (currentUserData.username !== oldUsername) {
-        throw new Error('USERNAME_CHANGED');
+      if (transactionError.message === 'USER_NOT_FOUND') {
+        const errorResponse = createErrorResponse(
+          ErrorType.NOT_FOUND,
+          'User not found',
+          { userId: authResult.uid },
+          res.getHeader('X-Request-ID') as string
+        );
+        return res.status(errorResponse.statusCode).json({
+          success: false,
+          error: 'USER_NOT_FOUND',
+          message: errorResponse.body.message,
+        });
       }
       
-      // Update user profile
-      const currentChangeCount = currentUserData.usernameChangeCount || 0;
-      transaction.update(userRef, {
-        username: normalizedNewUsername,
-        previousUsername: oldUsername,
-        lastUsernameChange: serverTimestamp(),
-        usernameChangeCount: currentChangeCount + 1,
-        updatedAt: serverTimestamp(),
-      });
-      
-      // Create audit record
-      const auditRef = doc(collection(db, 'username_change_audit'), `${authResult.uid}_${Date.now()}`);
-      transaction.set(auditRef, {
-        uid: authResult.uid,
-        oldUsername,
-        newUsername: normalizedNewUsername,
-        changeType: 'user_request',
-        changedBy: authResult.uid,
-        changedAt: serverTimestamp(),
-        reason: 'User requested username change',
-        metadata: {
-          changeCount: currentChangeCount + 1,
-          countryCode,
-        },
-      });
-    });
+      // Re-throw other errors to let withErrorHandling handle them
+      throw transactionError;
+    }
     
     // Step 9: Get updated cooldown info
     const cooldownInfo = await usernameChangePolicy.getCooldownInfo(authResult.uid);
@@ -339,7 +423,7 @@ const handler = async function(req, res) {
       newUsername: normalizedNewUsername,
     });
     
-    return res.status(200).json({
+    const response = createSuccessResponse({
       success: true,
       message: 'Username changed successfully',
       username: normalizedNewUsername,
@@ -348,44 +432,10 @@ const handler = async function(req, res) {
         cooldownDays: cooldownInfo.cooldownDays,
         retryAfterDate: cooldownInfo.retryAfterDate?.toISOString(),
       },
-    });
+    }, 200, logger);
     
-  } catch (error) {
-    logger.error('Username change error', error, {
-      component: 'auth',
-      operation: 'username-change',
-    });
-    
-    if (error.message === 'USERNAME_TAKEN') {
-      return res.status(409).json({
-        success: false,
-        error: 'USERNAME_TAKEN',
-        message: 'Username unavailable',
-      });
-    }
-    
-    if (error.message === 'USERNAME_CHANGED') {
-      return res.status(409).json({
-        success: false,
-        error: 'USERNAME_CHANGED',
-        message: 'Username was changed by another process. Please refresh and try again.',
-      });
-    }
-    
-    if (error.message === 'USER_NOT_FOUND') {
-      return res.status(404).json({
-        success: false,
-        error: 'USER_NOT_FOUND',
-        message: 'User not found',
-      });
-    }
-    
-    return res.status(500).json({
-      success: false,
-      error: 'SERVER_ERROR',
-      message: 'Error changing username',
-    });
-  }
+    return res.status(response.statusCode).json(response.body);
+  });
 };
 
 // Export with CSRF protection

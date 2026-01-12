@@ -35,6 +35,14 @@ import {
 import { initializeApp, getApps } from 'firebase/app';
 import { RateLimiter } from '../../../../lib/rateLimiter';
 import { logger } from '../../../../lib/structuredLogger.js';
+import { 
+  withErrorHandling, 
+  validateMethod, 
+  validateBody,
+  createErrorResponse,
+  createSuccessResponse,
+  ErrorType 
+} from '../../../../lib/apiErrorHandler.js';
 
 // ============================================================================
 // FIREBASE INITIALIZATION
@@ -64,14 +72,10 @@ const rateLimiter = new RateLimiter({
 // ============================================================================
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ 
-      error: 'Method not allowed',
-      message: 'Use POST request' 
-    });
-  }
-  
-  try {
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    // Validate HTTP method
+    validateMethod(req, ['POST'], logger);
+    
     // Rate limiting
     const rateLimitResult = await rateLimiter.check(req);
     
@@ -80,24 +84,31 @@ export default async function handler(req, res) {
     res.setHeader('X-RateLimit-Reset', Math.floor(rateLimitResult.resetAt / 1000));
     
     if (!rateLimitResult.allowed) {
-      return res.status(429).json({
+      const errorResponse = createErrorResponse(
+        ErrorType.RATE_LIMIT,
+        'Too many claim attempts. Please try again later.',
+        { retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000) },
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({
         success: false,
         error: 'RATE_LIMIT_EXCEEDED',
-        message: 'Too many claim attempts. Please try again later.',
+        message: errorResponse.body.message,
         retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000),
       });
     }
     
+    // Validate required body fields
+    validateBody(req, ['username', 'claimToken', 'userId'], logger);
+    
     const { username, claimToken, userId } = req.body;
     
-    // Validate request
-    if (!username || !claimToken || !userId) {
-      return res.status(400).json({
-        success: false,
-        error: 'INVALID_REQUEST',
-        message: 'Username, claim token, and user ID are required',
-      });
-    }
+    logger.info('Processing VIP username claim', {
+      component: 'auth',
+      operation: 'username-claim',
+      username,
+      userId,
+    });
     
     const normalizedUsername = username.toLowerCase().trim();
     
@@ -111,10 +122,16 @@ export default async function handler(req, res) {
     const vipSnapshot = await getDocs(vipQuery);
     
     if (vipSnapshot.empty) {
-      return res.status(404).json({
+      const errorResponse = createErrorResponse(
+        ErrorType.NOT_FOUND,
+        'No reservation found for this username',
+        { username },
+        res.getHeader('X-Request-ID') as string
+      );
+      return res.status(errorResponse.statusCode).json({
         success: false,
         error: 'NOT_FOUND',
-        message: 'No reservation found for this username',
+        message: errorResponse.body.message,
       });
     }
     
@@ -139,10 +156,16 @@ export default async function handler(req, res) {
       
       // Constant-time comparison
       if (!crypto.timingSafeEqual(expectedPadded, providedPadded)) {
-        return res.status(403).json({
+        const errorResponse = createErrorResponse(
+          ErrorType.UNAUTHORIZED,
+          'Invalid claim token',
+          {},
+          res.getHeader('X-Request-ID') as string
+        );
+        return res.status(errorResponse.statusCode).json({
           success: false,
           error: 'INVALID_TOKEN',
-          message: 'Invalid claim token',
+          message: errorResponse.body.message,
         });
       }
     }
@@ -150,10 +173,16 @@ export default async function handler(req, res) {
     // Check if expired
     const expiresAt = reservation.expiresAt?.toDate?.() || reservation.expiresAt;
     if (expiresAt && new Date(expiresAt) < new Date()) {
+      const errorResponse = createErrorResponse(
+        ErrorType.VALIDATION,
+        'This reservation has expired',
+        { username, expiresAt },
+        res.getHeader('X-Request-ID') as string
+      );
       return res.status(410).json({
         success: false,
         error: 'EXPIRED',
-        message: 'This reservation has expired',
+        message: errorResponse.body.message,
       });
     }
     
@@ -179,23 +208,13 @@ export default async function handler(req, res) {
       });
     });
     
-    return res.status(200).json({
+    const response = createSuccessResponse({
       success: true,
       message: `Username "${normalizedUsername}" claimed successfully`,
       username: normalizedUsername,
-    });
+    }, 200, logger);
     
-  } catch (error) {
-    logger.error('Username claim error', error, {
-      component: 'auth',
-      operation: 'username-claim',
-    });
-    
-    return res.status(500).json({
-      success: false,
-      error: 'SERVER_ERROR',
-      message: 'Error claiming username',
-    });
-  }
+    return res.status(response.statusCode).json(response.body);
+  });
 }
 

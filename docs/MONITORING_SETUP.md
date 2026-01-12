@@ -134,6 +134,84 @@ UptimeRobot provides free uptime monitoring with email alerts.
 
 ---
 
+## 3.5 Vercel Logs (Already Available)
+
+Vercel automatically aggregates logs from your application. Your structured logs from `lib/structuredLogger.ts` automatically appear in the Vercel dashboard.
+
+### Accessing Logs
+
+1. **Vercel Dashboard:**
+   - Go to: https://vercel.com/dashboard
+   - Select your project
+   - Click "Logs" tab
+   - Filter by function, environment, or time range
+
+2. **Log Stream:**
+   - Real-time log streaming during development
+   - Filter by log level (info, warn, error, debug)
+   - Search by message content
+
+### Log Format
+
+Your structured JSON logs appear in Vercel with full context:
+- **Timestamp:** ISO 8601 format
+- **Level:** info, warn, error, debug
+- **Message:** Log message from your code
+- **Context:** Additional data from `LogContext` parameter
+- **Error Details:** Stack traces for error logs
+
+**Example Log Entry:**
+```json
+{
+  "timestamp": "2025-01-15T10:30:00.000Z",
+  "level": "info",
+  "message": "User made pick",
+  "component": "DraftRoom",
+  "roomId": "abc123",
+  "userId": "user456",
+  "playerId": "player789"
+}
+```
+
+### Log Retention
+
+- **Free Tier:** 7 days
+- **Pro Tier:** 30 days
+- **Enterprise:** Custom retention (90+ days available)
+
+### Using Logs with Sentry
+
+Vercel logs complement Sentry error tracking:
+- **Sentry:** Error tracking, stack traces, user context, session replay
+- **Vercel Logs:** All application logs (info, debug, etc.), API route logs, function logs
+- **Use both together** for complete observability
+
+**When to use each:**
+- **Sentry:** Critical errors, exceptions, user-impacting issues
+- **Vercel Logs:** Debugging, information logs, performance logs, audit trails
+
+### Example: Searching Logs
+
+In Vercel logs interface, you can search for:
+- **Component:** `component:"Payment"` 
+- **Error level:** `level:"error"`
+- **Message text:** `message:"payment failed"`
+- **User ID:** `userId:"user123"`
+- **Time range:** Use date picker
+
+### Log Best Practices
+
+- Use structured logging consistently (already implemented)
+- Include relevant context in logs
+- Don't log sensitive information (passwords, tokens, etc.)
+- Use appropriate log levels:
+  - **debug:** Development-only details
+  - **info:** Normal operations, user actions
+  - **warn:** Unexpected but non-critical issues
+  - **error:** Errors that need attention
+
+---
+
 ## 4. Advanced Monitoring (Future)
 
 For more comprehensive monitoring, consider:

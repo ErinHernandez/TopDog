@@ -19,10 +19,18 @@ import {
   validatePaystackAmount,
   formatPaystackAmount,
   calculateTransferFee,
+  validateTransferFee,
 } from '../../../../lib/paystack/currencyConfig';
 import type { PaystackTransferRecipient } from '../../../../lib/paystack/paystackTypes';
-import { captureError } from '../../../../lib/errorTracking';
-import { logger } from '../../../../lib/structuredLogger';
+import { 
+  withErrorHandling,
+  validateMethod,
+  validateBody,
+  createSuccessResponse,
+  createErrorResponse,
+  ErrorType,
+  type ScopedLogger,
+} from '../../../../lib/apiErrorHandler';
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp, runTransaction } from 'firebase/firestore';
 import { db } from '../../../../lib/firebase';
 import { getStripeExchangeRate, convertToUSD } from '../../../../lib/stripe/exchangeRates';
@@ -90,15 +98,14 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<InitiateTransferResponse>
 ) {
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST');
-    return res.status(405).json({
-      ok: false,
-      error: { code: 'method_not_allowed', message: 'Only POST is allowed' },
+  return withErrorHandling(req, res, async (req, res, logger) => {
+    validateMethod(req, ['POST'], logger);
+    
+    logger.info('Paystack transfer initiation request', {
+      component: 'paystack',
+      operation: 'transfer-initiate',
     });
-  }
-  
-  try {
+    
     const {
       userId,
       amountSmallestUnit,
@@ -109,50 +116,74 @@ export default async function handler(
       idempotencyKey,
     } = req.body as InitiateTransferRequest;
     
-    // Validation
-    if (!userId) {
-      return res.status(400).json({
-        ok: false,
-        error: { code: 'missing_user_id', message: 'User ID is required' },
-      });
-    }
+    // Validate required fields
+    validateBody(req, ['userId', 'amountSmallestUnit', 'currency', 'recipientCode'], logger);
     
-    if (!amountSmallestUnit || amountSmallestUnit <= 0) {
-      return res.status(400).json({
+    // Validate amount type and value
+    if (typeof amountSmallestUnit !== 'number' || amountSmallestUnit <= 0) {
+      const response = createErrorResponse(
+        ErrorType.VALIDATION,
+        'Valid amount is required. Must be a positive number',
+        { amountSmallestUnit },
+        logger
+      );
+      return res.status(response.statusCode).json({
         ok: false,
         error: { code: 'invalid_amount', message: 'Valid amount is required' },
       });
     }
     
-    if (!currency || !['NGN', 'GHS', 'ZAR', 'KES'].includes(currency.toUpperCase())) {
-      return res.status(400).json({
+    // Validate currency
+    const currencyUpper = currency?.toUpperCase();
+    if (!currencyUpper || !['NGN', 'GHS', 'ZAR', 'KES'].includes(currencyUpper)) {
+      const response = createErrorResponse(
+        ErrorType.VALIDATION,
+        'Valid currency (NGN, GHS, ZAR, KES) is required',
+        { currency },
+        logger
+      );
+      return res.status(response.statusCode).json({
         ok: false,
         error: { code: 'invalid_currency', message: 'Valid currency (NGN, GHS, ZAR, KES) is required' },
       });
     }
     
-    if (!recipientCode) {
-      return res.status(400).json({
-        ok: false,
-        error: { code: 'missing_recipient', message: 'Recipient code is required' },
-      });
-    }
-    
-    // Validate amount
-    const validation = validatePaystackAmount(amountSmallestUnit, currency);
+    // Validate amount using Paystack rules
+    const validation = validatePaystackAmount(amountSmallestUnit, currencyUpper);
     if (!validation.isValid) {
-      return res.status(400).json({
+      const response = createErrorResponse(
+        ErrorType.VALIDATION,
+        validation.error || 'Invalid amount',
+        { amountSmallestUnit, currency: currencyUpper },
+        logger
+      );
+      return res.status(response.statusCode).json({
         ok: false,
         error: { code: 'invalid_amount', message: validation.error || 'Invalid amount' },
       });
     }
+    
+    logger.info('Validating transfer request', {
+      component: 'paystack',
+      operation: 'transfer-initiate',
+      userId,
+      amountSmallestUnit,
+      currency: currencyUpper,
+      recipientCode,
+    });
     
     // Get user data
     const userRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userRef);
     
     if (!userDoc.exists()) {
-      return res.status(404).json({
+      const response = createErrorResponse(
+        ErrorType.NOT_FOUND,
+        'User not found',
+        { userId },
+        logger
+      );
+      return res.status(response.statusCode).json({
         ok: false,
         error: { code: 'user_not_found', message: 'User not found' },
       });
@@ -165,27 +196,88 @@ export default async function handler(
     const recipient = recipients.find(r => r.code === recipientCode);
     
     if (!recipient) {
-      return res.status(400).json({
+      const response = createErrorResponse(
+        ErrorType.VALIDATION,
+        'Recipient not found. Please add a withdrawal method first.',
+        { userId, recipientCode },
+        logger
+      );
+      return res.status(response.statusCode).json({
         ok: false,
         error: { code: 'recipient_not_found', message: 'Recipient not found. Please add a withdrawal method first.' },
       });
     }
     
     // Check currency matches
-    if (recipient.currency.toUpperCase() !== currency.toUpperCase()) {
-      return res.status(400).json({
+    if (recipient.currency.toUpperCase() !== currencyUpper) {
+      const response = createErrorResponse(
+        ErrorType.VALIDATION,
+        `Recipient is for ${recipient.currency}, but withdrawal requested in ${currencyUpper}`,
+        { recipientCurrency: recipient.currency, requestedCurrency: currencyUpper },
+        logger
+      );
+      return res.status(response.statusCode).json({
         ok: false,
         error: {
           code: 'currency_mismatch',
-          message: `Recipient is for ${recipient.currency}, but withdrawal requested in ${currency}`,
+          message: `Recipient is for ${recipient.currency}, but withdrawal requested in ${currencyUpper}`,
         },
       });
     }
     
     // Calculate fee
     const recipientType = recipient.type === 'mobile_money' ? 'mobile_money' : 'bank';
-    const feeSmallestUnit = calculateTransferFee(amountSmallestUnit, currency, recipientType);
+    const feeSmallestUnit = calculateTransferFee(amountSmallestUnit, currencyUpper, recipientType);
+    
+    // Validate transfer fee calculation
+    // Ensure fee is reasonable and matches expected structure
+    if (feeSmallestUnit < 0) {
+      const response = createErrorResponse(
+        ErrorType.VALIDATION,
+        'Invalid transfer fee calculated',
+        { amountSmallestUnit, currency: currencyUpper, recipientType, feeSmallestUnit },
+        logger
+      );
+      return res.status(response.statusCode).json({
+        ok: false,
+        error: { code: 'fee_calculation_error', message: 'Transfer fee calculation failed' },
+      });
+    }
+    
+    // Validate fee against expected ranges for currency using validateTransferFee
+    const feeValidation = validateTransferFee(
+      feeSmallestUnit,
+      amountSmallestUnit,
+      currencyUpper,
+      recipientType
+    );
+    
+    if (!feeValidation.isValid) {
+      logger.warn('Transfer fee outside expected range', {
+        component: 'paystack',
+        operation: 'transfer-initiate',
+        currency: currencyUpper,
+        recipientType,
+        calculatedFee: feeSmallestUnit,
+        expectedRange: feeValidation.expectedRange,
+        amountSmallestUnit,
+        validationError: feeValidation.error,
+      });
+      // Don't fail, but log for monitoring - fees may change
+      // If fee is way outside range (e.g., > 2x expected), could add stricter validation
+    }
+    
     const totalAmountWithFee = amountSmallestUnit + feeSmallestUnit;
+    
+    logger.info('Transfer fee calculated', {
+      component: 'paystack',
+      operation: 'transfer-initiate',
+      currency: currencyUpper,
+      recipientType,
+      amountSmallestUnit,
+      feeSmallestUnit,
+      totalAmountWithFee,
+    });
     
     // Generate reference first (needed for idempotency)
     const reference = idempotencyKey || generateReference('TRF');
@@ -194,21 +286,31 @@ export default async function handler(
     const localAmountDisplay = amountSmallestUnit / 100;
     const localTotalWithFeeDisplay = totalAmountWithFee / 100;
     
+    logger.info('Converting currency to USD for balance debit', {
+      component: 'paystack',
+      operation: 'transfer-initiate',
+      userId,
+      localAmount: localAmountDisplay,
+      localTotalWithFee: localTotalWithFeeDisplay,
+      currency: currencyUpper,
+      feeSmallestUnit,
+    });
+    
     // Convert local currency to USD for balance operations
     // User balance is stored in USD, so we must convert withdrawal amounts
     let exchangeRate: number;
     let usdAmountToDebit: number;
     
     try {
-      const rateData = await getStripeExchangeRate(currency.toUpperCase());
+      const rateData = await getStripeExchangeRate(currencyUpper);
       exchangeRate = rateData.rate;
       usdAmountToDebit = convertToUSD(localTotalWithFeeDisplay, exchangeRate);
       
-      logger.info('Converting currency to USD', {
+      logger.info('Currency conversion successful', {
         component: 'paystack',
         operation: 'transfer-initiate',
         localAmount: localTotalWithFeeDisplay,
-        currency: currency.toUpperCase(),
+        currency: currencyUpper,
         exchangeRate,
         usdAmount: usdAmountToDebit.toFixed(2),
       });
@@ -216,9 +318,15 @@ export default async function handler(
       logger.error('Failed to get exchange rate', error as Error, {
         component: 'paystack',
         operation: 'transfer-initiate',
-        currency: currency.toUpperCase(),
+        currency: currencyUpper,
       });
-      return res.status(500).json({
+      const response = createErrorResponse(
+        ErrorType.EXTERNAL_API,
+        'Unable to process withdrawal: exchange rate unavailable',
+        { currency: currencyUpper },
+        logger
+      );
+      return res.status(response.statusCode).json({
         ok: false,
         error: {
           code: 'exchange_rate_failed',
@@ -228,8 +336,15 @@ export default async function handler(
     }
     
     // TODO: Verify 2FA if enabled
+    // Note: This feature should be implemented when 2FA is fully enabled
     // if (userData.twoFactorEnabled && !twoFactorToken) {
-    //   return res.status(400).json({
+    //   const response = createErrorResponse(
+    //     ErrorType.UNAUTHORIZED,
+    //     'Two-factor authentication is required',
+    //     { userId },
+    //     logger
+    //   );
+    //   return res.status(response.statusCode).json({
     //     ok: false,
     //     error: { code: '2fa_required', message: 'Two-factor authentication is required' },
     //   });
@@ -275,7 +390,14 @@ export default async function handler(
       
       // Check if this is a balance-related error
       if (message.includes('Insufficient balance') || message.includes('already in progress')) {
-        return res.status(400).json({
+        const errorType = message.includes('Insufficient') ? ErrorType.VALIDATION : ErrorType.VALIDATION;
+        const response = createErrorResponse(
+          errorType,
+          message,
+          { userId, usdAmountToDebit },
+          logger
+        );
+        return res.status(response.statusCode).json({
           ok: false,
           error: {
             code: message.includes('Insufficient') ? 'insufficient_balance' : 'withdrawal_in_progress',
@@ -338,7 +460,20 @@ export default async function handler(
         pendingWithdrawalReference: null,
       });
       
-      return res.status(200).json({
+      logger.info('Transfer initiated successfully', {
+        component: 'paystack',
+        operation: 'transfer-initiate',
+        userId,
+        reference,
+        transferCode: result.transferCode,
+        transactionId: transaction.id,
+        status: result.status,
+        amountSmallestUnit,
+        currency: currencyUpper,
+        feeSmallestUnit,
+      });
+      
+      const response = createSuccessResponse({
         ok: true,
         data: {
           reference,
@@ -346,25 +481,44 @@ export default async function handler(
           transactionId: transaction.id,
           status: result.status,
           amountSmallestUnit,
-          currency: currency.toUpperCase(),
-          amountFormatted: formatPaystackAmount(amountSmallestUnit, currency),
+          currency: currencyUpper,
+          amountFormatted: formatPaystackAmount(amountSmallestUnit, currencyUpper),
           feeSmallestUnit,
-          feeFormatted: formatPaystackAmount(feeSmallestUnit, currency),
+          feeFormatted: formatPaystackAmount(feeSmallestUnit, currencyUpper),
           recipient: {
             name: recipient.accountName || recipient.accountNumber,
             accountNumber: recipient.accountNumber,
             bankName: recipient.bankName,
           },
         },
-      });
+      }, 200, logger);
+      
+      return res.status(response.statusCode).json(response.body);
       
     } catch (initiateError) {
       // Restore user balance on failure (add back the USD amount that was debited)
       // Also clear the pending withdrawal reference
+      logger.error('Transfer initiation failed, restoring balance', {
+        component: 'paystack',
+        operation: 'transfer-initiate',
+        userId,
+        reference,
+        error: initiateError instanceof Error ? initiateError.message : 'Unknown error',
+        originalBalance: newBalance,
+        amountToRestore: usdAmountToDebit,
+      });
+      
       await updateDoc(userRef, {
         balance: newBalance + usdAmountToDebit, // Restore the original USD balance
         pendingWithdrawalReference: null,
         lastBalanceUpdate: serverTimestamp(),
+      });
+      
+      logger.info('Balance restored after transfer failure', {
+        component: 'paystack',
+        operation: 'transfer-initiate',
+        userId,
+        restoredBalance: newBalance + usdAmountToDebit,
       });
       
       // Update transaction to failed
@@ -375,26 +529,9 @@ export default async function handler(
         updatedAt: new Date().toISOString(),
       });
       
+      // Re-throw to be handled by withErrorHandling
       throw initiateError;
     }
-    
-  } catch (error) {
-    logger.error('Transfer initiation error', error as Error, {
-      component: 'paystack',
-      operation: 'transfer-initiate',
-      body: req.body,
-    });
-    await captureError(error as Error, {
-      tags: { component: 'paystack', operation: 'transfer-initiate' },
-      extra: { body: req.body },
-    });
-    
-    const message = error instanceof Error ? error.message : 'Transfer failed';
-    
-    return res.status(500).json({
-      ok: false,
-      error: { code: 'transfer_failed', message },
-    });
-  }
+  });
 }
 
