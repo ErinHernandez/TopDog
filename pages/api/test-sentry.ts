@@ -73,21 +73,21 @@ export default async function handler(
       
       // Add context
       scope.setContext('test', {
-        purpose: 'Verify Sentry integration',
-        timestamp: new Date().toISOString(),
-        environment: process.env.NODE_ENV || 'development',
+      purpose: 'Verify Sentry integration',
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development',
         testType: type,
         component: component || undefined,
-      });
+    });
 
       // Add user context
-      Sentry.setUser({
-        id: 'test-user',
-        username: 'test-user',
-      });
+    Sentry.setUser({
+      id: 'test-user',
+      username: 'test-user',
+    });
 
-      // Capture the exception
-      Sentry.captureException(testError);
+    // Capture the exception
+    Sentry.captureException(testError);
     });
 
     // Also log it normally
