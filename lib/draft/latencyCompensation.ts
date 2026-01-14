@@ -42,9 +42,9 @@ export interface LatencyStats {
  * 
  * Sends a ping request and measures round-trip time.
  */
-export async function measureLatency(
+export const measureLatency = async (
   endpoint: string = '/api/health'
-): Promise<LatencyMeasurement> {
+): Promise<LatencyMeasurement> => {
   const startTime = performance.now();
   
   try {
@@ -73,7 +73,7 @@ export async function measureLatency(
       timestamp: Date.now(),
     };
   }
-}
+};
 
 /**
  * Measure latency multiple times and calculate average
@@ -272,4 +272,3 @@ export async function calculateClockOffset(
 // ============================================================================
 
 // All exports are declared inline above (export function/class)
-// No need for explicit export block - would cause "Cannot redeclare exported variable" errors
