@@ -21,6 +21,11 @@ export interface WebVitalsMetric {
 }
 
 export interface PerformanceMetrics {
+  url?: string;
+  userAgent?: string;
+  deviceType?: 'mobile' | 'desktop';
+  timestamp?: string;
+  connectionType?: string;
   lcp?: number | null;
   fid?: number | null;
   cls?: number | null;
