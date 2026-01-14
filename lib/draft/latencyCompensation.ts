@@ -271,11 +271,5 @@ export async function calculateClockOffset(
 // EXPORTS
 // ============================================================================
 
-export {
-  measureLatency,
-  measureAverageLatency,
-  LatencyTracker,
-  compensateTimer,
-  calculateSafeSubmissionTime,
-  calculateClockOffset,
-};
+// All exports are declared inline above (export function/class)
+// No need for explicit export block - would cause "Cannot redeclare exported variable" errors
