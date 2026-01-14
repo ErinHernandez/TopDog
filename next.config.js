@@ -125,8 +125,6 @@ const nextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
-  // Optimize production builds
-  swcMinify: true,
   // Enable compression
   compress: true,
   // Optimize package imports
