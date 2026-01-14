@@ -527,7 +527,7 @@ export function useDraftRoom({
     roomId,
     participants: participants.map(p => ({ id: p.id, name: p.name })),
     maxParticipants: effectiveTeamCount,
-    roomStatus: status,
+    roomStatus: status === 'loading' ? 'waiting' : status === 'complete' ? 'completed' : status as 'waiting' | 'active' | 'paused',
     preDraftCountdown: 0, // TODO: Add pre-draft countdown state if needed
     picksUntilMyTurn,
     isMyTurn,
