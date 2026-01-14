@@ -217,12 +217,5 @@ export async function measureQueryPerformance<T>(
 // EXPORTS
 // ============================================================================
 
-export {
-  buildOptimizedQuery,
-  optimizeDraftPicksQuery,
-  optimizeUserQuery,
-  generateCacheKey,
-  shouldCacheQuery,
-  measureQueryPerformance,
-  connectionConfig,
-};
+// All exports are declared inline above (export function/const)
+// buildOptimizedQuery is exported inline on line 48
