@@ -1113,11 +1113,6 @@ function AddContactModal({ isOpen, onClose, type }: AddContactModalProps): React
       }
 
       setSuccess(true);
-      
-      // Refresh user data if available
-      if (onUpdate) {
-        onUpdate();
-      }
 
       setTimeout(() => {
         onClose();
