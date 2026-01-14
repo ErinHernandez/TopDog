@@ -1072,7 +1072,7 @@ function AddContactModal({ isOpen, onClose, type }: AddContactModalProps): React
         const auth = getAuth();
         if (auth.currentUser) {
           authToken = await auth.currentUser.getIdToken();
-        } else if (!user) {
+        } else {
           throw new Error('User not authenticated');
         }
       } catch (tokenError) {
