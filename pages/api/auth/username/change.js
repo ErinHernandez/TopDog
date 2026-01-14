@@ -41,7 +41,7 @@ import { validateUsername } from '../../../../lib/usernameValidation.js';
 import { checkUsernameAvailability } from '../../../../lib/usernameValidation.js';
 import { usernameChangePolicy } from '../../../../lib/usernameChangePolicy.js';
 import { createSignupLimiter } from '../../../../lib/rateLimiter.js';
-import { logger } from '../../../../lib/structuredLogger.js';
+import { logger } from '../../../../lib/structuredLogger';
 import { 
   withErrorHandling, 
   validateMethod, 

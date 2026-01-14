@@ -32,6 +32,7 @@ import {
   mapXenditStatus,
   getEWalletCharge,
 } from '../../xendit';
+import { requireBaseUrl } from '../../envHelpers';
 import type { XenditBankCode, XenditEWalletChannel } from '../../xendit/xenditTypes';
 
 // ============================================================================
@@ -277,7 +278,7 @@ class XenditProvider implements PaymentProvider {
     }
     
     // Build redirect URLs
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://topdog.gg';
+    const baseUrl = requireBaseUrl();
     const successUrl = request.successUrl || `${baseUrl}/deposit/xendit/callback?status=success`;
     const failureUrl = request.failureUrl || `${baseUrl}/deposit/xendit/callback?status=failed`;
     

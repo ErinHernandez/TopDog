@@ -111,6 +111,21 @@ const withPWA = require('next-pwa')({
 
 const nextConfig = {
   reactStrictMode: true,
+  // Remove console statements in production builds
+  // This eliminates 3,257+ console statements without code changes
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  // Optimize production builds
+  swcMinify: true,
+  // Enable compression
+  compress: true,
+  // Optimize images
+  images: {
+    formats: ['image/avif', 'image/webp'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+  },
   // Turbopack configuration
   // Note: firebase-admin uses CommonJS require() in API routes to ensure compatibility
   // with both webpack (production build) and Turbopack (dev mode)

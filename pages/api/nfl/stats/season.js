@@ -17,7 +17,7 @@
 import { getPlayerSeasonStats } from '../../../../lib/sportsdataio';
 import { transformPlayerStats, FANTASY_POSITIONS } from '../../../../lib/playerModel';
 import { RateLimiter } from '../../../../lib/rateLimiter';
-import { logger } from '../../../../lib/structuredLogger.js';
+import { logger } from '../../../../lib/structuredLogger';
 import { 
   withErrorHandling, 
   validateMethod, 

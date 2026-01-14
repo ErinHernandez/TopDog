@@ -66,12 +66,12 @@ function getStripe(): Stripe {
   if (!STRIPE_SECRET_KEY) {
     throw new Error('STRIPE_SECRET_KEY not configured');
   }
-  if (!stripe) {
+  if (stripe === null) {
     stripe = new Stripe(STRIPE_SECRET_KEY, {
       apiVersion: '2025-07-30.basil',
     });
   }
-  return stripe;
+  return stripe; // stripe is guaranteed to be non-null here
 }
 
 // ============================================================================
@@ -220,42 +220,48 @@ export default async function handler(
       retryCount: existingEvent?.retryCount || 0,
     });
     
-    // Process event
-    const result = await processEvent(event, logger);
-    
-    if (!result.success) {
-      // Log webhook processing failure
-      logger.error('Webhook processing failed', new Error(result.error || 'Unknown error'), {
-        component: 'stripe',
-        operation: 'webhook',
-        eventType: event.type,
+    try {
+      // Process event
+      const result = await processEvent(event, logger);
+      
+      if (!result.success) {
+        // Log webhook processing failure
+        logger.error('Webhook processing failed', new Error(result.error || 'Unknown error'), {
+          component: 'stripe',
+          operation: 'webhook',
+          eventType: event.type,
+          eventId: event.id,
+        });
+        // Still return 200 to prevent retries for handled errors
+      }
+      
+      const successResponse = createSuccessResponse({
+        received: true,
         eventId: event.id,
+        eventType: event.type,
+        ...result,
+      }, 200, logger);
+      
+      return res.status(successResponse.statusCode).json(successResponse.body);
+    } catch (error) {
+      // For webhooks, we must always return 200 to prevent retries
+      // Log the error for investigation but don't let it propagate
+      const err = error as Error;
+      logger.error('Webhook processing error', err, { 
+        component: 'stripe', 
+        operation: 'webhook' 
       });
-      // Still return 200 to prevent retries for handled errors
+      await captureError(err, {
+        tags: { component: 'stripe', operation: 'webhook' },
+      });
+      
+      // Always return 200 to prevent Stripe from retrying
+      // This is a webhook-specific requirement
+      return res.status(200).json({
+        received: true,
+        error: err.message || 'Processing error - logged for investigation',
+      });
     }
-    
-    const successResponse = createSuccessResponse({
-      received: true,
-      eventId: event.id,
-      eventType: event.type,
-      ...result,
-    }, 200, logger);
-    
-    return res.status(successResponse.statusCode).json(successResponse.body);
-  }).catch(async (error) => {
-    // Custom error handler for webhooks: always return 200
-    const err = error as Error;
-    logger.error('Webhook processing error (caught by wrapper)', err, { 
-      component: 'stripe', 
-      operation: 'webhook' 
-    });
-    await captureError(err, {
-      tags: { component: 'stripe', operation: 'webhook' },
-    });
-    return res.status(200).json({
-      received: true,
-      error: err.message || 'Processing error - logged for investigation',
-    });
   });
 }
 

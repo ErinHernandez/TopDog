@@ -29,13 +29,60 @@ module.exports = {
     "!**/cypress/**",
   ],
 
-  // Coverage thresholds - start conservative and increase over time
+  // Coverage thresholds - Risk-Based Coverage (Refined Plan)
+  // Tier 0: Money touches it (95%+) | Tier 1: Security/Auth (90%+) | Tier 2: Core Logic (80%+)
+  // Tier 3: Data Routes (60%+) | Tier 4: UI Components (40%+) | Tier 5: Utilities (Case-by-case)
   coverageThreshold: {
+    // Global baseline (achievable)
     global: {
-      branches: 20,
-      functions: 20,
-      lines: 20,
-      statements: 20,
+      branches: 50,
+      functions: 60,
+      lines: 60,
+      statements: 60,
+    },
+    // Tier 0: Payment Routes (95%+)
+    './pages/api/stripe/**/*.ts': {
+      branches: 90,
+      functions: 95,
+      lines: 95,
+      statements: 95,
+    },
+    './pages/api/paystack/**/*.ts': {
+      branches: 90,
+      functions: 95,
+      lines: 95,
+      statements: 95,
+    },
+    './pages/api/paymongo/**/*.ts': {
+      branches: 90,
+      functions: 95,
+      lines: 95,
+      statements: 95,
+    },
+    './pages/api/xendit/**/*.ts': {
+      branches: 90,
+      functions: 95,
+      lines: 95,
+      statements: 95,
+    },
+    './lib/stripe/**/*.ts': {
+      branches: 90,
+      functions: 95,
+      lines: 95,
+      statements: 95,
+    },
+    // Tier 1: Auth & Security (90%+)
+    './lib/apiAuth.js': {
+      branches: 85,
+      functions: 90,
+      lines: 90,
+      statements: 90,
+    },
+    './lib/csrfProtection.js': {
+      branches: 85,
+      functions: 90,
+      lines: 90,
+      statements: 90,
     },
   },
 

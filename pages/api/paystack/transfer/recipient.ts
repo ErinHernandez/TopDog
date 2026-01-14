@@ -100,7 +100,7 @@ export default async function handler(
           ErrorType.METHOD_NOT_ALLOWED,
           'Method not allowed',
           { allowedMethods: ['POST', 'GET', 'DELETE'] },
-          logger
+          res.getHeader('X-Request-ID') as string
         );
         res.setHeader('Allow', 'POST, GET, DELETE');
         return res.status(response.statusCode).json({

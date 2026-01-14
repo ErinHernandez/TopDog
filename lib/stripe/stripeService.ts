@@ -9,6 +9,7 @@ import Stripe from 'stripe';
 import { getDb } from '../firebase-utils';
 import { doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 import { captureError } from '../errorTracking';
+import { requireAppUrl } from '../envHelpers';
 import type {
   CreateCustomerRequest,
   CustomerWithPaymentMethods,
@@ -291,7 +292,7 @@ export async function createPaymentIntent(
     if (paymentMethodId) {
       params.payment_method = paymentMethodId;
       params.confirm = true;
-      params.return_url = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/deposit/complete`;
+      params.return_url = `${requireAppUrl()}/deposit/complete`;
     }
     
     // Create with idempotency key if provided
@@ -481,8 +482,8 @@ export async function getConnectAccountStatus(
     if (!status.detailsSubmitted || status.requirements?.currentlyDue?.length) {
       const accountLink = await stripe.accountLinks.create({
         account: accountId,
-        refresh_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/connect/refresh`,
-        return_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/connect/complete`,
+        refresh_url: `${requireAppUrl()}/connect/refresh`,
+        return_url: `${requireAppUrl()}/connect/complete`,
         type: 'account_onboarding',
       });
       

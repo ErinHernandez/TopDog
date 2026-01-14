@@ -39,6 +39,7 @@ interface HealthResponse {
 
 export default async function handler(req: NextRequest) {
   const startTime = Date.now();
+  const requestId = crypto.randomUUID();
   
   // Get edge region info
   const region = req.geo?.region || 'unknown';
@@ -57,8 +58,10 @@ export default async function handler(req: NextRequest) {
     if (!hasRequiredEnv) {
       overallStatus = 'degraded';
       checks.api = 'error';
+      checks.env = 'missing';
     } else {
       checks.api = 'ok';
+      checks.env = 'ok';
     }
 
     const responseTime = Date.now() - startTime;
@@ -84,12 +87,26 @@ export default async function handler(req: NextRequest) {
         'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
         'Pragma': 'no-cache',
         'Expires': '0',
-        // Add server timestamp for latency compensation
+        'X-Request-ID': requestId,
         'X-Server-Time': Date.now().toString(),
       },
     });
 
   } catch (error) {
+    // Log error details (Edge Runtime compatible)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    
+    // In production, log to console (Edge Runtime doesn't support structured logging)
+    if (process.env.NODE_ENV === 'production') {
+      console.error('[Health Edge] Error:', {
+        requestId,
+        error: errorMessage,
+        stack: errorStack,
+        region: req.geo?.region || 'unknown',
+      });
+    }
+
     const response: HealthResponse = {
       status: 'error',
       timestamp: new Date().toISOString(),
@@ -104,6 +121,7 @@ export default async function handler(req: NextRequest) {
       status: 503,
       headers: {
         'Content-Type': 'application/json',
+        'X-Request-ID': requestId,
         'X-Server-Time': Date.now().toString(),
       },
     });

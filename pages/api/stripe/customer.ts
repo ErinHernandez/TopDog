@@ -80,7 +80,7 @@ async function handleCreateCustomer(
   const { userId, email, name } = req.body;
   
   // Verify user access
-  if (req.user && !verifyUserAccess(req.user.uid, userId || '')) {
+  if (req.user && !verifyUserAccess(req.user.uid, userId ?? '')) {
     const error = createErrorResponse(
       ErrorType.FORBIDDEN,
       'Access denied'
@@ -119,7 +119,7 @@ async function handleCreateCustomer(
     
     const errorResponse = createErrorResponse(
       ErrorType.STRIPE,
-      err.message || 'Failed to create customer'
+      err.message ?? 'Failed to create customer'
     );
     return res.status(errorResponse.statusCode).json(errorResponse.body);
   }

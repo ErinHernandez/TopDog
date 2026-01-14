@@ -44,7 +44,7 @@ export default async function handler(
     if (!result.isAdmin) {
       return res.status(403).json({
         isAdmin: false,
-        error: result.error || 'Access denied',
+        error: result.error ?? 'Access denied',
       });
     }
     

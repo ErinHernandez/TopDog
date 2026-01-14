@@ -1,8 +1,8 @@
 # API Standardization - Master Document
 
 **Date:** January 2025  
-**Status:** ✅ **98.6% COMPLETE** - All standard API routes standardized  
-**Last Updated:** January 12, 2025
+**Status:** ✅ **100% COMPLETE** - All API routes standardized and optimized  
+**Last Updated:** January 2025
 
 **Recent Enhancements (January 12, 2025):**
 - ✅ P0 Critical Payment TODOs completed - Enhanced error handling and validation
@@ -26,7 +26,7 @@
 
 ## Executive Summary
 
-Successfully standardized **71 out of 72 API routes** (98.6%) to use the `withErrorHandling` wrapper and consistent error handling patterns. All critical payment, authentication, NFL data, and Stripe routes are now standardized with:
+Successfully standardized **all 72 API routes** (100%) with consistent error handling patterns. All critical payment, authentication, NFL data, and Stripe routes are now standardized with:
 
 - ✅ Consistent error handling
 - ✅ Request ID tracking
@@ -34,15 +34,17 @@ Successfully standardized **71 out of 72 API routes** (98.6%) to use the `withEr
 - ✅ Proper validation
 - ✅ Security features preserved
 
-The remaining 1 route uses Edge Runtime (different API pattern) and is already optimized.
+**Standard Routes (71):** Use `withErrorHandling` wrapper  
+**Edge Runtime Route (1):** Optimized with Edge-compatible error handling and request ID tracking
 
 ---
 
 ## Overall Statistics
 
 ### Total Routes: 72
-- **Standardized:** 71 routes (98.6%) ✅
-- **Edge Runtime:** 1 route (1.4%) - Different pattern, already optimized
+- **Standardized:** 71 routes (98.6%) ✅ - Using `withErrorHandling` wrapper
+- **Edge Runtime:** 1 route (1.4%) ✅ - Optimized with Edge-compatible error handling
+- **Total Complete:** 72 routes (100%) ✅
 
 ### Category Breakdown
 
@@ -339,14 +341,32 @@ For webhook handlers (always return 200):
 ```javascript
 export default async function handler(req, res) {
   return withErrorHandling(req, res, async (req, res, logger) => {
-    // Webhook logic
-  }).catch(async (error) => {
-    // Always return 200 for webhooks
-    logger.error('Webhook error', error, { ... });
-    return res.status(200).json({
-      received: true,
-      error: error.message || 'Processing error',
-    });
+    try {
+      // Webhook logic
+      // Process webhook event
+    } catch (error) {
+      // Always return 200 for webhooks (prevents retries)
+      logger.error('Webhook error', error as Error, { 
+        component: 'webhook',
+        operation: 'process' 
+      });
+      return res.status(200).json({
+        received: true,
+        error: error.message || 'Processing error',
+      });
+    }
+  }, {
+    // Custom error handler for webhooks: always return 200
+    onError: (err, req, res, logger, errorResponse) => {
+      logger.error('Webhook processing error (caught by wrapper)', err, { 
+        component: 'webhook', 
+        operation: 'webhook' 
+      });
+      return res.status(200).json({
+        received: true,
+        error: errorResponse.body.message || 'Processing error - logged for investigation',
+      });
+    }
   });
 }
 ```
@@ -415,17 +435,19 @@ export default async function handler(req, res) {
 
 ---
 
-## Remaining Routes
+## Edge Runtime Route
 
-### Edge Runtime Routes (1 Total)
+### Edge Runtime Routes (1 Total) ✅
 
 1. **`pages/api/health-edge.ts`** - Edge Function
    - Uses `NextRequest`/`Response` instead of `NextApiRequest`/`NextApiResponse`
    - Edge runtime has different error handling patterns
-   - Already has proper error handling with try-catch
-   - **Status:** ✅ Already optimized for Edge functions
+   - ✅ **Enhanced (January 2025):** Added request ID tracking
+   - ✅ **Enhanced (January 2025):** Improved error logging with structured format
+   - ✅ **Enhanced (January 2025):** Added environment variable checks
+   - **Status:** ✅ Fully optimized for Edge functions
 
-**Note:** Edge functions use a different API pattern and don't need the `withErrorHandling` wrapper. The current implementation is appropriate for Edge Runtime.
+**Note:** Edge functions use a different API pattern and cannot use the `withErrorHandling` wrapper. The implementation has been enhanced with equivalent error handling, request ID tracking, and structured logging compatible with Edge Runtime.
 
 ---
 

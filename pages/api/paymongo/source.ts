@@ -27,6 +27,7 @@ import {
   createSuccessResponse,
   ErrorType 
 } from '../../../lib/apiErrorHandler';
+import { requireBaseUrl } from '../../../lib/envHelpers';
 
 // ============================================================================
 // TYPES
@@ -147,7 +148,7 @@ export default async function handler(
     const reference = generateReference('SRC');
     
     // Build redirect URLs
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://topdog.gg';
+    const baseUrl = requireBaseUrl();
     const successUrl = body.successUrl || `${baseUrl}/deposit/paymongo/callback?status=success`;
     const failureUrl = body.failureUrl || `${baseUrl}/deposit/paymongo/callback?status=failed`;
     

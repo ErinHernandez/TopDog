@@ -8,7 +8,7 @@ import {
   describeImage 
 } from '../../../lib/azureVision';
 import { RateLimiter } from '../../../lib/rateLimiter';
-import { logger } from '../../../lib/structuredLogger.js';
+import { logger } from '../../../lib/structuredLogger';
 import { 
   withErrorHandling, 
   validateMethod, 

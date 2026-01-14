@@ -34,7 +34,7 @@ import {
 } from 'firebase/firestore';
 import { initializeApp, getApps } from 'firebase/app';
 import { RateLimiter } from '../../../../lib/rateLimiter';
-import { logger } from '../../../../lib/structuredLogger.js';
+import { logger } from '../../../../lib/structuredLogger';
 import { 
   withErrorHandling, 
   validateMethod, 
@@ -42,7 +42,7 @@ import {
   createErrorResponse,
   createSuccessResponse,
   ErrorType 
-} from '../../../../lib/apiErrorHandler.js';
+} from '../../../../lib/apiErrorHandler';
 
 // ============================================================================
 // FIREBASE INITIALIZATION

@@ -12,6 +12,7 @@ import { PlayerDataProvider } from '../lib/playerDataContext'
 import { swrConfig } from '../lib/swr'
 import userMetrics from '../lib/userMetrics'
 import exposurePreloader from '../lib/exposurePreloader'
+import GlobalErrorBoundary from '../components/shared/GlobalErrorBoundary'
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
@@ -110,7 +111,9 @@ function MyApp({ Component, pageProps }) {
           <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
             {!isLandingPage && !isDraftRoom && !isDevDraftNavbar && !isMobileDemo && !isTestingGrounds && !isProfileCustomization && !isMobileProfileCustomization && <Navbar />}
             <div style={{ flex: '1' }}>
-              <Component {...pageProps} />
+              <GlobalErrorBoundary>
+                <Component {...pageProps} />
+              </GlobalErrorBoundary>
             </div>
             {!isLandingPage && !isDraftRoom && !isDevDraftNavbar && !isMobileDemo && !isTestingGrounds && !isProfileCustomization && !isMobileProfileCustomization && <Footer />}
             {isTestingGrounds && isMounted && !isMobileDevice && <DevNav />}

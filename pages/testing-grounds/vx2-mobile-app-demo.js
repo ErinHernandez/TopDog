@@ -29,6 +29,12 @@ function VX2MobileAppDemo() {
   // Panel minimized state (persisted to localStorage)
   const [isMinimized, setIsMinimized] = React.useState(false);
   
+  // Track if component is mounted to prevent hydration mismatch
+  const [isMounted, setIsMounted] = React.useState(false);
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
+  
   // Load saved device preferences and panel state
   React.useEffect(() => {
     try {
@@ -134,7 +140,8 @@ function VX2MobileAppDemo() {
   };
 
   // Show nothing until we've detected device type AND router is ready to prevent flash
-  if (!isLoaded || !router.isReady) {
+  // Only show loading state on client to prevent hydration mismatch
+  if (!isMounted || (!isLoaded || !router.isReady)) {
     return (
       <div 
         style={{ 

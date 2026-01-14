@@ -125,7 +125,7 @@ export default async function handler(
         ErrorType.VALIDATION,
         'Valid amount is required. Must be a positive number',
         { amountSmallestUnit },
-        logger
+        res.getHeader('X-Request-ID') as string
       );
       return res.status(response.statusCode).json({
         ok: false,
@@ -140,7 +140,7 @@ export default async function handler(
         ErrorType.VALIDATION,
         'Valid currency (NGN, GHS, ZAR, KES) is required',
         { currency },
-        logger
+        res.getHeader('X-Request-ID') as string
       );
       return res.status(response.statusCode).json({
         ok: false,
@@ -155,7 +155,7 @@ export default async function handler(
         ErrorType.VALIDATION,
         validation.error || 'Invalid amount',
         { amountSmallestUnit, currency: currencyUpper },
-        logger
+        res.getHeader('X-Request-ID') as string
       );
       return res.status(response.statusCode).json({
         ok: false,
@@ -181,7 +181,7 @@ export default async function handler(
         ErrorType.NOT_FOUND,
         'User not found',
         { userId },
-        logger
+        res.getHeader('X-Request-ID') as string
       );
       return res.status(response.statusCode).json({
         ok: false,
@@ -200,7 +200,7 @@ export default async function handler(
         ErrorType.VALIDATION,
         'Recipient not found. Please add a withdrawal method first.',
         { userId, recipientCode },
-        logger
+        res.getHeader('X-Request-ID') as string
       );
       return res.status(response.statusCode).json({
         ok: false,
@@ -214,7 +214,7 @@ export default async function handler(
         ErrorType.VALIDATION,
         `Recipient is for ${recipient.currency}, but withdrawal requested in ${currencyUpper}`,
         { recipientCurrency: recipient.currency, requestedCurrency: currencyUpper },
-        logger
+        res.getHeader('X-Request-ID') as string
       );
       return res.status(response.statusCode).json({
         ok: false,
@@ -236,7 +236,7 @@ export default async function handler(
         ErrorType.VALIDATION,
         'Invalid transfer fee calculated',
         { amountSmallestUnit, currency: currencyUpper, recipientType, feeSmallestUnit },
-        logger
+        res.getHeader('X-Request-ID') as string
       );
       return res.status(response.statusCode).json({
         ok: false,
@@ -324,7 +324,7 @@ export default async function handler(
         ErrorType.EXTERNAL_API,
         'Unable to process withdrawal: exchange rate unavailable',
         { currency: currencyUpper },
-        logger
+        res.getHeader('X-Request-ID') as string
       );
       return res.status(response.statusCode).json({
         ok: false,
@@ -395,7 +395,7 @@ export default async function handler(
           errorType,
           message,
           { userId, usdAmountToDebit },
-          logger
+          res.getHeader('X-Request-ID') as string
         );
         return res.status(response.statusCode).json({
           ok: false,
@@ -498,12 +498,11 @@ export default async function handler(
     } catch (initiateError) {
       // Restore user balance on failure (add back the USD amount that was debited)
       // Also clear the pending withdrawal reference
-      logger.error('Transfer initiation failed, restoring balance', {
+      logger.error('Transfer initiation failed, restoring balance', initiateError instanceof Error ? initiateError : new Error('Unknown error'), {
         component: 'paystack',
         operation: 'transfer-initiate',
         userId,
         reference,
-        error: initiateError instanceof Error ? initiateError.message : 'Unknown error',
         originalBalance: newBalance,
         amountToRestore: usdAmountToDebit,
       });

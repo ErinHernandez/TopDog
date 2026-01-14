@@ -25,6 +25,7 @@ import {
   generateReference,
 } from '../../paystack/paystackService';
 import { isPaystackCurrency, validatePaystackAmount } from '../../paystack/currencyConfig';
+import { requireAppUrl } from '../../envHelpers';
 
 /**
  * Paystack payment provider implementation
@@ -93,7 +94,7 @@ export const paystackProvider: PaymentProvider = {
         currency: currency as 'NGN' | 'GHS' | 'ZAR' | 'KES',
         reference,
         channels,
-        callback_url: `${process.env.NEXT_PUBLIC_APP_URL || ''}/deposit/paystack/callback`,
+        callback_url: `${requireAppUrl()}/deposit/paystack/callback`,
         metadata: {
           custom_fields: Object.entries(metadata || {}).map(([key, value]: [string, unknown]) => ({
             display_name: key,

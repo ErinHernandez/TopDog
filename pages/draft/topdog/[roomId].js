@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState, useRef } from 'react';
 import { db } from '../../../lib/firebase';
+import { trackDraftVersion } from '../../../lib/analytics/draftVersionTracking';
 import {
   doc, getDoc, updateDoc, arrayUnion, onSnapshot, collection, addDoc, query, orderBy, setDoc, arrayRemove, getDocs, deleteDoc, runTransaction, serverTimestamp
 } from 'firebase/firestore';
@@ -21,49 +22,28 @@ import { createPositionGradient, createQueueGradient, createPickedPlayerGradient
 import RippleEffect from '../../../components/draft/v3/mobile/apple/components/RippleEffect';
 import DraftNavbar from '../../../components/draft/v2/ui/DraftNavbar';
 import { POSITION_COLORS, FLEX_POSITIONS } from '../../../components/draft/v3/constants/positions';
-
-// Team colors (from FullDraftBoard)
-const TEAM_COLORS = [
-  '#2563eb', // blue
-  '#e11d48', // red
-  '#10b981', // green
-  '#f59e42', // orange
-  '#a21caf', // purple
-  '#14b8a6', // teal
-  '#facc15', // yellow
-  '#f472b6', // pink
-  '#6b7280', // gray
-  '#92400e', // brown
-  '#84cc16', // lime
-  '#6366f1', // indigo
-];
-
-function getRandomName() {
-  const adjectives = ['Swift', 'Mighty', 'Brave', 'Clever', 'Fierce', 'Noble', 'Wild', 'Bold', 'Sharp', 'Quick'];
-  const nouns = ['Wolf', 'Eagle', 'Lion', 'Tiger', 'Bear', 'Hawk', 'Fox', 'Panther', 'Falcon', 'Jaguar'];
-  const adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
-  const noun = nouns[Math.floor(Math.random() * nouns.length)];
-  return `${adjective} ${noun}`;
-}
+import { TEAM_COLORS } from './constants/draftConstants';
+import { getRandomName, formatADP } from './utils/draftUtils';
 
 export default function DraftRoom() {
   const router = useRouter();
 
-  // Custom ADP formatting function
-  const formatADP = (adp) => {
-    if (!adp || adp <= 0) return '-';
-    const formatted = adp.toFixed(1);
-    // If ADP is under 10.0, replace leading zero with 2 spaces
-    if (adp < 10.0) {
-      return formatted.replace(/^0/, '  ');
-    }
-    return formatted;
-  };
+  // formatADP is now imported from utils/draftUtils
 
 
 
 
   const { roomId } = router.query;
+  
+  // Track draft version access for Phase 4 consolidation (legacy/topdog route)
+  useEffect(() => {
+    if (router.isReady && roomId && typeof roomId === 'string') {
+      // Track as 'legacy' since this is the old topdog route
+      // We'll map this to 'v1' or 'legacy' in analytics
+      trackDraftVersion('vx', roomId, null); // Using 'vx' as closest match for legacy
+    }
+  }, [router.isReady, roomId]);
+  
   const [room, setRoom] = useState(null);
   const [participants, setParticipants] = useState([]);
   const [picks, setPicks] = useState([]);
@@ -80,8 +60,6 @@ export default function DraftRoom() {
   const [rankings, setRankings] = useState(['Ja\'Marr Chase', 'Justin Jefferson', 'Bijan Robinson', 'Saquon Barkley', 'CeeDee Lamb']);
   const [customRankings, setCustomRankings] = useState([]);
   
-  // Temporary debug log
-  console.log('Current rankings:', rankings);
   const [queue, setQueue] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showTeamModal, setShowTeamModal] = useState(false);

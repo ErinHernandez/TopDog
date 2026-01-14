@@ -1,5 +1,11 @@
 # Draft Room V3 - Migration Foundation
 
+> **⚠️ DEPRECATED**  
+> This version is deprecated and will be removed in Phase 4 consolidation.  
+> **Migration:** Use `/draft/vx2/[roomId]` instead.  
+> **Deprecation Date:** TBD (pending traffic analysis)  
+> **See:** `PHASE4_DRAFT_CONSOLIDATION_PLAN.md`
+
 ## What We've Accomplished ✅
 
 ### 1. **Code Cleanup**

@@ -1,6 +1,11 @@
 /**
  * Draft Room V3 - Route Handler
  * 
+ * @deprecated This version is deprecated. Use vx2 instead.
+ * Migration: /draft/vx2/[roomId]
+ * Deprecation date: TBD (pending traffic analysis)
+ * See: PHASE4_DRAFT_CONSOLIDATION_PLAN.md
+ * 
  * This is the V3 draft room route that will eventually replace
  * the current implementation. Currently for testing and development.
  * 
@@ -11,6 +16,7 @@ import React from 'react';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import DraftRoomV3 from '../../../components/draft/v3/DraftRoomV3';
+import { trackDraftVersion } from '../../../lib/analytics/draftVersionTracking';
 
 export default function DraftRoomV3Route() {
   const router = useRouter();
@@ -21,6 +27,8 @@ export default function DraftRoomV3Route() {
   useEffect(() => {
     if (router.isReady && roomId) {
       setIsReady(true);
+      // Track draft version access for Phase 4 consolidation
+      trackDraftVersion('v3', roomId, null);
     }
   }, [router.isReady, roomId]);
 

@@ -7,11 +7,12 @@
  * On desktop: Shows phone frame with dev controls for testing.
  */
 
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { DraftRoomVX2 } from '../../components/vx2/draft-room';
 import { useIsMobileDevice } from '../../hooks/useIsMobileDevice';
+import { trackDraftVersion } from '../../lib/analytics/draftVersionTracking';
 
 function VX2DraftRoomPage() {
   const router = useRouter();
@@ -29,6 +30,13 @@ function VX2DraftRoomPage() {
   
   // Get roomId from query params, fallback to test roomId for testing
   const roomId = (router.query.roomId && typeof router.query.roomId === 'string' ? router.query.roomId : null) || 'test-room-123';
+  
+  // Track draft version access for Phase 4 consolidation
+  useEffect(() => {
+    if (router.isReady && roomId) {
+      trackDraftVersion('vx2', roomId, null);
+    }
+  }, [router.isReady, roomId]);
   
   // Get initial pick number and team count from query params
   const initialPickNumber = router.query.pickNumber 

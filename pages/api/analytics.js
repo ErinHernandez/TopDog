@@ -16,7 +16,7 @@ import {
 } from '../../lib/apiErrorHandler';
 import { createAnalyticsRateLimiter, withRateLimit } from '../../lib/rateLimitConfig';
 import { logRateLimitExceeded, getClientIP } from '../../lib/securityLogger';
-import { logger } from '../../lib/structuredLogger.js';
+import { logger } from '../../lib/structuredLogger';
 
 // Use require for firebase-admin to ensure Turbopack compatibility
 // eslint-disable-next-line @typescript-eslint/no-require-imports

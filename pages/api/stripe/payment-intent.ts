@@ -236,8 +236,8 @@ const handler = async function(
     
     // Validate required fields
     const { amountCents, userId, email } = body;
-    const currency = (body.currency || 'USD').toUpperCase();
-    const country = (body.country || body.riskContext?.country || 'US').toUpperCase();
+    const currency = (body.currency ?? 'USD').toUpperCase();
+    const country = (body.country ?? body.riskContext?.country ?? 'US').toUpperCase();
     
     if (!amountCents || !userId) {
       const error = createErrorResponse(
@@ -254,7 +254,7 @@ const handler = async function(
     if (!amountValidation.isValid) {
       const error = createErrorResponse(
         ErrorType.VALIDATION,
-        amountValidation.error || 'Invalid amount'
+        amountValidation.error ?? 'Invalid amount'
       );
       return res.status(error.statusCode).json(error.body);
     }
@@ -285,8 +285,8 @@ const handler = async function(
     try {
       // Risk assessment
       const riskContext: RiskContext = {
-        ipAddress: body.riskContext?.ipAddress || getClientIP(req),
-        country: body.riskContext?.country || country,
+        ipAddress: body.riskContext?.ipAddress ?? getClientIP(req),
+        country: body.riskContext?.country ?? country,
         deviceId: body.riskContext?.deviceId,
         sessionId: body.riskContext?.sessionId,
       };

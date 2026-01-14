@@ -31,7 +31,7 @@ import { initializeApp, getApps } from 'firebase/app';
 import { createUsernameCheckLimiter } from '../../../../lib/rateLimiter';
 import { generateUsernameSuggestions } from '../../../../lib/usernameSuggestions';
 import { findSimilarUsernames, generateSimilarityWarnings } from '../../../../lib/usernameSimilarity';
-import { logger } from '../../../../lib/structuredLogger.js';
+import { logger } from '../../../../lib/structuredLogger';
 import { 
   withErrorHandling, 
   validateMethod, 

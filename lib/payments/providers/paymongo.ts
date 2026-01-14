@@ -28,6 +28,8 @@ import {
   verifyPayment,
   verifyWebhookSignature as verifyPayMongoWebhookSignature,
   createPayMongoTransaction,
+} from '../../paymongo';
+import { requireBaseUrl } from '../../envHelpers';
   getSavedBankAccounts,
   generateReference,
 } from '../../paymongo';
@@ -89,7 +91,7 @@ class PayMongoProvider implements PaymentProvider {
       const reference = generateReference('DEP');
       
       // Build redirect URLs
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://topdog.gg';
+      const baseUrl = requireBaseUrl();
       const successUrl = request.successUrl || `${baseUrl}/deposit/paymongo/callback?status=success`;
       const failureUrl = request.failureUrl || `${baseUrl}/deposit/paymongo/callback?status=failed`;
       

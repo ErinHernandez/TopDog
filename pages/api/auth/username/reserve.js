@@ -37,8 +37,8 @@ import {
   serverTimestamp 
 } from 'firebase/firestore';
 import { initializeApp as initializeClientApp, getApps as getClientApps } from 'firebase/app';
-import { verifyAdminAccess } from '../../../../lib/adminAuth.js';
-import { logger } from '../../../../lib/structuredLogger.js';
+import { verifyAdminAccess } from '../../../../lib/adminAuth';
+import { logger } from '../../../../lib/structuredLogger';
 import { sanitizeUsername, sanitizeString } from '../../../../lib/inputSanitization.js';
 import { logSecurityEvent, SecurityEventType, getClientIP } from '../../../../lib/securityLogger.js';
 import { createAuthRateLimiter } from '../../../../lib/rateLimitConfig.js';
@@ -51,7 +51,7 @@ import {
   createErrorResponse,
   createSuccessResponse,
   ErrorType 
-} from '../../../../lib/apiErrorHandler.js';
+} from '../../../../lib/apiErrorHandler';
 
 // Use require for firebase-admin to ensure Turbopack compatibility
 // eslint-disable-next-line @typescript-eslint/no-require-imports

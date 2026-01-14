@@ -172,7 +172,8 @@ export default function LobbyTabVX2({
   // Success state - single featured tournament fills the screen
   const featuredTournament = tournaments.find(t => t.isFeatured) || tournaments[0];
   
-  // Calculate available height: 100vh minus header (60px) and footer (80px) and padding
+  // Use stable positioning to prevent layout shifts when viewport changes
+  // (e.g., when terminal opens or browser UI shows/hides on mobile)
   return (
     <div 
       className="vx2-lobby-container flex-1 relative"
@@ -181,29 +182,36 @@ export default function LobbyTabVX2({
         backgroundColor: BG_COLORS.primary,
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'center',
         alignItems: 'center',
         overflow: 'hidden',
         height: '100%',
         minHeight: 0,
+        // Use position relative for stable positioning
+        position: 'relative',
       }}
       role="main"
       aria-label="Tournament lobby"
     >
-      {/* Featured Tournament Card - centered with responsive sizing */}
-      {/* Height adapts to available space via flexbox */}
+      {/* Featured Tournament Card - centered with stable positioning */}
+      {/* Uses absolute positioning to prevent shifts when viewport changes */}
+      {/* This prevents the card from moving when browser UI shows/hides or terminal opens */}
       <div
         className="w-full"
         style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
           maxWidth: '100%',
           width: '100%',
-          flex: '1 1 auto',
+          maxHeight: 'calc(100% - 32px)', // Account for padding
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'center',
           alignItems: 'center',
-          minHeight: 0,
-          maxHeight: '100%',
+          // Prevent content from shifting when container height changes
+          willChange: 'transform',
+          // Ensure card doesn't overflow container
+          overflow: 'hidden',
         }}
       >
         <TournamentCard

@@ -39,7 +39,7 @@ import {
 import { initializeApp, getApps } from 'firebase/app';
 import { isApprovedCountry } from '../../../lib/localeCharacters.js';
 import { createSignupLimiter } from '../../../lib/rateLimiter.js';
-import { logger } from '../../../lib/structuredLogger.js';
+import { logger } from '../../../lib/structuredLogger';
 import { 
   withErrorHandling, 
   validateMethod, 

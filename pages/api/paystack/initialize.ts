@@ -28,6 +28,7 @@ import { logger } from '../../../lib/structuredLogger';
 import type { PaystackChannel } from '../../../lib/paystack/paystackTypes';
 import { withAuth } from '../../../lib/apiAuth';
 import { createPaymentRateLimiter, withRateLimit } from '../../../lib/rateLimitConfig';
+import { requireAppUrl } from '../../../lib/envHelpers';
 import { withCSRFProtection } from '../../../lib/csrfProtection';
 import { logPaymentTransaction, getClientIP } from '../../../lib/securityLogger';
 import { 
@@ -218,7 +219,7 @@ const handler = async function(
     
     // Build base callback URL
     const baseCallbackUrl = callbackUrl || 
-      `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/deposit/paystack/callback`;
+      `${requireAppUrl()}/deposit/paystack/callback`;
     
     // Handle different channels
     let result: {

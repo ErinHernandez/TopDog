@@ -1,5 +1,11 @@
 # Version X (VX) Components
 
+> **⚠️ NOTE**  
+> This directory contains shared component library used by vx2.  
+> The draft room routes using vx are deprecated.  
+> **Migration:** Use `/draft/vx2/[roomId]` instead.  
+> **See:** `PHASE4_DRAFT_CONSOLIDATION_PLAN.md`
+
 ## Purpose
 
 This directory contains the Version X migration components. These are being developed alongside the original mobile components, which remain untouched as a reference.

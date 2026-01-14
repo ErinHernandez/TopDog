@@ -1,5 +1,11 @@
 # Draft Room V2 - Clean Architecture
 
+> **⚠️ DEPRECATED**  
+> This version is deprecated and will be removed in Phase 4 consolidation.  
+> **Migration:** Use `/draft/vx2/[roomId]` instead.  
+> **Deprecation Date:** TBD (pending traffic analysis)  
+> **See:** `PHASE4_DRAFT_CONSOLIDATION_PLAN.md`
+
 ## Overview
 
 This is a completely rebuilt draft room following modern React best practices, designed to scale to 47,000+ concurrent drafts with easy element replacement and updates.
