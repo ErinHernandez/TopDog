@@ -106,8 +106,8 @@ export function TabletLayoutProvider({
   );
   
   // Viewport dimensions - always start with defaults to prevent hydration mismatch
-  const [viewportWidth, setViewportWidth] = useState(TABLET_FRAME.width);
-  const [viewportHeight, setViewportHeight] = useState(TABLET_FRAME.height);
+  const [viewportWidth, setViewportWidth] = useState<number>(TABLET_FRAME.width);
+  const [viewportHeight, setViewportHeight] = useState<number>(TABLET_FRAME.height);
   
   // Update viewport dimensions on mount and resize (client-side only)
   useEffect(() => {
