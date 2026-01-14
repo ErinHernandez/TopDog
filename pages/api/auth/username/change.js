@@ -198,7 +198,7 @@ const handler = async function(req, res) {
         ErrorType.RATE_LIMIT,
         'Too many requests. Please try again later.',
         { retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000) },
-        res.getHeader('X-Request-ID') as string
+        res.getHeader('X-Request-ID')
       );
       return res.status(errorResponse.statusCode).json({
         success: false,
@@ -220,7 +220,7 @@ const handler = async function(req, res) {
         ErrorType.UNAUTHORIZED,
         authResult.error || 'Authentication required',
         {},
-        res.getHeader('X-Request-ID') as string
+        res.getHeader('X-Request-ID')
       );
       return res.status(errorResponse.statusCode).json({
         success: false,
@@ -251,7 +251,7 @@ const handler = async function(req, res) {
           retryAfterDays: canChange.retryAfterDays,
           retryAfterDate: canChange.retryAfterDate?.toISOString(),
         },
-        res.getHeader('X-Request-ID') as string
+        res.getHeader('X-Request-ID')
       );
       return res.status(errorResponse.statusCode).json({
         success: false,
@@ -269,7 +269,7 @@ const handler = async function(req, res) {
         ErrorType.VALIDATION,
         'Username unavailable',
         { errors: validation.errors },
-        res.getHeader('X-Request-ID') as string
+        res.getHeader('X-Request-ID')
       );
       return res.status(errorResponse.statusCode).json({
         success: false,
@@ -288,7 +288,7 @@ const handler = async function(req, res) {
         ErrorType.VALIDATION,
         'Username unavailable',
         { suggestions: availability.suggestions },
-        res.getHeader('X-Request-ID') as string
+        res.getHeader('X-Request-ID')
       );
       return res.status(409).json({
         success: false,
@@ -307,7 +307,7 @@ const handler = async function(req, res) {
         ErrorType.NOT_FOUND,
         'User not found',
         { userId: authResult.uid },
-        res.getHeader('X-Request-ID') as string
+        res.getHeader('X-Request-ID')
       );
       return res.status(errorResponse.statusCode).json({
         success: false,
@@ -325,7 +325,7 @@ const handler = async function(req, res) {
         ErrorType.VALIDATION,
         'New username is the same as current username',
         {},
-        res.getHeader('X-Request-ID') as string
+        res.getHeader('X-Request-ID')
       );
       return res.status(errorResponse.statusCode).json({
         success: false,
@@ -386,7 +386,7 @@ const handler = async function(req, res) {
           ErrorType.VALIDATION,
           'Username was changed by another process. Please refresh and try again.',
           {},
-          res.getHeader('X-Request-ID') as string
+          res.getHeader('X-Request-ID')
         );
         return res.status(409).json({
           success: false,
@@ -400,7 +400,7 @@ const handler = async function(req, res) {
           ErrorType.NOT_FOUND,
           'User not found',
           { userId: authResult.uid },
-          res.getHeader('X-Request-ID') as string
+          res.getHeader('X-Request-ID')
         );
         return res.status(errorResponse.statusCode).json({
           success: false,

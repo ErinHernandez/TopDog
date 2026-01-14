@@ -149,7 +149,7 @@ const handler = async function(req, res) {
         ErrorType.RATE_LIMIT,
         'Too many requests. Please try again later.',
         { retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000) },
-        res.getHeader('X-Request-ID') as string
+        res.getHeader('X-Request-ID')
       );
       return res.status(errorResponse.statusCode).json({
         success: false,
@@ -178,7 +178,7 @@ const handler = async function(req, res) {
         ErrorType.FORBIDDEN,
         'Admin access required',
         {},
-        res.getHeader('X-Request-ID') as string
+        res.getHeader('X-Request-ID')
       );
       return res.status(errorResponse.statusCode).json({
         success: false,
@@ -212,7 +212,7 @@ const handler = async function(req, res) {
         ErrorType.VALIDATION,
         'Username is required and must be valid',
         {},
-        res.getHeader('X-Request-ID') as string
+        res.getHeader('X-Request-ID')
       );
       return res.status(errorResponse.statusCode).json({
         success: false,
@@ -226,7 +226,7 @@ const handler = async function(req, res) {
         ErrorType.VALIDATION,
         'Reserved for (VIP name) is required and must be valid',
         {},
-        res.getHeader('X-Request-ID') as string
+        res.getHeader('X-Request-ID')
       );
       return res.status(errorResponse.statusCode).json({
         success: false,
@@ -258,7 +258,7 @@ const handler = async function(req, res) {
         ErrorType.VALIDATION,
         'This username is already registered by a user',
         { username: normalizedUsername },
-        res.getHeader('X-Request-ID') as string
+        res.getHeader('X-Request-ID')
       );
       return res.status(409).json({
         success: false,
@@ -287,7 +287,7 @@ const handler = async function(req, res) {
             expiresAt: existing.expiresAt?.toDate?.() || existing.expiresAt,
           },
         },
-        res.getHeader('X-Request-ID') as string
+        res.getHeader('X-Request-ID')
       );
       return res.status(409).json({
         success: false,

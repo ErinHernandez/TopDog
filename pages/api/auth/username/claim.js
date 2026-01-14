@@ -88,7 +88,7 @@ export default async function handler(req, res) {
         ErrorType.RATE_LIMIT,
         'Too many claim attempts. Please try again later.',
         { retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000) },
-        res.getHeader('X-Request-ID') as string
+        res.getHeader('X-Request-ID')
       );
       return res.status(errorResponse.statusCode).json({
         success: false,
@@ -126,7 +126,7 @@ export default async function handler(req, res) {
         ErrorType.NOT_FOUND,
         'No reservation found for this username',
         { username },
-        res.getHeader('X-Request-ID') as string
+        res.getHeader('X-Request-ID')
       );
       return res.status(errorResponse.statusCode).json({
         success: false,
@@ -160,7 +160,7 @@ export default async function handler(req, res) {
           ErrorType.UNAUTHORIZED,
           'Invalid claim token',
           {},
-          res.getHeader('X-Request-ID') as string
+          res.getHeader('X-Request-ID')
         );
         return res.status(errorResponse.statusCode).json({
           success: false,
@@ -177,7 +177,7 @@ export default async function handler(req, res) {
         ErrorType.VALIDATION,
         'This reservation has expired',
         { username, expiresAt },
-        res.getHeader('X-Request-ID') as string
+        res.getHeader('X-Request-ID')
       );
       return res.status(410).json({
         success: false,

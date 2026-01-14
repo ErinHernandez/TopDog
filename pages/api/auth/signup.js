@@ -171,7 +171,7 @@ export default async function handler(req, res) {
         ErrorType.RATE_LIMIT,
         'Too many signup attempts. Please try again later.',
         { retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000) },
-        res.getHeader('X-Request-ID') as string
+        res.getHeader('X-Request-ID')
       );
       return res.status(errorResponse.statusCode).json({
         success: false,
@@ -212,7 +212,7 @@ export default async function handler(req, res) {
         ErrorType.FORBIDDEN,
         'This service is not available in your country',
         { countryCode },
-        res.getHeader('X-Request-ID') as string
+        res.getHeader('X-Request-ID')
       );
       return res.status(errorResponse.statusCode).json({
         success: false,
@@ -235,7 +235,7 @@ export default async function handler(req, res) {
         ErrorType.VALIDATION,
         'Username unavailable',
         { errors: validation.errors },
-        res.getHeader('X-Request-ID') as string
+        res.getHeader('X-Request-ID')
       );
       return res.status(errorResponse.statusCode).json({
         success: false,

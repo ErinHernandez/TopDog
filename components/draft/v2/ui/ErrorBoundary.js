@@ -30,7 +30,7 @@ class ErrorBoundary extends React.Component {
 
     // Send to error tracking service (Sentry)
     try {
-      const { captureReactError } = await import('../../../lib/errorTracking');
+      const { captureReactError } = await import('../../../../lib/errorTracking');
       await captureReactError(
         error,
         errorInfo.componentStack,

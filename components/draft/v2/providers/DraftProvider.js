@@ -404,7 +404,7 @@ export default function DraftProvider({ roomId, children }) {
         console.error('Pick failed:', error);
       } else {
         // In production, use structured logger
-        const { logger, logDraftEvent } = require('../../lib/structuredLogger');
+        const { logger, logDraftEvent } = require('../../../../lib/structuredLogger');
         logger.error('Pick failed', error, { roomId, userId: userName, playerName });
         logDraftEvent('Pick failed', { roomId, userId: userName, error: error.message });
       }

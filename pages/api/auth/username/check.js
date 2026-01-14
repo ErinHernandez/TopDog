@@ -178,7 +178,7 @@ export default async function handler(req, res) {
         ErrorType.RATE_LIMIT,
         'Too many requests. Please try again later.',
         { retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000) },
-        res.getHeader('X-Request-ID') as string
+        res.getHeader('X-Request-ID')
       );
       return res.status(errorResponse.statusCode).json({
         isAvailable: false,

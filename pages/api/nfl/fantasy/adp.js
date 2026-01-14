@@ -47,7 +47,7 @@ export default async function handler(req, res) {
         ErrorType.RATE_LIMIT,
         'Rate limit exceeded',
         { retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000) },
-        res.getHeader('X-Request-ID') as string
+        res.getHeader('X-Request-ID')
       );
       return res.status(errorResponse.statusCode).json({ error: errorResponse.body.message });
     }
@@ -69,7 +69,7 @@ export default async function handler(req, res) {
           ErrorType.NOT_FOUND,
           `Player "${name}" not found in ADP data`,
           { playerName: name },
-          res.getHeader('X-Request-ID') as string
+          res.getHeader('X-Request-ID')
         );
         return res.status(errorResponse.statusCode).json({
           ok: false,
