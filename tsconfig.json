@@ -78,6 +78,7 @@
     "node_modules",
     ".next",
     "out",
-    "components/vx"
+    "components/vx",
+    "functions"
   ]
 }
