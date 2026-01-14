@@ -341,7 +341,9 @@ export default function ProfileTabVX2({
           router.push(item.path).catch((error) => {
             console.error('[ProfileTab] Navigation error, using fallback:', error);
             // Fallback to window.location on error
-            window.location.href = item.path;
+            if (item.path) {
+              window.location.href = item.path;
+            }
           });
         }
         break;

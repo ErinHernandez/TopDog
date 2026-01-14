@@ -58,7 +58,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void> {
-  return withErrorHandling(req, res, async (req, res, logger) => {
+  await withErrorHandling(req, res, async (req, res, logger) => {
     // Validate HTTP method
     validateMethod(req, ['POST'], logger);
     
@@ -75,7 +75,7 @@ export default async function handler(
           {},
           res.getHeader('X-Request-ID') as string
         );
-        return res.status(errorResponse.statusCode).json({ error: errorResponse.body.message });
+        return res.status(errorResponse.statusCode).json({ error: errorResponse.body.error.message });
       }
       
       // Verify signature
@@ -89,7 +89,7 @@ export default async function handler(
           {},
           res.getHeader('X-Request-ID') as string
         );
-        return res.status(errorResponse.statusCode).json({ error: errorResponse.body.message });
+        return res.status(errorResponse.statusCode).json({ error: errorResponse.body.error.message });
       }
       
       // Parse payload

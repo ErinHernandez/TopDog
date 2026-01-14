@@ -49,8 +49,9 @@ export function canDraftPlayer({
     PLAYER_POOL
   );
 
-  const currentCount = userRoster[playerData.position]?.length || 0;
-  const limit = positionLimits[playerData.position];
+  const position = playerData.position as keyof typeof userRoster;
+  const currentCount = userRoster[position]?.length || 0;
+  const limit = positionLimits[position];
 
   return currentCount < limit;
 }
@@ -66,7 +67,8 @@ export function getPositionCount(
     userPicks.map((p) => p.player),
     PLAYER_POOL
   );
-  return userRoster[position]?.length || 0;
+  const pos = position as keyof typeof userRoster;
+  return userRoster[pos]?.length || 0;
 }
 
 /**

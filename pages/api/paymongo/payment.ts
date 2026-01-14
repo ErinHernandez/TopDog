@@ -62,7 +62,7 @@ const handler = async function(
   req: NextApiRequest,
   res: NextApiResponse<CreatePaymentResponse>
 ): Promise<void> {
-  return withErrorHandling(req, res, async (req, res, logger) => {
+  await withErrorHandling(req, res, async (req, res, logger) => {
     // Validate HTTP method
     validateMethod(req, ['POST'], logger);
     
@@ -84,7 +84,7 @@ const handler = async function(
       );
       return res.status(errorResponse.statusCode).json({ 
         success: false, 
-        error: errorResponse.body.message 
+        error: errorResponse.body.error.message 
       });
     }
     
@@ -112,7 +112,7 @@ const handler = async function(
       );
       return res.status(errorResponse.statusCode).json({ 
         success: false, 
-        error: errorResponse.body.message 
+        error: errorResponse.body.error.message 
       });
     }
     
@@ -127,7 +127,7 @@ const handler = async function(
       );
       return res.status(errorResponse.statusCode).json({ 
         success: false, 
-        error: errorResponse.body.message 
+        error: errorResponse.body.error.message 
       });
     }
     

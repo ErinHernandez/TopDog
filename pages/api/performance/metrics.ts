@@ -17,6 +17,7 @@ import {
   createSuccessResponse,
   createErrorResponse,
   ErrorType,
+  type ApiLogger,
 } from '../../../lib/apiErrorHandler';
 import { logger } from '../../../lib/structuredLogger';
 import { captureError } from '../../../lib/errorTracking';
@@ -127,7 +128,7 @@ function evaluateMetric(
 async function handler(
   req: NextApiRequest,
   res: NextApiResponse<PerformanceMetricsResponse>,
-  logger: typeof logger
+  logger: ApiLogger
 ): Promise<void> {
   // Validate method
   validateMethod(req, ['POST'], logger);
@@ -229,7 +230,7 @@ async function handler(
       logger
     );
 
-    return res.status(successResponse.statusCode).json(successResponse.body);
+    return res.status(successResponse.statusCode).json(successResponse.body.data);
 
   } catch (error) {
     logger.error('Error processing performance metrics', error as Error, {
@@ -254,9 +255,14 @@ async function handler(
 
     return res.status(errorResponse.statusCode).json({
       received: false,
-      error: errorResponse.body.error,
+      message: errorResponse.body.error.message,
     });
   }
 }
 
-export default withErrorHandling(handler);
+export default async function(
+  req: NextApiRequest,
+  res: NextApiResponse<PerformanceMetricsResponse>
+): Promise<void> {
+  await withErrorHandling(req, res, handler);
+}

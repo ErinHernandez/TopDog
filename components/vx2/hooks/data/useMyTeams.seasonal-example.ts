@@ -190,6 +190,9 @@ export function useMyTeamsSeasonal(): UseMyTeamsResult {
       }
       setError(null);
       
+      if (!db) {
+        throw new Error('Firebase Firestore is not initialized');
+      }
       const teamsRef = collection(db, 'users', userId, 'teams');
       const teamsQuery = query(teamsRef, orderBy('createdAt', 'desc'));
       const snapshot = await getDocs(teamsQuery);
@@ -238,6 +241,11 @@ export function useMyTeamsSeasonal(): UseMyTeamsResult {
     setIsLoading(true);
     setError(null);
 
+    if (!db) {
+      setError('Firebase Firestore is not initialized');
+      setIsLoading(false);
+      return;
+    }
     const teamsRef = collection(db, 'users', userId, 'teams');
     const teamsQuery = query(teamsRef, orderBy('createdAt', 'desc'));
 
@@ -341,6 +349,11 @@ export function useMyTeamsGameDayOptimized(): UseMyTeamsResult {
   // Helper function to fetch data once (for non-game days)
   const fetchData = useCallback(async () => {
     if (!userId) return;
+    if (!db) {
+      setError('Firebase Firestore is not initialized');
+      setIsLoading(false);
+      return;
+    }
     setIsLoading(true);
     try {
       const snapshot = await getDocs(
@@ -365,6 +378,12 @@ export function useMyTeamsGameDayOptimized(): UseMyTeamsResult {
     if (!useRealTime) {
       // Non-game days: One-time fetch
       fetchData();
+      return;
+    }
+
+    if (!db) {
+      setError('Firebase Firestore is not initialized');
+      setIsLoading(false);
       return;
     }
 

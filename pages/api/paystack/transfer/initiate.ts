@@ -29,7 +29,6 @@ import {
   createSuccessResponse,
   createErrorResponse,
   ErrorType,
-  type ScopedLogger,
 } from '../../../../lib/apiErrorHandler';
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp, runTransaction } from 'firebase/firestore';
 import { db } from '../../../../lib/firebase';
@@ -173,6 +172,18 @@ export default async function handler(
     });
     
     // Get user data
+    if (!db) {
+      const response = createErrorResponse(
+        ErrorType.CONFIGURATION,
+        'Firebase Firestore is not initialized',
+        {},
+        null
+      );
+      return res.status(response.statusCode).json({ 
+        success: false, 
+        error: 'Database not available' 
+      });
+    }
     const userRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userRef);
     
@@ -337,7 +348,7 @@ export default async function handler(
     
     // Verify 2FA if enabled on Paystack account
     // Paystack supports 2FA for transfers - check if enabled and verify token
-    const { twoFactorToken } = req.body as { twoFactorToken?: string };
+    // twoFactorToken is already destructured from req.body above
     
     // Check if Paystack account has 2FA enabled (this would be stored in user's Paystack settings)
     // For now, we'll check if a token is provided when required
@@ -381,6 +392,18 @@ export default async function handler(
       // #region agent log
       fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'initiate.ts:357',message:'Before transaction',data:{userId,usdAmountToDebit,reference},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
       // #endregion
+      if (!db) {
+        const response = createErrorResponse(
+          ErrorType.CONFIGURATION,
+          'Firebase Firestore is not initialized',
+          {},
+          null
+        );
+        return res.status(response.statusCode).json({ 
+          success: false, 
+          error: 'Database not available' 
+        });
+      }
       newBalance = await runTransaction(db, async (transaction) => {
         const userSnapshot = await transaction.get(userRef);
         
@@ -484,7 +507,7 @@ export default async function handler(
       
       // Update transaction with transfer code
       // Use updateDoc with dot notation for nested field updates (not setDoc which treats it as literal field name)
-      const transactionRef = doc(db, 'transactions', transaction.id);
+      const transactionRef = doc(db!, 'transactions', transaction.id);
       await updateDoc(transactionRef, {
         'metadata.paystackTransferCode': result.transferCode,
         status: result.status === 'success' ? 'completed' : 'processing',
@@ -557,7 +580,7 @@ export default async function handler(
       });
       
       // Update transaction to failed
-      const transactionRef = doc(db, 'transactions', transaction.id);
+      const transactionRef = doc(db!, 'transactions', transaction.id);
       await updateDoc(transactionRef, {
         status: 'failed',
         errorMessage: initiateError instanceof Error ? initiateError.message : 'Transfer initiation failed',

@@ -71,6 +71,12 @@ export function useLocationTracking(): UseLocationTrackingReturn {
       return;
     }
     
+    if (!db) {
+      setError(new Error('Firebase Firestore is not initialized'));
+      setIsLoading(false);
+      return;
+    }
+    
     const docRef = doc(db, 'userLocations', user.uid);
     
     const unsubscribe = onSnapshot(

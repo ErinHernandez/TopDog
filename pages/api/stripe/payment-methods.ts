@@ -15,7 +15,7 @@ import {
   createSuccessResponse,
   createErrorResponse,
   ErrorType,
-  type ScopedLogger,
+  type ApiLogger,
 } from '../../../lib/apiErrorHandler';
 import { createScopedLogger } from '../../../lib/serverLogger';
 import {
@@ -74,7 +74,7 @@ export default withCSRFProtection(withAuth(withRateLimit(handler, paymentMethods
 async function handleListPaymentMethods(
   req: NextApiRequest,
   res: NextApiResponse,
-  logger: ScopedLogger
+  logger: ApiLogger
 ) {
   const { userId } = req.query;
   
@@ -150,7 +150,7 @@ async function handleListPaymentMethods(
 async function handleDetachPaymentMethod(
   req: NextApiRequest,
   res: NextApiResponse,
-  logger: ScopedLogger
+  logger: ApiLogger
 ) {
   const { userId, paymentMethodId } = req.body;
   
@@ -197,7 +197,7 @@ async function handleDetachPaymentMethod(
 async function handleSetDefaultPaymentMethod(
   req: NextApiRequest,
   res: NextApiResponse,
-  logger: ScopedLogger
+  logger: ApiLogger
 ) {
   const { userId, paymentMethodId } = req.body;
   

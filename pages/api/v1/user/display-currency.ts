@@ -25,7 +25,7 @@ import {
   createSuccessResponse,
   createErrorResponse,
   ErrorType,
-  type ScopedLogger,
+  type ApiLogger,
 } from '../../../../lib/apiErrorHandler';
 import {
   getDisplayCurrency,
@@ -126,7 +126,7 @@ export default withCSRFProtection(
 async function handleGet(
   req: AuthenticatedRequest,
   res: NextApiResponse,
-  logger: ScopedLogger
+  logger: ApiLogger
 ) {
   const { userId, country } = req.query as Partial<GetDisplayCurrencyQuery>;
   
@@ -185,7 +185,7 @@ async function handleGet(
 async function handlePut(
   req: AuthenticatedRequest,
   res: NextApiResponse,
-  logger: ScopedLogger
+  logger: ApiLogger
 ) {
   const { userId, country, currency } = req.body as Partial<SetDisplayCurrencyBody>;
   
@@ -256,7 +256,7 @@ async function handlePut(
 async function handleDelete(
   req: AuthenticatedRequest,
   res: NextApiResponse,
-  logger: ScopedLogger
+  logger: ApiLogger
 ) {
   const { userId, country } = req.body as Partial<ResetDisplayCurrencyBody>;
   

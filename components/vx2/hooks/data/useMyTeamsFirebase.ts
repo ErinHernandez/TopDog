@@ -77,6 +77,9 @@ function transformFirestoreTeamToMyTeam(
  * Create teams query with proper ordering
  */
 function createTeamsQuery(userId: string) {
+  if (!db) {
+    throw new Error('Firebase Firestore is not initialized');
+  }
   const teamsRef = collection(db, 'users', userId, 'teams');
   return query(teamsRef, orderBy('createdAt', 'desc'));
 }

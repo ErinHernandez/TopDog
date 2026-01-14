@@ -50,7 +50,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void> {
-  return withErrorHandling(req, res, async (req, res, logger) => {
+  await withErrorHandling(req, res, async (req, res, logger) => {
     // Validate HTTP method
     validateMethod(req, ['GET'], logger);
     
@@ -69,9 +69,9 @@ export default async function handler(
         ErrorType.FORBIDDEN,
         adminCheck.error || 'Admin access required',
         {},
-        logger
+        null
       );
-      return res.status(errorResponse.statusCode).json({ error: errorResponse.body.message });
+      return res.status(errorResponse.statusCode).json({ error: errorResponse.body.error.message });
     }
     
     logger.info('Verifying admin claims', {
@@ -91,9 +91,9 @@ export default async function handler(
         ErrorType.CONFIGURATION,
         'Firebase Admin not initialized',
         {},
-        logger
+        null
       );
-      return res.status(errorResponse.statusCode).json({ error: errorResponse.body.message });
+      return res.status(errorResponse.statusCode).json({ error: errorResponse.body.error.message });
     }
     
     const auth = admin.auth();

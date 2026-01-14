@@ -687,7 +687,6 @@ export default function MobilePhoneFrame({
         right: 0,
         bottom: 0,
         // Use stable viewport height
-        height: '100vh', // Fallback
         height: 'calc(var(--stable-vh, 1vh) * 100)',
         // Center the phone frame using flexbox
         display: 'flex',

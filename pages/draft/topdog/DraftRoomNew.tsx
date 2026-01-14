@@ -107,6 +107,7 @@ export function DraftRoomNew({ roomId }: DraftRoomNewProps) {
 
   // Get current user
   useEffect(() => {
+    if (!auth) return;
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setAuthLoading(false);

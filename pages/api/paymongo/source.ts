@@ -94,7 +94,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<CreateSourceResponse>
 ): Promise<void> {
-  return withErrorHandling(req, res, async (req, res, logger) => {
+  await withErrorHandling(req, res, async (req, res, logger) => {
     // Validate HTTP method
     validateMethod(req, ['POST'], logger);
     
@@ -114,7 +114,7 @@ export default async function handler(
       );
       return res.status(errorResponse.statusCode).json({ 
         success: false, 
-        error: errorResponse.body.message 
+        error: errorResponse.body.error.message 
       });
     }
     
@@ -140,7 +140,7 @@ export default async function handler(
       );
       return res.status(errorResponse.statusCode).json({ 
         success: false, 
-        error: errorResponse.body.message 
+        error: errorResponse.body.error.message 
       });
     }
     

@@ -247,13 +247,13 @@ function TeamCard({
                 {formatDraftDate(team.draftedAt)}
               </span>
             )}
-              {showPointsDiff && (pointsBack !== null || pointsAhead !== null) && (
+              {showPointsDiff && ((pointsBack ?? null) !== null || (pointsAhead ?? null) !== null) && (
                 <div className="flex flex-col" style={{ fontSize: `${TYPOGRAPHY.fontSize.xs}px`, color: TEXT_COLORS.muted, marginLeft: 'auto', textAlign: 'right' }}>
-                  {pointsBack !== null && pointsBack > 0 && (
-                    <span style={{ whiteSpace: 'nowrap' }}>{pointsBack.toFixed(1)} pts back</span>
+                  {(pointsBack ?? null) !== null && (pointsBack ?? 0) > 0 && (
+                    <span style={{ whiteSpace: 'nowrap' }}>{(pointsBack ?? 0).toFixed(1)} pts back</span>
                   )}
-                  {pointsAhead !== null && pointsAhead > 0 && (
-                    <span style={{ whiteSpace: 'nowrap' }}>{pointsAhead.toFixed(1)} pts ahead</span>
+                  {(pointsAhead ?? null) !== null && (pointsAhead ?? 0) > 0 && (
+                    <span style={{ whiteSpace: 'nowrap' }}>{(pointsAhead ?? 0).toFixed(1)} pts ahead</span>
                   )}
                 </div>
               )}

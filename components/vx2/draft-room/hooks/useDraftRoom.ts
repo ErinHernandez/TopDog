@@ -531,7 +531,7 @@ export function useDraftRoom({
     preDraftCountdown: 0, // TODO: Add pre-draft countdown state if needed
     picksUntilMyTurn,
     isMyTurn,
-    timer: timerHook.timer,
+    timer: timerHook.seconds,
     currentRound: picksHook.currentRound,
     currentPick: currentPickNumber,
   });

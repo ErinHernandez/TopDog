@@ -574,7 +574,7 @@ function DynamicIslandVisualization({
         {/* Expanded view */}
         {isExpanded && (
           <div className="flex flex-col items-center justify-center px-4 py-2 w-full">
-            {content.showTimer && (
+            {content.showTimer && content.timerSeconds !== undefined && (
               <div className="flex items-center gap-2 w-full justify-between">
                 <span className="tabular-nums font-bold text-sm">{content.timerSeconds}</span>
                 {content.totalSeconds && (

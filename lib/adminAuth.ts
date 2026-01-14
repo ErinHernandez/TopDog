@@ -50,8 +50,9 @@ if (admin.apps.length === 0) {
     const serviceAccount = JSON.parse(serviceAccountJson) as ServiceAccount;
     
     if (serviceAccount.project_id) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
+        credential: admin.credential.cert(serviceAccount as any),
       });
       firebaseAdminInitialized = true;
     } else {

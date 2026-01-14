@@ -26,7 +26,7 @@ export function useDraftSocket({ roomId }: UseDraftSocketOptions): void {
 
   // Room listener
   useEffect(() => {
-    if (!roomId) return;
+    if (!roomId || !db) return;
 
     logger.info('Connecting to draft room', { roomId, component: 'useDraftSocket' });
 
@@ -82,7 +82,7 @@ export function useDraftSocket({ roomId }: UseDraftSocketOptions): void {
 
   // Picks listener
   useEffect(() => {
-    if (!roomId) return;
+    if (!roomId || !db) return;
 
     const picksQuery = query(
       collection(db, 'draftRooms', roomId, 'picks'),

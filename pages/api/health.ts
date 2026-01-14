@@ -48,7 +48,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<HealthResponse>
 ): Promise<void> {
-  return withErrorHandling(req, res, async (req, res, logger) => {
+  await withErrorHandling(req, res, async (req, res, logger) => {
     // Validate HTTP method
     validateMethod(req, ['GET'], logger);
     

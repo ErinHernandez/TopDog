@@ -42,8 +42,11 @@ export default async function handler(req: NextRequest) {
   const requestId = crypto.randomUUID();
   
   // Get edge region info
-  const region = req.geo?.region || 'unknown';
-  const city = req.geo?.city;
+  // geo property exists on NextRequest in edge runtime but not in types
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const geo = (req as any).geo;
+  const region = geo?.region || 'unknown';
+  const city = geo?.city;
   
   let overallStatus: 'ok' | 'degraded' | 'error' = 'ok';
   const checks: Record<string, string> = {};
@@ -103,7 +106,7 @@ export default async function handler(req: NextRequest) {
         requestId,
         error: errorMessage,
         stack: errorStack,
-        region: req.geo?.region || 'unknown',
+        region: geo?.region || 'unknown',
       });
     }
 
@@ -113,7 +116,7 @@ export default async function handler(req: NextRequest) {
       uptime: 0,
       environment: process.env.NODE_ENV || 'unknown',
       edge: {
-        region: req.geo?.region || 'unknown',
+        region: geo?.region || 'unknown',
       },
     };
 

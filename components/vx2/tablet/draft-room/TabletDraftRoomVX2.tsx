@@ -667,7 +667,9 @@ function InnerDraftRoom({ roomId, onLeave, fastMode }: InnerDraftRoomProps): Rea
                 <PlayerListPanel
                   players={draftRoom.availablePlayers.filteredPlayers}
                   isMyTurn={draftRoom.isMyTurn}
-                  onDraft={draftRoom.draftPlayer}
+                  onDraft={(player) => {
+                    void draftRoom.draftPlayer(player as DraftPlayer);
+                  }}
                   onToggleQueue={draftRoom.queue.toggleQueue}
                   isQueued={draftRoom.queue.isQueued}
                   positionFilters={draftRoom.availablePlayers.positionFilters}

@@ -30,7 +30,7 @@ import {
   createSuccessResponse,
   createErrorResponse,
   ErrorType,
-  type ScopedLogger,
+  type ApiLogger,
 } from '../../../../lib/apiErrorHandler';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../../../lib/firebase';
@@ -118,7 +118,7 @@ export default async function handler(
 async function handleCreate(
   req: NextApiRequest,
   res: NextApiResponse<RecipientResponse>,
-  logger: ScopedLogger
+  logger: ApiLogger
 ) {
   const {
     userId,
@@ -138,7 +138,7 @@ async function handleCreate(
       ErrorType.VALIDATION,
       'Valid country (NG, GH, ZA, KE) is required',
       { country },
-      logger
+      null
     );
     return res.status(response.statusCode).json({
       ok: false,
@@ -152,7 +152,7 @@ async function handleCreate(
       ErrorType.VALIDATION,
       'Bank code is required for bank transfers',
       { type },
-      logger
+      null
     );
     return res.status(response.statusCode).json({
       ok: false,
@@ -180,7 +180,7 @@ async function handleCreate(
         ErrorType.VALIDATION,
         'Invalid recipient type',
         { type, allowedTypes: ['nuban', 'basa', 'mobile_money'] },
-        logger
+        null
       );
       return res.status(invalidTypeResponse.statusCode).json({
         ok: false,
@@ -222,6 +222,18 @@ async function handleCreate(
   
   // If setting as default, update user doc
   if (setAsDefault) {
+    if (!db) {
+      const response = createErrorResponse(
+        ErrorType.CONFIGURATION,
+        'Firebase Firestore is not initialized',
+        {},
+        null
+      );
+      return res.status(response.statusCode).json({ 
+        ok: false,
+        error: { code: 'DATABASE_ERROR', message: 'Database not available' }
+      });
+    }
     const userRef = doc(db, 'users', userId);
     await setDoc(userRef, {
       defaultPaystackRecipient: result.recipientCode,
@@ -256,7 +268,7 @@ async function handleCreate(
 async function handleList(
   req: NextApiRequest,
   res: NextApiResponse<RecipientResponse>,
-  logger: ScopedLogger
+  logger: ApiLogger
 ) {
   const userId = req.query.userId as string;
   const listBanksFor = req.query.banks as string; // 'nigeria', 'ghana', 'south_africa', 'kenya'
@@ -283,7 +295,7 @@ async function handleList(
         ErrorType.VALIDATION,
         'Invalid country for bank list',
         { listBanksFor, allowedCountries: ['NG', 'GH', 'ZA', 'KE', 'nigeria', 'ghana', 'south_africa', 'kenya'] },
-        logger
+        null
       );
       return res.status(response.statusCode).json({
         ok: false,
@@ -346,7 +358,7 @@ async function handleList(
       ErrorType.VALIDATION,
       'User ID is required',
       {},
-      logger
+      null
     );
     return res.status(response.statusCode).json({
       ok: false,
@@ -360,6 +372,18 @@ async function handleList(
     userId,
   });
   
+  if (!db) {
+    const response = createErrorResponse(
+      ErrorType.CONFIGURATION,
+      'Firebase Firestore is not initialized',
+      {},
+      null
+    );
+    return res.status(response.statusCode).json({ 
+      ok: false,
+      error: { code: 'DATABASE_ERROR', message: 'Database not available' } 
+    });
+  }
   const userRef = doc(db, 'users', userId);
   const userDoc = await getDoc(userRef);
   
@@ -368,7 +392,7 @@ async function handleList(
       ErrorType.NOT_FOUND,
       'User not found',
       { userId },
-      logger
+      null
     );
     return res.status(response.statusCode).json({
       ok: false,
@@ -398,7 +422,7 @@ async function handleList(
 async function handleDelete(
   req: NextApiRequest,
   res: NextApiResponse<RecipientResponse>,
-  logger: ScopedLogger
+  logger: ApiLogger
 ) {
   validateBody(req, ['userId', 'recipientCode'], logger);
   
@@ -414,6 +438,18 @@ async function handleDelete(
     recipientCode,
   });
   
+  if (!db) {
+    const response = createErrorResponse(
+      ErrorType.CONFIGURATION,
+      'Firebase Firestore is not initialized',
+      {},
+      null
+    );
+    return res.status(response.statusCode).json({ 
+      ok: false,
+      error: { code: 'DATABASE_ERROR', message: 'Database not available' } 
+    });
+  }
   const userRef = doc(db, 'users', userId);
   const userDoc = await getDoc(userRef);
   
@@ -422,7 +458,7 @@ async function handleDelete(
       ErrorType.NOT_FOUND,
       'User not found',
       { userId },
-      logger
+      null
     );
     return res.status(response.statusCode).json({
       ok: false,
@@ -438,7 +474,7 @@ async function handleDelete(
       ErrorType.NOT_FOUND,
       'Recipient not found',
       { recipientCode, userId },
-      logger
+      null
     );
     return res.status(response.statusCode).json({
       ok: false,

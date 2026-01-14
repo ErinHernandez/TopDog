@@ -108,7 +108,7 @@ export default async function handler(
         );
         return res.status(errorResponse.statusCode).json({
           received: false,
-          error: errorResponse.body.message,
+          error: errorResponse.body.error.message,
         });
       }
       
@@ -125,7 +125,7 @@ export default async function handler(
         );
         return res.status(errorResponse.statusCode).json({
           received: false,
-          error: errorResponse.body.message,
+          error: errorResponse.body.error.message,
         });
       }
       

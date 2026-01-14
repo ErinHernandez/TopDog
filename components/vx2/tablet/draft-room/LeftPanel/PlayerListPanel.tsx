@@ -8,21 +8,11 @@
 import React, { useState, useCallback, type ReactElement } from 'react';
 import { BG_COLORS, TEXT_COLORS, POSITION_COLORS } from '../../../core/constants/colors';
 import { TABLET_DRAFT, TABLET_SPACING, TABLET_TYPOGRAPHY } from '../../../core/constants/tablet';
-import type { Position } from '../../../draft-room/types';
+import type { Position, DraftPlayer } from '../../../draft-room/types';
 
 // ============================================================================
 // TYPES
 // ============================================================================
-
-interface DraftPlayer {
-  id: string;
-  name: string;
-  team: string;
-  position: Position;
-  adp?: number;
-  projectedPoints?: number;
-  byeWeek?: number;
-}
 
 export interface PlayerListPanelProps {
   /** Available players */

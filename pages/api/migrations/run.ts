@@ -16,6 +16,8 @@ import {
   createSuccessResponse,
   createErrorResponse,
   ErrorType,
+  type ApiLogger,
+  type ApiHandler,
 } from '../../../lib/apiErrorHandler';
 import { logger } from '../../../lib/structuredLogger';
 import { runMigrations, migrations } from '../../../lib/migrations';
@@ -48,7 +50,7 @@ interface RunMigrationsResponse {
 async function handler(
   req: AuthenticatedRequest,
   res: NextApiResponse<RunMigrationsResponse>,
-  logger: typeof logger
+  logger: ApiLogger
 ): Promise<void> {
   // Only allow POST
   validateMethod(req, ['POST'], logger);
@@ -82,7 +84,7 @@ async function handler(
       logger
     );
     
-    return res.status(response.statusCode).json(response.body);
+    return res.status(response.statusCode).json(response.body.data);
     
   } catch (error) {
     logger.error('Migration run failed', error as Error);
@@ -95,14 +97,23 @@ async function handler(
     
     return res.status(errorResponse.statusCode).json({
       success: false,
-      results: [],
+      results: [{
+        version: 0,
+        name: 'error',
+        success: false,
+        error: errorResponse.body.error.message,
+      }],
       dryRun,
-      error: errorResponse.body.error,
     });
   }
 }
 
 // Export with authentication (admin only)
-export default withErrorHandling(
-  withAuth(handler, { required: true, allowAnonymous: false })
-);
+const authenticatedHandler = withAuth(handler, { required: true, allowAnonymous: false });
+
+export default async function(
+  req: NextApiRequest,
+  res: NextApiResponse<RunMigrationsResponse>
+): Promise<void> {
+  await withErrorHandling(req, res, authenticatedHandler as ApiHandler);
+}

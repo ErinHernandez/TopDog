@@ -15,7 +15,7 @@ import {
   createSuccessResponse,
   createErrorResponse,
   ErrorType,
-  type ScopedLogger,
+  type ApiLogger,
 } from '../../../../lib/apiErrorHandler';
 import {
   getOrCreateConnectAccount,
@@ -85,7 +85,7 @@ export default withCSRFProtection(
 async function handleCreateAccount(
   req: AuthenticatedRequest,
   res: NextApiResponse,
-  logger: ScopedLogger
+  logger: ApiLogger
 ) {
   const { userId, email, country = 'US' } = req.body;
   
@@ -163,7 +163,7 @@ async function handleCreateAccount(
 async function handleGetAccountStatus(
   req: AuthenticatedRequest,
   res: NextApiResponse,
-  logger: ScopedLogger
+  logger: ApiLogger
 ) {
   const { userId } = req.query;
   

@@ -183,7 +183,7 @@ const handler = async function(
         ok: false,
         error: {
           code: 'RATE_LIMIT_EXCEEDED',
-          message: errorResponse.body.message,
+          message: errorResponse.body.error.message,
         },
       });
     }
@@ -208,7 +208,7 @@ const handler = async function(
         ok: false,
         error: {
           code: 'FORBIDDEN',
-          message: errorResponse.body.message,
+          message: errorResponse.body.error.message,
         },
       });
     }
@@ -224,7 +224,7 @@ const handler = async function(
         ok: false,
         error: {
           code: 'INVALID_REQUEST',
-          message: errorResponse.body.message,
+          message: errorResponse.body.error.message,
         },
       });
     }

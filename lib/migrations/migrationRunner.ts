@@ -52,6 +52,9 @@ const MIGRATIONS_DOC_ID = 'current';
  * Get current migration version from Firestore
  */
 async function getCurrentVersion(): Promise<number> {
+  if (!db) {
+    throw new Error('Firebase Firestore is not initialized');
+  }
   try {
     const migrationDoc = await getDoc(doc(db, MIGRATIONS_COLLECTION, MIGRATIONS_DOC_ID));
     
@@ -80,6 +83,10 @@ async function updateCurrentVersion(
     return;
   }
 
+  if (!db) {
+    throw new Error('Firebase Firestore is not initialized');
+  }
+
   try {
     await setDoc(
       doc(db, MIGRATIONS_COLLECTION, MIGRATIONS_DOC_ID),
@@ -103,6 +110,9 @@ async function updateCurrentVersion(
  * Get list of applied migrations
  */
 export async function getAppliedMigrations(): Promise<MigrationStatus[]> {
+  if (!db) {
+    throw new Error('Firebase Firestore is not initialized');
+  }
   try {
     const migrationDoc = await getDoc(doc(db, MIGRATIONS_COLLECTION, MIGRATIONS_DOC_ID));
     
@@ -171,10 +181,14 @@ export async function runMigrations(
       logger.info(`Running migration ${migration.version}: ${migration.name}${dryRun ? ' (DRY RUN)' : ''}`);
       
       if (!dryRun) {
+        if (!db) {
+          throw new Error('Firebase Firestore is not initialized');
+        }
         // Run migration in a transaction for safety
-        await runTransaction(db, async (transaction) => {
+        // db is guaranteed to be non-null here due to check above
+        await runTransaction(db!, async (transaction) => {
           // Verify version hasn't changed
-          const currentDoc = await transaction.get(doc(db, MIGRATIONS_COLLECTION, MIGRATIONS_DOC_ID));
+          const currentDoc = await transaction.get(doc(db!, MIGRATIONS_COLLECTION, MIGRATIONS_DOC_ID));
           const currentVer = currentDoc.exists() ? (currentDoc.data().version || 0) : 0;
           
           if (currentVer !== currentVersion) {
@@ -182,7 +196,8 @@ export async function runMigrations(
           }
           
           // Run migration
-          await migration.up(db);
+          // db is guaranteed to be non-null here due to check above
+          await migration.up(db!);
           
           // Update version
           await updateCurrentVersion(migration.version, migration.name, false);
@@ -190,6 +205,9 @@ export async function runMigrations(
       } else {
         // Dry run - just log what would happen
         logger.info(`[DRY RUN] Would run migration ${migration.version}: ${migration.name}`);
+        if (!db) {
+          throw new Error('Firebase Firestore is not initialized');
+        }
         await migration.up(db); // Still run it, but don't update version
       }
       
@@ -264,9 +282,13 @@ export async function rollbackLastMigration(
     logger.info(`Rolling back migration ${currentVersion}: ${lastMigration.name}${dryRun ? ' (DRY RUN)' : ''}`);
     
     if (!dryRun) {
-      await runTransaction(db, async (transaction) => {
+      if (!db) {
+        throw new Error('Firebase Firestore is not initialized');
+      }
+      // db is guaranteed to be non-null here due to check above
+      await runTransaction(db!, async (transaction) => {
         // Verify version
-        const currentDoc = await transaction.get(doc(db, MIGRATIONS_COLLECTION, MIGRATIONS_DOC_ID));
+        const currentDoc = await transaction.get(doc(db!, MIGRATIONS_COLLECTION, MIGRATIONS_DOC_ID));
         const currentVer = currentDoc.exists() ? (currentDoc.data().version || 0) : 0;
         
         if (currentVer !== currentVersion) {
@@ -274,7 +296,8 @@ export async function rollbackLastMigration(
         }
         
         // Run rollback
-        await lastMigration.down!(db);
+        // db is guaranteed to be non-null here due to check above
+        await lastMigration.down!(db!);
         
         // Find previous migration
         const previousMigration = migrations
@@ -287,7 +310,7 @@ export async function rollbackLastMigration(
         } else {
           // No previous migration, set to 0
           await setDoc(
-            doc(db, MIGRATIONS_COLLECTION, MIGRATIONS_DOC_ID),
+            doc(db!, MIGRATIONS_COLLECTION, MIGRATIONS_DOC_ID),
             {
               version: 0,
               name: 'initial',
@@ -298,6 +321,9 @@ export async function rollbackLastMigration(
       });
     } else {
       logger.info(`[DRY RUN] Would rollback migration ${currentVersion}: ${lastMigration.name}`);
+      if (!db) {
+        throw new Error('Firebase Firestore is not initialized');
+      }
       await lastMigration.down!(db);
     }
     

@@ -94,6 +94,10 @@ interface SuccessResponse<T = unknown> {
 export interface ExtendedNextApiRequest extends NextApiRequest {
   logger?: ApiLogger;
   requestId?: string;
+  user?: {
+    uid: string;
+    email?: string;
+  } | null;
 }
 
 export type ApiHandler = (
@@ -219,17 +223,17 @@ export function createErrorResponse(
   requestId: string | null = null
 ): { statusCode: number; body: ErrorResponse } {
   const statusCodes: Record<ErrorTypeValue, number> = {
-    [ErrorType.VALIDATION]: 400,
-    [ErrorType.UNAUTHORIZED]: 401,
-    [ErrorType.FORBIDDEN]: 403,
-    [ErrorType.NOT_FOUND]: 404,
-    [ErrorType.METHOD_NOT_ALLOWED]: 405,
-    [ErrorType.RATE_LIMIT]: 429,
-    [ErrorType.EXTERNAL_API]: 502,
-    [ErrorType.DATABASE]: 503,
-    [ErrorType.CONFIGURATION]: 500,
-    [ErrorType.INTERNAL]: 500,
-    [ErrorType.STRIPE]: 500,
+    'VALIDATION_ERROR': 400,
+    'UNAUTHORIZED': 401,
+    'FORBIDDEN': 403,
+    'NOT_FOUND': 404,
+    'METHOD_NOT_ALLOWED': 405,
+    'RATE_LIMIT': 429,
+    'EXTERNAL_API_ERROR': 502,
+    'DATABASE_ERROR': 503,
+    'INTERNAL_SERVER_ERROR': 500,
+    'CONFIGURATION_ERROR': 500,
+    'STRIPE_ERROR': 500,
   };
 
   const statusCode = statusCodes[errorType] || 500;
@@ -404,7 +408,8 @@ export function validateQueryParams(
   const missing: string[] = [];
   
   for (const param of requiredParams) {
-    if (!req.query[param] && req.query[param] !== 0) {
+    const paramValue = req.query[param];
+    if (paramValue === undefined || paramValue === null || paramValue === '') {
       missing.push(param);
     }
   }

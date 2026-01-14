@@ -99,7 +99,7 @@ export default async function handler(
       );
       return res.status(errorResponse.statusCode).json({
         ok: false,
-        error: { code: 'missing_reference', message: errorResponse.body.message },
+        error: { code: 'missing_reference', message: errorResponse.body.error.message },
       });
     }
     
@@ -123,7 +123,7 @@ export default async function handler(
         ok: false,
         error: {
           code: 'transaction_not_found',
-          message: errorResponse.body.message,
+          message: errorResponse.body.error.message,
         },
       });
     }

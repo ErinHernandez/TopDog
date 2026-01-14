@@ -133,7 +133,7 @@ export function PayMongoWithdrawModalVX2({
   
   const handleContinueToBank = useCallback(() => {
     if (!amountValidation.isValid) {
-      setError(amountValidation.error);
+      setError(amountValidation.error ?? null);
       return;
     }
     setStep('bank');

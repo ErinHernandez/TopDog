@@ -43,7 +43,8 @@ import {
   validateMethod,
   createSuccessResponse,
   createErrorResponse,
-  ErrorType 
+  ErrorType,
+  type ApiLogger,
 } from '../../../lib/apiErrorHandler';
 
 // ============================================================================
@@ -138,7 +139,7 @@ export default async function handler(
         {},
         res.getHeader('X-Request-ID') as string
       );
-      return res.status(200).json({ received: false, error: errorResponse.body.message });
+      return res.status(200).json({ received: false, error: errorResponse.body.error.message });
     }
     
     // Get raw body for signature verification
@@ -154,7 +155,7 @@ export default async function handler(
         {},
         res.getHeader('X-Request-ID') as string
       );
-      return res.status(200).json({ received: false, error: errorResponse.body.message });
+      return res.status(200).json({ received: false, error: errorResponse.body.error.message });
     }
     
     // Verify webhook signature
@@ -179,7 +180,7 @@ export default async function handler(
         {},
         res.getHeader('X-Request-ID') as string
       );
-      return res.status(200).json({ received: false, error: errorResponse.body.message });
+      return res.status(200).json({ received: false, error: errorResponse.body.error.message });
     }
     
     // Check for duplicate event (idempotency)
@@ -277,7 +278,7 @@ interface ProcessingResult {
 
 async function processEvent(
   event: Stripe.Event,
-  logger: { info: (message: string, context?: Record<string, unknown>) => void; error: (message: string, error: unknown, context?: Record<string, unknown>) => void; warn: (message: string, context?: Record<string, unknown>) => void }
+  logger: ApiLogger
 ): Promise<ProcessingResult> {
   try {
     // Process event based on type
@@ -511,7 +512,6 @@ async function handlePaymentIntentSucceeded(
       component: 'stripe',
       operation: 'update-last-deposit-currency',
     });
-    }
     // Don't fail the whole operation for this
   }
   

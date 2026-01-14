@@ -8,6 +8,7 @@
  */
 
 import React from 'react';
+// @ts-expect-error - react-beautiful-dnd doesn't have type definitions
 import { DragDropContext } from 'react-beautiful-dnd';
 import StrictModeDroppable from '@/components/StrictModeDroppable';
 import { useDraftState, useDraftDispatch } from '../context/DraftRoomContext';
@@ -166,7 +167,7 @@ export function PlayerList({ onPlayerClick }: PlayerListProps) {
       <div className="flex-1 overflow-y-auto">
         <DragDropContext onDragEnd={handleDragEnd}>
           <StrictModeDroppable droppableId="available-players">
-            {(provided) => (
+            {(provided: any) => (
               <div
                 ref={provided.innerRef}
                 {...provided.droppableProps}

@@ -73,7 +73,7 @@ const handler = async function(
 ) {
   const clientIP = getClientIP(req);
   
-  return withErrorHandling(req, res, async (req, res, logger) => {
+  return withErrorHandling(req, res, async (req: AuthenticatedRequest, res, logger) => {
     // Validate HTTP method
     validateMethod(req, ['POST'], logger);
     
@@ -90,7 +90,7 @@ const handler = async function(
         SecurityEventType.RATE_LIMIT_EXCEEDED,
         'medium',
         { endpoint: '/api/stripe/cancel-payment' },
-        req.user?.uid || null,
+        req.user?.uid || undefined,
         clientIP
       );
       
@@ -104,7 +104,7 @@ const handler = async function(
         ok: false,
         error: {
           code: 'RATE_LIMIT_EXCEEDED',
-          message: errorResponse.body.message,
+          message: errorResponse.body.error.message,
         },
       });
     }
@@ -143,7 +143,7 @@ const handler = async function(
         ok: false,
         error: {
           code: 'FORBIDDEN',
-          message: errorResponse.body.message,
+          message: errorResponse.body.error.message,
         },
       });
     }
@@ -160,7 +160,7 @@ const handler = async function(
         ok: false,
         error: {
           code: 'INVALID_REQUEST',
-          message: errorResponse.body.message,
+          message: errorResponse.body.error.message,
         },
       });
     }
@@ -176,7 +176,7 @@ const handler = async function(
         ok: false,
         error: {
           code: 'INVALID_REQUEST',
-          message: errorResponse.body.message,
+          message: errorResponse.body.error.message,
         },
       });
     }

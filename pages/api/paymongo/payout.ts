@@ -23,7 +23,6 @@ import {
   createSuccessResponse,
   createErrorResponse,
   ErrorType,
-  type ScopedLogger,
 } from '../../../lib/apiErrorHandler';
 import { db } from '../../../lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
@@ -64,7 +63,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<CreatePayoutResponse>
 ): Promise<void> {
-  return withErrorHandling(req, res, async (req, res, logger) => {
+  await withErrorHandling(req, res, async (req, res, logger) => {
     validateMethod(req, ['POST'], logger);
     
     logger.info('PayMongo payout request', {
@@ -83,7 +82,7 @@ export default async function handler(
         ErrorType.VALIDATION,
         'Invalid amount. Must be a positive number',
         { amount: body.amount },
-        logger
+        null
       );
       return res.status(response.statusCode).json({ 
         success: false, 
@@ -97,7 +96,7 @@ export default async function handler(
         ErrorType.VALIDATION,
         'User ID must be a string',
         {},
-        logger
+        null
       );
       return res.status(response.statusCode).json({ 
         success: false, 
@@ -114,6 +113,18 @@ export default async function handler(
     });
     
     // Get user balance
+    if (!db) {
+      const response = createErrorResponse(
+        ErrorType.CONFIGURATION,
+        'Firebase Firestore is not initialized',
+        {},
+        null
+      );
+      return res.status(response.statusCode).json({ 
+        success: false, 
+        error: 'Database not available' 
+      });
+    }
     const userRef = doc(db, 'users', body.userId);
     const userDoc = await getDoc(userRef);
     
@@ -122,7 +133,7 @@ export default async function handler(
         ErrorType.NOT_FOUND,
         'User not found',
         { userId: body.userId },
-        logger
+        null
       );
       return res.status(response.statusCode).json({ 
         success: false, 
@@ -148,7 +159,7 @@ export default async function handler(
           balance: currentBalance,
           balanceCentavos,
         },
-        logger
+        null
       );
       return res.status(response.statusCode).json({ 
         success: false, 
@@ -167,7 +178,7 @@ export default async function handler(
           ErrorType.VALIDATION,
           'New bank account details required when bankAccountId is "new"',
           {},
-          logger
+          null
         );
         return res.status(response.statusCode).json({ 
           success: false, 
@@ -181,7 +192,7 @@ export default async function handler(
           ErrorType.VALIDATION,
           'Bank code, account number, and account holder name are required for new bank accounts',
           {},
-          logger
+          null
         );
         return res.status(response.statusCode).json({ 
           success: false, 
@@ -219,7 +230,7 @@ export default async function handler(
           ErrorType.NOT_FOUND,
           'Bank account not found',
           { userId: body.userId, bankAccountId: body.bankAccountId },
-          logger
+          null
         );
         return res.status(response.statusCode).json({ 
           success: false, 

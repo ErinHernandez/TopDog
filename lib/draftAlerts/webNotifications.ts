@@ -43,14 +43,16 @@ export async function showWebNotification(
     // Try service worker first for better reliability
     if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
       const registration = await navigator.serviceWorker.ready;
-      await registration.showNotification('TopDog Draft', {
+      // Note: 'actions' is not in the standard NotificationOptions type
+      // but is supported by service worker notifications
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const notificationOptions: any = {
         body: alertState.message,
         icon: '/icon-192x192.png',
         badge: '/icon-96x96.png',
         tag: `draft-alert-${alertState.roomId}-${alertState.type}`,
         requireInteraction: alertState.type === DraftAlertType.ON_THE_CLOCK,
         silent: false,
-        vibrate: [200, 100, 200],
         data: {
           url: `/draft/topdog/${alertState.roomId}`,
           roomId: alertState.roomId,
@@ -63,7 +65,9 @@ export async function showWebNotification(
             title: 'Open Draft',
           },
         ],
-      });
+      };
+      
+      await registration.showNotification('TopDog Draft', notificationOptions);
     } else {
       // Fallback to direct Notification API
       const notification = new Notification('TopDog Draft', {

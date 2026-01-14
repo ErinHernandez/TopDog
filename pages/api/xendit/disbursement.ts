@@ -23,7 +23,6 @@ import {
   createSuccessResponse,
   createErrorResponse,
   ErrorType,
-  type ScopedLogger,
 } from '../../../lib/apiErrorHandler';
 import { db } from '../../../lib/firebase';
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
@@ -64,7 +63,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<CreateDisbursementResponse>
 ): Promise<void> {
-  return withErrorHandling(req, res, async (req, res, logger) => {
+  await withErrorHandling(req, res, async (req, res, logger) => {
     validateMethod(req, ['POST'], logger);
     
     logger.info('Xendit disbursement request', {
@@ -83,7 +82,7 @@ export default async function handler(
         ErrorType.VALIDATION,
         'Invalid amount. Must be a positive number',
         { amount: body.amount },
-        logger
+        null
       );
       return res.status(response.statusCode).json({ 
         success: false, 
@@ -97,7 +96,7 @@ export default async function handler(
         ErrorType.VALIDATION,
         'User ID must be a string',
         {},
-        logger
+        null
       );
       return res.status(response.statusCode).json({ 
         success: false, 
@@ -114,6 +113,18 @@ export default async function handler(
     });
     
     // Get user balance
+    if (!db) {
+      const response = createErrorResponse(
+        ErrorType.CONFIGURATION,
+        'Firebase Firestore is not initialized',
+        {},
+        null
+      );
+      return res.status(response.statusCode).json({ 
+        success: false, 
+        error: 'Database not available' 
+      });
+    }
     const userRef = doc(db, 'users', body.userId);
     const userDoc = await getDoc(userRef);
     
@@ -122,7 +133,7 @@ export default async function handler(
         ErrorType.NOT_FOUND,
         'User not found',
         { userId: body.userId },
-        logger
+        null
       );
       return res.status(response.statusCode).json({ 
         success: false, 
@@ -143,7 +154,7 @@ export default async function handler(
           amount: body.amount,
           balance: currentBalance,
         },
-        logger
+        null
       );
       return res.status(response.statusCode).json({ 
         success: false, 
@@ -162,7 +173,7 @@ export default async function handler(
           ErrorType.VALIDATION,
           'New account details required when accountId is "new"',
           {},
-          logger
+          null
         );
         return res.status(response.statusCode).json({ 
           success: false, 
@@ -176,7 +187,7 @@ export default async function handler(
           ErrorType.VALIDATION,
           'Bank code, account number, and account holder name are required for new accounts',
           {},
-          logger
+          null
         );
         return res.status(response.statusCode).json({ 
           success: false, 
@@ -214,7 +225,7 @@ export default async function handler(
           ErrorType.NOT_FOUND,
           'Account not found',
           { userId: body.userId, accountId: body.accountId },
-          logger
+          null
         );
         return res.status(response.statusCode).json({ 
           success: false, 
@@ -326,11 +337,10 @@ export default async function handler(
       
     } catch (disbursementError) {
       // Restore balance if disbursement fails
-      logger.error('Disbursement creation failed, verifying and restoring balance', {
+      logger.error('Disbursement creation failed, verifying and restoring balance', disbursementError, {
         component: 'xendit',
         operation: 'createDisbursement',
         userId: body.userId,
-        error: disbursementError instanceof Error ? disbursementError.message : 'Unknown error',
         originalBalance: currentBalance,
       });
       
@@ -366,18 +376,17 @@ export default async function handler(
         }
       } catch (restoreError) {
         // Critical: Balance restoration failed - log for manual intervention
-        logger.error('CRITICAL: Balance restoration failed', {
+        logger.error('CRITICAL: Balance restoration failed', restoreError, {
           component: 'xendit',
           operation: 'createDisbursement',
           userId: body.userId,
           originalBalance: currentBalance,
-          restoreError: restoreError instanceof Error ? restoreError.message : 'Unknown error',
         });
         
         // Update transaction to indicate manual review needed
         // Note: transaction may not exist if disbursement failed before creation
         if (transaction?.id) {
-          const transactionRef = doc(db, 'transactions', transaction.id);
+          const transactionRef = doc(db!, 'transactions', transaction.id);
           await updateDoc(transactionRef, {
             status: 'failed',
             errorMessage: 'Disbursement failed and balance restoration failed - manual review required',

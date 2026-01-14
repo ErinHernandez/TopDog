@@ -50,6 +50,12 @@ export function useLocationConsent(): UseLocationConsentReturn {
       return;
     }
     
+    if (!db) {
+      setError(new Error('Firebase Firestore is not initialized'));
+      setIsLoading(false);
+      return;
+    }
+    
     setIsLoading(true);
     setError(null);
     

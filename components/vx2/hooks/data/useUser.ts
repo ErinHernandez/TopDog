@@ -182,7 +182,7 @@ export function useUser(): UseUserResult {
   // Determine if user is "fully" authenticated (not anonymous)
   // Anonymous users can't make payments, so they're treated as unauthenticated
   // for tournament entry and payment-related features
-  const isFullyAuthenticated = authIsAuthenticated && authUser && !authUser.isAnonymous;
+  const isFullyAuthenticated = !!(authIsAuthenticated && authUser && !authUser.isAnonymous);
   
   // Build the user profile from auth data + balance
   const user = useMemo<UserProfile | null>(() => {

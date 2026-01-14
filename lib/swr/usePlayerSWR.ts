@@ -237,12 +237,19 @@ export function useHeadshots(options: HeadshotsOptions = {}): UseHeadshotsReturn
     // Filter by position if specified
     if (position) {
       const positions = Array.isArray(position) ? position : [position];
-      players = players.filter((p: PlayerPoolEntry) => positions.includes(p.position?.toUpperCase()));
+      players = players.filter((p: PlayerPoolEntry) => {
+        const pPosition = p.position?.toUpperCase();
+        return pPosition ? positions.includes(pPosition) : false;
+      });
     }
     
     // Filter by team if specified
     if (team) {
-      players = players.filter((p: PlayerPoolEntry) => p.team?.toUpperCase() === team.toUpperCase());
+      const teamUpper = team.toUpperCase();
+      players = players.filter((p: PlayerPoolEntry) => {
+        const pTeam = p.team?.toUpperCase();
+        return pTeam === teamUpper;
+      });
     }
     
     // Get SportsDataIO headshots map (actual headshot URLs)
@@ -259,7 +266,7 @@ export function useHeadshots(options: HeadshotsOptions = {}): UseHeadshotsReturn
       // Priority 3: Generated local URL (will likely be placeholder)
       let headshotUrl = null;
       
-      if (sportsDataIOHeadshotsMap[player.name]) {
+      if (player.name && sportsDataIOHeadshotsMap[player.name]) {
         // Use SportsDataIO headshot (actual photo)
         headshotUrl = sportsDataIOHeadshotsMap[player.name];
       } else if (player.photoUrl && !player.photoUrl.startsWith('/players/')) {

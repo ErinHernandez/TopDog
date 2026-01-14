@@ -13,6 +13,8 @@ import {
   withErrorHandling,
   validateMethod,
   createSuccessResponse,
+  type ApiLogger,
+  type ApiHandler,
 } from '../../../lib/apiErrorHandler';
 import { logger } from '../../../lib/structuredLogger';
 import { getMigrationStatus } from '../../../lib/migrations';
@@ -41,7 +43,7 @@ interface MigrationStatusResponse {
 async function handler(
   req: AuthenticatedRequest,
   res: NextApiResponse<MigrationStatusResponse>,
-  logger: typeof logger
+  logger: ApiLogger
 ): Promise<void> {
   // Only allow GET
   validateMethod(req, ['GET'], logger);
@@ -61,7 +63,7 @@ async function handler(
       logger
     );
     
-    return res.status(response.statusCode).json(response.body);
+    return res.status(response.statusCode).json(response.body.data);
     
   } catch (error) {
     logger.error('Failed to get migration status', error as Error);
@@ -70,6 +72,11 @@ async function handler(
 }
 
 // Export with authentication
-export default withErrorHandling(
-  withAuth(handler, { required: true, allowAnonymous: false })
-);
+const authenticatedHandler = withAuth(handler, { required: true, allowAnonymous: false });
+
+export default async function(
+  req: NextApiRequest,
+  res: NextApiResponse<MigrationStatusResponse>
+): Promise<void> {
+  await withErrorHandling(req, res, authenticatedHandler as ApiHandler);
+}

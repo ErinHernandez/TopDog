@@ -38,9 +38,13 @@ export async function makePick({
   currentRound,
   draftOrder,
 }: MakePickOptions): Promise<MakePickResult> {
+  if (!db) {
+    return { success: false, error: 'Firebase Firestore is not initialized' };
+  }
   try {
-    const pickData = await runTransaction(db, async (transaction) => {
-      const roomRef = doc(db, 'draftRooms', roomId);
+    // db is guaranteed to be non-null here due to check above
+    const pickData = await runTransaction(db!, async (transaction) => {
+      const roomRef = doc(db!, 'draftRooms', roomId);
       const roomDoc = await transaction.get(roomRef);
 
       if (!roomDoc.exists()) {
@@ -64,7 +68,7 @@ export async function makePick({
       }
 
       // Create pick document
-      const pickRef = doc(db, 'draftRooms', roomId, 'picks', String(currentPickNumber));
+      const pickRef = doc(db!, 'draftRooms', roomId, 'picks', String(currentPickNumber));
       const pickData = {
         pickNumber: currentPickNumber,
         round: currentRound,
@@ -130,9 +134,13 @@ export async function makeAutoPick({
   round: number;
   draftOrder: string[];
 }): Promise<MakePickResult> {
+  if (!db) {
+    return { success: false, error: 'Firebase Firestore is not initialized' };
+  }
   try {
-    const pickData = await runTransaction(db, async (transaction) => {
-      const roomRef = doc(db, 'draftRooms', roomId);
+    // db is guaranteed to be non-null here due to check above
+    const pickData = await runTransaction(db!, async (transaction) => {
+      const roomRef = doc(db!, 'draftRooms', roomId);
       const roomDoc = await transaction.get(roomRef);
 
       if (!roomDoc.exists()) {
@@ -156,7 +164,7 @@ export async function makeAutoPick({
       }
 
       // Create pick document
-      const pickRef = doc(db, 'draftRooms', roomId, 'picks', String(pickNumber));
+      const pickRef = doc(db!, 'draftRooms', roomId, 'picks', String(pickNumber));
       const pickData = {
         pickNumber,
         round,

@@ -79,6 +79,9 @@ function timestampToISO(timestamp: Timestamp | Date | string): string {
  * Fetch teams once (non-real-time)
  */
 async function fetchMyTeamsOnce(userId: string): Promise<MyTeam[]> {
+  if (!db) {
+    throw new Error('Firebase Firestore is not initialized');
+  }
   try {
     const teamsRef = collection(db, 'users', userId, 'teams');
     const teamsQuery = query(
@@ -114,6 +117,10 @@ function setupTeamsListener(
   onUpdate: (teams: MyTeam[]) => void,
   onError: (error: Error) => void
 ): () => void {
+  if (!db) {
+    onError(new Error('Firebase Firestore is not initialized'));
+    return () => {}; // Return no-op unsubscribe function
+  }
   const teamsRef = collection(db, 'users', userId, 'teams');
   const teamsQuery = query(
     teamsRef,
@@ -256,6 +263,9 @@ export async function fetchTeamsByTournament(
   userId: string,
   tournamentId: string
 ): Promise<MyTeam[]> {
+  if (!db) {
+    throw new Error('Firebase Firestore is not initialized');
+  }
   const teamsRef = collection(db, 'users', userId, 'teams');
   const teamsQuery = query(
     teamsRef,
@@ -281,6 +291,9 @@ export async function fetchTeamsByStatus(
   userId: string,
   status: TeamStatus
 ): Promise<MyTeam[]> {
+  if (!db) {
+    throw new Error('Firebase Firestore is not initialized');
+  }
   const teamsRef = collection(db, 'users', userId, 'teams');
   const teamsQuery = query(
     teamsRef,
@@ -311,6 +324,9 @@ export async function fetchTeamsFiltered(
     minPoints?: number;
   }
 ): Promise<MyTeam[]> {
+  if (!db) {
+    throw new Error('Firebase Firestore is not initialized');
+  }
   const teamsRef = collection(db, 'users', userId, 'teams');
   let teamsQuery: any = teamsRef;
 

@@ -225,6 +225,9 @@ async function fetchTransactionsFromFirebase(
   userId: string,
   maxResults: number = 100
 ): Promise<Transaction[]> {
+  if (!db) {
+    throw new Error('Firebase Firestore is not initialized');
+  }
   const q = query(
     collection(db, 'transactions'),
     where('userId', '==', userId),
@@ -352,6 +355,12 @@ export function useTransactionHistory(
     
     if (!realTime) {
       fetchData();
+      return;
+    }
+    
+    if (!db) {
+      setError('Firebase Firestore is not initialized');
+      setIsLoading(false);
       return;
     }
     

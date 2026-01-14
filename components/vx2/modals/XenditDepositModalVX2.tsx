@@ -143,7 +143,7 @@ export function XenditDepositModalVX2({
   
   const handleContinueToCategory = useCallback(() => {
     if (!amountValidation.isValid) {
-      setError(amountValidation.error);
+      setError(amountValidation.error ?? null);
       return;
     }
     setStep('category');

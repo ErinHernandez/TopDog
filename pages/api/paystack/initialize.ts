@@ -128,7 +128,7 @@ const handler = async function(
         ok: false,
         error: { 
           code: 'rate_limit_exceeded', 
-          message: errorResponse.body.message 
+          message: errorResponse.body.error.message 
         },
       });
     }
@@ -160,7 +160,7 @@ const handler = async function(
       );
       return res.status(errorResponse.statusCode).json({
         ok: false,
-        error: { code: 'invalid_amount', message: errorResponse.body.message },
+        error: { code: 'invalid_amount', message: errorResponse.body.error.message },
       });
     }
     
@@ -185,7 +185,7 @@ const handler = async function(
         ok: false,
         error: {
           code: 'invalid_currency',
-          message: errorResponse.body.message,
+          message: errorResponse.body.error.message,
         },
       });
     }
@@ -201,7 +201,7 @@ const handler = async function(
       );
       return res.status(errorResponse.statusCode).json({
         ok: false,
-        error: { code: 'invalid_amount', message: errorResponse.body.message },
+        error: { code: 'invalid_amount', message: errorResponse.body.error.message },
       });
     }
     
@@ -241,7 +241,7 @@ const handler = async function(
         );
         return res.status(errorResponse.statusCode).json({
           ok: false,
-          error: { code: 'invalid_channel', message: errorResponse.body.message },
+          error: { code: 'invalid_channel', message: errorResponse.body.error.message },
         });
       }
       
@@ -272,7 +272,7 @@ const handler = async function(
         );
         return res.status(errorResponse.statusCode).json({
           ok: false,
-          error: { code: 'invalid_channel', message: errorResponse.body.message },
+          error: { code: 'invalid_channel', message: errorResponse.body.error.message },
         });
       }
       

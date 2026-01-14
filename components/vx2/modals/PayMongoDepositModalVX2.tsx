@@ -159,7 +159,7 @@ export function PayMongoDepositModalVX2({
   
   const handleContinueToMethod = useCallback(() => {
     if (!amountValidation.isValid) {
-      setError(amountValidation.error);
+      setError(amountValidation.error ?? null);
       return;
     }
     setStep('method');
