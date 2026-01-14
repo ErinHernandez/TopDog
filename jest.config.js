@@ -29,57 +29,92 @@ module.exports = {
     "!**/cypress/**",
   ],
 
-  // Coverage thresholds - Risk-Based Coverage (Refined Plan)
-  // Tier 0: Money touches it (95%+) | Tier 1: Security/Auth (90%+) | Tier 2: Core Logic (80%+)
-  // Tier 3: Data Routes (60%+) | Tier 4: UI Components (40%+) | Tier 5: Utilities (Case-by-case)
+  // Coverage thresholds - Enterprise Implementation Guide v2.0
+  // Tier 0: Payment & Security (95%+) | Tier 1: Core Business Logic (90%+)
   coverageThreshold: {
-    // Global baseline (achievable)
+    // Global minimum
     global: {
-      branches: 50,
+      branches: 60,
       functions: 60,
       lines: 60,
       statements: 60,
     },
-    // Tier 0: Payment Routes (95%+)
+    // Tier 0: Payment & Security (95%+)
+    './pages/api/payment/**/*.ts': {
+      branches: 95,
+      functions: 95,
+      lines: 95,
+      statements: 95,
+    },
     './pages/api/stripe/**/*.ts': {
-      branches: 90,
+      branches: 95,
       functions: 95,
       lines: 95,
       statements: 95,
     },
     './pages/api/paystack/**/*.ts': {
-      branches: 90,
+      branches: 95,
       functions: 95,
       lines: 95,
       statements: 95,
     },
     './pages/api/paymongo/**/*.ts': {
-      branches: 90,
+      branches: 95,
       functions: 95,
       lines: 95,
       statements: 95,
     },
     './pages/api/xendit/**/*.ts': {
-      branches: 90,
+      branches: 95,
+      functions: 95,
+      lines: 95,
+      statements: 95,
+    },
+    './lib/auth*.ts': {
+      branches: 95,
+      functions: 95,
+      lines: 95,
+      statements: 95,
+    },
+    './lib/security*.ts': {
+      branches: 95,
       functions: 95,
       lines: 95,
       statements: 95,
     },
     './lib/stripe/**/*.ts': {
-      branches: 90,
+      branches: 95,
       functions: 95,
       lines: 95,
       statements: 95,
     },
-    // Tier 1: Auth & Security (90%+)
+    // Tier 1: Core Business Logic (90%+)
+    './pages/api/draft/**/*.ts': {
+      branches: 90,
+      functions: 90,
+      lines: 90,
+      statements: 90,
+    },
+    './pages/api/league/**/*.ts': {
+      branches: 90,
+      functions: 90,
+      lines: 90,
+      statements: 90,
+    },
+    './lib/draft*.ts': {
+      branches: 90,
+      functions: 90,
+      lines: 90,
+      statements: 90,
+    },
     './lib/apiAuth.js': {
-      branches: 85,
+      branches: 90,
       functions: 90,
       lines: 90,
       statements: 90,
     },
     './lib/csrfProtection.js': {
-      branches: 85,
+      branches: 90,
       functions: 90,
       lines: 90,
       statements: 90,

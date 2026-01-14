@@ -19,6 +19,8 @@ import { useAuth } from '../hooks/useAuth';
 import { useUsernameValidation } from '../hooks/useUsernameValidation';
 import { RATE_LIMITS } from '../constants';
 import { createScopedLogger } from '../../../../lib/clientLogger';
+import { fcmService } from '../../../../lib/pushNotifications/fcmService';
+import { getAuth } from 'firebase/auth';
 
 const logger = createScopedLogger('[ProfileSettingsModal]');
 
@@ -342,8 +344,29 @@ function PreferencesTabContent(): React.ReactElement {
   const [saved, setSaved] = useState(false);
   const [dynamicIslandSupported, setDynamicIslandSupported] = useState(false);
   
+  // Alert preferences state
+  const [alertPreferences, setAlertPreferences] = useState({
+    roomFilled: profile?.preferences?.draftAlerts?.roomFilled ?? true,
+    draftStarting: profile?.preferences?.draftAlerts?.draftStarting ?? true,
+    twoPicksAway: profile?.preferences?.draftAlerts?.twoPicksAway ?? true,
+    onTheClock: profile?.preferences?.draftAlerts?.onTheClock ?? true,
+    tenSecondsRemaining: profile?.preferences?.draftAlerts?.tenSecondsRemaining ?? true,
+  });
+  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
+  const [savingKey, setSavingKey] = useState<string | null>(null);
+  const [fcmEnabled, setFcmEnabled] = useState(profile?.preferences?.fcmEnabled ?? false);
+  const [fcmInitializing, setFcmInitializing] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+  const [isStandalone, setIsStandalone] = useState(false);
+  
   // Check Dynamic Island support on mount
   useEffect(() => {
+    // Check iOS and standalone mode
+    if (typeof window !== 'undefined') {
+      const userAgent = navigator.userAgent;
+      setIsIOS(/iPad|iPhone|iPod/.test(userAgent));
+      setIsStandalone((window.navigator as any).standalone === true);
+    }
     // Check if iOS 16.1+ (Live Activities support)
     const checkSupport = () => {
       if (typeof window === 'undefined') return false;
@@ -359,7 +382,45 @@ function PreferencesTabContent(): React.ReactElement {
       return false;
     };
     setDynamicIslandSupported(checkSupport());
+    
+    // Check notification permission
+    if ('Notification' in window) {
+      setNotificationPermission(Notification.permission);
+    }
   }, []);
+  
+  const requestNotificationPermission = async () => {
+    if ('Notification' in window) {
+      const permission = await Notification.requestPermission();
+      setNotificationPermission(permission);
+    }
+  };
+  
+  const handleAlertToggle = async (key: keyof typeof alertPreferences) => {
+    setSavingKey(key);
+    const newValue = !alertPreferences[key];
+    setAlertPreferences(prev => ({ ...prev, [key]: newValue }));
+    
+    try {
+      await updateProfile({
+        preferences: {
+          ...profile?.preferences,
+          draftAlerts: {
+            ...alertPreferences,
+            [key]: newValue,
+          },
+        },
+      });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (error) {
+      console.error('Failed to update alert preferences:', error);
+      // Revert on error
+      setAlertPreferences(prev => ({ ...prev, [key]: !newValue }));
+    } finally {
+      setSavingKey(null);
+    }
+  };
   
   const handleToggle = async (key: keyof typeof preferences) => {
     const newValue = !preferences[key];
@@ -445,6 +506,76 @@ function PreferencesTabContent(): React.ReactElement {
         />
       </div>
       
+      {/* FCM Push Notifications - Receive alerts when app is closed */}
+      <div 
+        className="flex items-center justify-between p-4 rounded-xl"
+        style={{ backgroundColor: 'rgba(255,255,255,0.03)' }}
+      >
+        <div className="flex-1">
+          <span 
+            className="block font-medium"
+            style={{ color: TEXT_COLORS.primary }}
+          >
+            Background Push Notifications
+          </span>
+          <span style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+            Receive alerts even when app is closed
+          </span>
+          {isIOS && !isStandalone && (
+            <span style={{ color: '#FBBF25', fontSize: `${TYPOGRAPHY.fontSize.xs}px` }} className="block mt-1">
+              ⚠️ Add to Home Screen to enable on iOS
+            </span>
+          )}
+        </div>
+        <button
+          onClick={async () => {
+            if (fcmEnabled) {
+              // Disable
+              await fcmService.deleteToken();
+              setFcmEnabled(false);
+              await updateProfile({
+                preferences: {
+                  ...profile?.preferences,
+                  fcmEnabled: false,
+                },
+              });
+            } else {
+              // Enable (user interaction required)
+              setFcmInitializing(true);
+              try {
+                const token = await fcmService.requestPermissionAndGetToken();
+                if (token) {
+                  setFcmEnabled(true);
+                  await updateProfile({
+                    preferences: {
+                      ...profile?.preferences,
+                      fcmEnabled: true,
+                    },
+                  });
+                } else {
+                  alert('Failed to enable push notifications. Please check browser permissions.');
+                }
+              } catch (error) {
+                console.error('[FCM] Enable failed:', error);
+                alert('Failed to enable push notifications.');
+              } finally {
+                setFcmInitializing(false);
+              }
+            }
+          }}
+          disabled={fcmInitializing}
+          className="px-4 py-2 rounded-lg font-medium text-sm transition-opacity"
+          style={{ 
+            backgroundColor: fcmEnabled ? STATE_COLORS.active : 'rgba(255,255,255,0.1)',
+            color: fcmEnabled ? '#000' : TEXT_COLORS.primary,
+            opacity: fcmInitializing ? 0.5 : 1,
+            cursor: fcmInitializing ? 'not-allowed' : 'pointer',
+          }}
+        >
+          {fcmInitializing ? 'Enabling...' : fcmEnabled ? 'Disable' : 'Enable'}
+        </button>
+      </div>
+      
       {/* Dynamic Island / Live Activity toggle - only show on supported iOS devices */}
       {dynamicIslandSupported && (
         <div 
@@ -468,6 +599,70 @@ function PreferencesTabContent(): React.ReactElement {
           />
         </div>
       )}
+      
+      {/* Draft Alerts - Show for ALL users */}
+      <div className="space-y-3 mt-6">
+        <h3 className="text-lg font-semibold" style={{ color: TEXT_COLORS.primary }}>
+          Draft Alerts
+        </h3>
+        <p style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+          {dynamicIslandSupported
+            ? 'Alerts appear in Dynamic Island and Lock Screen'
+            : 'Alerts appear as browser notifications'
+          }
+        </p>
+        
+        {/* Show permission request for non-Dynamic Island users */}
+        {notificationPermission !== 'granted' && !dynamicIslandSupported && (
+          <div className="p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/20 mb-4">
+            <p className="text-yellow-400 text-sm mb-2">
+              Enable browser notifications to receive draft alerts
+            </p>
+            <button
+              onClick={requestNotificationPermission}
+              className="px-4 py-2 bg-yellow-500 text-black rounded-lg font-medium"
+            >
+              Enable Notifications
+            </button>
+          </div>
+        )}
+        
+        {[
+          { key: 'roomFilled' as const, label: 'Room Filled', desc: 'When draft room reaches capacity' },
+          { key: 'draftStarting' as const, label: 'Draft Starting', desc: 'When draft countdown begins' },
+          { key: 'twoPicksAway' as const, label: 'Two Picks Away', desc: "When you're 2 picks from your turn" },
+          { key: 'onTheClock' as const, label: 'On The Clock', desc: "When it's your turn to pick" },
+          { key: 'tenSecondsRemaining' as const, label: '10 Seconds Remaining', desc: 'When timer hits 10 seconds' },
+        ].map(({ key, label, desc }) => (
+          <div
+            key={key}
+            className="flex items-center justify-between p-4 rounded-xl"
+            style={{ backgroundColor: 'rgba(255,255,255,0.03)' }}
+          >
+            <div>
+              <span
+                className="block font-medium"
+                style={{ color: TEXT_COLORS.primary }}
+              >
+                {label}
+              </span>
+              <span style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+                {desc}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <ToggleSwitch
+                checked={alertPreferences[key]}
+                onChange={() => handleAlertToggle(key)}
+                disabled={savingKey === key || isSaving}
+              />
+              {savingKey === key && (
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
       
       <div 
         className="flex items-center justify-between p-4 rounded-xl"
@@ -871,17 +1066,67 @@ function AddContactModal({ isOpen, onClose, type }: AddContactModalProps): React
     setError(null);
     
     try {
-      // TODO: Call API to add email/phone to account
-      // For now, simulate success
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Get Firebase auth token for API call
+      let authToken: string | null = null;
+      try {
+        const auth = getAuth();
+        if (auth.currentUser) {
+          authToken = await auth.currentUser.getIdToken();
+        } else if (!user) {
+          throw new Error('User not authenticated');
+        }
+      } catch (tokenError) {
+        logger.warn('Failed to get auth token', { error: tokenError });
+        // In development, allow dev-token fallback
+        if (process.env.NODE_ENV !== 'production') {
+          // Will use dev-token below
+        } else {
+          throw new Error('Authentication required');
+        }
+      }
+
+      // Call API to add email/phone to account
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      };
+
+      if (authToken) {
+        headers['Authorization'] = `Bearer ${authToken}`;
+      } else if (process.env.NODE_ENV === 'development') {
+        // Development fallback
+        headers['Authorization'] = 'Bearer dev-token';
+      }
+
+      const response = await fetch('/api/user/update-contact', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          userId: user?.uid,
+          [isEmail ? 'email' : 'phone']: value,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.ok) {
+        throw new Error(data.error?.message || `Failed to add ${label.toLowerCase()}`);
+      }
+
       setSuccess(true);
+      
+      // Refresh user data if available
+      if (onUpdate) {
+        onUpdate();
+      }
+
       setTimeout(() => {
         onClose();
         setSuccess(false);
         setValue('');
       }, 1500);
     } catch (err) {
-      setError(`Failed to add ${label.toLowerCase()}. Please try again.`);
+      const errorMessage = err instanceof Error ? err.message : `Failed to add ${label.toLowerCase()}. Please try again.`;
+      setError(errorMessage);
     } finally {
       setIsAdding(false);
     }

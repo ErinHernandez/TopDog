@@ -184,12 +184,19 @@ function VX2MobileAppDemo() {
       */}
       <AuthProvider>
         {isMobile ? (
-          <div style={{ 
-            position: 'fixed', 
-            inset: 0, 
-            backgroundColor: '#101927',
-            overflow: 'hidden',
-          }}>
+          <div 
+            style={{ 
+              position: 'fixed', 
+              top: 0,
+              left: 0,
+              right: 0,
+              backgroundColor: '#101927',
+              overflow: 'hidden',
+              // Use stable viewport height
+              height: '100vh', // Fallback
+              height: 'calc(var(--stable-vh, 1vh) * 100)',
+            }}
+          >
             <AppShellVX2
               initialTab={initialTab}
               showPhoneFrame={false}

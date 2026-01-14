@@ -97,6 +97,16 @@ export interface UserPreferences {
   language?: string;
   /** Enable Dynamic Island / Live Activity for draft timer */
   dynamicIslandEnabled?: boolean;
+  /** Enable FCM push notifications (works when app is closed) */
+  fcmEnabled?: boolean;
+  /** Individual alert preferences */
+  draftAlerts?: {
+    roomFilled: boolean;
+    draftStarting: boolean;
+    twoPicksAway: boolean;
+    onTheClock: boolean;
+    tenSecondsRemaining: boolean;
+  };
 }
 
 // ============================================================================

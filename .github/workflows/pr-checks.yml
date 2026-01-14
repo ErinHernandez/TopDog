@@ -1,0 +1,95 @@
+# File: .github/workflows/pr-checks.yml
+name: PR Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  pr-title:
+    name: PR Title Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR title format
+        uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            perf
+            test
+            chore
+            revert
+          requireScope: false
+
+  changed-files:
+    name: Check Changed Files
+    runs-on: ubuntu-latest
+    outputs:
+      payment: ${{ steps.filter.outputs.payment }}
+      auth: ${{ steps.filter.outputs.auth }}
+      api: ${{ steps.filter.outputs.api }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            payment:
+              - 'pages/api/payment/**'
+              - 'pages/api/stripe/**'
+              - 'pages/api/paystack/**'
+              - 'pages/api/paymongo/**'
+              - 'pages/api/xendit/**'
+              - 'lib/payment/**'
+              - 'lib/stripe/**'
+              - 'lib/paystack/**'
+              - 'lib/paymongo/**'
+              - 'lib/xendit/**'
+            auth:
+              - 'lib/auth**'
+              - 'lib/security**'
+              - 'lib/csrf**'
+              - 'pages/api/auth/**'
+            api:
+              - 'pages/api/**'
+
+  payment-review:
+    name: Payment Code Review Required
+    runs-on: ubuntu-latest
+    needs: changed-files
+    if: needs.changed-files.outputs.payment == 'true'
+    steps:
+      - name: Request payment team review
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.pulls.requestReviewers({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              team_reviewers: ['payment-team']
+            })
+
+  security-review:
+    name: Security Review Required
+    runs-on: ubuntu-latest
+    needs: changed-files
+    if: needs.changed-files.outputs.auth == 'true'
+    steps:
+      - name: Request security team review
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.pulls.requestReviewers({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              team_reviewers: ['security-team']
+            })

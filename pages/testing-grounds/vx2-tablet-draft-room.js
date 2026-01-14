@@ -8,7 +8,7 @@
  * On desktop: Shows tablet frame with dev controls.
  */
 
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { TabletDraftRoomVX2 } from '../../components/vx2/tablet';
@@ -22,6 +22,12 @@ function VX2TabletDraftRoomPage() {
   const [draftKey, setDraftKey] = useState(0);
   const [fastMode, setFastMode] = useState(false);
   const [frameModel, setFrameModel] = useState('ipad-pro-11');
+  const [isMounted, setIsMounted] = useState(false);
+  
+  // Track client-side mount to prevent hydration mismatch
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
   
   const handleRestart = useCallback(() => {
     setDraftKey((prev) => prev + 1);
@@ -37,8 +43,9 @@ function VX2TabletDraftRoomPage() {
     setDraftKey((prev) => prev + 1);
   }, []);
   
-  // Show loading state until device detection is complete
-  if (!isLoaded) {
+  // Show loading state until device detection is complete and component is mounted
+  // This ensures server and client render the same initial state
+  if (!isLoaded || !isMounted) {
     return (
       <div
         style={{

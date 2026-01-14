@@ -1,0 +1,44 @@
+# File: .github/workflows/bundle-size.yml
+name: Bundle Size Check
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  bundle-size:
+    name: Bundle Size Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL || 'http://localhost:3000' }}
+      
+      - name: Analyze bundle
+        run: npm run bundle:track
+      
+      - name: Check bundle size limit
+        run: |
+          if [ -f bundle-stats.json ]; then
+            SIZE=$(cat bundle-stats.json | jq -r '.totalSize // 0')
+            MAX_SIZE=5242880  # 5MB
+            if [ "$SIZE" -gt "$MAX_SIZE" ]; then
+              echo "❌ Bundle size ($SIZE bytes) exceeds limit ($MAX_SIZE bytes)"
+              exit 1
+            fi
+            echo "✅ Bundle size ($SIZE bytes) is within limit"
+          else
+            echo "⚠️  bundle-stats.json not found, skipping size check"
+          fi

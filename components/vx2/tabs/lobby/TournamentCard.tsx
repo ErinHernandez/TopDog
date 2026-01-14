@@ -12,9 +12,8 @@
 import React, { useState, useEffect } from 'react';
 import { BG_COLORS, TEXT_COLORS, BRAND_COLORS, STATE_COLORS } from '../../core/constants/colors';
 import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
-import { ProgressBar } from '../../components/shared';
 import type { Tournament } from '../../hooks/data';
-import { TILED_BG_STYLE } from '../../draft-room/constants';
+import { TournamentCardBottomSection } from './TournamentCardBottomSection';
 
 // Tiny blur placeholder (92 bytes) - loads instantly, shows while full image loads
 const BLUR_PLACEHOLDER = 'data:image/webp;base64,UklGRlQAAABXRUJQVlA4IEgAAABwAwCdASoUABsAPyl+uFOuKCWisAwBwCUJZQAAW+q+9Bpo4aAA/uvZ+YkAc4jvVTc7+oJAY99soPLjJTrwm3j5Y3VE0BWmGAA=';
@@ -108,47 +107,6 @@ export interface TournamentCardProps {
 }
 
 // ============================================================================
-// SUB-COMPONENTS
-// ============================================================================
-
-interface StatItemProps {
-  value: string;
-  label: string;
-}
-
-function StatItem({ value, label }: StatItemProps): React.ReactElement {
-  return (
-    <div className="text-center" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <span 
-        className="vx2-tournament-stat-value font-bold" 
-        style={{ 
-          fontSize: `${CARD_PX.statsValueFontSize}px`, 
-          color: CARD_COLORS.text,
-          backgroundColor: '#000000',
-          padding: '2px 6px',
-          borderRadius: '4px',
-        }}
-      >
-        {value}
-      </span>
-      <span 
-        className="vx2-tournament-stat-label"
-        style={{ 
-          fontSize: `${CARD_PX.statsLabelFontSize}px`, 
-          color: CARD_COLORS.textMuted,
-          backgroundColor: '#000000',
-          padding: '1px 4px',
-          borderRadius: '3px',
-          marginTop: '2px',
-        }}
-      >
-        {label}
-      </span>
-    </div>
-  );
-}
-
-// ============================================================================
 // MAIN COMPONENT
 // ============================================================================
 
@@ -161,10 +119,6 @@ export function TournamentCard({
 }: TournamentCardProps): React.ReactElement {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [useFallback, setUseFallback] = useState(false);
-  
-  const fillPercentage = tournament.maxEntries 
-    ? Math.round((tournament.currentEntries / tournament.maxEntries) * 100)
-    : 0;
   
   // Merge style overrides with defaults
   // If backgroundImage URL is provided, wrap it in url(); otherwise use gradient/pattern
@@ -332,6 +286,7 @@ export function TournamentCard({
         flexDirection: 'column', 
         flex: 1,
         minHeight: 0, // Important for flexbox on mobile
+        justifyContent: 'space-between', // Distribute space evenly
       }}>
       {/* Tournament Title */}
       <div style={{ marginTop: '12px' }}>
@@ -351,64 +306,16 @@ export function TournamentCard({
         </h2>
       </div>
 
-      {/* Spacer to push bottom content down - hidden on compact */}
-      <div className="vx2-card-spacer" style={{ flex: 1 }} />
-
       {/* Bottom Section - Progress, Button, Stats */}
-      <div style={{ marginTop: `${SPACING.xl}px` }}>
-        {/* Progress Bar */}
-        {tournament.maxEntries && (
-          <div className="vx2-progress-section" style={{ marginBottom: `${SPACING.lg}px` }}>
-            <ProgressBar 
-              value={fillPercentage} 
-              fillBackgroundImage="url(/wr_blue.png)"
-              backgroundColor={colors.progressBg}
-              size="md"
-            />
-          </div>
-        )}
-
-        {/* Join Button */}
-        <button
-          onClick={onJoinClick}
-          className="vx2-tournament-button w-full font-semibold transition-colors duration-200 active:scale-[0.98]"
-          style={{ 
-            ...(styleOverrides.buttonBackground ? {} : TILED_BG_STYLE),
-            ...(styleOverrides.buttonBackground ? { 
-              backgroundImage: styleOverrides.buttonBackground,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            } : {}),
-            ...(styleOverrides.buttonBackgroundColor ? { 
-              backgroundColor: styleOverrides.buttonBackgroundColor 
-            } : {}),
-            color: '#FFFFFF',
-            height: `${CARD_PX.buttonHeight}px`,
-            fontSize: `${CARD_PX.buttonFontSize}px`,
-            borderRadius: `${RADIUS.md}px`,
-            marginBottom: `${SPACING.lg}px`,
-            border: 'none',
-            cursor: 'pointer',
-          }}
-          aria-label={`Join ${tournament.title} for ${tournament.entryFee}`}
-        >
-          Join Tournament
-        </button>
-
-        {/* Stats Grid */}
-        <div 
-          className="vx2-tournament-stats"
-          style={{ 
-            display: 'grid', 
-            gridTemplateColumns: '1fr 1fr 1fr', 
-            gap: `${CARD_PX.statsGap}px`,
-          }}
-        >
-          <StatItem value={tournament.entryFee} label="Entry" />
-          <StatItem value={tournament.totalEntries} label="Entries" />
-          <StatItem value={tournament.firstPlacePrize} label="1st Place" />
-        </div>
-      </div>
+      <TournamentCardBottomSection
+        tournament={tournament}
+        onJoinClick={onJoinClick}
+        styleOverrides={{
+          buttonBackground: styleOverrides.buttonBackground,
+          buttonBackgroundColor: styleOverrides.buttonBackgroundColor,
+          progressBg: colors.progressBg,
+        }}
+      />
       </div>{/* End content layer */}
     </div>
   );

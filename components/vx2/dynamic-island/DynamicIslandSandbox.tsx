@@ -14,6 +14,32 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import type { DraftStatus } from '../draft-room/types';
 
 // ============================================================================
+// STYLES
+// ============================================================================
+
+// Add pulsing animation for background
+if (typeof document !== 'undefined') {
+  const styleId = 'dynamic-island-pulse-animation';
+  if (!document.getElementById(styleId)) {
+    const style = document.createElement('style');
+    style.id = styleId;
+    style.textContent = `
+      @keyframes pulseBackground {
+        0%, 100% {
+          opacity: 1;
+          background-size: 200px 200px;
+        }
+        50% {
+          opacity: 0.7;
+          background-size: 220px 220px;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+}
+
+// ============================================================================
 // TYPES
 // ============================================================================
 
@@ -41,6 +67,8 @@ export interface DynamicIslandSandboxProps {
   currentDrafter?: string;
   /** Room ID */
   roomId?: string;
+  /** Autopick player name (if timer expires) */
+  autopickPlayerName?: string;
   /** Auto-cycle through states for demo */
   autoCycle?: boolean;
   /** Cycle duration in seconds */
@@ -70,6 +98,7 @@ export default function DynamicIslandSandbox({
   totalPicks = 216,
   currentDrafter = 'You',
   roomId = 'demo-room',
+  autopickPlayerName,
   autoCycle = false,
   cycleDuration = DEFAULT_CYCLE_DURATION,
   onStateChange,
@@ -129,20 +158,7 @@ export default function DynamicIslandSandbox({
   const islandContent = useMemo(() => {
     switch (currentState) {
       case 'in-draft':
-        return getInDraftContent({
-          timerSeconds: externalTimerSeconds ?? timerSeconds,
-          totalSeconds,
-          isMyTurn,
-          currentPickNumber,
-          totalPicks,
-          currentDrafter,
-          draftStatus,
-        });
-
-      case 'out-of-draft':
-        return getOutOfDraftContent();
-
-      case 'out-of-app-live':
+        // Swapped: Use out-of-app-live content for in-draft
         return getOutOfAppLiveContent({
           timerSeconds: externalTimerSeconds ?? timerSeconds,
           totalSeconds,
@@ -151,6 +167,36 @@ export default function DynamicIslandSandbox({
           totalPicks,
           currentDrafter,
           roomId,
+          autopickPlayerName,
+        });
+
+      case 'out-of-draft':
+        // Show Dynamic Island if user is on the clock even when out of draft
+        if (isMyTurn && draftStatus === 'active') {
+          return getInDraftContent({
+            timerSeconds: externalTimerSeconds ?? timerSeconds,
+            totalSeconds,
+            isMyTurn: true,
+            currentPickNumber,
+            totalPicks,
+            currentDrafter: 'You',
+            draftStatus,
+            autopickPlayerName,
+          });
+        }
+        return getOutOfDraftContent();
+
+      case 'out-of-app-live':
+        // Swapped: Use in-draft content for out-of-app-live
+        return getInDraftContent({
+          timerSeconds: externalTimerSeconds ?? timerSeconds,
+          totalSeconds,
+          isMyTurn,
+          currentPickNumber,
+          totalPicks,
+          currentDrafter,
+          draftStatus,
+          autopickPlayerName,
         });
 
       default:
@@ -167,6 +213,7 @@ export default function DynamicIslandSandbox({
     currentDrafter,
     draftStatus,
     roomId,
+    autopickPlayerName,
   ]);
 
   // Manual state controls
@@ -207,6 +254,13 @@ export default function DynamicIslandSandbox({
               <DynamicIslandVisualization
                 state={currentState}
                 content={islandContent}
+                roomId={roomId}
+                onNavigateToDraft={(id) => {
+                  // Navigate to draft room
+                  if (typeof window !== 'undefined') {
+                    window.location.href = `/draft/topdog/${id}`;
+                  }
+                }}
               />
             </div>
 
@@ -282,6 +336,8 @@ interface IslandContent {
   timerSeconds?: number;
   totalSeconds?: number;
   urgency?: 'normal' | 'warning' | 'critical';
+  isMyTurn?: boolean;
+  isInDraft?: boolean;
 }
 
 function getInDraftContent({
@@ -292,6 +348,7 @@ function getInDraftContent({
   totalPicks,
   currentDrafter,
   draftStatus,
+  autopickPlayerName,
 }: {
   timerSeconds: number;
   totalSeconds: number;
@@ -300,12 +357,13 @@ function getInDraftContent({
   totalPicks: number;
   currentDrafter: string;
   draftStatus: DraftStatus;
+  autopickPlayerName?: string;
 }): IslandContent {
   if (draftStatus === 'paused') {
     return {
       description: 'Paused indicator in Dynamic Island',
-      compactText: '⏸ Draft Paused',
-      expandedText: `Draft paused - Pick ${currentPickNumber}/${totalPicks}`,
+      compactText: 'Draft Paused',
+      expandedText: 'Draft paused',
     };
   }
 
@@ -315,25 +373,33 @@ function getInDraftContent({
     'normal';
 
   if (isMyTurn) {
+    const expandedText = autopickPlayerName
+      ? `Autopick would be: ${autopickPlayerName}`
+      : 'Your pick!';
+    
     return {
       description: 'Your turn timer countdown in Dynamic Island',
-      compactText: `⏱ ${timerSeconds}s`,
-      expandedText: `Your pick! ${timerSeconds}s remaining`,
+      compactText: 'Your Turn',
+      expandedText,
       showTimer: true,
       timerSeconds,
       totalSeconds,
       urgency,
+      isMyTurn: true,
+      isInDraft: true,
     };
   }
 
   return {
     description: 'Other player picking indicator',
     compactText: `${currentDrafter} picking...`,
-    expandedText: `${currentDrafter} is picking - Pick ${currentPickNumber}/${totalPicks}`,
+    expandedText: `${currentDrafter} is picking`,
     showTimer: true,
     timerSeconds,
     totalSeconds,
     urgency: 'normal',
+    isMyTurn: false,
+    isInDraft: true,
   };
 }
 
@@ -353,6 +419,7 @@ function getOutOfAppLiveContent({
   totalPicks,
   currentDrafter,
   roomId,
+  autopickPlayerName,
 }: {
   timerSeconds: number;
   totalSeconds: number;
@@ -361,6 +428,7 @@ function getOutOfAppLiveContent({
   totalPicks: number;
   currentDrafter: string;
   roomId: string;
+  autopickPlayerName?: string;
 }): IslandContent {
   const urgency: 'normal' | 'warning' | 'critical' = 
     timerSeconds <= 5 ? 'critical' : 
@@ -368,25 +436,33 @@ function getOutOfAppLiveContent({
     'normal';
 
   if (isMyTurn) {
+    const expandedText = autopickPlayerName
+      ? `Autopick would be: ${autopickPlayerName}`
+      : 'Your pick!';
+    
     return {
       description: 'Live Activity showing your turn timer (while app is in background)',
-      compactText: `📱 Your Turn! ${timerSeconds}s`,
-      expandedText: `Your pick! ${timerSeconds}s remaining - Pick ${currentPickNumber}/${totalPicks}`,
+      compactText: 'Your Turn',
+      expandedText,
       showTimer: true,
       timerSeconds,
       totalSeconds,
       urgency,
+      isMyTurn: true,
+      isInDraft: false, // This is now used for "in-draft" state (swapped)
     };
   }
 
   return {
     description: 'Live Activity showing draft progress (while app is in background)',
-    compactText: `📱 ${currentDrafter} picking...`,
-    expandedText: `${currentDrafter} is picking - Pick ${currentPickNumber}/${totalPicks} - ${timerSeconds}s`,
+    compactText: `${currentDrafter} picking...`,
+    expandedText: `${currentDrafter} is picking`,
     showTimer: true,
     timerSeconds,
     totalSeconds,
     urgency: 'normal',
+    isMyTurn: false,
+    isInDraft: false, // This is now used for "in-draft" state (swapped)
   };
 }
 
@@ -394,17 +470,23 @@ function getOutOfAppLiveContent({
 // DYNAMIC ISLAND VISUALIZATION
 // ============================================================================
 
+
 interface DynamicIslandVisualizationProps {
   state: DynamicIslandState;
   content: IslandContent | null;
+  roomId?: string;
+  onNavigateToDraft?: (roomId: string) => void;
 }
 
 function DynamicIslandVisualization({
   state,
   content,
+  roomId,
+  onNavigateToDraft,
 }: DynamicIslandVisualizationProps): React.ReactElement {
-  // If out-of-draft, show nothing (normal status bar)
-  if (state === 'out-of-draft' || !content || !content.compactText) {
+  // If out-of-draft and no content, show nothing (normal status bar)
+  // But if content exists (user on clock), show Dynamic Island
+  if (!content || !content.compactText) {
     return (
       <div className="absolute top-0 left-0 right-0 h-14 flex items-center justify-center">
         <div className="text-xs text-gray-600">9:41 AM</div>
@@ -417,11 +499,41 @@ function DynamicIslandVisualization({
   const islandWidth = isExpanded ? 'w-72' : 'w-32';
   const islandHeight = isExpanded ? 'h-16' : 'h-8';
 
-  // Urgency colors
+  // Urgency colors and background
   const getUrgencyColor = () => {
+    // In draft, user on the clock: use wr_blue.png background with red text
+    if (content.isInDraft && content.isMyTurn) {
+      return ''; // No background color class, use inline style with image
+    }
     if (content.urgency === 'critical') return 'bg-red-500';
     if (content.urgency === 'warning') return 'bg-orange-500';
     return 'bg-black';
+  };
+
+  const getBackgroundStyle = () => {
+    // In draft, user on the clock: use wr_blue.png background with pulse animation
+    if (content.isInDraft && content.isMyTurn) {
+      return {
+        backgroundImage: 'url(/wr_blue.png)',
+        backgroundRepeat: 'repeat',
+        backgroundSize: '200px 200px',
+        backgroundColor: '#1E3A5F', // Fallback color
+        animation: 'pulseBackground 2s ease-in-out infinite',
+      };
+    }
+    return {};
+  };
+
+  const getTextColor = () => {
+    // Always use white text
+    return 'text-white';
+  };
+
+  // Handle click to navigate to draft room
+  const handleClick = () => {
+    if (roomId && state === 'out-of-draft' && content.isMyTurn) {
+      onNavigateToDraft?.(roomId);
+    }
   };
 
   return (
@@ -433,16 +545,27 @@ function DynamicIslandVisualization({
           ${getUrgencyColor()}
           rounded-full
           flex items-center justify-center
-          text-white text-xs font-medium
+          ${getTextColor()} text-xs font-medium
           shadow-lg
           transition-all duration-300 ease-in-out
+          ${state === 'out-of-draft' && content.isMyTurn ? 'cursor-pointer hover:opacity-90' : ''}
         `}
+        style={getBackgroundStyle()}
+        onClick={handleClick}
+        role={state === 'out-of-draft' && content.isMyTurn ? 'button' : undefined}
+        tabIndex={state === 'out-of-draft' && content.isMyTurn ? 0 : undefined}
+        onKeyDown={(e) => {
+          if (state === 'out-of-draft' && content.isMyTurn && (e.key === 'Enter' || e.key === ' ')) {
+            e.preventDefault();
+            handleClick();
+          }
+        }}
       >
         {/* Compact view */}
         {!isExpanded && (
           <div className="flex items-center gap-2 px-3">
             {content.showTimer && (
-              <span className="tabular-nums">{content.timerSeconds}s</span>
+              <span className="tabular-nums">{content.timerSeconds}</span>
             )}
             <span className="truncate max-w-[80px]">{content.compactText}</span>
           </div>
@@ -453,7 +576,7 @@ function DynamicIslandVisualization({
           <div className="flex flex-col items-center justify-center px-4 py-2 w-full">
             {content.showTimer && (
               <div className="flex items-center gap-2 w-full justify-between">
-                <span className="tabular-nums font-bold text-sm">{content.timerSeconds}s</span>
+                <span className="tabular-nums font-bold text-sm">{content.timerSeconds}</span>
                 {content.totalSeconds && (
                   <div className="flex-1 mx-2 bg-white/20 rounded-full h-1.5">
                     <div

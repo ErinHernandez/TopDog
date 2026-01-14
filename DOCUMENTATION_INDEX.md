@@ -7,10 +7,11 @@
 
 ## 🚀 Start Here
 
-### For New Developers
-1. **[README.md](README.md)** - Project overview and setup
-2. **[DEVELOPER_GUIDE.md](DEVELOPER_GUIDE.md)** - Complete developer guide with best practices
-3. **[EXECUTIVE_SUMMARY.md](EXECUTIVE_SUMMARY.md)** - Quick overview of what was accomplished
+### For Agents & New Developers
+1. **[LIBRARY.md](LIBRARY.md)** - **⭐ PRIMARY ENTRY POINT** - Single index of all important documentation, plans, status, and goals
+2. **[README.md](README.md)** - Project overview and setup
+3. **[DEVELOPER_GUIDE.md](DEVELOPER_GUIDE.md)** - Complete developer guide with best practices
+4. **[EXECUTIVE_SUMMARY.md](EXECUTIVE_SUMMARY.md)** - Quick overview of what was accomplished
 
 ### For Production Deployment
 1. **[PRODUCTION_READINESS_REPORT.md](PRODUCTION_READINESS_REPORT.md)** - Production readiness checklist

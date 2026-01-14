@@ -103,6 +103,7 @@ const DEFAULT_LINKS = [
   { id: 'vx2-shell', href: '/testing-grounds/vx2-mobile-app-demo', label: 'Mobile App (VX2)', bgColor: '#14532D', bgColorActive: '#1F4D3A', textColor: '#86EFAC' },
   { id: 'vx2-draft', href: '/testing-grounds/vx2-draft-room', label: 'Draft Room (VX2)', bgColor: '#14532D', bgColorActive: '#1F4D3A', textColor: '#86EFAC' },
   { id: 'vx2-tablet', href: '/testing-grounds/vx2-tablet-draft-room', label: 'Tablet Draft (VX2)', bgColor: '#14532D', bgColorActive: '#1F4D3A', textColor: '#86EFAC' },
+  { id: 'dynamic-island-sandbox', href: '/testing-grounds/dynamic-island-sandbox', label: 'Dynamic Island Sandbox', bgColor: '#D97706', bgColorActive: '#B45309', textColor: '#FDE68A' },
   { id: 'card-sandbox', href: '/testing-grounds/card-sandbox', label: 'Card Sandbox', bgColor: '#1E3A8A', bgColorActive: '#1E3A5F', textColor: '#93C5FD' },
   { id: 'navbar-sandbox', href: '/testing-grounds/navbar-sandbox', label: 'Navbar Sandbox', bgColor: '#5B21B6', bgColorActive: '#4C1D95', textColor: '#C4B5FD' },
   { id: 'device-compare', href: '/testing-grounds/device-comparison', label: 'Device Comparison', bgColor: '#14B8A6', bgColorActive: '#0F766E', textColor: '#CCFBF1' },

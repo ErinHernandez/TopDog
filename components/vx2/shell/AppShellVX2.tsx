@@ -34,6 +34,7 @@ import {
   RankingsModalVX2 
 } from '../modals';
 import { useAuth, AuthGateVX2 } from '../auth';
+import { useStableViewportHeight } from '../hooks/ui/useStableViewportHeight';
 
 // ============================================================================
 // MODAL CONTEXT
@@ -77,9 +78,15 @@ export interface AppShellVX2Props {
 interface InnerShellProps {
   badgeOverrides?: Partial<Record<TabId, number>>;
   deviceClass?: DeviceClass;
+  inPhoneFrame?: boolean;
 }
 
-function InnerShell({ badgeOverrides, deviceClass = 'standard' }: InnerShellProps): React.ReactElement {
+function InnerShell({ badgeOverrides, deviceClass = 'standard', inPhoneFrame = false }: InnerShellProps): React.ReactElement {
+  // Initialize stable viewport height (sets CSS variable)
+  // Note: Hook always runs to set the CSS variable (needed for mobile), but when inPhoneFrame=true,
+  // we use height: 100% which ignores the CSS variable and fills the fixed phone frame container
+  useStableViewportHeight();
+  
   const { state: authState } = useAuth();
   
   // Modal state
@@ -111,9 +118,17 @@ function InnerShell({ badgeOverrides, deviceClass = 'standard' }: InnerShellProp
   return (
     <ModalContext.Provider value={modalContext}>
       <div 
-        className={`h-full flex flex-col relative vx2-device-${deviceClass}`}
+        className={`flex flex-col relative vx2-device-${deviceClass}`}
         data-device-class={deviceClass}
-        style={{ backgroundColor: BG_COLORS.primary }}
+        style={{ 
+          backgroundColor: BG_COLORS.primary,
+          // When in phone frame, use 100% to fill the fixed frame container
+          // When not in phone frame (actual mobile), use stable viewport height
+          height: inPhoneFrame 
+            ? '100%' 
+            : 'calc(var(--stable-vh, 1vh) * 100)',
+          overflow: 'hidden',
+        }}
       >
         {/* Tab Content Area */}
         <TabContentVX2 />
@@ -182,7 +197,7 @@ export default function AppShellVX2({
           <MobilePhoneFrame devicePreset={devicePreset}>
             {/* AuthGateVX2 gates all app content - must authenticate to access */}
             <AuthGateVX2>
-              <InnerShell badgeOverrides={badgeOverrides} deviceClass={deviceClass} />
+              <InnerShell badgeOverrides={badgeOverrides} deviceClass={deviceClass} inPhoneFrame={true} />
             </AuthGateVX2>
           </MobilePhoneFrame>
         </HeaderProvider>

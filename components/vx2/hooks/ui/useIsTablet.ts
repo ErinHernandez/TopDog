@@ -118,8 +118,8 @@ export function useIsTablet(): UseIsTabletResult {
   const [deviceInfo, setDeviceInfo] = useState<TabletDeviceInfo | null>(null);
   
   useEffect(() => {
+    // Only run on client-side to prevent hydration mismatches
     if (typeof window === 'undefined') {
-      setIsLoaded(true);
       return;
     }
     

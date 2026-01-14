@@ -633,13 +633,14 @@ export default function MobilePhoneFrame({
             )}
             
             {/* Content wrapper - starts below safe area */}
+            {/* Use fixed height calculation instead of bottom: 0 to prevent layout shifts */}
             <div 
               style={{ 
                 position: 'absolute',
                 top: device?.statusBarHeight ?? 47,
                 left: 0,
                 right: 0,
-                bottom: 0,
+                height: height - (device?.statusBarHeight ?? 47), // Fixed height, not bottom: 0
                 overflow: 'hidden',
               }}
             >
@@ -676,8 +677,27 @@ export default function MobilePhoneFrame({
   
   return (
     <div 
-      className={`min-h-screen flex items-center justify-center p-4 ${className}`}
-      style={{ backgroundColor: '#0a0f1a' }}
+      className={`${className}`}
+      style={{ 
+        backgroundColor: '#0a0f1a',
+        // Use fixed positioning to prevent any layout shifts
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        // Use stable viewport height
+        height: '100vh', // Fallback
+        height: 'calc(var(--stable-vh, 1vh) * 100)',
+        // Center the phone frame using flexbox
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '16px',
+        overflow: 'auto',
+        // Prevent layout shifts
+        contain: 'layout style paint',
+      }}
     >
       {frameContent}
     </div>

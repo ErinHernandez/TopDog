@@ -569,10 +569,22 @@ export default function DraftRoom() {
     const stored = localStorage.getItem('draftRankings');
     if (stored) {
       try {
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'[roomId].js:569',message:'Loading rankings from localStorage',data:{hasStored:!!stored,storedLength:stored?.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+        // #endregion
         const parsedRankings = JSON.parse(stored);
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'[roomId].js:573',message:'Rankings parsed successfully',data:{isArray:Array.isArray(parsedRankings),length:parsedRankings?.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+        // #endregion
         setRankings(parsedRankings);
       } catch (error) {
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'[roomId].js:575',message:'JSON.parse failed for rankings',data:{error:error?.message,storedLength:stored?.length,storedPreview:stored?.substring(0,100)},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'A'})}).catch(()=>{});
+        // #endregion
         console.error('Error parsing rankings:', error);
+        // FIX: Clear corrupted data and set fallback
+        localStorage.removeItem('draftRankings');
+        setRankings([]);
       }
     }
   }, []);
@@ -1517,8 +1529,17 @@ export default function DraftRoom() {
             try {
               const ticking = new Audio('/ticking.mp3');
               ticking.volume = 0.3;
-              ticking.play().catch(() => {});
+              // #region agent log
+              ticking.play().catch((err) => {
+                fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'[roomId].js:1520',message:'Audio play failed',data:{error:err?.message,prev},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'C'})}).catch(()=>{});
+                // FIX: Log audio failures for debugging
+                console.warn('[DraftRoom] Audio play failed:', err?.message || err);
+              });
+              // #endregion
             } catch (error) {
+              // #region agent log
+              fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'[roomId].js:1522',message:'Audio creation failed',data:{error:error?.message,prev},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+              // #endregion
               console.log('Audio not supported');
             }
           }
@@ -1538,11 +1559,21 @@ export default function DraftRoom() {
       try {
         const audio = new Audio('/notification.mp3');
         audio.volume = 0.5;
-        audio.play().catch(() => {
+        audio.play().catch((err) => {
+          // #region agent log
+          fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'[roomId].js:1541',message:'Notification audio play failed',data:{error:err?.message},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'C'})}).catch(()=>{});
+          // #endregion
+          // FIX: Log audio failures for debugging
+          console.warn('[DraftRoom] Notification audio play failed:', err?.message || err);
           // Fallback to ticking sound if notification fails
           const ticking = new Audio('/ticking.mp3');
           ticking.volume = 0.5;
-          ticking.play().catch(() => {});
+          ticking.play().catch((err2) => {
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'[roomId].js:1545',message:'Ticking fallback audio play failed',data:{error:err2?.message},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'C'})}).catch(()=>{});
+            // #endregion
+            console.warn('[DraftRoom] Ticking fallback audio play failed:', err2?.message || err2);
+          });
         });
       } catch (error) {
         console.log('Audio not supported');
@@ -1554,8 +1585,17 @@ export default function DraftRoom() {
       try {
         const ticking = new Audio('/ticking.mp3');
         ticking.volume = 0.3;
-        ticking.play().catch(() => {});
+        ticking.play().catch((err) => {
+          // #region agent log
+          fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'[roomId].js:1557',message:'Ticking audio play failed',data:{error:err?.message,timer},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'C'})}).catch(()=>{});
+          // #endregion
+          // FIX: Log audio failures for debugging
+          console.warn('[DraftRoom] Ticking audio play failed:', err?.message || err);
+        });
       } catch (error) {
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'[roomId].js:1559',message:'Audio creation failed',data:{error:error?.message,timer},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+        // #endregion
         console.log('Audio not supported');
       }
       if (window.navigator.vibrate) window.navigator.vibrate([100, 100, 100]);

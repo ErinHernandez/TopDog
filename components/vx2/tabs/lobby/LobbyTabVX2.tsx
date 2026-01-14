@@ -172,46 +172,40 @@ export default function LobbyTabVX2({
   // Success state - single featured tournament fills the screen
   const featuredTournament = tournaments.find(t => t.isFeatured) || tournaments[0];
   
-  // Use stable positioning to prevent layout shifts when viewport changes
-  // (e.g., when terminal opens or browser UI shows/hides on mobile)
+  // Use flexbox centering to prevent layout shifts when viewport changes
+  // Flexbox justify-content: center centers without calculations based on container height
+  // The key is that flex-1 on the parent (TabContentVX2) should be stable
   return (
     <div 
-      className="vx2-lobby-container flex-1 relative"
+      className="vx2-lobby-container"
       style={{ 
         padding: `${LOBBY_PX.containerPaddingY}px ${LOBBY_PX.containerPaddingX}px`,
         backgroundColor: BG_COLORS.primary,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
+        justifyContent: 'center', // Flexbox centering instead of absolute positioning
+        flex: 1,
+        minHeight: 0, // Important for flex-1 to work correctly
         overflow: 'hidden',
-        height: '100%',
-        minHeight: 0,
-        // Use position relative for stable positioning
-        position: 'relative',
+        // CSS containment to prevent layout shifts from affecting this container
+        contain: 'layout style paint',
+        // Force hardware acceleration to prevent layout recalculations
+        willChange: 'auto',
+        transform: 'translateZ(0)', // Force GPU layer
       }}
       role="main"
       aria-label="Tournament lobby"
     >
-      {/* Featured Tournament Card - centered with stable positioning */}
-      {/* Uses absolute positioning to prevent shifts when viewport changes */}
-      {/* This prevents the card from moving when browser UI shows/hides or terminal opens */}
+      {/* Featured Tournament Card - centered with flexbox */}
       <div
-        className="w-full"
         style={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          maxWidth: '100%',
           width: '100%',
-          maxHeight: 'calc(100% - 32px)', // Account for padding
+          maxWidth: '375px', // Constrain card width to prevent it from getting too wide
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          // Prevent content from shifting when container height changes
-          willChange: 'transform',
-          // Ensure card doesn't overflow container
-          overflow: 'hidden',
+          // No position: absolute, no top: 50%, no transform
         }}
       >
         <TournamentCard

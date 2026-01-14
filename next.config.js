@@ -1,4 +1,8 @@
 /** @type {import('next').NextConfig} */
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
+
 const withPWA = require('next-pwa')({
   dest: 'public',
   register: true,
@@ -120,6 +124,56 @@ const nextConfig = {
   swcMinify: true,
   // Enable compression
   compress: true,
+  // Optimize package imports
+  experimental: {
+    optimizePackageImports: [
+      'lodash',
+      'date-fns',
+      '@heroicons/react',
+      'lucide-react',
+    ],
+  },
+  // Webpack configuration for bundle optimization
+  webpack: (config, { isServer }) => {
+    // Bundle splitting for large modules
+    if (!isServer) {
+      config.optimization.splitChunks = {
+        chunks: 'all',
+        cacheGroups: {
+          // Vendor chunk for node_modules
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all',
+            priority: 10,
+          },
+          // Separate chunk for Stripe
+          stripe: {
+            test: /[\\/]node_modules[\\/](@stripe|stripe)[\\/]/,
+            name: 'stripe',
+            chunks: 'all',
+            priority: 20,
+          },
+          // Separate chunk for Firebase
+          firebase: {
+            test: /[\\/]node_modules[\\/](firebase|@firebase)[\\/]/,
+            name: 'firebase',
+            chunks: 'all',
+            priority: 20,
+          },
+          // Draft room components (identify duplication)
+          draftRoom: {
+            test: /[\\/]components[\\/](draft|DraftRoom|VX|topdog)[\\/]/,
+            name: 'draft-room',
+            chunks: 'all',
+            priority: 15,
+          },
+        },
+      };
+    }
+    
+    return config;
+  },
   // Optimize images
   images: {
     formats: ['image/avif', 'image/webp'],
@@ -241,5 +295,5 @@ const nextConfig = {
   },
 };
 
-module.exports = withPWA(nextConfig);
+module.exports = withBundleAnalyzer(withPWA(nextConfig));
 // Force rebuild Fri Dec 12 03:54:11 EST 2025

@@ -59,3 +59,5 @@ export {
   useDeviceClassDebug,
 } from './useDeviceClass';
 
+// Viewport height hooks
+export { useStableViewportHeight } from './useStableViewportHeight';

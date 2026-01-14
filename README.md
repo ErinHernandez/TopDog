@@ -117,6 +117,9 @@ bestball-site/
 
 ## Documentation
 
+### 📚 Project Library
+- **[LIBRARY.md](LIBRARY.md)** - **Start here!** Single index of all important documentation, plans, status, and goals
+
 ### For Developers
 - **[Developer Guide](DEVELOPER_GUIDE.md)** - Complete developer guide with best practices
 - **[API Route Template](docs/API_ROUTE_TEMPLATE.md)** - Guide for creating new API routes

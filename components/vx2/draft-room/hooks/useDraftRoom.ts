@@ -44,6 +44,7 @@ import { useDraftPicks } from './useDraftPicks';
 import { usePlayerPool } from '../../../../lib/playerPool/usePlayerPool';
 import type { DraftPick } from '../types';
 import { getPickInRound, getRoundForPick, generatePlayerId } from '../utils';
+import { useDraftAlerts } from '../../draft-logic/hooks/useDraftAlerts';
 
 // ============================================================================
 // TYPES
@@ -520,6 +521,20 @@ export function useDraftRoom({
     forcePick,
     isPaused,
   }), [startDraft, togglePause, forcePick, isPaused]);
+  
+  // Integrate draft alerts
+  useDraftAlerts({
+    roomId,
+    participants: participants.map(p => ({ id: p.id, name: p.name })),
+    maxParticipants: effectiveTeamCount,
+    roomStatus: status,
+    preDraftCountdown: 0, // TODO: Add pre-draft countdown state if needed
+    picksUntilMyTurn,
+    isMyTurn,
+    timer: timerHook.timer,
+    currentRound: picksHook.currentRound,
+    currentPick: currentPickNumber,
+  });
   
   return {
     room,

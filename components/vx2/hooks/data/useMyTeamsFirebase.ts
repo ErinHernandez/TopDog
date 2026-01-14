@@ -5,7 +5,7 @@
  * Uses game-day optimization to minimize Firebase costs.
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { 
   collection, 
   query, 
@@ -164,6 +164,14 @@ export function useMyTeamsFirebase(): UseMyTeamsResult {
   const { user } = useAuth();
   const userId = user?.uid;
 
+  // FIX: Track mounted state to prevent state updates after unmount
+  const isMountedRef = useRef(true);
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
   // Determine if we should use real-time based on game day logic
   const useRealTime = useMemo(() => shouldUseRealTime(), []);
 
@@ -175,6 +183,10 @@ export function useMyTeamsFirebase(): UseMyTeamsResult {
       return;
     }
 
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useMyTeamsFirebase.ts:171',message:'fetchData called',data:{userId,isRefetch},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+    // #endregion
+
     try {
       if (isRefetch) {
         setIsRefetching(true);
@@ -183,15 +195,37 @@ export function useMyTeamsFirebase(): UseMyTeamsResult {
       }
       setError(null);
       
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useMyTeamsFirebase.ts:186',message:'Before fetchMyTeamsOnce',data:{userId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+      // #endregion
       const data = await fetchMyTeamsOnce(userId);
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useMyTeamsFirebase.ts:189',message:'After fetchMyTeamsOnce',data:{dataLength:data?.length,isArray:Array.isArray(data),isMounted:isMountedRef.current},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'B'})}).catch(()=>{});
+      // #endregion
+      // FIX: Check if component is mounted before setting state
+      if (!isMountedRef.current) {
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useMyTeamsFirebase.ts:198',message:'Skipping state update - component unmounted',data:{userId},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'B'})}).catch(()=>{});
+        // #endregion
+        return;
+      }
       setTeams(data);
     } catch (err) {
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useMyTeamsFirebase.ts:192',message:'fetchData error',data:{error:err instanceof Error?err.message:'unknown',userId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+      // #endregion
       const errorMessage = err instanceof Error ? err.message : 'An error occurred';
-      setError(errorMessage);
+      // FIX: Check if mounted before setting error state
+      if (isMountedRef.current) {
+        setError(errorMessage);
+      }
       console.error('[useMyTeamsFirebase] Fetch error:', err);
     } finally {
-      setIsLoading(false);
-      setIsRefetching(false);
+      // FIX: Check if mounted before setting loading state
+      if (isMountedRef.current) {
+        setIsLoading(false);
+        setIsRefetching(false);
+      }
     }
   }, [userId]);
 

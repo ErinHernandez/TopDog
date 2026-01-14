@@ -776,6 +776,46 @@
   transition: width 200ms ease-out;
 }
 
+/* ============================================================================
+   STABLE VIEWPORT HEIGHT UTILITIES
+   ============================================================================
+   
+   These use the --stable-vh CSS variable set by useStableViewportHeight hook.
+   The variable is set to 1% of the stable viewport height.
+   
+   Example: var(--stable-vh) * 100 = full stable viewport height
+   
+   This replaces 100vh which is unstable on mobile browsers when the address
+   bar shows/hides or keyboard appears.
+   */
+
+/* Full stable viewport height */
+.h-stable-screen {
+  height: 100vh; /* Fallback for SSR and old browsers */
+  height: calc(var(--stable-vh, 1vh) * 100);
+}
+
+/* Minimum stable viewport height */
+.min-h-stable-screen {
+  min-height: 100vh;
+  min-height: calc(var(--stable-vh, 1vh) * 100);
+}
+
+/* Maximum stable viewport height */
+.max-h-stable-screen {
+  max-height: 100vh;
+  max-height: calc(var(--stable-vh, 1vh) * 100);
+}
+
+/* 
+ * For components that need stable centering without flexbox,
+ * use these with position: absolute 
+ */
+.top-stable-center {
+  top: 50vh;
+  top: calc(var(--stable-vh, 1vh) * 50);
+}
+
 /* Tablet panel divider hover state */
 .tablet-panel-divider:hover {
   background-color: rgba(96, 165, 250, 0.3);

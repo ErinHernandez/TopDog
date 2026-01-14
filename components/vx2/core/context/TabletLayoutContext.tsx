@@ -105,17 +105,17 @@ export function TabletLayoutProvider({
     initialRightWidth ?? TABLET_PANELS.right.defaultWidth
   );
   
-  // Viewport dimensions
-  const [viewportWidth, setViewportWidth] = useState(
-    typeof window !== 'undefined' ? window.innerWidth : TABLET_FRAME.width
-  );
-  const [viewportHeight, setViewportHeight] = useState(
-    typeof window !== 'undefined' ? window.innerHeight : TABLET_FRAME.height
-  );
+  // Viewport dimensions - always start with defaults to prevent hydration mismatch
+  const [viewportWidth, setViewportWidth] = useState(TABLET_FRAME.width);
+  const [viewportHeight, setViewportHeight] = useState(TABLET_FRAME.height);
   
-  // Listen for resize events
+  // Update viewport dimensions on mount and resize (client-side only)
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    
+    // Set initial values on mount
+    setViewportWidth(window.innerWidth);
+    setViewportHeight(window.innerHeight);
     
     const handleResize = () => {
       setViewportWidth(window.innerWidth);

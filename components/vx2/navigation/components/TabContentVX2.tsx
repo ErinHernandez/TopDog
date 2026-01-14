@@ -166,6 +166,8 @@ export default function TabContentVX2({
         scrollbarWidth: 'none',
         msOverflowStyle: 'none',
         WebkitOverflowScrolling: 'touch',
+        // Ensure flex-1 calculates from stable parent height
+        flexBasis: 0, // Force flex-1 to use available space, not content size
       }}
       role="tabpanel"
       id={`tabpanel-${state.activeTab}`}

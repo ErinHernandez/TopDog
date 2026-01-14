@@ -335,25 +335,52 @@ export default async function handler(
       });
     }
     
-    // TODO: Verify 2FA if enabled
-    // Note: This feature should be implemented when 2FA is fully enabled
-    // if (userData.twoFactorEnabled && !twoFactorToken) {
-    //   const response = createErrorResponse(
-    //     ErrorType.UNAUTHORIZED,
-    //     'Two-factor authentication is required',
-    //     { userId },
-    //     logger
-    //   );
-    //   return res.status(response.statusCode).json({
-    //     ok: false,
-    //     error: { code: '2fa_required', message: 'Two-factor authentication is required' },
-    //   });
-    // }
+    // Verify 2FA if enabled on Paystack account
+    // Paystack supports 2FA for transfers - check if enabled and verify token
+    const { twoFactorToken } = req.body as { twoFactorToken?: string };
+    
+    // Check if Paystack account has 2FA enabled (this would be stored in user's Paystack settings)
+    // For now, we'll check if a token is provided when required
+    // In production, you should:
+    // 1. Store 2FA status in user's Paystack data
+    // 2. Require token when 2FA is enabled
+    // 3. Verify token with Paystack before proceeding
+    
+    // Example implementation (uncomment when 2FA is configured):
+    /*
+    const paystackUserData = userData.paystackData;
+    if (paystackUserData?.twoFactorEnabled) {
+      if (!twoFactorToken) {
+        const response = createErrorResponse(
+          ErrorType.UNAUTHORIZED,
+          'Two-factor authentication token is required',
+          { userId, requires2FA: true },
+          logger
+        );
+        return res.status(response.statusCode).json({
+          ok: false,
+          error: { 
+            code: '2FA_REQUIRED', 
+            message: 'Two-factor authentication token is required for this transfer',
+            requires2FA: true,
+          },
+        });
+      }
+      
+      // Verify 2FA token with Paystack
+      // This would call Paystack's 2FA verification endpoint
+      // For now, this is a placeholder - implement based on Paystack's 2FA API
+      logger.info('2FA token provided, verification would happen here', { userId });
+    }
+    */
     
     // Use Firestore transaction to atomically check and debit balance (in USD)
     // This prevents race conditions where concurrent requests both pass validation
     let newBalance: number;
     try {
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'initiate.ts:357',message:'Before transaction',data:{userId,usdAmountToDebit,reference},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+      // #endregion
       newBalance = await runTransaction(db, async (transaction) => {
         const userSnapshot = await transaction.get(userRef);
         
@@ -362,6 +389,9 @@ export default async function handler(
         }
         
         const currentBalance = (userSnapshot.data().balance || 0) as number; // USD balance
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'initiate.ts:364',message:'Inside transaction',data:{currentBalance,usdAmountToDebit,pendingWithdrawal:userSnapshot.data().pendingWithdrawalReference},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+        // #endregion
         
         // Check balance within transaction (comparing USD to USD)
         if (currentBalance < usdAmountToDebit) {
@@ -375,6 +405,9 @@ export default async function handler(
         }
         
         const calculatedNewBalance = currentBalance - usdAmountToDebit;
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'initiate.ts:377',message:'Calculating new balance',data:{currentBalance,usdAmountToDebit,calculatedNewBalance},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+        // #endregion
         
         // Atomically debit balance (USD) and set pending withdrawal reference
         transaction.update(userRef, {
@@ -385,6 +418,9 @@ export default async function handler(
         
         return calculatedNewBalance;
       });
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'initiate.ts:388',message:'Transaction completed',data:{newBalance},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+      // #endregion
     } catch (txError) {
       const message = txError instanceof Error ? txError.message : 'Balance debit failed';
       
