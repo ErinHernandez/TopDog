@@ -203,6 +203,7 @@ export function useDraftPicks({
     
     // PRODUCTION MODE: Load picks from Firebase
     if (!roomId) return;
+    if (!db) return;
     
     setIsLoading(true);
     const picksQuery = query(
