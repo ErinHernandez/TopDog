@@ -1101,7 +1101,7 @@ function AddContactModal({ isOpen, onClose, type }: AddContactModalProps): React
         method: 'POST',
         headers,
         body: JSON.stringify({
-          userId: user?.uid,
+          userId: getAuth().currentUser?.uid,
           [isEmail ? 'email' : 'phone']: value,
         }),
       });
