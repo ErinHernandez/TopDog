@@ -114,7 +114,7 @@ interface InputProps {
   disabled?: boolean;
   error?: string | null;
   touched?: boolean;
-  inputRef?: React.RefObject<HTMLInputElement>;
+  inputRef?: React.RefObject<HTMLInputElement | null>;
   onBlur?: () => void;
   rightElement?: React.ReactNode;
   autoFocus?: boolean;
