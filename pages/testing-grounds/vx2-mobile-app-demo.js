@@ -24,7 +24,8 @@ function VX2MobileAppDemo() {
   const { isMobile, isLoaded } = useIsMobileDevice();
   
   // Multiple device presets state (persisted to localStorage)
-  const [selectedDevices, setSelectedDevices] = React.useState(['iphone-14-pro-max']);
+  // Default to showing 3 devices for better comparison
+  const [selectedDevices, setSelectedDevices] = React.useState(['iphone-se', 'iphone-13', 'iphone-14-pro-max']);
   
   // Panel minimized state (persisted to localStorage)
   const [isMinimized, setIsMinimized] = React.useState(false);
@@ -110,22 +111,12 @@ function VX2MobileAppDemo() {
     saveDevices(allDevices);
   };
   
-  // Determine initial tab:
-  // - If coming from draft room (session flag), go to live-drafts
-  // - Otherwise, always default to lobby (even on refresh)
-  const [initialTab, setInitialTab] = React.useState('lobby');
+  // Always use 'lobby' as initial tab to prevent hydration mismatch
+  // SessionStorage flag will be handled after mount if needed
+  const initialTab = 'lobby';
   
   React.useEffect(() => {
     if (!router.isReady || typeof window === 'undefined') return;
-    
-    // Check if user just came from draft room
-    const cameFromDraft = sessionStorage.getItem('topdog_came_from_draft');
-    
-    if (cameFromDraft) {
-      // Clear the flag so refresh goes to lobby
-      sessionStorage.removeItem('topdog_came_from_draft');
-      setInitialTab('live-drafts');
-    }
     
     // Clean up URL query param if present
     if (router.query.tab) {
@@ -139,9 +130,8 @@ function VX2MobileAppDemo() {
     console.log(`[VX2] Tab changed: ${fromTab || 'initial'} -> ${toTab}`);
   };
 
-  // Show nothing until we've detected device type AND router is ready to prevent flash
-  // Only show loading state on client to prevent hydration mismatch
-  if (!isMounted || (!isLoaded || !router.isReady)) {
+  // Show loading state until client-side mounted
+  if (!isMounted || !isLoaded) {
     return (
       <div 
         style={{ 
@@ -181,6 +171,7 @@ function VX2MobileAppDemo() {
       {/* 
         On mobile: fullscreen app (no phone frame)
         On desktop: phone frame preview 
+        NOTE: isMobile is only used after mount and isLoaded check, so safe for hydration
       */}
       <AuthProvider>
         {isMobile ? (
@@ -402,12 +393,14 @@ function VX2MobileAppDemo() {
             gap: 24,
             padding: '24px',
             paddingLeft: selectedDevices.length > 1 ? '240px' : '24px',
+            paddingTop: '80px', // Add top padding to account for device selector
             minHeight: '100vh',
             overflowX: 'auto',
             overflowY: 'hidden',
             flexWrap: 'nowrap',
             scrollBehavior: 'smooth',
             paddingBottom: 40,
+            justifyContent: selectedDevices.length > 1 ? 'flex-start' : 'center',
           }}>
             {ALL_DEVICES.filter(id => selectedDevices.includes(id)).map((deviceId) => (
               <div 
@@ -425,30 +418,31 @@ function VX2MobileAppDemo() {
                   showPhoneFrame={true}
                   devicePreset={deviceId}
                   onTabChange={handleTabChange}
+                  fullScreen={false}
                   badgeOverrides={{
                     'live-drafts': 3,
                   }}
                 />
-                {/* Device label */}
-                {selectedDevices.length > 1 && (
-                  <div style={{
-                    marginTop: 12,
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: '#6B7280',
-                    textAlign: 'center',
+                {/* Device label - always show when multiple devices */}
+                <div style={{
+                  marginTop: 12,
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: '#6B7280',
+                  textAlign: 'center',
+                  opacity: selectedDevices.length > 1 ? 1 : 0,
+                  transition: 'opacity 0.2s ease',
+                }}>
+                  {DEVICE_PRESETS[deviceId]?.name}
+                  <span style={{ 
+                    display: 'block', 
+                    fontSize: 10, 
+                    fontWeight: 400,
+                    marginTop: 2,
                   }}>
-                    {DEVICE_PRESETS[deviceId]?.name}
-                    <span style={{ 
-                      display: 'block', 
-                      fontSize: 10, 
-                      fontWeight: 400,
-                      marginTop: 2,
-                    }}>
-                      {DEVICE_PRESETS[deviceId]?.width}x{DEVICE_PRESETS[deviceId]?.height}
-                    </span>
-                  </div>
-                )}
+                    {DEVICE_PRESETS[deviceId]?.width}x{DEVICE_PRESETS[deviceId]?.height}
+                  </span>
+                </div>
               </div>
             ))}
           </div>
