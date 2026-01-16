@@ -242,12 +242,6 @@ export default function FilterSortBar({
             isActive={filterBy === 'myTurnOnly'}
             onTap={() => onFilterChange('myTurnOnly')}
           />
-          <FilterPill
-            label="Needs Attention"
-            count={counts.needsAttention}
-            isActive={filterBy === 'needsAttention'}
-            onTap={() => onFilterChange('needsAttention')}
-          />
         </div>
 
         {/* Sort dropdown */}

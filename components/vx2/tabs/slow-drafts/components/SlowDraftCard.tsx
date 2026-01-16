@@ -24,7 +24,6 @@ import { RADIUS } from '../../../core/constants/sizes';
 import { TEXT_COLORS, STATE_COLORS } from '../../../core/constants/colors';
 
 import MyRosterStrip from './MyRosterStrip';
-import PositionNeedsIndicator from './PositionNeedsIndicator';
 
 // ============================================================================
 // HELPERS
@@ -358,12 +357,6 @@ export default function SlowDraftCard({
               />
             </div>
 
-            {/* Position needs (compact) */}
-            <PositionNeedsIndicator
-              needs={draft.positionNeeds}
-              compact={true}
-            />
-
             {/* Progress bar */}
             <DraftProgressBar
               currentRound={draft.currentRound}
@@ -388,14 +381,6 @@ export default function SlowDraftCard({
               <MyRosterStrip
                 picks={draft.myPicks}
                 rosterSize={18}
-                compact={false}
-              />
-            </div>
-
-            {/* Position needs (expanded) */}
-            <div style={{ marginBottom: SLOW_DRAFT_LAYOUT.sectionGap }}>
-              <PositionNeedsIndicator
-                needs={draft.positionNeeds}
                 compact={false}
               />
             </div>

@@ -54,8 +54,21 @@ function RosterSquare({ pick, index, size }: RosterSquareProps): React.ReactElem
 }
 
 // ============================================================================
-// EXPANDED PLAYER CARD
+// EXPANDED PLAYER CARD (matches DraftBoard PickCell style)
 // ============================================================================
+
+// Pixel values matched from DraftBoard.tsx
+const CARD_PX = {
+  cellWidth: 92,
+  cellHeight: 62,
+  cellBorderWidth: 4,
+  cellBorderRadius: 6,
+  pickNumberFontSize: 8,
+  playerFirstNameFontSize: 10,
+  playerLastNameFontSize: 11,
+  playerPosTeamFontSize: 9,
+  playerPosTeamMarginTop: 6,
+} as const;
 
 interface PlayerMiniCardProps {
   pick: MyPick;
@@ -65,69 +78,101 @@ interface PlayerMiniCardProps {
 function PlayerMiniCard({ pick, onTap }: PlayerMiniCardProps): React.ReactElement {
   const positionColor = SLOW_DRAFT_COLORS.positions[pick.player.position];
 
-  // Get first initial and last name
+  // Split name into first and last
   const nameParts = pick.player.name.split(' ');
-  const displayName = nameParts.length > 1
-    ? `${nameParts[0][0]}. ${nameParts.slice(1).join(' ')}`
-    : pick.player.name;
+  const firstName = nameParts[0] || '';
+  const lastName = nameParts.slice(1).join(' ') || pick.player.name;
 
-  // Truncate if too long
-  const truncatedName = displayName.length > 10
-    ? displayName.substring(0, 9) + '…'
-    : displayName;
+  // Format pick number as round.pick (e.g., "1.01") using actual round/pickInRound data
+  const formattedPickNumber = `${pick.round}.${String(pick.pickInRound).padStart(2, '0')}`;
 
   return (
     <button
       onClick={onTap}
-      className="flex flex-col items-center transition-transform active:scale-95"
+      className="flex flex-col transition-transform active:scale-95"
       style={{
-        width: SLOW_DRAFT_LAYOUT.expandedPlayerCardWidth,
-        height: SLOW_DRAFT_LAYOUT.expandedPlayerCardHeight,
-        backgroundColor: 'rgba(255, 255, 255, 0.06)',
-        borderRadius: 8,
-        padding: 6,
-        border: `2px solid ${positionColor}`,
+        width: CARD_PX.cellWidth,
+        height: CARD_PX.cellHeight,
+        borderRadius: CARD_PX.cellBorderRadius,
+        border: `${CARD_PX.cellBorderWidth}px solid ${positionColor}`,
+        backgroundColor: `${positionColor}20`, // 20% opacity tint
+        padding: '2px 3px',
+        flexShrink: 0,
       }}
     >
-      {/* Position badge */}
+      {/* Pick number - top left */}
       <div
         style={{
-          backgroundColor: positionColor,
-          color: pick.player.position === 'WR' ? '#000' : '#fff',
-          fontSize: 10,
-          fontWeight: 700,
-          padding: '2px 6px',
-          borderRadius: 4,
-          marginBottom: 4,
+          fontSize: CARD_PX.pickNumberFontSize,
+          fontWeight: 500,
+          color: '#FFFFFF',
+          lineHeight: 1,
+          marginTop: 2,
+          marginLeft: 1,
+          textAlign: 'left',
         }}
       >
-        {pick.player.position}
+        {formattedPickNumber}
       </div>
 
-      {/* Player name */}
-      <span
+      {/* Content area - centered */}
+      <div
         style={{
-          ...SLOW_DRAFT_TYPOGRAPHY.playerName,
-          textAlign: 'center',
-          lineHeight: 1.2,
-          overflow: 'hidden',
-          display: '-webkit-box',
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: 'vertical',
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
         }}
       >
-        {truncatedName}
-      </span>
+        {/* First name */}
+        <div
+          style={{
+            fontWeight: 700,
+            color: '#FFFFFF',
+            textAlign: 'center',
+            width: '100%',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            fontSize: CARD_PX.playerFirstNameFontSize,
+            lineHeight: 1.2,
+            marginTop: -1,
+          }}
+        >
+          {firstName}
+        </div>
 
-      {/* Team */}
-      <span
-        style={{
-          ...SLOW_DRAFT_TYPOGRAPHY.playerPosition,
-          marginTop: 'auto',
-        }}
-      >
-        {pick.player.team}
-      </span>
+        {/* Last name */}
+        <div
+          style={{
+            fontWeight: 700,
+            color: '#FFFFFF',
+            textAlign: 'center',
+            width: '100%',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            fontSize: CARD_PX.playerLastNameFontSize,
+            lineHeight: 1.2,
+          }}
+        >
+          {lastName}
+        </div>
+
+        {/* POS-TEAM */}
+        <div
+          style={{
+            color: '#FFFFFF',
+            textAlign: 'center',
+            fontSize: CARD_PX.playerPosTeamFontSize,
+            lineHeight: 1.2,
+            marginTop: CARD_PX.playerPosTeamMarginTop,
+          }}
+        >
+          {pick.player.position}-{pick.player.team}
+        </div>
+      </div>
     </button>
   );
 }
@@ -147,11 +192,12 @@ function MoreIndicator({ count, onTap }: MoreIndicatorProps): React.ReactElement
       onClick={onTap}
       className="flex items-center justify-center transition-transform active:scale-95"
       style={{
-        width: SLOW_DRAFT_LAYOUT.expandedPlayerCardWidth,
-        height: SLOW_DRAFT_LAYOUT.expandedPlayerCardHeight,
+        width: CARD_PX.cellWidth,
+        height: CARD_PX.cellHeight,
         backgroundColor: 'rgba(255, 255, 255, 0.04)',
-        borderRadius: 8,
+        borderRadius: CARD_PX.cellBorderRadius,
         border: '1px dashed rgba(255, 255, 255, 0.2)',
+        flexShrink: 0,
       }}
     >
       <span
