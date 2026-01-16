@@ -1,6 +1,6 @@
 /**
  * PushNotificationSettings - UI for managing push notification permissions
- * 
+ *
  * Provides button to request notification permissions and enable alerts.
  */
 
@@ -23,10 +23,14 @@ export function PushNotificationSettings(): React.ReactElement {
     // Get current permission status
     if (supported) {
       setPermissionStatus(Notification.permission);
-      
+
       // Get current token if permission already granted
       if (Notification.permission === 'granted') {
-        fcmService.getToken().then(setToken);
+        // fcmService.getToken() returns string | null, not a Promise
+        const currentToken = fcmService.getToken();
+        if (currentToken) {
+          setToken(currentToken);
+        }
       }
     }
   }, []);
@@ -55,7 +59,7 @@ export function PushNotificationSettings(): React.ReactElement {
   return (
     <div>
       <h3>Push Notifications</h3>
-      
+
       {permissionStatus === 'granted' ? (
         <div>
           <p>✅ Notifications enabled</p>

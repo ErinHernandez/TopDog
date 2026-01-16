@@ -162,7 +162,7 @@ export class FirebaseAdapter implements DraftAdapter {
 
       return convertFirestoreRoomToRoom(roomId, roomDoc.data() as FirestoreDraftRoom);
     } catch (error) {
-      logger.error('Error getting room', { roomId, error });
+      logger.error('Error getting room', error as Error, { roomId });
       throw error;
     }
   }
@@ -187,7 +187,7 @@ export class FirebaseAdapter implements DraftAdapter {
         }
       },
       (error) => {
-        logger.error('Room subscription error', { roomId, error });
+        logger.error('Room subscription error', error as Error, { roomId });
       }
     );
 
@@ -215,7 +215,7 @@ export class FirebaseAdapter implements DraftAdapter {
       await updateDoc(roomRef, updates);
       logger.info('Room status updated', { roomId, status });
     } catch (error) {
-      logger.error('Error updating room status', { roomId, status, error });
+      logger.error('Error updating room status', error as Error, { roomId, status });
       throw error;
     }
   }
@@ -238,7 +238,7 @@ export class FirebaseAdapter implements DraftAdapter {
         convertFirestorePickToPick(doc.id, doc.data() as FirestoreDraftPick)
       );
     } catch (error) {
-      logger.error('Error getting picks', { roomId, error });
+      logger.error('Error getting picks', error as Error, { roomId });
       throw error;
     }
   }
@@ -264,7 +264,7 @@ export class FirebaseAdapter implements DraftAdapter {
         callback(picks);
       },
       (error) => {
-        logger.error('Picks subscription error', { roomId, error });
+        logger.error('Picks subscription error', error as Error, { roomId });
       }
     );
 
@@ -292,7 +292,7 @@ export class FirebaseAdapter implements DraftAdapter {
         timestamp: serverTimestamp(),
         isAutopick: pick.isAutopick,
         source: pick.source,
-        rosterAtPick: pick.rosterAtPick,
+        rosterAtPick: { ...pick.rosterAtPick },
       };
 
       const docRef = await addDoc(picksRef, firestorePick);
@@ -312,7 +312,7 @@ export class FirebaseAdapter implements DraftAdapter {
         timestamp: Date.now(),
       };
     } catch (error) {
-      logger.error('Error adding pick', { roomId, pick, error });
+      logger.error('Error adding pick', error as Error, { roomId, pickNumber: pick.pickNumber });
       throw error;
     }
   }
@@ -357,7 +357,7 @@ export class FirebaseAdapter implements DraftAdapter {
       logger.info('Players loaded', { count: players.length });
       return players;
     } catch (error) {
-      logger.error('Error getting players', { roomId, error });
+      logger.error('Error getting players', error as Error, { roomId });
       throw error;
     }
   }
@@ -391,7 +391,7 @@ export class FirebaseAdapter implements DraftAdapter {
         customRankings: data.customRankings || [],
       };
     } catch (error) {
-      logger.error('Error getting autodraft config', { userId, error });
+      logger.error('Error getting autodraft config', error as Error, { userId });
       throw error;
     }
   }
@@ -418,7 +418,7 @@ export class FirebaseAdapter implements DraftAdapter {
 
       logger.info('Autodraft config saved', { userId });
     } catch (error) {
-      logger.error('Error saving autodraft config', { userId, error });
+      logger.error('Error saving autodraft config', error as Error, { userId });
       throw error;
     }
   }

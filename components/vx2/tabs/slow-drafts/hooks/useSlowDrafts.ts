@@ -1,19 +1,15 @@
 /**
  * useSlowDrafts - Hook for fetching and managing slow draft data
  *
- * Provides enhanced draft data including:
- * - User's picks with full player details
- * - Position counts and needs
- * - Notable events (reaches, steals, alerts)
- * - Top available players
+ * Uses SWR for data fetching with automatic polling for real-time updates.
+ * Falls back to mock data in development when API is unavailable.
  */
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback } from 'react';
+import useSWR from 'swr';
 import type {
   SlowDraft,
   MyPick,
-  RecentPick,
-  NotableEvent,
   PositionCounts,
   PositionNeed,
   Position,
@@ -28,10 +24,31 @@ import {
 } from '../constants';
 
 // ============================================================================
-// MOCK DATA GENERATION
+// API FETCHER
 // ============================================================================
 
-// Player pool for mock data
+async function fetcher<T>(url: string): Promise<T> {
+  const res = await fetch(url);
+
+  if (!res.ok) {
+    const error = new Error('Failed to fetch slow drafts');
+    throw error;
+  }
+
+  const data = await res.json();
+
+  // Handle API responses that wrap data in { ok, data } format
+  if (data.ok !== undefined && data.data !== undefined) {
+    return data.data as T;
+  }
+
+  return data as T;
+}
+
+// ============================================================================
+// MOCK DATA (fallback for development/demo)
+// ============================================================================
+
 const MOCK_PLAYERS: DraftPlayer[] = [
   { id: 'allen_josh', name: 'Josh Allen', position: 'QB', team: 'BUF', adp: 25.5 },
   { id: 'jackson_lamar', name: 'Lamar Jackson', position: 'QB', team: 'BAL', adp: 30.2 },
@@ -81,70 +98,13 @@ function generateMockPicks(count: number): MyPick[] {
     picks.push({
       slotIndex: i,
       player,
-      pickNumber: (i + 1) * 12 - Math.floor(Math.random() * 6), // Rough snake draft sim
+      pickNumber: (i + 1) * 12 - Math.floor(Math.random() * 6),
       round: i + 1,
       pickInRound: Math.floor(Math.random() * 12) + 1,
     });
   }
 
   return picks;
-}
-
-function generateNotableEvents(draftId: string, pickNumber: number): NotableEvent[] {
-  const events: NotableEvent[] = [];
-  const now = Date.now();
-
-  // Reach event
-  if (Math.random() > 0.4) {
-    const player = getRandomPlayer();
-    events.push({
-      id: `${draftId}-reach-${pickNumber}`,
-      type: 'reach',
-      pickNumber: pickNumber - 3,
-      round: Math.ceil((pickNumber - 3) / 12),
-      description: `${player.name} taken early`,
-      severity: 'warning',
-      player,
-      drafter: { id: 'user-123', name: 'GridironGuru' },
-      adpDelta: 15 + Math.floor(Math.random() * 20),
-      timestamp: now - Math.random() * 3600000,
-    });
-  }
-
-  // Steal event
-  if (Math.random() > 0.5) {
-    const player = getRandomPlayer();
-    events.push({
-      id: `${draftId}-steal-${pickNumber}`,
-      type: 'steal',
-      pickNumber: pickNumber - 5,
-      round: Math.ceil((pickNumber - 5) / 12),
-      description: `${player.name} fell late`,
-      severity: 'info',
-      player,
-      drafter: { id: 'user-456', name: 'FFChampion' },
-      adpDelta: -(15 + Math.floor(Math.random() * 15)),
-      timestamp: now - Math.random() * 7200000,
-    });
-  }
-
-  // Queue alert
-  if (Math.random() > 0.7) {
-    const player = getRandomPlayer();
-    events.push({
-      id: `${draftId}-queue-${pickNumber}`,
-      type: 'queue_alert',
-      pickNumber: pickNumber - 1,
-      round: Math.ceil((pickNumber - 1) / 12),
-      description: `${player.name} was taken!`,
-      severity: 'alert',
-      player,
-      drafter: { id: 'user-789', name: 'DragonSlayer' },
-      timestamp: now - Math.random() * 1800000,
-    });
-  }
-
-  return events;
 }
 
 function calculatePositionCounts(picks: MyPick[]): PositionCounts {
@@ -163,7 +123,6 @@ function calculatePositionNeeds(counts: PositionCounts, currentRound: number): P
     const current = counts[position];
     const needed = Math.max(0, req.min - current);
 
-    // Determine urgency based on round and needs
     let urgency: PositionNeed['urgency'] = 'neutral';
     if (needed > 0 && currentRound >= 12) {
       urgency = 'critical';
@@ -188,7 +147,6 @@ function calculatePositionNeeds(counts: PositionCounts, currentRound: number): P
 
 function generateTopAvailable(picks: MyPick[]): TopAvailable {
   const pickedIds = new Set(picks.map((p) => p.player.id));
-
   const available = MOCK_PLAYERS.filter((p) => !pickedIds.has(p.id));
 
   return {
@@ -199,7 +157,6 @@ function generateTopAvailable(picks: MyPick[]): TopAvailable {
   };
 }
 
-// Calculate picks away in a snake draft
 function calculatePicksAway(
   currentPick: number,
   userPosition: number,
@@ -209,7 +166,6 @@ function calculatePicksAway(
   const pickInRound = ((currentPick - 1) % teamCount) + 1;
   const isOddRound = currentRound % 2 === 1;
 
-  // User's position in current round
   const userPickInRound = isOddRound ? userPosition : teamCount - userPosition + 1;
 
   if (pickInRound < userPickInRound) {
@@ -217,15 +173,10 @@ function calculatePicksAway(
   } else if (pickInRound === userPickInRound) {
     return 0;
   } else {
-    // Next round
     const nextRoundUserPick = !isOddRound ? userPosition : teamCount - userPosition + 1;
     return (teamCount - pickInRound) + nextRoundUserPick;
   }
 }
-
-// ============================================================================
-// MOCK DRAFT GENERATOR
-// ============================================================================
 
 function generateMockSlowDraft(index: number): SlowDraft {
   const id = `slow-draft-${index}`;
@@ -236,13 +187,13 @@ function generateMockSlowDraft(index: number): SlowDraft {
   const picksAway = calculatePicksAway(pickNumber, userPosition, 12);
   const isYourTurn = picksAway === 0;
 
-  const myPickCount = Math.floor(currentRound * 0.9); // Roughly your picks
+  const myPickCount = Math.floor(currentRound * 0.9);
   const myPicks = generateMockPicks(myPickCount);
   const positionCounts = calculatePositionCounts(myPicks);
 
   const timeLeftSeconds = isYourTurn
-    ? 3600 + Math.floor(Math.random() * 86400) // 1h to 1d
-    : 3600 * 2 + Math.floor(Math.random() * 86400 * 3); // 2h to 3d
+    ? 3600 + Math.floor(Math.random() * 86400)
+    : 3600 * 2 + Math.floor(Math.random() * 86400 * 3);
 
   return {
     id,
@@ -272,15 +223,38 @@ function generateMockSlowDraft(index: number): SlowDraft {
     positionCounts,
     positionNeeds: calculatePositionNeeds(positionCounts, currentRound),
     recentPicks: [],
-    notableEvents: generateNotableEvents(id, pickNumber),
+    notableEvents: [],
     topAvailable: generateTopAvailable(myPicks),
     lastActivityAt: Date.now() - Math.random() * 86400000,
   };
 }
 
+function generateMockDrafts(): SlowDraft[] {
+  const count = 8 + Math.floor(Math.random() * 8);
+  const mockDrafts = Array.from({ length: count }, (_, i) =>
+    generateMockSlowDraft(i)
+  );
+
+  // Ensure at least 2 are "your turn"
+  if (mockDrafts.filter((d) => d.status === 'your-turn').length < 2) {
+    mockDrafts[0].status = 'your-turn';
+    mockDrafts[0].picksAway = 0;
+    mockDrafts[1].status = 'your-turn';
+    mockDrafts[1].picksAway = 0;
+  }
+
+  return mockDrafts;
+}
+
 // ============================================================================
 // HOOK
 // ============================================================================
+
+interface UseSlowDraftsOptions {
+  userId?: string;
+  useMockData?: boolean;
+  refreshInterval?: number;
+}
 
 interface UseSlowDraftsResult {
   drafts: SlowDraft[];
@@ -303,49 +277,55 @@ interface UseSlowDraftsResult {
 
   // Processed list
   sortedFilteredDrafts: SlowDraft[];
+
+  // Quick pick action
+  quickPick: (draftId: string, playerId: string) => Promise<void>;
 }
 
-export function useSlowDrafts(): UseSlowDraftsResult {
-  const [drafts, setDrafts] = useState<SlowDraft[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export function useSlowDrafts(options: UseSlowDraftsOptions = {}): UseSlowDraftsResult {
+  const {
+    userId,
+    useMockData = false,
+    refreshInterval = 30000, // 30 second polling by default
+  } = options;
 
   const [sortBy, setSortBy] = useState<SortOption>('myTurnFirst');
   const [filterBy, setFilterBy] = useState<FilterOption>('all');
 
-  // Initial fetch
-  useEffect(() => {
-    const fetchDrafts = async () => {
-      setIsLoading(true);
-      try {
-        // Simulate API delay
-        await new Promise((resolve) => setTimeout(resolve, 800));
+  // Build API URL
+  const apiUrl = userId && !useMockData
+    ? `/api/slow-drafts?userId=${encodeURIComponent(userId)}`
+    : null;
 
-        // Generate mock drafts (5-15 drafts)
-        const count = 8 + Math.floor(Math.random() * 8);
-        const mockDrafts = Array.from({ length: count }, (_, i) =>
-          generateMockSlowDraft(i)
-        );
+  // Use SWR for data fetching with polling
+  const {
+    data: apiDrafts,
+    error: swrError,
+    isLoading: swrLoading,
+    mutate,
+  } = useSWR<SlowDraft[]>(
+    apiUrl,
+    fetcher,
+    {
+      refreshInterval: apiUrl ? refreshInterval : 0,
+      revalidateOnFocus: true,
+      dedupingInterval: 5000,
+      onError: (err) => {
+        console.error('[useSlowDrafts] API error:', err);
+      },
+    }
+  );
 
-        // Ensure at least 2 are "your turn"
-        if (mockDrafts.filter((d) => d.status === 'your-turn').length < 2) {
-          mockDrafts[0].status = 'your-turn';
-          mockDrafts[0].picksAway = 0;
-          mockDrafts[1].status = 'your-turn';
-          mockDrafts[1].picksAway = 0;
-        }
+  // Use mock data as fallback
+  const mockDrafts = useMemo(() => {
+    if (apiUrl && !swrError) return null;
+    return generateMockDrafts();
+  }, [apiUrl, swrError]);
 
-        setDrafts(mockDrafts);
-        setError(null);
-      } catch (err) {
-        setError('Failed to load drafts');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchDrafts();
-  }, []);
+  // Combine data sources
+  const drafts = apiDrafts || mockDrafts || [];
+  const isLoading = swrLoading && !mockDrafts;
+  const error = swrError ? 'Failed to load drafts' : null;
 
   // Calculate counts
   const counts = useMemo(() => {
@@ -428,18 +408,36 @@ export function useSlowDrafts(): UseSlowDraftsResult {
   }, [drafts, sortBy, filterBy]);
 
   const refetch = useCallback(() => {
-    setIsLoading(true);
-    // Re-trigger effect
-    setDrafts([]);
-    setTimeout(() => {
-      const count = 8 + Math.floor(Math.random() * 8);
-      const mockDrafts = Array.from({ length: count }, (_, i) =>
-        generateMockSlowDraft(i)
-      );
-      setDrafts(mockDrafts);
-      setIsLoading(false);
-    }, 800);
-  }, []);
+    if (apiUrl) {
+      mutate();
+    }
+  }, [apiUrl, mutate]);
+
+  // Quick pick action
+  const quickPick = useCallback(async (draftId: string, playerId: string) => {
+    if (!userId) {
+      throw new Error('User ID is required for quick pick');
+    }
+
+    const response = await fetch(`/api/slow-drafts/${draftId}/quick-pick`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId,
+        playerId,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error?.message || 'Failed to submit quick pick');
+    }
+
+    // Refresh data after successful pick
+    mutate();
+  }, [userId, mutate]);
 
   return {
     drafts,
@@ -452,6 +450,7 @@ export function useSlowDrafts(): UseSlowDraftsResult {
     setFilterBy,
     counts,
     sortedFilteredDrafts,
+    quickPick,
   };
 }
 

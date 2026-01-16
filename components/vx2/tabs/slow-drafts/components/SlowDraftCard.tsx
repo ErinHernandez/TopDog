@@ -25,7 +25,6 @@ import { TEXT_COLORS, STATE_COLORS } from '../../../core/constants/colors';
 
 import MyRosterStrip from './MyRosterStrip';
 import PositionNeedsIndicator from './PositionNeedsIndicator';
-import NotablePicks from './NotablePicks';
 
 // ============================================================================
 // HELPERS
@@ -302,19 +301,7 @@ export default function SlowDraftCard({
             {/* Right: Timer or status */}
             <div className="flex items-center gap-3 flex-shrink-0">
               {isYourTurn ? (
-                <>
-                  <OnTheClockBadge />
-                  {timeInfo && (
-                    <span
-                      style={{
-                        ...SLOW_DRAFT_TYPOGRAPHY.timer,
-                        color: getTimerColor(timeInfo),
-                      }}
-                    >
-                      {timeInfo.text}
-                    </span>
-                  )}
-                </>
+                <OnTheClockBadge />
               ) : (
                 <div className="text-right">
                   {draft.picksAway > 0 && (
@@ -404,16 +391,6 @@ export default function SlowDraftCard({
                 compact={false}
               />
             </div>
-
-            {/* Notable events */}
-            {draft.notableEvents.length > 0 && (
-              <div style={{ marginBottom: SLOW_DRAFT_LAYOUT.sectionGap }}>
-                <NotablePicks
-                  events={draft.notableEvents}
-                  maxVisible={3}
-                />
-              </div>
-            )}
 
             {/* Position needs (expanded) */}
             <div style={{ marginBottom: SLOW_DRAFT_LAYOUT.sectionGap }}>

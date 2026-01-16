@@ -197,7 +197,7 @@ export function useConnectionStatus({
           }
         },
         (error) => {
-          logger.error('Firestore subscription error', { error });
+          logger.error('Firestore subscription error', error as Error);
           setIsFirestoreConnected(false);
           setErrorMessage(error.message);
 
@@ -286,7 +286,7 @@ export function useConnectionStatus({
 
       // Connection restoration will be detected by the snapshot listener
     } catch (error) {
-      logger.error('Reconnection attempt failed', { error });
+      logger.error('Reconnection attempt failed', error as Error);
 
       if (reconnectAttempts + 1 < maxReconnectAttempts) {
         scheduleReconnect();
@@ -332,7 +332,7 @@ export function useConnectionStatus({
       setIsFirestoreConnected(false);
       setState('disconnected');
     } catch (error) {
-      logger.error('Disconnect failed', { error });
+      logger.error('Disconnect failed', error as Error);
     }
   }, [db]);
 

@@ -201,6 +201,8 @@ export interface SlowDraftsTabProps {
   onEnterDraft?: (draft: SlowDraft) => void;
   onJoinDraft?: () => void;
   onQuickPick?: (draftId: string, playerId: string) => Promise<void>;
+  /** User ID for fetching drafts (uses mock data if not provided) */
+  userId?: string;
 }
 
 export interface SlowDraftCardProps {

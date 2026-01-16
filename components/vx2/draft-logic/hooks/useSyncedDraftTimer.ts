@@ -182,7 +182,7 @@ export function useSyncedDraftTimer({
         }
       },
       (error) => {
-        logger.error('Timer subscription error', { roomId, error });
+        logger.error('Timer subscription error', error as Error, { roomId });
         setIsSynced(false);
       }
     );
@@ -287,7 +287,7 @@ export function useSyncedDraftTimer({
 
       logger.info('Timer reset on server', { roomId });
     } catch (error) {
-      logger.error('Failed to reset timer', { roomId, error });
+      logger.error('Failed to reset timer', error as Error, { roomId });
       throw error;
     }
   }, [db, roomId, pickTimeSeconds]);

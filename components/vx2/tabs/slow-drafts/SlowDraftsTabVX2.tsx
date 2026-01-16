@@ -140,9 +140,10 @@ function JoinDraftButton({ onClick }: JoinDraftButtonProps): React.ReactElement 
 export default function SlowDraftsTabVX2({
   onEnterDraft,
   onJoinDraft,
-  onQuickPick,
+  onQuickPick: externalQuickPick,
+  userId,
 }: SlowDraftsTabProps): React.ReactElement {
-  // Data hook
+  // Data hook with optional userId for real API data
   const {
     isLoading,
     error,
@@ -153,7 +154,8 @@ export default function SlowDraftsTabVX2({
     setFilterBy,
     counts,
     sortedFilteredDrafts,
-  } = useSlowDrafts();
+    quickPick: hookQuickPick,
+  } = useSlowDrafts({ userId });
 
   // Track expanded card
   const [expandedDraftId, setExpandedDraftId] = useState<string | null>(null);
@@ -177,13 +179,17 @@ export default function SlowDraftsTabVX2({
   const handleQuickPick = useCallback(
     async (draftId: string, playerId: string) => {
       try {
-        await onQuickPick?.(draftId, playerId);
-        // Could refresh data here
+        // Use external handler if provided, otherwise use hook's quickPick
+        if (externalQuickPick) {
+          await externalQuickPick(draftId, playerId);
+        } else if (userId) {
+          await hookQuickPick(draftId, playerId);
+        }
       } catch (err) {
         console.error('Quick pick failed:', err);
       }
     },
-    [onQuickPick]
+    [externalQuickPick, hookQuickPick, userId]
   );
 
   // ============================================================
@@ -328,7 +334,7 @@ export default function SlowDraftsTabVX2({
               onToggleExpand={() => handleToggleExpand(draft.id)}
               onEnterDraft={() => handleEnterDraft(draft)}
               onQuickPick={
-                onQuickPick
+                (externalQuickPick || userId)
                   ? (playerId) => handleQuickPick(draft.id, playerId)
                   : undefined
               }
