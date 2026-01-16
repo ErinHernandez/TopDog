@@ -17,15 +17,24 @@
  * ```
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useTournaments, type Tournament } from '../../hooks/data';
 import { BG_COLORS } from '../../core/constants/colors';
 import { SPACING } from '../../core/constants/sizes';
 import { EmptyState, ErrorState } from '../../components/shared';
-import { TournamentCard, TournamentCardSkeleton } from './TournamentCard';
+import { TournamentCardSkeletonV3 as TournamentCardSkeleton } from './TournamentCardV3';
 import JoinTournamentModal from './JoinTournamentModal';
 import { createScopedLogger } from '../../../../lib/clientLogger';
+import { useCardHeight } from '../../hooks/ui/useCardHeight';
+import { CARD_SPACING_V3 } from './constants/cardSpacingV3';
+import {
+  TournamentBackground,
+  TournamentTitle,
+  TournamentProgressBar,
+  TournamentJoinButton,
+  TournamentStats,
+} from './elements';
 
 const logger = createScopedLogger('[LobbyTab]');
 
@@ -38,6 +47,16 @@ const LOBBY_PX = {
   containerPaddingY: SPACING.lg,
   listGap: SPACING.lg,
 } as const;
+
+/**
+ * Default background image for tournaments
+ */
+const DEFAULT_BACKGROUND_IMAGE = 'url(/do_riding_football_III.webp)';
+
+/**
+ * Tiny blur placeholder (92 bytes) - displays instantly while full image loads
+ */
+const BLUR_PLACEHOLDER = 'data:image/webp;base64,UklGRlQAAABXRUJQVlA4IEgAAABwAwCdASoUABsAPyl+uFOuKCWisAwBwCUJZQAAW+q+9Bpo4aAA/uvZ+YkAc4jvVTc7+oJAY99soPLjJTrwm3j5Y3VE0BWmGAA=';
 
 // ============================================================================
 // TYPES
@@ -76,10 +95,28 @@ export default function LobbyTabVX2({
 }: LobbyTabVX2Props): React.ReactElement {
   const router = useRouter();
   const { tournaments, isLoading, error, refetch } = useTournaments();
-  React.useEffect(() => {
-  }, [tournaments.length, isLoading, error]);
   const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
   const [isJoining, setIsJoining] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  
+  // Calculate card dimensions using fixed pixel margins
+  // Card will have exactly 16px spacing from status bar and tab bar
+  // IMPORTANT: Hooks must be called before any conditional returns
+  const {
+    height: cardHeight,
+    width: cardWidth,
+    statusBarHeight,
+    isReady: isCardHeightReady,
+  } = useCardHeight({
+    // Fixed pixel margins from viewport edges
+    topMargin: 16,
+    bottomMargin: 16,
+    leftMargin: 16,
+    rightMargin: 16,
+    // Constraints
+    minHeight: 400,
+    maxWidth: 420,
+  });
 
   const handleJoinClick = useCallback((tournamentId: string) => {
     const tournament = tournaments.find(t => t.id === tournamentId);
@@ -117,9 +154,51 @@ export default function LobbyTabVX2({
       setSelectedTournament(null);
     }
   }, [isJoining]);
-  
-  // Loading state
-  if (isLoading) {
+
+  // Get featured tournament for background image preloading
+  // Must compute this before the useEffect to avoid conditional hook calls
+  const featuredTournament = tournaments.find(t => t.isFeatured) || tournaments[0] || null;
+
+  // Extract background image URL from tournament or use default
+  const backgroundImage = (featuredTournament as any)?.backgroundImage || DEFAULT_BACKGROUND_IMAGE;
+  const backgroundImageBlur = (featuredTournament as any)?.backgroundImageBlur || BLUR_PLACEHOLDER;
+
+  // Extract URL from CSS background value for preloading
+  const urlMatch = backgroundImage.match(/url\(['"]?([^'"]+)['"]?\)/);
+  const backgroundUrl = urlMatch ? urlMatch[1] : null;
+
+  // Preload image - MUST be called before any conditional returns
+  useEffect(() => {
+    // Skip preloading for data URLs (already embedded)
+    if (!backgroundUrl || backgroundUrl.startsWith('data:')) {
+      setImageLoaded(true);
+      return;
+    }
+
+    const img = new Image();
+    img.onload = () => {
+      setImageLoaded(true);
+    };
+    img.onerror = () => {
+      // Image failed to load, show anyway (will use fallback)
+      setImageLoaded(true);
+    };
+    img.src = backgroundUrl;
+
+    // Handle already-cached images
+    if (img.complete) {
+      setImageLoaded(true);
+    }
+
+    return () => {
+      img.onload = null;
+      img.onerror = null;
+    };
+  }, [backgroundUrl]);
+
+  // Loading state - only show if we don't have any tournaments yet
+  // If tournaments exist, show them even if isLoading is true (prevents flicker)
+  if (isLoading && tournaments.length === 0) {
     return (
       <div 
         className="flex-1 overflow-y-auto"
@@ -169,52 +248,156 @@ export default function LobbyTabVX2({
     );
   }
   
-  // Success state - single featured tournament fills the screen
-  const featuredTournament = tournaments.find(t => t.isFeatured) || tournaments[0];
+  // Early return if not ready
+  if (!isCardHeightReady || !featuredTournament) {
+    return (
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: BG_COLORS.primary,
+        }}
+      >
+        <div style={{ color: '#6B7280' }}>Loading...</div>
+      </div>
+    );
+  }
   
-  // Use flexbox centering to prevent layout shifts when viewport changes
-  // Flexbox justify-content: center centers without calculations based on container height
-  // The key is that flex-1 on the parent (TabContentVX2) should be stable
+  // Use absolute positioning for guaranteed spacing
+  // This ensures exactly 16px margins on all sides regardless of flexbox quirks
   return (
     <div 
       className="vx2-lobby-container"
       style={{ 
-        padding: `${LOBBY_PX.containerPaddingY}px ${LOBBY_PX.containerPaddingX}px`,
+        position: 'relative',
+        width: '100%',
+        height: '100%',
         backgroundColor: BG_COLORS.primary,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center', // Flexbox centering instead of absolute positioning
-        flex: 1,
-        minHeight: 0, // Important for flex-1 to work correctly
-        overflow: 'hidden',
-        // CSS containment to prevent layout shifts from affecting this container
-        contain: 'layout style paint',
-        // Force hardware acceleration to prevent layout recalculations
-        willChange: 'auto',
-        transform: 'translateZ(0)', // Force GPU layer
       }}
       role="main"
       aria-label="Tournament lobby"
     >
-      {/* Featured Tournament Card - centered with flexbox */}
-      <div
-        style={{
-          width: '100%',
-          maxWidth: '375px', // Constrain card width to prevent it from getting too wide
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          // No position: absolute, no top: 50%, no transform
-        }}
-      >
-        <TournamentCard
-          tournament={featuredTournament}
-          onJoinClick={() => handleJoinClick(featuredTournament.id)}
-          featured={true}
-          className="w-full"
-        />
-      </div>
+      {/* ============================================ */}
+      {/* TOURNAMENT CARD - Decomposed Atomic Version */}
+      {/* ============================================ */}
+
+      {/* Card Container - Absolutely positioned with fixed margins */}
+      {cardHeight && cardWidth ? (
+        <article
+          className="tournament-card"
+          style={{
+            // CRITICAL: Absolute positioning guarantees margins work
+            position: 'absolute',
+            top: '16px',
+            bottom: '16px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            
+            // Size from hook (respects maxWidth)
+            width: `${cardWidth}px`,
+            maxWidth: '420px',
+            
+            // Card styling
+            borderRadius: `${CARD_SPACING_V3.borderRadius}px`,
+            border: `${CARD_SPACING_V3.borderWidth}px solid ${CARD_SPACING_V3.borderColor}`,
+            overflow: 'hidden',
+            
+            // Flex context for content grid
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          {/* ====== LAYER 1: Background ====== */}
+          <TournamentBackground
+            image={backgroundImage}
+            placeholder={backgroundImageBlur}
+            isLoaded={imageLoaded}
+            borderRadius={CARD_SPACING_V3.borderRadius - CARD_SPACING_V3.borderWidth}
+          />
+
+          {/* ====== LAYER 2: Content Grid ====== */}
+          <div
+            className="tournament-card__content"
+            style={{
+              // Fill container
+              flex: 1,
+              
+              // Above background
+              position: 'relative',
+              zIndex: 1,
+              
+              // Inner padding
+              padding: `${CARD_SPACING_V3.outerPadding}px`,
+              
+              // 3-row grid layout
+              display: 'grid',
+              gridTemplateRows: 'auto 1fr auto',
+              gap: 0,
+            }}
+          >
+            {/* Row 1: Title (auto height) */}
+            <TournamentTitle title={featuredTournament.title || 'Tournament'} />
+
+            {/* Row 2: Spacer (flexible, fills available space) */}
+            <div
+              className="tournament-card__spacer"
+              style={{
+                minHeight: `${CARD_SPACING_V3.spacerMinHeight}px`,
+              }}
+            />
+
+            {/* Row 3: Bottom Section (auto height, content anchored to bottom) */}
+            <div
+              className="tournament-card__bottom"
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'flex-end',
+                gap: `${CARD_SPACING_V3.bottomRowGap}px`,
+              }}
+            >
+              {/* Progress Bar (only renders if maxEntries > 0) */}
+              <TournamentProgressBar
+                currentEntries={featuredTournament.currentEntries || 0}
+                maxEntries={featuredTournament.maxEntries || 0}
+              />
+
+              {/* Join Button */}
+              <TournamentJoinButton
+                onClick={() => handleJoinClick(featuredTournament.id)}
+                label="Join Tournament"
+              />
+
+              {/* Stats Grid */}
+              <TournamentStats
+                entryFee={featuredTournament.entryFee || 'Free'}
+                entries={featuredTournament.totalEntries || 0}
+                prize={featuredTournament.firstPlacePrize || '$0'}
+              />
+            </div>
+          </div>
+        </article>
+      ) : (
+        // Show skeleton while dimensions are calculating
+        <div
+          style={{
+            position: 'absolute',
+            top: '16px',
+            bottom: '16px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: 'calc(100% - 32px)',
+            maxWidth: '420px',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          <TournamentCardSkeleton />
+        </div>
+      )}
 
       {/* Join Modal */}
       {selectedTournament && (

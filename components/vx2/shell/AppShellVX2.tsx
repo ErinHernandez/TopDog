@@ -17,24 +17,71 @@
  * dismissable modal - users MUST sign in or sign up to access the app.
  */
 
-import React, { useCallback, useState, createContext, useContext } from 'react';
+import React, { useCallback, useState, useEffect, createContext, useContext } from 'react';
+import dynamic from 'next/dynamic';
 import { TabNavigationProvider, HeaderProvider } from '../core';
 import type { TabId } from '../core/types';
 import type { DevicePresetId } from '../core/constants/sizes';
-import { BG_COLORS } from '../core/constants/colors';
+import { BG_COLORS, TEXT_COLORS } from '../core/constants/colors';
 import { getDeviceClassFromPreset } from '../core/constants/responsive';
 import type { DeviceClass } from '../core/constants/responsive';
 import { TabBarVX2, TabContentVX2 } from '../navigation';
 import MobilePhoneFrame from './MobilePhoneFrame';
-import { 
-  AutodraftLimitsModalVX2, 
-  DepositHistoryModalVX2, 
-  DepositModalVX2,
-  WithdrawModalVX2, 
-  RankingsModalVX2 
+// Light modals - static imports
+import {
+  AutodraftLimitsModalVX2,
+  DepositHistoryModalVX2,
+  RankingsModalVX2
 } from '../modals';
+// Type imports for dynamic modals
+import type { DepositModalVX2Props } from '../modals/DepositModalVX2';
+import type { WithdrawModalVX2Props } from '../modals/WithdrawModalVX2';
 import { useAuth, AuthGateVX2 } from '../auth';
 import { useStableViewportHeight } from '../hooks/ui/useStableViewportHeight';
+
+// ============================================================================
+// DYNAMIC IMPORTS FOR HEAVY PAYMENT MODALS
+// ============================================================================
+
+// Loading placeholder for payment modals - matches app visual style
+const PaymentModalLoadingPlaceholder = () => (
+  <div
+    className="fixed inset-0 flex items-center justify-center"
+    style={{ zIndex: 9999 }}
+  >
+    <div className="absolute inset-0 bg-black/60" />
+    <div
+      className="relative p-8 rounded-xl max-w-sm mx-4"
+      style={{ backgroundColor: BG_COLORS.secondary }}
+    >
+      <div className="flex items-center gap-3">
+        <span className="animate-spin w-5 h-5 border-2 border-white/30 border-t-white rounded-full" />
+        <span style={{ color: TEXT_COLORS.primary }}>Loading payment...</span>
+      </div>
+    </div>
+  </div>
+);
+
+// Dynamic imports for heavy payment modals
+// ssr: false is critical because:
+// 1. Stripe SDK requires browser APIs (PaymentElement, ExpressCheckoutElement)
+// 2. WebAuthn biometric auth is browser-only
+// 3. Prevents hydration mismatches with payment SDKs
+const DepositModalVX2 = dynamic<DepositModalVX2Props>(
+  () => import('../modals/DepositModalVX2').then(mod => ({ default: mod.DepositModalVX2 })),
+  {
+    ssr: false,
+    loading: () => <PaymentModalLoadingPlaceholder />
+  }
+);
+
+const WithdrawModalVX2 = dynamic<WithdrawModalVX2Props>(
+  () => import('../modals/WithdrawModalVX2'),
+  {
+    ssr: false,
+    loading: () => <PaymentModalLoadingPlaceholder />
+  }
+);
 
 // ============================================================================
 // MODAL CONTEXT
@@ -69,6 +116,8 @@ export interface AppShellVX2Props {
   badgeOverrides?: Partial<Record<TabId, number>>;
   /** Callback when tab changes */
   onTabChange?: (fromTab: TabId | null, toTab: TabId) => void;
+  /** Whether phone frame should be fullscreen (false for side-by-side layouts) */
+  fullScreen?: boolean;
 }
 
 // ============================================================================
@@ -88,6 +137,12 @@ function InnerShell({ badgeOverrides, deviceClass = 'standard', inPhoneFrame = f
   useStableViewportHeight();
   
   const { state: authState } = useAuth();
+  const [isMounted, setIsMounted] = useState(false);
+  
+  // Track mount state to prevent hydration mismatch with conditional modal rendering
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
   
   // Modal state
   const [showAutodraftLimits, setShowAutodraftLimits] = useState(false);
@@ -136,12 +191,12 @@ function InnerShell({ badgeOverrides, deviceClass = 'standard', inPhoneFrame = f
         {/* Tab Bar */}
         <TabBarVX2 badgeOverrides={badgeOverrides} />
         
-        {/* Modals - Only show for authenticated users */}
+        {/* Modals - Only show for authenticated users after mount to prevent hydration mismatch */}
         <AutodraftLimitsModalVX2 
           isOpen={showAutodraftLimits} 
           onClose={() => setShowAutodraftLimits(false)} 
         />
-        {authState.user && (
+        {isMounted && authState.user && (
           <DepositModalVX2
             isOpen={showDeposit}
             onClose={() => setShowDeposit(false)}
@@ -155,7 +210,7 @@ function InnerShell({ badgeOverrides, deviceClass = 'standard', inPhoneFrame = f
           isOpen={showDepositHistory} 
           onClose={() => setShowDepositHistory(false)} 
         />
-        {authState.user && (
+        {isMounted && authState.user && (
           <WithdrawModalVX2 
             isOpen={showWithdraw} 
             onClose={() => setShowWithdraw(false)}
@@ -182,6 +237,7 @@ export default function AppShellVX2({
   devicePreset,
   badgeOverrides,
   onTabChange,
+  fullScreen = true,
 }: AppShellVX2Props): React.ReactElement {
   // Get device class from preset for simulated frames
   const deviceClass = getDeviceClassFromPreset(devicePreset);
@@ -194,7 +250,7 @@ export default function AppShellVX2({
         onTabChange={onTabChange}
       >
         <HeaderProvider>
-          <MobilePhoneFrame devicePreset={devicePreset}>
+          <MobilePhoneFrame devicePreset={devicePreset} fullScreen={fullScreen}>
             {/* AuthGateVX2 gates all app content - must authenticate to access */}
             <AuthGateVX2>
               <InnerShell badgeOverrides={badgeOverrides} deviceClass={deviceClass} inPhoneFrame={true} />

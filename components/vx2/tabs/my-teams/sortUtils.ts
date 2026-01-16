@@ -333,6 +333,11 @@ interface StoredSortState {
  * Load sort preferences from localStorage
  */
 export function loadSortPreferences(): SortState | null {
+  // Check if we're on the client-side before accessing localStorage
+  if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+    return null;
+  }
+  
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) return null;
@@ -359,6 +364,11 @@ export function loadSortPreferences(): SortState | null {
  * Save sort preferences to localStorage
  */
 export function saveSortPreferences(state: SortState): void {
+  // Check if we're on the client-side before accessing localStorage
+  if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+    return;
+  }
+  
   try {
     const toStore: StoredSortState = {
       version: STORAGE_VERSION,
@@ -431,6 +441,11 @@ function getCustomOrderKey(userId: string | null): string {
  * Load custom team order from localStorage
  */
 export function loadCustomOrder(userId: string | null = null): Map<string, number> {
+  // Check if we're on the client-side before accessing localStorage
+  if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+    return new Map();
+  }
+  
   try {
     const key = getCustomOrderKey(userId);
     const stored = localStorage.getItem(key);
@@ -448,6 +463,11 @@ export function loadCustomOrder(userId: string | null = null): Map<string, numbe
  * Save custom team order to localStorage
  */
 export function saveCustomOrder(order: Map<string, number>, userId: string | null = null): void {
+  // Check if we're on the client-side before accessing localStorage
+  if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+    return;
+  }
+  
   try {
     const key = getCustomOrderKey(userId);
     const toStore = Object.fromEntries(order);
@@ -472,6 +492,11 @@ export function updateCustomOrder(teamIds: string[], userId: string | null = nul
  * Clear custom order
  */
 export function clearCustomOrder(userId: string | null = null): void {
+  // Check if we're on the client-side before accessing localStorage
+  if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+    return;
+  }
+  
   try {
     const key = getCustomOrderKey(userId);
     localStorage.removeItem(key);

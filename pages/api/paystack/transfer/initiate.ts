@@ -389,9 +389,6 @@ export default async function handler(
     // This prevents race conditions where concurrent requests both pass validation
     let newBalance: number;
     try {
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'initiate.ts:357',message:'Before transaction',data:{userId,usdAmountToDebit,reference},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-      // #endregion
       if (!db) {
         const response = createErrorResponse(
           ErrorType.CONFIGURATION,
@@ -412,10 +409,7 @@ export default async function handler(
         }
         
         const currentBalance = (userSnapshot.data().balance || 0) as number; // USD balance
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'initiate.ts:364',message:'Inside transaction',data:{currentBalance,usdAmountToDebit,pendingWithdrawal:userSnapshot.data().pendingWithdrawalReference},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-        // #endregion
-        
+
         // Check balance within transaction (comparing USD to USD)
         if (currentBalance < usdAmountToDebit) {
           throw new Error(`Insufficient balance. Available: $${currentBalance.toFixed(2)} USD, Required: $${usdAmountToDebit.toFixed(2)} USD (${localTotalWithFeeDisplay.toFixed(2)} ${currency} including fee)`);
@@ -428,10 +422,7 @@ export default async function handler(
         }
         
         const calculatedNewBalance = currentBalance - usdAmountToDebit;
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'initiate.ts:377',message:'Calculating new balance',data:{currentBalance,usdAmountToDebit,calculatedNewBalance},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-        // #endregion
-        
+
         // Atomically debit balance (USD) and set pending withdrawal reference
         transaction.update(userRef, {
           balance: calculatedNewBalance,
@@ -441,9 +432,6 @@ export default async function handler(
         
         return calculatedNewBalance;
       });
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/2aaead3f-67a7-4f92-b03f-ef7a26e0239e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'initiate.ts:388',message:'Transaction completed',data:{newBalance},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-      // #endregion
     } catch (txError) {
       const message = txError instanceof Error ? txError.message : 'Balance debit failed';
       

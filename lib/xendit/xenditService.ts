@@ -331,15 +331,35 @@ export async function deleteDisbursementAccount(userId: string, accountId: strin
 // ============================================================================
 
 /**
- * Verify Xendit webhook token
+ * Verify Xendit webhook token using timing-safe comparison
+ *
+ * SECURITY: Uses crypto.timingSafeEqual to prevent timing attacks.
+ * A timing attack could allow an attacker to guess the token byte-by-byte
+ * by measuring response times when comparing tokens.
  */
 export function verifyWebhookToken(token: string): boolean {
   if (!XENDIT_WEBHOOK_TOKEN) {
     console.error('[XenditService] XENDIT_WEBHOOK_TOKEN not configured');
     return false;
   }
-  
-  return token === XENDIT_WEBHOOK_TOKEN;
+
+  // Validate token format
+  if (!token || typeof token !== 'string') {
+    return false;
+  }
+
+  // Use timing-safe comparison to prevent timing attacks
+  const tokenBuffer = Buffer.from(token, 'utf8');
+  const expectedBuffer = Buffer.from(XENDIT_WEBHOOK_TOKEN, 'utf8');
+
+  // If lengths differ, token is invalid (but still do constant-time check)
+  if (tokenBuffer.length !== expectedBuffer.length) {
+    // Perform a dummy comparison to maintain constant time
+    crypto.timingSafeEqual(expectedBuffer, expectedBuffer);
+    return false;
+  }
+
+  return crypto.timingSafeEqual(tokenBuffer, expectedBuffer);
 }
 
 /**

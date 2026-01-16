@@ -7,12 +7,18 @@ export default function Home() {
   const router = useRouter();
   const { isMobile, isLoaded } = useIsMobileDevice();
 
+  // Debug: Log state values to identify loading issue
+  useEffect(() => {
+    console.log('[DEBUG index] isLoaded:', isLoaded, 'isMobile:', isMobile);
+  }, [isLoaded, isMobile]);
+
   // Automatically redirect mobile devices to mobile app
   useEffect(() => {
-    if (isLoaded && isMobile) {
+    if (isLoaded && isMobile && router.isReady) {
       router.replace('/testing-grounds/vx2-mobile-app-demo');
     }
-  }, [isMobile, isLoaded, router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isMobile, isLoaded, router.isReady]);
 
   // Show loading state while detecting device or redirecting
   if (isLoaded && isMobile) {

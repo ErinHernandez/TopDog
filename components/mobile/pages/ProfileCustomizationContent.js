@@ -80,7 +80,7 @@ function PaletteIcon({ className = '' }) {
 export default function ProfileCustomizationContent() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
-  const { user, isLoading: authLoading } = useAuth();
+  const { user, state: authState } = useAuth();
   const {
     draft,
     updateDraft,
@@ -102,9 +102,11 @@ export default function ProfileCustomizationContent() {
     setMounted(true);
   }, []);
 
-  // Show loading state during SSR and initial mount
-  // Note: Users navigating to this page are already logged in, so we don't check for user
-  if (!mounted || authLoading || isLoading) {
+  // Only block on auth if we're truly initializing AND have no user yet
+  // Once user exists, render immediately (profile loads in background)
+  const shouldShowLoading = !mounted || (authState.isInitializing && !authState.user);
+
+  if (shouldShowLoading) {
     return (
       <MobilePhoneFrame>
         <MobilePhoneContent className="items-center justify-center">

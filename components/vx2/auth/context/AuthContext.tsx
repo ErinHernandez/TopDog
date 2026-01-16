@@ -302,6 +302,21 @@ export function AuthProvider({
     }
   }, []);
   
+  // ========== Timeout Helper ==========
+  
+  /**
+   * Wraps a promise with a timeout
+   * If the promise doesn't resolve within timeoutMs, rejects with error
+   */
+  const withTimeout = useCallback(<T,>(promise: Promise<T>, timeoutMs: number, errorMessage: string): Promise<T> => {
+    return Promise.race([
+      promise,
+      new Promise<T>((_, reject) => {
+        setTimeout(() => reject(new Error(errorMessage)), timeoutMs);
+      }),
+    ]);
+  }, []);
+  
   // ========== Auth State Listener ==========
   
   useEffect(() => {
@@ -316,11 +331,19 @@ export function AuthProvider({
         dispatch({ type: 'AUTH_STATE_CHANGED', payload: { user: authUser } });
         onAuthStateChange?.(authUser);
         
-        // Load profile
+        // Load profile with timeout to prevent indefinite hanging
         if (db) {
           try {
-            const profileDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
-            if (profileDoc.exists()) {
+            const profileDoc = await withTimeout(
+              getDoc(doc(db, 'users', firebaseUser.uid)),
+              10000, // 10 second timeout
+              'Profile load timed out'
+            ).catch((error) => {
+              console.warn('[AuthContext] Profile load failed or timed out:', error.message);
+              return null; // Return null to continue with defaults
+            });
+            
+            if (profileDoc && profileDoc.exists()) {
               const profileData = profileDoc.data();
               const profile: UserProfile = {
                 uid: firebaseUser.uid,
@@ -349,6 +372,8 @@ export function AuthProvider({
               };
               dispatch({ type: 'PROFILE_LOADED', payload: { profile } });
             } else {
+              // Profile doesn't exist or load failed - use defaults
+              logger.debug('[AuthContext] Using default profile');
               dispatch({ type: 'INITIALIZATION_COMPLETE' });
             }
           } catch (error) {
@@ -775,8 +800,16 @@ export function AuthProvider({
     if (!db || !state.user) return;
     
     try {
-      const profileDoc = await getDoc(doc(db, 'users', state.user.uid));
-      if (profileDoc.exists()) {
+      const profileDoc = await withTimeout(
+        getDoc(doc(db, 'users', state.user.uid)),
+        10000, // 10 second timeout
+        'Profile refresh timed out'
+      ).catch((error) => {
+        console.warn('[AuthContext] Profile refresh failed or timed out:', error.message);
+        return null; // Return null to continue without updating
+      });
+      
+      if (profileDoc && profileDoc.exists()) {
         const profileData = profileDoc.data();
         const profile: UserProfile = {
           uid: state.user.uid,
@@ -805,7 +838,7 @@ export function AuthProvider({
     } catch (error) {
       logger.error('Error refreshing profile', error instanceof Error ? error : new Error(String(error)));
     }
-  }, [db, state.user]);
+  }, [db, state.user, withTimeout]);
   
   const clearError = useCallback(() => {
     dispatch({ type: 'CLEAR_ERROR' });
@@ -877,12 +910,14 @@ export function AuthProvider({
  * Prevents build errors when AuthProvider is not available
  */
 function createBuildTimeSafeDefaults(): AuthContextValue {
+  // Match initialState exactly to prevent hydration mismatches
+  // During SSR/build, we want the same state structure as initial client render
   const safeState: AuthState = {
     status: 'idle',
     user: null,
     profile: null,
-    isLoading: false,
-    isInitializing: false,
+    isLoading: true,
+    isInitializing: true,
     error: null,
     profileCompleteness: 'minimal',
   };
@@ -920,7 +955,7 @@ function createBuildTimeSafeDefaults(): AuthContextValue {
     user: null,
     profile: null,
     isAuthenticated: false,
-    isLoading: false,
+    isLoading: safeState.isLoading, // Match safeState to prevent hydration mismatch
     error: null,
     signUpWithEmail: noOpSignUp,
     signInWithEmail: noOpSignIn,

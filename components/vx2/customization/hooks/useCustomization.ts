@@ -100,20 +100,31 @@ export function useCustomization(): UseCustomizationReturn {
       return;
     }
 
+    // Set a timeout to clear loading state if subscription doesn't fire within 5 seconds
+    // This prevents infinite loading if Firebase is slow or unavailable
+    const timeoutId = setTimeout(() => {
+      setIsLoading(false);
+    }, 5000);
+
     const unsubscribe = subscribeToPreferences(
       user.uid,
       (prefs) => {
+        clearTimeout(timeoutId);
         setPreferences(prefs);
         setDraft(prefs);
         setIsLoading(false);
       },
       (err) => {
+        clearTimeout(timeoutId);
         setError(err);
         setIsLoading(false);
       }
     );
 
-    return unsubscribe;
+    return () => {
+      clearTimeout(timeoutId);
+      unsubscribe();
+    };
   }, [user?.uid]);
 
   // Subscribe to locations

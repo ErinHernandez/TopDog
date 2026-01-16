@@ -94,6 +94,11 @@ export function AuthGateVX2({ children }: AuthGateVX2Props): React.ReactElement 
     setIsMounted(true);
   }, []);
   
+  // Debug: Log state values to identify loading issue
+  useEffect(() => {
+    console.log('[DEBUG] isMounted:', isMounted, 'isLoaded:', isMobileLoaded, 'isMobile:', isMobile);
+  }, [isMounted, isMobileLoaded, isMobile]);
+  
   // Check if running on Vercel deployment (runtime, not build)
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -135,13 +140,17 @@ export function AuthGateVX2({ children }: AuthGateVX2Props): React.ReactElement 
   }, []);
   
   // Handle anonymous users - sign them out automatically (only if not bypassing auth)
+  // Only run this after mobile detection is loaded to avoid race conditions
   useEffect(() => {
+    // Wait for mobile detection to complete before making auth decisions
+    if (!isMobileLoaded) return;
+    
     // Don't sign out if we're bypassing auth for mobile/Vercel
     const bypassAuth = isMobile || isVercelDeployment;
     if (!bypassAuth && authState.user?.isAnonymous) {
       signOut();
     }
-  }, [authState.user?.isAnonymous, signOut, isMobile, isVercelDeployment]);
+  }, [authState.user?.isAnonymous, signOut, isMobile, isMobileLoaded, isVercelDeployment]);
   
   // Handle successful authentication
   const handleAuthSuccess = useCallback(() => {
@@ -166,10 +175,22 @@ export function AuthGateVX2({ children }: AuthGateVX2Props): React.ReactElement 
     return <>{children}</>;
   }
   
+  // CRITICAL: During initial render (before mount or before mobile detection is loaded), 
+  // always show loading spinner to ensure server and client render the same thing during hydration
+  // The server always has isInitializing=true from createBuildTimeSafeDefaults()
+  // We show loading during initial render to guarantee hydration match
+  // On server: isMounted is false, so we show loading
+  // On client: wait for both isMounted and isMobileLoaded before proceeding
+  const isReady = isMounted && (typeof window === 'undefined' || isMobileLoaded);
+  if (!isReady) {
+    return <LoadingSpinner />;
+  }
+  
   // DEV BYPASS: Auto-login on mobile devices (for dev purposes)
   // DEV BYPASS: Auto-login on Vercel deployments (until further notice)
-  // Only use mobile detection after mount to prevent hydration mismatch
-  const bypassAuth = (isMounted && isMobileLoaded && isMobile) || isVercelDeployment;
+  // Only use mobile detection and Vercel detection after mount and mobile detection is loaded
+  // to prevent hydration mismatch
+  const bypassAuth = (isMobileLoaded && isMobile) || isVercelDeployment;
   
   if (bypassAuth) {
     return <>{children}</>;

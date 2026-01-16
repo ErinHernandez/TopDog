@@ -8,10 +8,11 @@
  * - Loading states
  */
 
-import React, { useEffect, useRef, useCallback, useState } from 'react';
+import React, { useEffect, useRef, useCallback, useState, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import { useTabNavigation } from '../../core';
 import type { TabId } from '../../core/types';
+import { DEFAULT_TAB } from '../../core/constants';
 import { useDebouncedCallback } from '../../hooks/ui/useDebounce';
 import TabErrorBoundary from './TabErrorBoundary';
 import { createScopedLogger } from '../../../../lib/clientLogger';
@@ -20,10 +21,13 @@ const logger = createScopedLogger('[TabContentVX2]');
 
 // Direct imports for all tabs (SSR compatible)
 import { LobbyTabVX2 as LobbyTab } from '../../tabs/lobby';
-import { LiveDraftsTabVX2 as LiveDraftsTab } from '../../tabs/live-drafts';
+import { DraftsTabVX2 as DraftsTab } from '../../tabs/live-drafts';
 import { MyTeamsTabVX2 as MyTeamsTab } from '../../tabs/my-teams';
 import { ExposureTabVX2 as ExposureTab } from '../../tabs/exposure';
 import { ProfileTabVX2 as ProfileTab } from '../../tabs/profile';
+
+// Debug: Log what DraftsTab is
+console.log('[TabContentVX2] DraftsTab component loaded:', DraftsTab?.name || 'unknown');
 
 // ============================================================================
 // TYPES
@@ -42,7 +46,7 @@ export interface TabContentVX2Props {
 
 const TAB_COMPONENTS: Record<TabId, React.ComponentType> = {
   'lobby': LobbyTab,
-  'live-drafts': LiveDraftsTab,
+  'live-drafts': DraftsTab,
   'my-teams': MyTeamsTab,
   'exposure': ExposureTab,
   'profile': ProfileTab,
@@ -60,9 +64,19 @@ export default function TabContentVX2({
   const { state, saveTabState, getTabState, getTabConfig } = useTabNavigation();
   logger.debug('Tab navigation initialized', { activeTab: state.activeTab });
   const contentRef = useRef<HTMLDivElement>(null);
-  const tabConfig = getTabConfig(state.activeTab);
-  const [isMounted, setIsMounted] = useState(false);
   
+  // Get tab config with fallback to default tab if not found
+  // Use useMemo to ensure proper React tracking and memoization
+  const tabConfig = useMemo(() => {
+    const config = getTabConfig(state.activeTab);
+    if (!config) {
+      logger.warn('Tab config not found, falling back to default', { activeTab: state.activeTab });
+      return getTabConfig(DEFAULT_TAB);
+    }
+    return config;
+  }, [state.activeTab, getTabConfig]);
+  
+  const [isMounted, setIsMounted] = useState(false);
   
   // Track mount state for SSR
   useEffect(() => {
@@ -72,7 +86,7 @@ export default function TabContentVX2({
   
   // Restore scroll position when tab becomes active
   useEffect(() => {
-    if (!isMounted || !tabConfig.preserveState) {
+    if (!isMounted || !tabConfig || !tabConfig.preserveState) {
       return;
     }
     
@@ -87,7 +101,7 @@ export default function TabContentVX2({
         });
       });
     }
-  }, [state.activeTab, tabConfig.preserveState, getTabState, isMounted]);
+  }, [state.activeTab, tabConfig, getTabState, isMounted]);
   
   // Save scroll position on scroll (debounced)
   // Use refs to capture current values for the debounced callback
@@ -102,7 +116,7 @@ export default function TabContentVX2({
   }, [tabConfig, state.activeTab, saveTabState]);
   
   const { debouncedCallback: handleScrollDebounced } = useDebouncedCallback((target: HTMLElement) => {
-    if (!tabConfigRef.current.preserveState) return;
+    if (!tabConfigRef.current || !tabConfigRef.current.preserveState) return;
     
     saveTabStateRef.current(activeTabRef.current, {
       scrollPosition: { 
@@ -150,7 +164,16 @@ export default function TabContentVX2({
   const renderTabContent = () => {
     switch (state.activeTab) {
       case 'live-drafts':
-        return <LiveDraftsTab onEnterDraft={handleEnterDraft} />;
+        return (
+          <DraftsTab
+            onEnterFastDraft={handleEnterDraft}
+            onEnterSlowDraft={(draft) => handleEnterDraft({
+              id: draft.id,
+              pickNumber: draft.pickNumber,
+              teamCount: draft.teamCount,
+            })}
+          />
+        );
       default:
         return TabComponent ? <TabComponent /> : null;
     }

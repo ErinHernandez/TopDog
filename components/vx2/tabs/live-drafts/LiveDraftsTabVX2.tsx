@@ -59,6 +59,8 @@ export interface LiveDraftsTabVX2Props {
   onEnterDraft?: (draft: LiveDraft) => void;
   /** Callback when user wants to join a new draft */
   onJoinDraft?: () => void;
+  /** Hide the tab switcher (used when embedded in DraftsTabVX2) */
+  hideTabSwitcher?: boolean;
 }
 
 // ============================================================================
@@ -473,6 +475,7 @@ type DraftType = 'live' | 'slow';
 export default function LiveDraftsTabVX2({
   onEnterDraft,
   onJoinDraft,
+  hideTabSwitcher = false,
 }: LiveDraftsTabVX2Props): React.ReactElement {
   const { drafts, isLoading, error, refetch } = useLiveDrafts();
   const [draftType, setDraftType] = useState<DraftType>('live');
@@ -495,29 +498,32 @@ export default function LiveDraftsTabVX2({
   
   // Note: Auth check removed - AuthGateVX2 ensures only logged-in users can access tabs
   
-  // Loading State
-  if (isLoading) {
+  // Loading State - only show if we don't have any drafts yet
+  // If drafts exist, show them even if isLoading is true (prevents flicker)
+  if (isLoading && drafts.length === 0) {
     return (
-      <div 
+      <div
         className="flex-1 flex flex-col"
         style={{ backgroundColor: BG_COLORS.primary }}
       >
-        {/* Header */}
-        <div
-          style={{
-            paddingLeft: `${LIVE_DRAFTS_PX.headerPaddingX}px`,
-            paddingRight: `${LIVE_DRAFTS_PX.headerPaddingX}px`,
-            paddingTop: `${LIVE_DRAFTS_PX.headerPaddingY}px`,
-            paddingBottom: `${LIVE_DRAFTS_PX.headerPaddingY}px`,
-            borderBottom: '1px solid rgba(255,255,255,0.1)',
-          }}
-        >
-          <TabSwitcher selected={draftType} onSelect={setDraftType} />
-          <div className="mt-1">
-            <Skeleton width={100} height={16} />
+        {/* Header - only show tab switcher if not hidden */}
+        {!hideTabSwitcher && (
+          <div
+            style={{
+              paddingLeft: `${LIVE_DRAFTS_PX.headerPaddingX}px`,
+              paddingRight: `${LIVE_DRAFTS_PX.headerPaddingX}px`,
+              paddingTop: `${LIVE_DRAFTS_PX.headerPaddingY}px`,
+              paddingBottom: `${LIVE_DRAFTS_PX.headerPaddingY}px`,
+              borderBottom: '1px solid rgba(255,255,255,0.1)',
+            }}
+          >
+            <TabSwitcher selected={draftType} onSelect={setDraftType} />
+            <div className="mt-1">
+              <Skeleton width={100} height={16} />
+            </div>
           </div>
-        </div>
-        
+        )}
+
         {/* List */}
         <div
           style={{
@@ -554,13 +560,56 @@ export default function LiveDraftsTabVX2({
   // Empty State
   if (filteredDrafts.length === 0 && !isLoading) {
     return (
-      <div 
+      <div
         className="flex-1 flex flex-col"
         style={{ backgroundColor: BG_COLORS.primary }}
         role="main"
         aria-label="Fast drafts"
       >
-        {/* Header */}
+        {/* Header - only show tab switcher if not hidden */}
+        {!hideTabSwitcher && (
+          <div
+            className="flex-shrink-0"
+            style={{
+              position: 'sticky',
+              top: 0,
+              zIndex: 10,
+              backgroundColor: BG_COLORS.primary,
+              paddingLeft: `${LIVE_DRAFTS_PX.headerPaddingX}px`,
+              paddingRight: `${LIVE_DRAFTS_PX.headerPaddingX}px`,
+              paddingTop: `${LIVE_DRAFTS_PX.headerPaddingY}px`,
+              paddingBottom: `${LIVE_DRAFTS_PX.headerPaddingY}px`,
+              borderBottom: '1px solid rgba(255,255,255,0.1)',
+            }}
+          >
+            <TabSwitcher selected={draftType} onSelect={setDraftType} />
+          </div>
+        )}
+
+        <div className="flex-1 flex items-center justify-center" style={{ padding: SPACING.xl }}>
+          <EmptyState
+            title="No Active Drafts"
+            description="Join a tournament to start drafting your team!"
+            action={onJoinDraft ? {
+              label: 'Join Draft',
+              onClick: handleJoinDraft,
+            } : undefined}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Main Content
+  return (
+    <div
+      className="flex-1 flex flex-col"
+      style={{ backgroundColor: BG_COLORS.primary }}
+      role="main"
+      aria-label="Fast drafts"
+    >
+      {/* Header - only show tab switcher if not hidden */}
+      {!hideTabSwitcher && (
         <div
           className="flex-shrink-0"
           style={{
@@ -577,46 +626,7 @@ export default function LiveDraftsTabVX2({
         >
           <TabSwitcher selected={draftType} onSelect={setDraftType} />
         </div>
-        
-        <div className="flex-1 flex items-center justify-center" style={{ padding: SPACING.xl }}>
-          <EmptyState
-            title="No Active Drafts"
-            description="Join a tournament to start drafting your team!"
-            action={onJoinDraft ? {
-              label: 'Join Draft',
-              onClick: handleJoinDraft,
-            } : undefined}
-          />
-        </div>
-      </div>
-    );
-  }
-  
-  // Main Content
-  return (
-    <div 
-      className="flex-1 flex flex-col"
-      style={{ backgroundColor: BG_COLORS.primary }}
-      role="main"
-      aria-label="Fast drafts"
-    >
-      {/* Header */}
-      <div
-        className="flex-shrink-0"
-        style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 10,
-          backgroundColor: BG_COLORS.primary,
-          paddingLeft: `${LIVE_DRAFTS_PX.headerPaddingX}px`,
-          paddingRight: `${LIVE_DRAFTS_PX.headerPaddingX}px`,
-          paddingTop: `${LIVE_DRAFTS_PX.headerPaddingY}px`,
-          paddingBottom: `${LIVE_DRAFTS_PX.headerPaddingY}px`,
-          borderBottom: '1px solid rgba(255,255,255,0.1)',
-        }}
-        >
-        <TabSwitcher selected={draftType} onSelect={setDraftType} />
-      </div>
+      )}
       
       {/* Drafts List */}
       <div

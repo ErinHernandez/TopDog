@@ -112,6 +112,14 @@
   max-height: 40px !important;
 }
 
+/* V2 components - don't override (fixes squishing on viewport change) */
+.vx2-device-compact .vx2-tournament-bottom-section-v2 .vx2-tournament-button {
+  height: unset !important;
+  min-height: unset !important;
+  max-height: unset !important;
+  font-size: unset !important;
+}
+
 /* Stats - scaled */
 .vx2-device-compact .vx2-tournament-stats {
   gap: 12px !important;
@@ -183,6 +191,14 @@
     font-size: 12px !important;
     min-height: 40px !important;
     max-height: 40px !important;
+  }
+  
+  /* V2 components - don't override (fixes squishing on viewport change) */
+  .vx2-tournament-bottom-section-v2 .vx2-tournament-button {
+    height: unset !important;
+    min-height: unset !important;
+    max-height: unset !important;
+    font-size: unset !important;
   }
   
   .vx2-tournament-stats {
@@ -273,6 +289,16 @@
   height: var(--vx2-button-height) !important;
   font-size: var(--vx2-button-text-size) !important;
   margin-bottom: var(--vx2-button-margin-bottom) !important;
+}
+
+/* V2 components use fixed pixel heights - prevent CSS override */
+/* This is the fix for buttons squishing when viewport changes */
+.vx2-tournament-bottom-section-v2 .vx2-tournament-button {
+  height: unset !important;
+  min-height: unset !important;
+  max-height: unset !important;
+  font-size: unset !important;
+  margin-bottom: unset !important;
 }
 
 .vx2-tournament-stats {

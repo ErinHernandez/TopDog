@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useUserPreferences } from '../hooks/useUserPreferences';
 
 /**
@@ -8,6 +8,12 @@ import { useUserPreferences } from '../hooks/useUserPreferences';
 export default function BorderColorPicker() {
   const { preferences, updateBorderColor, loading } = useUserPreferences();
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Track mount state to prevent hydration mismatch
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Predefined color options
   const colorOptions = [
@@ -37,7 +43,8 @@ export default function BorderColorPicker() {
     }
   };
 
-  if (loading) {
+  // Show loading state until mounted and preferences are loaded to prevent hydration mismatch
+  if (!isMounted || loading) {
     return (
       <div className="p-4">
         <div className="text-gray-400">Loading preferences...</div>

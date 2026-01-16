@@ -1,6 +1,6 @@
 /**
  * Tests for /api/user/update-contact endpoint
- * 
+ *
  * Tests cover:
  * - Authentication
  * - Authorization (user can only update own contact)
@@ -9,6 +9,8 @@
  * - Successful updates
  * - Error handling
  */
+
+import { jest, describe, it, expect, beforeEach } from '@jest/globals';
 
 jest.mock('../../../lib/apiErrorHandler', () => ({
   withErrorHandling: jest.fn((req, res, handler) => handler(req, res, {

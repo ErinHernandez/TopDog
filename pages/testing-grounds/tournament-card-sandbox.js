@@ -14,10 +14,11 @@
 
 import React, { useState, useCallback, useMemo } from 'react';
 import Head from 'next/head';
-import { TournamentCard } from '../../components/vx2/tabs/lobby/TournamentCard';
+import { TournamentCardV3 as TournamentCard } from '../../components/vx2/tabs/lobby/TournamentCardV3';
 import MobilePhoneFrame from '../../components/vx2/shell/MobilePhoneFrame';
 import { DEVICE_PRESETS, BG_COLORS } from '../../components/vx2/core/constants';
-import DevNav from '../../components/dev/DevNav';
+import { TabNavigationProvider } from '../../components/vx2/core';
+import { TabBarVX2 } from '../../components/vx2/navigation';
 
 // ============================================================================
 // VIEW MODES
@@ -59,6 +60,7 @@ const MOCK_TOURNAMENT = {
   maxEntries: 10000,
   isFeatured: true,
 };
+
 
 // ============================================================================
 // PRESETS
@@ -248,32 +250,86 @@ function Select({ label, value, onChange, options }) {
 // DEVICE CARD WRAPPER
 // ============================================================================
 
-function DeviceCardWrapper({ devicePreset, styleOverrides, tournament }) {
+function DeviceCardWrapper({ devicePreset, styleOverrides, tournament, bottomTextBoxes = [], onTextBoxChange }) {
   const device = DEVICE_PRESETS[devicePreset];
   
+  // Calculate responsive padding based on device width
+  // This padding should match on all sides (top, left, right, bottom)
+  // Smaller devices get less padding, larger devices get more
+  const responsivePadding = Math.max(12, Math.min(device.width * 0.04, 24));
+  
+  // Calculate responsive card padding based on device width
+  const cardPadding = Math.max(16, Math.min(device.width * 0.056, 28));
+  
+  // Calculate responsive border radius
+  const cardBorderRadius = Math.max(12, Math.min(device.width * 0.064, 24));
+  
+  // Calculate responsive title font size based on device width
+  // Scales from 36px (smallest) to 46px (largest)
+  const titleFontSize = Math.max(36, Math.min(device.width * 0.12, 46));
+  
+  // Tab bar height calculation
+  // TAB_BAR: paddingTop (10) + minHeight (44) + paddingBottom (10) + homeIndicatorMarginTop (8) + homeIndicatorHeight (5) + homeIndicatorMarginBottom (4) = 81px
+  const tabBarHeight = 10 + 44 + 10 + 8 + 5 + 4; // 81px total
+  
+  // Available height for content = device height - status bar - tab bar
+  const statusBarHeight = device.statusBarHeight || 47;
+  const availableHeight = device.height - statusBarHeight - tabBarHeight;
+  
+  // Card height = available height - (padding top + padding bottom)
+  const cardHeight = availableHeight - (responsivePadding * 2);
+  
   return (
-    <MobilePhoneFrame
-      devicePreset={devicePreset}
-      fullScreen={false}
-      label={`${device.name} (${device.width}x${device.height})`}
-    >
-      <div
-        style={{
-          height: '100%',
-          backgroundColor: BG_COLORS.primary,
-          padding: 16,
-          display: 'flex',
-          flexDirection: 'column',
-        }}
+    <TabNavigationProvider initialTab="lobby">
+      <MobilePhoneFrame
+        devicePreset={devicePreset}
+        fullScreen={false}
+        label={`${device.name} (${device.width}x${device.height})`}
       >
-        <TournamentCard
-          tournament={tournament}
-          featured={true}
-          styleOverrides={styleOverrides}
-          onJoinClick={() => console.log('Join clicked')}
-        />
-      </div>
-    </MobilePhoneFrame>
+        <div
+          style={{
+            height: '100%',
+            backgroundColor: BG_COLORS.primary,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+          }}
+        >
+          {/* Content area with uniform padding on all sides */}
+          <div
+            style={{
+              flex: 1,
+              padding: `${responsivePadding}px`, // Uniform padding: top, right, bottom, left
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'stretch', // Ensure card stretches to full width
+              overflow: 'hidden', // Prevent scrolling
+              minHeight: 0, // Important for flex-1 to work correctly
+            }}
+          >
+            <TournamentCard
+              tournament={tournament}
+              featured={true}
+              styleOverrides={{
+                ...styleOverrides,
+                padding: cardPadding,
+                borderRadius: styleOverrides.borderRadius ?? cardBorderRadius, // Use slider value if provided, otherwise use calculated
+                titleFontSize: titleFontSize,
+                minHeight: cardHeight, // Set explicit height to match available space
+                bottomTextBoxes: styleOverrides.bottomTextBoxes || (bottomTextBoxes && bottomTextBoxes.length > 0 ? bottomTextBoxes.map((box, index) => ({
+                  ...box,
+                  onChange: onTextBoxChange ? (value) => onTextBoxChange(index, value) : undefined,
+                })) : undefined),
+              }}
+              onJoinClick={() => console.log('Join clicked')}
+            />
+          </div>
+          
+          {/* Footer tabs */}
+          <TabBarVX2 />
+        </div>
+      </MobilePhoneFrame>
+    </TabNavigationProvider>
   );
 }
 
@@ -282,6 +338,12 @@ function DeviceCardWrapper({ devicePreset, styleOverrides, tournament }) {
 // ============================================================================
 
 function TournamentCardSandbox() {
+  // State for bottom text boxes - initialized with default values
+  const [bottomTextBoxes, setBottomTextBoxes] = useState([
+    { id: 1, text: '$25' },
+    { id: 2, text: '10,000' },
+    { id: 3, text: '$100,000' },
+  ]);
   // View mode state
   const [viewMode, setViewMode] = useState('cards');
   
@@ -633,6 +695,13 @@ const styleOverrides = {
               min={0}
               max={6}
             />
+            <Slider
+              label="Outer Border"
+              value={overrides.borderWidth}
+              onChange={(v) => updateOverride('borderWidth', v)}
+              min={0}
+              max={20}
+            />
             <ColorPicker
               label="Accent (Featured)"
               value={overrides.accent}
@@ -738,9 +807,11 @@ const styleOverrides = {
                 </h3>
                 <div style={{ 
                   width: 375, 
-                  height: 650,
+                  height: 750,
                   transform: 'scale(0.85)',
                   transformOrigin: 'top center',
+                  display: 'flex',
+                  flexDirection: 'column',
                 }}>
                   <TournamentCard
                     tournament={MOCK_TOURNAMENT}
@@ -757,14 +828,26 @@ const styleOverrides = {
                 </h3>
                 <div style={{ 
                   width: 375, 
-                  height: 650,
+                  height: 750,
                   transform: 'scale(0.85)',
                   transformOrigin: 'top center',
+                  display: 'flex',
+                  flexDirection: 'column',
                 }}>
                   <TournamentCard
                     tournament={MOCK_TOURNAMENT}
                     featured={true}
-                    styleOverrides={computedOverrides}
+                    styleOverrides={{
+                      ...computedOverrides,
+                      bottomTextBoxes: bottomTextBoxes.map((box, index) => ({
+                        ...box,
+                        onChange: (value) => {
+                          const newBoxes = [...bottomTextBoxes];
+                          newBoxes[index] = { ...newBoxes[index], text: value };
+                          setBottomTextBoxes(newBoxes);
+                        },
+                      })),
+                    }}
                     onJoinClick={() => console.log('Join clicked')}
                   />
                 </div>
@@ -797,6 +880,12 @@ const styleOverrides = {
                     devicePreset={deviceId}
                     styleOverrides={computedOverrides}
                     tournament={MOCK_TOURNAMENT}
+                    bottomTextBoxes={bottomTextBoxes}
+                    onTextBoxChange={(index, value) => {
+                      const newBoxes = [...bottomTextBoxes];
+                      newBoxes[index] = { ...newBoxes[index], text: value };
+                      setBottomTextBoxes(newBoxes);
+                    }}
                   />
                 ))}
               </div>
@@ -844,9 +933,6 @@ const styleOverrides = {
           )}
         </main>
       </div>
-
-      {/* DevNav */}
-      <DevNav />
     </>
   );
 }

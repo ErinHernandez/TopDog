@@ -28,6 +28,8 @@ import Switch from '../../../vx/shared/Switch';
 import TournamentRulesModal from '../../../mobile/modals/TournamentRulesModal';
 import { formatCents } from '../../utils/formatting';
 import { useModals } from '../../shell/AppShellVX2';
+import { ProgressBar } from '../../components/shared';
+import { TILED_BG_STYLE } from '../../draft-room/constants';
 
 // ============================================================================
 // CONSTANTS
@@ -35,6 +37,30 @@ import { useModals } from '../../shell/AppShellVX2';
 
 const MAX_ENTRIES = 150;
 const WR_BLUE_BG = 'url(/wr_blue.png) center center / cover no-repeat';
+
+// Bottom section constants (matching TournamentCardBottomSectionV2)
+const ROW_HEIGHTS = {
+  progress: 8,
+  button: 57,
+  stats: 48,
+} as const;
+
+const BOTTOM_SECTION_SPACING = {
+  rowGap: 16,
+  statsGap: 24,
+} as const;
+
+const BOTTOM_SECTION_TYPOGRAPHY = {
+  buttonFontSize: 14,
+  statsValueFontSize: 18,
+  statsLabelFontSize: 12,
+} as const;
+
+const BOTTOM_SECTION_COLORS = {
+  textPrimary: '#FFFFFF',
+  textSecondary: 'rgba(255, 255, 255, 0.7)',
+  statBackground: '#000000',
+} as const;
 
 // ============================================================================
 // TYPES
@@ -49,6 +75,8 @@ export interface JoinTournamentModalProps {
   onConfirm: (options: { entries: number; autopilot: boolean }) => void;
   /** Whether join is in progress */
   isJoining: boolean;
+  /** Custom text boxes to display at the bottom of the modal */
+  bottomTextBoxes?: Array<{ id?: number | string; text: string; onChange?: (value: string) => void }>;
 }
 
 // ============================================================================
@@ -64,6 +92,46 @@ function InfoRow({ label, value }: { label: string; value: string }): React.Reac
   );
 }
 
+function StatItem({ value, label }: { value: string; label: string }): React.ReactElement {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <span
+        className="vx2-tournament-stat-value"
+        style={{
+          fontSize: `${BOTTOM_SECTION_TYPOGRAPHY.statsValueFontSize}px`,
+          fontWeight: 'bold',
+          color: BOTTOM_SECTION_COLORS.textPrimary,
+          backgroundColor: BOTTOM_SECTION_COLORS.statBackground,
+          padding: '2px 6px',
+          borderRadius: '4px',
+        }}
+      >
+        {value}
+      </span>
+      <span
+        className="vx2-tournament-stat-label"
+        style={{
+          fontSize: `${BOTTOM_SECTION_TYPOGRAPHY.statsLabelFontSize}px`,
+          color: BOTTOM_SECTION_COLORS.textSecondary,
+          backgroundColor: BOTTOM_SECTION_COLORS.statBackground,
+          padding: '1px 4px',
+          borderRadius: '3px',
+          marginTop: '2px',
+        }}
+      >
+        {label}
+      </span>
+    </div>
+  );
+}
+
 // ============================================================================
 // MAIN COMPONENT
 // ============================================================================
@@ -72,7 +140,8 @@ export default function JoinTournamentModal({
   tournament, 
   onClose, 
   onConfirm, 
-  isJoining 
+  isJoining,
+  bottomTextBoxes = [],
 }: JoinTournamentModalProps): React.ReactElement {
   // Hooks
   const { user } = useUser();
@@ -87,6 +156,16 @@ export default function JoinTournamentModal({
   const totalCostCents = tournament.entryFeeCents * numberOfEntries;
   const userBalanceCents = user?.balanceCents ?? 0;
   const hasInsufficientBalance = totalCostCents > userBalanceCents;
+  
+  // Progress bar calculation
+  const hasProgress = Boolean(tournament.maxEntries);
+  const fillPercentage = tournament.maxEntries
+    ? Math.round((tournament.currentEntries / tournament.maxEntries) * 100)
+    : 0;
+  
+  // Text boxes check
+  const hasTextBoxes = bottomTextBoxes && bottomTextBoxes.length > 0 && bottomTextBoxes.some(box => box.text && box.text.trim());
+  const textBoxesHeight = hasTextBoxes ? 60 : 0;
 
   // Handlers
   const handleEntriesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -428,7 +507,7 @@ export default function JoinTournamentModal({
             </p>
 
             {/* Buttons */}
-            <div className="flex gap-3">
+            <div className="flex gap-3" style={{ marginBottom: `${SPACING.md}px` }}>
               <button
                 onClick={() => setShowRulesModal(true)}
                 className="flex-1 font-semibold transition-all"
@@ -444,34 +523,136 @@ export default function JoinTournamentModal({
               >
                 All rules
               </button>
-              <button
-                onClick={handleConfirm}
-                disabled={isJoining || hasInsufficientBalance || !user}
-                className="flex-1 font-semibold transition-all flex items-center justify-center gap-2"
-                style={{ 
-                  height: '44px',
-                  borderRadius: `${RADIUS.md}px`,
-                  background: (isJoining || hasInsufficientBalance || !user) ? BG_COLORS.tertiary : WR_BLUE_BG,
-                  color: '#fff',
-                  border: 'none',
-                  cursor: (isJoining || hasInsufficientBalance || !user) ? 'not-allowed' : 'pointer',
-                  fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-                  opacity: (isJoining || hasInsufficientBalance || !user) ? 0.5 : 1,
+            </div>
+          </div>
+
+          {/* Bottom Section - Progress Bar, Join Button, Stats - Fixed at bottom of modal */}
+          <div
+            className="vx2-tournament-bottom-section-v2"
+            style={{
+              display: 'grid',
+              gridTemplateRows: hasProgress
+                ? `${ROW_HEIGHTS.progress}px ${ROW_HEIGHTS.button}px ${ROW_HEIGHTS.stats}px${hasTextBoxes ? ` ${textBoxesHeight}px` : ''}`
+                : `${ROW_HEIGHTS.button}px ${ROW_HEIGHTS.stats}px${hasTextBoxes ? ` ${textBoxesHeight}px` : ''}`,
+              gap: `${BOTTOM_SECTION_SPACING.rowGap}px`,
+              padding: `${SPACING.lg}px`,
+              borderTop: '1px solid rgba(255,255,255,0.1)',
+              backgroundColor: 'rgba(255,255,255,0.02)',
+              flexShrink: 0,
+            }}
+          >
+            {/* Progress Bar */}
+            {hasProgress && (
+              <div
+                className="vx2-progress-section"
+                style={{
+                  height: `${ROW_HEIGHTS.progress}px`,
+                  display: 'flex',
+                  alignItems: 'center',
                 }}
               >
-                {isJoining ? (
-                  <>
-                    <div 
-                      className="animate-spin rounded-full h-4 w-4 border-2" 
-                      style={{ borderColor: '#fff transparent transparent transparent' }} 
-                    />
-                    Joining...
-                  </>
-                ) : (
-                  `Enter (${formatCents(totalCostCents, { showCents: false })})`
-                )}
-              </button>
+                <ProgressBar
+                  value={fillPercentage}
+                  fillBackgroundImage="url(/wr_blue.png)"
+                  backgroundColor="rgba(55, 65, 81, 0.5)"
+                  size="md"
+                />
+              </div>
+            )}
+
+            {/* Join Button */}
+            <button
+              onClick={handleConfirm}
+              disabled={isJoining || hasInsufficientBalance || !user}
+              className="vx2-tournament-button"
+              style={{
+                ...TILED_BG_STYLE,
+                height: `${ROW_HEIGHTS.button}px`,
+                minHeight: `${ROW_HEIGHTS.button}px`,
+                maxHeight: `${ROW_HEIGHTS.button}px`,
+                color: BOTTOM_SECTION_COLORS.textPrimary,
+                fontSize: `${BOTTOM_SECTION_TYPOGRAPHY.buttonFontSize}px`,
+                fontWeight: 600,
+                width: '100%',
+                borderRadius: '8px',
+                border: 'none',
+                cursor: (isJoining || hasInsufficientBalance || !user) ? 'not-allowed' : 'pointer',
+                transition: 'background-color 0.2s ease',
+                opacity: (isJoining || hasInsufficientBalance || !user) ? 0.5 : 1,
+              }}
+              aria-label={`Join ${tournament.title} for ${tournament.entryFee}`}
+            >
+              {isJoining ? (
+                <>
+                  <div 
+                    className="animate-spin rounded-full h-4 w-4 border-2 inline-block mr-2" 
+                    style={{ borderColor: '#fff transparent transparent transparent' }} 
+                  />
+                  Joining...
+                </>
+              ) : (
+                `Join Tournament (${formatCents(totalCostCents, { showCents: false })})`
+              )}
+            </button>
+
+            {/* Stats Grid */}
+            <div
+              className="vx2-tournament-stats"
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: `${BOTTOM_SECTION_SPACING.statsGap}px`,
+                height: `${ROW_HEIGHTS.stats}px`,
+                alignContent: 'center',
+              }}
+            >
+              <StatItem value={tournament.entryFee} label="Entry" />
+              <StatItem value={tournament.totalEntries} label="Entries" />
+              <StatItem value={tournament.firstPlacePrize} label="1st Place" />
             </div>
+
+            {/* Text Boxes Section (if provided) */}
+            {bottomTextBoxes && bottomTextBoxes.length > 0 && bottomTextBoxes.some(box => box.text && box.text.trim()) && (
+              <div
+                className="vx2-tournament-text-boxes"
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gap: `${BOTTOM_SECTION_SPACING.statsGap}px`,
+                  height: '60px',
+                  alignContent: 'center',
+                }}
+              >
+                {bottomTextBoxes
+                  .slice(0, 3)
+                  .map((box, index) => (
+                    <input
+                      key={box.id || index}
+                      type="text"
+                      value={box.text || ''}
+                      onChange={(e) => {
+                        if (box.onChange) {
+                          box.onChange(e.target.value);
+                        }
+                      }}
+                      placeholder={`Text ${index + 1}`}
+                      style={{
+                        fontSize: `${BOTTOM_SECTION_TYPOGRAPHY.statsValueFontSize}px`,
+                        fontWeight: 'bold',
+                        color: BOTTOM_SECTION_COLORS.textPrimary,
+                        backgroundColor: BOTTOM_SECTION_COLORS.statBackground,
+                        padding: '4px 8px',
+                        borderRadius: '4px',
+                        textAlign: 'center',
+                        border: '1px solid rgba(255, 255, 255, 0.3)',
+                        outline: 'none',
+                        width: '100%',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                  ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

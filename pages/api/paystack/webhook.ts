@@ -20,6 +20,10 @@ import {
   handleChargeFailed,
   handleTransferSuccess,
   handleTransferFailed,
+  findWebhookEventByReference,
+  markWebhookEventAsProcessed,
+  markWebhookEventAsFailed,
+  createOrUpdateWebhookEvent,
 } from '../../../lib/paystack';
 import type {
   PaystackWebhookPayload,
@@ -132,12 +136,46 @@ export default async function handler(
       // Parse body
       const payload = JSON.parse(rawBody) as PaystackWebhookPayload;
       const { event, data } = payload;
-      
-      logger.info('Received webhook event', { component: 'paystack', operation: 'webhook', event });
-      
+
+      // Extract reference for deduplication
+      // Paystack uses 'reference' for charges and 'transfer_code' for transfers
+      const reference = (data as { reference?: string; transfer_code?: string }).reference ||
+                       (data as { reference?: string; transfer_code?: string }).transfer_code ||
+                       '';
+
+      logger.info('Received webhook event', {
+        component: 'paystack',
+        operation: 'webhook',
+        event,
+        reference,
+      });
+
+      // Check for duplicate event (replay protection)
+      if (reference) {
+        const existingEvent = await findWebhookEventByReference(reference, event);
+        if (existingEvent?.status === 'processed') {
+          logger.info('Duplicate webhook event - already processed', {
+            component: 'paystack',
+            operation: 'webhook',
+            event,
+            reference,
+          });
+          return res.status(200).json({
+            received: true,
+            event,
+            actions: ['duplicate_skipped'],
+          });
+        }
+
+        // Create/update event record for tracking
+        await createOrUpdateWebhookEvent(reference, event, {
+          receivedAt: new Date().toISOString(),
+        });
+      }
+
       // Handle events
       let result: { success: boolean; actions: string[] };
-      
+
       switch (event) {
         case 'charge.success':
           result = await handleChargeSuccess(data as ChargeSuccessWebhookData);
@@ -161,14 +199,27 @@ export default async function handler(
           logger.info('Unhandled event type', { component: 'paystack', operation: 'webhook', event });
           result = { success: true, actions: ['unhandled_event'] };
       }
-      
+
+      // Mark event as processed or failed
+      if (reference) {
+        if (result.success) {
+          await markWebhookEventAsProcessed(reference, event, {
+            actions: result.actions,
+          });
+        } else {
+          await markWebhookEventAsFailed(reference, event, 'Processing failed', {
+            actions: result.actions,
+          });
+        }
+      }
+
       // Respond to Paystack with success
       const response = createSuccessResponse({
         received: true,
         event,
         actions: result.actions,
       }, 200, logger);
-      
+
       return res.status(response.statusCode).json(response.body);
       
     } catch (error) {

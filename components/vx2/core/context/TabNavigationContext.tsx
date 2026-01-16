@@ -46,7 +46,7 @@ const initialState: TabNavigationState = {
   previousTab: null,
   history: [{
     tabId: DEFAULT_TAB,
-    timestamp: Date.now(),
+    timestamp: 0, // Use 0 for initial state to prevent hydration mismatch (will be updated on first navigation)
   }],
   historyIndex: 0,
   tabStates: {},

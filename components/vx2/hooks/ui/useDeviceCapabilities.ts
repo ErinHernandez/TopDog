@@ -41,9 +41,27 @@ import {
  * @returns Device capabilities object
  */
 export function useDeviceCapabilities(applyClasses = false): DeviceCapabilities {
-  const [capabilities, setCapabilities] = useState<DeviceCapabilities>(() => 
-    getDeviceCapabilities()
-  );
+  // Initialize with SSR-safe defaults to prevent hydration mismatch
+  // Always use defaults on initial render (both server and client) to ensure hydration match
+  // Will be updated in useEffect on client-side after mount
+  const [capabilities, setCapabilities] = useState<DeviceCapabilities>(() => {
+    // Always return SSR-safe defaults on initial render to prevent hydration mismatch
+    return {
+      iosVersion: null,
+      safariVersion: null,
+      isLegacyDevice: false,
+      supportTier: 1,
+      supportsFlexGap: true,
+      supportsAspectRatio: true,
+      supportsWebP: true,
+      prefersReducedMotion: false,
+      screenWidth: 390,
+      screenHeight: 844,
+      devicePixelRatio: 3,
+      hasNotchOrIsland: true,
+      estimatedModel: 'iPhone 14 Pro',
+    };
+  });
 
   useEffect(() => {
     // Detect capabilities on mount (handles SSR -> client hydration)

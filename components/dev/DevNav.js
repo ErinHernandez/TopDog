@@ -265,8 +265,8 @@ export default function DevNav() {
     }
     
     if (isResizing && resizeDirection) {
-      const deltaX = e.clientX - resizeStart.current.x;
-      const deltaY = e.clientY - resizeStart.current.y;
+      const deltaX = e.pageX - resizeStart.current.x;
+      const deltaY = e.pageY - resizeStart.current.y;
       
       let newWidth = resizeStart.current.width;
       let newHeight = resizeStart.current.height;
@@ -316,13 +316,18 @@ export default function DevNav() {
     e.stopPropagation();
     
     const rect = containerRef.current?.getBoundingClientRect();
+    const scrollX = window.pageXOffset || document.documentElement.scrollLeft;
+    const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+    
     resizeStart.current = {
-      x: e.clientX,
-      y: e.clientY,
+      x: e.pageX,
+      y: e.pageY,
       width: rect?.width || 200,
       height: rect?.height || 400,
       posX: position.x,
       posY: position.y,
+      scrollX,
+      scrollY,
     };
     setIsResizing(true);
     setResizeDirection(direction);
@@ -415,9 +420,10 @@ export default function DevNav() {
   }, []);
 
   // Calculate style based on position
+  // Use absolute positioning so it scrolls with the page
   const positionStyle = position.x !== null && position.y !== null
-    ? { left: position.x, top: position.y }
-    : { bottom: 20, right: 20 };
+    ? { left: `${position.x}px`, top: `${position.y}px` }
+    : { bottom: '20px', right: '20px' };
 
   // Get ordered links
   const orderedLinks = linkOrder
@@ -431,11 +437,88 @@ export default function DevNav() {
     zIndex: 10,
   };
 
+  // Calculate actual dimensions for CSS variables (using document coordinates)
+  const actualWidth = isMinimized ? 0 : (size.width || 200);
+  const actualHeight = isMinimized ? 0 : (size.height || 400);
+
+  // Update CSS variables for page padding calculation (using document coordinates)
+  useEffect(() => {
+    if (typeof document !== 'undefined' && containerRef.current) {
+      const updateCSSVars = () => {
+        const rect = containerRef.current?.getBoundingClientRect();
+        if (rect) {
+          const scrollX = window.pageXOffset || document.documentElement.scrollLeft;
+          const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+          
+          const navWidth = isMinimized ? 0 : rect.width;
+          const navHeight = isMinimized ? 0 : rect.height;
+          // Convert viewport coordinates to document coordinates
+          const navX = rect.left + scrollX;
+          const navY = rect.top + scrollY;
+          const navRight = navX + navWidth;
+          const navBottom = navY + navHeight;
+          
+          const docWidth = Math.max(
+            document.body.scrollWidth,
+            document.body.offsetWidth,
+            document.documentElement.clientWidth,
+            document.documentElement.scrollWidth,
+            document.documentElement.offsetWidth
+          );
+          const docHeight = Math.max(
+            document.body.scrollHeight,
+            document.body.offsetHeight,
+            document.documentElement.clientHeight,
+            document.documentElement.scrollHeight,
+            document.documentElement.offsetHeight
+          );
+          
+          // Calculate which edges DevNav is near (within 50px threshold)
+          const nearRight = navRight > docWidth - 50;
+          const nearBottom = navBottom > docHeight - 50;
+          const nearLeft = navX < 50;
+          const nearTop = navY < 50;
+          
+          document.documentElement.style.setProperty('--devnav-width', `${navWidth}px`);
+          document.documentElement.style.setProperty('--devnav-height', `${navHeight}px`);
+          document.documentElement.style.setProperty('--devnav-x', `${navX}px`);
+          document.documentElement.style.setProperty('--devnav-y', `${navY}px`);
+          document.documentElement.style.setProperty('--devnav-right', `${navRight}px`);
+          document.documentElement.style.setProperty('--devnav-bottom', `${navBottom}px`);
+          document.documentElement.style.setProperty('--devnav-visible', isMinimized ? '0' : '1');
+          document.documentElement.style.setProperty('--devnav-padding-right', nearRight ? `${navWidth + 20}px` : '0px');
+          document.documentElement.style.setProperty('--devnav-padding-bottom', nearBottom ? `${navHeight + 20}px` : '0px');
+          document.documentElement.style.setProperty('--devnav-padding-left', nearLeft ? `${navWidth + 20}px` : '0px');
+          document.documentElement.style.setProperty('--devnav-padding-top', nearTop ? `${navHeight + 20}px` : '0px');
+        }
+      };
+      
+      // Update immediately
+      updateCSSVars();
+      
+      // Update on resize and scroll
+      window.addEventListener('resize', updateCSSVars);
+      window.addEventListener('scroll', updateCSSVars, true);
+      
+      // Use ResizeObserver to track DevNav size changes
+      const resizeObserver = new ResizeObserver(updateCSSVars);
+      if (containerRef.current) {
+        resizeObserver.observe(containerRef.current);
+      }
+      
+      return () => {
+        window.removeEventListener('resize', updateCSSVars);
+        window.removeEventListener('scroll', updateCSSVars, true);
+        resizeObserver.disconnect();
+      };
+    }
+  }, [position, size, isMinimized, isDragging, isResizing]);
+
   return (
     <div 
       ref={containerRef}
       style={{
-        position: 'fixed',
+        position: 'absolute',
         ...positionStyle,
         backgroundColor: '#1F2937',
         borderRadius: isMinimized ? 8 : 12,

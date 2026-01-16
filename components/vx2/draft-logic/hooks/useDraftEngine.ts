@@ -5,7 +5,7 @@
  * All new implementation - no code reuse.
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import type { 
   DraftRoom,
   DraftStatus,
@@ -16,7 +16,7 @@ import type {
   DraftEngineState,
   DraftEngineActions,
 } from '../types';
-import { DRAFT_CONFIG } from '../constants';
+import { DRAFT_CONFIG, STORAGE_KEYS } from '../constants';
 // Direct imports to avoid barrel export issues with Turbopack
 import { getParticipantForPick, getRoundForPick, getPicksUntilTurn } from '../utils/snakeDraft';
 import { selectAutodraftPlayer } from '../utils/autodraft';
@@ -135,17 +135,20 @@ export function useDraftEngine({
   const excludedPlayers = useMemo(() => {
     if (typeof window === 'undefined') return [];
     try {
-      const saved = localStorage.getItem('vx2Excluded');
+      const saved = localStorage.getItem(STORAGE_KEYS.excludedPlayers);
       return saved ? JSON.parse(saved) : [];
     } catch {
       return [];
     }
   }, []);
 
+  // Ref for executor to avoid circular dependency
+  const executorRef = useRef<ReturnType<typeof usePickExecutor> | null>(null);
+
   // Handle timer expiration (autopick)
-  const handleTimerExpire = useCallback(() => {
+  const handleTimerExpire = useCallback(async () => {
     if (!isMyTurn || status !== 'active') return;
-    
+
     // Select player using autodraft AI
     const result = selectAutodraftPlayer(
       availablePlayers,
@@ -155,20 +158,29 @@ export function useDraftEngine({
       autodraft.positionLimits,
       excludedPlayers
     );
-    
-    if (result) {
-      // Execute autopick through executor
-      logger.debug('Autopick', { player: result.player.name, source: result.source });
+
+    if (result && executorRef.current) {
+      logger.info('Executing autopick', { player: result.player.name, source: result.source });
+      try {
+        const success = await executorRef.current.executeAutopick(result.player, result.source);
+        if (!success) {
+          logger.warn('Autopick failed, will retry on next tick');
+        }
+      } catch (err) {
+        logger.error('Autopick execution error', err instanceof Error ? err : new Error(String(err)));
+      }
+    } else if (!result) {
+      logger.warn('No player available for autopick');
     }
   }, [
-    isMyTurn, 
-    status, 
-    availablePlayers, 
-    currentRoster, 
-    queue.queueIds, 
-    autodraft.customRankings, 
+    isMyTurn,
+    status,
+    availablePlayers,
+    currentRoster,
+    queue.queueIds,
+    autodraft.customRankings,
     autodraft.positionLimits,
-    excludedPlayers
+    excludedPlayers,
   ]);
   
   // Timer
@@ -205,6 +217,11 @@ export function useDraftEngine({
       setError(err instanceof Error ? err.message : String(err));
     },
   });
+
+  // Keep executorRef updated
+  useEffect(() => {
+    executorRef.current = executor;
+  }, [executor]);
   
   // ============================================
   // Data Loading

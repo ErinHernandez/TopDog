@@ -152,6 +152,8 @@ export const STORAGE_KEYS = {
   customRankings: 'vx2_custom_rankings',
   /** Queue */
   queue: 'vx2_draft_queue',
+  /** Excluded players */
+  excludedPlayers: 'vx2_excluded_players',
 } as const;
 
 

@@ -5,9 +5,12 @@
  * All new implementation - no code reuse.
  */
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import type { DraftPlayer, QueuedPlayer } from '../types';
 import { STORAGE_KEYS } from '../constants';
+
+// Debounce delay for localStorage saves (ms)
+const STORAGE_SAVE_DEBOUNCE = 300;
 
 // ============================================================================
 // TYPES
@@ -98,20 +101,23 @@ export function useDraftQueue({
   persist = true,
 }: UseDraftQueueOptions = {}): UseDraftQueueResult {
   // Load initial queue
-  const [queue, setQueue] = useState<QueuedPlayer[]>(() => 
+  const [queue, setQueue] = useState<QueuedPlayer[]>(() =>
     persist ? loadQueue(roomId) : []
   );
-  
+
+  // Ref for debounced save timeout
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   // Create lookup set for O(1) checks
   const queuedIds = useMemo(
     () => new Set(queue.map(p => p.id)),
     [queue]
   );
-  
+
   // Auto-remove picked players from queue
   useEffect(() => {
     if (pickedPlayerIds.size === 0) return;
-    
+
     setQueue(prev => {
       const filtered = prev.filter(p => !pickedPlayerIds.has(p.id));
       if (filtered.length !== prev.length) {
@@ -121,12 +127,26 @@ export function useDraftQueue({
       return prev;
     });
   }, [pickedPlayerIds]);
-  
-  // Persist queue changes
+
+  // Persist queue changes with debouncing
   useEffect(() => {
-    if (persist) {
-      saveQueue(queue, roomId);
+    if (!persist) return;
+
+    // Clear any pending save
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
     }
+
+    // Debounce the save to avoid rapid localStorage writes
+    saveTimeoutRef.current = setTimeout(() => {
+      saveQueue(queue, roomId);
+    }, STORAGE_SAVE_DEBOUNCE);
+
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
   }, [queue, roomId, persist]);
   
   // Add player to end of queue

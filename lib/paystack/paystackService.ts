@@ -475,7 +475,11 @@ export async function getOrCreateCustomer(
 // ============================================================================
 
 /**
- * Verify Paystack webhook signature
+ * Verify Paystack webhook signature using timing-safe comparison
+ *
+ * SECURITY: Uses crypto.timingSafeEqual to prevent timing attacks.
+ * A timing attack could allow an attacker to guess the signature byte-by-byte
+ * by measuring response times when comparing signatures.
  */
 export function verifyWebhookSignature(
   payload: string | Buffer,
@@ -485,13 +489,30 @@ export function verifyWebhookSignature(
     console.error('[PaystackService] PAYSTACK_WEBHOOK_SECRET not configured');
     return false;
   }
-  
+
+  // Validate signature format (should be hex string)
+  if (!signature || typeof signature !== 'string') {
+    return false;
+  }
+
   const hash = crypto
     .createHmac('sha512', PAYSTACK_WEBHOOK_SECRET)
     .update(typeof payload === 'string' ? payload : payload.toString())
     .digest('hex');
-  
-  return hash === signature;
+
+  // Use timing-safe comparison to prevent timing attacks
+  // Both buffers must be the same length for timingSafeEqual
+  const hashBuffer = Buffer.from(hash, 'hex');
+  const signatureBuffer = Buffer.from(signature, 'hex');
+
+  // If lengths differ, signature is invalid (but still do constant-time check)
+  if (hashBuffer.length !== signatureBuffer.length) {
+    // Perform a dummy comparison to maintain constant time
+    crypto.timingSafeEqual(hashBuffer, hashBuffer);
+    return false;
+  }
+
+  return crypto.timingSafeEqual(hashBuffer, signatureBuffer);
 }
 
 /**
@@ -837,6 +858,212 @@ export async function findTransactionByTransferCode(
     id: docData.id,
     ...docData.data(),
   } as UnifiedTransaction;
+}
+
+// ============================================================================
+// WEBHOOK EVENT TRACKING (Replay Protection)
+// ============================================================================
+
+/**
+ * Webhook event tracking document
+ */
+interface PaystackWebhookEvent {
+  id: string;
+  eventId: string;
+  eventType: string;
+  status: 'pending' | 'processed' | 'failed';
+  processedAt?: string;
+  failedAt?: string;
+  errorMessage?: string;
+  retryCount: number;
+  createdAt: string;
+  updatedAt: string;
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * Find webhook event by Paystack event reference
+ *
+ * Paystack doesn't provide a unique event ID, so we use the reference from the data
+ * combined with the event type to create a unique identifier
+ */
+export async function findWebhookEventByReference(
+  reference: string,
+  eventType: string
+): Promise<PaystackWebhookEvent | null> {
+  try {
+    const db = getDb();
+    const eventId = `${eventType}_${reference}`;
+    const q = query(
+      collection(db, 'paystack_webhook_events'),
+      where('eventId', '==', eventId)
+    );
+
+    const snapshot = await getDocs(q);
+
+    if (snapshot.empty) {
+      return null;
+    }
+
+    const docData = snapshot.docs[0];
+    return {
+      id: docData.id,
+      ...docData.data(),
+    } as PaystackWebhookEvent;
+  } catch (error: unknown) {
+    await captureError(error as Error, {
+      tags: { component: 'paystack', operation: 'findWebhookEventByReference' },
+      extra: { reference, eventType },
+    });
+    throw error;
+  }
+}
+
+/**
+ * Mark webhook event as processed
+ */
+export async function markWebhookEventAsProcessed(
+  reference: string,
+  eventType: string,
+  metadata?: Record<string, unknown>
+): Promise<void> {
+  try {
+    const db = getDb();
+    const eventId = `${eventType}_${reference}`;
+    const existingEvent = await findWebhookEventByReference(reference, eventType);
+
+    if (existingEvent) {
+      // Update existing event
+      const eventRef = doc(db, 'paystack_webhook_events', existingEvent.id);
+      await updateDoc(eventRef, {
+        status: 'processed',
+        processedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        ...(metadata && { metadata }),
+      });
+    } else {
+      // Create new event record (shouldn't happen, but handle gracefully)
+      const eventRef = doc(collection(db, 'paystack_webhook_events'));
+      await setDoc(eventRef, {
+        eventId,
+        eventType,
+        status: 'processed',
+        processedAt: new Date().toISOString(),
+        retryCount: 0,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        ...(metadata && { metadata }),
+      });
+    }
+  } catch (error: unknown) {
+    await captureError(error as Error, {
+      tags: { component: 'paystack', operation: 'markWebhookEventAsProcessed' },
+      extra: { reference, eventType },
+    });
+    // Don't throw - event processing shouldn't fail because of tracking
+  }
+}
+
+/**
+ * Mark webhook event as failed
+ */
+export async function markWebhookEventAsFailed(
+  reference: string,
+  eventType: string,
+  errorMessage: string,
+  metadata?: Record<string, unknown>
+): Promise<void> {
+  try {
+    const db = getDb();
+    const eventId = `${eventType}_${reference}`;
+    const existingEvent = await findWebhookEventByReference(reference, eventType);
+
+    if (existingEvent) {
+      // Update existing event
+      const eventRef = doc(db, 'paystack_webhook_events', existingEvent.id);
+      await updateDoc(eventRef, {
+        status: 'failed',
+        failedAt: new Date().toISOString(),
+        errorMessage,
+        retryCount: (existingEvent.retryCount || 0) + 1,
+        updatedAt: new Date().toISOString(),
+        ...(metadata && { metadata }),
+      });
+    } else {
+      // Create new event record for failed event
+      const eventRef = doc(collection(db, 'paystack_webhook_events'));
+      await setDoc(eventRef, {
+        eventId,
+        eventType,
+        status: 'failed',
+        failedAt: new Date().toISOString(),
+        errorMessage,
+        retryCount: 1,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        ...(metadata && { metadata }),
+      });
+    }
+  } catch (error: unknown) {
+    await captureError(error as Error, {
+      tags: { component: 'paystack', operation: 'markWebhookEventAsFailed' },
+      extra: { reference, eventType, errorMessage },
+    });
+    // Don't throw - event tracking shouldn't fail the webhook
+  }
+}
+
+/**
+ * Create or update webhook event record (for idempotency tracking)
+ */
+export async function createOrUpdateWebhookEvent(
+  reference: string,
+  eventType: string,
+  metadata?: Record<string, unknown>
+): Promise<PaystackWebhookEvent> {
+  try {
+    const db = getDb();
+    const eventId = `${eventType}_${reference}`;
+    const existingEvent = await findWebhookEventByReference(reference, eventType);
+
+    if (existingEvent) {
+      // Update existing event
+      const eventRef = doc(db, 'paystack_webhook_events', existingEvent.id);
+      await updateDoc(eventRef, {
+        eventType,
+        updatedAt: new Date().toISOString(),
+        ...(metadata && { metadata }),
+      });
+      return {
+        ...existingEvent,
+        eventType,
+        ...(metadata && { metadata }),
+      } as PaystackWebhookEvent;
+    } else {
+      // Create new event record
+      const eventRef = doc(collection(db, 'paystack_webhook_events'));
+      const eventData: Omit<PaystackWebhookEvent, 'id'> = {
+        eventId,
+        eventType,
+        status: 'pending',
+        retryCount: 0,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        ...(metadata && { metadata }),
+      };
+      await setDoc(eventRef, eventData);
+      return {
+        id: eventRef.id,
+        ...eventData,
+      };
+    }
+  } catch (error: unknown) {
+    await captureError(error as Error, {
+      tags: { component: 'paystack', operation: 'createOrUpdateWebhookEvent' },
+      extra: { reference, eventType },
+    });
+    throw error;
+  }
 }
 
 // ============================================================================

@@ -64,7 +64,10 @@ function VX2DraftRoomPage() {
     
     if (!cameFromApp && !hasRoomId) {
       // Direct access on mobile without roomId - redirect to app demo (lobby)
-      router.replace('/testing-grounds/vx2-mobile-app-demo');
+      // Use router.isReady to prevent multiple redirects
+      if (router.isReady) {
+        router.replace('/testing-grounds/vx2-mobile-app-demo');
+      }
       return;
     }
     
@@ -73,7 +76,8 @@ function VX2DraftRoomPage() {
       sessionStorage.removeItem('topdog_joined_draft');
     }
     setIsAuthorized(true);
-  }, [isMobile, isLoaded, router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isMobile, isLoaded, router.isReady, router.query.roomId]);
   
   const handleRestart = useCallback(() => {
     setDraftKey(prev => prev + 1);
@@ -127,6 +131,11 @@ function VX2DraftRoomPage() {
     // Restart draft with new speed
     setDraftKey(prev => prev + 1);
   }, []);
+
+  // Debug: Log state values to identify loading issue
+  useEffect(() => {
+    console.log('[DEBUG vx2-draft-room] isLoaded:', isLoaded, 'isMobile:', isMobile, 'isAuthorized:', isAuthorized);
+  }, [isLoaded, isMobile, isAuthorized]);
 
   // Show loading state until device detection AND authorization check are complete
   // This prevents the draft room from flashing before redirect on mobile

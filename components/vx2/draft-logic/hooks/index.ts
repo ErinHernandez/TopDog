@@ -5,6 +5,9 @@
 export { useDraftTimer } from './useDraftTimer';
 export type { UseDraftTimerOptions, UseDraftTimerResult } from './useDraftTimer';
 
+export { useSyncedDraftTimer } from './useSyncedDraftTimer';
+export type { UseSyncedDraftTimerOptions, UseSyncedDraftTimerResult } from './useSyncedDraftTimer';
+
 export { useDraftQueue } from './useDraftQueue';
 export type { UseDraftQueueOptions, UseDraftQueueResult } from './useDraftQueue';
 
@@ -19,3 +22,14 @@ export type { UseDraftEngineOptions, UseDraftEngineResult } from './useDraftEngi
 
 export { useDynamicIsland } from './useDynamicIsland';
 export type { UseDynamicIslandOptions, UseDynamicIslandResult } from './useDynamicIsland';
+
+export { useConnectionStatus } from './useConnectionStatus';
+export type {
+  ConnectionState,
+  ConnectionInfo,
+  UseConnectionStatusOptions,
+  UseConnectionStatusResult,
+} from './useConnectionStatus';
+
+export { useDraftAlerts } from './useDraftAlerts';
+export type { UseDraftAlertsOptions } from './useDraftAlerts';

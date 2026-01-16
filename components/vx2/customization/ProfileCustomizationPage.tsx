@@ -92,16 +92,9 @@ export function ProfileCustomizationPage() {
 
   const [activeSection, setActiveSection] = useState<'background' | 'overlay'>('background');
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen" style={{ backgroundColor: BG_COLORS.primary }}>
-        <AppHeaderVX2 title="Customization" />
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
-        </div>
-      </div>
-    );
-  }
+  // Always show content since draft is initialized with defaults
+  // This prevents persistent loading state when data is already present
+  // The draft object always has valid default values, so we can render immediately
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: BG_COLORS.primary }}>

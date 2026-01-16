@@ -130,8 +130,11 @@ function VX2MobileAppDemo() {
     console.log(`[VX2] Tab changed: ${fromTab || 'initial'} -> ${toTab}`);
   };
 
-  // Show loading state until client-side mounted
-  if (!isMounted || !isLoaded) {
+  // Show loading only until component mounts on client
+  // REMOVED: typeof window check (causes hydration mismatch)
+  // REMOVED: isLoaded check (useIsMobileDevice now sets isLoaded=true immediately)
+  // Only check isMounted to prevent hydration issues
+  if (!isMounted) {
     return (
       <div 
         style={{ 

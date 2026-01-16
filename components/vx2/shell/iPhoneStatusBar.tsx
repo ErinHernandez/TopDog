@@ -53,7 +53,15 @@ export default function IPhoneStatusBar({
   };
   
   // Use provided time or manage state for auto-updating time
-  const [displayTime, setDisplayTime] = useState(time || getCurrentTime());
+  // Initialize with a placeholder that matches server/client to prevent hydration mismatch
+  // Will be updated in useEffect on client-side
+  const [displayTime, setDisplayTime] = useState(time || '12:00');
+  const [isMounted, setIsMounted] = useState(false);
+  
+  // Track mount state to prevent hydration mismatch
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
   
   // Update time every minute if time prop is not provided
   useEffect(() => {
@@ -61,6 +69,9 @@ export default function IPhoneStatusBar({
       setDisplayTime(time);
       return;
     }
+    
+    // Only run on client-side after mount to prevent hydration mismatch
+    if (!isMounted || typeof window === 'undefined') return;
     
     // Update immediately
     setDisplayTime(getCurrentTime());
@@ -71,7 +82,7 @@ export default function IPhoneStatusBar({
     }, 60000); // 60 seconds
     
     return () => clearInterval(interval);
-  }, [time]);
+  }, [time, isMounted]);
 
   // Ensure battery is between 0-100
   const batteryLevel = Math.max(0, Math.min(100, battery));

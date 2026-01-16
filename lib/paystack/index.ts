@@ -44,7 +44,13 @@ export {
   updateTransactionStatus,
   findTransactionByReference,
   findTransactionByTransferCode,
-  
+
+  // Webhook event tracking (replay protection)
+  findWebhookEventByReference,
+  markWebhookEventAsProcessed,
+  markWebhookEventAsFailed,
+  createOrUpdateWebhookEvent,
+
   // Utilities
   generateReference,
   PAYSTACK_PUBLIC_KEY,

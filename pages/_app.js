@@ -108,15 +108,36 @@ function MyApp({ Component, pageProps }) {
     <SWRConfig value={swrConfig}>
       <UserProvider>
         <PlayerDataProvider>
-          <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', position: 'relative' }}>
             {!isLandingPage && !isDraftRoom && !isDevDraftNavbar && !isMobileDemo && !isTestingGrounds && !isProfileCustomization && !isMobileProfileCustomization && <Navbar />}
-            <div style={{ flex: '1' }}>
+            <div 
+              suppressHydrationWarning
+              style={{ 
+                flex: '1',
+                position: 'relative',
+                // Add padding dynamically based on DevNav position to prevent content overlap
+                paddingRight: isTestingGrounds && isMounted && !isMobileDevice 
+                  ? 'var(--devnav-padding-right, 0px)' 
+                  : 0,
+                paddingBottom: isTestingGrounds && isMounted && !isMobileDevice 
+                  ? 'var(--devnav-padding-bottom, 0px)' 
+                  : 0,
+                paddingLeft: isTestingGrounds && isMounted && !isMobileDevice 
+                  ? 'var(--devnav-padding-left, 0px)' 
+                  : 0,
+                paddingTop: isTestingGrounds && isMounted && !isMobileDevice 
+                  ? 'var(--devnav-padding-top, 0px)' 
+                  : 0,
+                // Match background color for testing-grounds pages so padding blends seamlessly
+                backgroundColor: isTestingGrounds ? '#0F172A' : 'transparent',
+              }}
+            >
               <GlobalErrorBoundary>
                 <Component {...pageProps} />
               </GlobalErrorBoundary>
             </div>
             {!isLandingPage && !isDraftRoom && !isDevDraftNavbar && !isMobileDemo && !isTestingGrounds && !isProfileCustomization && !isMobileProfileCustomization && <Footer />}
-            {isTestingGrounds && isMounted && !isMobileDevice && <DevNav />}
+            {typeof window !== 'undefined' && isTestingGrounds && isMounted && !isMobileDevice && <DevNav />}
           </div>
         </PlayerDataProvider>
       </UserProvider>
