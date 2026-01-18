@@ -14,7 +14,7 @@
  */
 
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs, query, where, limit } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import {
   withErrorHandling,
@@ -271,8 +271,9 @@ export default async function handler(
       });
     }
 
-    // Check 7: Position limit not exceeded
-    const allPicksSnapshot = await getDocs(picksRef);
+    // Check 7: Position limit not exceeded (limited to max draft size for safety)
+    const allPicksQuery = query(picksRef, limit(500));
+    const allPicksSnapshot = await getDocs(allPicksQuery);
     const allPicks = allPicksSnapshot.docs.map((doc) => doc.data() as { participantIndex: number; playerPosition: string });
 
     const positionCounts = countPositionsForParticipant(allPicks, expectedParticipantIndex);

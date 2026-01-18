@@ -119,6 +119,27 @@ module.exports = {
       lines: 90,
       statements: 90,
     },
+    // Services Layer (90%+) - Critical for query safety
+    './lib/services/**/*.ts': {
+      branches: 90,
+      functions: 90,
+      lines: 90,
+      statements: 90,
+    },
+    // Monitoring (85%+)
+    './lib/monitoring/**/*.ts': {
+      branches: 85,
+      functions: 85,
+      lines: 85,
+      statements: 85,
+    },
+    // Slow Drafts API (85%+) - Performance critical
+    './pages/api/slow-drafts/**/*.ts': {
+      branches: 85,
+      functions: 85,
+      lines: 85,
+      statements: 85,
+    },
   },
 
   // Module name mapper for path aliases

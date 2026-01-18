@@ -14,6 +14,7 @@ import {
   query,
   where,
   orderBy,
+  limit,
 } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
 import {
@@ -210,13 +211,14 @@ export default async function handler(
       // Query draft rooms where user is a participant and draft is slow (pickTimeSeconds > 60)
       const roomsRef = collection(db, 'draftRooms');
 
-      // Get all active/waiting drafts
+      // Get all active/waiting drafts (limited to 50 for performance)
       // Note: We'll filter by participant in memory since Firestore doesn't support
       // array-contains with complex objects easily
       const q = query(
         roomsRef,
         where('status', 'in', ['active', 'waiting', 'paused']),
-        orderBy('updatedAt', 'desc')
+        orderBy('updatedAt', 'desc'),
+        limit(50)
       );
 
       const snapshot = await getDocs(q);
@@ -253,12 +255,13 @@ export default async function handler(
         const picksAway = calculatePicksAway(currentPickNumber, draftPosition, teamCount);
         const isYourTurn = picksAway === 0;
 
-        // Get user's picks from subcollection
+        // Get user's picks from subcollection (limited to roster size for safety)
         const picksRef = collection(db, 'draftRooms', roomId, 'picks');
         const userPicksQuery = query(
           picksRef,
           where('participantId', '==', userParticipant.id),
-          orderBy('pickNumber', 'asc')
+          orderBy('pickNumber', 'asc'),
+          limit(rosterSize)
         );
         const picksSnapshot = await getDocs(userPicksQuery);
 
@@ -321,8 +324,37 @@ export default async function handler(
         });
       }
 
+      // Filter to only TopDog International tournaments - STRICT FILTER
+      const filteredDrafts = slowDrafts.filter((draft) => {
+        const name = draft.tournamentName.toLowerCase().trim();
+        
+        // STRICT: Only allow exact "TopDog International" variants
+        // Must start with "topdog international" (case insensitive)
+        const isTopDogInternational = /^topdog\s+international/.test(name) ||
+                                      name === 'topdog international i' ||
+                                      name === 'topdog international ii' ||
+                                      name === 'topdog international iii' ||
+                                      name.startsWith('topdog international');
+        
+        // Explicitly exclude all other tournaments
+        const isExcluded = name.includes('best ball') ||
+                          name.includes('summer') ||
+                          name.includes('ultimate') ||
+                          name.includes('draft masters') ||
+                          name.includes('gridiron') ||
+                          name.includes('championship') ||
+                          name.includes('showdown') ||
+                          name.includes('bowl') ||
+                          name.includes('league') ||
+                          name.includes('premier') ||
+                          name.includes('elite') ||
+                          name.includes('regional');
+        
+        return isTopDogInternational && !isExcluded;
+      });
+
       // Sort by your-turn first, then by picksAway
-      slowDrafts.sort((a, b) => {
+      filteredDrafts.sort((a, b) => {
         if (a.status === 'your-turn' && b.status !== 'your-turn') return -1;
         if (b.status === 'your-turn' && a.status !== 'your-turn') return 1;
         return a.picksAway - b.picksAway;
@@ -332,11 +364,12 @@ export default async function handler(
         component: 'slow-drafts',
         operation: 'list',
         userId,
-        count: slowDrafts.length,
+        count: filteredDrafts.length,
+        filteredFrom: slowDrafts.length,
       });
 
       return res.status(200).json(
-        createSuccessResponse(slowDrafts)
+        createSuccessResponse(filteredDrafts)
       );
     } catch (error) {
       logger.error('Error fetching slow drafts', error as Error, {

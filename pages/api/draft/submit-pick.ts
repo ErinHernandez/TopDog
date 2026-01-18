@@ -19,6 +19,7 @@ import {
   updateDoc,
   query,
   where,
+  limit,
   runTransaction,
   serverTimestamp,
 } from 'firebase/firestore';
@@ -228,8 +229,9 @@ export default async function handler(
           throw new Error('PLAYER_UNAVAILABLE:Player has already been drafted');
         }
 
-        // Get all picks for position counting
-        const allPicksSnapshot = await getDocs(picksRef);
+        // Get all picks for position counting (limited to max draft size for safety)
+        const allPicksQuery = query(picksRef, limit(500));
+        const allPicksSnapshot = await getDocs(allPicksQuery);
         const allPicks = allPicksSnapshot.docs.map((d) => d.data() as { participantIndex: number; playerPosition: string });
         const positionCounts = countPositionsForParticipant(allPicks, participantIndex);
 

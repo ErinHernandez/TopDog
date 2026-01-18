@@ -11,13 +11,15 @@
 
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { logger } from '../../lib/structuredLogger';
-import { 
-  withErrorHandling, 
+import {
+  withErrorHandling,
   validateMethod,
   createSuccessResponse,
   createErrorResponse,
-  ErrorType 
+  ErrorType
 } from '../../lib/apiErrorHandler';
+import { getMetricsSummary, getThresholds } from '../../lib/monitoring/queryMonitor';
+import { getPlayerCacheStats } from '../../lib/services/playerService';
 
 // ============================================================================
 // TYPES
@@ -33,10 +35,28 @@ interface HealthResponse {
   checks?: {
     database?: 'ok' | 'error';
     api?: 'ok' | 'error';
+    queries?: 'ok' | 'degraded' | 'error';
   };
   performance?: {
     memoryUsageMB?: number;
     cpuUsage?: number;
+  };
+  queryMetrics?: {
+    avgDuration: number;
+    maxDuration: number;
+    slowQueries: number;
+    criticalQueries: number;
+    totalQueries: number;
+    thresholds: {
+      slowMs: number;
+      criticalMs: number;
+    };
+  };
+  cache?: {
+    playerCache: {
+      size: number;
+      keys: string[];
+    };
   };
 }
 
@@ -92,6 +112,25 @@ export default async function handler(
     //   overallStatus = 'degraded';
     // }
 
+    // Query performance check
+    const queryMetrics = getMetricsSummary();
+    const thresholds = getThresholds();
+
+    if (queryMetrics.criticalQueryCount > 0) {
+      checks.queries = 'error';
+      overallStatus = 'degraded';
+    } else if (queryMetrics.slowQueryCount > 5) {
+      checks.queries = 'degraded';
+      if (overallStatus === 'ok') {
+        overallStatus = 'degraded';
+      }
+    } else {
+      checks.queries = 'ok';
+    }
+
+    // Cache stats
+    const playerCacheStats = getPlayerCacheStats();
+
     const responseTime = Date.now() - startTime;
 
     // Collect performance metrics
@@ -132,6 +171,17 @@ export default async function handler(
       responseTimeMs: responseTime,
       checks,
       performance: Object.keys(performance).length > 0 ? performance : undefined,
+      queryMetrics: {
+        avgDuration: queryMetrics.avgDuration,
+        maxDuration: queryMetrics.maxDuration,
+        slowQueries: queryMetrics.slowQueryCount,
+        criticalQueries: queryMetrics.criticalQueryCount,
+        totalQueries: queryMetrics.totalQueries,
+        thresholds,
+      },
+      cache: {
+        playerCache: playerCacheStats,
+      },
     }, statusCode, logger);
     
     return res.status(response.statusCode).json(response.body);

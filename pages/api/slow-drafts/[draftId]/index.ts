@@ -16,6 +16,7 @@ import {
   query,
   where,
   orderBy,
+  limit,
 } from 'firebase/firestore';
 import { db } from '../../../../lib/firebase';
 import {
@@ -302,9 +303,14 @@ export default async function handler(
       // Get recent picks (last 10)
       const recentPicksSlice = recentPicks.slice(-10).reverse();
 
-      // Get top available players
+      // Get top available players (limited to top 500 by ADP for performance)
       const playersRef = collection(db, 'players');
-      const playersSnapshot = await getDocs(playersRef);
+      const playersQuery = query(
+        playersRef,
+        orderBy('adp', 'asc'),
+        limit(500)
+      );
+      const playersSnapshot = await getDocs(playersQuery);
 
       const availablePlayers: DraftPlayer[] = [];
       playersSnapshot.docs.forEach((playerDoc) => {

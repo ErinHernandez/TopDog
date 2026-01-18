@@ -52,7 +52,7 @@ if (SENTRY_DSN) {
       /^moz-extension:\/\//i,
     ],
     
-    beforeSend(event, hint) {
+    beforeSend(event: Sentry.ErrorEvent, hint: Sentry.EventHint) {
       // Don't send in development unless explicitly enabled
       if (!IS_PRODUCTION) {
         const shouldSend = typeof window !== 'undefined' && 

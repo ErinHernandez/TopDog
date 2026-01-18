@@ -24,7 +24,9 @@
     "audit:any-types": "node scripts/find-any-types.js",
     "analyze": "ANALYZE=true npm run build",
     "bundle:track": "node scripts/track-bundle-size.js",
-    "console:plan": "node scripts/replace-console-logs.js"
+    "console:plan": "node scripts/replace-console-logs.js",
+    "lint:firestore": "grep -r 'getDocs(collection(' --include='*.ts' --include='*.tsx' pages/ lib/ | grep -v 'limit(' | grep -v '.test.ts' | grep -v 'node_modules' && echo 'ERROR: Found unbounded getDocs(collection(...)) calls!' && exit 1 || echo 'Firestore query check passed'",
+    "prepare": "husky install"
   },
   "keywords": [],
   "author": "",
@@ -49,7 +51,7 @@
     "uuid": "^11.0.0",
     "source-map": "^0.7.4",
     "sourcemap-codec": "npm:@jridgewell/sourcemap-codec@^1.4.15",
-    "rollup-plugin-terser": "npm:@rollup/plugin-terser@^7.0.2",
+    "rollup-plugin-terser": "npm:@rollup/plugin-terser@^0.4.4",
     "whatwg-encoding": "npm:@exodus/bytes@^1.0.0"
   },
   "dependencies": {
@@ -81,13 +83,15 @@
     "swr": "^2.3.7"
   },
   "devDependencies": {
-    "@next/bundle-analyzer": "^16.0.0",
+    "@babel/plugin-bugfix-firefox-class-in-computed-class-key": "^7.28.5",
     "@babel/preset-env": "^7.27.2",
     "@babel/preset-react": "^7.27.1",
     "@babel/preset-typescript": "^7.28.5",
+    "@next/bundle-analyzer": "^16.0.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
+    "@types/jest": "^30.0.0",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
@@ -96,7 +100,7 @@
     "axios": "^1.11.0",
     "cypress": "^14.5.0",
     "eslint": "9.33.0",
-    "eslint-config-next": "15.4.7",
+    "eslint-config-next": "^16.0.0",
     "firebase-tools": "^14.11.1",
     "jest": "^30.0.3",
     "jest-environment-jsdom": "^30.2.0",

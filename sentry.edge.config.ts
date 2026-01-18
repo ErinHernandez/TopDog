@@ -18,7 +18,7 @@ if (SENTRY_DSN) {
     // Lower sample rate for edge (higher volume)
     tracesSampleRate: IS_PRODUCTION ? 0.05 : 0.5,
     
-    beforeSend(event) {
+    beforeSend(event: Sentry.ErrorEvent) {
       // Don't send in development unless explicitly enabled
       if (!IS_PRODUCTION) {
         const shouldSend = process.env.SENTRY_DEBUG === 'true';

@@ -31,8 +31,8 @@ export const SLOW_DRAFT_LAYOUT = {
   rosterSquareBorderRadius: 4,
 
   // Expanded roster
-  expandedPlayerCardWidth: 56,
-  expandedPlayerCardHeight: 68,
+  expandedPlayerCardWidth: 140, // Increased to fit all player names
+  expandedPlayerCardHeight: 95, // Reduced height
   expandedPlayerCardGap: 8,
 
   // Section spacing
@@ -77,7 +77,7 @@ export const SLOW_DRAFT_COLORS = {
   events: {
     reach: '#F59E0B',      // Amber - overpaid
     reachBg: 'rgba(245, 158, 11, 0.15)',
-    steal: '#10B981',      // Green - value
+    steal: '#10B981',      // Green - value pick
     stealBg: 'rgba(16, 185, 129, 0.15)',
     alert: '#EF4444',      // Red - queue taken
     alertBg: 'rgba(239, 68, 68, 0.15)',
@@ -213,7 +213,6 @@ export const SLOW_DRAFT_THRESHOLDS = {
 
   // ADP delta for notable events
   reachThreshold: 15,      // Picks early = reach
-  stealThreshold: 15,      // Picks late = steal
 
   // Position run detection
   positionRunMinimum: 3,   // Consecutive same position
@@ -272,11 +271,9 @@ export const SORT_OPTIONS: { value: SortOption; label: string }[] = [
 
 export type FilterOption =
   | 'all'
-  | 'myTurnOnly'
-  | 'needsAttention';
+  | 'myTurnOnly';
 
 export const FILTER_OPTIONS: { value: FilterOption; label: string; description: string }[] = [
   { value: 'all', label: 'All Drafts', description: 'Show all active slow drafts' },
   { value: 'myTurnOnly', label: 'My Turn', description: 'Only drafts where it\'s your pick' },
-  { value: 'needsAttention', label: 'Needs Attention', description: 'Urgent timer or position needs' },
 ];

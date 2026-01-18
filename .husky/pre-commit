@@ -1,0 +1,33 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "Running Firestore query safety check..."
+
+# Check for unbounded getDocs(collection(...)) calls
+UNBOUNDED_COLLECTION=$(grep -r "getDocs(collection(" --include="*.ts" --include="*.tsx" pages/ lib/ 2>/dev/null | grep -v "limit(" | grep -v ".test.ts" | grep -v "node_modules" || true)
+
+if [ -n "$UNBOUNDED_COLLECTION" ]; then
+  echo ""
+  echo "ERROR: Found getDocs without limit() constraint:"
+  echo "$UNBOUNDED_COLLECTION"
+  echo ""
+  echo "All Firestore queries must include a limit() to prevent server hangs."
+  echo "See docs/firestore-best-practices.md for details."
+  echo ""
+  exit 1
+fi
+
+# Check for getDocs(query(...)) without limit - warning only
+QUERY_WITHOUT_LIMIT=$(grep -r "getDocs(query(" --include="*.ts" --include="*.tsx" pages/ lib/ 2>/dev/null | grep -v "limit(" | grep -v ".test.ts" | grep -v "node_modules" || true)
+
+if [ -n "$QUERY_WITHOUT_LIMIT" ]; then
+  echo ""
+  echo "WARNING: Found query without explicit limit():"
+  echo "$QUERY_WITHOUT_LIMIT"
+  echo ""
+  echo "Consider adding a limit() constraint for safety."
+  echo ""
+fi
+
+echo "Firestore query check passed"
+exit 0

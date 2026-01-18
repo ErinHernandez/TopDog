@@ -27,7 +27,7 @@ if (SENTRY_DSN) {
       'ValidationError',
     ],
     
-    beforeSend(event, hint) {
+    beforeSend(event: Sentry.ErrorEvent, hint: Sentry.EventHint) {
       // Don't send in development unless explicitly enabled
       if (!IS_PRODUCTION) {
         const shouldSend = process.env.SENTRY_DEBUG === 'true';

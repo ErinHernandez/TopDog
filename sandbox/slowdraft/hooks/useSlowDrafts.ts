@@ -327,10 +327,10 @@ export function useSlowDrafts(): UseSlowDraftsResult {
 
   // Calculate counts
   const counts = useMemo(() => {
-    const myTurn = drafts.filter((d) => d.status === 'your-turn').length;
-    const needsAttention = drafts.filter((d) => {
+    const myTurn = drafts.filter((d: SlowDraft) => d.status === 'your-turn').length;
+    const needsAttention = drafts.filter((d: SlowDraft) => {
       const hasUrgentNeeds = d.positionNeeds.some(
-        (n) => n.urgency === 'critical' || n.urgency === 'warning'
+        (n: PositionNeed) => n.urgency === 'critical' || n.urgency === 'warning'
       );
       const hasUrgentTimer =
         d.timeLeftSeconds !== undefined &&
@@ -355,9 +355,9 @@ export function useSlowDrafts(): UseSlowDraftsResult {
         filtered = filtered.filter((d) => d.status === 'your-turn');
         break;
       case 'needsAttention':
-        filtered = filtered.filter((d) => {
+        filtered = filtered.filter((d: SlowDraft) => {
           const hasUrgentNeeds = d.positionNeeds.some(
-            (n) => n.urgency === 'critical' || n.urgency === 'warning'
+            (n: PositionNeed) => n.urgency === 'critical' || n.urgency === 'warning'
           );
           const hasUrgentTimer =
             d.timeLeftSeconds !== undefined &&
