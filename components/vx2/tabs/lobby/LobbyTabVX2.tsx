@@ -210,6 +210,8 @@ export default function LobbyTabVX2({
     position: 'relative',
     width: '100%',
     height: '100%',
+    minHeight: '400px', // Ensure container has minimum height for loading state
+    flex: 1, // Take available space in flex parent
     backgroundColor: BG_COLORS.primary,
   };
 
@@ -217,6 +219,7 @@ export default function LobbyTabVX2({
   // LOADING STATE
   // ----------------------------------------
   if (isLoading && tournaments.length === 0) {
+    logger.debug('Showing loading state', { isLoading, tournamentCount: tournaments.length });
     return (
       <div className="vx2-lobby-container" style={containerStyle}>
         <LoadingState />
@@ -268,6 +271,12 @@ export default function LobbyTabVX2({
   // WAITING FOR DIMENSIONS
   // ----------------------------------------
   if (!featuredTournament || !isCardHeightReady || !cardHeight || !cardWidth) {
+    logger.debug('Waiting for dimensions', { 
+      hasFeaturedTournament: !!featuredTournament, 
+      isCardHeightReady, 
+      cardHeight, 
+      cardWidth 
+    });
     return (
       <div className="vx2-lobby-container" style={containerStyle}>
         <LoadingState />
