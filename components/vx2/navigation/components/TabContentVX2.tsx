@@ -221,13 +221,16 @@ export default function TabContentVX2({
       id={`tabpanel-${state.activeTab}`}
       aria-labelledby={`tab-${state.activeTab}`}
       tabIndex={0}
+      suppressHydrationWarning
     >
-      {/* Hide scrollbar for WebKit browsers */}
-      <style>{`
-        #tabpanel-${state.activeTab}::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
+      {/* Hide scrollbar for WebKit browsers - only render after mount to prevent hydration mismatch */}
+      {isMounted && (
+        <style>{`
+          #tabpanel-${state.activeTab}::-webkit-scrollbar {
+            display: none;
+          }
+        `}</style>
+      )}
       
       <TabErrorBoundary
         tabId={state.activeTab}
@@ -237,7 +240,7 @@ export default function TabContentVX2({
         {TabComponent ? (
           renderTabContent()
         ) : (
-          <div style={{ padding: '20px', color: '#fff' }}>
+          <div style={{ padding: '20px', color: '#fff' }} suppressHydrationWarning>
             <p>Error: Tab component not found for "{state.activeTab}"</p>
             <p style={{ fontSize: '12px', color: '#999' }}>
               Available tabs: {Object.keys(TAB_COMPONENTS).join(', ')}
