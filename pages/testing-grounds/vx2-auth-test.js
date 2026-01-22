@@ -6,14 +6,20 @@
  */
 
 import React, { useState } from 'react';
+import dynamic from 'next/dynamic';
 import { 
-  AuthProvider, 
   SignUpModal, 
   SignInModal, 
   ForgotPasswordModal, 
   ProfileSettingsModal,
   useAuth 
 } from '../../components/vx2/auth';
+
+// Make AuthProvider client-only to prevent hydration issues
+const AuthProvider = dynamic(
+  () => import('../../components/vx2/auth').then(mod => ({ default: mod.AuthProvider })),
+  { ssr: false }
+);
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS } from '../../components/vx2/core/constants/colors';
 import MobilePhoneFrame from '../../components/vx2/shell/MobilePhoneFrame';
 
