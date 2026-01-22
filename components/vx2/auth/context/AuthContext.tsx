@@ -282,15 +282,14 @@ export function AuthProvider({
   // CRITICAL: Always render the Provider wrapper to prevent hydration mismatch
   // During SSR/build OR before mount, provide safe defaults, but keep the same DOM structure
   // This ensures server and initial client render are identical
+  // IMPORTANT: Do NOT wrap children in additional divs - this causes hydration mismatches
   if (isBuildPhase || isSSR || isVercelBuild || !isMounted) {
     // During build, SSR, or before mount, provide safe defaults but keep Provider wrapper
     // This ensures server and client render the same DOM structure
     const safeValue = createBuildTimeSafeDefaults();
     return (
-      <AuthContext.Provider value={safeValue}>
-        <div suppressHydrationWarning>
-          {children}
-        </div>
+      <AuthContext.Provider value={safeValue} suppressHydrationWarning>
+        {children}
         {/* Invisible recaptcha container for phone auth */}
         <div id="recaptcha-container" suppressHydrationWarning />
       </AuthContext.Provider>
@@ -913,10 +912,8 @@ export function AuthProvider({
   ]);
   
   return (
-    <AuthContext.Provider value={value}>
-      <div suppressHydrationWarning>
-        {children}
-      </div>
+    <AuthContext.Provider value={value} suppressHydrationWarning>
+      {children}
       {/* Invisible recaptcha container for phone auth */}
       <div id="recaptcha-container" suppressHydrationWarning />
     </AuthContext.Provider>
