@@ -21,6 +21,7 @@ import React, {
   useMemo,
   useEffect,
   useRef,
+  useState,
 } from 'react';
 import {
   getAuth,
@@ -261,6 +262,13 @@ export function AuthProvider({
   children,
   onAuthStateChange,
 }: AuthProviderProps): React.ReactElement {
+  // Track mount state to ensure consistent SSR/client rendering
+  const [isMounted, setIsMounted] = useState(false);
+  
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+  
   // Build-time detection: return children without auth initialization
   // IMPORTANT: Keep this in sync with useAuthContext detection logic
   const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build' || 
@@ -272,9 +280,10 @@ export function AuthProvider({
   const isVercelBuild = process.env.VERCEL === '1';
   
   // CRITICAL: Always render the Provider wrapper to prevent hydration mismatch
-  // During SSR/build, provide safe defaults, but keep the same DOM structure
-  if (isBuildPhase || isSSR || isVercelBuild) {
-    // During build or SSR, provide safe defaults but keep Provider wrapper
+  // During SSR/build OR before mount, provide safe defaults, but keep the same DOM structure
+  // This ensures server and initial client render are identical
+  if (isBuildPhase || isSSR || isVercelBuild || !isMounted) {
+    // During build, SSR, or before mount, provide safe defaults but keep Provider wrapper
     // This ensures server and client render the same DOM structure
     const safeValue = createBuildTimeSafeDefaults();
     return (
