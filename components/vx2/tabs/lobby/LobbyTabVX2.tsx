@@ -162,11 +162,12 @@ export default function LobbyTabVX2({
 
   // ----------------------------------------
   // Image preloading
+  // Only enable after mount to prevent hydration mismatch
   // ----------------------------------------
   const { isLoaded: imageLoaded } = useTournamentImage({
     image: CARD_VISUALS.backgroundImage,
     placeholder: BLUR_PLACEHOLDER,
-    enabled: Boolean(featuredTournament),
+    enabled: isMounted && Boolean(featuredTournament),
   });
 
   // ----------------------------------------
@@ -277,9 +278,15 @@ export default function LobbyTabVX2({
   // WAITING FOR DIMENSIONS OR MOUNT
   // ----------------------------------------
   // On server or before mount, always show loading to prevent hydration mismatch
-  if (!isMounted || !featuredTournament || !isCardHeightReady || !cardHeight || !cardWidth) {
-    logger.debug('Waiting for dimensions or mount', { 
+  // Also wait for data to be loaded (not just initial empty state)
+  const isDataReady = isMounted && !isLoading && tournaments.length > 0;
+  const canRender = isDataReady && featuredTournament && isCardHeightReady && cardHeight && cardWidth;
+  
+  if (!canRender) {
+    logger.debug('Waiting for mount, data, or dimensions', { 
       isMounted,
+      isLoading,
+      tournamentCount: tournaments.length,
       hasFeaturedTournament: !!featuredTournament, 
       isCardHeightReady, 
       cardHeight, 
@@ -328,6 +335,7 @@ export default function LobbyTabVX2({
           contain: 'layout style paint',
           isolation: 'isolate',
         }}
+        suppressHydrationWarning
       >
         {/* Background Layers */}
         <TournamentBackground
