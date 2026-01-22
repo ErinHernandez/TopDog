@@ -288,7 +288,7 @@ export function AuthProvider({
     // This ensures server and client render the same DOM structure
     const safeValue = createBuildTimeSafeDefaults();
     return (
-      <AuthContext.Provider value={safeValue} suppressHydrationWarning>
+      <AuthContext.Provider value={safeValue}>
         {children}
         {/* Invisible recaptcha container for phone auth */}
         <div id="recaptcha-container" suppressHydrationWarning />
@@ -912,7 +912,7 @@ export function AuthProvider({
   ]);
   
   return (
-    <AuthContext.Provider value={value} suppressHydrationWarning>
+    <AuthContext.Provider value={value}>
       {children}
       {/* Invisible recaptcha container for phone auth */}
       <div id="recaptcha-container" suppressHydrationWarning />
