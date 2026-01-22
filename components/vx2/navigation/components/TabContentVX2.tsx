@@ -20,7 +20,27 @@ import { createScopedLogger } from '../../../../lib/clientLogger';
 const logger = createScopedLogger('[TabContentVX2]');
 
 // Direct imports for all tabs (SSR compatible)
-import { LobbyTabVX2 as LobbyTab } from '../../tabs/lobby';
+// LobbyTab is client-only to prevent hydration issues
+import dynamic from 'next/dynamic';
+const LobbyTab = dynamic(() => import('../../tabs/lobby').then(mod => ({ default: mod.LobbyTabVX2 })), {
+  ssr: false,
+  loading: () => (
+    <div className="vx2-lobby-container" style={{ 
+      position: 'relative', 
+      width: '100%', 
+      height: '100%', 
+      minHeight: '400px',
+      flex: 1,
+      backgroundColor: '#0a0a1a',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: '#fff'
+    }}>
+      <div>Loading tournaments...</div>
+    </div>
+  ),
+});
 import { DraftsTabVX2 as DraftsTab } from '../../tabs/live-drafts';
 import { MyTeamsTabVX2 as MyTeamsTab } from '../../tabs/my-teams';
 import { ExposureTabVX2 as ExposureTab } from '../../tabs/exposure';
