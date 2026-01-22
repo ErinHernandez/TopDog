@@ -271,10 +271,19 @@ export function AuthProvider({
   // VERCEL=1 is always set during Vercel builds, regardless of VERCEL_ENV
   const isVercelBuild = process.env.VERCEL === '1';
   
+  // CRITICAL: Always render the Provider wrapper to prevent hydration mismatch
+  // During SSR/build, provide safe defaults, but keep the same DOM structure
   if (isBuildPhase || isSSR || isVercelBuild) {
-    // During build or SSR, return children without auth context
-    // The useAuthContext hook will handle this case with safe defaults
-    return <>{children}</>;
+    // During build or SSR, provide safe defaults but keep Provider wrapper
+    // This ensures server and client render the same DOM structure
+    const safeValue = createBuildTimeSafeDefaults();
+    return (
+      <AuthContext.Provider value={safeValue}>
+        {children}
+        {/* Invisible recaptcha container for phone auth */}
+        <div id="recaptcha-container" />
+      </AuthContext.Provider>
+    );
   }
   
   const [state, dispatch] = useReducer(authReducer, initialState);
