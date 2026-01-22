@@ -7,13 +7,16 @@
  *   - position: Filter by position (QB, RB, WR, TE)
  *   - limit: Max results (default: all)
  *   - refresh: Force cache refresh (true/false)
+ * 
+ * Uses data source abstraction layer - automatically uses ESPN or SportsDataIO
+ * based on DATA_SOURCE_PROJECTIONS environment variable, with automatic fallback.
  */
 
-import { getProjections } from '../../../lib/sportsdataio';
+import { getProjections } from '../../../lib/dataSources';
+import { getProjectionsSource } from '../../../lib/dataSources/config';
 import { 
   withErrorHandling, 
   validateMethod, 
-  requireEnvVar,
   createSuccessResponse,
 } from '../../../lib/apiErrorHandler';
 
@@ -22,53 +25,51 @@ export default async function handler(req, res) {
     // Validate HTTP method
     validateMethod(req, ['GET'], logger);
 
-    // Check required environment variables
-    const apiKey = requireEnvVar('SPORTSDATAIO_API_KEY', logger);
-
     const { season, position, limit, refresh } = req.query;
     const forceRefresh = refresh === 'true';
+    const seasonYear = season ? parseInt(season, 10) : new Date().getFullYear();
+    
+    // Determine which source will be used (for logging)
+    const source = getProjectionsSource();
     
     logger.info('Fetching projections', {
+      source,
       filters: {
-        season: season || 'default',
+        season: seasonYear,
         position,
         limit,
         refresh: forceRefresh,
       }
     });
     
-    let projections = await getProjections(apiKey, forceRefresh);
-    logger.debug('Projections fetched', { count: projections.length });
-    
-    // Filter by position if specified
-    if (position) {
-      const beforeCount = projections.length;
-      const positions = position.toUpperCase().split(',');
-      projections = projections.filter(p => positions.includes(p.Position));
-      logger.debug('Filtered by position', { 
-        positions, 
-        before: beforeCount, 
-        after: projections.length 
+    try {
+      // Use data source abstraction - automatically handles ESPN/SportsDataIO and fallback
+      let projections = await getProjections(seasonYear, {
+        position,
+        limit: limit ? parseInt(limit, 10) : undefined,
+        forceRefresh,
       });
+      
+      logger.debug('Projections fetched', { 
+        count: projections.length,
+        source: projections[0]?._source || source,
+      });
+      
+      // Note: Filtering, sorting, and limiting are now handled by the data source abstraction
+      // But we keep the response format consistent
+      
+      const response = createSuccessResponse({
+        season: seasonYear,
+        count: projections.length,
+        source: projections[0]?._source || source, // Include source in response for debugging
+        data: projections,
+      }, 200, logger);
+      
+      return res.status(response.statusCode).json(response.body);
+    } catch (error) {
+      logger.error('Failed to fetch projections', { error: error.message, source });
+      throw error; // Let error handler deal with it
     }
-    
-    // Sort by PPR fantasy points
-    projections.sort((a, b) => (b.FantasyPointsPPR || 0) - (a.FantasyPointsPPR || 0));
-    
-    // Limit results
-    if (limit) {
-      const limitNum = parseInt(limit);
-      projections = projections.slice(0, limitNum);
-      logger.debug('Limited results', { limit: limitNum });
-    }
-    
-    const response = createSuccessResponse({
-      season: season || new Date().getFullYear(),
-      count: projections.length,
-      data: projections,
-    }, 200, logger);
-    
-    return res.status(response.statusCode).json(response.body);
   });
 }
 

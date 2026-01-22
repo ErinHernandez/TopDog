@@ -4,9 +4,18 @@
  * Historical Data Ingestion Script - Player Pool Based
  * 
  * Fetches historical statistics for EVERY player in the player pool.
- * Uses ESPN Core API with per-player statistics endpoint.
+ * Supports multiple data sources:
+ * - ESPN Core API (default, public, no auth)
+ * - ESPN Fantasy API (requires authentication)
  * 
- * Usage: node scripts/ingest-historical-data.js
+ * Usage: 
+ *   node scripts/ingest-historical-data.js
+ * 
+ * Environment Variables:
+ *   DATA_SOURCE_HISTORICAL=espn_fantasy  # Use ESPN Fantasy API
+ *   DATA_SOURCE_HISTORICAL=espn_core     # Use ESPN Core API (default)
+ *   ESPN_S2_COOKIE=...                  # Required if using espn_fantasy
+ *   ESPN_SWID_COOKIE=...                # Required if using espn_fantasy
  */
 
 const http = require('http');
@@ -19,22 +28,33 @@ const crypto = require('crypto');
 // CONFIGURATION
 // =============================================================================
 
+// Determine data source from environment
+const DATA_SOURCE = process.env.DATA_SOURCE_HISTORICAL || 'espn_core';
+
 const CONFIG = {
   seasons: [2021, 2022, 2023, 2024],
   currentSeason: 2025,
   outputDir: path.join(__dirname, '..', 'public', 'data', 'history'),
   playerPoolPath: path.join(__dirname, '..', 'public', 'data', 'player-pool-2025.json'),
   positions: ['QB', 'RB', 'WR', 'TE'],
+  dataSource: DATA_SOURCE,
   
-  // Rate limiting
-  requestDelay: 100, // ms between requests (be nice to ESPN)
+  // Rate limiting (ESPN Fantasy API needs longer delays)
+  requestDelay: DATA_SOURCE === 'espn_fantasy' ? 3500 : 100, // 3.5s for Fantasy API, 100ms for Core API
   batchSize: 10,     // concurrent requests per batch
   batchDelay: 500,   // delay between batches
   
-  // ESPN API endpoints
+  // ESPN Core API endpoints (for espn_core source)
   espnSearchUrl: 'http://site.api.espn.com/apis/common/v3/search',
   espnAthleteUrl: 'http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/athletes',
   espnSeasonStatsUrl: 'http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons',
+  
+  // ESPN Fantasy API configuration (for espn_fantasy source)
+  espnFantasy: {
+    s2Cookie: process.env.ESPN_S2_COOKIE,
+    swidCookie: process.env.ESPN_SWID_COOKIE,
+    leagueId: process.env.ESPN_LEAGUE_ID ? parseInt(process.env.ESPN_LEAGUE_ID, 10) : 1,
+  },
 };
 
 // =============================================================================
@@ -408,8 +428,26 @@ function writeJsonFile(filePath, data) {
 async function main() {
   console.log('🏈 Historical Data Ingestion - Player Pool Based');
   console.log('='.repeat(50));
+  console.log(`Data Source: ${CONFIG.dataSource}`);
   console.log(`Seasons: ${CONFIG.seasons.join(', ')}`);
   console.log(`Output: ${CONFIG.outputDir}\n`);
+
+  // Validate ESPN Fantasy API credentials if using espn_fantasy
+  if (CONFIG.dataSource === 'espn_fantasy') {
+    if (!CONFIG.espnFantasy.s2Cookie || !CONFIG.espnFantasy.swidCookie) {
+      console.error('❌ ESPN Fantasy API credentials required when DATA_SOURCE_HISTORICAL=espn_fantasy');
+      console.error('   Set ESPN_S2_COOKIE and ESPN_SWID_COOKIE environment variables');
+      process.exit(1);
+    }
+    console.log('   Using ESPN Fantasy API (authenticated)');
+    console.log('   ⚠️  Note: ESPN Fantasy API historical stats implementation needs completion');
+    console.log('   Falling back to ESPN Core API for now...\n');
+    // TODO: Implement ESPN Fantasy API historical stats fetching
+    // For now, fall back to ESPN Core API
+    CONFIG.dataSource = 'espn_core';
+  } else {
+    console.log('   Using ESPN Core API (public, no auth required)\n');
+  }
 
   // Load player pool
   console.log('📋 Loading player pool...');
@@ -435,7 +473,7 @@ async function main() {
   });
 
   // Process players in batches
-  console.log('\n🔍 Fetching player statistics from ESPN...\n');
+  console.log(`\n🔍 Fetching player statistics from ${CONFIG.dataSource === 'espn_fantasy' ? 'ESPN Fantasy API' : 'ESPN Core API'}...\n`);
   
   let processed = 0;
   let found = 0;

@@ -1,275 +1,134 @@
-# Testing Guide
-**How to test the new Enterprise Implementation features**
+# ESPN Fantasy API Integration - Testing Guide
 
----
+## Quick Test
 
-## 🧪 Testing the New API Route
+### 1. Test Configuration
 
-### Test User Contact Update API
-
-#### Manual Test (Browser Console)
-```javascript
-// 1. Get your Firebase auth token
-const auth = firebase.auth();
-const user = auth.currentUser;
-const token = await user.getIdToken();
-
-// 2. Test the API
-const response = await fetch('/api/user/update-contact', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
-  },
-  body: JSON.stringify({
-    userId: user.uid,
-    email: 'newemail@example.com',
-  }),
-});
-
-const data = await response.json();
-console.log(data);
-```
-
-#### Automated Test
 ```bash
-# Run the test suite
-npm test -- update-contact
-
-# Or run all API tests
-npm test -- pages/api
+node scripts/test-espn-integration.js
 ```
 
----
+This will:
+- ✅ Validate environment variables
+- ✅ Check data source configuration
+- ✅ Test module loading
+- ✅ Verify fallback mechanism
 
-## 🔍 Testing Audit Scripts
+### 2. Test via API Endpoint
 
-### Environment Variable Audit
+**Start the dev server:**
 ```bash
-npm run audit:env
-# Check output for:
-# - Potential leaks (should be 0 or all in API routes)
-# - Generated .env.example file
+npm run dev
 ```
 
-### TODO Triage
+**In another terminal, test the API:**
 ```bash
-npm run audit:todos
-# Check:
-# - TODO_TRIAGE_REPORT.md
-# - todo-items.csv
-# - P0-CRITICAL count (should be 0)
+# Test with ESPN (if configured)
+curl "http://localhost:3000/api/nfl/projections?position=RB&limit=5"
+
+# Or use the test script
+./scripts/test-espn-api-endpoint.sh
 ```
 
-### Type Safety Audit
+## Manual Testing Steps
+
+### Step 1: Verify Environment Variables
+
+Check that your `.env.local` has the required variables:
+
 ```bash
-npm run audit:any-types
-# Check:
-# - any-types-report.json
-# - Critical path count (should be 0)
+# For ESPN
+DATA_SOURCE_PROJECTIONS=espn
+ESPN_S2_COOKIE=your_cookie
+ESPN_SWID_COOKIE={your_swid}
+
+# For SportsDataIO (fallback)
+SPORTSDATAIO_API_KEY=your_key
 ```
 
-### Security Audit
+### Step 2: Test Projections API
+
+**With ESPN:**
 ```bash
-npm run security:audit
-# Check for:
-# - Critical/high vulnerabilities
-# - Auto-fixable issues
+curl "http://localhost:3000/api/nfl/projections?position=RB&limit=10"
 ```
 
----
-
-## 📊 Testing Structured Logging
-
-### Client-Side Logging
-```typescript
-import { logger } from '@/lib/logger';
-
-// Test in browser console or component
-logger.info('Test message', { component: 'TestComponent', userId: '123' });
-logger.error('Test error', new Error('Test'), { component: 'TestComponent' });
+**Expected response:**
+```json
+{
+  "success": true,
+  "statusCode": 200,
+  "body": {
+    "season": 2025,
+    "count": 10,
+    "source": "espn",
+    "data": [
+      {
+        "PlayerID": 12345,
+        "Name": "Player Name",
+        "Position": "RB",
+        "Team": "BUF",
+        "FantasyPointsPPR": 250.5,
+        "_source": "espn"
+      }
+    ]
+  }
+}
 ```
 
-**Expected:**
-- Development: Console output with structured format
-- Production: Batched POST to `/api/logs` (needs endpoint)
+### Step 3: Test Fallback
 
-### Server-Side Logging
-```typescript
-import { serverLogger } from '@/lib/logger';
+To test fallback, temporarily use invalid ESPN credentials:
 
-// Test in API route
-serverLogger.info('Test message', { userId: '123', operation: 'test' });
-serverLogger.error('Test error', error, { component: 'TestAPI' });
-```
-
-**Expected:**
-- Development: Readable console output
-- Production: JSON output for log aggregation
-
----
-
-## 🚀 Testing CI/CD Workflows
-
-### Test Locally with Act
 ```bash
-# Install act (GitHub Actions local runner)
-# macOS: brew install act
-# Or see: https://github.com/nektos/act
-
-# Test lint job
-act -j lint
-
-# Test test job
-act -j test
-
-# Test build job
-act -j build
+# Set invalid cookie
+ESPN_S2_COOKIE=invalid
 ```
 
-### Test with a PR
-1. Create a test branch
-2. Make a small change
-3. Push and create PR
-4. Check GitHub Actions tab
-5. Verify all workflows run
+Then make the same API request. It should automatically fall back to SportsDataIO.
 
----
+### Step 4: Test Historical Data Ingestion
 
-## 📦 Testing Bundle Analysis
-
-### Generate Bundle Analysis
 ```bash
-# Install package first
-npm install --save-dev @next/bundle-analyzer
+# Using ESPN Core API (default, no auth needed)
+node scripts/ingest-historical-data.js
 
-# Generate analysis
-npm run analyze
-# Opens browser with bundle visualization
+# Using ESPN Fantasy API (requires auth)
+DATA_SOURCE_HISTORICAL=espn_fantasy node scripts/ingest-historical-data.js
 ```
 
-### Track Bundle Size
-```bash
-# Build first
-npm run build
+## Verification Checklist
 
-# Track size
-npm run bundle:track
-# Creates bundle-stats.json
-# Shows top 20 chunks
-# Compares with previous build
-```
+- [ ] Configuration test passes
+- [ ] Projections API returns data
+- [ ] Source is correctly identified in response
+- [ ] Fallback works when ESPN fails
+- [ ] Historical data ingestion script runs
+- [ ] Player cards still display correctly
+- [ ] No errors in server logs
 
----
+## Troubleshooting
 
-## ✅ Testing Checklist
+### "ESPN credentials required" error
+- Make sure `ESPN_S2_COOKIE` and `ESPN_SWID_COOKIE` are set
+- Extract cookies from browser DevTools (see README in `lib/dataSources/`)
 
-### Before Committing
-- [ ] Run `npm run audit:env` - No leaks
-- [ ] Run `npm run audit:any-types` - No critical issues
-- [ ] Run `npm run lint:fix` - No lint errors
-- [ ] Run `npm run type-check` - No type errors
+### "SPORTSDATAIO_API_KEY required" error
+- Set `SPORTSDATAIO_API_KEY` in `.env.local`
+- Or set `DATA_SOURCE_PROJECTIONS=espn` to use ESPN only
 
-### Before Deploying
-- [ ] Run `npm run security:audit` - No critical/high vulnerabilities
-- [ ] Run `npm run test:tier0` - Critical path tests pass
-- [ ] Run `npm run build` - Build succeeds
-- [ ] Run `npm run bundle:track` - Bundle size acceptable
+### API returns empty data
+- Check that the season is correct (current year)
+- Verify ESPN cookies are valid (they can expire)
+- Check server logs for detailed error messages
 
-### Weekly
-- [ ] Run `npm run audit:todos` - Review technical debt
-- [ ] Review CI/CD workflow runs
-- [ ] Check bundle size trends
-- [ ] Review test coverage
+### TypeScript import errors in test script
+- This is normal - TypeScript modules work in Next.js runtime
+- Test via API endpoint instead
+- Or use `ts-node` to run TypeScript directly
 
----
+## Next Steps After Testing
 
-## 🐛 Common Issues & Solutions
-
-### Audit Scripts Failing
-**Issue:** Scripts can't find files or timeout
-
-**Solution:**
-```bash
-# Make sure you're in project root
-cd /path/to/bestball-site
-
-# Check script permissions
-chmod +x scripts/security-audit.sh
-
-# Run with more memory if needed
-node --max-old-space-size=4096 scripts/audit-env-vars.js
-```
-
-### Tests Failing
-**Issue:** Mock errors or missing dependencies
-
-**Solution:**
-```bash
-# Clear Jest cache
-npm test -- --clearCache
-
-# Reinstall dependencies
-rm -rf node_modules package-lock.json
-npm install
-
-# Run with verbose output
-npm test -- --verbose
-```
-
-### Bundle Analyzer Not Working
-**Issue:** Package not installed or build fails
-
-**Solution:**
-```bash
-# Install package
-npm install --save-dev @next/bundle-analyzer
-
-# Check next.config.js has bundle analyzer
-grep -A 2 "withBundleAnalyzer" next.config.js
-
-# Run with ANALYZE flag
-ANALYZE=true npm run build
-```
-
----
-
-## 📝 Test Results Template
-
-Create a test results file:
-
-```markdown
-# Test Results - [Date]
-
-## API Tests
-- [ ] User contact update API
-- [ ] Authentication works
-- [ ] Validation works
-- [ ] Error handling works
-
-## Audit Scripts
-- [ ] Environment variable audit
-- [ ] TODO triage
-- [ ] Type safety audit
-- [ ] Security audit
-
-## Logging
-- [ ] Client logger
-- [ ] Server logger
-- [ ] Sentry integration
-
-## CI/CD
-- [ ] Lint job
-- [ ] Test job
-- [ ] Build job
-- [ ] Deploy job
-
-## Bundle Analysis
-- [ ] Bundle analyzer works
-- [ ] Size tracking works
-- [ ] Reports generated
-```
-
----
-
-**Status:** Ready for testing! 🧪
+1. **If tests pass**: Switch to ESPN in production by updating environment variables
+2. **If issues found**: Check logs, verify credentials, test fallback
+3. **Monitor**: Watch for ESPN API changes or rate limiting

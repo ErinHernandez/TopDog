@@ -34,6 +34,7 @@ import type {
   TransformedPlayerStats,
   TransformedADP,
 } from '@/types/api';
+import type { ProjectionData } from '@/lib/dataSources/types';
 
 
 // ============================================================================
@@ -440,6 +441,77 @@ export function transformPlayerHeadshot(raw: SportsDataIOPlayer | null): {
     position: raw.Position,
     headshotUrl: raw.PhotoUrl,
     number: raw.Number,
+  };
+}
+
+// ============================================================================
+// ESPN FANTASY API TRANSFORMERS
+// ============================================================================
+
+/**
+ * Transform ESPN Fantasy API projection data to canonical format
+ * ESPN ProjectionData format is compatible with SportsDataIO format,
+ * so we can reuse most of the transformation logic
+ */
+export function transformFromESPN(raw: ProjectionData | null): PlayerFull | null {
+  if (!raw) return null;
+  
+  // Convert ProjectionData to SportsDataIO-like format for transformation
+  const sportsdataioLike: RawStatsInput = {
+    PlayerID: raw.PlayerID,
+    Name: raw.Name,
+    Position: raw.Position,
+    Team: raw.Team,
+    FantasyPointsPPR: raw.FantasyPointsPPR,
+    FantasyPoints: raw.FantasyPoints,
+    FantasyPointsHalfPPR: raw.FantasyPointsHalfPPR,
+    PassingAttempts: raw.PassingAttempts,
+    PassingCompletions: raw.PassingCompletions,
+    PassingYards: raw.PassingYards,
+    PassingTouchdowns: raw.PassingTouchdowns,
+    PassingInterceptions: raw.PassingInterceptions,
+    RushingAttempts: raw.RushingAttempts,
+    RushingYards: raw.RushingYards,
+    RushingTouchdowns: raw.RushingTouchdowns,
+    Receptions: raw.Receptions,
+    ReceivingTargets: raw.ReceivingTargets,
+    ReceivingYards: raw.ReceivingYards,
+    ReceivingTouchdowns: raw.ReceivingTouchdowns,
+    ByeWeek: raw.ByeWeek,
+    AverageDraftPosition: raw.AverageDraftPosition,
+    AverageDraftPositionPPR: raw.AverageDraftPositionPPR,
+  };
+
+  const fantasy = transformFantasyPoints(sportsdataioLike);
+  
+  const meta: PlayerMeta = {
+    espnId: raw.PlayerID,
+    // ESPN doesn't provide these fields in projections, so they're null
+    number: null,
+    height: null,
+    weight: null,
+    age: null,
+    college: null,
+    experience: null,
+    status: null,
+    injuryStatus: null,
+    injuryBodyPart: null,
+    lastUpdated: null,
+  };
+  
+  return {
+    id: String(raw.PlayerID || ''),
+    name: raw.Name || '',
+    position: (raw.Position || '') as FantasyPosition,
+    team: raw.Team || '',
+    bye: raw.ByeWeek ?? null,
+    headshotUrl: null, // ESPN projections don't include headshots
+    proj: formatNumber(fantasy.ppr),
+    adp: raw.AverageDraftPositionPPR ?? raw.AverageDraftPosition ?? null,
+    projections: transformProjections(sportsdataioLike),
+    stats: {},
+    adpData: transformADPData(sportsdataioLike),
+    meta,
   };
 }
 
