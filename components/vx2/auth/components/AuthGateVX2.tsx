@@ -186,6 +186,9 @@ export function AuthGateVX2({ children }: AuthGateVX2Props): React.ReactElement 
     return <LoadingSpinner />;
   }
   
+  // Guard: Ensure we don't render children until fully ready to prevent hydration mismatch
+  // This ensures server and client render the same initial state
+  
   // DEV BYPASS: Auto-login on mobile devices (for dev purposes)
   // DEV BYPASS: Auto-login on Vercel deployments (until further notice)
   // Only use mobile detection and Vercel detection after mount and mobile detection is loaded

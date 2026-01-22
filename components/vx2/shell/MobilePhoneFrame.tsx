@@ -678,6 +678,7 @@ export default function MobilePhoneFrame({
   return (
     <div 
       className={`${className}`}
+      suppressHydrationWarning
       style={{ 
         backgroundColor: '#0a0f1a',
         // Use fixed positioning to prevent any layout shifts
@@ -686,8 +687,10 @@ export default function MobilePhoneFrame({
         left: 0,
         right: 0,
         bottom: 0,
-        // Use stable viewport height
-        height: 'calc(var(--stable-vh, 1vh) * 100)',
+        // Use stable viewport height with SSR fallback
+        height: typeof window === 'undefined' 
+          ? '100vh' 
+          : 'calc(var(--stable-vh, 1vh) * 100)',
         // Center the phone frame using flexbox
         display: 'flex',
         alignItems: 'center',
