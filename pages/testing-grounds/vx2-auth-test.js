@@ -6,34 +6,14 @@
  */
 
 import React, { useState } from 'react';
-import dynamic from 'next/dynamic';
 import { 
+  AuthProvider,
   SignUpModal, 
   SignInModal, 
   ForgotPasswordModal, 
   ProfileSettingsModal,
   useAuth 
 } from '../../components/vx2/auth';
-
-// Make AuthProvider client-only to prevent hydration issues
-const AuthProvider = dynamic(
-  () => import('../../components/vx2/auth').then(mod => ({ default: mod.AuthProvider })),
-  { 
-    ssr: false,
-    loading: () => (
-      <div style={{ 
-        minHeight: '100vh', 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center',
-        backgroundColor: '#1a1a2e',
-        color: '#fff'
-      }}>
-        <div>Loading auth...</div>
-      </div>
-    )
-  }
-);
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS } from '../../components/vx2/core/constants/colors';
 import MobilePhoneFrame from '../../components/vx2/shell/MobilePhoneFrame';
 
@@ -312,25 +292,12 @@ function AuthTestPage() {
   );
 }
 
-// Make entire page client-only to prevent hydration issues
+// Disable SSR for this page to prevent hydration issues
 // This page has complex components (MobilePhoneFrame, modals) that can cause mismatches
-// Use a wrapper function to properly export the dynamic component
-function ClientAuthTestPage() {
-  return <AuthTestPage />;
+export async function getServerSideProps() {
+  return {
+    props: {},
+  };
 }
 
-export default dynamic(() => Promise.resolve(ClientAuthTestPage), { 
-  ssr: false,
-  loading: () => (
-    <div style={{ 
-      minHeight: '100vh', 
-      display: 'flex', 
-      alignItems: 'center', 
-      justifyContent: 'center',
-      backgroundColor: '#1a1a2e',
-      color: '#fff'
-    }}>
-      <div>Loading auth test page...</div>
-    </div>
-  )
-});
+export default AuthTestPage;
