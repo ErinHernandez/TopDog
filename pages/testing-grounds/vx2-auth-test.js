@@ -18,7 +18,21 @@ import {
 // Make AuthProvider client-only to prevent hydration issues
 const AuthProvider = dynamic(
   () => import('../../components/vx2/auth').then(mod => ({ default: mod.AuthProvider })),
-  { ssr: false }
+  { 
+    ssr: false,
+    loading: () => (
+      <div style={{ 
+        minHeight: '100vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        backgroundColor: '#1a1a2e',
+        color: '#fff'
+      }}>
+        <div>Loading auth...</div>
+      </div>
+    )
+  }
 );
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS } from '../../components/vx2/core/constants/colors';
 import MobilePhoneFrame from '../../components/vx2/shell/MobilePhoneFrame';
