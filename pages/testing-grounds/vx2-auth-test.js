@@ -312,11 +312,8 @@ function AuthTestPage() {
   );
 }
 
-// Disable static generation - this page requires client-side auth
-export async function getServerSideProps() {
-  return {
-    props: {},
-  };
-}
+// Make entire page client-only to prevent hydration issues
+// This page has complex components (MobilePhoneFrame, modals) that can cause mismatches
+const ClientAuthTestPage = dynamic(() => Promise.resolve(AuthTestPage), { ssr: false });
 
-export default AuthTestPage;
+export default ClientAuthTestPage;
