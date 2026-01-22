@@ -12,12 +12,12 @@ importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-comp
 
 // Firebase configuration (injected from environment variables)
 const firebaseConfig = {
-  apiKey: "AIzaSyD3FtIzbb1HwEa1juMYk1XSWB4tvbd6oBg",
-  authDomain: "topdog-e9d48.firebaseapp.com",
-  projectId: "topdog-e9d48",
-  storageBucket: "topdog-e9d48.firebasestorage.app",
-  messagingSenderId: "410904939799",
-  appId: "1:410904939799:web:352b9748425c9274f3fb52"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 
 // Initialize Firebase

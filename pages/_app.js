@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { SWRConfig } from 'swr';
+import { Analytics } from '@vercel/analytics/next';
 import '../styles/globals.css'
 import '../styles/legacy-support.css'
 import '../styles/device-sizing.css'
@@ -108,6 +109,7 @@ function MyApp({ Component, pageProps }) {
     <SWRConfig value={swrConfig}>
       <UserProvider>
         <PlayerDataProvider>
+          <Analytics />
           <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', position: 'relative' }}>
             {!isLandingPage && !isDraftRoom && !isDevDraftNavbar && !isMobileDemo && !isTestingGrounds && !isProfileCustomization && !isMobileProfileCustomization && <Navbar />}
             <div 
