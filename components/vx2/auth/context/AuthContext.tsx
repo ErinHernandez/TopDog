@@ -288,9 +288,11 @@ export function AuthProvider({
     const safeValue = createBuildTimeSafeDefaults();
     return (
       <AuthContext.Provider value={safeValue}>
-        {children}
+        <div suppressHydrationWarning>
+          {children}
+        </div>
         {/* Invisible recaptcha container for phone auth */}
-        <div id="recaptcha-container" />
+        <div id="recaptcha-container" suppressHydrationWarning />
       </AuthContext.Provider>
     );
   }
@@ -912,9 +914,11 @@ export function AuthProvider({
   
   return (
     <AuthContext.Provider value={value}>
-      {children}
+      <div suppressHydrationWarning>
+        {children}
+      </div>
       {/* Invisible recaptcha container for phone auth */}
-      <div id="recaptcha-container" />
+      <div id="recaptcha-container" suppressHydrationWarning />
     </AuthContext.Provider>
   );
 }
