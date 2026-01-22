@@ -32,6 +32,7 @@ import {
   where, 
   getDocs, 
   doc, 
+  getDoc,
   setDoc,
   serverTimestamp,
   runTransaction
@@ -251,7 +252,26 @@ export default async function handler(req, res) {
     let result;
     try {
       result = await runTransaction(db, async (transaction) => {
-        // Check if username exists
+        // Check usernames collection first (O(1) lookup)
+        const usernameRef = doc(db, 'usernames', normalizedUsername);
+        const usernameDoc = await transaction.get(usernameRef);
+        
+        if (usernameDoc.exists()) {
+          const data = usernameDoc.data();
+          // Check if it's a recycled username that's still in cooldown
+          if (data.recycledAt) {
+            const recycledTime = data.recycledAt?.toMillis?.() || data.recycledAt;
+            const RECYCLING_COOLDOWN_MS = 90 * 24 * 60 * 60 * 1000; // 90 days
+            if (Date.now() - recycledTime < RECYCLING_COOLDOWN_MS) {
+              throw new Error('USERNAME_IN_COOLDOWN');
+            }
+            // Cooldown expired, can reuse
+          } else {
+            throw new Error('USERNAME_TAKEN');
+          }
+        }
+        
+        // Also check users collection for backward compatibility
         const usersQuery = query(
           collection(db, 'users'),
           where('username', '==', normalizedUsername)
@@ -280,32 +300,41 @@ export default async function handler(req, res) {
           }
         }
       
-      // Create user profile
-      const userProfile = {
-        uid,
-        username: normalizedUsername,
-        email: email || null,
-        countryCode,
-        displayName: displayName || normalizedUsername,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-        lastLogin: serverTimestamp(),
-        isActive: true,
-        profileComplete: true,
-        tournamentsEntered: 0,
-        tournamentsWon: 0,
-        totalWinnings: 0,
-        bestFinish: null,
-        preferences: {
-          notifications: true,
-          emailUpdates: true,
-          publicProfile: true,
-          borderColor: '#4285F4',
-        },
-      };
-      
-      const userRef = doc(db, 'users', uid);
-      transaction.set(userRef, userProfile);
+        // Create user profile
+        const userProfile = {
+          uid,
+          username: normalizedUsername,
+          email: email || null,
+          countryCode,
+          displayName: displayName || normalizedUsername,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+          lastLogin: serverTimestamp(),
+          isActive: true,
+          profileComplete: true,
+          tournamentsEntered: 0,
+          tournamentsWon: 0,
+          totalWinnings: 0,
+          bestFinish: null,
+          preferences: {
+            notifications: true,
+            emailUpdates: true,
+            publicProfile: true,
+            borderColor: '#4285F4',
+          },
+        };
+        
+        const userRef = doc(db, 'users', uid);
+        transaction.set(userRef, userProfile);
+        
+        // Also reserve in usernames collection for O(1) lookups
+        transaction.set(usernameRef, {
+          uid,
+          username: normalizedUsername,
+          createdAt: serverTimestamp(),
+          previousOwner: null,
+          recycledAt: null,
+        });
       
         return userProfile;
       });
@@ -321,6 +350,14 @@ export default async function handler(req, res) {
         return res.status(409).json({
           success: false,
           error: 'USERNAME_TAKEN',
+          message: 'Username unavailable',
+        });
+      }
+      
+      if (transactionError.message === 'USERNAME_IN_COOLDOWN') {
+        return res.status(409).json({
+          success: false,
+          error: 'USERNAME_IN_COOLDOWN',
           message: 'Username unavailable',
         });
       }

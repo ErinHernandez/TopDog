@@ -20,8 +20,8 @@ jest.mock('../../../lib/firebase-utils', () => ({
 
 // Mock micro buffer
 jest.mock('micro', () => ({
-  buffer: jest.fn().mockImplementation((req) => {
-    return Promise.resolve(Buffer.from((req as any)._mockBody || '{}'));
+  buffer: jest.fn().mockImplementation((req: NextApiRequest) => {
+    return Promise.resolve(Buffer.from((req as NextApiRequest & { _mockBody?: string })._mockBody || '{}'));
   }),
 }));
 

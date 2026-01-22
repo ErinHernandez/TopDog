@@ -77,6 +77,8 @@ export const SLOW_DRAFT_COLORS = {
   events: {
     reach: '#F59E0B',      // Amber - overpaid
     reachBg: 'rgba(245, 158, 11, 0.15)',
+    steal: '#10B981',      // Green - good value
+    stealBg: 'rgba(16, 185, 129, 0.15)',
     alert: '#EF4444',      // Red - queue taken
     alertBg: 'rgba(239, 68, 68, 0.15)',
     positionRun: '#8B5CF6', // Purple

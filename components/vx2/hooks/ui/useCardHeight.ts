@@ -345,6 +345,8 @@ export function useCardHeight(options: UseCardHeightOptions = {}): CardHeightRes
     statusBarHeight: number;
   } | null>(null);
 
+  // Initialize isReady as false to ensure consistent server/client rendering
+  // Components should wait for isReady before using dimensions
   const [isReady, setIsReady] = useState(false);
   const [, forceUpdate] = useState(0);
 

@@ -216,7 +216,7 @@ function InputStep({
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
               onFocus={() => setTouched(false)}
               onBlur={() => setTouched(true)}
               placeholder="you@example.com"
@@ -360,7 +360,7 @@ function CodeStep({
   
   useEffect(() => {
     if (cooldown > 0) {
-      const timer = setTimeout(() => setCooldown(c => c - 1), 1000);
+      const timer = setTimeout(() => setCooldown((c: number) => c - 1), 1000);
       return () => clearTimeout(timer);
     }
     return undefined;
@@ -440,7 +440,7 @@ function CodeStep({
         <input
           type="text"
           value={code}
-          onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
           placeholder="000000"
           maxLength={6}
           autoFocus
@@ -603,7 +603,7 @@ function NewPasswordStep({
           <input
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
             placeholder="New password"
             autoComplete="new-password"
             autoFocus
@@ -624,7 +624,7 @@ function NewPasswordStep({
           <input
             type="password"
             value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
             placeholder="Confirm new password"
             autoComplete="new-password"
             disabled={isLoading}

@@ -105,10 +105,13 @@ export default function Countdown({
   dangerThreshold = 10,
   className = '',
 }: CountdownProps): React.ReactElement {
+  const [isMounted, setIsMounted] = useState(false);
+  
+  // CRITICAL: Always initialize with SSR-safe defaults to prevent hydration mismatch
+  // Don't calculate timeLeft with Date.now() during initial render
+  // Will be updated in useEffect after mount (client-side only)
   const [timeLeft, setTimeLeft] = useState<TimeLeft>(() => {
-    if (targetDate) {
-      return calculateTimeLeft(targetDate);
-    }
+    // If using initialSeconds (static prop), use it directly (SSR-safe)
     if (initialSeconds !== undefined) {
       return {
         days: 0,
@@ -118,8 +121,19 @@ export default function Countdown({
         total: initialSeconds,
       };
     }
+    // For targetDate, return safe defaults - will be calculated after mount
+    // This ensures server and client render the same initial HTML
     return { days: 0, hours: 0, minutes: 0, seconds: 0, total: 0 };
   });
+  
+  // Track mount state for targetDate (prevents hydration mismatch)
+  useEffect(() => {
+    setIsMounted(true);
+    if (targetDate) {
+      // Update immediately after mount
+      setTimeLeft(calculateTimeLeft(targetDate));
+    }
+  }, [targetDate]);
 
   const sizeStyle = SIZE_STYLES[size];
 
@@ -159,6 +173,19 @@ export default function Countdown({
     if (timeLeft.total <= warningThreshold) return '#F59E0B';
     return TEXT_COLORS.primary;
   }, [timeLeft.total, dangerThreshold, warningThreshold]);
+
+  // For targetDate, show placeholder until mounted to prevent hydration mismatch
+  // Server and client must render the same initial HTML
+  if (targetDate && !isMounted) {
+    return (
+      <div
+        className={`font-bold tabular-nums ${className}`}
+        style={{ fontSize: SIZE_STYLES[size].fontSize, color: TEXT_COLORS.primary }}
+      >
+        —:—:—
+      </div>
+    );
+  }
 
   if (timeLeft.total <= 0) {
     return (

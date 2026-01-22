@@ -162,7 +162,7 @@ function Input({
           ref={inputRef}
           type={type}
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
           onBlur={onBlur}
           onFocus={onFocus}
           placeholder={placeholder}
@@ -696,7 +696,7 @@ export function LoginScreenVX2({
             <input
               type="text"
               value={phoneCode}
-              onChange={(e) => setPhoneCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPhoneCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
               placeholder="000000"
               autoComplete="one-time-code"
               disabled={isLoading}

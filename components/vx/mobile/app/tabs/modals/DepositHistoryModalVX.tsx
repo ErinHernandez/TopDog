@@ -237,9 +237,19 @@ interface TransactionCardProps {
 }
 
 function TransactionCard({ transaction }: TransactionCardProps): React.ReactElement {
+  const [isMounted, setIsMounted] = useState(false);
+  
+  // Track mount state to prevent hydration mismatch with toLocaleDateString
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+  
   const isDeposit = transaction.type === 'deposit';
   const statusColor = STATUS_COLORS[transaction.status];
   const amountColor = isDeposit ? '#10B981' : '#EF4444';
+  
+  // Use safe placeholder during SSR/initial render, then format after mount
+  const formattedDate = isMounted ? formatDate(transaction.date) : '—';
 
   return (
     <div 
@@ -292,7 +302,7 @@ function TransactionCard({ transaction }: TransactionCardProps): React.ReactElem
               className="text-xs"
               style={{ color: TEXT_COLORS.muted }}
             >
-              {formatDate(transaction.date)}
+              {formattedDate}
             </p>
           </div>
         </div>

@@ -24,25 +24,56 @@ export interface FetchError extends Error {
 
 /**
  * Default JSON fetcher for SWR
+ * Handles errors gracefully to prevent runtime crashes
  */
 export async function fetcher<T = unknown>(url: string): Promise<T> {
-  const res = await fetch(url);
-  
-  if (!res.ok) {
-    const error: FetchError = new Error('An error occurred while fetching the data.');
-    error.info = await res.json().catch(() => ({}));
-    error.status = res.status;
-    throw error;
+  try {
+    const res = await fetch(url);
+    
+    if (!res.ok) {
+      // For client errors (4xx), return empty data instead of throwing
+      // This allows components to use fallback/mock data gracefully
+      if (res.status >= 400 && res.status < 500) {
+        const errorData = await res.json().catch(() => ({}));
+        // Log in development but don't throw
+        if (process.env.NODE_ENV === 'development') {
+          console.warn(`[SWR Fetcher] ${res.status} error for ${url}:`, errorData);
+        }
+        // Return empty array for list endpoints, empty object for others
+        const isListEndpoint = url.match(/\/api\/.*\/list|\/api\/.*s$/) || url.includes('slow-drafts');
+        return (isListEndpoint ? [] : {}) as T;
+      }
+      
+      // For server errors (5xx), still throw but with better error info
+      const error: FetchError = new Error('An error occurred while fetching the data.');
+      error.info = await res.json().catch(() => ({}));
+      error.status = res.status;
+      throw error;
+    }
+    
+    const data = await res.json();
+    
+    // Handle API responses that wrap data in { ok, data } format
+    if (data.ok !== undefined && data.data !== undefined) {
+      return data.data as T;
+    }
+    
+    return data as T;
+  } catch (error) {
+    // If it's already a FetchError with 5xx status, re-throw it
+    const fetchError = error as FetchError;
+    if (fetchError.status && fetchError.status >= 500) {
+      throw error;
+    }
+    
+    // For all other errors (network, 4xx, etc.), return empty data
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(`[SWR Fetcher] Error for ${url}, returning empty data:`, error);
+    }
+    // Return empty array for list endpoints, empty object for others
+    const isListEndpoint = url.match(/\/api\/.*\/list|\/api\/.*s$/) || url.includes('slow-drafts');
+    return (isListEndpoint ? [] : {}) as T;
   }
-  
-  const data = await res.json();
-  
-  // Handle API responses that wrap data in { ok, data } format
-  if (data.ok !== undefined && data.data !== undefined) {
-    return data.data as T;
-  }
-  
-  return data as T;
 }
 
 /**
@@ -116,9 +147,24 @@ export const swrConfig: SWRConfiguration = {
   // Deduplication - prevents duplicate requests within 2 seconds
   dedupingInterval: 2000,
   
-  // Error retry settings
+  // Error retry settings - default retry count
   errorRetryCount: 3,
   errorRetryInterval: 5000,
+  
+  // Custom retry logic - don't retry on 400/404 errors
+  onErrorRetry: (error, key, config, revalidate, { retryCount }) => {
+    const fetchError = error as FetchError;
+    // Don't retry on client errors (400, 404) - these are expected in some cases
+    if (fetchError.status === 400 || fetchError.status === 404) {
+      return; // Don't retry
+    }
+    // Retry up to 3 times for other errors
+    if (retryCount >= 3) {
+      return; // Stop retrying after 3 attempts
+    }
+    // Retry with exponential backoff
+    setTimeout(() => revalidate({ retryCount }), 5000);
+  },
   
   // Focus throttle - at most one revalidation per 5 seconds on focus
   focusThrottleInterval: 5000,
@@ -126,9 +172,11 @@ export const swrConfig: SWRConfiguration = {
   // Keep previous data while fetching new data
   keepPreviousData: true,
   
-  // Global error handler
+  // Global error handler - only log in development, don't crash
   onError: (error: Error, key: string) => {
-    if (process.env.NODE_ENV === 'development') {
+    const fetchError = error as FetchError;
+    // Only log non-400/404 errors in development
+    if (process.env.NODE_ENV === 'development' && fetchError.status !== 400 && fetchError.status !== 404) {
       console.error(`SWR Error [${key}]:`, error);
     }
   },

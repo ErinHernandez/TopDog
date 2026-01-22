@@ -111,19 +111,11 @@ function VX2MobileAppDemo() {
     saveDevices(allDevices);
   };
   
-  // Always use 'lobby' as initial tab to prevent hydration mismatch
-  // SessionStorage flag will be handled after mount if needed
-  const initialTab = 'lobby';
-  
-  React.useEffect(() => {
-    if (!router.isReady || typeof window === 'undefined') return;
-    
-    // Clean up URL query param if present
-    if (router.query.tab) {
-      router.replace('/testing-grounds/vx2-mobile-app-demo', undefined, { shallow: true });
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- router object changes on every render, only need specific props
-  }, [router.isReady, router.query.tab]);
+  // Support deep-linking to specific tabs via query param
+  // Valid tabs: 'lobby', 'my-teams', 'slow-drafts', 'profile'
+  const validTabs = ['lobby', 'my-teams', 'slow-drafts', 'profile'];
+  const queryTab = router.query.tab;
+  const initialTab = validTabs.includes(queryTab) ? queryTab : 'lobby';
   
   // Track tab changes for debugging
   const handleTabChange = (fromTab, toTab) => {

@@ -85,7 +85,7 @@ function PlayerMiniCard({ pick, onTap }: PlayerMiniCardProps): React.ReactElemen
         height: SLOW_DRAFT_LAYOUT.expandedPlayerCardHeight,
         backgroundColor: 'rgba(255, 255, 255, 0.06)',
         borderRadius: 8,
-        padding: 6,
+        padding: 4,
         border: `2px solid ${positionColor}`,
       }}
     >
@@ -94,11 +94,11 @@ function PlayerMiniCard({ pick, onTap }: PlayerMiniCardProps): React.ReactElemen
         style={{
           backgroundColor: positionColor,
           color: pick.player.position === 'WR' ? '#000' : '#fff',
-          fontSize: 10,
+          fontSize: 9,
           fontWeight: 700,
-          padding: '2px 6px',
-          borderRadius: 4,
-          marginBottom: 4,
+          padding: '2px 5px',
+          borderRadius: 3,
+          marginBottom: 3,
         }}
       >
         {pick.player.position}
@@ -114,6 +114,7 @@ function PlayerMiniCard({ pick, onTap }: PlayerMiniCardProps): React.ReactElemen
           display: '-webkit-box',
           WebkitLineClamp: 2,
           WebkitBoxOrient: 'vertical',
+          fontSize: 11,
         }}
       >
         {truncatedName}
@@ -124,6 +125,7 @@ function PlayerMiniCard({ pick, onTap }: PlayerMiniCardProps): React.ReactElemen
         style={{
           ...SLOW_DRAFT_TYPOGRAPHY.playerPosition,
           marginTop: 'auto',
+          fontSize: 9,
         }}
       >
         {pick.player.team}

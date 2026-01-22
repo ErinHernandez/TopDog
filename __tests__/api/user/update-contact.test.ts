@@ -11,9 +11,20 @@
  */
 
 import { jest, describe, it, expect, beforeEach } from '@jest/globals';
+import type { NextApiRequest, NextApiResponse } from 'next';
+
+interface MockLogger {
+  info: jest.Mock;
+  error: jest.Mock;
+  warn: jest.Mock;
+  debug: jest.Mock;
+}
+
+type InternalHandlerFn = (req: NextApiRequest, res: NextApiResponse, logger: MockLogger) => Promise<void>;
+type ApiHandlerFn = (req: NextApiRequest, res: NextApiResponse) => Promise<void>;
 
 jest.mock('../../../lib/apiErrorHandler', () => ({
-  withErrorHandling: jest.fn((req, res, handler) => handler(req, res, {
+  withErrorHandling: jest.fn((req: NextApiRequest, res: NextApiResponse, handler: InternalHandlerFn) => handler(req, res, {
     info: jest.fn(),
     error: jest.fn(),
     warn: jest.fn(),
@@ -42,14 +53,14 @@ const { getDb } = require('../../../lib/firebase-utils');
 const { doc, updateDoc } = require('firebase/firestore');
 
 describe('/api/user/update-contact', () => {
-  let handler;
+  let handler: ApiHandlerFn;
 
   beforeEach(() => {
     jest.clearAllMocks();
     jest.resetModules();
-    
+
     getDb.mockReturnValue({});
-    doc.mockImplementation((db, collection, id) => ({ db, collection, id }));
+    doc.mockImplementation((db: unknown, collection: string, id: string) => ({ db, collection, id }));
     
     // Import handler after mocks are set up
     handler = require('../../../pages/api/user/update-contact').default;

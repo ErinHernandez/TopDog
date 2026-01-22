@@ -271,7 +271,8 @@ export const SORT_OPTIONS: { value: SortOption; label: string }[] = [
 
 export type FilterOption =
   | 'all'
-  | 'myTurnOnly';
+  | 'myTurnOnly'
+  | 'needsAttention';
 
 export const FILTER_OPTIONS: { value: FilterOption; label: string; description: string }[] = [
   { value: 'all', label: 'All Drafts', description: 'Show all active slow drafts' },

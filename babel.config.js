@@ -13,7 +13,7 @@ module.exports = {
         // This ensures optional chaining (?.) and nullish coalescing (??)
         // are transpiled for iOS 12+ support
         useBuiltIns: false, // Don't auto-inject polyfills (Next.js handles this)
-        bugfixes: true, // Use smaller output with modern transforms where possible
+        // bugfixes: true, // Disabled to avoid requiring @babel/plugin-bugfix-firefox-class-in-computed-class-key
       },
     ],
     '@babel/preset-react',

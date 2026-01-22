@@ -48,6 +48,7 @@ export interface RecentPick {
 
 export type NotableEventType =
   | 'reach'           // Player taken early
+  | 'steal'           // Player fell late
   | 'position_run'    // 3+ same position in a row
   | 'queue_alert'     // Your queued player was taken
   | 'competitor_alert'; // Key pickup by leader

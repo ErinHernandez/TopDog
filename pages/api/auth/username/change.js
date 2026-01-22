@@ -353,6 +353,25 @@ const handler = async function(req, res) {
           throw new Error('USERNAME_CHANGED');
         }
         
+        // Check new username in usernames collection (O(1) lookup)
+        const newUsernameRef = doc(db, 'usernames', normalizedNewUsername);
+        const newUsernameDoc = await transaction.get(newUsernameRef);
+        
+        if (newUsernameDoc.exists()) {
+          const data = newUsernameDoc.data();
+          // Check if it's a recycled username that's still in cooldown
+          if (data.recycledAt) {
+            const recycledTime = data.recycledAt?.toMillis?.() || data.recycledAt;
+            const RECYCLING_COOLDOWN_MS = 90 * 24 * 60 * 60 * 1000; // 90 days
+            if (Date.now() - recycledTime < RECYCLING_COOLDOWN_MS) {
+              throw new Error('NEW_USERNAME_IN_COOLDOWN');
+            }
+            // Cooldown expired, can reuse
+          } else {
+            throw new Error('NEW_USERNAME_TAKEN');
+          }
+        }
+        
         // Update user profile
         const currentChangeCount = currentUserData.usernameChangeCount || 0;
         transaction.update(userRef, {
@@ -361,6 +380,26 @@ const handler = async function(req, res) {
           lastUsernameChange: serverTimestamp(),
           usernameChangeCount: currentChangeCount + 1,
           updatedAt: serverTimestamp(),
+        });
+        
+        // Update usernames collection: release old, reserve new
+        const oldUsernameRef = doc(db, 'usernames', oldUsername);
+        
+        // Mark old username as recycled (90-day cooldown before reuse)
+        transaction.set(oldUsernameRef, {
+          uid: null,
+          username: oldUsername,
+          previousOwner: authResult.uid,
+          recycledAt: serverTimestamp(),
+        }, { merge: true });
+        
+        // Reserve new username
+        transaction.set(newUsernameRef, {
+          uid: authResult.uid,
+          username: normalizedNewUsername,
+          createdAt: serverTimestamp(),
+          previousOwner: null,
+          recycledAt: null,
         });
         
         // Create audit record
@@ -391,6 +430,34 @@ const handler = async function(req, res) {
         return res.status(409).json({
           success: false,
           error: 'USERNAME_CHANGED',
+          message: errorResponse.body.message,
+        });
+      }
+      
+      if (transactionError.message === 'NEW_USERNAME_TAKEN') {
+        const errorResponse = createErrorResponse(
+          ErrorType.VALIDATION,
+          'Username unavailable',
+          {},
+          res.getHeader('X-Request-ID')
+        );
+        return res.status(409).json({
+          success: false,
+          error: 'USERNAME_TAKEN',
+          message: errorResponse.body.message,
+        });
+      }
+      
+      if (transactionError.message === 'NEW_USERNAME_IN_COOLDOWN') {
+        const errorResponse = createErrorResponse(
+          ErrorType.VALIDATION,
+          'Username unavailable',
+          {},
+          res.getHeader('X-Request-ID')
+        );
+        return res.status(409).json({
+          success: false,
+          error: 'USERNAME_IN_COOLDOWN',
           message: errorResponse.body.message,
         });
       }

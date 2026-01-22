@@ -116,7 +116,17 @@ function PaymentCard({
   onCancel,
   isCancelling,
 }: PaymentCardProps): React.ReactElement {
-  const timeInfo = formatTimeRemaining(payment.expiresAt);
+  const [isMounted, setIsMounted] = useState(false);
+  
+  // Track mount state to prevent hydration mismatch with Date.now()
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+  
+  // Use safe placeholder during SSR/initial render, then calculate after mount
+  const timeInfo = isMounted 
+    ? formatTimeRemaining(payment.expiresAt)
+    : { text: '—', isExpiringSoon: false, isExpired: false };
   const isDisabled = timeInfo.isExpired || payment.status !== 'pending';
   
   return (

@@ -1718,11 +1718,21 @@ export default function MyTeamsTabVX2({
   const [teams, setTeams] = useState<MyTeam[]>(initialTeams);
   
   // Sort state management
+  // CRITICAL: Initialize with default state to prevent hydration mismatch
+  // Load from localStorage in useEffect after mount (client-side only)
   const [sortState, setSortState] = useState<SortState>(() => {
-    // Try to load from localStorage on initial mount
-    const saved = loadSortPreferences();
-    return saved || getDefaultSortState();
+    // Always return default state on initial render (both server and client)
+    // This ensures server and client render the same HTML during hydration
+    return getDefaultSortState();
   });
+
+  // Load sort preferences from localStorage after mount (client-side only)
+  useEffect(() => {
+    const saved = loadSortPreferences();
+    if (saved) {
+      setSortState(saved);
+    }
+  }, []);
   
   // Save sort preferences when they change
   const handleSortChange = useCallback((newTeamSort: TeamSortState) => {

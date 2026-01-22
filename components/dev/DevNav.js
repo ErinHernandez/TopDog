@@ -101,6 +101,7 @@ const DEV_AUTH_OVERRIDE_KEY = 'devnav-auth-override'; // 'logged-in' | 'logged-o
 // VX2 components are the current/active development - put them first
 const DEFAULT_LINKS = [
   { id: 'vx2-shell', href: '/testing-grounds/vx2-mobile-app-demo', label: 'Mobile App (VX2)', bgColor: '#14532D', bgColorActive: '#1F4D3A', textColor: '#86EFAC' },
+  { id: 'vx2-lobby', href: '/testing-grounds/vx2-mobile-app-demo?tab=lobby', label: 'Lobby Tab (VX2)', bgColor: '#14532D', bgColorActive: '#1F4D3A', textColor: '#86EFAC' },
   { id: 'vx2-draft', href: '/testing-grounds/vx2-draft-room', label: 'Draft Room (VX2)', bgColor: '#14532D', bgColorActive: '#1F4D3A', textColor: '#86EFAC' },
   { id: 'vx2-tablet', href: '/testing-grounds/vx2-tablet-draft-room', label: 'Tablet Draft (VX2)', bgColor: '#14532D', bgColorActive: '#1F4D3A', textColor: '#86EFAC' },
   { id: 'slow-draft-sandbox', href: '/testing-grounds/slow-draft-sandbox', label: 'Slow Draft Sandbox', bgColor: '#14532D', bgColorActive: '#1F4D3A', textColor: '#86EFAC' },

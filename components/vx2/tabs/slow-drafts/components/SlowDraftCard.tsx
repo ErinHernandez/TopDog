@@ -4,7 +4,6 @@
  * Transforms each draft into a visual fingerprint with:
  * - Roster strip for instant recognition
  * - Position needs at a glance
- * - Notable events feed
  * - Quick actions without entering draft room
  *
  * Supports collapsed (compact) and expanded (full detail) states.
@@ -31,14 +30,13 @@ import PositionNeedsIndicator from './PositionNeedsIndicator';
 // ============================================================================
 
 function formatTimeRemaining(seconds: number): { text: string; isUrgent: boolean; isCritical: boolean } {
-  const days = Math.floor(seconds / 86400);
-  const hours = Math.floor((seconds % 86400) / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
+  // Cap display at 12 hours (43200 seconds)
+  const displaySeconds = Math.min(seconds, 43200);
+  const hours = Math.floor(displaySeconds / 3600);
+  const minutes = Math.floor((displaySeconds % 3600) / 60);
 
   let text: string;
-  if (days > 0) {
-    text = `${days}d ${hours}h`;
-  } else if (hours > 0) {
+  if (hours > 0) {
     text = `${hours}h ${minutes}m`;
   } else if (minutes > 0) {
     text = `${minutes}m`;
@@ -56,7 +54,7 @@ function formatTimeRemaining(seconds: number): { text: string; isUrgent: boolean
 function formatPickInfo(draft: SlowDraft): string {
   const round = draft.currentRound;
   const pickInRound = ((draft.pickNumber - 1) % draft.teamCount) + 1;
-  return `Pick ${round}.${pickInRound.toString().padStart(2, '0')} • Round ${round} of ${draft.totalRounds}`;
+  return `Pick ${round}.${pickInRound.toString().padStart(2, '0')}`;
 }
 
 function getTimerColor(timeInfo: { isUrgent: boolean; isCritical: boolean }): string {
@@ -113,15 +111,6 @@ function DraftProgressBar({ currentRound, totalRounds, isYourTurn }: DraftProgre
           }}
         >
           Round {currentRound}/{totalRounds}
-        </span>
-
-        <span
-          style={{
-            fontSize: 11,
-            color: 'rgba(255, 255, 255, 0.35)',
-          }}
-        >
-          {Math.round(progress)}% complete
         </span>
       </div>
     </div>
@@ -293,7 +282,7 @@ export default function SlowDraftCard({
               >
                 {draft.tournamentName}
               </h3>
-              <p style={SLOW_DRAFT_TYPOGRAPHY.pickInfo}>
+              <p style={{ color: SLOW_DRAFT_TYPOGRAPHY.pickInfo.color }}>
                 {formatPickInfo(draft)}
               </p>
             </div>
@@ -301,7 +290,22 @@ export default function SlowDraftCard({
             {/* Right: Timer or status */}
             <div className="flex items-center gap-3 flex-shrink-0">
               {isYourTurn ? (
-                <OnTheClockBadge />
+                <div className="flex flex-col items-end gap-1">
+                  <OnTheClockBadge />
+                  {timeInfo && (
+                    <div
+                      style={{
+                        ...SLOW_DRAFT_TYPOGRAPHY.timer,
+                        color: getTimerColor(timeInfo),
+                        fontSize: 14,
+                        fontWeight: 700,
+                        lineHeight: 1,
+                      }}
+                    >
+                      {timeInfo.text}
+                    </div>
+                  )}
+                </div>
               ) : (
                 <div className="text-right">
                   {draft.picksAway > 0 && (
@@ -318,9 +322,12 @@ export default function SlowDraftCard({
                   {timeInfo && (
                     <div
                       style={{
-                        fontSize: 12,
+                        ...SLOW_DRAFT_TYPOGRAPHY.timer,
+                        fontSize: 14,
+                        fontWeight: 600,
                         color: getTimerColor(timeInfo),
                         marginTop: 2,
+                        lineHeight: 1,
                       }}
                     >
                       ⏱ {timeInfo.text}

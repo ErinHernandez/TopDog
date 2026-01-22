@@ -229,18 +229,6 @@ export default function PositionNeedsIndicator({
             • {flexRemaining} FLEX
           </span>
         )}
-
-        {/* All good indicator */}
-        {urgentNeeds.length === 0 && flexRemaining > 0 && (
-          <span
-            style={{
-              ...SLOW_DRAFT_TYPOGRAPHY.needsText,
-              color: SLOW_DRAFT_COLORS.needs.good,
-            }}
-          >
-            Position mins met
-          </span>
-        )}
       </div>
     );
   }
@@ -248,15 +236,6 @@ export default function PositionNeedsIndicator({
   // Expanded mode: Full breakdown
   return (
     <div>
-      <div
-        style={{
-          ...SLOW_DRAFT_TYPOGRAPHY.sectionLabel,
-          marginBottom: SLOW_DRAFT_LAYOUT.sectionLabelMarginBottom,
-        }}
-      >
-        POSITION NEEDS
-      </div>
-
       <div className="flex flex-col gap-2">
         {needs.map((need) => (
           <PositionRow key={need.position} need={need} />

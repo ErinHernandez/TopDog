@@ -157,6 +157,15 @@ export default function SlowDraftsTabVX2({
     quickPick: hookQuickPick,
   } = useSlowDrafts({ userId });
 
+  // Debug: Log counts when they change
+  React.useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[SlowDraftsTabVX2] Counts updated:', counts, {
+        sortedFilteredDraftsCount: sortedFilteredDrafts.length,
+      });
+    }
+  }, [counts, sortedFilteredDrafts.length]);
+
   // Track expanded card
   const [expandedDraftId, setExpandedDraftId] = useState<string | null>(null);
 

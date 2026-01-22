@@ -4,32 +4,40 @@
  * A standalone page to test and develop SlowDraft components
  */
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import SlowDraftsTabVX2 from './SlowDraftsTabVX2';
 import { BG_COLORS } from './deps/core/constants/colors';
 import type { SlowDraft } from './types';
 
-export default function SlowDraftSandbox() {
-  const handleEnterDraft = (draft: SlowDraft) => {
+export default function SlowDraftSandbox(): React.ReactElement {
+  const handleEnterDraft = useCallback((draft: SlowDraft): void => {
     console.log('Enter draft:', draft);
     alert(`Entering draft: ${draft.tournamentName}`);
-  };
+  }, []);
 
-  const handleJoinDraft = () => {
+  const handleJoinDraft = useCallback((): void => {
     console.log('Join draft');
     alert('Join new slow draft');
-  };
+  }, []);
 
-  const handleQuickPick = async (draftId: string, playerId: string) => {
-    console.log('Quick pick:', { draftId, playerId });
-    alert(`Quick picking player ${playerId} in draft ${draftId}`);
-  };
+  const handleQuickPick = useCallback(
+    async (draftId: string, playerId: string): Promise<void> => {
+      try {
+        console.log('Quick pick:', { draftId, playerId });
+        alert(`Quick picking player ${playerId} in draft ${draftId}`);
+      } catch (error) {
+        console.error('Quick pick failed:', error);
+        alert('Failed to quick pick player');
+      }
+    },
+    []
+  );
 
   return (
     <div
       style={{
-        width: '100vw',
-        height: '100vh',
+        width: '100%',
+        height: '100%',
         backgroundColor: BG_COLORS.primary,
         display: 'flex',
         flexDirection: 'column',

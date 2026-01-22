@@ -21,8 +21,8 @@ jest.mock('../../../lib/firebase-utils', () => ({
 
 // Mock micro buffer
 jest.mock('micro', () => ({
-  buffer: jest.fn().mockImplementation((req) => {
-    return Promise.resolve(Buffer.from((req as any)._mockBody || '{}'));
+  buffer: jest.fn().mockImplementation((req: NextApiRequest) => {
+    return Promise.resolve(Buffer.from((req as NextApiRequest & { _mockBody?: string })._mockBody || '{}'));
   }),
 }));
 
@@ -165,7 +165,7 @@ describe('Xendit Webhook Integration', () => {
         metadata: { firebaseUserId: userId },
       });
       // Add required fields for VA detection
-      payload.callback_virtual_account_id = randomId('va');
+      // callback_virtual_account_id is now included in factory
       const payloadString = JSON.stringify(payload);
 
       const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
@@ -189,7 +189,7 @@ describe('Xendit Webhook Integration', () => {
         bank_code: 'MANDIRI',
         metadata: { firebaseUserId: 'user_va_mandiri' },
       });
-      payload.callback_virtual_account_id = randomId('va');
+      // callback_virtual_account_id is now included in factory
       const payloadString = JSON.stringify(payload);
 
       const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
@@ -215,7 +215,7 @@ describe('Xendit Webhook Integration', () => {
         currency: 'IDR',
         metadata: { firebaseUserId: 'user_idr' },
       });
-      payload.callback_virtual_account_id = randomId('va');
+      // callback_virtual_account_id is now included in factory
       const payloadString = JSON.stringify(payload);
 
       const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
@@ -496,7 +496,7 @@ describe('Xendit Webhook Integration', () => {
       const payload = xenditFactories.virtualAccountPaid({
         metadata: { firebaseUserId: 'user_error' },
       });
-      payload.callback_virtual_account_id = randomId('va');
+      // callback_virtual_account_id is now included in factory
       const payloadString = JSON.stringify(payload);
 
       mockHandleVAPayment.mockRejectedValue(new Error('Database connection failed'));
@@ -568,7 +568,7 @@ describe('Xendit Webhook Integration', () => {
         currency: 'IDR',
         metadata: { firebaseUserId: 'user_idr_full' },
       });
-      payload.callback_virtual_account_id = randomId('va');
+      // callback_virtual_account_id is now included in factory
       const payloadString = JSON.stringify(payload);
 
       const { req, res } = createMocks<NextApiRequest, NextApiResponse>({

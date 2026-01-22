@@ -31,6 +31,7 @@ import { initializeApp, getApps } from 'firebase/app';
 import { createUsernameCheckLimiter } from '../../../../lib/rateLimiter';
 import { generateUsernameSuggestions } from '../../../../lib/usernameSuggestions';
 import { findSimilarUsernames, generateSimilarityWarnings } from '../../../../lib/usernameSimilarity';
+import { isUsernameAvailable as checkUsernamesCollection } from '../../../../lib/usernamesCollection';
 import { logger } from '../../../../lib/structuredLogger';
 import { 
   withErrorHandling, 
@@ -223,43 +224,14 @@ export default async function handler(req, res) {
       return res.status(response.statusCode).json(response.body);
     }
     
-    // Step 2: Check VIP reservations
-    const vipQuery = query(
-      collection(db, 'vip_reservations'),
-      where('usernameLower', '==', normalizedUsername),
-      where('claimed', '==', false)
-    );
-    
-    const vipSnapshot = await getDocs(vipQuery);
-    let isVIPReserved = false;
+    // Step 2: Check usernames collection first (O(1) lookup)
+    const usernamesResult = await checkUsernamesCollection(normalizedUsername);
+    let isVIPReserved = usernamesResult.isVIPReserved || false;
     let suggestions = [];
     
-    if (!vipSnapshot.empty) {
-      const reservation = vipSnapshot.docs[0].data();
-      
-      // Check if not expired
-      const expiresAt = reservation.expiresAt?.toDate?.() || reservation.expiresAt;
-      if (!expiresAt || new Date(expiresAt) > new Date()) {
-        isVIPReserved = true;
-        // Generate suggestions even for VIP reserved usernames
-        suggestions = await generateUsernameSuggestions(normalizedUsername, 3);
-      }
-    }
-    
-    // Step 3: Check existing users
-    const usersQuery = query(
-      collection(db, 'users'),
-      where('username', '==', normalizedUsername)
-    );
-    
-    const usersSnapshot = await getDocs(usersQuery);
-    const isTaken = !usersSnapshot.empty;
-    
-    // Step 4: Generate suggestions if username is unavailable
-    if (isTaken || isVIPReserved) {
-      if (suggestions.length === 0) {
-        suggestions = await generateUsernameSuggestions(normalizedUsername, 3);
-      }
+    if (!usernamesResult.isAvailable) {
+      // Username is taken or reserved
+      suggestions = await generateUsernameSuggestions(normalizedUsername, 3);
       
       // Ensure consistent timing (add delay if needed)
       const elapsed = Date.now() - startTime;
@@ -272,6 +244,36 @@ export default async function handler(req, res) {
         message: 'Username unavailable',
         suggestions: suggestions.length > 0 ? suggestions : undefined,
         isVIPReserved,
+        warnings: validation.warnings,
+      }, 200, logger);
+      return res.status(response.statusCode).json(response.body);
+    }
+    
+    // Step 3: Also check users collection for backward compatibility
+    // (in case usernames collection is not fully migrated)
+    const usersQuery = query(
+      collection(db, 'users'),
+      where('username', '==', normalizedUsername)
+    );
+    
+    const usersSnapshot = await getDocs(usersQuery);
+    const isTaken = !usersSnapshot.empty;
+    
+    // Step 4: Generate suggestions if username is unavailable
+    if (isTaken) {
+      suggestions = await generateUsernameSuggestions(normalizedUsername, 3);
+      
+      // Ensure consistent timing (add delay if needed)
+      const elapsed = Date.now() - startTime;
+      if (elapsed < MIN_RESPONSE_TIME_MS) {
+        await new Promise(resolve => setTimeout(resolve, MIN_RESPONSE_TIME_MS - elapsed));
+      }
+      
+      const response = createSuccessResponse({
+        isAvailable: false,
+        message: 'Username unavailable',
+        suggestions: suggestions.length > 0 ? suggestions : undefined,
+        isVIPReserved: false,
         warnings: validation.warnings,
       }, 200, logger);
       return res.status(response.statusCode).json(response.body);

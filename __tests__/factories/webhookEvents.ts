@@ -487,6 +487,7 @@ export const xenditFactories = {
       payment_id: randomId('pay'),
       merchant_code: '12345',
       currency: 'IDR',
+      callback_virtual_account_id: randomId('va'), // For VA detection
       metadata: {
         firebaseUserId: randomId('user'),
         ...((overrides.metadata as Record<string, unknown>) || {}),

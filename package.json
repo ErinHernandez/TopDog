@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "next dev --turbo -H localhost",
+    "dev": "node scripts/ensure-manifests.js && next dev --webpack -H localhost",
     "build": "node scripts/generate-firebase-messaging-sw.js && next build && node scripts/merge-service-worker.js",
     "start": "next start",
     "lint": "next lint",

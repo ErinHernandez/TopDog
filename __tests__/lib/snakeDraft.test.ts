@@ -41,7 +41,7 @@ describe('Snake Draft Calculations', () => {
         [6, 5, 'Middle of round'],
         [11, 10, 'Second to last pick'],
         [12, 11, 'Last pick of round 1 goes to participant 11'],
-      ])('pick %i → participant %i (%s)', (pick, expected) => {
+      ])('pick %i → participant %i (%s)', (pick: number, expected: number) => {
         expect(getParticipantForPick(pick, 12)).toBe(expected);
       });
     });
@@ -53,7 +53,7 @@ describe('Snake Draft Calculations', () => {
         [18, 6, 'Middle of round 2'],
         [23, 1, 'Near end of round 2'],
         [24, 0, 'Last pick of round 2 goes to participant 0'],
-      ])('pick %i → participant %i (%s)', (pick, expected) => {
+      ])('pick %i → participant %i (%s)', (pick: number, expected: number) => {
         expect(getParticipantForPick(pick, 12)).toBe(expected);
       });
     });
@@ -63,7 +63,7 @@ describe('Snake Draft Calculations', () => {
         [25, 0, 'First pick of round 3 goes to participant 0'],
         [30, 5, 'Middle of round 3'],
         [36, 11, 'Last pick of round 3'],
-      ])('pick %i → participant %i (%s)', (pick, expected) => {
+      ])('pick %i → participant %i (%s)', (pick: number, expected: number) => {
         expect(getParticipantForPick(pick, 12)).toBe(expected);
       });
     });
@@ -72,7 +72,7 @@ describe('Snake Draft Calculations', () => {
       it.each([
         [37, 11, 'First pick of round 4'],
         [48, 0, 'Last pick of round 4'],
-      ])('pick %i → participant %i (%s)', (pick, expected) => {
+      ])('pick %i → participant %i (%s)', (pick: number, expected: number) => {
         expect(getParticipantForPick(pick, 12)).toBe(expected);
       });
     });
@@ -158,7 +158,7 @@ describe('Snake Draft Calculations', () => {
       [36, 3, 'Last pick of round 3'],
       [100, 9, 'Pick 100 is round 9'],
       [216, 18, 'Final pick is round 18'],
-    ])('pick %i → round %i (%s)', (pick, expectedRound) => {
+    ])('pick %i → round %i (%s)', (pick: number, expectedRound: number) => {
       expect(getRoundForPick(pick, 12)).toBe(expectedRound);
     });
 
@@ -198,7 +198,7 @@ describe('Snake Draft Calculations', () => {
       [15, 3, 'Third pick in round 2'],
       [24, 12, 'Last pick in round 2'],
       [25, 1, 'First pick in round 3'],
-    ])('pick %i → position %i in round (%s)', (pick, expectedPosition) => {
+    ])('pick %i → position %i in round (%s)', (pick: number, expectedPosition: number) => {
       expect(getPickInRound(pick, 12)).toBe(expectedPosition);
     });
 
@@ -233,7 +233,7 @@ describe('Snake Draft Calculations', () => {
     describe('odd rounds are NOT snake rounds (forward order)', () => {
       it.each([1, 3, 5, 7, 9, 11, 13, 15, 17])(
         'round %i is NOT a snake round',
-        (round) => {
+        (round: number) => {
           expect(isSnakeRound(round)).toBe(false);
         }
       );
@@ -242,7 +242,7 @@ describe('Snake Draft Calculations', () => {
     describe('even rounds ARE snake rounds (reverse order)', () => {
       it.each([2, 4, 6, 8, 10, 12, 14, 16, 18])(
         'round %i IS a snake round',
-        (round) => {
+        (round: number) => {
           expect(isSnakeRound(round)).toBe(true);
         }
       );
@@ -444,7 +444,7 @@ describe('Snake Draft Calculations', () => {
       [100, '9.04'],
       [145, '13.01'],
       [216, '18.12'],
-    ])('pick %i → "%s"', (pick, expected) => {
+    ])('pick %i → "%s"', (pick: number, expected: string) => {
       expect(formatPickNumber(pick, 12)).toBe(expected);
     });
 
@@ -479,7 +479,7 @@ describe('Snake Draft Calculations', () => {
       ['9.04', 100],
       ['13.01', 145],
       ['18.12', 216],
-    ])('"%s" → pick %i', (formatted, expected) => {
+    ])('"%s" → pick %i', (formatted: string, expected: number) => {
       expect(parsePickNumber(formatted, 12)).toBe(expected);
     });
 

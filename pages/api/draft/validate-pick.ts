@@ -298,13 +298,13 @@ export default async function handler(
     }
 
     const currentCount = positionCounts[playerPosition] || 0;
-    const limit = positionLimits[playerPosition] || DEFAULT_POSITION_LIMITS[playerPosition];
+    const positionLimit = positionLimits[playerPosition] || DEFAULT_POSITION_LIMITS[playerPosition];
 
-    if (currentCount >= limit) {
+    if (currentCount >= positionLimit) {
       return res.status(400).json({
         valid: false,
         errorCode: 'POSITION_LIMIT_REACHED',
-        errorMessage: `Position limit reached for ${playerPosition} (${currentCount}/${limit})`,
+        errorMessage: `Position limit reached for ${playerPosition} (${currentCount}/${positionLimit})`,
       });
     }
 

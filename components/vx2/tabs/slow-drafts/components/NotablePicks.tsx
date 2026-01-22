@@ -4,7 +4,7 @@
  * Surfaces interesting draft activity so users don't miss key moments.
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import type { NotablePicksProps, NotableEvent, NotableEventType } from '../types';
 import {
   SLOW_DRAFT_COLORS,
@@ -81,7 +81,14 @@ function formatPickNumber(pickNumber: number, teamCount: number = 12): string {
   return `${round}.${pickInRound.toString().padStart(2, '0')}`;
 }
 
-function formatTimestamp(timestamp: number): string {
+// Format timestamp with SSR-safe defaults to prevent hydration mismatch
+// Returns a placeholder during initial render, then updates after mount
+function formatTimestamp(timestamp: number, isMounted: boolean): string {
+  // During SSR and initial client render, return a safe placeholder
+  if (!isMounted) {
+    return '—'; // Placeholder that matches on server and client
+  }
+  
   const now = Date.now();
   const diffMs = now - timestamp;
   const diffMins = Math.floor(diffMs / 60000);
@@ -113,6 +120,12 @@ interface EventItemProps {
 
 function EventItem({ event, onTap }: EventItemProps): React.ReactElement {
   const style = getEventStyle(event.type);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Track mount state to prevent hydration mismatch with Date.now()
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   return (
     <button
@@ -225,7 +238,7 @@ function EventItem({ event, onTap }: EventItemProps): React.ReactElement {
           paddingTop: 2,
         }}
       >
-        {formatTimestamp(event.timestamp)}
+        {formatTimestamp(event.timestamp, isMounted)}
       </div>
     </button>
   );

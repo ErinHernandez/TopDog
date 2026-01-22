@@ -13,6 +13,7 @@ import {
   SLOW_DRAFT_TYPOGRAPHY,
   SLOW_DRAFT_LAYOUT,
 } from '../constants';
+import { TEXT_COLORS } from '../../../core/constants/colors';
 
 // ============================================================================
 // URGENCY HELPERS
@@ -28,19 +29,6 @@ function getUrgencyColor(urgency: PositionNeed['urgency']): string {
       return SLOW_DRAFT_COLORS.needs.good;
     default:
       return SLOW_DRAFT_COLORS.needs.neutral;
-  }
-}
-
-function getUrgencyIcon(urgency: PositionNeed['urgency']): string {
-  switch (urgency) {
-    case 'critical':
-      return '⚠️';
-    case 'warning':
-      return '⚡';
-    case 'good':
-      return '✓';
-    default:
-      return '';
   }
 }
 
@@ -161,13 +149,7 @@ function PositionRow({ need }: PositionRowProps): React.ReactElement {
       >
         {need.current}/{need.recommended}
       </div>
-
-      {/* Status indicator */}
-      <div style={{ width: 20, textAlign: 'center' }}>
-        {need.urgency === 'critical' && '⚠️'}
-        {need.urgency === 'warning' && '⚡'}
-        {need.urgency === 'good' && '✓'}
-      </div>
+      {/* No status indicator - checkmarks removed */}
     </div>
   );
 }
@@ -179,7 +161,7 @@ function PositionRow({ need }: PositionRowProps): React.ReactElement {
 export default function PositionNeedsIndicator({
   needs,
   compact = true,
-}: PositionNeedsIndicatorProps): React.ReactElement {
+}: PositionNeedsIndicatorProps): React.ReactElement | null {
   // Filter to only show positions that need more picks
   const urgentNeeds = needs.filter(
     (need) => need.urgency === 'critical' || need.urgency === 'warning'
@@ -190,93 +172,34 @@ export default function PositionNeedsIndicator({
   const flexRemaining = 18 - totalPicked; // ROSTER_SIZE
 
   if (compact) {
-    // Compact mode: Single line summary
-    if (urgentNeeds.length === 0 && flexRemaining <= 0) {
-      return (
-        <div
-          style={{
-            ...SLOW_DRAFT_TYPOGRAPHY.needsText,
-            color: SLOW_DRAFT_COLORS.needs.good,
-          }}
-        >
-          ✓ Roster complete
-        </div>
-      );
-    }
-
-    return (
-      <div className="flex items-center flex-wrap gap-2">
-        <span
-          style={{
-            ...SLOW_DRAFT_TYPOGRAPHY.sectionLabel,
-            marginRight: 4,
-          }}
-        >
-          NEEDS:
-        </span>
-
-        {/* Urgent position needs */}
-        {urgentNeeds.map((need) => (
-          <NeedPill key={need.position} need={need} />
-        ))}
-
-        {/* Flex remaining */}
-        {flexRemaining > 0 && (
-          <span
-            style={{
-              ...SLOW_DRAFT_TYPOGRAPHY.needsText,
-              color: 'rgba(255, 255, 255, 0.6)',
-            }}
-          >
-            • {flexRemaining} FLEX
-          </span>
-        )}
-
-        {/* All good indicator */}
-        {urgentNeeds.length === 0 && flexRemaining > 0 && (
-          <span
-            style={{
-              ...SLOW_DRAFT_TYPOGRAPHY.needsText,
-              color: SLOW_DRAFT_COLORS.needs.good,
-            }}
-          >
-            Position mins met
-          </span>
-        )}
-      </div>
-    );
+    // Compact mode: Removed - return null to hide needs section
+    return null;
   }
 
-  // Expanded mode: Full breakdown
+  // Expanded mode: Show position rows without checkmarks
   return (
-    <div>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 12,
+      }}
+    >
       <div
         style={{
-          ...SLOW_DRAFT_TYPOGRAPHY.sectionLabel,
-          marginBottom: SLOW_DRAFT_LAYOUT.sectionLabelMarginBottom,
+          fontSize: 12,
+          fontWeight: 600,
+          color: TEXT_COLORS.secondary,
+          marginBottom: 4,
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em',
         }}
       >
         POSITION NEEDS
       </div>
-
-      <div className="flex flex-col gap-2">
-        {needs.map((need) => (
-          <PositionRow key={need.position} need={need} />
-        ))}
-      </div>
-
-      {/* Flex remaining */}
-      {flexRemaining > 0 && (
-        <div
-          style={{
-            marginTop: 8,
-            fontSize: 12,
-            color: 'rgba(255, 255, 255, 0.5)',
-          }}
-        >
-          {flexRemaining} roster slot{flexRemaining !== 1 ? 's' : ''} remaining
-        </div>
-      )}
+      {needs.map((need) => (
+        <PositionRow key={need.position} need={need} />
+      ))}
     </div>
   );
 }

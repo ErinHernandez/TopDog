@@ -265,44 +265,15 @@ export function AuthProvider({
   // Track mount state to ensure consistent SSR/client rendering
   const [isMounted, setIsMounted] = useState(false);
   
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-  
-  // Build-time detection: return children without auth initialization
-  // IMPORTANT: Keep this in sync with useAuthContext detection logic
-  const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build' || 
-                       process.env.NEXT_PHASE === 'phase-export';
-  const isSSR = typeof window === 'undefined';
-  
-  // Vercel-specific build detection - simplified to match useAuthContext
-  // VERCEL=1 is always set during Vercel builds, regardless of VERCEL_ENV
-  const isVercelBuild = process.env.VERCEL === '1';
-  
-  // CRITICAL: Always render the Provider wrapper to prevent hydration mismatch
-  // During SSR/build OR before mount, provide safe defaults, but keep the same DOM structure
-  // This ensures server and initial client render are identical
-  // IMPORTANT: Do NOT wrap children in additional divs - this causes hydration mismatches
-  if (isBuildPhase || isSSR || isVercelBuild || !isMounted) {
-    // During build, SSR, or before mount, provide safe defaults but keep Provider wrapper
-    // This ensures server and client render the same DOM structure
-    const safeValue = createBuildTimeSafeDefaults();
-    return (
-      <AuthContext.Provider value={safeValue}>
-        {children}
-        {/* Invisible recaptcha container for phone auth */}
-        <div id="recaptcha-container" suppressHydrationWarning />
-      </AuthContext.Provider>
-    );
-  }
-  
+  // CRITICAL: All hooks must be called before any conditional returns
+  // This ensures hooks are always called in the same order (Rules of Hooks)
   const [state, dispatch] = useReducer(authReducer, initialState);
   
   // Store phone verification result
   const confirmationResultRef = useRef<ConfirmationResult | null>(null);
   const recaptchaVerifierRef = useRef<RecaptchaVerifier | null>(null);
   
-  // Firebase instances
+  // Firebase instances - safe to call during SSR (will return null if not initialized)
   const auth = useMemo(() => {
     try {
       return getAuth();
@@ -335,6 +306,37 @@ export function AuthProvider({
       }),
     ]);
   }, []);
+  
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+  
+  // Build-time detection: return children without auth initialization
+  // IMPORTANT: Keep this in sync with useAuthContext detection logic
+  const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build' || 
+                       process.env.NEXT_PHASE === 'phase-export';
+  const isSSR = typeof window === 'undefined';
+  
+  // Vercel-specific build detection - simplified to match useAuthContext
+  // VERCEL=1 is always set during Vercel builds, regardless of VERCEL_ENV
+  const isVercelBuild = process.env.VERCEL === '1';
+  
+  // CRITICAL: Always render the Provider wrapper to prevent hydration mismatch
+  // During SSR/build OR before mount, provide safe defaults, but keep the same DOM structure
+  // This ensures server and initial client render are identical
+  // IMPORTANT: Do NOT wrap children in additional divs - this causes hydration mismatches
+  if (isBuildPhase || isSSR || isVercelBuild || !isMounted) {
+    // During build, SSR, or before mount, provide safe defaults but keep Provider wrapper
+    // This ensures server and client render the same DOM structure
+    const safeValue = createBuildTimeSafeDefaults();
+    return (
+      <AuthContext.Provider value={safeValue}>
+        {children}
+        {/* Invisible recaptcha container for phone auth */}
+        <div id="recaptcha-container" suppressHydrationWarning />
+      </AuthContext.Provider>
+    );
+  }
   
   // ========== Auth State Listener ==========
   

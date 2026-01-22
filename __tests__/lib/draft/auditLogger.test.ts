@@ -4,6 +4,7 @@
  * Tests for comprehensive audit logging of draft actions.
  */
 
+import { jest, describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import {
   DraftAuditLogger,
   createAuditLogger,
@@ -24,8 +25,8 @@ jest.mock('../../../lib/structuredLogger', () => ({
 describe('DraftAuditLogger', () => {
   let auditLogger: DraftAuditLogger;
   let mockPersistenceAdapter: {
-    addDocument: jest.Mock;
-    queryDocuments: jest.Mock;
+    addDocument: jest.Mock<() => Promise<string>>;
+    queryDocuments: jest.Mock<() => Promise<AuditEvent[]>>;
   };
 
   beforeEach(() => {
@@ -306,7 +307,7 @@ describe('DraftAuditLogger', () => {
       await auditLogger.flush();
 
       const events = mockPersistenceAdapter.addDocument.mock.calls.map(
-        (call) => call[1] as AuditEvent
+        (call: unknown[]) => call[1] as AuditEvent
       );
 
       // First event has no previous hash
@@ -328,7 +329,7 @@ describe('DraftAuditLogger', () => {
 
       // Get the saved events
       const savedEvents = mockPersistenceAdapter.addDocument.mock.calls.map(
-        (call) => call[1] as AuditEvent
+        (call: unknown[]) => call[1] as AuditEvent
       );
 
       // Mock query to return these events
@@ -506,7 +507,7 @@ describe('DraftAuditLogger', () => {
       'admin_edit_pick',
     ];
 
-    it.each(actionTypes)('should successfully log action type: %s', async (actionType) => {
+    it.each(actionTypes)('should successfully log action type: %s', async (actionType: DraftActionType) => {
       const eventId = await auditLogger.log(actionType, 'room_test', 'user_test', {});
 
       expect(eventId).toBeDefined();
