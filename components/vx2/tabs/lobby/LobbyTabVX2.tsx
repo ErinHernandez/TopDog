@@ -132,6 +132,7 @@ export default function LobbyTabVX2({
   const [isMounted, setIsMounted] = useState(false);
 
   // Track mount state to prevent hydration mismatches
+  // Use useEffect (not useLayoutEffect) to ensure this runs after React hydration
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -155,9 +156,13 @@ export default function LobbyTabVX2({
   // ----------------------------------------
   // Get featured tournament (or first one)
   // ----------------------------------------
+  // Only compute after mount to prevent hydration mismatch
   const featuredTournament = useMemo(
-    () => tournaments.find(t => t.isFeatured) || tournaments[0],
-    [tournaments]
+    () => {
+      if (!isMounted) return undefined;
+      return tournaments.find(t => t.isFeatured) || tournaments[0];
+    },
+    [tournaments, isMounted]
   );
 
   // ----------------------------------------
@@ -223,16 +228,25 @@ export default function LobbyTabVX2({
   };
 
   // ----------------------------------------
-  // CLIENT-SIDE ONLY RENDERING
+  // SERVER/CLIENT CONSISTENT RENDERING
   // ----------------------------------------
-  // On server, always render loading state to ensure hydration match
-  // On client, wait for mount before rendering any dynamic content
-  if (!isMounted) {
+  // CRITICAL: Always render the same structure on server and client
+  // On server: isMounted = false, so we render loading
+  // On client initial: isMounted = false (before useEffect), so we render loading (matches server)
+  // On client after mount: isMounted = true, then we check data/dimensions
+  // This ensures perfect HTML matching during hydration
+  const shouldShowLoading = !isMounted || 
+    (isLoading && tournaments.length === 0) ||
+    !featuredTournament || 
+    !isCardHeightReady || 
+    !cardHeight || 
+    !cardWidth;
+  
+  if (shouldShowLoading) {
     return (
       <div 
         className="vx2-lobby-container" 
         style={containerStyle}
-        suppressHydrationWarning
       >
         <LoadingState />
       </div>
@@ -240,19 +254,7 @@ export default function LobbyTabVX2({
   }
 
   // ----------------------------------------
-  // LOADING STATE (client-side only)
-  // ----------------------------------------
-  if (isLoading && tournaments.length === 0) {
-    logger.debug('Showing loading state', { isLoading, tournamentCount: tournaments.length });
-    return (
-      <div className="vx2-lobby-container" style={containerStyle}>
-        <LoadingState />
-      </div>
-    );
-  }
-
-  // ----------------------------------------
-  // ERROR STATE
+  // ERROR STATE (only after mount)
   // ----------------------------------------
   if (error) {
     return (
@@ -270,9 +272,9 @@ export default function LobbyTabVX2({
   }
 
   // ----------------------------------------
-  // EMPTY STATE
+  // EMPTY STATE (only after mount and data loaded)
   // ----------------------------------------
-  if (tournaments.length === 0) {
+  if (!isLoading && tournaments.length === 0) {
     return (
       <div
         className="vx2-lobby-container flex-1 flex items-center justify-center"
@@ -292,38 +294,28 @@ export default function LobbyTabVX2({
   }
 
   // ----------------------------------------
-  // WAITING FOR DIMENSIONS
-  // ----------------------------------------
-  // After mount, wait for dimensions to be calculated
-  if (!featuredTournament || !isCardHeightReady || !cardHeight || !cardWidth) {
-    logger.debug('Waiting for dimensions', { 
-      hasFeaturedTournament: !!featuredTournament, 
-      isCardHeightReady, 
-      cardHeight, 
-      cardWidth 
-    });
-    return (
-      <div className="vx2-lobby-container" style={containerStyle}>
-        <LoadingState />
-      </div>
-    );
-  }
-
-  // ----------------------------------------
   // SUCCESS STATE - Render decomposed components
   // ----------------------------------------
+  // At this point, we know:
+  // - isMounted = true (client-side only)
+  // - featuredTournament exists
+  // - cardHeight and cardWidth are defined
   const borderColor = featuredTournament.isFeatured
     ? CARD_VISUALS.borderFeatured
     : CARD_VISUALS.borderDefault;
   const borderWidth = featuredTournament.isFeatured ? 3 : 1;
 
+  // Ensure dimensions are numbers (TypeScript safety)
+  const finalWidth = cardWidth ?? 390; // Fallback to iPhone 13 width
+  const finalHeight = cardHeight ?? 600; // Fallback height
+
+  // Render content (only reached after mount)
   return (
     <div
       className="vx2-lobby-container"
       style={containerStyle}
       role="main"
       aria-label="Tournament lobby"
-      suppressHydrationWarning
     >
       {/* Absolutely positioned card container with 16px margins */}
       <div
@@ -334,8 +326,8 @@ export default function LobbyTabVX2({
           bottom: '16px',
           left: '50%',
           transform: 'translateX(-50%)',
-          width: `${cardWidth}px`,
-          height: `${cardHeight}px`,
+          width: `${finalWidth}px`,
+          height: `${finalHeight}px`,
           maxWidth: '420px',
           display: 'flex',
           flexDirection: 'column',
@@ -346,7 +338,6 @@ export default function LobbyTabVX2({
           contain: 'layout style paint',
           isolation: 'isolate',
         }}
-        suppressHydrationWarning
       >
         {/* Background Layers */}
         <TournamentBackground
