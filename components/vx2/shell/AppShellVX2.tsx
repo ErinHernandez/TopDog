@@ -175,13 +175,17 @@ function InnerShell({ badgeOverrides, deviceClass = 'standard', inPhoneFrame = f
       <div 
         className={`flex flex-col relative vx2-device-${deviceClass}`}
         data-device-class={deviceClass}
+        suppressHydrationWarning
         style={{ 
           backgroundColor: BG_COLORS.primary,
           // When in phone frame, use 100% to fill the fixed frame container
           // When not in phone frame (actual mobile), use stable viewport height
+          // Use fallback for SSR to prevent hydration mismatch
           height: inPhoneFrame 
             ? '100%' 
-            : 'calc(var(--stable-vh, 1vh) * 100)',
+            : typeof window === 'undefined' 
+              ? '100vh' 
+              : 'calc(var(--stable-vh, 1vh) * 100)',
           overflow: 'hidden',
         }}
       >
