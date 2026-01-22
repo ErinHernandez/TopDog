@@ -314,6 +314,23 @@ function AuthTestPage() {
 
 // Make entire page client-only to prevent hydration issues
 // This page has complex components (MobilePhoneFrame, modals) that can cause mismatches
-const ClientAuthTestPage = dynamic(() => Promise.resolve(AuthTestPage), { ssr: false });
+// Use a wrapper function to properly export the dynamic component
+function ClientAuthTestPage() {
+  return <AuthTestPage />;
+}
 
-export default ClientAuthTestPage;
+export default dynamic(() => Promise.resolve(ClientAuthTestPage), { 
+  ssr: false,
+  loading: () => (
+    <div style={{ 
+      minHeight: '100vh', 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'center',
+      backgroundColor: '#1a1a2e',
+      color: '#fff'
+    }}>
+      <div>Loading auth test page...</div>
+    </div>
+  )
+});
