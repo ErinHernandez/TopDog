@@ -97,7 +97,7 @@ function ErrorFallback({ tabId, error, onRetry }: ErrorFallbackProps): React.Rea
       </p>
       
       {/* Error Details (collapsed by default in production) */}
-      {process.env.NODE_ENV === 'development' && error && (
+      {typeof window !== 'undefined' && process.env.NODE_ENV === 'development' && error && (
         <details 
           className="w-full max-w-sm mb-6 text-left"
           style={{

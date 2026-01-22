@@ -22,32 +22,37 @@ const logger = createScopedLogger('[TabContentVX2]');
 // Direct imports for all tabs (SSR compatible)
 // LobbyTab is client-only to prevent hydration issues
 import dynamic from 'next/dynamic';
-const LobbyTab = dynamic(() => import('../../tabs/lobby').then(mod => ({ default: mod.LobbyTabVX2 })), {
-  ssr: false,
-  loading: () => (
-    <div className="vx2-lobby-container" style={{ 
-      position: 'relative', 
-      width: '100%', 
-      height: '100%', 
-      minHeight: '400px',
-      flex: 1,
-      backgroundColor: '#0a0a1a',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      color: '#fff'
-    }}>
-      <div>Loading tournaments...</div>
-    </div>
-  ),
-});
+const LobbyTab = dynamic(
+  () => import('../../tabs/lobby').then(mod => ({ default: mod.LobbyTabVX2 })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="vx2-lobby-container" style={{ 
+        position: 'relative', 
+        width: '100%', 
+        height: '100%', 
+        minHeight: '400px',
+        flex: 1,
+        backgroundColor: '#0a0a1a',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: '#fff'
+      }}>
+        <div>Loading tournaments...</div>
+      </div>
+    ),
+  }
+);
 import { DraftsTabVX2 as DraftsTab } from '../../tabs/live-drafts';
 import { MyTeamsTabVX2 as MyTeamsTab } from '../../tabs/my-teams';
 import { ExposureTabVX2 as ExposureTab } from '../../tabs/exposure';
 import { ProfileTabVX2 as ProfileTab } from '../../tabs/profile';
 
-// Debug: Log what DraftsTab is
-console.log('[TabContentVX2] DraftsTab component loaded:', DraftsTab?.name || 'unknown');
+// Debug: Log what DraftsTab is (only in development, client-side)
+if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+  console.log('[TabContentVX2] DraftsTab component loaded:', DraftsTab?.name || 'unknown');
+}
 
 // ============================================================================
 // TYPES
