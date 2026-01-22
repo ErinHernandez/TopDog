@@ -22,26 +22,34 @@ const logger = createScopedLogger('[TabContentVX2]');
 // Direct imports for all tabs (SSR compatible)
 // LobbyTab is client-only to prevent hydration issues
 import dynamic from 'next/dynamic';
+
+// Create a stable loading component that's identical on server and client
+const LobbyTabLoading = () => (
+  <div 
+    className="vx2-lobby-container" 
+    suppressHydrationWarning
+    style={{ 
+      position: 'relative', 
+      width: '100%', 
+      height: '100%', 
+      minHeight: '400px',
+      flex: 1,
+      backgroundColor: '#0a0a1a',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: '#fff'
+    }}
+  >
+    <div>Loading tournaments...</div>
+  </div>
+);
+
 const LobbyTab = dynamic(
   () => import('../../tabs/lobby').then(mod => ({ default: mod.LobbyTabVX2 })),
   {
     ssr: false,
-    loading: () => (
-      <div className="vx2-lobby-container" style={{ 
-        position: 'relative', 
-        width: '100%', 
-        height: '100%', 
-        minHeight: '400px',
-        flex: 1,
-        backgroundColor: '#0a0a1a',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: '#fff'
-      }}>
-        <div>Loading tournaments...</div>
-      </div>
-    ),
+    loading: () => <LobbyTabLoading />,
   }
 );
 import { DraftsTabVX2 as DraftsTab } from '../../tabs/live-drafts';
@@ -237,16 +245,17 @@ export default function TabContentVX2({
         onRetry={handleRetry}
         fallback={errorComponent}
       >
-        {TabComponent ? (
+        {/* Only render content after mount to prevent hydration mismatch */}
+        {isMounted && TabComponent ? (
           renderTabContent()
-        ) : (
+        ) : isMounted && !TabComponent ? (
           <div style={{ padding: '20px', color: '#fff' }} suppressHydrationWarning>
             <p>Error: Tab component not found for "{state.activeTab}"</p>
             <p style={{ fontSize: '12px', color: '#999' }}>
               Available tabs: {Object.keys(TAB_COMPONENTS).join(', ')}
             </p>
           </div>
-        )}
+        ) : null}
       </TabErrorBoundary>
     </div>
   );
