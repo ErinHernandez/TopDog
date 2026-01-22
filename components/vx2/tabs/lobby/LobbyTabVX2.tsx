@@ -223,7 +223,24 @@ export default function LobbyTabVX2({
   };
 
   // ----------------------------------------
-  // LOADING STATE
+  // CLIENT-SIDE ONLY RENDERING
+  // ----------------------------------------
+  // On server, always render loading state to ensure hydration match
+  // On client, wait for mount before rendering any dynamic content
+  if (!isMounted) {
+    return (
+      <div 
+        className="vx2-lobby-container" 
+        style={containerStyle}
+        suppressHydrationWarning
+      >
+        <LoadingState />
+      </div>
+    );
+  }
+
+  // ----------------------------------------
+  // LOADING STATE (client-side only)
   // ----------------------------------------
   if (isLoading && tournaments.length === 0) {
     logger.debug('Showing loading state', { isLoading, tournamentCount: tournaments.length });
@@ -275,18 +292,11 @@ export default function LobbyTabVX2({
   }
 
   // ----------------------------------------
-  // WAITING FOR DIMENSIONS OR MOUNT
+  // WAITING FOR DIMENSIONS
   // ----------------------------------------
-  // On server or before mount, always show loading to prevent hydration mismatch
-  // Also wait for data to be loaded (not just initial empty state)
-  const isDataReady = isMounted && !isLoading && tournaments.length > 0;
-  const canRender = isDataReady && featuredTournament && isCardHeightReady && cardHeight && cardWidth;
-  
-  if (!canRender) {
-    logger.debug('Waiting for mount, data, or dimensions', { 
-      isMounted,
-      isLoading,
-      tournamentCount: tournaments.length,
+  // After mount, wait for dimensions to be calculated
+  if (!featuredTournament || !isCardHeightReady || !cardHeight || !cardWidth) {
+    logger.debug('Waiting for dimensions', { 
       hasFeaturedTournament: !!featuredTournament, 
       isCardHeightReady, 
       cardHeight, 
@@ -313,6 +323,7 @@ export default function LobbyTabVX2({
       style={containerStyle}
       role="main"
       aria-label="Tournament lobby"
+      suppressHydrationWarning
     >
       {/* Absolutely positioned card container with 16px margins */}
       <div
