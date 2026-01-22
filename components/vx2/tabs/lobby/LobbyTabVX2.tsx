@@ -16,7 +16,7 @@
  * @module LobbyTabVX2
  */
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 // Data hooks
@@ -129,6 +129,12 @@ export default function LobbyTabVX2({
   // ----------------------------------------
   const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
   const [isJoining, setIsJoining] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Track mount state to prevent hydration mismatches
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // ----------------------------------------
   // Card dimensions (fixed pixel margins)
@@ -268,10 +274,12 @@ export default function LobbyTabVX2({
   }
 
   // ----------------------------------------
-  // WAITING FOR DIMENSIONS
+  // WAITING FOR DIMENSIONS OR MOUNT
   // ----------------------------------------
-  if (!featuredTournament || !isCardHeightReady || !cardHeight || !cardWidth) {
-    logger.debug('Waiting for dimensions', { 
+  // On server or before mount, always show loading to prevent hydration mismatch
+  if (!isMounted || !featuredTournament || !isCardHeightReady || !cardHeight || !cardWidth) {
+    logger.debug('Waiting for dimensions or mount', { 
+      isMounted,
       hasFeaturedTournament: !!featuredTournament, 
       isCardHeightReady, 
       cardHeight, 
