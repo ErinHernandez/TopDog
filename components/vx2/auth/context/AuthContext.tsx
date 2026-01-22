@@ -1003,10 +1003,23 @@ function createBuildTimeSafeDefaults(): AuthContextValue {
  * @throws Error if used outside of AuthProvider (except during build phase)
  */
 export function useAuthContext(): AuthContextValue {
+  // Track mount state to ensure consistent SSR/client rendering
+  const [isMounted, setIsMounted] = useState(false);
+  
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+  
   // CRITICAL: Check for SSR/build FIRST, before ANY other logic
   // This is the most important check - if window is undefined, we're definitely in SSR/build
   // Return safe defaults immediately without calling useContext
   if (typeof window === 'undefined') {
+    return createBuildTimeSafeDefaults();
+  }
+  
+  // CRITICAL: On client's initial render (before mount), return safe defaults
+  // This ensures server and initial client render are identical
+  if (!isMounted) {
     return createBuildTimeSafeDefaults();
   }
   
@@ -1029,8 +1042,8 @@ export function useAuthContext(): AuthContextValue {
     return createBuildTimeSafeDefaults();
   }
   
-  // Only call useContext if we're confirmed to be in client-side runtime
-  // At this point, window exists and we're not in a build phase
+  // Only call useContext if we're confirmed to be in client-side runtime and mounted
+  // At this point, window exists, we're not in a build phase, and component is mounted
   const context = React.useContext(AuthContext);
   
   // ULTRA-DEFENSIVE: If no context is available, NEVER throw during builds
