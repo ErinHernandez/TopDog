@@ -10,6 +10,7 @@ import { getDb } from '../firebase-utils';
 import { doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 import { captureError } from '../errorTracking';
 import { requireAppUrl } from '../envHelpers';
+import { getStripeExchangeRate } from './exchangeRates';
 import type {
   CreateCustomerRequest,
   CustomerWithPaymentMethods,
@@ -553,23 +554,62 @@ export async function createPayout(
     // Convert withdrawal amount to display amount in its currency
     const withdrawalDisplayAmount = toDisplayAmount(amountCents, currencyUpper);
     
-    // TODO: Implement proper exchange rate conversion for non-USD withdrawals
-    // For now, this only works correctly for USD withdrawals.
-    // For other currencies, we need to:
-    // 1. Get current exchange rate (e.g., from Stripe or external API)
-    // 2. Convert withdrawalDisplayAmount * exchangeRate to get USD equivalent
-    // 3. Compare USD equivalent to currentBalance
-    if (currencyUpper !== 'USD') {
-      throw new Error(
-        `Currency conversion not yet implemented. ` +
-        `Withdrawals in ${currencyUpper} require exchange rate conversion to USD. ` +
-        `Please use USD for withdrawals until this feature is implemented.`
-      );
+    // Convert withdrawal amount to USD equivalent for balance comparison
+    let withdrawalAmountUSD: number;
+    let exchangeRate: number | null = null;
+    
+    if (currencyUpper === 'USD') {
+      // For USD, no conversion needed
+      withdrawalAmountUSD = withdrawalDisplayAmount;
+    } else {
+      // Get current exchange rate for the currency
+      // Rate format: 1 USD = X local currency (e.g., 1 USD = 1.55 AUD)
+      // To convert local currency to USD: localAmount / rate
+      try {
+        const rateData = await getStripeExchangeRate(currencyUpper);
+        exchangeRate = rateData.rate;
+        
+        // Convert withdrawal amount to USD
+        // withdrawalDisplayAmount is in local currency
+        // USD equivalent = localAmount / rate (since rate = local/USD)
+        withdrawalAmountUSD = withdrawalDisplayAmount / exchangeRate;
+        
+        // Log conversion for debugging (using console since no logger available)
+        console.log('[StripeService] Exchange rate conversion for withdrawal', {
+          currency: currencyUpper,
+          localAmount: withdrawalDisplayAmount,
+          exchangeRate,
+          usdEquivalent: withdrawalAmountUSD,
+          rateDisplay: rateData.rateDisplay,
+        });
+      } catch (error) {
+        const err = error as Error;
+        console.error('[StripeService] Failed to fetch exchange rate for withdrawal', {
+          currency: currencyUpper,
+          withdrawalAmount: withdrawalDisplayAmount,
+          error: err.message,
+        });
+        
+        throw new Error(
+          `Failed to fetch exchange rate for ${currencyUpper}. ` +
+          `Please try again or use USD for withdrawals. ` +
+          `Error: ${err.message}`
+        );
+      }
     }
     
-    // For USD, compare directly (balance is already in USD)
-    if (currentBalance < withdrawalDisplayAmount) {
-      throw new Error('Insufficient balance');
+    // Compare USD equivalent to current balance
+    if (withdrawalAmountUSD > currentBalance) {
+      const errorMessage = exchangeRate
+        ? `Insufficient balance. ` +
+          `Requested: ${withdrawalDisplayAmount.toFixed(2)} ${currencyUpper} ` +
+          `(${withdrawalAmountUSD.toFixed(2)} USD), ` +
+          `Available: ${currentBalance.toFixed(2)} USD`
+        : `Insufficient balance. ` +
+          `Requested: ${withdrawalDisplayAmount.toFixed(2)} ${currencyUpper}, ` +
+          `Available: ${currentBalance.toFixed(2)} USD`;
+      
+      throw new Error(errorMessage);
     }
     
     // Create a transfer to the Connect account

@@ -9,7 +9,6 @@
 
 import React from 'react';
 import Head from 'next/head';
-import MobilePhoneFrame from '../../components/vx2/shell/MobilePhoneFrame';
 import SlowDraftSandbox from '../../sandbox/slowdraft/Sandbox';
 
 export default function SlowDraftSandboxPage(): React.ReactElement {
@@ -24,17 +23,10 @@ export default function SlowDraftSandboxPage(): React.ReactElement {
       </Head>
 
       <div 
-        className="min-h-screen flex items-center justify-center p-8"
-        style={{ backgroundColor: '#1a1a2e' }}
+        className="relative w-full h-full overflow-hidden"
+        style={{ backgroundColor: '#101927' }}
       >
-        <MobilePhoneFrame>
-          <div 
-            className="relative w-full h-full overflow-hidden"
-            style={{ backgroundColor: '#101927' }}
-          >
-            <SlowDraftSandbox />
-          </div>
-        </MobilePhoneFrame>
+        <SlowDraftSandbox />
       </div>
     </>
   );

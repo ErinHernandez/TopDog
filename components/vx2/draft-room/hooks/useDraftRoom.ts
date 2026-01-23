@@ -242,6 +242,7 @@ export function useDraftRoom({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isPaused, setIsPaused] = useState(false);
+  const [preDraftCountdown, setPreDraftCountdown] = useState<number | null>(null);
   
   // UI state
   const [activeTab, setActiveTab] = useState<DraftTab>('players');
@@ -274,6 +275,7 @@ export function useDraftRoom({
       setStatus(initialStatus);
       setCurrentPickNumber(initialPickNumber);
       setIsLoading(false);
+      // Don't start countdown here - wait for room to be full
     }, 500);
     
     return () => clearTimeout(timer);
@@ -287,6 +289,43 @@ export function useDraftRoom({
   const participants = useMemo(() => room?.participants ?? [], [room?.participants]);
   // Use room's teamCount if available, otherwise use the parameter or default
   const effectiveTeamCount = room?.settings.teamCount ?? teamCount;
+  
+  // Check if room is full (all participants joined)
+  const isRoomFull = useMemo(() => {
+    if (!room) return false;
+    return participants.length >= effectiveTeamCount;
+  }, [participants.length, effectiveTeamCount, room]);
+  
+  // Start countdown when room becomes full
+  useEffect(() => {
+    if (status === 'waiting' && isRoomFull && preDraftCountdown === null) {
+      // Room just became full - start 60-second countdown
+      setPreDraftCountdown(60);
+    }
+  }, [status, isRoomFull, preDraftCountdown]);
+  
+  // Pre-draft countdown timer - counts down from 60 to 0, then starts draft
+  useEffect(() => {
+    if (status !== 'waiting' || preDraftCountdown === null || !isRoomFull) return;
+    
+    if (preDraftCountdown <= 0) {
+      // Countdown finished - start the draft
+      setStatus('active');
+      setPreDraftCountdown(null);
+      return;
+    }
+    
+    const interval = setInterval(() => {
+      setPreDraftCountdown(prev => {
+        if (prev === null || prev <= 1) {
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    
+    return () => clearInterval(interval);
+  }, [status, preDraftCountdown, isRoomFull]);
   
   // Convert pool players to DraftPlayer format for mock picks
   const allPlayersForPicks = useMemo(() => {
@@ -528,7 +567,7 @@ export function useDraftRoom({
     participants: participants.map(p => ({ id: p.id, name: p.name })),
     maxParticipants: effectiveTeamCount,
     roomStatus: status === 'loading' ? 'waiting' : status === 'complete' ? 'completed' : status as 'waiting' | 'active' | 'paused',
-    preDraftCountdown: 0, // TODO: Add pre-draft countdown state if needed
+    preDraftCountdown: preDraftCountdown ?? 0,
     picksUntilMyTurn,
     isMyTurn,
     timer: timerHook.seconds,
@@ -562,6 +601,7 @@ export function useDraftRoom({
     leaveDraft,
     autoPickForUser,
     devTools,
+    preDraftCountdown,
   };
 }
 

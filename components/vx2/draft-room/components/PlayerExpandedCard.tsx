@@ -585,7 +585,7 @@ export default function PlayerExpandedCard({
             backgroundSize: isMyTurn ? 'cover' : undefined,
             color: '#FFFFFF',
             opacity: isMyTurn ? 1 : 0.7,
-            border: 'none',
+            border: '1px solid rgba(255, 255, 255, 0.3)',
             cursor: 'pointer',
           }}
         >

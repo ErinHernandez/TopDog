@@ -30,6 +30,7 @@ const TUTORIAL_SHOWN_PREFIX = 'topdog_tutorial_shown_';
 
 // Hooks
 import { useDraftRoom } from '../hooks/useDraftRoom';
+import { getParticipantForPick } from '../utils';
 
 // Components
 import DraftStatusBar, { HEADER_HEIGHT } from './DraftStatusBar';
@@ -217,31 +218,35 @@ interface TabContentProps {
     rosterSize: number;
     pickTimeSeconds: number;
   };
+  selectedRosterParticipantIndex?: number;
+  onRosterParticipantSelect?: (index: number) => void;
 }
 
-function TabContent({ activeTab, draftRoom, onTutorial, onLeave, onLeaveFromLink, draftSettings }: TabContentProps): React.ReactElement {
+function TabContent({ activeTab, draftRoom, onTutorial, onLeave, onLeaveFromLink, draftSettings, selectedRosterParticipantIndex, onRosterParticipantSelect }: TabContentProps): React.ReactElement {
   switch (activeTab) {
     case 'players':
       return (
-        <PlayerList
-          players={draftRoom.availablePlayers.filteredPlayers}
-          totalCount={draftRoom.availablePlayers.totalCount}
-          isLoading={draftRoom.availablePlayers.isLoading}
-          isMyTurn={draftRoom.isMyTurn}
-          draftedCounts={draftRoom.picks.userPositionCounts}
-          positionFilters={draftRoom.availablePlayers.positionFilters}
-          onToggleFilter={draftRoom.availablePlayers.togglePositionFilter}
-          searchQuery={draftRoom.availablePlayers.searchQuery}
-          onSearchChange={draftRoom.availablePlayers.setSearchQuery}
-          onClearAll={draftRoom.availablePlayers.clearAll}
-          sortOption={draftRoom.availablePlayers.sortOption}
-          onSortChange={draftRoom.availablePlayers.setSortOption}
-          onDraft={draftRoom.draftPlayer}
-          onToggleQueue={draftRoom.queue.toggleQueue}
-          isQueued={draftRoom.queue.isQueued}
-          initialScrollPosition={draftRoom.getScrollPosition('players')}
-          onScrollPositionChange={(pos) => draftRoom.saveScrollPosition('players', pos)}
-        />
+        <div style={{ height: '100%', minHeight: 0, display: 'flex', flexDirection: 'column', position: 'relative' }}>
+          <PlayerList
+            players={draftRoom.availablePlayers.filteredPlayers}
+            totalCount={draftRoom.availablePlayers.totalCount}
+            isLoading={draftRoom.availablePlayers.isLoading}
+            isMyTurn={draftRoom.isMyTurn}
+            draftedCounts={draftRoom.picks.userPositionCounts}
+            positionFilters={draftRoom.availablePlayers.positionFilters}
+            onToggleFilter={draftRoom.availablePlayers.togglePositionFilter}
+            searchQuery={draftRoom.availablePlayers.searchQuery}
+            onSearchChange={draftRoom.availablePlayers.setSearchQuery}
+            onClearAll={draftRoom.availablePlayers.clearAll}
+            sortOption={draftRoom.availablePlayers.sortOption}
+            onSortChange={draftRoom.availablePlayers.setSortOption}
+            onDraft={draftRoom.draftPlayer}
+            onToggleQueue={draftRoom.queue.toggleQueue}
+            isQueued={draftRoom.queue.isQueued}
+            initialScrollPosition={draftRoom.getScrollPosition('players')}
+            onScrollPositionChange={(pos) => draftRoom.saveScrollPosition('players', pos)}
+          />
+        </div>
       );
     
     case 'queue':
@@ -266,6 +271,8 @@ function TabContent({ activeTab, draftRoom, onTutorial, onLeave, onLeaveFromLink
           getPicksForParticipant={(idx) => draftRoom.picks.picksByParticipant(idx)}
           initialScrollPosition={draftRoom.getScrollPosition('rosters')}
           onScrollPositionChange={(pos) => draftRoom.saveScrollPosition('rosters', pos)}
+          selectedParticipantIndex={selectedRosterParticipantIndex}
+          onParticipantSelect={onRosterParticipantSelect}
         />
       );
     
@@ -349,6 +356,16 @@ export default function DraftRoomVX2({
   // Info and tutorial modal state
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [showTutorialModal, setShowTutorialModal] = useState(false);
+  
+  // Selected participant index in rosters tab (for external control from PicksBar)
+  const [selectedRosterParticipantIndex, setSelectedRosterParticipantIndex] = useState<number | undefined>(undefined);
+  
+  // Reset selected participant index when switching away from rosters tab
+  useEffect(() => {
+    if (draftRoom.activeTab !== 'rosters') {
+      setSelectedRosterParticipantIndex(undefined);
+    }
+  }, [draftRoom.activeTab]);
   
   // Track if we've already auto-shown tutorial for this draft session
   const hasAutoShownTutorial = useRef(false);
@@ -544,7 +561,9 @@ export default function DraftRoomVX2({
           isUserTurn={draftRoom.isMyTurn && draftRoom.status === 'active'}
           onGracePeriodEnd={handleGracePeriodEnd}
           onLeave={handleLeaveClick}
-          hideTimer={draftRoom.status === 'active'} // Hide timer in status bar when draft is active (timer shown in pick card)
+          hideTimer={false} // Always show timer in status bar
+          preDraftCountdown={draftRoom.preDraftCountdown}
+          draftStatus={draftRoom.status}
         />
       </div>
 
@@ -560,7 +579,7 @@ export default function DraftRoomVX2({
       >
         {/* Picks Bar - 200px when visible (not on board tab) */}
         {draftRoom.activeTab !== 'board' && (
-          <div style={{ flexShrink: 0, height: LAYOUT_PX.picksBarHeight }}>
+          <div style={{ flexShrink: 0, height: LAYOUT_PX.picksBarHeight, marginBottom: 0, paddingBottom: 0 }}>
             <PicksBar
               picks={draftRoom.picks.picks}
               currentPickNumber={draftRoom.currentPickNumber}
@@ -568,18 +587,27 @@ export default function DraftRoomVX2({
               userParticipantIndex={draftRoom.userParticipantIndex}
               timer={draftRoom.timer.seconds}
               status={draftRoom.status}
+              onBlankClick={(pickNumber) => {
+                // When in rosters tab, clicking a blank card should navigate to that user
+                if (draftRoom.activeTab === 'rosters') {
+                  const teamCount = draftRoom.participants.length;
+                  const participantIndex = getParticipantForPick(pickNumber, teamCount);
+                  setSelectedRosterParticipantIndex(participantIndex);
+                }
+              }}
             />
           </div>
         )}
 
-        {/* Main Content - Scrollable */}
+        {/* Main Content - Fill available space, let child components handle scrolling */}
         <main
           style={{
             flex: 1,
             minHeight: 0,  // CRITICAL: Allow shrinking
-            overflowY: 'auto',
-            overflowX: 'hidden',
-            WebkitOverflowScrolling: 'touch',
+            overflow: 'hidden',  // Changed from 'auto' - let child components handle scrolling
+            display: 'flex',
+            flexDirection: 'column',
+            paddingTop: 0,
           }}
         >
           <TabContent 
@@ -589,6 +617,8 @@ export default function DraftRoomVX2({
             onLeave={handleLeaveClick}
             onLeaveFromLink={handleLeaveFromLink}
             draftSettings={draftSettings}
+            selectedRosterParticipantIndex={selectedRosterParticipantIndex}
+            onRosterParticipantSelect={setSelectedRosterParticipantIndex}
           />
         </main>
       </div>

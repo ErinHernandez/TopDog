@@ -46,7 +46,7 @@ export const DRAFT_LAYOUT = {
   navbarPaddingX: SPACING.md,
   
   // Picks Bar
-  picksBarHeight: 200,
+  picksBarHeight: 130,
   pickCardWidth: 140,
   pickCardHeight: 172,
   pickCardGap: SPACING.sm,

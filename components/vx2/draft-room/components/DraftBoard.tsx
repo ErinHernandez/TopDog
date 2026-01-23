@@ -291,6 +291,7 @@ interface PickCellProps {
   userBorderColor: string;
   picksAway: number;
   isNextUserPick: boolean;
+  isDraftActive?: boolean;
 }
 
 function PickCell({ 
@@ -300,6 +301,7 @@ function PickCell({
   userBorderColor, 
   picksAway,
   isNextUserPick,
+  isDraftActive,
 }: PickCellProps): React.ReactElement {
   const { pick, isUserPick, isCurrentPick, pickNumber, round } = pickData;
   const { preferences } = useCustomizationPreferences();
@@ -377,7 +379,7 @@ function PickCell({
           height: BOARD_PX.cellHeight,
           padding: '2px 3px',
           position: 'relative',
-          zIndex: 20,
+          zIndex: 1,
         }}
       >
         {/* Pick number - top left */}
@@ -451,8 +453,8 @@ function PickCell({
                 {pick.player.position}-{pick.player.team}
               </div>
             </>
-          ) : isCurrentPick ? (
-            // Current pick - show "On The Clock"
+          ) : isCurrentPick && isDraftActive ? (
+            // Current pick - show "On The Clock" only when draft is active
             <div
               style={{
                 fontWeight: 600,
@@ -677,7 +679,7 @@ export default function DraftBoard({
             style={{
               position: 'sticky',
               top: 0,
-              zIndex: 10,
+              zIndex: 100,
               backgroundColor: BOARD_COLORS.background,
               paddingTop: 16,
             }}
@@ -724,6 +726,7 @@ export default function DraftBoard({
                     userBorderColor={userBorderColor}
                     picksAway={getPicksAway(pickData.pickNumber)}
                     isNextUserPick={pickData.pickNumber === nextUserPickNumber}
+                    isDraftActive={isDraftActive}
                   />
                 ))}
               </div>

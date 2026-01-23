@@ -151,6 +151,8 @@ function FilterButton({ position, count, isActive, onToggle }: FilterButtonProps
         borderBottom: `2px solid ${color}`,
         opacity: isActive ? 1 : 0.4,
         cursor: 'pointer',
+        minWidth: 0,
+        flex: 1,
       }}
     >
       {position} {count}
@@ -351,7 +353,7 @@ function PlayerRow({
               justifyContent: 'center',
               alignItems: 'center',
               padding: 0,
-              marginLeft: -14,
+              marginLeft: -10, // Moved right 4px (was -14)
               marginRight: 14,
             }}
           >
@@ -455,7 +457,11 @@ export default function PlayerList({
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
+        minHeight: 0,
         backgroundColor: BG_COLORS.primary,
+        paddingTop: 0,
+        paddingLeft: `${SPACING.xs}px`,
+        paddingRight: `${SPACING.xs}px`,
       }}
     >
       {/* Position Filter Buttons */}
@@ -463,8 +469,13 @@ export default function PlayerList({
         className="flex rounded-lg overflow-hidden"
         style={{ 
           backgroundColor: 'rgba(255,255,255,0.05)',
-          marginTop: `${SPACING.md}px`,
+          position: 'relative',
+          top: '0px',
+          marginTop: 0,
           marginBottom: `${SPACING.xs}px`,
+          width: '100%',
+          overflow: 'hidden',
+          flexShrink: 0,
         }}
       >
         {POSITIONS.map(position => (
@@ -479,18 +490,21 @@ export default function PlayerList({
       </div>
       
       {/* Search Bar */}
-      <SearchBar
-        value={searchQuery}
-        onChange={onSearchChange}
-        onClear={onClearAll}
-      />
+      <div style={{ flexShrink: 0 }}>
+        <SearchBar
+          value={searchQuery}
+          onChange={onSearchChange}
+          onClear={onClearAll}
+        />
+      </div>
       
       {/* Player Table with integrated headers */}
       <div
         ref={scrollContainerRef}
         onScroll={handleScroll}
         style={{
-          flex: 1,
+          flex: '1 1 0',
+          minHeight: 0,
           overflowY: 'auto',
           WebkitOverflowScrolling: 'touch',
           scrollbarWidth: 'none',

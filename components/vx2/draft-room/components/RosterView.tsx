@@ -33,7 +33,7 @@ const logger = createScopedLogger('[RosterView]');
 
 const ROSTER_PX = {
   // Header
-  headerPaddingTop: 0,
+  headerPaddingTop: -6,
   headerPaddingBottom: 16,
   headerPaddingX: 24,
   dropdownWidth: 240,
@@ -123,6 +123,10 @@ export interface RosterViewProps {
   initialScrollPosition?: number;
   /** Callback when scroll position changes */
   onScrollPositionChange?: (position: number) => void;
+  /** Callback to allow external control of selected participant index */
+  onParticipantSelect?: (index: number) => void;
+  /** External control of selected participant index (if provided, overrides internal state) */
+  selectedParticipantIndex?: number;
 }
 
 // ============================================================================
@@ -594,8 +598,28 @@ export default function RosterView({
   getPicksForParticipant,
   initialScrollPosition = 0,
   onScrollPositionChange,
+  onParticipantSelect,
+  selectedParticipantIndex: externalSelectedIndex,
 }: RosterViewProps): React.ReactElement {
-  const [selectedIndex, setSelectedIndex] = useState(userParticipantIndex);
+  const [internalSelectedIndex, setInternalSelectedIndex] = useState(userParticipantIndex);
+  
+  // Use external selectedIndex if provided, otherwise use internal state
+  const selectedIndex = externalSelectedIndex !== undefined ? externalSelectedIndex : internalSelectedIndex;
+  
+  // Update function that handles both internal state and external callback
+  const setSelectedIndex = useCallback((index: number) => {
+    if (externalSelectedIndex === undefined) {
+      setInternalSelectedIndex(index);
+    }
+    onParticipantSelect?.(index);
+  }, [externalSelectedIndex, onParticipantSelect]);
+  
+  // Sync internal state when external prop changes
+  useEffect(() => {
+    if (externalSelectedIndex !== undefined) {
+      setInternalSelectedIndex(externalSelectedIndex);
+    }
+  }, [externalSelectedIndex]);
   const [expandedPlayerId, setExpandedPlayerId] = useState<string | null>(null);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -661,7 +685,20 @@ export default function RosterView({
   // Get team for selected participant
   const getTeamForParticipant = (participantIndex: number): DraftPlayer[] => {
     const participantPicks = getPicksForParticipant(participantIndex);
-    return participantPicks.map(pick => pick.player);
+    const players = participantPicks.map(pick => pick.player);
+    
+    // CRITICAL: Deduplicate by player ID to prevent same player appearing multiple times
+    const seenPlayerIds = new Set<string>();
+    const uniquePlayers: DraftPlayer[] = [];
+    
+    for (const player of players) {
+      if (!seenPlayerIds.has(player.id)) {
+        seenPlayerIds.add(player.id);
+        uniquePlayers.push(player);
+      }
+    }
+    
+    return uniquePlayers;
   };
   
   const team = getTeamForParticipant(selectedIndex);
@@ -696,6 +733,7 @@ export default function RosterView({
         onScroll={handleScroll}
         style={{
           flex: 1,
+          minHeight: 0,
           overflowY: 'auto',
           WebkitOverflowScrolling: 'touch',
           overscrollBehavior: 'contain',

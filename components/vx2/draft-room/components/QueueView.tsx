@@ -468,6 +468,7 @@ export default function QueueView({
         onScroll={handleScroll}
         style={{
           flex: 1,
+          minHeight: 0,
           overflowY: 'auto',
           WebkitOverflowScrolling: 'touch',
           overscrollBehavior: 'contain',
@@ -520,7 +521,7 @@ export default function QueueView({
               color: QUEUE_COLORS.textMuted,
             }}
           >
-            Your top queued player will be auto-drafted when it&apos;s your turn
+            Your top queued player will be auto-drafted when it&apos;s your turn, unless you have reached the maximum players for that position (or your custom position limit)
           </span>
         </div>
       )}

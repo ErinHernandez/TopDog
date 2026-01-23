@@ -20,15 +20,22 @@ export function MobilePhoneFrame({ children }: MobilePhoneFrameProps): React.Rea
       }}
       data-phone-frame="true"
     >
-      {/* Notch */}
-      <div
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-7 bg-black rounded-b-2xl z-10"
-        aria-hidden
-      />
       {/* Screen - children fill this completely */}
       <div 
         className="w-full h-full bg-white rounded-[2.5rem] overflow-hidden relative"
       >
+        {/* Dynamic Island - positioned on top of screen content */}
+        <div
+          className="absolute top-2 left-1/2 -translate-x-1/2"
+          style={{
+            width: '70px',
+            height: '20px',
+            backgroundColor: '#000',
+            borderRadius: '12px',
+            zIndex: 9999,
+          }}
+          aria-hidden
+        />
         {children}
       </div>
       {/* Home indicator */}

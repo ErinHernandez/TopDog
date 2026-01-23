@@ -50,7 +50,7 @@ if (typeof document !== 'undefined') {
 // CONSTANTS
 // ============================================================================
 
-export const HEADER_HEIGHT = 54; // Combined status bar + timer area
+export const HEADER_HEIGHT = 64; // Combined status bar + Dynamic Island + timer area
 
 // ============================================================================
 // TYPES
@@ -63,6 +63,10 @@ export interface DraftStatusBarProps {
   hideTimer?: boolean;
   /** Whether it's the current user's turn */
   isUserTurn: boolean;
+  /** Pre-draft countdown (60 seconds before draft starts) */
+  preDraftCountdown?: number | null;
+  /** Draft status */
+  draftStatus?: 'waiting' | 'active' | 'paused' | 'complete';
   /** Callback when grace period ends (after shake animation) */
   onGracePeriodEnd?: () => void;
   /** Callback when exit button is pressed */
@@ -79,6 +83,8 @@ export default function DraftStatusBar({
   onGracePeriodEnd,
   onLeave,
   hideTimer = false,
+  preDraftCountdown,
+  draftStatus,
 }: DraftStatusBarProps): React.ReactElement {
   // Shake animation state
   const [shakeKey, setShakeKey] = useState(0);
@@ -110,8 +116,12 @@ export default function DraftStatusBar({
 
   // Background logic
   const getBackgroundStyle = (): React.CSSProperties => {
+    // Pre-draft countdown - use same color as PicksBar (only when countdown is active)
+    if (draftStatus === 'waiting' && preDraftCountdown !== null && preDraftCountdown > 0) {
+      return { backgroundColor: '#101927' }; // Match PicksBar background color
+    }
     if (!isUserTurn) {
-      return { backgroundColor: '#1F2937' }; // Dark - not your turn
+      return { backgroundColor: '#101927' }; // Match PicksBar background - not your turn
     }
     if (timerSeconds <= 9) {
       return { backgroundColor: '#DC2626' }; // Red-600 - urgent
@@ -146,7 +156,8 @@ export default function DraftStatusBar({
         position: 'relative',
         height: `${HEADER_HEIGHT}px`,
         ...backgroundStyle,
-        paddingTop: 'env(safe-area-inset-top, 0px)',
+        paddingTop: '28px', // Space for Dynamic Island (8px top + 20px height)
+        paddingBottom: '2px', // Padding below safe area
         zIndex: 60,
         flexShrink: 0,
         transition: 'background-color 0.15s ease',
@@ -159,11 +170,12 @@ export default function DraftStatusBar({
       aria-label={onLeave ? "Draft header - tap anywhere to leave draft" : "Draft header"}
     >
       {/* Centered Timer - large and prominent (hidden when shown in pick card) */}
+      {/* Positioned below Dynamic Island */}
       {!hideTimer && (
         <div
           style={{
             position: 'absolute',
-            top: 0,
+            top: '28px', // Below Dynamic Island (8px top + 20px height)
             left: 0,
             right: 0,
             bottom: 0,
@@ -176,16 +188,22 @@ export default function DraftStatusBar({
         >
           <div
             style={{
-              fontSize: '32px',
+              fontSize: '24px',
               fontWeight: 700,
               fontVariantNumeric: 'tabular-nums',
               color: '#FFFFFF',
               pointerEvents: 'none',
             }}
-            aria-label={`${timerSeconds} seconds remaining`}
+            aria-label={
+              draftStatus === 'waiting' && preDraftCountdown !== null && preDraftCountdown > 0
+                ? `Draft starts in ${preDraftCountdown} seconds`
+                : `${timerSeconds} seconds remaining`
+            }
             aria-live="polite"
           >
-            {timerSeconds}
+            {draftStatus === 'waiting' && preDraftCountdown !== null && preDraftCountdown > 0
+              ? preDraftCountdown
+              : timerSeconds}
           </div>
         </div>
       )}

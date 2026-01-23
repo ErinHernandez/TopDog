@@ -190,12 +190,26 @@ export function useDraftPicks({
     if (DEV_FLAGS.useMockData) {
       // In mock mode, use initialPicks if provided
       if (initialPicks.length > 0 && (picks.length === 0 || picks.length < initialPicks.length)) {
+        // CRITICAL: Filter out any future picks (pickNumber >= currentPickNumber)
+        // Future picks should NEVER have players in them
+        const validInitialPicks = initialPicks.filter(pick => pick.pickNumber < currentPickNumber);
+        
+        if (validInitialPicks.length !== initialPicks.length) {
+          logger.warn('Filtered out future picks from initialPicks', {
+            totalPicks: initialPicks.length,
+            validPicks: validInitialPicks.length,
+            currentPickNumber,
+            filteredCount: initialPicks.length - validInitialPicks.length
+          });
+        }
+        
         logger.debug('Initializing picks with mock picks', { 
-          initialPicksCount: initialPicks.length, 
+          initialPicksCount: initialPicks.length,
+          validPicksCount: validInitialPicks.length,
           currentPicksCount: picks.length,
-          willSetPicks: initialPicks.length
+          currentPickNumber
         });
-        setPicks(initialPicks);
+        setPicks(validInitialPicks);
         setIsLoading(false);
       }
       return;
@@ -229,12 +243,25 @@ export function useDraftPicks({
         // Sort by pick number to ensure order
         convertedPicks.sort((a, b) => a.pickNumber - b.pickNumber);
         
+        // CRITICAL: Filter out any future picks (pickNumber >= currentPickNumber)
+        // Future picks should NEVER have players in them
+        const validPicks = convertedPicks.filter(pick => pick.pickNumber < currentPickNumber);
+        
+        if (validPicks.length !== convertedPicks.length) {
+          logger.warn('Filtered out future picks', {
+            totalPicks: convertedPicks.length,
+            validPicks: validPicks.length,
+            currentPickNumber,
+            filteredCount: convertedPicks.length - validPicks.length
+          });
+        }
+        
         logger.debug('Loaded picks from Firebase', { 
-          count: convertedPicks.length,
+          count: validPicks.length,
           roomId 
         });
         
-        setPicks(convertedPicks);
+        setPicks(validPicks);
         setIsLoading(false);
         setError(null);
       },
@@ -246,7 +273,26 @@ export function useDraftPicks({
     );
     
     return () => unsubscribe();
-  }, [roomId, initialPicks, picks.length, participants, convertFirebasePick]);
+  }, [roomId, initialPicks, picks.length, participants, convertFirebasePick, currentPickNumber]);
+  
+  // CRITICAL: Filter out future picks whenever currentPickNumber changes
+  // This ensures that if the draft refreshes or restarts, future picks are cleared
+  useEffect(() => {
+    setPicks(prevPicks => {
+      const validPicks = prevPicks.filter(pick => pick.pickNumber < currentPickNumber);
+      const futurePicks = prevPicks.filter(pick => pick.pickNumber >= currentPickNumber);
+      
+      if (futurePicks.length > 0) {
+        logger.warn('Removing future picks', {
+          futurePicksCount: futurePicks.length,
+          currentPickNumber,
+          futurePickNumbers: futurePicks.map(p => p.pickNumber)
+        });
+      }
+      
+      return validPicks;
+    });
+  }, [currentPickNumber]);
   
   const teamCount = participants.length || DRAFT_DEFAULTS.teamCount;
   

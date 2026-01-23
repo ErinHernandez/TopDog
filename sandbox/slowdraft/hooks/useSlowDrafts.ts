@@ -230,11 +230,13 @@ function generateMockSlowDraft(index: number): SlowDraft {
   return {
     id,
     tournamentId: `tournament-${index}`,
-    tournamentName: [
-      'TopDog International I',
-      'TopDog International II',
-      'TopDog International III',
-    ][index % 3],
+    tournamentName: index < 3
+      ? [
+          'TopDog International I',
+          'TopDog International II',
+          'TopDog International III',
+        ][index]
+      : `TopDog International ${index + 1}`,
     teamId: `team-${index}`,
     teamName: `Team ${index + 1}`,
     status: isYourTurn ? 'your-turn' : 'waiting',

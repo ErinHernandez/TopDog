@@ -282,12 +282,13 @@ class GlobalErrorBoundaryClass extends Component<ErrorBoundaryProps, ErrorBounda
     // Error content
     const errorContent = (
       <div 
-        className="text-center w-full px-2 flex flex-col items-center justify-center"
+        className="text-center w-full px-2 flex flex-col items-center justify-between"
         style={showPhoneFrame ? {
           width: '100%',
           height: 'calc(100% - 80px)', // Account for navbar height
         } : {
           paddingTop: '2rem',
+          minHeight: '100%',
         }}
       >
           {/* Error Icon - Smaller on mobile */}
@@ -312,12 +313,8 @@ class GlobalErrorBoundaryClass extends Component<ErrorBoundaryProps, ErrorBounda
             Something went wrong
           </h1>
 
-          <p className="text-base sm:text-lg text-gray-300 mb-2 px-2">
+          <p className="text-base sm:text-lg text-gray-300 mb-4 sm:mb-6 px-2">
             We hit an unexpected error.
-          </p>
-
-          <p className="text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6 px-2 break-words">
-            Error ID: <code className="bg-gray-800 px-2 py-1 rounded text-xs sm:text-sm">{errorId}</code>
           </p>
 
           {/* Development-only error details */}
@@ -349,27 +346,9 @@ class GlobalErrorBoundaryClass extends Component<ErrorBoundaryProps, ErrorBounda
             </details>
           )}
 
-          {/* Retry limit warning */}
-          {!canRetry && (
-            <p className="text-yellow-400 text-xs sm:text-sm mb-3 sm:mb-4 px-2">
-              Multiple retry attempts failed. Please reload the page or return home.
-            </p>
-          )}
 
           {/* Action Buttons - Full width on mobile, stacked */}
           <div className="flex flex-col gap-3 sm:gap-3 sm:flex-row sm:justify-center px-2">
-            {canRetry && (
-              <button
-                onClick={this.handleRetry}
-                className="bg-blue-600 text-white px-6 py-3.5 sm:py-3 rounded-lg font-semibold 
-                         active:bg-blue-700 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 
-                         focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors
-                         min-h-[48px] text-base touch-manipulation w-full sm:w-auto"
-              >
-                Try Again {retryCount > 0 && `(${maxRetries - retryCount} left)`}
-              </button>
-            )}
-
             <button
               onClick={this.handleGoHome}
               className="bg-gray-700 text-white px-6 py-3.5 sm:py-3 rounded-lg font-semibold 
@@ -377,7 +356,7 @@ class GlobalErrorBoundaryClass extends Component<ErrorBoundaryProps, ErrorBounda
                        focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors
                        min-h-[48px] text-base touch-manipulation w-full sm:w-auto"
             >
-              Go Home
+              Home
             </button>
 
             <button
@@ -392,8 +371,13 @@ class GlobalErrorBoundaryClass extends Component<ErrorBoundaryProps, ErrorBounda
           </div>
 
           {/* Support hint - Smaller on mobile */}
-          <p className="mt-6 sm:mt-8 text-xs sm:text-sm text-gray-500 px-2">
-            If this keeps happening, please contact support with the Error ID above.
+          <p className="mt-6 sm:mt-8 text-xs sm:text-sm text-gray-500 px-2 mb-2">
+            If this keeps happening, please contact support with the Error ID below.
+          </p>
+          
+          {/* Error ID at bottom - pushed to bottom with mt-auto */}
+          <p className="mt-auto text-xs sm:text-sm text-gray-500 px-2 break-words pb-4">
+            Error ID: <code className="bg-gray-800 px-2 py-1 rounded text-xs sm:text-sm">{errorId}</code>
           </p>
       </div>
     );

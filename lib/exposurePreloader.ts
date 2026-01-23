@@ -4,7 +4,7 @@
  */
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const userMetrics = require('./userMetrics');
+const userMetrics = require('./userMetrics').default || require('./userMetrics').userMetrics;
 
 // ============================================================================
 // TYPES
