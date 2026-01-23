@@ -8,16 +8,16 @@
  * ```tsx
  * // Basic usage
  * <OptimizedImage
- *   src="/players/mahomes_patrick.webp"
- *   alt="Patrick Mahomes"
+ *   src="/logos/nfl/kc.png"
+ *   alt="Kansas City Chiefs"
  *   width={100}
  *   height={100}
  * />
  * 
  * // With priority loading (above fold)
  * <OptimizedImage
- *   src="/players/mahomes_patrick.webp"
- *   alt="Patrick Mahomes"
+ *   src="/logos/nfl/kc.png"
+ *   alt="Kansas City Chiefs"
  *   width={100}
  *   height={100}
  *   priority
@@ -267,34 +267,6 @@ function LoadingPlaceholder({ isLegacyDevice }: LoadingPlaceholderProps): React.
   };
   
   return <div style={style} aria-hidden="true" />;
-}
-
-// ============================================================================
-// PLAYER IMAGE VARIANT
-// ============================================================================
-
-export interface PlayerImageProps extends Omit<OptimizedImageProps, 'src'> {
-  /** Player ID (e.g., 'mahomes_patrick') */
-  playerId: string;
-  /** Image variant */
-  variant?: 'standard' | 'thumbnail' | 'highRes';
-}
-
-/**
- * Convenience component for player images
- * Automatically constructs the correct path
- */
-export function PlayerImage({
-  playerId,
-  variant = 'standard',
-  ...props
-}: PlayerImageProps): React.ReactElement {
-  const src = useMemo(() => {
-    const suffix = variant === 'thumbnail' ? '-thumbnail' : variant === 'highRes' ? '-highRes' : '';
-    return `/players/${playerId}${suffix}.webp`;
-  }, [playerId, variant]);
-  
-  return <OptimizedImage src={src} {...props} />;
 }
 
 // ============================================================================

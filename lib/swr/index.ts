@@ -4,7 +4,7 @@
  * Exports all SWR configuration and hooks for player data.
  * 
  * Usage:
- *   import { useHeadshots, useADP, swrConfig } from '@/lib/swr';
+ *   import { useADP, swrConfig } from '@/lib/swr';
  */
 
 // Configuration
@@ -23,7 +23,6 @@ export {
 
 // Player data hooks
 export {
-  useHeadshots,
   usePlayers,
   useProjections,
   useSeasonStats,

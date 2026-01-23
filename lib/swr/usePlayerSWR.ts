@@ -6,9 +6,8 @@
  * deduplication, and revalidation.
  * 
  * Usage:
- *   import { useHeadshots, usePlayerStats, useADP } from '@/lib/swr/usePlayerSWR';
+ *   import { usePlayerStats, useADP } from '@/lib/swr/usePlayerSWR';
  *   
- *   const { headshots, isLoading, error } = useHeadshots();
  *   const { stats, isLoading } = useSeasonStats({ position: 'QB' });
  */
 
@@ -16,7 +15,6 @@ import { useMemo } from 'react';
 import useSWR, { type KeyedMutator } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import { API_ENDPOINTS, CACHE_TIMES, fetcher } from './config';
-import { getPlayerId } from '@/lib/playerPhotos';
 
 import type { FantasyPosition, NFLTeam, InjuryReport, PlayerNews, NFLTeamInfo } from '@/types/player';
 import type { TransformedPlayerStats, TransformedADP } from '@/types/api';
@@ -57,12 +55,6 @@ interface BaseSWRReturn<T> {
 // ============================================================================
 // HOOK OPTIONS TYPES
 // ============================================================================
-
-interface HeadshotsOptions {
-  position?: FantasyPosition | string;
-  team?: NFLTeam | string;
-  enabled?: boolean;
-}
 
 interface PlayersOptions {
   position?: FantasyPosition | string;
@@ -127,11 +119,6 @@ interface PlayerDataCombinedOptions {
 // HOOK RETURN TYPES
 // ============================================================================
 
-interface UseHeadshotsReturn extends BaseSWRReturn<PlayerWithHeadshot[]> {
-  headshots: PlayerWithHeadshot[];
-  headshotsMap: Record<string, string>;
-}
-
 interface UsePlayersReturn extends BaseSWRReturn<PlayerWithHeadshot[]> {
   players: PlayerWithHeadshot[];
 }
@@ -175,136 +162,14 @@ interface UseByeWeeksReturn extends BaseSWRReturn<ByeWeekItem[]> {
 }
 
 interface UsePlayerDataCombinedReturn {
-  headshots: PlayerWithHeadshot[];
-  headshotsMap: Record<string, string>;
   adp: TransformedADP[];
   stats: TransformedPlayerStats[];
   isLoading: boolean;
   isValidating: boolean;
   error: Error | undefined;
   mutate: {
-    headshots: KeyedMutator<PlayerWithHeadshot[]>;
     adp: KeyedMutator<TransformedADP[]>;
     stats: KeyedMutator<TransformedPlayerStats[]>;
-  };
-}
-
-
-// ============================================================================
-// HEADSHOTS HOOK
-// ============================================================================
-
-/**
- * Generate player headshot URLs from SportsDataIO (actual headshots, not placeholders)
- * Falls back to player pool photoUrl if SportsDataIO headshot not available
- * Uses immutable SWR - headshots are taken before the season and never change
- */
-export function useHeadshots(options: HeadshotsOptions = {}): UseHeadshotsReturn {
-  const { position, team, enabled = true } = options;
-  
-  // Generate cache key based on filters
-  const cacheKey = enabled 
-    ? `headshots:${position || 'all'}:${team || 'all'}`
-    : null;
-  
-  // Fetch SportsDataIO headshots (actual headshot URLs)
-  const { data: sportsDataIOHeadshots, error: sportsDataIOError, isLoading: sportsDataIOLoading } = useSWRImmutable(
-    enabled ? '/api/nfl/headshots-sportsdataio' : null,
-    fetcher
-  );
-  
-  // Fetch player pool for player list and fallback URLs
-  const { data: playerPoolData, error: poolError, isLoading: poolLoading } = useSWRImmutable(
-    enabled ? '/data/player-pool-2025.json' : null,
-    fetcher
-  );
-  
-  // Generate headshots from player pool data, using SportsDataIO URLs when available
-  // Handle both array format (legacy) and {players: []} format
-  const headshots: PlayerWithHeadshot[] = useMemo(() => {
-    if (!enabled) return [];
-    
-    // Handle both array format and object with players property
-    const typedPoolData = playerPoolData as (PlayerPoolEntry[] | { players: PlayerPoolEntry[] } | undefined);
-    const playersArray: PlayerPoolEntry[] = Array.isArray(typedPoolData) 
-      ? typedPoolData 
-      : typedPoolData?.players || [];
-    
-    if (!playersArray || playersArray.length === 0) return [];
-    
-    let players: PlayerPoolEntry[] = playersArray;
-    
-    // Filter by position if specified
-    if (position) {
-      const positions = Array.isArray(position) ? position : [position];
-      players = players.filter((p: PlayerPoolEntry) => {
-        const pPosition = p.position?.toUpperCase();
-        return pPosition ? positions.includes(pPosition) : false;
-      });
-    }
-    
-    // Filter by team if specified
-    if (team) {
-      const teamUpper = team.toUpperCase();
-      players = players.filter((p: PlayerPoolEntry) => {
-        const pTeam = p.team?.toUpperCase();
-        return pTeam === teamUpper;
-      });
-    }
-    
-    // Get SportsDataIO headshots map (actual headshot URLs)
-    const typedHeadshots = sportsDataIOHeadshots as { headshotsMap?: Record<string, string> } | undefined;
-    const sportsDataIOHeadshotsMap: Record<string, string> = typedHeadshots?.headshotsMap || {};
-    
-    // Generate headshot URLs - prioritize SportsDataIO, fallback to player pool photoUrl
-    return players.map((player: PlayerPoolEntry) => {
-      // Use player.id from pool (matches actual file names in /players/ directory)
-      const playerId = player.id || (player.name ? getPlayerId(player.name) : null);
-      
-      // Priority 1: SportsDataIO headshot (actual headshot, not placeholder)
-      // Priority 2: Player pool photoUrl (may be placeholder, but better than nothing)
-      // Priority 3: Generated local URL (will likely be placeholder)
-      let headshotUrl = null;
-      
-      if (player.name && sportsDataIOHeadshotsMap[player.name]) {
-        // Use SportsDataIO headshot (actual photo)
-        headshotUrl = sportsDataIOHeadshotsMap[player.name];
-      } else if (player.photoUrl && !player.photoUrl.startsWith('/players/')) {
-        // Use player pool photoUrl if it's not a local placeholder
-        headshotUrl = player.photoUrl;
-      } else if (playerId) {
-        // Fallback to local file (likely placeholder, but try anyway)
-        headshotUrl = `/players/${playerId}.webp`;
-      }
-      
-      return {
-        playerId: typeof playerId === 'number' ? playerId : 0,
-        name: String(player.name || ''),
-        team: String(player.team || ''),
-        position: String(player.position || ''),
-        headshotUrl: headshotUrl,
-      } as PlayerWithHeadshot;
-    }); // Include all players - headshotUrl will be generated for all
-  }, [playerPoolData, sportsDataIOHeadshots, position, team, enabled]);
-  
-  // Create lookup map by player name
-  const headshotsMap: Record<string, string> = useMemo(() => {
-    const map: Record<string, string> = {};
-    headshots.forEach(player => {
-      if (player.name && player.headshotUrl) {
-        map[player.name] = player.headshotUrl;
-      }
-    });
-    return map;
-  }, [headshots]);
-  
-  return {
-    headshots,
-    headshotsMap,
-    isLoading: sportsDataIOLoading || poolLoading,
-    isValidating: false, // Static data, never revalidates
-    error: sportsDataIOError || poolError,
-    mutate: (() => Promise.resolve(headshots)) as KeyedMutator<PlayerWithHeadshot[]>, // No-op since data is static
   };
 }
 
@@ -650,32 +515,28 @@ export function useByeWeeks(options: ByeWeeksOptions = {}): UseByeWeeksReturn {
 
 /**
  * Fetch all essential player data in parallel
- * Combines headshots, ADP, and optionally stats
+ * Combines ADP and optionally stats
  */
 export function usePlayerDataCombined(options: PlayerDataCombinedOptions = {}): UsePlayerDataCombinedReturn {
   const { includeStats = false, position, enabled = true } = options;
   
-  const headshots = useHeadshots({ position, enabled });
   const adp = useADP({ position, enabled });
   const stats = useSeasonStats({ 
     position, 
     enabled: enabled && includeStats 
   });
   
-  const isLoading = headshots.isLoading || adp.isLoading || (includeStats && stats.isLoading);
-  const isValidating = headshots.isValidating || adp.isValidating || (includeStats && stats.isValidating);
-  const error = headshots.error || adp.error || stats.error;
+  const isLoading = adp.isLoading || (includeStats && stats.isLoading);
+  const isValidating = adp.isValidating || (includeStats && stats.isValidating);
+  const error = adp.error || stats.error;
   
   return {
-    headshots: headshots.headshots,
-    headshotsMap: headshots.headshotsMap,
     adp: adp.adp,
     stats: stats.stats,
     isLoading,
     isValidating,
     error,
     mutate: {
-      headshots: headshots.mutate,
       adp: adp.mutate,
       stats: stats.mutate,
     },
@@ -693,7 +554,6 @@ export function usePlayerDataCombined(options: PlayerDataCombinedOptions = {}): 
  */
 export async function prefetchPlayerData(): Promise<void> {
   const endpoints = [
-    API_ENDPOINTS.HEADSHOTS,
     API_ENDPOINTS.ADP,
   ];
   
@@ -708,7 +568,6 @@ export async function prefetchPlayerData(): Promise<void> {
 // ============================================================================
 
 const playerSWRHooks = {
-  useHeadshots,
   usePlayers,
   useProjections,
   useSeasonStats,

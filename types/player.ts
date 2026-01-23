@@ -142,9 +142,9 @@ export interface PlayerBase {
   team: NFLTeam | string;
 }
 
-/** Player with headshot */
+/** Player with headshot (deprecated - headshotUrl will always be null) */
 export interface PlayerWithHeadshot extends PlayerBase {
-  headshotUrl: string | null;
+  headshotUrl: string | null; // Always null - headshots removed
   number?: number;
 }
 
@@ -153,7 +153,7 @@ export interface PlayerListItem extends PlayerBase {
   bye: number | null;
   adp: number | null;
   proj: string;
-  headshotUrl?: string | null;
+  headshotUrl?: string | null; // Deprecated - always null
 }
 
 /** Player from PLAYER_POOL (static data) */
@@ -175,7 +175,7 @@ export interface PlayerFull extends PlayerBase {
   bye: number | null;
   adp: number | null;
   proj: string;
-  headshotUrl: string | null;
+  headshotUrl: string | null; // Deprecated - always null, headshots removed
   projections: Projections | null;
   stats: Record<string, PlayerStats>;
   adpData: ADPData | null;

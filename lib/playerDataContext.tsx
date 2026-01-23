@@ -14,14 +14,14 @@
  * 
  * Usage:
  *   import { usePlayerData } from '../lib/playerDataContext';
- *   const { allPlayers, headshotsMap, getPlayersByPosition } = usePlayerData();
+ *   const { allPlayers, getPlayersByPosition } = usePlayerData();
  */
 
 import type { JSX } from 'react';
 import React, { createContext, useContext, useState, useMemo, useCallback, ReactNode } from 'react';
 import { PLAYER_POOL, PlayerPoolEntry } from './playerPool';
 import { POSITIONS, FLEX_POSITIONS } from './constants/positions';
-import { useHeadshots } from './swr/usePlayerSWR';
+import { getPlayerPhotoUrl } from './playerPhotos';
 
 // ============================================================================
 // TYPES
@@ -53,8 +53,6 @@ export interface PlayerDataContextValue {
   // Core data
   allPlayers: PlayerPoolEntry[];
   availablePlayers: PlayerPoolEntry[];
-  headshotsMap: Record<string, string>;
-  headshotsLoading: boolean;
   draftedPlayerNames: string[];
   playerStats: Record<string, unknown>;
   
@@ -73,17 +71,13 @@ export interface PlayerDataContextValue {
   
   // Lookups
   getPlayer: (playerName: string) => PlayerPoolEntry | undefined;
-  getPlayerHeadshot: (playerName: string) => string | null;
-  getPlayerWithHeadshot: (playerName: string) => (PlayerPoolEntry & { headshotUrl: string | null }) | null;
+  getPlayerPhoto: (playerName: string) => string | null;
   
   // Stats
   positionCounts: PositionCounts;
   totalPlayers: number;
   availableCount: number;
   draftedCount: number;
-  
-  // SWR utilities
-  refreshHeadshots: () => void;
 }
 
 interface PlayerDataProviderProps {
@@ -104,9 +98,6 @@ export function PlayerDataProvider({ children }: PlayerDataProviderProps): JSX.E
   // Core state
   const [draftedPlayerNames, setDraftedPlayerNames] = useState<Set<string>>(new Set());
   const [playerStats, setPlayerStats] = useState<Record<string, unknown>>({});
-  
-  // Headshots via SWR - automatic caching, deduplication, and revalidation
-  const { headshotsMap, isLoading: headshotsLoading, mutate: mutateHeadshots } = useHeadshots();
   
   // All players from static pool
   const allPlayers = useMemo(() => PLAYER_POOL, []);
@@ -257,21 +248,11 @@ export function PlayerDataProvider({ children }: PlayerDataProviderProps): JSX.E
     return allPlayers.find(p => p.name === playerName);
   }, [allPlayers]);
 
-  const getPlayerHeadshot = useCallback((playerName: string): string | null => {
-    return headshotsMap[playerName] || null;
-  }, [headshotsMap]);
-
-  const getPlayerWithHeadshot = useCallback((
-    playerName: string
-  ): (PlayerPoolEntry & { headshotUrl: string | null }) | null => {
+  const getPlayerPhoto = useCallback((playerName: string): string | null => {
     const player = getPlayer(playerName);
     if (!player) return null;
-    
-    return {
-      ...player,
-      headshotUrl: headshotsMap[player.name] || null
-    };
-  }, [getPlayer, headshotsMap]);
+    return getPlayerPhotoUrl(player.name, player.team, player.position);
+  }, [getPlayer]);
 
   // ============================================
   // Position Counts
@@ -298,17 +279,10 @@ export function PlayerDataProvider({ children }: PlayerDataProviderProps): JSX.E
   // Context Value
   // ============================================
   
-  // Refresh headshots (useful for manual refresh)
-  const refreshHeadshots = useCallback((): void => {
-    mutateHeadshots();
-  }, [mutateHeadshots]);
-
   const value = useMemo((): PlayerDataContextValue => ({
     // Core data
     allPlayers,
     availablePlayers,
-    headshotsMap,
-    headshotsLoading,
     draftedPlayerNames: Array.from(draftedPlayerNames),
     playerStats,
     
@@ -327,22 +301,16 @@ export function PlayerDataProvider({ children }: PlayerDataProviderProps): JSX.E
     
     // Lookups
     getPlayer,
-    getPlayerHeadshot,
-    getPlayerWithHeadshot,
+    getPlayerPhoto,
     
     // Stats
     positionCounts,
     totalPlayers: allPlayers.length,
     availableCount: availablePlayers.length,
     draftedCount: draftedPlayerNames.size,
-    
-    // SWR utilities
-    refreshHeadshots,
   }), [
     allPlayers,
     availablePlayers,
-    headshotsMap,
-    headshotsLoading,
     draftedPlayerNames,
     playerStats,
     getPlayersByPosition,
@@ -355,10 +323,8 @@ export function PlayerDataProvider({ children }: PlayerDataProviderProps): JSX.E
     resetDraftedPlayers,
     syncDraftedPlayers,
     getPlayer,
-    getPlayerHeadshot,
-    getPlayerWithHeadshot,
+    getPlayerPhoto,
     positionCounts,
-    refreshHeadshots,
   ]);
 
   return (
@@ -400,14 +366,14 @@ export function useFilteredPlayers(options: FilterOptions = {}): PlayerPoolEntry
 }
 
 /**
- * Hook to get player headshot with fallback
+ * Hook to get player photo URL with fallback
  */
 export function usePlayerHeadshot(playerName: string): { headshotUrl: string | null; loading: boolean } {
-  const { getPlayerHeadshot, headshotsLoading } = usePlayerData();
+  const { getPlayerPhoto } = usePlayerData();
   
   return {
-    headshotUrl: getPlayerHeadshot(playerName),
-    loading: headshotsLoading
+    headshotUrl: getPlayerPhoto(playerName),
+    loading: false
   };
 }
 

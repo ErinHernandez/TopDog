@@ -197,7 +197,6 @@ export const swrConfig: SWRConfiguration = {
 export const CACHE_TIMES = {
   // Player data - rarely changes, long cache
   PLAYERS: 24 * 60 * 60 * 1000, // 24 hours
-  HEADSHOTS: Infinity, // Immutable - headshots don't change during the season
   PROJECTIONS: 24 * 60 * 60 * 1000, // 24 hours
   
   // Stats - moderate cache
@@ -225,7 +224,6 @@ export type CacheTimeKey = keyof typeof CACHE_TIMES;
 /** API endpoint constants */
 export const API_ENDPOINTS = {
   PLAYERS: '/api/nfl/players',
-  HEADSHOTS: '/api/nfl/headshots',
   PROJECTIONS: '/api/nfl/projections',
   SEASON_STATS: '/api/nfl/stats/season',
   WEEKLY_STATS: '/api/nfl/stats/weekly',

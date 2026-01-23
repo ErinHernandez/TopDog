@@ -20,9 +20,6 @@ export type NFLTeamCode =
 
 export type PlayerPosition = 'QB' | 'RB' | 'WR' | 'TE' | 'K' | 'DEF';
 
-export interface HeadshotsMap {
-  [playerName: string]: string;
-}
 
 // ============================================================================
 // CONSTANTS
@@ -68,63 +65,32 @@ export const getPlayerId = (playerName: string | null | undefined): string | nul
 };
 
 /**
- * Generate a player photo URL with enhanced fallback chain
+ * Generate a player photo URL with fallback chain
  * Fallback order:
- * 1. SportsDataIO headshot from headshotsMap (highest quality, official)
- * 2. Provided photoUrl from player pool
- * 3. Local player image (WebP) - /players/{playerId}.webp
- * 4. Local player image (PNG) - /players/{playerId}.png
- * 5. Team logo - /logos/nfl/{team}.png
- * 6. Initials-based avatar (ui-avatars.com)
+ * 1. Team logo - /logos/nfl/{team}.png
+ * 2. Initials-based avatar (ui-avatars.com)
  * 
  * @param playerName - The player's name
  * @param teamCode - The player's team code (e.g., 'BUF', 'KC')
  * @param position - The player's position (QB, RB, WR, TE)
  * @param size - Image size (default: 40)
- * @param playerId - Optional player ID (will be generated from name if not provided)
- * @param photoUrl - Optional direct photo URL from player pool
- * @param headshotsMap - Optional map of player names to SportsDataIO headshot URLs
  * @returns URL for the player image or null
  */
 export const getPlayerPhotoUrl = (
   playerName: string | null | undefined,
   teamCode: NFLTeamCode | string | null | undefined,
   position: PlayerPosition | string | null | undefined,
-  size: number = 40,
-  playerId: string | null = null,
-  photoUrl: string | null = null,
-  headshotsMap: HeadshotsMap | null = null
+  size: number = 40
 ): string | null => {
   if (!playerName) return null;
   
-  // Priority 1: SportsDataIO headshot (highest quality, official source)
-  if (headshotsMap && headshotsMap[playerName]) {
-    return headshotsMap[playerName];
-  }
-  
-  // Priority 2: Use provided photoUrl from player pool (if available)
-  if (photoUrl) {
-    return photoUrl;
-  }
-  
-  // Priority 2: Try local player image (WebP)
-  const id = playerId || getPlayerId(playerName);
-  if (id) {
-    // Check if WebP exists (browser will handle fallback to PNG automatically)
-    // Return WebP URL - browser will fallback to PNG if WebP not supported
-    const webpUrl = `/players/${id}.webp`;
-    // Note: In actual implementation, you'd check if file exists server-side
-    // For client-side, we return the URL and let the browser handle 404s
-    return webpUrl;
-  }
-  
-  // Priority 3: Team logo fallback
+  // Priority 1: Team logo fallback
   const teamLogoUrl = getTeamLogoUrl(teamCode);
   if (teamLogoUrl) {
     return teamLogoUrl;
   }
   
-  // Priority 4: Initials-based avatar (final fallback)
+  // Priority 2: Initials-based avatar (final fallback)
   const cleanName = playerName.trim();
   const encodedName = encodeURIComponent(cleanName);
   const positionColor = (POSITION_COLORS as Record<string, { primary?: string }>)[position || '']?.primary || '#6b7280';

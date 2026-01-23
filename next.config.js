@@ -136,7 +136,6 @@ const nextConfig = {
   },
   // Exclude .bak files from build
   pageExtensions: ['tsx', 'ts', 'jsx', 'js'],
-  exclude: ['**/*.bak'],
   // Enable compression
   compress: true,
   // Optimize package imports
@@ -150,6 +149,14 @@ const nextConfig = {
   },
   // Webpack configuration for bundle optimization
   webpack: (config, { isServer, dev }) => {
+    // Exclude .bak files
+    config.module = config.module || {};
+    config.module.rules = config.module.rules || [];
+    config.module.rules.push({
+      test: /\.bak$/,
+      use: 'ignore-loader',
+    });
+    
     // Fix hot-update.json ENOENT errors in dev mode
     if (dev) {
       const fs = require('fs');
@@ -248,101 +255,6 @@ const nextConfig = {
     // Keep empty - firebase-admin is handled via serverExternalPackages and CommonJS require
     // Exclude .bak files from build
     resolveExtensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
-  },
-  // Exclude .bak files from webpack
-  webpack: (config, { isServer, dev }) => {
-    // Exclude .bak files
-    config.module = config.module || {};
-    config.module.rules = config.module.rules || [];
-    config.module.rules.push({
-      test: /\.bak$/,
-      use: 'ignore-loader',
-    });
-    
-    // Fix hot-update.json ENOENT errors in dev mode
-    if (dev) {
-      const fs = require('fs');
-      const path = require('path');
-      
-      // Ensure hot-update directory exists
-      const hotUpdateDir = path.join(process.cwd(), '.next', 'dev', 'static', 'webpack');
-      if (!fs.existsSync(hotUpdateDir)) {
-        fs.mkdirSync(hotUpdateDir, { recursive: true });
-      }
-      
-      // Disable HMR to avoid hot-update.json errors (temporary workaround)
-      // This prevents webpack from trying to read non-existent hot-update files
-      if (!isServer) {
-        config.optimization = config.optimization || {};
-        // Keep HMR enabled but add error handling
-        config.plugins = config.plugins || [];
-        config.plugins.push({
-          apply: (compiler) => {
-            // Intercept file system errors for hot-update.json
-            const originalReadFile = fs.readFile;
-            const originalReadFileSync = fs.readFileSync;
-            
-            // Wrap readFile to handle missing hot-update.json gracefully
-            const wrappedReadFile = function(...args) {
-              const filePath = args[0];
-              if (typeof filePath === 'string' && filePath.includes('hot-update.json')) {
-                const callback = args[args.length - 1];
-                if (typeof callback === 'function') {
-                  // Return empty object for missing hot-update files
-                  return callback(null, Buffer.from('{}'));
-                }
-              }
-              return originalReadFile.apply(this, args);
-            };
-            
-            compiler.hooks.beforeCompile.tap('HotUpdateFix', () => {
-              // Ensure directory exists
-              if (!fs.existsSync(hotUpdateDir)) {
-                fs.mkdirSync(hotUpdateDir, { recursive: true });
-              }
-            });
-          }
-        });
-      }
-    }
-    // Bundle splitting for large modules
-    if (!isServer) {
-      config.optimization.splitChunks = {
-        chunks: 'all',
-        cacheGroups: {
-          // Vendor chunk for node_modules
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
-            priority: 10,
-          },
-          // Separate chunk for Stripe
-          stripe: {
-            test: /[\\/]node_modules[\\/](@stripe|stripe)[\\/]/,
-            name: 'stripe',
-            chunks: 'all',
-            priority: 20,
-          },
-          // Separate chunk for Firebase
-          firebase: {
-            test: /[\\/]node_modules[\\/](firebase|@firebase)[\\/]/,
-            name: 'firebase',
-            chunks: 'all',
-            priority: 20,
-          },
-          // Draft room components (identify duplication)
-          draftRoom: {
-            test: /[\\/]components[\\/](draft|DraftRoom|VX|topdog)[\\/]/,
-            name: 'draft-room',
-            chunks: 'all',
-            priority: 15,
-          },
-        },
-      };
-    }
-    
-    return config;
   },
   // Mark firebase-admin as server-only (not bundled for client)
   // This works for both webpack builds and Turbopack dev mode
