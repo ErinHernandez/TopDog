@@ -31,6 +31,7 @@
 
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { withMiddlewareErrorHandling } from './lib/middlewareErrorHandler';
 
 /** Pages removed in V4 mobile-only – redirect to home */
 const REMOVED_PAGES = [
@@ -80,10 +81,12 @@ function getUserHash(request: NextRequest): number {
   
   // Fallback to IP + User-Agent for anonymous users
   // Get IP from headers (NextRequest doesn't have .ip property)
-  const forwardedFor = request.headers.get('x-forwarded-for');
-  const realIp = request.headers.get('x-real-ip');
-  const cfIp = request.headers.get('cf-connecting-ip');
-  const ip = forwardedFor?.split(',')[0] || realIp || cfIp || 'unknown';
+  // Priority: Trusted proxies first (cf-connecting-ip, x-real-ip), then x-forwarded-for
+  // x-forwarded-for can be spoofed by clients, so it's checked last
+  const cfIp = request.headers.get('cf-connecting-ip'); // Cloudflare (most trusted)
+  const realIp = request.headers.get('x-real-ip'); // Nginx/Vercel (trusted proxy)
+  const forwardedFor = request.headers.get('x-forwarded-for'); // Can be spoofed (least trusted)
+  const ip = cfIp || realIp || forwardedFor?.split(',')[0] || 'unknown';
   
   const identifier = userId || 
     `${ip}-${request.headers.get('user-agent') || 'unknown'}`;
@@ -117,7 +120,11 @@ function shouldRedirectToVX2(request: NextRequest, rolloutPercentage: number): b
   return userHash < rolloutPercentage;
 }
 
-export function middleware(request: NextRequest) {
+/**
+ * Main middleware function
+ * Handles redirects for removed pages and legacy draft room migration
+ */
+function middlewareHandler(request: NextRequest): NextResponse {
   const { pathname } = request.nextUrl;
 
   if (REMOVED_PAGES.includes(pathname)) {
@@ -156,6 +163,9 @@ export function middleware(request: NextRequest) {
   
   return response;
 }
+
+// Export middleware with error handling
+export const middleware = withMiddlewareErrorHandling(middlewareHandler);
 
 export const config = {
   matcher: [

@@ -148,6 +148,10 @@ module.exports = {
     '^@/components/(.*)$': '<rootDir>/components/$1',
     '^@/lib/(.*)$': '<rootDir>/lib/$1',
     '^@/hooks/(.*)$': '<rootDir>/hooks/$1',
+    // Mock Next.js server modules for testing
+    '^next/server$': '<rootDir>/__tests__/__mocks__/next-server.js',
+    // Mock whatwg-encoding to prevent ESM issues
+    '^whatwg-encoding$': '<rootDir>/__tests__/__mocks__/whatwg-encoding.js',
   },
 
   // Transform files
