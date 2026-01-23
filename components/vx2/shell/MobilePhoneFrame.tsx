@@ -1,7 +1,7 @@
 /**
  * Phone frame for desktop viewing.
- * Fixed dimensions matching iPhone 15 (393×852 logical pixels).
- * Used when _app wraps content on desktop; mobile renders fullscreen without frame.
+ * Fixed dimensions: 375×812 (iPhone standard).
+ * Children fill 100% of the screen area.
  */
 
 import React from 'react';
@@ -15,19 +15,19 @@ export function MobilePhoneFrame({ children }: MobilePhoneFrameProps): React.Rea
     <div
       className="relative bg-black rounded-[3rem] p-3 shadow-2xl"
       style={{
-        width: '393px',
-        height: '852px',
+        width: '375px',
+        height: '812px',
       }}
+      data-phone-frame="true"
     >
       {/* Notch */}
       <div
         className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-7 bg-black rounded-b-2xl z-10"
         aria-hidden
       />
-      {/* Screen */}
+      {/* Screen - children fill this completely */}
       <div 
-        className="w-full h-full rounded-[2.5rem] overflow-hidden relative"
-        style={{ backgroundColor: '#101927' }}
+        className="w-full h-full bg-white rounded-[2.5rem] overflow-hidden relative"
       >
         {children}
       </div>

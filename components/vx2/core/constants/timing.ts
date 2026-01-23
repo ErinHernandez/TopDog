@@ -78,11 +78,4 @@ export const DRAFT_TUTORIAL = {
   CELL_GAP: 2,
 } as const;
 
-/**
- * Tablet layout constants
- */
-export const TABLET_LAYOUT = {
-  /** 30 days in milliseconds */
-  THIRTY_DAYS_MS: 30 * 24 * 60 * 60 * 1000,
-} as const;
 

@@ -64,30 +64,11 @@ function MyApp({ Component, pageProps }: AppProps) {
     setTimeout(init, 500);
   }, []);
 
-  function renderContent() {
-    if (isMobile === null) {
-      return <Component {...pageProps} />;
-    }
-    if (isMobile) {
-      return <Component {...pageProps} />;
-    }
-    return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-        {showDevNav && (
-          <div className="fixed top-4 left-4 z-50">
-            <DevNav />
-          </div>
-        )}
-        <InPhoneFrameProvider value={true}>
-          <MobilePhoneFrame>
-            <Component {...pageProps} />
-          </MobilePhoneFrame>
-        </InPhoneFrameProvider>
-      </div>
-    );
-  }
+  // Render the page content
+  const pageContent = <Component {...pageProps} />;
 
-  return (
+  // Wrap with providers
+  const withProviders = (content: React.ReactNode) => (
     <SWRConfig value={swrConfig}>
       <Head>
         <meta
@@ -97,10 +78,40 @@ function MyApp({ Component, pageProps }: AppProps) {
       </Head>
       <UserProvider>
         <PlayerDataProvider>
-          <GlobalErrorBoundary>{renderContent()}</GlobalErrorBoundary>
+          <GlobalErrorBoundary>{content}</GlobalErrorBoundary>
         </PlayerDataProvider>
       </UserProvider>
     </SWRConfig>
+  );
+
+  // SSR/Hydration: Render without frame to avoid mismatch
+  // Frame appears after client-side hydration
+  if (isMobile === null) {
+    return withProviders(pageContent);
+  }
+
+  // Mobile: Fullscreen, no frame
+  if (isMobile) {
+    return withProviders(pageContent);
+  }
+
+  // Desktop: Centered phone frame
+  return withProviders(
+    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
+      {/* DevNav for testing routes - positioned outside frame */}
+      {showDevNav && (
+        <div className="fixed top-4 left-4 z-50">
+          <DevNav />
+        </div>
+      )}
+
+      {/* Phone frame with page content */}
+      <InPhoneFrameProvider value={true}>
+        <MobilePhoneFrame>
+          {pageContent}
+        </MobilePhoneFrame>
+      </InPhoneFrameProvider>
+    </div>
   );
 }
 

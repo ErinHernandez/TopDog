@@ -163,27 +163,32 @@ function InnerShell({ badgeOverrides }: InnerShellProps): React.ReactElement {
   return (
     <ModalContext.Provider value={modalContext}>
       <div 
-        className="flex flex-col relative vx2-device-standard"
-        data-device-class="standard"
-        suppressHydrationWarning
         style={{ 
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
+          width: '100%',
           backgroundColor: BG_COLORS.primary,
-          // When in phone frame, use 100% to fill the fixed frame container
-          // When not in phone frame (actual mobile), use stable viewport height
-          // Use fallback for SSR to prevent hydration mismatch
-          height: inPhoneFrame 
-            ? '100%' 
-            : typeof window === 'undefined' 
-              ? '100vh' 
-              : 'calc(var(--stable-vh, 1vh) * 100)',
           overflow: 'hidden',
         }}
       >
-        {/* Tab Content Area */}
-        <TabContentVX2 />
+        {/* Main content - Scrollable */}
+        <main
+          style={{
+            flex: 1,
+            minHeight: 0,  // CRITICAL: Allow shrinking
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            WebkitOverflowScrolling: 'touch',
+          }}
+        >
+          <TabContentVX2 />
+        </main>
         
         {/* Tab Bar */}
-        <TabBarVX2 badgeOverrides={badgeOverrides} />
+        <div style={{ flexShrink: 0 }}>
+          <TabBarVX2 badgeOverrides={badgeOverrides} />
+        </div>
         
         {/* Modals - Only show for authenticated users after mount to prevent hydration mismatch */}
         <AutodraftLimitsModalVX2 

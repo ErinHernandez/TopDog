@@ -69,8 +69,6 @@ export interface DraftRoomVX2Props {
   userId?: string;
   /** Callback when leaving draft */
   onLeave?: () => void;
-  /** Use absolute positioning (for phone frame container) */
-  useAbsolutePosition?: boolean;
   /** Enable fast timer mode (3 seconds per pick) */
   fastMode?: boolean;
   /** Initial pick number to start at (default: 1) */
@@ -308,7 +306,6 @@ export default function DraftRoomVX2({
   roomId,
   userId,
   onLeave,
-  useAbsolutePosition = false,
   fastMode = false,
   initialPickNumber = 1,
   teamCount = 12,
@@ -529,32 +526,19 @@ export default function DraftRoomVX2({
     );
   }
   
-  const positionStyle = useAbsolutePosition ? 'absolute' : 'fixed';
-  
   return (
     <div
       style={{
-        position: positionStyle,
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: BG_COLORS.primary,
         display: 'flex',
         flexDirection: 'column',
+        height: '100%',
+        width: '100%',
+        backgroundColor: BG_COLORS.primary,
         overflow: 'hidden',
       }}
     >
-      {/* Unified Header - Status bar with centered timer */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 50,
-        }}
-      >
+      {/* Header - Fixed 54px */}
+      <div style={{ flexShrink: 0, height: HEADER_HEIGHT, zIndex: 50 }}>
         <DraftStatusBar
           timerSeconds={draftRoom.timer.seconds}
           isUserTurn={draftRoom.isMyTurn && draftRoom.status === 'active'}
@@ -563,24 +547,20 @@ export default function DraftRoomVX2({
           hideTimer={draftRoom.status === 'active'} // Hide timer in status bar when draft is active (timer shown in pick card)
         />
       </div>
-      
-      {/* Content wrapper - accounts for combined header + safe area */}
+
+      {/* Content Area - Flexible */}
       <div
         style={{
-          position: 'absolute',
-          // Account for combined header + safe area inset
-          top: `calc(${HEADER_HEIGHT}px + env(safe-area-inset-top, 0px))`,
-          left: 0,
-          right: 0,
-          bottom: LAYOUT_PX.footerHeight,
+          flex: 1,
+          minHeight: 0,  // CRITICAL: Allow shrinking
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
         }}
       >
-        {/* Picks Bar - hidden on Board tab (matches VX) */}
+        {/* Picks Bar - 200px when visible (not on board tab) */}
         {draftRoom.activeTab !== 'board' && (
-          <div style={{ flexShrink: 0 }}>
+          <div style={{ flexShrink: 0, height: LAYOUT_PX.picksBarHeight }}>
             <PicksBar
               picks={draftRoom.picks.picks}
               currentPickNumber={draftRoom.currentPickNumber}
@@ -591,12 +571,15 @@ export default function DraftRoomVX2({
             />
           </div>
         )}
-        
-        {/* Main Content Area */}
+
+        {/* Main Content - Scrollable */}
         <main
           style={{
             flex: 1,
-            overflow: 'hidden',
+            minHeight: 0,  // CRITICAL: Allow shrinking
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            WebkitOverflowScrolling: 'touch',
           }}
         >
           <TabContent 
@@ -609,14 +592,15 @@ export default function DraftRoomVX2({
           />
         </main>
       </div>
-      
-      {/* Footer */}
-      <DraftFooter
-        activeTab={draftRoom.activeTab}
-        onTabChange={draftRoom.setActiveTab}
-        queueCount={draftRoom.queue.queueCount}
-        useAbsolutePosition={useAbsolutePosition}
-      />
+
+      {/* Footer - Fixed 56px */}
+      <div style={{ flexShrink: 0, height: LAYOUT_PX.footerHeight, zIndex: 50 }}>
+        <DraftFooter
+          activeTab={draftRoom.activeTab}
+          onTabChange={draftRoom.setActiveTab}
+          queueCount={draftRoom.queue.queueCount}
+        />
+      </div>
       
       {/* Leave Confirmation Modal */}
       <LeaveConfirmModal

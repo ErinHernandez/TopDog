@@ -72,8 +72,6 @@ export interface DraftFooterProps {
   onTabChange: (tab: DraftTab) => void;
   /** Number of items in queue (shows badge) */
   queueCount?: number;
-  /** Use absolute positioning (for phone frame container) */
-  useAbsolutePosition?: boolean;
 }
 
 interface FooterTabConfig {
@@ -222,7 +220,6 @@ export default function DraftFooter({
   activeTab,
   onTabChange,
   queueCount = 0,
-  useAbsolutePosition = false,
 }: DraftFooterProps): React.ReactElement {
   return (
     <nav
@@ -232,10 +229,7 @@ export default function DraftFooter({
         backgroundColor: FOOTER_COLORS.background,
         height: FOOTER_PX.containerHeight,
         borderTop: `${FOOTER_PX.containerBorderTop}px solid ${FOOTER_COLORS.border}`,
-        position: useAbsolutePosition ? 'absolute' : 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
+        width: '100%',
         zIndex: 50,
         display: 'flex',
         flexDirection: 'column',

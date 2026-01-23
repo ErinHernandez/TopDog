@@ -44,6 +44,7 @@ const REMOVED_PAGES = [
   '/mobile-rankings',
   '/mobile-deposit-history',
   '/mobile-profile-customization',
+  '/mobile',
 ];
 
 /**
@@ -178,6 +179,7 @@ export const config = {
     '/mobile-rankings',
     '/mobile-deposit-history',
     '/mobile-profile-customization',
+    '/mobile',
     '/draft/v2/:path*',
     '/draft/v3/:path*',
     '/draft/topdog/:path*',
