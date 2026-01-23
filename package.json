@@ -28,7 +28,7 @@
     "bundle:track": "node scripts/track-bundle-size.js",
     "console:plan": "node scripts/replace-console-logs.js",
     "lint:firestore": "grep -r 'getDocs(collection(' --include='*.ts' --include='*.tsx' pages/ lib/ | grep -v 'limit(' | grep -v '.test.ts' | grep -v 'node_modules' && echo 'ERROR: Found unbounded getDocs(collection(...)) calls!' && exit 1 || echo 'Firestore query check passed'",
-    "prepare": "husky install"
+    "prepare": "node -e \"if (process.env.CI || process.env.VERCEL) { process.exit(0) } try { require('husky').install() } catch (e) { process.exit(0) }\""
   },
   "keywords": [],
   "author": "",
