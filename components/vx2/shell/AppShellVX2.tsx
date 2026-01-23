@@ -21,12 +21,9 @@ import React, { useCallback, useState, useEffect, createContext, useContext } fr
 import dynamic from 'next/dynamic';
 import { TabNavigationProvider, HeaderProvider } from '../core';
 import type { TabId } from '../core/types';
-import type { DevicePresetId } from '../core/constants/sizes';
 import { BG_COLORS, TEXT_COLORS } from '../core/constants/colors';
-import { getDeviceClassFromPreset } from '../core/constants/responsive';
-import type { DeviceClass } from '../core/constants/responsive';
 import { TabBarVX2, TabContentVX2 } from '../navigation';
-import MobilePhoneFrame from './MobilePhoneFrame';
+import { useInPhoneFrame } from '../../../lib/inPhoneFrameContext';
 // Light modals - static imports
 import {
   AutodraftLimitsModalVX2,
@@ -108,16 +105,10 @@ export function useModals(): ModalContextType | null {
 export interface AppShellVX2Props {
   /** Initial tab to show */
   initialTab?: TabId;
-  /** Whether to show in phone frame (for desktop preview) */
-  showPhoneFrame?: boolean;
-  /** Device preset for phone frame (optional, defaults to standard iPhone) */
-  devicePreset?: DevicePresetId;
   /** Badge overrides for tabs */
   badgeOverrides?: Partial<Record<TabId, number>>;
   /** Callback when tab changes */
   onTabChange?: (fromTab: TabId | null, toTab: TabId) => void;
-  /** Whether phone frame should be fullscreen (false for side-by-side layouts) */
-  fullScreen?: boolean;
 }
 
 // ============================================================================
@@ -126,11 +117,10 @@ export interface AppShellVX2Props {
 
 interface InnerShellProps {
   badgeOverrides?: Partial<Record<TabId, number>>;
-  deviceClass?: DeviceClass;
-  inPhoneFrame?: boolean;
 }
 
-function InnerShell({ badgeOverrides, deviceClass = 'standard', inPhoneFrame = false }: InnerShellProps): React.ReactElement {
+function InnerShell({ badgeOverrides }: InnerShellProps): React.ReactElement {
+  const inPhoneFrame = useInPhoneFrame();
   // Initialize stable viewport height (sets CSS variable)
   // Note: Hook always runs to set the CSS variable (needed for mobile), but when inPhoneFrame=true,
   // we use height: 100% which ignores the CSS variable and fills the fixed phone frame container
@@ -173,8 +163,8 @@ function InnerShell({ badgeOverrides, deviceClass = 'standard', inPhoneFrame = f
   return (
     <ModalContext.Provider value={modalContext}>
       <div 
-        className={`flex flex-col relative vx2-device-${deviceClass}`}
-        data-device-class={deviceClass}
+        className="flex flex-col relative vx2-device-standard"
+        data-device-class="standard"
         suppressHydrationWarning
         style={{ 
           backgroundColor: BG_COLORS.primary,
@@ -237,44 +227,14 @@ function InnerShell({ badgeOverrides, deviceClass = 'standard', inPhoneFrame = f
 
 export default function AppShellVX2({
   initialTab = 'lobby',
-  showPhoneFrame = true,
-  devicePreset,
   badgeOverrides,
   onTabChange,
-  fullScreen = true,
 }: AppShellVX2Props): React.ReactElement {
-  // Get device class from preset for simulated frames
-  const deviceClass = getDeviceClassFromPreset(devicePreset);
-  
-  // Optionally wrap in phone frame for desktop preview
-  if (showPhoneFrame) {
-    return (
-      <TabNavigationProvider 
-        initialTab={initialTab}
-        onTabChange={onTabChange}
-      >
-        <HeaderProvider>
-          <MobilePhoneFrame devicePreset={devicePreset} fullScreen={fullScreen}>
-            {/* AuthGateVX2 gates all app content - must authenticate to access */}
-            <AuthGateVX2>
-              <InnerShell badgeOverrides={badgeOverrides} deviceClass={deviceClass} inPhoneFrame={true} />
-            </AuthGateVX2>
-          </MobilePhoneFrame>
-        </HeaderProvider>
-      </TabNavigationProvider>
-    );
-  }
-  
-  // Without phone frame (actual mobile device) - use standard, CSS media queries will handle it
   return (
-    <TabNavigationProvider 
-      initialTab={initialTab}
-      onTabChange={onTabChange}
-    >
+    <TabNavigationProvider initialTab={initialTab} onTabChange={onTabChange}>
       <HeaderProvider>
-        {/* AuthGateVX2 gates all app content - must authenticate to access */}
         <AuthGateVX2>
-          <InnerShell badgeOverrides={badgeOverrides} deviceClass="standard" />
+          <InnerShell badgeOverrides={badgeOverrides} />
         </AuthGateVX2>
       </HeaderProvider>
     </TabNavigationProvider>

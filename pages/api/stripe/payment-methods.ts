@@ -62,7 +62,9 @@ async function handler(
 }
 
 // Export with authentication, CSRF protection, and rate limiting
-export default withCSRFProtection(withAuth(withRateLimit(handler, paymentMethodsLimiter)));
+import type { ApiHandler as AuthApiHandler } from '../../../lib/apiAuth';
+type CSRFHandler = (req: NextApiRequest, res: NextApiResponse) => Promise<void> | void;
+export default withCSRFProtection(withAuth(withRateLimit(handler, paymentMethodsLimiter) as unknown as AuthApiHandler) as unknown as CSRFHandler);
 
 // ============================================================================
 // HANDLERS

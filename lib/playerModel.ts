@@ -457,7 +457,8 @@ export function transformFromESPN(raw: ProjectionData | null): PlayerFull | null
   if (!raw) return null;
   
   // Convert ProjectionData to SportsDataIO-like format for transformation
-  const sportsdataioLike: RawStatsInput = {
+  // Use RawPlayerPoolInput which includes PlayerID, Name, etc.
+  const sportsdataioLike: RawPlayerPoolInput = {
     PlayerID: raw.PlayerID,
     Name: raw.Name,
     Position: raw.Position,
@@ -485,7 +486,6 @@ export function transformFromESPN(raw: ProjectionData | null): PlayerFull | null
   const fantasy = transformFantasyPoints(sportsdataioLike);
   
   const meta: PlayerMeta = {
-    espnId: raw.PlayerID,
     // ESPN doesn't provide these fields in projections, so they're null
     number: null,
     height: null,

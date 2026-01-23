@@ -1,1 +1,0 @@
-export { DraftTimer as default } from './stubs';

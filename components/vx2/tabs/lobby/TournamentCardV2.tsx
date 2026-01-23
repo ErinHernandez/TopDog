@@ -68,9 +68,9 @@ const CARD_DIMENSIONS = {
  * These match the original TournamentCard colors exactly
  */
 const CARD_COLORS = {
-  // Background image URL (WebP with PNG fallback)
-  backgroundImage: 'url(/do_riding_football_III.webp)',
-  backgroundImagePng: 'url(/do_riding_football_III.png)',
+  // Background image URL (public/tournament_card_background.png)
+  backgroundImage: 'url(/tournament_card_background.png)',
+  backgroundImagePng: 'url(/tournament_card_background.png)',
   
   // Solid color fallback if images fail
   backgroundFallback: '#0a0a1a',

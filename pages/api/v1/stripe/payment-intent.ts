@@ -412,4 +412,5 @@ const handler = async function(
 };
 
 // Export with CSRF protection
-export default withCSRFProtection(handler);
+type CSRFHandler = (req: NextApiRequest, res: NextApiResponse) => Promise<void> | void;
+export default withCSRFProtection(handler as unknown as CSRFHandler);

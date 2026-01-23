@@ -25,7 +25,7 @@ import type { SlowDraftsTabProps, SlowDraft } from './types';
 import { SLOW_DRAFT_LAYOUT } from './constants';
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS } from '../../core/constants/colors';
 import { SPACING, RADIUS } from '../../core/constants/sizes';
-import { Skeleton, EmptyState, ErrorState } from '../../components/shared';
+import { Skeleton, EmptyState, ErrorState } from '../../../ui';
 
 import {
   SlowDraftCard,

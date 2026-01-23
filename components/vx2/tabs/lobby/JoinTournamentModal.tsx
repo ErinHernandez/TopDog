@@ -24,11 +24,11 @@ import { type Tournament, useUser } from '../../hooks/data';
 import { BG_COLORS, TEXT_COLORS } from '../../core/constants/colors';
 import { SPACING, RADIUS, TYPOGRAPHY, Z_INDEX } from '../../core/constants/sizes';
 import { Close, Plus } from '../../components/icons';
-import Switch from '../../../vx/shared/Switch';
+import { Switch } from '../../../ui';
 import TournamentRulesModal from '../../../mobile/modals/TournamentRulesModal';
 import { formatCents } from '../../utils/formatting';
 import { useModals } from '../../shell/AppShellVX2';
-import { ProgressBar } from '../../components/shared';
+import { ProgressBar } from '../../../ui';
 import { TILED_BG_STYLE } from '../../draft-room/constants';
 
 // ============================================================================

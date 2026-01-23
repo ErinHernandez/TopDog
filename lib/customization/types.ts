@@ -39,7 +39,7 @@ export type OverlayPattern =
 export interface FlagOption {
   code: string;
   name: string;
-  type: 'country' | 'state';
+  type: 'country' | 'state' | 'county' | 'division';
 }
 
 export const DEFAULT_PREFERENCES: CustomizationPreferences = {

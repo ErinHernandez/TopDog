@@ -15,9 +15,7 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS, POSITION_COLORS } from '../core/constants/colors';
 import { SPACING, RADIUS, TYPOGRAPHY, Z_INDEX } from '../core/constants/sizes';
 import { Close, Plus, Minus, Search } from '../components/icons';
-import { PositionBadge } from '../components/shared';
-import type { Position } from '../components/shared/display/types';
-import { POSITIONS } from '../components/shared/display/types';
+import { PositionBadge, type Position, POSITIONS } from '../../ui';
 
 // ============================================================================
 // TYPES

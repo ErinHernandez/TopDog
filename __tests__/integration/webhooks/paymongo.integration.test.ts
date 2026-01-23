@@ -20,18 +20,18 @@ jest.mock('../../../lib/firebase-utils', () => ({
 
 // Mock micro buffer
 jest.mock('micro', () => ({
-  buffer: jest.fn().mockImplementation((req: NextApiRequest) => {
+  buffer: jest.fn((req: NextApiRequest) => {
     return Promise.resolve(Buffer.from((req as NextApiRequest & { _mockBody?: string })._mockBody || '{}'));
   }),
 }));
 
 // Mock PayMongo functions
-const mockVerifyWebhookSignature = jest.fn();
-const mockHandleSourceChargeable = jest.fn();
-const mockHandlePaymentPaid = jest.fn();
-const mockHandlePaymentFailed = jest.fn();
-const mockHandlePayoutPaid = jest.fn();
-const mockHandlePayoutFailed = jest.fn();
+const mockVerifyWebhookSignature = jest.fn<boolean, any[]>().mockReturnValue(true);
+const mockHandleSourceChargeable = jest.fn<Promise<{ success: boolean; actions: string[] }>, any[]>();
+const mockHandlePaymentPaid = jest.fn<Promise<{ success: boolean; actions: string[] }>, any[]>();
+const mockHandlePaymentFailed = jest.fn<Promise<{ success: boolean; actions: string[] }>, any[]>();
+const mockHandlePayoutPaid = jest.fn<Promise<{ success: boolean; actions: string[] }>, any[]>();
+const mockHandlePayoutFailed = jest.fn<Promise<{ success: boolean; actions: string[] }>, any[]>();
 
 jest.mock('../../../lib/paymongo', () => ({
   verifyWebhookSignature: (...args: unknown[]) => mockVerifyWebhookSignature(...args),
@@ -487,7 +487,7 @@ describe('PayMongo Webhook Integration', () => {
       });
       const payloadString = JSON.stringify(payload);
 
-      mockHandlePaymentPaid.mockRejectedValue(new Error('Database error'));
+      mockHandlePaymentPaid.mockRejectedValue(new Error('Database error') as Error);
 
       const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
         method: 'POST',

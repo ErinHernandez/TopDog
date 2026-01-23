@@ -26,6 +26,8 @@ import {
 } from '@/lib/customization/geolocation';
 import { useLocationConsent } from '@/components/vx2/location/hooks/useLocationConsent';
 import { trackLocation } from '@/lib/location/locationService';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 interface UseCustomizationReturn {
   // Saved state
@@ -57,7 +59,14 @@ const DEV_FLAGS: FlagOption[] = [
   { code: 'US', name: 'United States', type: 'country' },
   { code: 'US-SC', name: 'South Carolina', type: 'state' },
   { code: 'US-NY', name: 'New York', type: 'state' },
+  { code: 'US-CA-06037', name: 'Los Angeles', type: 'county' },
   { code: 'IE', name: 'Ireland', type: 'country' },
+  // Sample divisions for testing
+  { code: 'CA-ON', name: 'Ontario', type: 'division' },
+  { code: 'AU-NSW', name: 'New South Wales', type: 'division' },
+  { code: 'GB-ENG', name: 'England', type: 'division' },
+  { code: 'DE-BY', name: 'Bavaria', type: 'division' },
+  { code: 'FR-IDF', name: 'Île-de-France', type: 'division' },
 ];
 
 export function useCustomization(): UseCustomizationReturn {
@@ -127,7 +136,7 @@ export function useCustomization(): UseCustomizationReturn {
     };
   }, [user?.uid]);
 
-  // Subscribe to locations
+  // Subscribe to locations and badges
   useEffect(() => {
     if (!user?.uid) {
       // In dev mode, show dev flags even without user
@@ -138,23 +147,68 @@ export function useCustomization(): UseCustomizationReturn {
       return;
     }
 
-    const unsubscribe = subscribeToLocations(user.uid, async (locations) => {
-      if (locations && (locations.countries?.length > 0 || locations.states?.length > 0)) {
-        setLocationConsent(locations.consentGiven ?? false);
-        const flags: FlagOption[] = [
-          ...(locations.countries || []).map((c) => ({
-            code: c.code,
-            name: c.name,
-            type: 'country' as const,
-          })),
-          ...(locations.states || []).map((s) => ({
-            code: `US-${s.code}`,
-            name: s.name,
-            type: 'state' as const,
-          })),
-        ];
-        
-        // In dev mode, merge dev flags with user flags (avoid duplicates)
+    if (!db) {
+      setFlagsLoading(false);
+      return;
+    }
+
+    let locationsData: UserLocations | null = null;
+    let badgeData: any = null;
+
+    // Helper to combine and set flags
+    const updateFlags = () => {
+      const flags: FlagOption[] = [];
+      
+      // Add countries from locations or badges
+      if (locationsData?.countries?.length) {
+        flags.push(...locationsData.countries.map((c) => ({
+          code: c.code,
+          name: c.name,
+          type: 'country' as const,
+        })));
+      } else if (badgeData?.countries?.length) {
+        flags.push(...badgeData.countries.map((c: any) => ({
+          code: c.code,
+          name: c.name,
+          type: 'country' as const,
+        })));
+      }
+      
+      // Add states from locations or badges
+      if (locationsData?.states?.length) {
+        flags.push(...locationsData.states.map((s) => ({
+          code: `US-${s.code}`,
+          name: s.name,
+          type: 'state' as const,
+        })));
+      } else if (badgeData?.states?.length) {
+        flags.push(...badgeData.states.map((s: any) => ({
+          code: s.code,
+          name: s.name,
+          type: 'state' as const,
+        })));
+      }
+      
+      // Add counties from badges only
+      if (badgeData?.counties?.length) {
+        flags.push(...badgeData.counties.map((c: any) => ({
+          code: c.code,
+          name: c.name,
+          type: 'county' as const,
+        })));
+      }
+      
+      // Add divisions from badges (international administrative divisions)
+      if (badgeData?.divisions?.length) {
+        flags.push(...badgeData.divisions.map((d: any) => ({
+          code: d.code,
+          name: d.name,
+          type: 'division' as const,
+        })));
+      }
+
+      if (flags.length > 0 || locationsData || badgeData) {
+        setLocationConsent(true);
         const finalFlags = process.env.NODE_ENV === 'development'
           ? [
               ...DEV_FLAGS,
@@ -163,55 +217,64 @@ export function useCustomization(): UseCustomizationReturn {
               ),
             ]
           : flags;
-        
         setAvailableFlags(finalFlags);
         setFlagsLoading(false);
-      } else {
+      } else if (!hasAutoDetectedRef.current) {
         // No locations exist - automatically detect and record location
-        // This ensures users always have at least their country flag (and state if US)
-        if (!hasAutoDetectedRef.current) {
-          hasAutoDetectedRef.current = true;
-          
+        hasAutoDetectedRef.current = true;
+        
+        (async () => {
           try {
-            // Automatically grant consent (IP-based geolocation doesn't require explicit consent)
             await grantLocationConsent(user.uid);
             setLocationConsent(true);
-
-            // Detect location using IP-based geolocation (no permission needed)
-            // Wrap in try-catch to handle network errors gracefully
             try {
               const location = await detectLocation();
               if (location.country) {
-                // Record the location visit - this will trigger the subscription again with new data
                 await recordLocationVisit(user.uid, location);
-                // Don't set flagsLoading to false yet - wait for subscription to fire with new data
               } else {
-                // If detection fails, show dev flags in dev mode, otherwise empty
                 setAvailableFlags(process.env.NODE_ENV === 'development' ? DEV_FLAGS : []);
                 setFlagsLoading(false);
               }
             } catch (detectErr) {
-              // Location detection failed (network error, API down, etc.)
-              console.warn('Location detection failed, user can still use customization:', detectErr);
-              // Don't block the UI - allow user to proceed with dev flags in dev mode
+              console.warn('Location detection failed:', detectErr);
               setAvailableFlags(process.env.NODE_ENV === 'development' ? DEV_FLAGS : []);
               setFlagsLoading(false);
             }
           } catch (err) {
-            // Grant consent or other error
             console.error('Auto-location setup failed:', err);
             setAvailableFlags(process.env.NODE_ENV === 'development' ? DEV_FLAGS : []);
             setFlagsLoading(false);
           }
-        } else {
-          // Already attempted detection, show dev flags in dev mode, otherwise empty
-          setAvailableFlags(process.env.NODE_ENV === 'development' ? DEV_FLAGS : []);
-          setFlagsLoading(false);
-        }
+        })();
+      } else {
+        setAvailableFlags(process.env.NODE_ENV === 'development' ? DEV_FLAGS : []);
+        setFlagsLoading(false);
       }
+    };
+
+    // Subscribe to locations
+    const unsubscribeLocations = subscribeToLocations(user.uid, (locations) => {
+      locationsData = locations;
+      updateFlags();
     });
 
-    return unsubscribe;
+    // Subscribe to badges
+    const unsubscribeBadges = onSnapshot(
+      doc(db, 'userBadges', user.uid),
+      (badgeSnap) => {
+        badgeData = badgeSnap.exists() ? badgeSnap.data() : null;
+        updateFlags();
+      },
+      (err) => {
+        console.error('Badge subscription error:', err);
+        setFlagsLoading(false);
+      }
+    );
+
+    return () => {
+      unsubscribeLocations();
+      unsubscribeBadges();
+    };
   }, [user?.uid]);
 
   // Check if draft differs from saved

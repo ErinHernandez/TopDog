@@ -19,7 +19,7 @@ import React from 'react';
 // IMPORTS - Verify these paths match your project structure
 // ============================================================================
 
-import { ProgressBar } from '../../components/shared';
+import { ProgressBar } from '../../../ui';
 import { TILED_BG_STYLE } from '../../draft-room/constants';
 import type { Tournament } from '../../hooks/data';
 import { CARD_SPACING, BOTTOM_SECTION_GRID_TEMPLATE } from './constants/cardSpacing';

@@ -1,1 +1,0 @@
-export { TeamRoster as default } from './stubs';

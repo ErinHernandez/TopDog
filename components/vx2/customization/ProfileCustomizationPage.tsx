@@ -100,48 +100,42 @@ export function ProfileCustomizationPage() {
     <div className="min-h-screen" style={{ backgroundColor: BG_COLORS.primary }}>
       <AppHeaderVX2 title="Customization" />
 
-      <div className="flex flex-col lg:flex-row" style={{ padding: '16px', paddingTop: '16px' }}>
-        {/* Preview - Show at top on mobile, sidebar on desktop */}
-        <div className="w-full mb-6 lg:w-64 lg:ml-8 lg:mt-0 lg:mb-0 order-first lg:order-last">
-          <div className="lg:sticky lg:top-4">
-            <LivePreview preferences={draft} />
-          </div>
+      <div className="flex flex-col" style={{ padding: '16px', paddingTop: '16px' }}>
+        <div className="w-full mb-6 order-first">
+          <LivePreview preferences={draft} />
         </div>
 
-        {/* Main controls */}
-        <div className="flex-1 space-y-4 lg:space-y-6">
-          {/* Section tabs */}
-          <div 
+        <div className="flex-1 space-y-4">
+          <div
             className="flex border-b"
             style={{ borderColor: BORDER_COLORS.light }}
           >
             <button
               onClick={() => setActiveSection('background')}
-              className={`flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors flex-1 lg:flex-initial min-h-[48px]`}
+              className={`flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors flex-1 min-h-[48px]`}
               style={{
                 borderColor: activeSection === 'background' ? STATE_COLORS.info : 'transparent',
                 color: activeSection === 'background' ? STATE_COLORS.info : TEXT_COLORS.secondary,
               }}
             >
               <PaletteIcon className="w-4 h-4" />
-              <span className="lg:inline">Background</span>
+              <span className="inline">Background</span>
             </button>
             <button
               onClick={() => setActiveSection('overlay')}
-              className={`flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors flex-1 lg:flex-initial min-h-[48px]`}
+              className={`flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors flex-1 min-h-[48px]`}
               style={{
                 borderColor: activeSection === 'overlay' ? STATE_COLORS.info : 'transparent',
                 color: activeSection === 'overlay' ? STATE_COLORS.info : TEXT_COLORS.secondary,
               }}
             >
               <LayersIcon className="w-4 h-4" />
-              <span className="lg:inline">Overlay</span>
+              <span className="inline">Overlay</span>
             </button>
           </div>
 
-          {/* Background Section */}
           {activeSection === 'background' && (
-            <div className="space-y-4 lg:space-y-6">
+            <div className="space-y-4">
               {/* Background type selector */}
               <div>
                 <label 
@@ -155,7 +149,7 @@ export function ProfileCustomizationPage() {
                     <button
                       key={type}
                       onClick={() => updateDraft({ backgroundType: type })}
-                      className={`flex-1 lg:flex-initial px-4 py-3 lg:py-2 rounded-lg text-sm capitalize transition-colors min-h-[48px]`}
+                      className={`flex-1 px-4 py-3 rounded-lg text-sm capitalize transition-colors min-h-[48px]`}
                       style={{
                         backgroundColor: draft.backgroundType === type 
                           ? STATE_COLORS.info 
@@ -213,16 +207,14 @@ export function ProfileCustomizationPage() {
             </div>
           )}
 
-          {/* Overlay Section */}
           {activeSection === 'overlay' && (
-            <div className="space-y-4 lg:space-y-6">
-              {/* Enable toggle */}
+            <div className="space-y-4">
               <label className="flex items-center gap-3 cursor-pointer min-h-[48px]">
                 <input
                   type="checkbox"
                   checked={draft.overlayEnabled}
                   onChange={(e) => updateDraft({ overlayEnabled: e.target.checked })}
-                  className="w-6 h-6 lg:w-5 lg:h-5 rounded"
+                  className="w-6 h-6 rounded"
                   style={{ accentColor: STATE_COLORS.info }}
                 />
                 <span 
@@ -303,7 +295,7 @@ export function ProfileCustomizationPage() {
             <button
               onClick={save}
               disabled={!isDirty || isSaving}
-              className="flex-1 sm:flex-initial px-6 py-3 lg:py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-h-[48px]"
+              className="flex-1 sm:flex-initial px-6 py-3 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-h-[48px]"
               style={{
                 backgroundColor: STATE_COLORS.info,
                 color: '#FFFFFF',
@@ -314,7 +306,7 @@ export function ProfileCustomizationPage() {
             <button
               onClick={reset}
               disabled={!isDirty}
-              className="flex-1 sm:flex-initial px-6 py-3 lg:py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-h-[48px]"
+              className="flex-1 sm:flex-initial px-6 py-3 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-h-[48px]"
               style={{
                 backgroundColor: BG_COLORS.tertiary,
                 color: TEXT_COLORS.secondary,

@@ -1,1 +1,0 @@
-export { PlayerCard as default } from './stubs';

@@ -1,20 +1,34 @@
-import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
-import { getFirestore, connectFirestoreEmulator, Firestore } from 'firebase/firestore';
-import { getAuth, signInAnonymously, onAuthStateChanged, Auth, User } from 'firebase/auth';
-import { logger } from './structuredLogger';
+/**
+ * Firebase Client Initialization
+ * 
+ * Handles Firebase app, Firestore, and Auth initialization with proper error handling
+ * and environment variable validation.
+ */
+
+import { initializeApp, getApps, type FirebaseApp } from 'firebase/app';
+import { getFirestore, connectFirestoreEmulator, type Firestore } from 'firebase/firestore';
+import { getAuth, signInAnonymously, onAuthStateChanged, type Auth, type User } from 'firebase/auth';
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+export interface FirebaseConfig {
+  apiKey: string | undefined;
+  authDomain: string | undefined;
+  projectId: string | undefined;
+  storageBucket: string | undefined;
+  messagingSenderId: string | undefined;
+  appId: string | undefined;
+  measurementId: string | undefined;
+}
+
+// ============================================================================
+// CONFIGURATION
+// ============================================================================
 
 // SECURITY: Never hardcode credentials - always use environment variables
 // In production, all environment variables must be set
-interface FirebaseConfig {
-  apiKey?: string;
-  authDomain?: string;
-  projectId?: string;
-  storageBucket?: string;
-  messagingSenderId?: string;
-  appId?: string;
-  measurementId?: string;
-}
-
 const firebaseConfig: FirebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -26,14 +40,14 @@ const firebaseConfig: FirebaseConfig = {
 };
 
 // Validate required configuration
-const requiredVars = [
+const requiredVars: string[] = [
   'NEXT_PUBLIC_FIREBASE_API_KEY',
   'NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN',
   'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
   'NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET',
   'NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID',
   'NEXT_PUBLIC_FIREBASE_APP_ID'
-] as const;
+];
 
 // Helper to check for missing vars (lazy evaluation to avoid HMR noise)
 const checkMissingVars = (): string[] => {
@@ -61,7 +75,7 @@ let auth: Auth | null = null;
 try {
   // Check if we have at least the API key and project ID (minimum required)
   if (firebaseConfig.apiKey && firebaseConfig.projectId) {
-    app = !getApps().length ? initializeApp(firebaseConfig as { [key: string]: string }) : getApps()[0];
+    app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
     
     // Initialize Firestore with offline persistence enabled for better performance
     // This caches data locally and reduces network requests
@@ -72,20 +86,18 @@ try {
       // Note: enableIndexedDbPersistence is async and may fail if another tab is open
       // We'll enable it silently - if it fails, Firebase will still work without persistence
       import('firebase/firestore').then(({ enableIndexedDbPersistence }) => {
-        enableIndexedDbPersistence(db!).catch((err: { code?: string }) => {
-          // Persistence can only be enabled in one tab at a time
-          // If it fails, that's okay - Firebase will still work
-          if (err.code === 'failed-precondition') {
-            logger.debug('Firebase persistence already enabled in another tab', {
-              component: 'firebase',
-            });
-          } else if (err.code === 'unimplemented') {
-            logger.debug('Firebase persistence not available in this browser', {
-              component: 'firebase',
-            });
-          }
-          // Silently ignore other errors - offline persistence is optional
-        });
+        if (db) {
+          enableIndexedDbPersistence(db).catch((err: { code?: string }) => {
+            // Persistence can only be enabled in one tab at a time
+            // If it fails, that's okay - Firebase will still work
+            if (err.code === 'failed-precondition') {
+              console.log('Firebase persistence already enabled in another tab');
+            } else if (err.code === 'unimplemented') {
+              console.log('Firebase persistence not available in this browser');
+            }
+            // Silently ignore other errors - offline persistence is optional
+          });
+        }
       }).catch(() => {
         // If import fails, continue without persistence
       });
@@ -108,38 +120,31 @@ try {
       // In development, warn but provide helpful instructions (only once to avoid HMR spam)
       // Only log if we're actually missing variables (they might be available later during HMR)
       hasLoggedConfigError = true;
-      logger.error('MISSING FIREBASE ENVIRONMENT VARIABLES', undefined, {
-        component: 'firebase',
-        missingVars: missingVars.join(', '),
-        instructions: [
-          '1. Create a .env.local file in the project root',
-          '2. Add your Firebase configuration (see FIREBASE_SETUP.md)',
-          '3. Get your Firebase config from: https://console.firebase.google.com/',
-          '4. Restart the development server',
-        ],
-        note: 'The app will not work without Firebase configuration. See FIREBASE_SETUP.md for detailed instructions.',
-      });
+      console.error('MISSING FIREBASE ENVIRONMENT VARIABLES');
+      console.error('Missing variables:', missingVars.join(', '));
+      console.error('');
+      console.error('To fix this:');
+      console.error('   1. Create a .env.local file in the project root');
+      console.error('   2. Add your Firebase configuration (see FIREBASE_SETUP.md)');
+      console.error('   3. Get your Firebase config from: https://console.firebase.google.com/');
+      console.error('   4. Restart the development server');
+      console.error('');
+      console.error('The app will not work without Firebase configuration.');
+      console.error('See FIREBASE_SETUP.md for detailed instructions.');
     }
     
     // During local production builds (npm run build), just warn
     if (process.env.NODE_ENV === 'production' && !isRealProductionRuntime && !hasLoggedConfigError && missingVars.length > 0) {
       hasLoggedConfigError = true;
-      logger.warn('Missing env vars during build - will fail at runtime if not provided', {
-        component: 'firebase',
-      });
+      console.warn('[Firebase] Missing env vars during build - will fail at runtime if not provided');
     }
   }
 } catch (error) {
   const errorMessage = error instanceof Error ? error.message : String(error);
-  logger.error('Firebase initialization error', error instanceof Error ? error : undefined, {
-    component: 'firebase',
-    message: errorMessage,
-  });
+  console.error('❌ Firebase initialization error:', errorMessage);
   if (process.env.NODE_ENV === 'development') {
-    logger.warn('The app will continue but Firebase features will not work', {
-      component: 'firebase',
-      note: 'Please set up your Firebase environment variables (see FIREBASE_SETUP.md)',
-    });
+    console.error('⚠️  The app will continue but Firebase features will not work.');
+    console.error('Please set up your Firebase environment variables (see FIREBASE_SETUP.md)');
   } else {
     throw error; // Re-throw in production
   }
@@ -149,27 +154,18 @@ try {
 let authInitialized = false;
 let authEnabled = false;
 
-interface FirebaseAuthError extends Error {
-  code?: string;
-  message: string;
-}
-
 // Initialize anonymous authentication for development
 const initializeAuth = async (): Promise<User | null> => {
   // Only run on client side
   if (typeof window === 'undefined') {
-    logger.debug('Server-side rendering - skipping Firebase auth', {
-      component: 'firebase',
-    });
+    console.log('🔄 Server-side rendering - skipping Firebase auth');
     return null;
   }
 
   // Check if Firebase is initialized
   if (!auth) {
-    logger.error('Firebase auth not initialized - missing environment variables', undefined, {
-      component: 'firebase',
-      note: 'Please set up your Firebase configuration (see FIREBASE_SETUP.md)',
-    });
+    console.error('❌ Firebase auth not initialized - missing environment variables');
+    console.error('Please set up your Firebase configuration (see FIREBASE_SETUP.md)');
     authInitialized = true;
     authEnabled = false;
     return null;
@@ -179,10 +175,7 @@ const initializeAuth = async (): Promise<User | null> => {
     // Check if user is already signed in
     const currentUser = auth.currentUser;
     if (currentUser) {
-      logger.debug('User already authenticated', {
-        component: 'firebase',
-        userId: currentUser.uid,
-      });
+      console.log('User already authenticated:', currentUser.uid);
       authInitialized = true;
       authEnabled = true;
       return currentUser;
@@ -190,44 +183,31 @@ const initializeAuth = async (): Promise<User | null> => {
 
     // Sign in anonymously
     const userCredential = await signInAnonymously(auth);
-    logger.info('Anonymous authentication successful', {
-      component: 'firebase',
-      userId: userCredential.user.uid,
-    });
+    console.log('Anonymous authentication successful:', userCredential.user.uid);
     authInitialized = true;
     authEnabled = true;
     return userCredential.user;
   } catch (error) {
-    const authError = error as FirebaseAuthError;
-    logger.error('Anonymous authentication failed', authError instanceof Error ? authError : undefined, {
-      component: 'firebase',
-      errorCode: authError.code,
-    });
+    const authError = error as { code?: string; message?: string };
+    console.error('Anonymous authentication failed:', authError);
     
     if (authError.code === 'auth/invalid-api-key') {
-      logger.error('Invalid Firebase API key', undefined, {
-        component: 'firebase',
-        note: 'Please check your NEXT_PUBLIC_FIREBASE_API_KEY in .env.local',
-        instructions: 'Get your API key from: https://console.firebase.google.com/ → Project Settings → General',
-      });
+      console.error('❌ Invalid Firebase API key');
+      console.error('Please check your NEXT_PUBLIC_FIREBASE_API_KEY in .env.local');
+      console.error('Get your API key from: https://console.firebase.google.com/ → Project Settings → General');
     } else if (authError.code === 'auth/admin-restricted-operation') {
-      logger.warn('Anonymous Authentication is not enabled in Firebase Console', {
-        component: 'firebase',
-        instructions: [
-          '1. Go to https://console.firebase.google.com/',
-          '2. Select your project',
-          '3. Click "Authentication" → "Sign-in method"',
-          '4. Enable "Anonymous" authentication',
-          '5. Click "Save"',
-        ],
-        note: 'The app will continue to work with mock data for now',
-      });
+      console.log('⚠️  Anonymous Authentication is not enabled in Firebase Console');
+      console.log('📋 To enable it:');
+      console.log('   1. Go to https://console.firebase.google.com/');
+      console.log('   2. Select your project');
+      console.log('   3. Click "Authentication" → "Sign-in method"');
+      console.log('   4. Enable "Anonymous" authentication');
+      console.log('   5. Click "Save"');
+      console.log('');
+      console.log('🔄 The app will continue to work with mock data for now');
     } else {
-      logger.error('Authentication error', authError instanceof Error ? authError : undefined, {
-        component: 'firebase',
-        errorCode: authError.code,
-        errorMessage: authError.message,
-      });
+      console.log('❌ Authentication error:', authError.message);
+      console.log('Error code:', authError.code);
     }
     
     authInitialized = true;
@@ -246,9 +226,7 @@ const safeInitializeAuth = async (): Promise<void> => {
   try {
     await initializeAuth();
   } catch (error) {
-    logger.warn('Firebase authentication disabled - using mock data', {
-      component: 'firebase',
-    });
+    console.log('🔄 Firebase authentication disabled - using mock data');
     authInitialized = true;
     authEnabled = false;
   }
@@ -258,17 +236,12 @@ const safeInitializeAuth = async (): Promise<void> => {
 if (typeof window !== 'undefined' && auth) {
   try {
     // Only set up the listener once
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, (user: User | null) => {
       if (user) {
-        logger.debug('Auth state changed - User signed in', {
-          component: 'firebase',
-          userId: user.uid,
-        });
+        console.log('Auth state changed - User signed in:', user.uid);
         authEnabled = true;
       } else {
-        logger.debug('Auth state changed - User signed out', {
-          component: 'firebase',
-        });
+        console.log('Auth state changed - User signed out');
         authEnabled = false;
         // Don't try to sign in again if it's disabled
         // Note: authEnabled is now false, so we don't re-initialize on sign out
@@ -278,20 +251,20 @@ if (typeof window !== 'undefined' && auth) {
     // Initialize auth when the module is imported
     safeInitializeAuth();
   } catch (error) {
-    logger.warn('Firebase auth listener failed - using mock data', {
-      component: 'firebase',
-    });
+    console.log('🔄 Firebase auth listener failed - using mock data');
     authInitialized = true;
     authEnabled = false;
   }
 } else if (typeof window !== 'undefined' && !auth) {
   // Firebase not initialized - log warning
-  logger.error('Firebase not initialized - auth features disabled', undefined, {
-    component: 'firebase',
-  });
+  console.error('⚠️  Firebase not initialized - auth features disabled');
   authInitialized = true;
   authEnabled = false;
 }
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
 
 // Helper function to handle Firebase operations with error handling
 export const safeFirebaseOperation = async <T>(
@@ -306,20 +279,17 @@ export const safeFirebaseOperation = async <T>(
   try {
     return await operation();
   } catch (error) {
-    const fbError = error as FirebaseAuthError;
-    if (fbError.code === 'permission-denied' || 
-        (fbError.message && fbError.message.includes('Missing or insufficient permissions')) ||
-        fbError.code === 'auth/admin-restricted-operation') {
-      logger.error('Firebase permission error', fbError instanceof Error ? fbError : undefined, {
-        component: 'firebase',
-        errorCode: fbError.code,
-        instructions: [
-          '1. Enable Anonymous Authentication in Firebase Console',
-          '2. Update Firestore security rules to allow read/write',
-          '3. Use the rules from firestore.rules file',
-        ],
-        note: 'Using fallback data for now',
-      });
+    const firebaseError = error as { code?: string; message?: string };
+    if (firebaseError.code === 'permission-denied' || 
+        (firebaseError.message && firebaseError.message.includes('Missing or insufficient permissions')) ||
+        firebaseError.code === 'auth/admin-restricted-operation') {
+      console.error('Firebase permission error:', firebaseError.message || firebaseError);
+      console.log('📋 To fix this:');
+      console.log('   1. Enable Anonymous Authentication in Firebase Console');
+      console.log('   2. Update Firestore security rules to allow read/write');
+      console.log('   3. Use the rules from firestore.rules file');
+      console.log('');
+      console.log('🔄 Using fallback data for now');
       return fallback;
     }
     throw error;

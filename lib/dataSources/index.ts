@@ -36,8 +36,14 @@ export async function getProjections(
       return data;
     } else {
       console.log('[DataSources] Using SportsDataIO for projections');
-      const data = await sportsdataio.getPlayerProjections(season, options);
-      return data;
+      try {
+        const data = await sportsdataio.getPlayerProjections(season, options);
+        return data;
+      } catch (sdiError) {
+        // Log the error for debugging
+        console.error('[DataSources] SportsDataIO error:', sdiError);
+        throw sdiError;
+      }
     }
   } catch (error) {
     lastError = error as Error;

@@ -311,36 +311,18 @@ export function AuthProvider({
     setIsMounted(true);
   }, []);
   
-  // Build-time detection: return children without auth initialization
-  // IMPORTANT: Keep this in sync with useAuthContext detection logic
+  // Build-time detection: used for conditional render only (all hooks must run first)
   const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build' || 
                        process.env.NEXT_PHASE === 'phase-export';
   const isSSR = typeof window === 'undefined';
-  
-  // Vercel-specific build detection - simplified to match useAuthContext
-  // VERCEL=1 is always set during Vercel builds, regardless of VERCEL_ENV
   const isVercelBuild = process.env.VERCEL === '1';
-  
-  // CRITICAL: Always render the Provider wrapper to prevent hydration mismatch
-  // During SSR/build OR before mount, provide safe defaults, but keep the same DOM structure
-  // This ensures server and initial client render are identical
-  // IMPORTANT: Do NOT wrap children in additional divs - this causes hydration mismatches
-  if (isBuildPhase || isSSR || isVercelBuild || !isMounted) {
-    // During build, SSR, or before mount, provide safe defaults but keep Provider wrapper
-    // This ensures server and client render the same DOM structure
-    const safeValue = createBuildTimeSafeDefaults();
-    return (
-      <AuthContext.Provider value={safeValue}>
-        {children}
-        {/* Invisible recaptcha container for phone auth */}
-        <div id="recaptcha-container" suppressHydrationWarning />
-      </AuthContext.Provider>
-    );
-  }
+  const useSafeDefaults = isBuildPhase || isSSR || isVercelBuild || !isMounted;
   
   // ========== Auth State Listener ==========
+  // CRITICAL: All hooks must run unconditionally before any return (Rules of Hooks)
   
   useEffect(() => {
+    if (useSafeDefaults) return;
     if (!auth) {
       dispatch({ type: 'INITIALIZATION_COMPLETE' });
       return;
@@ -412,7 +394,7 @@ export function AuthProvider({
     });
     
     return () => unsubscribe();
-  }, [auth, db, onAuthStateChange]);
+  }, [auth, db, onAuthStateChange, useSafeDefaults]);
   
   // ========== Email/Password Auth ==========
   
@@ -488,6 +470,26 @@ export function AuthProvider({
       };
       
       await setDoc(doc(db, 'users', firebaseUser.uid), userProfile);
+      
+      // Record location for first flag earned
+      // This uses the location provided during signup or auto-detects it
+      try {
+        // Import location functions dynamically to avoid circular dependencies
+        const { detectLocation, recordLocationVisit, grantLocationConsent } = await import('@/lib/customization/geolocation');
+        
+        // Grant location consent (IP-based geolocation doesn't require explicit user consent)
+        await grantLocationConsent(firebaseUser.uid);
+        
+        // Detect location using IP-based geolocation
+        const location = await detectLocation();
+        if (location.country) {
+          // Record the location visit - this gives the user their first flag
+          await recordLocationVisit(firebaseUser.uid, location);
+        }
+      } catch (locationError) {
+        // Don't fail signup if location detection fails - just log it
+        console.warn('Failed to record location during signup:', locationError);
+      }
       
       // Send verification email
       await sendEmailVerification(firebaseUser);
@@ -913,8 +915,11 @@ export function AuthProvider({
     clearError,
   ]);
   
+  // Use safe defaults during build/SSR/before mount; otherwise use real auth value
+  const providerValue = useSafeDefaults ? createBuildTimeSafeDefaults() : value;
+  
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={providerValue}>
       {children}
       {/* Invisible recaptcha container for phone auth */}
       <div id="recaptcha-container" suppressHydrationWarning />

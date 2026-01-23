@@ -177,7 +177,7 @@ function PositionRow({ need }: PositionRowProps): React.ReactElement {
 export default function PositionNeedsIndicator({
   needs,
   compact = true,
-}: PositionNeedsIndicatorProps): React.ReactElement {
+}: PositionNeedsIndicatorProps): React.ReactElement | null {
   // Filter to only show positions that need more picks
   const urgentNeeds = needs.filter(
     (need) => need.urgency === 'critical' || need.urgency === 'warning'
@@ -188,49 +188,8 @@ export default function PositionNeedsIndicator({
   const flexRemaining = 18 - totalPicked; // ROSTER_SIZE
 
   if (compact) {
-    // Compact mode: Single line summary
-    if (urgentNeeds.length === 0 && flexRemaining <= 0) {
-      return (
-        <div
-          style={{
-            ...SLOW_DRAFT_TYPOGRAPHY.needsText,
-            color: SLOW_DRAFT_COLORS.needs.good,
-          }}
-        >
-          ✓ Roster complete
-        </div>
-      );
-    }
-
-    return (
-      <div className="flex items-center flex-wrap gap-2">
-        <span
-          style={{
-            ...SLOW_DRAFT_TYPOGRAPHY.sectionLabel,
-            marginRight: 4,
-          }}
-        >
-          NEEDS:
-        </span>
-
-        {/* Urgent position needs */}
-        {urgentNeeds.map((need) => (
-          <NeedPill key={need.position} need={need} />
-        ))}
-
-        {/* Flex remaining */}
-        {flexRemaining > 0 && (
-          <span
-            style={{
-              ...SLOW_DRAFT_TYPOGRAPHY.needsText,
-              color: 'rgba(255, 255, 255, 0.6)',
-            }}
-          >
-            • {flexRemaining} FLEX
-          </span>
-        )}
-      </div>
-    );
+    // Compact mode: Removed - return null to hide needs section
+    return null;
   }
 
   // Expanded mode: Full breakdown

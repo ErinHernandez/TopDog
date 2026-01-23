@@ -217,20 +217,16 @@ export const TYPOGRAPHY = {
 } as const;
 
 // ============================================================================
-// BREAKPOINTS
+// BREAKPOINTS (mobile-only)
 // ============================================================================
 
 export const BREAKPOINTS = {
   /** Small phones */
+  xs: 320,
+  /** Standard phones (iPhone) */
   sm: 375,
-  /** Large phones */
-  md: 428,
-  /** Tablets */
-  lg: 768,
-  /** Small laptops */
-  xl: 1024,
-  /** Desktops */
-  '2xl': 1280,
+  /** Large phones (iPhone Plus/Max) */
+  md: 414,
 } as const;
 
 // ============================================================================

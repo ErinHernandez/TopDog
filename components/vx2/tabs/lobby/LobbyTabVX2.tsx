@@ -4,7 +4,8 @@
  * RESTRUCTURED: Uses decomposed atomic components instead of TournamentCardV3.
  *
  * Architecture:
- * - TournamentBackground: Background image with blur-up loading
+ * - Solid card background (no full-bleed image)
+ * - TournamentCardLogo: Logo image inside card (not background)
  * - TournamentTitle: Title display with typography
  * - TournamentProgressBar: Entry progress indicator
  * - TournamentJoinButton: Primary action button
@@ -24,11 +25,10 @@ import { useTournaments, type Tournament } from '../../hooks/data';
 
 // UI hooks
 import { useCardHeight } from '../../hooks/ui/useCardHeight';
-import { useTournamentImage } from './hooks';
 
 // Atomic components
 import {
-  TournamentBackground,
+  TournamentCardLogo,
   TournamentTitle,
   TournamentProgressBar,
   TournamentJoinButton,
@@ -36,7 +36,7 @@ import {
 } from './elements';
 
 // Shared components
-import { EmptyState, ErrorState } from '../../components/shared/feedback';
+import { EmptyState, ErrorState } from '../../../ui';
 
 // Constants
 import { CARD_SPACING_V3, CARD_GRID_V3 } from './constants/cardSpacingV3';
@@ -58,23 +58,15 @@ const logger = createScopedLogger('[LobbyTab]');
  * Card visual constants
  */
 const CARD_VISUALS = {
-  /** Background image path */
-  backgroundImage: '/do_riding_football_III.webp',
-  /** Fallback PNG image */
-  backgroundImagePng: '/do_riding_football_III.png',
-  /** Fallback background color if images fail */
+  /** Logo image path (public) — used as logo inside card, not background */
+  logoImage: '/tournament_card_background.png',
+  /** Card background (solid color only; no full-bleed image) */
   backgroundFallback: '#0a0a1a',
   /** Default border color */
   borderDefault: 'rgba(75, 85, 99, 0.5)',
   /** Featured tournament border color */
   borderFeatured: '#1E3A5F',
 } as const;
-
-/**
- * Blur placeholder for progressive image loading
- * 92 bytes - displays instantly while full image loads
- */
-const BLUR_PLACEHOLDER = 'data:image/webp;base64,UklGRlQAAABXRUJQVlA4IEgAAABwAwCdASoUABsAPyl+uFOuKCWisAwBwCUJZQAAW+q+9Bpo4aAA/uvZ+YkAc4jvVTc7+oJAY99soPLjJTrwm3j5Y3VE0BWmGAA=';
 
 // ============================================================================
 // TYPES
@@ -164,16 +156,6 @@ export default function LobbyTabVX2({
     },
     [tournaments, isMounted]
   );
-
-  // ----------------------------------------
-  // Image preloading
-  // Only enable after mount to prevent hydration mismatch
-  // ----------------------------------------
-  const { isLoaded: imageLoaded } = useTournamentImage({
-    image: CARD_VISUALS.backgroundImage,
-    placeholder: BLUR_PLACEHOLDER,
-    enabled: isMounted && Boolean(featuredTournament),
-  });
 
   // ----------------------------------------
   // Handlers
@@ -339,14 +321,6 @@ export default function LobbyTabVX2({
           isolation: 'isolate',
         }}
       >
-        {/* Background Layers */}
-        <TournamentBackground
-          image={CARD_VISUALS.backgroundImage}
-          placeholder={BLUR_PLACEHOLDER}
-          isLoaded={imageLoaded}
-          borderRadius={CARD_SPACING_V3.borderRadius}
-        />
-
         {/* Content Grid - The Layout Engine */}
         <div
           className="vx2-lobby-content"
@@ -361,8 +335,11 @@ export default function LobbyTabVX2({
             overflow: 'hidden',
           }}
         >
-          {/* Row 1: Title (auto height) */}
-          <TournamentTitle title={featuredTournament.title} />
+          {/* Row 1: Logo + Title (auto height) */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <TournamentCardLogo src={CARD_VISUALS.logoImage} alt="Tournament logo" maxHeight={72} />
+            <TournamentTitle title={featuredTournament.title} />
+          </div>
 
           {/* Row 2: Spacer (Takes 1fr - flexible space) */}
           <div

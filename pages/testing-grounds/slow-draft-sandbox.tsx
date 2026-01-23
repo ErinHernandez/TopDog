@@ -27,7 +27,7 @@ export default function SlowDraftSandboxPage(): React.ReactElement {
         className="min-h-screen flex items-center justify-center p-8"
         style={{ backgroundColor: '#1a1a2e' }}
       >
-        <MobilePhoneFrame devicePreset="iphone-14-pro-max" label="Slow Draft Sandbox">
+        <MobilePhoneFrame>
           <div 
             className="relative w-full h-full overflow-hidden"
             style={{ backgroundColor: '#101927' }}

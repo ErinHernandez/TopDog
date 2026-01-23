@@ -91,6 +91,7 @@ If you still see errors, check:
 2. Verify your Firebase project is active
 3. Make sure you're using the correct project's credentials
 4. Clear browser cache and restart dev server
+5. **Dev server / terminal issues** (ENOENT manifests, Babel, webpack cache, paste problems): see `docs/TERMINAL_AND_DEV_TROUBLESHOOTING.md`
 
 ## 📋 Example `.env.local` Structure
 

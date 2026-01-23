@@ -41,12 +41,13 @@ interface MigrationStatusResponse {
 // ============================================================================
 
 async function handler(
-  req: AuthenticatedRequest,
+  req: NextApiRequest,
   res: NextApiResponse<MigrationStatusResponse>,
   logger: ApiLogger
 ): Promise<void> {
+  const authenticatedReq = req as AuthenticatedRequest;
   // Only allow GET
-  validateMethod(req, ['GET'], logger);
+  validateMethod(authenticatedReq, ['GET'], logger);
   
   logger.info('Fetching migration status');
   
@@ -71,12 +72,10 @@ async function handler(
   }
 }
 
-// Export with authentication
-const authenticatedHandler = withAuth(handler, { required: true, allowAnonymous: false });
-
-export default async function(
-  req: NextApiRequest,
-  res: NextApiResponse<MigrationStatusResponse>
-): Promise<void> {
-  await withErrorHandling(req, res, authenticatedHandler as ApiHandler);
-}
+// Export with authentication and error handling
+export default withAuth(
+  async (req: AuthenticatedRequest, res: NextApiResponse<MigrationStatusResponse>): Promise<void> => {
+    await withErrorHandling(req, res, handler as unknown as ApiHandler);
+  },
+  { required: true, allowAnonymous: false }
+);

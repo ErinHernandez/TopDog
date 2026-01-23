@@ -19,15 +19,15 @@ jest.mock('../../../lib/firebase-utils', () => ({
 }));
 
 // Mock Paystack functions
-const mockVerifyWebhookSignature = jest.fn();
-const mockHandleChargeSuccess = jest.fn();
-const mockHandleChargeFailed = jest.fn();
-const mockHandleTransferSuccess = jest.fn();
-const mockHandleTransferFailed = jest.fn();
-const mockFindWebhookEventByReference = jest.fn();
-const mockMarkWebhookEventAsProcessed = jest.fn();
-const mockMarkWebhookEventAsFailed = jest.fn();
-const mockCreateOrUpdateWebhookEvent = jest.fn();
+const mockVerifyWebhookSignature = jest.fn<boolean, any[]>().mockReturnValue(true);
+const mockHandleChargeSuccess = jest.fn<Promise<{ userId: string; amountNGN: number } | Record<string, unknown>>, any[]>();
+const mockHandleChargeFailed = jest.fn<Promise<Record<string, unknown>>, any[]>();
+const mockHandleTransferSuccess = jest.fn<Promise<Record<string, unknown>>, any[]>();
+const mockHandleTransferFailed = jest.fn<Promise<Record<string, unknown>>, any[]>();
+const mockFindWebhookEventByReference = jest.fn<Promise<null | Record<string, unknown>>, any[]>();
+const mockMarkWebhookEventAsProcessed = jest.fn<Promise<Record<string, unknown>>, any[]>();
+const mockMarkWebhookEventAsFailed = jest.fn<Promise<Record<string, unknown>>, any[]>();
+const mockCreateOrUpdateWebhookEvent = jest.fn<Promise<Record<string, unknown>>, any[]>();
 
 jest.mock('../../../lib/paystack', () => ({
   verifyWebhookSignature: (...args: unknown[]) => mockVerifyWebhookSignature(...args),
@@ -186,7 +186,7 @@ describe('Paystack Webhook Integration', () => {
         reference,
         status: 'processed',
         processedAt: new Date().toISOString(),
-      });
+      } as Record<string, unknown>);
 
       const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
         method: 'POST',
@@ -250,7 +250,7 @@ describe('Paystack Webhook Integration', () => {
         userId,
         amountNGN: amountKobo / 100,
         transactionId: 'txn_123',
-      });
+      } as { userId: string; amountNGN: number; transactionId: string });
 
       const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
         method: 'POST',
@@ -522,7 +522,7 @@ describe('Paystack Webhook Integration', () => {
       });
       const payloadString = JSON.stringify(payload);
 
-      mockHandleChargeSuccess.mockRejectedValue(new Error('Database connection failed'));
+      mockHandleChargeSuccess.mockRejectedValue(new Error('Database connection failed') as Error);
 
       const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
         method: 'POST',

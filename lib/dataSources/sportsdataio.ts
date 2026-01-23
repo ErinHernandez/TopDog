@@ -8,7 +8,9 @@
 import type { ProjectionData, GetProjectionsOptions } from './types';
 
 // Import existing SportsDataIO functions
-const sportsdataio = require('../sportsdataio');
+// Use require for CommonJS module compatibility
+// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
+const sportsdataio = require('../sportsdataio.js');
 
 /**
  * Get projections from SportsDataIO
@@ -23,7 +25,19 @@ export async function getPlayerProjections(
   }
 
   // Use existing SportsDataIO getProjections function
-  const projections = await sportsdataio.getProjections(apiKey, options.forceRefresh);
+  // Note: Original function signature is getProjections(apiKey, forceRefresh)
+  // Season is not used by SportsDataIO - it always returns current season projections
+  let projections;
+  try {
+    projections = await sportsdataio.getProjections(apiKey, options.forceRefresh || false);
+  } catch (error) {
+    console.error('[DataSources] SportsDataIO getProjections error:', error);
+    throw new Error(`Failed to fetch projections from SportsDataIO: ${error.message}`);
+  }
+  
+  if (!Array.isArray(projections)) {
+    throw new Error(`SportsDataIO returned invalid data: expected array, got ${typeof projections}`);
+  }
 
   // Filter by position if specified
   let filtered = projections;

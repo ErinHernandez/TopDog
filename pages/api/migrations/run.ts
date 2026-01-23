@@ -48,12 +48,13 @@ interface RunMigrationsResponse {
 // ============================================================================
 
 async function handler(
-  req: AuthenticatedRequest,
+  req: NextApiRequest,
   res: NextApiResponse<RunMigrationsResponse>,
   logger: ApiLogger
 ): Promise<void> {
+  const authenticatedReq = req as AuthenticatedRequest;
   // Only allow POST
-  validateMethod(req, ['POST'], logger);
+  validateMethod(authenticatedReq, ['POST'], logger);
   
   // Check authentication (admin only in production)
   if (process.env.NODE_ENV === 'production') {
@@ -62,7 +63,7 @@ async function handler(
     logger.warn('Migration API called in production - admin check needed');
   }
   
-  const { dryRun = false } = req.body as RunMigrationsRequest;
+  const { dryRun = false } = authenticatedReq.body as RunMigrationsRequest;
   
   logger.info('Running migrations', { dryRun, migrationCount: migrations.length });
   
@@ -108,12 +109,10 @@ async function handler(
   }
 }
 
-// Export with authentication (admin only)
-const authenticatedHandler = withAuth(handler, { required: true, allowAnonymous: false });
-
-export default async function(
-  req: NextApiRequest,
-  res: NextApiResponse<RunMigrationsResponse>
-): Promise<void> {
-  await withErrorHandling(req, res, authenticatedHandler as ApiHandler);
-}
+// Export with authentication (admin only) and error handling
+export default withAuth(
+  async (req: AuthenticatedRequest, res: NextApiResponse<RunMigrationsResponse>): Promise<void> => {
+    await withErrorHandling(req, res, handler as unknown as ApiHandler);
+  },
+  { required: true, allowAnonymous: false }
+);

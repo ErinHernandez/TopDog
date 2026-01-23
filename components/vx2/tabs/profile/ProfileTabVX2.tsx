@@ -39,7 +39,7 @@ import {
   Plus,
   Customize,
 } from '../../components/icons';
-import { Skeleton } from '../../components/shared';
+import { Skeleton } from '../../../ui';
 
 const logger = createScopedLogger('[ProfileTab]');
 

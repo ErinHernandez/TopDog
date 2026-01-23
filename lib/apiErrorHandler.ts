@@ -8,26 +8,20 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 // ============================================================================
-// Types
+// TYPES
 // ============================================================================
 
-export type ErrorTypeValue =
-  | 'VALIDATION_ERROR'
-  | 'UNAUTHORIZED'
-  | 'FORBIDDEN'
-  | 'NOT_FOUND'
-  | 'METHOD_NOT_ALLOWED'
-  | 'RATE_LIMIT'
-  | 'EXTERNAL_API_ERROR'
-  | 'DATABASE_ERROR'
-  | 'INTERNAL_SERVER_ERROR'
-  | 'CONFIGURATION_ERROR'
-  | 'STRIPE_ERROR';
+/**
+ * Generate a unique request ID for tracking requests across logs
+ */
+function generateRequestId(): string {
+  return `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+}
 
 /**
  * Error types for categorization
  */
-export const ErrorType: Record<string, ErrorTypeValue> = {
+export const ErrorType = {
   VALIDATION: 'VALIDATION_ERROR',
   UNAUTHORIZED: 'UNAUTHORIZED',
   FORBIDDEN: 'FORBIDDEN',
@@ -41,6 +35,8 @@ export const ErrorType: Record<string, ErrorTypeValue> = {
   STRIPE: 'STRIPE_ERROR',
 } as const;
 
+export type ErrorType = typeof ErrorType[keyof typeof ErrorType];
+
 /**
  * Log levels
  */
@@ -51,9 +47,16 @@ const LogLevel = {
   DEBUG: 'DEBUG',
 } as const;
 
-type LogLevelValue = typeof LogLevel[keyof typeof LogLevel];
+type LogLevel = typeof LogLevel[keyof typeof LogLevel];
 
-interface LogData {
+interface LogEntry {
+  timestamp: string;
+  level: LogLevel;
+  requestId: string;
+  route: string;
+  method: string;
+  duration: string;
+  message: string;
   [key: string]: unknown;
 }
 
@@ -64,60 +67,52 @@ interface ErrorDetails {
   stack?: string;
 }
 
-interface LogEntry {
-  timestamp: string;
-  level: LogLevelValue;
-  requestId: string;
-  route: string;
-  method: string;
-  duration: string;
-  message: string;
+interface LogContext {
   [key: string]: unknown;
 }
 
-interface ErrorResponse {
+interface ErrorResponseBody {
   error: {
-    type: ErrorTypeValue;
+    type: ErrorType;
     message: string;
     requestId: string | null;
     timestamp: string;
-    details?: unknown;
+    details?: Record<string, unknown>;
   };
 }
 
-interface SuccessResponse<T = unknown> {
-  ok: boolean;
-  data: T;
-  timestamp: string;
+interface ErrorResponse {
+  statusCode: number;
+  body: ErrorResponseBody;
 }
 
-export interface ExtendedNextApiRequest extends NextApiRequest {
-  logger?: ApiLogger;
-  requestId?: string;
-  user?: {
-    uid: string;
-    email?: string;
-  } | null;
+interface SuccessResponse<T = unknown> {
+  statusCode: number;
+  body: {
+    ok: boolean;
+    data: T;
+    timestamp: string;
+  };
 }
 
 export type ApiHandler = (
-  req: ExtendedNextApiRequest,
+  req: NextApiRequest,
   res: NextApiResponse,
   logger: ApiLogger
-) => Promise<void> | void;
+) => Promise<unknown> | unknown;
 
 // ============================================================================
-// Logger Class
+// API LOGGER CLASS
 // ============================================================================
 
 /**
  * Structured logger with request context
  */
 export class ApiLogger {
-  private readonly requestId: string;
-  private readonly route: string;
-  private readonly method: string;
-  private readonly startTime: number;
+  private requestId: string;
+  private route: string;
+  private method: string;
+  private startTime: number;
 
   constructor(requestId: string, route: string, method: string) {
     this.requestId = requestId;
@@ -129,7 +124,7 @@ export class ApiLogger {
   /**
    * Format log entry with context
    */
-  private formatLog(level: LogLevelValue, message: string, data: LogData = {}): LogEntry {
+  private formatLog(level: LogLevel, message: string, data: LogContext = {}): LogEntry {
     const timestamp = new Date().toISOString();
     const duration = Date.now() - this.startTime;
     
@@ -162,8 +157,8 @@ export class ApiLogger {
     return logEntry;
   }
 
-  error(message: string, error: Error | null = null, context: LogData = {}): LogEntry {
-    const data: LogData = {
+  error(message: string, error: Error | null = null, context: LogContext = {}): LogEntry {
+    const data: LogContext = {
       ...context,
     };
 
@@ -185,60 +180,49 @@ export class ApiLogger {
     return this.formatLog(LogLevel.ERROR, message, data);
   }
 
-  warn(message: string, context: LogData = {}): LogEntry {
+  warn(message: string, context: LogContext = {}): LogEntry {
     return this.formatLog(LogLevel.WARN, message, context);
   }
 
-  info(message: string, context: LogData = {}): LogEntry {
+  info(message: string, context: LogContext = {}): LogEntry {
     return this.formatLog(LogLevel.INFO, message, context);
   }
 
-  debug(message: string, context: LogData = {}): LogEntry {
+  debug(message: string, context: LogContext = {}): LogEntry {
     return this.formatLog(LogLevel.DEBUG, message, context);
   }
 }
 
 // ============================================================================
-// Request ID Generation
-// ============================================================================
-
-/**
- * Generate a unique request ID for tracking requests across logs
- */
-function generateRequestId(): string {
-  return `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-}
-
-// ============================================================================
-// Error Response Helper
+// ERROR HANDLING FUNCTIONS
 // ============================================================================
 
 /**
  * Create a standardized error response
  */
 export function createErrorResponse(
-  errorType: ErrorTypeValue,
+  errorType: ErrorType,
   message: string,
-  details: LogData = {},
+  details: Record<string, unknown> = {},
   requestId: string | null = null
-): { statusCode: number; body: ErrorResponse } {
-  const statusCodes: Record<ErrorTypeValue, number> = {
-    'VALIDATION_ERROR': 400,
-    'UNAUTHORIZED': 401,
-    'FORBIDDEN': 403,
-    'NOT_FOUND': 404,
-    'METHOD_NOT_ALLOWED': 405,
-    'RATE_LIMIT': 429,
-    'EXTERNAL_API_ERROR': 502,
-    'DATABASE_ERROR': 503,
-    'INTERNAL_SERVER_ERROR': 500,
-    'CONFIGURATION_ERROR': 500,
-    'STRIPE_ERROR': 500,
+): ErrorResponse {
+  const statusCodes: Record<ErrorType, number> = {
+    [ErrorType.VALIDATION]: 400,
+    [ErrorType.UNAUTHORIZED]: 401,
+    [ErrorType.FORBIDDEN]: 403,
+    [ErrorType.NOT_FOUND]: 404,
+    [ErrorType.METHOD_NOT_ALLOWED]: 405,
+    [ErrorType.RATE_LIMIT]: 429,
+    [ErrorType.EXTERNAL_API]: 502,
+    [ErrorType.DATABASE]: 503,
+    [ErrorType.CONFIGURATION]: 500,
+    [ErrorType.INTERNAL]: 500,
+    [ErrorType.STRIPE]: 500,
   };
 
   const statusCode = statusCodes[errorType] || 500;
 
-  const response: ErrorResponse = {
+  const response: ErrorResponseBody = {
     error: {
       type: errorType,
       message,
@@ -249,7 +233,7 @@ export function createErrorResponse(
 
   // Add details if provided (but not in production for sensitive info)
   if (Object.keys(details).length > 0) {
-    if (process.env.NODE_ENV === 'development' || (details.safeForProduction as boolean)) {
+    if (process.env.NODE_ENV === 'development' || (details as { safeForProduction?: boolean }).safeForProduction) {
       response.error.details = details;
     }
   }
@@ -259,39 +243,6 @@ export function createErrorResponse(
     body: response,
   };
 }
-
-// ============================================================================
-// Success Response Helper
-// ============================================================================
-
-/**
- * Create a success response helper
- */
-export function createSuccessResponse<T = unknown>(
-  data: T,
-  statusCode: number = 200,
-  logger: ApiLogger | null = null
-): { statusCode: number; body: SuccessResponse<T> } {
-  if (logger) {
-    logger.info('Request completed successfully', { 
-      statusCode,
-      dataSize: JSON.stringify(data).length 
-    });
-  }
-  
-  return {
-    statusCode,
-    body: {
-      ok: true,
-      data,
-      timestamp: new Date().toISOString(),
-    },
-  };
-}
-
-// ============================================================================
-// Error Handling Wrapper
-// ============================================================================
 
 /**
  * Wrapper for API route handlers with error handling
@@ -311,7 +262,7 @@ export function withErrorHandling(
   req: NextApiRequest,
   res: NextApiResponse,
   handler: ApiHandler
-): Promise<NextApiResponse | void> {
+): Promise<unknown> {
   const requestId = generateRequestId();
   const route = req.url || 'unknown';
   const method = req.method || 'UNKNOWN';
@@ -319,11 +270,6 @@ export function withErrorHandling(
 
   // Set request ID in response header for client tracking
   res.setHeader('X-Request-ID', requestId);
-
-  // Extend request with logger and requestId
-  const extendedReq = req as ExtendedNextApiRequest;
-  extendedReq.logger = logger;
-  extendedReq.requestId = requestId;
 
   // Log incoming request (in development)
   if (process.env.NODE_ENV === 'development') {
@@ -338,49 +284,47 @@ export function withErrorHandling(
   }
 
   return Promise.resolve()
-    .then(() => handler(extendedReq, res, logger))
-    .catch((error: unknown) => {
+    .then(() => handler(req, res, logger))
+    .catch((error: Error) => {
       // Determine error type
-      let errorType: ErrorTypeValue = ErrorType.INTERNAL;
+      let errorType: ErrorType = ErrorType.INTERNAL;
       let statusCode = 500;
       let message = 'An internal server error occurred';
-      let details: LogData = {};
-
-      const err = error as Error & { code?: string; message?: string; name?: string };
+      let details: Record<string, unknown> = {};
 
       // Handle known error types
-      if (err.name === 'ValidationError' || err.message?.includes('required')) {
+      if (error.name === 'ValidationError' || error.message?.includes('required')) {
         errorType = ErrorType.VALIDATION;
         statusCode = 400;
-        message = err.message || 'Invalid request parameters';
-      } else if (err.code === 'ENOTFOUND' || err.code === 'ECONNREFUSED') {
+        message = error.message || 'Invalid request parameters';
+      } else if ((error as { code?: string }).code === 'ENOTFOUND' || (error as { code?: string }).code === 'ECONNREFUSED') {
         errorType = ErrorType.EXTERNAL_API;
         statusCode = 502;
         message = 'External service unavailable';
         details = { service: 'external_api' };
-      } else if (err.code === 'permission-denied' || err.message?.includes('permission')) {
+      } else if ((error as { code?: string }).code === 'permission-denied' || error.message?.includes('permission')) {
         errorType = ErrorType.FORBIDDEN;
         statusCode = 403;
-        message = err.message || 'Permission denied';
-      } else if (err.message?.includes('not found')) {
+        message = error.message || 'Permission denied';
+      } else if (error.message?.includes('not found')) {
         errorType = ErrorType.NOT_FOUND;
         statusCode = 404;
-        message = err.message || 'Resource not found';
-      } else if (err.message?.includes('API key') || err.message?.includes('configured')) {
+        message = error.message || 'Resource not found';
+      } else if (error.message?.includes('API key') || error.message?.includes('configured')) {
         errorType = ErrorType.CONFIGURATION;
         statusCode = 500;
-        message = err.message || 'Configuration error';
+        message = error.message || 'Configuration error';
       } else {
         // Use error message if available, otherwise default
-        message = err.message || message;
+        message = error.message || message;
         details = {
-          name: err.name,
-          code: err.code,
+          name: error.name,
+          code: (error as { code?: string }).code,
         };
       }
 
       // Log the error
-      logger.error(message, err instanceof Error ? err : null, {
+      logger.error(message, error, {
         errorType,
         statusCode,
         ...details,
@@ -393,10 +337,6 @@ export function withErrorHandling(
     });
 }
 
-// ============================================================================
-// Validation Helpers
-// ============================================================================
-
 /**
  * Helper to validate required query parameters
  */
@@ -408,8 +348,8 @@ export function validateQueryParams(
   const missing: string[] = [];
   
   for (const param of requiredParams) {
-    const paramValue = req.query[param];
-    if (paramValue === undefined || paramValue === null || paramValue === '') {
+    const value = req.query[param];
+    if (value === undefined || value === null || value === '') {
       missing.push(param);
     }
   }
@@ -458,7 +398,7 @@ export function validateMethod(
   allowedMethods: string[],
   logger: ApiLogger
 ): boolean {
-  if (!req.method || !allowedMethods.includes(req.method)) {
+  if (!allowedMethods.includes(req.method || '')) {
     logger.warn('Method not allowed', { 
       requested: req.method, 
       allowed: allowedMethods 
@@ -482,11 +422,33 @@ export function requireEnvVar(varName: string, logger: ApiLogger): string {
   return value;
 }
 
-// ============================================================================
-// Exports
-// ============================================================================
+/**
+ * Create a success response helper
+ */
+export function createSuccessResponse<T = unknown>(
+  data: T,
+  statusCode: number = 200,
+  logger: ApiLogger | null = null
+): SuccessResponse<T> {
+  if (logger) {
+    logger.info('Request completed successfully', { 
+      statusCode,
+      dataSize: JSON.stringify(data).length 
+    });
+  }
+  
+  return {
+    statusCode,
+    body: {
+      ok: true,
+      data,
+      timestamp: new Date().toISOString(),
+    },
+  };
+}
 
 /**
  * Export error types for direct use if needed
+ * Note: ApiLogger is already exported as a class above
  */
 export { ErrorType as ApiErrorType };

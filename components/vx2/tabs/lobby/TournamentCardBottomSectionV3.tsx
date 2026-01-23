@@ -10,7 +10,7 @@
  */
 
 import React from 'react';
-import { ProgressBar } from '../../components/shared';
+import { ProgressBar } from '../../../ui';
 import { TILED_BG_STYLE } from '../../draft-room/constants';
 import type { Tournament } from '../../hooks/data';
 import { CARD_SPACING_V3, BOTTOM_GRID_V3 } from './constants/cardSpacingV3';

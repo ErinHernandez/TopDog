@@ -1,4 +1,4 @@
-import { doc, updateDoc, deleteField, onSnapshot } from 'firebase/firestore';
+import { doc, updateDoc, deleteField, onSnapshot, Timestamp } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { CustomizationPreferences, DEFAULT_PREFERENCES, UserLocations, type OverlayPattern } from './types';
@@ -30,10 +30,43 @@ export function subscribeToLocations(
   if (!db) {
     throw new Error('Firebase db not initialized');
   }
+  // Updated to read from userBadges collection (new location integrity system)
   return onSnapshot(
-    doc(db, 'userLocations', userId),
+    doc(db, 'userBadges', userId),
     (docSnap) => {
-      callback(docSnap.exists() ? (docSnap.data() as UserLocations) : null);
+      if (!docSnap.exists()) {
+        callback(null);
+        return;
+      }
+      
+      const data = docSnap.data();
+      // Convert badge format to UserLocations format for backward compatibility
+      // Note: counties are stored separately and will be loaded directly from userBadges
+      const locations: UserLocations = {
+        userId: userId,
+        countries: (data.countries || []).map((c: any) => ({
+          code: c.code,
+          name: c.name,
+          firstSeen: c.firstSeen || Timestamp.now(),
+          lastSeen: c.lastSeen || Timestamp.now(),
+          visitCount: c.visitCount || 1,
+        })),
+        states: (data.states || []).map((s: any) => {
+          // Extract state code from "US-{stateCode}" format
+          const stateCode = s.code.replace('US-', '');
+          return {
+            code: stateCode,
+            name: s.name,
+            firstSeen: s.firstSeen || Timestamp.now(),
+            lastSeen: s.lastSeen || Timestamp.now(),
+            visitCount: s.visitCount || 1,
+          };
+        }),
+        updatedAt: data.updatedAt || Timestamp.now(),
+        consentGiven: data.consentGiven ?? true,
+      };
+      
+      callback(locations);
     },
     onError
   );

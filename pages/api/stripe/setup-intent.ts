@@ -71,7 +71,7 @@ const handler = async function(
         success: false,
         error: 'RATE_LIMIT_EXCEEDED',
         message: 'Too many requests. Please try again later.',
-        retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000),
+        retryAfter: Math.ceil((rateLimitResult.retryAfterMs || 60) / 1000),
       });
     }
     
@@ -150,10 +150,13 @@ const handler = async function(
 };
 
 // Export with authentication, CSRF protection, and rate limiting
+import type { ApiHandler as AuthApiHandler } from '../../../lib/apiAuth';
+import type { NextApiRequest } from 'next';
+type CSRFHandler = (req: NextApiRequest, res: NextApiResponse) => Promise<void> | void;
 export default withCSRFProtection(
   withAuth(
-    withRateLimit(handler, setupIntentLimiter),
+    withRateLimit(handler, setupIntentLimiter) as unknown as AuthApiHandler,
     { required: true, allowAnonymous: false }
-  )
+  ) as unknown as CSRFHandler
 );
 

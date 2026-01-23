@@ -5,7 +5,7 @@
  */
 
 import React, { useState } from 'react';
-import { PlayerDropdown } from '../../../shared/PlayerDropdown';
+import { PlayerDropdown } from '../../../ui';
 import PositionBadge from '../../../draft/v3/mobile/apple/components/PositionBadge';
 import ShareButton from '../../ShareButton';
 import { SHARE_TYPES, generateShareData } from '../../../../lib/shareConfig';

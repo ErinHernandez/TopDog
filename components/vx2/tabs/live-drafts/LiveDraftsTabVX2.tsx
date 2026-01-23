@@ -31,7 +31,7 @@ import {
   Skeleton, 
   EmptyState, 
   ErrorState,
-} from '../../components/shared';
+} from '../../../ui';
 import { List } from '../../components/icons';
 
 // ============================================================================

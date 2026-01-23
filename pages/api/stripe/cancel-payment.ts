@@ -7,7 +7,7 @@
  * Only payments in 'requires_action' status can be cancelled.
  */
 
-import type { NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import type { AuthenticatedRequest } from '../../../lib/apiTypes';
 import Stripe from 'stripe';
 import { adminDb } from '../../../lib/firebase/firebaseAdmin';
@@ -323,10 +323,12 @@ const handler = async function(
 };
 
 // Export with authentication, CSRF protection, and rate limiting
+import type { ApiHandler as AuthApiHandler } from '../../../lib/apiAuth';
+type CSRFHandler = (req: NextApiRequest, res: NextApiResponse) => Promise<void> | void;
 export default withCSRFProtection(
   withAuth(
-    withRateLimit(handler, cancelPaymentLimiter),
+    withRateLimit(handler, cancelPaymentLimiter) as unknown as AuthApiHandler,
     { required: true, allowAnonymous: false }
-  )
+  ) as unknown as CSRFHandler
 );
 

@@ -8,7 +8,7 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { BG_COLORS, TEXT_COLORS } from '../../../core/constants/colors';
 import { SPACING, RADIUS, TYPOGRAPHY } from '../../../core/constants/sizes';
-import { SearchInput } from '../../../components/shared/inputs';
+import { SearchInput } from '../../../../ui';
 import { ChevronRight } from '../../../components/icons';
 import type { PlayoffPod, PlayoffTeam } from '../../../../../lib/mockData/playoffTeams';
 

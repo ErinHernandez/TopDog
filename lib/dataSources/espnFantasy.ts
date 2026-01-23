@@ -71,12 +71,13 @@ function makeRequest(url: string, options: { retries?: number } = {}): Promise<a
           reject(new Error(`ESPN API authentication failed: ${res.statusCode}`));
         } else if (res.statusCode === 429) {
           // Rate limited - retry with backoff
-          if (options.retries && options.retries > 0) {
+          const retries = options.retries ?? MAX_RETRIES;
+          if (retries > 0) {
             setTimeout(() => {
-              makeRequest(url, { retries: options.retries - 1 })
+              makeRequest(url, { retries: retries - 1 })
                 .then(resolve)
                 .catch(reject);
-            }, RETRY_DELAY * (MAX_RETRIES - options.retries + 1));
+            }, RETRY_DELAY * (MAX_RETRIES - retries + 1));
           } else {
             reject(new Error('ESPN API rate limit exceeded'));
           }
@@ -86,12 +87,13 @@ function makeRequest(url: string, options: { retries?: number } = {}): Promise<a
       });
     }).on('error', (error) => {
       // Network error - retry if retries available
-      if (options.retries && options.retries > 0) {
+      const retries = options.retries ?? MAX_RETRIES;
+      if (retries > 0) {
         setTimeout(() => {
-          makeRequest(url, { retries: options.retries - 1 })
+          makeRequest(url, { retries: retries - 1 })
             .then(resolve)
             .catch(reject);
-        }, RETRY_DELAY * (MAX_RETRIES - options.retries + 1));
+        }, RETRY_DELAY * (MAX_RETRIES - retries + 1));
       } else {
         reject(error);
       }

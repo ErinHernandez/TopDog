@@ -52,8 +52,8 @@ const CARD_PX = {
 } as const;
 
 const CARD_COLORS = {
-  background: 'url(/do_riding_football_III.webp)',
-  backgroundFallbackPng: 'url(/do_riding_football_III.png)', // PNG fallback for iOS/older browsers
+  background: 'url(/tournament_card_background.png)',
+  backgroundFallbackPng: 'url(/tournament_card_background.png)', // PNG fallback for iOS/older browsers
   backgroundFallback: '#0a0a1a',
   border: 'rgba(75, 85, 99, 0.5)',
   text: TEXT_COLORS.primary,

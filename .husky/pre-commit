@@ -30,4 +30,9 @@ if [ -n "$QUERY_WITHOUT_LIMIT" ]; then
 fi
 
 echo "Firestore query check passed"
+
+# Check for new handoff docs (warning only, non-blocking)
+echo "Checking for new handoff documentation..."
+node scripts/check-new-handoff-docs.js || true
+
 exit 0

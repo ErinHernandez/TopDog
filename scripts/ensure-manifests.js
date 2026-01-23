@@ -12,11 +12,15 @@ const projectRoot = path.resolve(__dirname, '..');
 const devServerDir = path.join(projectRoot, '.next', 'dev', 'server');
 const devDir = path.join(projectRoot, '.next', 'dev');
 
-// Ensure directories exist
+try {
+  // Ensure directories exist (including webpack cache dirs to avoid ENOENT on first compile)
 const requiredDirs = [
   devServerDir,
   path.join(devServerDir, 'pages'),
-  path.join(projectRoot, '.next', 'dev', 'static', 'webpack')
+  path.join(projectRoot, '.next', 'dev', 'static', 'webpack'),
+  path.join(projectRoot, '.next', 'dev', 'cache', 'webpack', 'client-development'),
+  path.join(projectRoot, '.next', 'dev', 'cache', 'webpack', 'client-development-fallback'),
+  path.join(projectRoot, '.next', 'dev', 'cache', 'webpack', 'server-development'),
 ];
 
 requiredDirs.forEach(dir => {
@@ -75,12 +79,34 @@ if (fs.existsSync(devServerDir)) {
 }
 console.log('✅ Created/updated routes-manifest.json');
 
-// Create a placeholder hot-update.json to prevent ENOENT errors
+// Create a .gitkeep in webpack static dir to ensure it persists
 const hotUpdateDir = path.join(projectRoot, '.next', 'dev', 'static', 'webpack');
-if (!fs.existsSync(hotUpdateDir)) {
-  fs.mkdirSync(hotUpdateDir, { recursive: true });
-}
-// Create a .gitkeep to ensure directory persists
 fs.writeFileSync(path.join(hotUpdateDir, '.gitkeep'), '');
 
+// Always write fallback-build-manifest.json (Next may delete it; we re-create before dev starts)
+const fallbackManifest = { polyfillFiles: [], devFiles: [], ampDevFiles: [], lowPriorityFiles: [] };
+const fallbackManifestPath = path.join(devDir, 'fallback-build-manifest.json');
+fs.writeFileSync(fallbackManifestPath, JSON.stringify(fallbackManifest, null, 2));
+console.log('✅ Created/updated fallback-build-manifest.json');
+
+// Always write prerender-manifest.json (Next expects it before first compile; we bootstrap it)
+const prerenderManifest = {
+  version: 4,
+  routes: {},
+  dynamicRoutes: {},
+  notFoundRoutes: [],
+  preview: {
+    previewModeId: '00000000000000000000000000000000',
+    previewModeSigningKey: '0000000000000000000000000000000000000000000000000000000000000000',
+    previewModeEncryptionKey: '0000000000000000000000000000000000000000000000000000000000000000',
+  },
+};
+const prerenderManifestPath = path.join(devDir, 'prerender-manifest.json');
+fs.writeFileSync(prerenderManifestPath, JSON.stringify(prerenderManifest, null, 2));
+console.log('✅ Created/updated prerender-manifest.json');
+
 console.log('✅ All manifest files ensured');
+} catch (err) {
+  console.error('❌ ensure-manifests failed:', err.message);
+  process.exit(1);
+}

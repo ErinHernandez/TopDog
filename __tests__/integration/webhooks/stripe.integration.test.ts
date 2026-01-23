@@ -21,17 +21,17 @@ jest.mock('../../../lib/firebase-utils', () => ({
 }));
 
 // Mock Stripe functions
-const mockUpdateUserBalance = jest.fn();
-const mockCreateTransaction = jest.fn();
-const mockUpdateTransactionStatus = jest.fn();
-const mockFindTransactionByPaymentIntent = jest.fn();
-const mockFindTransactionByTransfer = jest.fn();
-const mockLogPaymentEvent = jest.fn();
-const mockUpdateLastDepositCurrency = jest.fn();
-const mockFindEventByStripeId = jest.fn();
-const mockMarkEventAsProcessed = jest.fn();
-const mockMarkEventAsFailed = jest.fn();
-const mockCreateOrUpdateWebhookEvent = jest.fn();
+const mockUpdateUserBalance = jest.fn<Promise<Record<string, unknown>>, any[]>();
+const mockCreateTransaction = jest.fn<Promise<{ id: string }>, any[]>();
+const mockUpdateTransactionStatus = jest.fn<Promise<Record<string, unknown>>, any[]>();
+const mockFindTransactionByPaymentIntent = jest.fn<Promise<Record<string, unknown> | null>, any[]>();
+const mockFindTransactionByTransfer = jest.fn<Promise<Record<string, unknown> | null>, any[]>();
+const mockLogPaymentEvent = jest.fn<Promise<Record<string, unknown>>, any[]>();
+const mockUpdateLastDepositCurrency = jest.fn<Promise<Record<string, unknown>>, any[]>();
+const mockFindEventByStripeId = jest.fn<Promise<null | Record<string, unknown>>, any[]>();
+const mockMarkEventAsProcessed = jest.fn<Promise<Record<string, unknown>>, any[]>();
+const mockMarkEventAsFailed = jest.fn<Promise<Record<string, unknown>>, any[]>();
+const mockCreateOrUpdateWebhookEvent = jest.fn<Promise<Record<string, unknown>>, any[]>();
 
 jest.mock('../../../lib/stripe', () => ({
   updateUserBalance: (...args: unknown[]) => mockUpdateUserBalance(...args),
@@ -219,7 +219,7 @@ describe('Stripe Webhook Integration', () => {
         id: eventId,
         status: 'processed',
         processedAt: new Date().toISOString(),
-      });
+      } as Record<string, unknown>);
 
       const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
         method: 'POST',
@@ -523,7 +523,7 @@ describe('Stripe Webhook Integration', () => {
         id: 'txn_123',
         userId,
         amount: amount / 100,
-      });
+      } as Record<string, unknown>);
 
       const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
         method: 'POST',
@@ -564,7 +564,7 @@ describe('Stripe Webhook Integration', () => {
         id: 'txn_disputed',
         userId: 'user_disputed',
         amount: 50,
-      });
+      } as Record<string, unknown>);
 
       const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
         method: 'POST',
@@ -610,7 +610,7 @@ describe('Stripe Webhook Integration', () => {
         id: 'txn_to_refund',
         userId,
         amount: 50,
-      });
+      } as Record<string, unknown>);
 
       const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
         method: 'POST',
@@ -676,7 +676,7 @@ describe('Stripe Webhook Integration', () => {
       };
 
       mockConstructEvent.mockReturnValue(event);
-      mockUpdateUserBalance.mockRejectedValue(new Error('Database connection failed'));
+      mockUpdateUserBalance.mockRejectedValue(new Error('Database connection failed') as Error);
 
       const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
         method: 'POST',

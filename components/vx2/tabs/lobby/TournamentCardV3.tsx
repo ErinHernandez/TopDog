@@ -13,9 +13,10 @@
  * @module TournamentCardV3
  */
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { CARD_SPACING_V3, CARD_GRID_V3 } from './constants/cardSpacingV3';
 import { BottomSectionV3 } from './TournamentCardBottomSectionV3';
+import { TournamentCardLogo } from './elements';
 import type { Tournament } from '../../hooks/data';
 
 // ============================================================================
@@ -23,30 +24,18 @@ import type { Tournament } from '../../hooks/data';
 // ============================================================================
 
 /**
- * Tiny blur placeholder (92 bytes) - displays instantly while full image loads
- */
-const BLUR_PLACEHOLDER = 'data:image/webp;base64,UklGRlQAAABXRUJQVlA4IEgAAABwAwCdASoUABsAPyl+uFOuKCWisAwBwCUJZQAAW+q+9Bpo4aAA/uvZ+YkAc4jvVTc7+oJAY99soPLjJTrwm3j5Y3VE0BWmGAA=';
-
-/**
  * Color constants for the card
+ * No full-bleed background image — solid color only; logo used as logo inside card.
  */
 const CARD_COLORS = {
-  // Background image URL (WebP with PNG fallback)
-  backgroundImage: 'url(/do_riding_football_III.webp)',
-  backgroundImagePng: 'url(/do_riding_football_III.png)',
-  
-  // Solid color fallback if images fail
+  /** Logo image (inside card, not background) */
+  logoImage: '/tournament_card_background.png',
+  /** Card background (solid only) */
   backgroundFallback: '#0a0a1a',
-  
-  // Border colors
   borderDefault: 'rgba(75, 85, 99, 0.5)',
   borderFeatured: '#1E3A5F',
-  
-  // Text colors
   textPrimary: '#FFFFFF',
   textSecondary: 'rgba(255, 255, 255, 0.7)',
-  
-  // Progress bar background
   progressBackground: 'rgba(55, 65, 81, 0.5)',
 } as const;
 
@@ -101,94 +90,6 @@ export interface TournamentCardV3Props {
   className?: string;
   /** Style overrides for customization */
   styleOverrides?: CardStyleOverridesV3;
-}
-
-/**
- * Props for the BackgroundLayers sub-component
- */
-interface BackgroundLayersProps {
-  blurPlaceholder: string;
-  fullImageUrl: string;
-  useFallback: boolean;
-  imageLoaded: boolean;
-  borderRadius: number;
-  originalUrl: string | null;
-}
-
-// ============================================================================
-// SUB-COMPONENT: BackgroundLayers
-// ============================================================================
-
-/**
- * BackgroundLayers - Renders blur placeholder and full image
- * 
- * Architecture:
- * - Two absolutely-positioned div layers
- * - Layer 1 (z-index: 0): Blur placeholder, visible immediately
- * - Layer 2 (z-index: 1): Full image, fades in when loaded
- * 
- * These layers are position: absolute, so they do NOT affect the grid layout.
- */
-function BackgroundLayers({
-  blurPlaceholder,
-  fullImageUrl,
-  useFallback,
-  imageLoaded,
-  borderRadius,
-  originalUrl,
-}: BackgroundLayersProps): React.ReactElement {
-  // Determine which image to show based on fallback status
-  const displayImageUrl = useFallback && originalUrl && 
-    (originalUrl.endsWith('.webp') || originalUrl.includes('.webp'))
-    ? CARD_COLORS.backgroundImagePng
-    : fullImageUrl;
-
-  return (
-    <>
-      {/* Layer 1: Blur placeholder - shows instantly */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundImage: `url(${blurPlaceholder})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          borderRadius: `${borderRadius - 1}px`,
-          zIndex: 0,
-        }}
-      />
-      
-      {/* Layer 2: Full image - fades in when loaded */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundImage: displayImageUrl,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          borderRadius: `${borderRadius - 1}px`,
-          zIndex: 1,
-          // Opacity transition for smooth fade-in
-          opacity: imageLoaded ? 1 : 0,
-          transition: 'opacity 0.3s ease-out',
-          // GPU acceleration for smooth animation
-          willChange: 'opacity',
-          transform: 'translateZ(0)',
-          WebkitTransform: 'translateZ(0)',
-        }}
-      />
-    </>
-  );
 }
 
 // ============================================================================
@@ -258,78 +159,9 @@ export function TournamentCardV3({
   styleOverrides = {},
 }: TournamentCardV3Props): React.ReactElement {
   // ----------------------------------------
-  // State
-  // ----------------------------------------
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const [useFallback, setUseFallback] = useState(false);
-
-  // ----------------------------------------
-  // Resolve style overrides
-  // ----------------------------------------
-  
-  // Determine the background image URL
-  const resolvedBackground = styleOverrides.backgroundImage
-    ? `url(${styleOverrides.backgroundImage})`
-    : (styleOverrides.background ?? CARD_COLORS.backgroundImage);
-
-  // Extract URL from CSS background value for preloading
-  const urlMatch = resolvedBackground.match(/url\(['"]?([^'"]+)['"]?\)/);
-  const backgroundUrl = urlMatch ? urlMatch[1] : null;
-
-  // ----------------------------------------
-  // Image preloading effect
-  // ----------------------------------------
-  useEffect(() => {
-    // Skip preloading for data URLs (already embedded)
-    if (!backgroundUrl || backgroundUrl.startsWith('data:')) {
-      setImageLoaded(true);
-      return;
-    }
-
-    const img = new Image();
-
-    // Fallback handler for WebP images
-    const tryPngFallback = () => {
-      if (backgroundUrl.endsWith('.webp') || backgroundUrl.includes('.webp')) {
-        const pngUrl = backgroundUrl.replace('.webp', '.png').split('?')[0];
-        
-        const fallbackImg = new Image();
-        fallbackImg.onload = () => {
-          setImageLoaded(true);
-          setUseFallback(true);
-        };
-        fallbackImg.onerror = () => {
-          // Both failed, show anyway (will use fallback color)
-          setImageLoaded(true);
-          setUseFallback(true);
-        };
-        fallbackImg.src = pngUrl;
-      } else {
-        setImageLoaded(true);
-      }
-    };
-
-    img.onload = () => {
-      setImageLoaded(true);
-    };
-
-    img.onerror = () => {
-      tryPngFallback();
-    };
-
-    img.src = backgroundUrl;
-
-    // Handle already-cached images
-    if (img.complete) {
-      setImageLoaded(true);
-    }
-  }, [backgroundUrl]);
-
-  // ----------------------------------------
-  // Compute final styles
+  // Compute final styles (solid background only; logo inside card)
   // ----------------------------------------
   const finalColors = {
-    background: resolvedBackground,
     backgroundFallback: styleOverrides.backgroundFallback ?? CARD_COLORS.backgroundFallback,
     border: styleOverrides.border ?? CARD_COLORS.borderDefault,
     borderWidth: styleOverrides.borderWidth ?? (featured ? 3 : 1),
@@ -385,25 +217,11 @@ export function TournamentCardV3({
       role="article"
       aria-label={`${tournament.title} tournament`}
     >
-      {/* Background Layers - Absolute positioned, outside grid flow */}
-      <BackgroundLayers
-        blurPlaceholder={BLUR_PLACEHOLDER}
-        fullImageUrl={finalColors.background}
-        useFallback={useFallback}
-        imageLoaded={imageLoaded}
-        borderRadius={finalSizes.borderRadius}
-        originalUrl={backgroundUrl}
-      />
-
       {/* Content Grid - The Layout Engine */}
       <div
         style={{
           flex: 1,
           display: 'grid',
-          // ========================================
-          // THE "FLEX-IN-GRID" SECRET SAUCE
-          // auto / 1fr / auto
-          // ========================================
           gridTemplateRows: CARD_GRID_V3.template,
           padding: `${finalSizes.padding}px`,
           zIndex: 1,
@@ -412,10 +230,11 @@ export function TournamentCardV3({
           overflow: 'hidden',
         }}
       >
-        {/* ========================================
-            Row 1: Title
-            ======================================== */}
-        <TitleSection titleFontSize={styleOverrides.titleFontSize} />
+        {/* Row 1: Logo + Title (no full-bleed background; logo as logo only) */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <TournamentCardLogo src={CARD_COLORS.logoImage} alt="Tournament logo" maxHeight={72} />
+          <TitleSection titleFontSize={styleOverrides.titleFontSize} />
+        </div>
 
         {/* ========================================
             Row 2: Spacer (Takes 1fr)

@@ -81,3 +81,6 @@ temp/
 # macOS cruft
 .DS_Store
 .cursor/
+
+# Backup files
+*.bak

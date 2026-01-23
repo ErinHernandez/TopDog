@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { FlagOption } from '@/lib/customization/types';
-import { getFlagUrl, getFlagDisplayName } from '@/lib/customization/flags';
+import { getFlagUrl, getFlagDisplayName, COUNTRY_NAMES } from '@/lib/customization/flags';
 import { cn } from '@/lib/utils';
 
 interface FlagGridProps {
@@ -30,16 +30,31 @@ export function FlagGrid({ flags, selectedCode, onSelect, isLoading }: FlagGridP
     );
   }
 
-  // Group: countries first, then US states
+  // Group: countries first, then US states, then US counties, then international divisions
   const countries = flags.filter((f) => f.type === 'country');
   const states = flags.filter((f) => f.type === 'state');
+  const counties = flags.filter((f) => f.type === 'county');
+  const divisions = flags.filter((f) => f.type === 'division');
+
+  // Group divisions by country for better organization
+  const divisionsByCountry = useMemo(() => {
+    const grouped: Record<string, FlagOption[]> = {};
+    divisions.forEach(div => {
+      const countryCode = div.code.split('-')[0];
+      if (!grouped[countryCode]) {
+        grouped[countryCode] = [];
+      }
+      grouped[countryCode].push(div);
+    });
+    return grouped;
+  }, [divisions]);
 
   return (
     <div className="space-y-4">
       {countries.length > 0 && (
         <div>
           <h4 className="text-sm font-medium mb-2" style={{ color: 'rgba(209, 213, 219, 0.9)' }}>Countries</h4>
-          <div className="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-4 gap-2 sm:gap-3">
+          <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 sm:gap-3">
             {countries.map((flag) => (
               <FlagItem
                 key={flag.code}
@@ -55,7 +70,7 @@ export function FlagGrid({ flags, selectedCode, onSelect, isLoading }: FlagGridP
       {states.length > 0 && (
         <div>
           <h4 className="text-sm font-medium mb-2" style={{ color: 'rgba(209, 213, 219, 0.9)' }}>US States</h4>
-          <div className="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-4 gap-2 sm:gap-3">
+          <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 sm:gap-3">
             {states.map((flag) => (
               <FlagItem
                 key={flag.code}
@@ -65,6 +80,47 @@ export function FlagGrid({ flags, selectedCode, onSelect, isLoading }: FlagGridP
               />
             ))}
           </div>
+        </div>
+      )}
+
+      {counties.length > 0 && (
+        <div>
+          <h4 className="text-sm font-medium mb-2" style={{ color: 'rgba(209, 213, 219, 0.9)' }}>US Counties</h4>
+          <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 sm:gap-3">
+            {counties.map((flag) => (
+              <FlagItem
+                key={flag.code}
+                flag={flag}
+                isSelected={selectedCode === flag.code}
+                onSelect={onSelect}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {Object.keys(divisionsByCountry).length > 0 && (
+        <div>
+          <h4 className="text-sm font-medium mb-2" style={{ color: 'rgba(209, 213, 219, 0.9)' }}>
+            Regions & Provinces
+          </h4>
+          {Object.entries(divisionsByCountry).map(([countryCode, countryDivisions]) => (
+            <div key={countryCode} className="mb-3">
+              <h5 className="text-xs font-medium mb-1" style={{ color: 'rgba(209, 213, 219, 0.6)' }}>
+                {COUNTRY_NAMES[countryCode] || countryCode}
+              </h5>
+              <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 sm:gap-3">
+                {countryDivisions.map((flag) => (
+                  <FlagItem
+                    key={flag.code}
+                    flag={flag}
+                    isSelected={selectedCode === flag.code}
+                    onSelect={onSelect}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>

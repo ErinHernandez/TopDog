@@ -1,1 +1,0 @@
-export { PerformanceMonitor as default } from '../ui/stubs';

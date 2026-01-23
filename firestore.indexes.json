@@ -71,13 +71,6 @@
       "collectionGroup": "users",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "username", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "users",
-      "queryScope": "COLLECTION",
-      "fields": [
         { "fieldPath": "countryCode", "order": "ASCENDING" },
         { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
@@ -175,22 +168,8 @@
       "collectionGroup": "stripe_webhook_events",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "stripeEventId", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "stripe_webhook_events",
-      "queryScope": "COLLECTION",
-      "fields": [
         { "fieldPath": "status", "order": "ASCENDING" },
         { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "paystack_webhook_events",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "eventId", "order": "ASCENDING" }
       ]
     },
     {
@@ -202,17 +181,60 @@
       ]
     },
     {
-      "collectionGroup": "xendit_webhook_events",
+      "collectionGroup": "pickLocations",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "eventId", "order": "ASCENDING" }
+        { "fieldPath": "draftId", "order": "ASCENDING" },
+        { "fieldPath": "pickNumber", "order": "ASCENDING" }
       ]
     },
     {
-      "collectionGroup": "paymongo_webhook_events",
+      "collectionGroup": "draftRiskScores",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "eventId", "order": "ASCENDING" }
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "maxRiskScore", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "userPairAnalysis",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "overallRiskLevel", "order": "ASCENDING" },
+        { "fieldPath": "lastDraftTogether", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "userPairAnalysis",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId1", "order": "ASCENDING" },
+        { "fieldPath": "lastAnalyzedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "userPairAnalysis",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId2", "order": "ASCENDING" },
+        { "fieldPath": "lastAnalyzedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "adminActions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "targetType", "order": "ASCENDING" },
+        { "fieldPath": "targetId", "order": "ASCENDING" },
+        { "fieldPath": "timestamp", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "draftIntegrityFlags",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "lastUpdatedAt", "order": "DESCENDING" }
       ]
     }
   ],

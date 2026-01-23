@@ -55,7 +55,7 @@ function formatTimeRemaining(seconds: number): { text: string; isUrgent: boolean
 function formatPickInfo(draft: SlowDraft): string {
   const round = draft.currentRound;
   const pickInRound = ((draft.pickNumber - 1) % draft.teamCount) + 1;
-  return `Pick ${round}.${pickInRound.toString().padStart(2, '0')} • Round ${round} of ${draft.totalRounds}`;
+  return `Pick ${round}.${pickInRound.toString().padStart(2, '0')}`;
 }
 
 function getTimerColor(timeInfo: { isUrgent: boolean; isCritical: boolean }): string {
@@ -229,7 +229,7 @@ export default function SlowDraftCard({
   // Card background and border based on state
   const cardStyle = isYourTurn
     ? {
-        ...TILED_BG_STYLE,
+        backgroundColor: SLOW_DRAFT_COLORS.card.default,
         border: `1px solid ${SLOW_DRAFT_COLORS.card.yourTurnBorder}`,
         boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)',
       }
@@ -248,16 +248,6 @@ export default function SlowDraftCard({
         padding: SLOW_DRAFT_LAYOUT.cardPaddingX,
       }}
     >
-      {/* Dark overlay for tiled background (your turn state) */}
-      {isYourTurn && (
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            zIndex: 0,
-          }}
-        />
-      )}
 
       {/* Content wrapper */}
       <div className="relative z-10">

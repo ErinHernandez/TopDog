@@ -44,15 +44,16 @@ export function getDataSourceConfig(): DataSourceConfig {
 
   // SportsDataIO configuration (required for fallback or if using SportsDataIO)
   const sportsdataioKey = process.env.SPORTSDATAIO_API_KEY;
-  if (projections === 'sportsdataio' || !sportsdataioKey) {
-    // Only require if explicitly using SportsDataIO, or if we need it for fallback
-    if (projections === 'sportsdataio' && !sportsdataioKey) {
-      throw new Error(
-        'SPORTSDATAIO_API_KEY required when using SportsDataIO data source.'
-      );
-    }
+  
+  // Only require SportsDataIO key if explicitly using it
+  // For fallback, we'll check at runtime
+  if (projections === 'sportsdataio' && !sportsdataioKey) {
+    throw new Error(
+      'SPORTSDATAIO_API_KEY required when using SportsDataIO data source.'
+    );
   }
 
+  // Add SportsDataIO config if key is available (for fallback)
   if (sportsdataioKey) {
     config.sportsdataio = {
       apiKey: sportsdataioKey,

@@ -32,6 +32,7 @@ import {
   createErrorResponse,
   ErrorType,
 } from '../../../lib/apiErrorHandler';
+import { locationIntegrityService } from '../../../lib/integrity';
 
 // ============================================================================
 // TYPES
@@ -48,6 +49,14 @@ interface SubmitPickRequest {
   isAutopick?: boolean;
   /** Source of the pick selection */
   source?: 'manual' | 'queue' | 'custom_ranking' | 'adp';
+  /** Location data (optional, captured client-side) */
+  location?: {
+    lat: number;
+    lng: number;
+    accuracy: number;
+  };
+  /** Device ID for tracking */
+  deviceId?: string;
 }
 
 interface SubmitPickResponse {
@@ -144,6 +153,8 @@ export default async function handler(
       playerId,
       isAutopick = false,
       source = 'manual',
+      location,
+      deviceId,
     } = req.body as SubmitPickRequest;
 
     validateBody(req, ['roomId', 'userId', 'playerId'], logger);
@@ -298,6 +309,79 @@ export default async function handler(
         pickNumber: result.currentPickNumber,
         pickId: pickDocRef.id,
       });
+
+      // Record location data (non-blocking, don't fail pick if location fails)
+      if (location && deviceId) {
+        try {
+          // Get IP address from request headers
+          const ipAddress = 
+            (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ||
+            (req.headers['x-real-ip'] as string) ||
+            req.socket?.remoteAddress ||
+            'UNKNOWN';
+
+          await locationIntegrityService.recordPickLocation({
+            draftId: roomId,
+            pickNumber: result.currentPickNumber,
+            userId,
+            location: {
+              lat: location.lat,
+              lng: location.lng,
+              accuracy: location.accuracy,
+              ipAddress,
+            },
+            deviceId,
+          });
+        } catch (locationError) {
+          // Log but don't fail the pick
+          logger.error('Failed to record pick location', locationError as Error, {
+            component: 'draft',
+            operation: 'submit-pick',
+            roomId,
+            userId,
+            pickNumber: result.currentPickNumber,
+          });
+        }
+      }
+
+      // Mark draft as completed for collusion analysis if this was the last pick
+      // NOTE: This is completely non-blocking. Draft completion analysis happens
+      // asynchronously after the draft has already completed. We NEVER block drafts.
+      if (result.isLastPick) {
+        try {
+          const { collusionFlagService } = await import('../../../lib/integrity/CollusionFlagService');
+          // This triggers post-draft analysis asynchronously - does not block
+          collusionFlagService.markDraftCompleted(roomId).catch((error) => {
+            // Log but don't fail - draft is already complete
+            logger.error('Failed to mark draft as completed for collusion analysis', error as Error, {
+              component: 'draft',
+              operation: 'submit-pick',
+              roomId,
+            });
+          });
+        } catch (error) {
+          // Log but don't fail the pick - draft completion is not dependent on analysis
+          logger.error('Failed to trigger collusion analysis', error as Error, {
+            component: 'draft',
+            operation: 'submit-pick',
+            roomId,
+          });
+        }
+      }
+
+      // Clean up draft location state if draft is complete
+      if (result.isLastPick) {
+        try {
+          await locationIntegrityService.cleanupDraftState(roomId);
+        } catch (cleanupError) {
+          // Log but don't fail the response
+          logger.error('Failed to cleanup draft location state', cleanupError as Error, {
+            component: 'draft',
+            operation: 'submit-pick',
+            roomId,
+          });
+        }
+      }
 
       return res.status(200).json({
         success: true,

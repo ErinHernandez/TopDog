@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "node scripts/ensure-manifests.js && next dev --webpack -H localhost",
+    "dev": "node scripts/kill-port-3000.js && node scripts/ensure-manifests.js && next dev --webpack -H localhost -p 3000",
+    "dev:clean": "node scripts/kill-port-3000.js && npx rimraf .next node_modules/.cache .turbo && node scripts/ensure-manifests.js && next dev --webpack -H localhost -p 3000",
     "build": "node scripts/generate-firebase-messaging-sw.js && next build && node scripts/merge-service-worker.js",
     "start": "next start",
     "lint": "next lint",
@@ -22,6 +23,7 @@
     "audit:env": "node scripts/audit-env-vars.js",
     "audit:todos": "node scripts/triage-todos.js",
     "audit:any-types": "node scripts/find-any-types.js",
+    "docs:archive": "node scripts/archive-docs.js",
     "analyze": "ANALYZE=true npm run build",
     "bundle:track": "node scripts/track-bundle-size.js",
     "console:plan": "node scripts/replace-console-logs.js",
@@ -33,20 +35,23 @@
   "license": "ISC",
   "description": "",
   "overrides": {
-    "debug": "4.3.1",
+    "debug": "^4.3.1",
     "semver": "7.5.4",
-    "path-to-regexp": "6.2.2",
-    "undici": "7.14.0",
-    "tar": "6.2.1",
+    "path-to-regexp": "6.3.0",
+    "undici": "7.18.2",
+    "tar": "7.5.4",
     "esbuild": "0.25.9",
+    "@vercel/routing-utils": {
+      "path-to-regexp": "6.3.0"
+    },
     "express": {
-      "path-to-regexp": "6.2.2"
+      "path-to-regexp": "6.3.0"
     },
     "path-match": {
-      "path-to-regexp": "6.2.2"
+      "path-to-regexp": "6.3.0"
     },
     "superstatic": {
-      "path-to-regexp": "6.2.2"
+      "path-to-regexp": "6.3.0"
     },
     "uuid": "^11.0.0",
     "source-map": "^0.7.4",
@@ -60,7 +65,9 @@
     "@sentry/nextjs": "^10.33.0",
     "@stripe/react-stripe-js": "^5.4.1",
     "@stripe/stripe-js": "^8.6.0",
+    "@vercel/analytics": "^1.6.1",
     "canvas": "^3.1.2",
+    "debug": "^4.3.1",
     "dotenv": "^17.2.1",
     "firebase": "^11.9.1",
     "firebase-admin": "^13.0.1",
@@ -75,10 +82,8 @@
     "react": "^18.2.0",
     "react-beautiful-dnd": "^13.1.1",
     "react-dom": "^18.2.0",
-    "react-redux": "^7.2.9",
     "react-seven-segment-display": "^2.1.0",
     "react-window": "^1.8.11",
-    "redux": "^5.0.1",
     "stripe": "^18.3.0",
     "swr": "^2.3.7"
   },
@@ -98,14 +103,17 @@
     "@types/react-window": "^1.8.5",
     "autoprefixer": "^10.4.14",
     "axios": "^1.11.0",
+    "babel-plugin-polyfill-corejs3": "^0.13.0",
     "cypress": "^14.5.0",
     "eslint": "9.33.0",
     "eslint-config-next": "^16.0.0",
     "firebase-tools": "^14.11.1",
     "jest": "^30.0.3",
     "jest-environment-jsdom": "^30.2.0",
+    "node-mocks-http": "^1.15.1",
     "postcss": "^8.4.27",
     "puppeteer": "^24.17.0",
+    "rimraf": "^6.0.1",
     "sharp": "^0.34.5",
     "tailwindcss": "^3.3.3",
     "typescript": "^5.9.3",

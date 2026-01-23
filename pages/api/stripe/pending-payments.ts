@@ -197,7 +197,8 @@ const handler = async function(
     const sanitizedUserId = typeof userId === 'string' ? sanitizeID(userId) : null;
     
     // Verify user access
-    if (req.user && sanitizedUserId && !verifyUserAccess(req.user.uid, sanitizedUserId)) {
+    const authenticatedReq = req as AuthenticatedRequest;
+    if (authenticatedReq.user && sanitizedUserId && !verifyUserAccess(authenticatedReq.user.uid, sanitizedUserId)) {
       const errorResponse = createErrorResponse(
         ErrorType.FORBIDDEN,
         'Access denied',
@@ -297,8 +298,9 @@ const handler = async function(
 };
 
 // Export with authentication and rate limiting
+import type { ApiHandler as AuthApiHandler } from '../../../lib/apiAuth';
 export default withAuth(
-  withRateLimit(handler, pendingPaymentsLimiter),
+  withRateLimit(handler, pendingPaymentsLimiter) as unknown as AuthApiHandler,
   { required: true, allowAnonymous: false }
 );
 

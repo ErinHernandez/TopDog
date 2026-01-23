@@ -18,3 +18,6 @@ export type { TournamentJoinButtonProps } from './TournamentJoinButton';
 
 export { TournamentStats } from './TournamentStats';
 export type { TournamentStatsProps } from './TournamentStats';
+
+export { TournamentCardLogo } from './TournamentCardLogo';
+export type { TournamentCardLogoProps } from './TournamentCardLogo';

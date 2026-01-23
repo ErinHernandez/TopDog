@@ -20,11 +20,11 @@ import {
   Skeleton, 
   EmptyState, 
   ErrorState,
-} from '../../components/shared';
-import { SearchInput } from '../../components/shared/inputs';
+  SearchInput,
+  type Position,
+  POSITIONS,
+} from '../../../ui';
 import { Rankings } from '../../components/icons';
-import type { Position } from '../../components/shared/display/types';
-import { POSITIONS } from '../../components/shared/display/types';
 
 // ============================================================================
 // CONSTANTS

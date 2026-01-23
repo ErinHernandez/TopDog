@@ -21,4 +21,9 @@ module.exports = {
   ],
   // Ensure Safari-specific bug fixes are applied
   plugins: [],
+  // Exclude node_modules from Babel processing (Next.js handles this, but be explicit)
+  ignore: [
+    'node_modules/**',
+    '.next/**',
+  ],
 };

@@ -85,7 +85,7 @@ const handler = async function(
         success: false,
         error: 'RATE_LIMIT_EXCEEDED',
         message: 'Too many requests. Please try again later.',
-        retryAfter: Math.ceil(rateLimitResult.retryAfterMs / 1000),
+        retryAfter: Math.ceil((rateLimitResult.retryAfterMs || 60) / 1000),
       });
     }
     

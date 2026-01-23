@@ -1,1 +1,0 @@
-export { Rankings as default } from './stubs';

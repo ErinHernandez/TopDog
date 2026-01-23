@@ -2,7 +2,7 @@
 
 > **For Agents:** Start here to understand project state. This is the single index of all important documentation.
 
-**Last Updated:** January 2025
+**Last Updated:** January 2025 (Updated: Added Research section)
 
 ---
 
@@ -82,6 +82,19 @@ Architecture and technical documentation.
 | Firebase Regional Optimization | Firebase optimization guide | [docs/FIREBASE_REGIONAL_OPTIMIZATION.md](./docs/FIREBASE_REGIONAL_OPTIMIZATION.md) |
 | Technical Debt Audit | Catalog of technical debt | [docs/TECHNICAL_DEBT_AUDIT.md](./docs/TECHNICAL_DEBT_AUDIT.md) |
 | Accessibility Audit Guide | Accessibility testing guide | [docs/ACCESSIBILITY_AUDIT_GUIDE.md](./docs/ACCESSIBILITY_AUDIT_GUIDE.md) |
+
+---
+
+## 🔬 Research & Analysis
+
+Research documents and analysis for future features.
+
+| Document | Description | Location |
+|----------|-------------|----------|
+| Collusion Detection Research | Algorithm research for detecting collusion in best ball tournaments | [docs/COLLUSION_DETECTION_RESEARCH.md](./docs/COLLUSION_DETECTION_RESEARCH.md) |
+| Location Integrity System | Location data collection system design for integrity/fraud detection | [LOCATION_INTEGRITY_SYSTEM_DESIGN.md](./LOCATION_INTEGRITY_SYSTEM_DESIGN.md) |
+| Username System Research | Username system implementation research | [docs/USERNAME_SYSTEM_RESEARCH.md](./docs/USERNAME_SYSTEM_RESEARCH.md) |
+| Payment Provider Research | Payment provider analysis and selection | [docs/PAYMENT_PROVIDER_RESEARCH.md](./docs/PAYMENT_PROVIDER_RESEARCH.md) |
 
 ---
 

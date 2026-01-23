@@ -28,6 +28,7 @@ import {
   validateBody,
   createSuccessResponse,
 } from '../../../../lib/apiErrorHandler';
+import { locationIntegrityService } from '../../../../lib/integrity';
 
 // ============================================================================
 // TYPES
@@ -36,6 +37,14 @@ import {
 interface QuickPickRequest {
   userId: string;
   playerId: string;
+  /** Location data (optional, captured client-side) */
+  location?: {
+    lat: number;
+    lng: number;
+    accuracy: number;
+  };
+  /** Device ID for tracking */
+  deviceId?: string;
 }
 
 interface QuickPickResponse {
@@ -114,7 +123,7 @@ export default async function handler(
     validateMethod(req, ['POST'], logger);
 
     const { draftId } = req.query;
-    const { userId, playerId } = req.body as QuickPickRequest;
+    const { userId, playerId, location, deviceId } = req.body as QuickPickRequest;
 
     if (!draftId || typeof draftId !== 'string') {
       return res.status(400).json({
@@ -278,6 +287,54 @@ export default async function handler(
         pickNumber: result.currentPickNumber,
         pickId: pickDocRef.id,
       });
+
+      // Record location data (non-blocking, don't fail pick if location fails)
+      if (location && deviceId) {
+        try {
+          // Get IP address from request headers
+          const ipAddress = 
+            (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ||
+            (req.headers['x-real-ip'] as string) ||
+            req.socket?.remoteAddress ||
+            'UNKNOWN';
+
+          await locationIntegrityService.recordPickLocation({
+            draftId: draftId as string,
+            pickNumber: result.currentPickNumber,
+            userId,
+            location: {
+              lat: location.lat,
+              lng: location.lng,
+              accuracy: location.accuracy,
+              ipAddress,
+            },
+            deviceId,
+          });
+        } catch (locationError) {
+          // Log but don't fail the pick
+          logger.error('Failed to record pick location', locationError as Error, {
+            component: 'slow-drafts',
+            operation: 'quick-pick',
+            draftId,
+            userId,
+            pickNumber: result.currentPickNumber,
+          });
+        }
+      }
+
+      // Clean up draft location state if draft is complete
+      if (result.isLastPick) {
+        try {
+          await locationIntegrityService.cleanupDraftState(draftId as string);
+        } catch (cleanupError) {
+          // Log but don't fail the response
+          logger.error('Failed to cleanup draft location state', cleanupError as Error, {
+            component: 'slow-drafts',
+            operation: 'quick-pick',
+            draftId,
+          });
+        }
+      }
 
       return res.status(200).json({
         success: true,

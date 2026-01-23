@@ -12,7 +12,7 @@
  */
 
 import React from 'react';
-import { ProgressBar } from '../../components/shared';
+import { ProgressBar } from '../../../ui';
 import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
 import { TEXT_COLORS } from '../../core/constants/colors';
 import { TILED_BG_STYLE } from '../../draft-room/constants';

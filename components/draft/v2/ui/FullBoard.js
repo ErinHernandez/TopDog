@@ -1,1 +1,0 @@
-export { FullBoard as default } from './stubs';

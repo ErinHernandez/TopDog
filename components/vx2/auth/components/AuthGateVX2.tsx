@@ -83,7 +83,9 @@ function LoadingSpinner(): React.ReactElement {
 
 export function AuthGateVX2({ children }: AuthGateVX2Props): React.ReactElement {
   const { state: authState, signOut } = useAuth();
-  const { isMobile, isLoaded: isMobileLoaded } = useIsMobileDevice();
+  const isMobileRaw = useIsMobileDevice();
+  const isMobileLoaded = isMobileRaw !== null;
+  const isMobile = isMobileRaw === true;
   const [currentView, setCurrentView] = useState<AuthView>('login');
   const [devAuthOverride, setDevAuthOverride] = useState<DevAuthOverride>(null);
   const [isVercelDeployment, setIsVercelDeployment] = useState(false);
@@ -93,11 +95,6 @@ export function AuthGateVX2({ children }: AuthGateVX2Props): React.ReactElement 
   useEffect(() => {
     setIsMounted(true);
   }, []);
-  
-  // Debug: Log state values to identify loading issue
-  useEffect(() => {
-    console.log('[DEBUG] isMounted:', isMounted, 'isLoaded:', isMobileLoaded, 'isMobile:', isMobile);
-  }, [isMounted, isMobileLoaded, isMobile]);
   
   // Check if running on Vercel deployment (runtime, not build)
   useEffect(() => {

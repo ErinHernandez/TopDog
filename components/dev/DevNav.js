@@ -103,14 +103,11 @@ const DEFAULT_LINKS = [
   { id: 'vx2-shell', href: '/testing-grounds/vx2-mobile-app-demo', label: 'Mobile App (VX2)', bgColor: '#14532D', bgColorActive: '#1F4D3A', textColor: '#86EFAC' },
   { id: 'vx2-lobby', href: '/testing-grounds/vx2-mobile-app-demo?tab=lobby', label: 'Lobby Tab (VX2)', bgColor: '#14532D', bgColorActive: '#1F4D3A', textColor: '#86EFAC' },
   { id: 'vx2-draft', href: '/testing-grounds/vx2-draft-room', label: 'Draft Room (VX2)', bgColor: '#14532D', bgColorActive: '#1F4D3A', textColor: '#86EFAC' },
-  { id: 'vx2-tablet', href: '/testing-grounds/vx2-tablet-draft-room', label: 'Tablet Draft (VX2)', bgColor: '#14532D', bgColorActive: '#1F4D3A', textColor: '#86EFAC' },
   { id: 'slow-draft-sandbox', href: '/testing-grounds/slow-draft-sandbox', label: 'Slow Draft Sandbox', bgColor: '#14532D', bgColorActive: '#1F4D3A', textColor: '#86EFAC' },
   { id: 'dynamic-island-sandbox', href: '/testing-grounds/dynamic-island-sandbox', label: 'Dynamic Island Sandbox', bgColor: '#D97706', bgColorActive: '#B45309', textColor: '#FDE68A' },
-  { id: 'card-sandbox', href: '/testing-grounds/card-sandbox', label: 'Card Sandbox', bgColor: '#1E3A8A', bgColorActive: '#1E3A5F', textColor: '#93C5FD' },
   { id: 'navbar-sandbox', href: '/testing-grounds/navbar-sandbox', label: 'Navbar Sandbox', bgColor: '#5B21B6', bgColorActive: '#4C1D95', textColor: '#C4B5FD' },
   { id: 'device-compare', href: '/testing-grounds/device-comparison', label: 'Device Comparison', bgColor: '#14B8A6', bgColorActive: '#0F766E', textColor: '#CCFBF1' },
-  { id: 'tournament-sandbox', href: '/testing-grounds/tournament-card-sandbox', label: 'Card Sandbox (Tournament)', bgColor: '#7C3AED', bgColorActive: '#6B21A6', textColor: '#E9D5FF' },
-  { id: 'join-modal-desktop', href: '/testing-grounds/join-tournament-modal-desktop', label: 'Join Modal (Desktop)', bgColor: '#0369A1', bgColorActive: '#075985', textColor: '#7DD3FC' },
+  { id: 'join-modal-mobile', href: '/testing-grounds/join-tournament-modal-mobile', label: 'Join Modal (Mobile)', bgColor: '#14532D', bgColorActive: '#1F4D3A', textColor: '#86EFAC' },
   { id: 'auth-test', href: '/testing-grounds/vx2-auth-test', label: 'Auth Components Test', bgColor: '#065F46', bgColorActive: '#064E3B', textColor: '#A7F3D0' },
   // Legacy/deprecated - kept for reference only
   { id: 'mobile-demo', href: '/testing-grounds/mobile-apple-demo', label: '[Legacy] Mobile Demo', bgColor: '#78350F', bgColorActive: '#4B3621', textColor: '#FCD34D' },
@@ -731,11 +728,13 @@ export default function DevNav() {
               <div
                 key={link.id}
                 draggable={isEditMode}
-                onDragStart={(e) => handleLinkDragStart(e, link.id)}
-                onDragOver={(e) => handleLinkDragOver(e, link.id)}
-                onDragLeave={handleLinkDragLeave}
-                onDrop={(e) => handleLinkDrop(e, link.id)}
-                onDragEnd={handleLinkDragEnd}
+                {...(isEditMode ? {
+                  onDragStart: (e) => handleLinkDragStart(e, link.id),
+                  onDragOver: (e) => handleLinkDragOver(e, link.id),
+                  onDragLeave: handleLinkDragLeave,
+                  onDrop: (e) => handleLinkDrop(e, link.id),
+                  onDragEnd: handleLinkDragEnd,
+                } : {})}
                 style={{
                   marginBottom: 4,
                   opacity: draggedLinkId === link.id ? 0.5 : 1,
@@ -757,7 +756,11 @@ export default function DevNav() {
                     cursor: isEditMode ? 'grab' : 'pointer',
                     border: dragOverLinkId === link.id ? '2px dashed #3B82F6' : '2px solid transparent',
                   }}
-                  onClick={(e) => isEditMode && e.preventDefault()}
+                  onClick={(e) => {
+                    if (isEditMode) {
+                      e.preventDefault();
+                    }
+                  }}
                 >
                   {isEditMode && (
                     <svg 

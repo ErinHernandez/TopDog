@@ -23,8 +23,8 @@ import {
   EmptyState, 
   ErrorState,
   PlayerStatsCard,
-} from '../../components/shared';
-import { SearchInput } from '../../components/shared/inputs';
+  SearchInput,
+} from '../../../ui';
 import { ChevronRight, ChevronLeft, Share, Close, Grid, UserIcon, Undo, Save, Check } from '../../components/icons';
 import { usePlayerPool } from '../../../../lib/playerPool/usePlayerPool';
 import ShareOptionsModal from '../../draft-room/components/ShareOptionsModal';

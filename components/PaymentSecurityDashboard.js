@@ -1,8 +1,8 @@
 // Payment Security Dashboard - Real-time monitoring for 31-processor payment system
 import React, { useState, useEffect } from 'react';
-import { paymentHealthMonitor } from '../lib/paymentHealthMonitor.js';
-import { fraudDetectionEngine } from '../lib/fraudDetection.js';
-import { GLOBAL_PAYMENT_METHODS } from '../lib/paymentMethodConfig.js';
+import { paymentHealthMonitor } from '../lib/paymentHealthMonitor';
+import { fraudDetectionEngine } from '../lib/fraudDetection';
+import { GLOBAL_PAYMENT_METHODS } from '../lib/paymentMethodConfig';
 
 const PaymentSecurityDashboard = () => {
   const [healthStatus, setHealthStatus] = useState({});

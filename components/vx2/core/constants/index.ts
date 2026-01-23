@@ -54,22 +54,6 @@ export {
 } from './sizes';
 export type { DevicePresetId, DevicePreset } from './sizes';
 
-// Tablet constants
-export {
-  TABLET_FRAME,
-  TABLET_BREAKPOINTS,
-  TABLET_PANELS,
-  TABLET_HEADER,
-  TABLET_NAV,
-  TABLET_DRAFT,
-  TABLET_TYPOGRAPHY,
-  TABLET_SPACING,
-  TABLET_TOUCH,
-  TABLET_SAFE_AREA,
-  TABLET_Z_INDEX,
-  TABLET_ANIMATIONS,
-} from './tablet';
-
 // Responsive constants
 export {
   DEVICE_CLASSIFICATIONS,

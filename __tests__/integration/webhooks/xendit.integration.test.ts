@@ -21,16 +21,16 @@ jest.mock('../../../lib/firebase-utils', () => ({
 
 // Mock micro buffer
 jest.mock('micro', () => ({
-  buffer: jest.fn().mockImplementation((req: NextApiRequest) => {
+  buffer: jest.fn((req: NextApiRequest) => {
     return Promise.resolve(Buffer.from((req as NextApiRequest & { _mockBody?: string })._mockBody || '{}'));
   }),
 }));
 
 // Mock Xendit functions
-const mockVerifyWebhookToken = jest.fn();
-const mockHandleVAPayment = jest.fn();
-const mockHandleEWalletCapture = jest.fn();
-const mockHandleDisbursementCallback = jest.fn();
+const mockVerifyWebhookToken = jest.fn<boolean, any[]>().mockReturnValue(true);
+const mockHandleVAPayment = jest.fn<Promise<{ success: boolean; actions: string[] }>, any[]>();
+const mockHandleEWalletCapture = jest.fn<Promise<{ success: boolean; actions: string[] }>, any[]>();
+const mockHandleDisbursementCallback = jest.fn<Promise<{ success: boolean; actions: string[] }>, any[]>();
 
 jest.mock('../../../lib/xendit', () => ({
   verifyWebhookToken: (...args: unknown[]) => mockVerifyWebhookToken(...args),
