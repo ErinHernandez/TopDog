@@ -82,7 +82,8 @@ export default async function handler(
       const errorResponse = createErrorResponse(
         ErrorType.RATE_LIMIT,
         'Too many PDF processing requests',
-        { retryAfter: Math.ceil((rateLimitResult.retryAfterMs || 60) / 1000) }
+        { retryAfter: Math.ceil((rateLimitResult.retryAfterMs || 60) / 1000) },
+        res.getHeader('X-Request-ID') as string | undefined
       );
       return res.status(errorResponse.statusCode).json({
         error: errorResponse.body.error.message,

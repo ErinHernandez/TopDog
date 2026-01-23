@@ -11,37 +11,48 @@ export default function PerformanceMonitor({ enabled = false }) {
   useEffect(() => {
     if (!enabled) return;
 
+    // Frame rate monitoring
+    let lastTime = performance.now();
+    let frameCount = 0;
+    let rafId = null;
+    let isActive = true;
+
+    const measureFrameRate = () => {
+      if (!isActive) return;
+      
+      frameCount++;
+      const currentTime = performance.now();
+      
+      if (currentTime - lastTime >= 1000) {
+        setMetrics(prev => ({ ...prev, frameRate: frameCount }));
+        frameCount = 0;
+        lastTime = currentTime;
+      }
+      
+      rafId = requestAnimationFrame(measureFrameRate);
+    };
+
     const updateMetrics = () => {
       // Memory usage
       if (performance.memory) {
         const memoryMB = (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(1);
         setMetrics(prev => ({ ...prev, memoryUsage: memoryMB }));
       }
-
-      // Frame rate monitoring
-      let lastTime = performance.now();
-      let frameCount = 0;
-      
-      const measureFrameRate = () => {
-        frameCount++;
-        const currentTime = performance.now();
-        
-        if (currentTime - lastTime >= 1000) {
-          setMetrics(prev => ({ ...prev, frameRate: frameCount }));
-          frameCount = 0;
-          lastTime = currentTime;
-        }
-        
-        requestAnimationFrame(measureFrameRate);
-      };
-      
-      measureFrameRate();
     };
 
-    updateMetrics();
+    // Start frame rate monitoring
+    rafId = requestAnimationFrame(measureFrameRate);
+    
+    // Start interval for memory updates
     const interval = setInterval(updateMetrics, 1000);
 
-    return () => clearInterval(interval);
+    return () => {
+      isActive = false;
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+      }
+      clearInterval(interval);
+    };
   }, [enabled]);
 
   if (!enabled) return null;
