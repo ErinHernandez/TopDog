@@ -4,9 +4,9 @@
  */
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { tournamentCollector } = require('./tournamentDataCollector.js');
+const { tournamentCollector } = require('./tournamentDataCollector');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { DataManager } = require('./dataManager.js');
+const { DataManager } = require('./dataManager');
 
 // ============================================================================
 // TYPES

@@ -159,7 +159,15 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    ...REMOVED_PAGES,
+    '/rankings',
+    '/my-teams',
+    '/exposure',
+    '/profile-customization',
+    '/customer-support',
+    '/deposit-history',
+    '/mobile-rankings',
+    '/mobile-deposit-history',
+    '/mobile-profile-customization',
     '/draft/v2/:path*',
     '/draft/v3/:path*',
     '/draft/topdog/:path*',

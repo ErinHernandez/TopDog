@@ -14,7 +14,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { PLAYER_POOL } from '../../lib/playerPool';
 import { saveCustomRankings, loadCustomRankings, clearCustomRankings } from '../../lib/customRankings';
-import { PositionBadge } from '../../ui';
+import { PositionBadge } from '../ui/display';
 import { POSITIONS, POSITION_COLORS } from '../../lib/constants/positions';
 // MOBILE_SIZES - using default spacing from VX2 (SPACING from vx2/core/constants/sizes)
 

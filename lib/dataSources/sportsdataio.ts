@@ -10,7 +10,7 @@ import type { ProjectionData, GetProjectionsOptions } from './types';
 // Import existing SportsDataIO functions
 // Use require for CommonJS module compatibility
 // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
-const sportsdataio = require('../sportsdataio.js');
+const sportsdataio = require('../sportsdataio');
 
 /**
  * Get projections from SportsDataIO

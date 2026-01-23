@@ -5,7 +5,7 @@
  */
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { TournamentDatabase } = require('./tournamentDatabase.js');
+const { TournamentDatabase } = require('./tournamentDatabase');
 
 // ============================================================================
 // TYPES
