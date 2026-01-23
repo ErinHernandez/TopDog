@@ -42,6 +42,13 @@ export const loadCustomRankings = (): CustomRankings => {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error('Error loading custom rankings:', errorMessage);
+    // Clear corrupted data from localStorage to prevent future errors
+    try {
+      localStorage.removeItem('customRankings');
+    } catch (clearError) {
+      // Ignore errors when clearing (e.g., in private browsing mode)
+      console.warn('Could not clear corrupted customRankings from localStorage:', clearError);
+    }
     return [];
   }
 };

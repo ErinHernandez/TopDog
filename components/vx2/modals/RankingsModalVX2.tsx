@@ -463,8 +463,14 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
       if (saved) {
         try {
           savedRankings = JSON.parse(saved);
-        } catch {
-          // If JSON is corrupted, use empty array (this is expected behavior, not an error)
+        } catch (error) {
+          // If JSON is corrupted, clear it and use empty array
+          console.error('Error parsing vx2Rankings from localStorage:', error);
+          try {
+            localStorage.removeItem('vx2Rankings');
+          } catch (clearError) {
+            console.warn('Could not clear corrupted vx2Rankings from localStorage:', clearError);
+          }
           savedRankings = [];
         }
       }
@@ -473,7 +479,14 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
       if (savedExcluded) {
         try {
           savedExcludedList = JSON.parse(savedExcluded);
-        } catch {
+        } catch (error) {
+          // If JSON is corrupted, clear it and use empty array
+          console.error('Error parsing vx2Excluded from localStorage:', error);
+          try {
+            localStorage.removeItem('vx2Excluded');
+          } catch (clearError) {
+            console.warn('Could not clear corrupted vx2Excluded from localStorage:', clearError);
+          }
           savedExcludedList = [];
         }
       }

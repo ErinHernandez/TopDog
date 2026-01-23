@@ -19,26 +19,26 @@ jest.mock('../../../lib/firebase-utils', () => ({
 }));
 
 // Mock Paystack functions
-const mockVerifyWebhookSignature = jest.fn<boolean, any[]>().mockReturnValue(true);
-const mockHandleChargeSuccess = jest.fn<Promise<{ userId: string; amountNGN: number } | Record<string, unknown>>, any[]>();
-const mockHandleChargeFailed = jest.fn<Promise<Record<string, unknown>>, any[]>();
-const mockHandleTransferSuccess = jest.fn<Promise<Record<string, unknown>>, any[]>();
-const mockHandleTransferFailed = jest.fn<Promise<Record<string, unknown>>, any[]>();
-const mockFindWebhookEventByReference = jest.fn<Promise<null | Record<string, unknown>>, any[]>();
-const mockMarkWebhookEventAsProcessed = jest.fn<Promise<Record<string, unknown>>, any[]>();
-const mockMarkWebhookEventAsFailed = jest.fn<Promise<Record<string, unknown>>, any[]>();
-const mockCreateOrUpdateWebhookEvent = jest.fn<Promise<Record<string, unknown>>, any[]>();
+const mockVerifyWebhookSignature = jest.fn<(...args: unknown[]) => boolean>().mockReturnValue(true);
+const mockHandleChargeSuccess = jest.fn<(...args: unknown[]) => Promise<{ userId: string; amountNGN: number } | Record<string, unknown>>>();
+const mockHandleChargeFailed = jest.fn<(...args: unknown[]) => Promise<Record<string, unknown>>>();
+const mockHandleTransferSuccess = jest.fn<(...args: unknown[]) => Promise<Record<string, unknown>>>();
+const mockHandleTransferFailed = jest.fn<(...args: unknown[]) => Promise<Record<string, unknown>>>();
+const mockFindWebhookEventByReference = jest.fn<(...args: unknown[]) => Promise<null | Record<string, unknown>>>();
+const mockMarkWebhookEventAsProcessed = jest.fn<(...args: unknown[]) => Promise<Record<string, unknown>>>();
+const mockMarkWebhookEventAsFailed = jest.fn<(...args: unknown[]) => Promise<Record<string, unknown>>>();
+const mockCreateOrUpdateWebhookEvent = jest.fn<(...args: unknown[]) => Promise<Record<string, unknown>>>();
 
 jest.mock('../../../lib/paystack', () => ({
-  verifyWebhookSignature: (...args: unknown[]) => mockVerifyWebhookSignature(...args),
-  handleChargeSuccess: (...args: unknown[]) => mockHandleChargeSuccess(...args),
-  handleChargeFailed: (...args: unknown[]) => mockHandleChargeFailed(...args),
-  handleTransferSuccess: (...args: unknown[]) => mockHandleTransferSuccess(...args),
-  handleTransferFailed: (...args: unknown[]) => mockHandleTransferFailed(...args),
-  findWebhookEventByReference: (...args: unknown[]) => mockFindWebhookEventByReference(...args),
-  markWebhookEventAsProcessed: (...args: unknown[]) => mockMarkWebhookEventAsProcessed(...args),
-  markWebhookEventAsFailed: (...args: unknown[]) => mockMarkWebhookEventAsFailed(...args),
-  createOrUpdateWebhookEvent: (...args: unknown[]) => mockCreateOrUpdateWebhookEvent(...args),
+  verifyWebhookSignature: mockVerifyWebhookSignature,
+  handleChargeSuccess: mockHandleChargeSuccess,
+  handleChargeFailed: mockHandleChargeFailed,
+  handleTransferSuccess: mockHandleTransferSuccess,
+  handleTransferFailed: mockHandleTransferFailed,
+  findWebhookEventByReference: mockFindWebhookEventByReference,
+  markWebhookEventAsProcessed: mockMarkWebhookEventAsProcessed,
+  markWebhookEventAsFailed: mockMarkWebhookEventAsFailed,
+  createOrUpdateWebhookEvent: mockCreateOrUpdateWebhookEvent,
 }));
 
 // Mock error tracking

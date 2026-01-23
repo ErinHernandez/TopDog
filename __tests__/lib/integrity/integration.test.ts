@@ -101,7 +101,11 @@ describe('Collusion Detection Integration', () => {
         query: {
           draftId: 'short', // Invalid format
         },
-      } as NextApiRequest;
+        cookies: {},
+        body: {},
+        env: {},
+        aborted: false,
+      } as unknown as NextApiRequest;
 
       const res = {
         status: jest.fn().mockReturnThis(),

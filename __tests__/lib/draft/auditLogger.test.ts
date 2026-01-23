@@ -25,14 +25,14 @@ jest.mock('../../../lib/structuredLogger', () => ({
 describe('DraftAuditLogger', () => {
   let auditLogger: DraftAuditLogger;
   let mockPersistenceAdapter: {
-    addDocument: jest.Mock<() => Promise<string>>;
-    queryDocuments: jest.Mock<() => Promise<AuditEvent[]>>;
+    addDocument: jest.Mock<(collection: string, data: unknown) => Promise<string>>;
+    queryDocuments: jest.Mock<(collection: string, constraints: unknown[], options?: unknown) => Promise<unknown[]>>;
   };
 
   beforeEach(() => {
     mockPersistenceAdapter = {
-      addDocument: jest.fn().mockResolvedValue('doc_123'),
-      queryDocuments: jest.fn().mockResolvedValue([]),
+      addDocument: jest.fn<(collection: string, data: unknown) => Promise<string>>().mockResolvedValue('doc_123'),
+      queryDocuments: jest.fn<(collection: string, constraints: unknown[], options?: unknown) => Promise<unknown[]>>().mockResolvedValue([]),
     };
 
     auditLogger = createAuditLogger({
@@ -82,7 +82,10 @@ describe('DraftAuditLogger', () => {
       await auditLogger.flush();
 
       expect(mockPersistenceAdapter.addDocument).toHaveBeenCalled();
-      const savedEvent = mockPersistenceAdapter.addDocument.mock.calls[0][1] as AuditEvent;
+      const callArgs = mockPersistenceAdapter.addDocument.mock.calls[0];
+      expect(callArgs).toBeDefined();
+      expect(callArgs.length).toBeGreaterThan(1);
+      const savedEvent = callArgs[1] as AuditEvent;
 
       expect(savedEvent.action).toBe('room_created');
       expect(savedEvent.roomId).toBe('room_abc');

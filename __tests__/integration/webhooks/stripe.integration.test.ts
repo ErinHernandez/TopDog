@@ -21,30 +21,30 @@ jest.mock('../../../lib/firebase-utils', () => ({
 }));
 
 // Mock Stripe functions
-const mockUpdateUserBalance = jest.fn<Promise<Record<string, unknown>>, any[]>();
-const mockCreateTransaction = jest.fn<Promise<{ id: string }>, any[]>();
-const mockUpdateTransactionStatus = jest.fn<Promise<Record<string, unknown>>, any[]>();
-const mockFindTransactionByPaymentIntent = jest.fn<Promise<Record<string, unknown> | null>, any[]>();
-const mockFindTransactionByTransfer = jest.fn<Promise<Record<string, unknown> | null>, any[]>();
-const mockLogPaymentEvent = jest.fn<Promise<Record<string, unknown>>, any[]>();
-const mockUpdateLastDepositCurrency = jest.fn<Promise<Record<string, unknown>>, any[]>();
-const mockFindEventByStripeId = jest.fn<Promise<null | Record<string, unknown>>, any[]>();
-const mockMarkEventAsProcessed = jest.fn<Promise<Record<string, unknown>>, any[]>();
-const mockMarkEventAsFailed = jest.fn<Promise<Record<string, unknown>>, any[]>();
-const mockCreateOrUpdateWebhookEvent = jest.fn<Promise<Record<string, unknown>>, any[]>();
+const mockUpdateUserBalance = jest.fn<(...args: unknown[]) => Promise<Record<string, unknown>>>();
+const mockCreateTransaction = jest.fn<(...args: unknown[]) => Promise<{ id: string }>>();
+const mockUpdateTransactionStatus = jest.fn<(...args: unknown[]) => Promise<Record<string, unknown>>>();
+const mockFindTransactionByPaymentIntent = jest.fn<(...args: unknown[]) => Promise<Record<string, unknown> | null>>();
+const mockFindTransactionByTransfer = jest.fn<(...args: unknown[]) => Promise<Record<string, unknown> | null>>();
+const mockLogPaymentEvent = jest.fn<(...args: unknown[]) => Promise<Record<string, unknown>>>();
+const mockUpdateLastDepositCurrency = jest.fn<(...args: unknown[]) => Promise<Record<string, unknown>>>();
+const mockFindEventByStripeId = jest.fn<(...args: unknown[]) => Promise<null | Record<string, unknown>>>();
+const mockMarkEventAsProcessed = jest.fn<(...args: unknown[]) => Promise<Record<string, unknown>>>();
+const mockMarkEventAsFailed = jest.fn<(...args: unknown[]) => Promise<Record<string, unknown>>>();
+const mockCreateOrUpdateWebhookEvent = jest.fn<(...args: unknown[]) => Promise<Record<string, unknown>>>();
 
 jest.mock('../../../lib/stripe', () => ({
-  updateUserBalance: (...args: unknown[]) => mockUpdateUserBalance(...args),
-  createTransaction: (...args: unknown[]) => mockCreateTransaction(...args),
-  updateTransactionStatus: (...args: unknown[]) => mockUpdateTransactionStatus(...args),
-  findTransactionByPaymentIntent: (...args: unknown[]) => mockFindTransactionByPaymentIntent(...args),
-  findTransactionByTransfer: (...args: unknown[]) => mockFindTransactionByTransfer(...args),
-  logPaymentEvent: (...args: unknown[]) => mockLogPaymentEvent(...args),
-  updateLastDepositCurrency: (...args: unknown[]) => mockUpdateLastDepositCurrency(...args),
-  findEventByStripeId: (...args: unknown[]) => mockFindEventByStripeId(...args),
-  markEventAsProcessed: (...args: unknown[]) => mockMarkEventAsProcessed(...args),
-  markEventAsFailed: (...args: unknown[]) => mockMarkEventAsFailed(...args),
-  createOrUpdateWebhookEvent: (...args: unknown[]) => mockCreateOrUpdateWebhookEvent(...args),
+  updateUserBalance: mockUpdateUserBalance,
+  createTransaction: mockCreateTransaction,
+  updateTransactionStatus: mockUpdateTransactionStatus,
+  findTransactionByPaymentIntent: mockFindTransactionByPaymentIntent,
+  findTransactionByTransfer: mockFindTransactionByTransfer,
+  logPaymentEvent: mockLogPaymentEvent,
+  updateLastDepositCurrency: mockUpdateLastDepositCurrency,
+  findEventByStripeId: mockFindEventByStripeId,
+  markEventAsProcessed: mockMarkEventAsProcessed,
+  markEventAsFailed: mockMarkEventAsFailed,
+  createOrUpdateWebhookEvent: mockCreateOrUpdateWebhookEvent,
 }));
 
 // Mock error tracking
@@ -124,7 +124,7 @@ describe('Stripe Webhook Integration', () => {
 
       // Mock the buffer function
       jest.doMock('micro', () => ({
-        buffer: jest.fn().mockResolvedValue(Buffer.from(JSON.stringify(payload))),
+        buffer: jest.fn<() => Promise<Buffer>>().mockResolvedValue(Buffer.from(JSON.stringify(payload))),
       }));
 
       await handler(req, res);

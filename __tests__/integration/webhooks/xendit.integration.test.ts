@@ -27,16 +27,16 @@ jest.mock('micro', () => ({
 }));
 
 // Mock Xendit functions
-const mockVerifyWebhookToken = jest.fn<boolean, any[]>().mockReturnValue(true);
-const mockHandleVAPayment = jest.fn<Promise<{ success: boolean; actions: string[] }>, any[]>();
-const mockHandleEWalletCapture = jest.fn<Promise<{ success: boolean; actions: string[] }>, any[]>();
-const mockHandleDisbursementCallback = jest.fn<Promise<{ success: boolean; actions: string[] }>, any[]>();
+const mockVerifyWebhookToken = jest.fn<(...args: unknown[]) => boolean>().mockReturnValue(true);
+const mockHandleVAPayment = jest.fn<(...args: unknown[]) => Promise<{ success: boolean; actions: string[] }>>();
+const mockHandleEWalletCapture = jest.fn<(...args: unknown[]) => Promise<{ success: boolean; actions: string[] }>>();
+const mockHandleDisbursementCallback = jest.fn<(...args: unknown[]) => Promise<{ success: boolean; actions: string[] }>>();
 
 jest.mock('../../../lib/xendit', () => ({
-  verifyWebhookToken: (...args: unknown[]) => mockVerifyWebhookToken(...args),
-  handleVAPayment: (...args: unknown[]) => mockHandleVAPayment(...args),
-  handleEWalletCapture: (...args: unknown[]) => mockHandleEWalletCapture(...args),
-  handleDisbursementCallback: (...args: unknown[]) => mockHandleDisbursementCallback(...args),
+  verifyWebhookToken: mockVerifyWebhookToken,
+  handleVAPayment: mockHandleVAPayment,
+  handleEWalletCapture: mockHandleEWalletCapture,
+  handleDisbursementCallback: mockHandleDisbursementCallback,
 }));
 
 // Mock error tracking

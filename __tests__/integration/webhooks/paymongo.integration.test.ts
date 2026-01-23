@@ -26,20 +26,20 @@ jest.mock('micro', () => ({
 }));
 
 // Mock PayMongo functions
-const mockVerifyWebhookSignature = jest.fn<boolean, any[]>().mockReturnValue(true);
-const mockHandleSourceChargeable = jest.fn<Promise<{ success: boolean; actions: string[] }>, any[]>();
-const mockHandlePaymentPaid = jest.fn<Promise<{ success: boolean; actions: string[] }>, any[]>();
-const mockHandlePaymentFailed = jest.fn<Promise<{ success: boolean; actions: string[] }>, any[]>();
-const mockHandlePayoutPaid = jest.fn<Promise<{ success: boolean; actions: string[] }>, any[]>();
-const mockHandlePayoutFailed = jest.fn<Promise<{ success: boolean; actions: string[] }>, any[]>();
+const mockVerifyWebhookSignature = jest.fn<(...args: unknown[]) => boolean>().mockReturnValue(true);
+const mockHandleSourceChargeable = jest.fn<(...args: unknown[]) => Promise<{ success: boolean; actions: string[] }>>();
+const mockHandlePaymentPaid = jest.fn<(...args: unknown[]) => Promise<{ success: boolean; actions: string[] }>>();
+const mockHandlePaymentFailed = jest.fn<(...args: unknown[]) => Promise<{ success: boolean; actions: string[] }>>();
+const mockHandlePayoutPaid = jest.fn<(...args: unknown[]) => Promise<{ success: boolean; actions: string[] }>>();
+const mockHandlePayoutFailed = jest.fn<(...args: unknown[]) => Promise<{ success: boolean; actions: string[] }>>();
 
 jest.mock('../../../lib/paymongo', () => ({
-  verifyWebhookSignature: (...args: unknown[]) => mockVerifyWebhookSignature(...args),
-  handleSourceChargeable: (...args: unknown[]) => mockHandleSourceChargeable(...args),
-  handlePaymentPaid: (...args: unknown[]) => mockHandlePaymentPaid(...args),
-  handlePaymentFailed: (...args: unknown[]) => mockHandlePaymentFailed(...args),
-  handlePayoutPaid: (...args: unknown[]) => mockHandlePayoutPaid(...args),
-  handlePayoutFailed: (...args: unknown[]) => mockHandlePayoutFailed(...args),
+  verifyWebhookSignature: mockVerifyWebhookSignature,
+  handleSourceChargeable: mockHandleSourceChargeable,
+  handlePaymentPaid: mockHandlePaymentPaid,
+  handlePaymentFailed: mockHandlePaymentFailed,
+  handlePayoutPaid: mockHandlePayoutPaid,
+  handlePayoutFailed: mockHandlePayoutFailed,
 }));
 
 // Mock error tracking

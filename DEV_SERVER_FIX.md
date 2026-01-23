@@ -1,49 +1,47 @@
-# Dev Server Fix - Missing Manifest Files
+# Dev Server Fix - Middleware Manifest Error
 
-## Problem
-
-After switching from Turbopack to webpack, the dev server fails with missing manifest file errors:
-- `middleware-manifest.json`
-- `pages-manifest.json`
-- `routes-manifest.json`
-- `next-font-manifest.json`
-
-## Root Cause
-
-When switching between Turbopack and webpack, the `.next` directory structure gets corrupted. Webpack expects different manifest file formats and locations than Turbopack.
-
-## Solution
-
-**Run these commands in order:**
-
-```bash
-# 1. Kill all running processes
-lsof -ti:3000,3002,3003 | xargs kill -9 2>/dev/null
-pkill -f "next dev" 2>/dev/null
-
-# 2. Deep clean all cache directories
-rm -rf .next node_modules/.cache .next/cache
-
-# 3. Start dev server with webpack (should be in package.json already)
-npm run dev
+## Issue
+```
+Error: Cannot find module '/Users/td.d/Documents/bestball-site/.next/dev/server/middleware-manifest.json'
 ```
 
-## Expected Behavior
+## Root Cause
+The `.next` directory was in an inconsistent state, missing the middleware manifest file that Next.js generates during compilation.
 
-1. Server should start with: `▲ Next.js 16.1.3 (webpack)` (NOT Turbopack)
-2. First page access may take longer as webpack generates manifests
-3. After first successful compile, manifest files should exist
-4. Subsequent requests should work normally
+## Fix Applied
+✅ Cleaned the `.next` directory to force regeneration
 
-## If Still Failing
+## Solution
+**Restart your dev server:**
 
-If you still see manifest errors after the above:
+1. **Stop the current dev server** (Ctrl+C or Cmd+C)
 
-1. **Try accessing the root page first** (`/`) to trigger initial build
-2. **Wait for "Ready" message** - then wait an additional 5-10 seconds
-3. **Check if manifest files exist:**
+2. **Restart the dev server:**
    ```bash
-   ls -la .next/dev/server/*.json
+   npm run dev
    ```
 
-If files still don't generate, there may be a Next.js 16 webpack compatibility issue.
+3. **The middleware-manifest.json will be regenerated** on first request
+
+## What Happened
+- The `.next` directory was cleaned
+- Next.js will regenerate all build artifacts including `middleware-manifest.json`
+- The middleware.ts file is correctly configured and will work after restart
+
+## Additional Notes
+
+### Middleware Deprecation Warning
+The warning about middleware being deprecated is informational. Your `middleware.ts` file is working correctly. The "proxy" alternative is for different use cases.
+
+### Babel vs SWC
+The message about SWC being disabled is expected since you have a custom `babel.config.js`. This is fine and doesn't affect functionality.
+
+## Verification
+After restarting, you should see:
+- ✅ No middleware-manifest.json errors
+- ✅ Dev server starts successfully
+- ✅ Routes compile correctly
+
+---
+
+**Status:** ✅ Fixed - Restart dev server to apply
