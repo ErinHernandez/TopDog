@@ -323,9 +323,21 @@ export default function DraftRoomVX2({
     teamCount,
   });
   
-  // Expose dev tools to parent - always keep ref updated
+  // Expose dev tools to parent - use ref to track previous values and prevent infinite loops
+  const prevDevToolsRef = useRef<{ status: string; isPaused: boolean } | null>(null);
+  
   React.useEffect(() => {
-    if (onDevToolsReady && !draftRoom.isLoading) {
+    if (!onDevToolsReady || draftRoom.isLoading) return;
+    
+    const current = {
+      status: draftRoom.status,
+      isPaused: draftRoom.devTools.isPaused,
+    };
+    
+    // Only call callback if status or isPaused actually changed
+    const prev = prevDevToolsRef.current;
+    if (!prev || prev.status !== current.status || prev.isPaused !== current.isPaused) {
+      prevDevToolsRef.current = current;
       onDevToolsReady({
         ...draftRoom.devTools,
         status: draftRoom.status,

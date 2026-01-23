@@ -1017,14 +1017,17 @@ export function useAuthContext(): AuthContextValue {
     setIsMounted(true);
   }, []);
   
-  // CRITICAL: Check for SSR/build FIRST, before ANY other logic
-  // This is the most important check - if window is undefined, we're definitely in SSR/build
-  // Return safe defaults immediately without calling useContext
+  // CRITICAL: Always call useContext unconditionally to follow Rules of Hooks
+  // useContext is safe to call even during SSR - it will return null or default value
+  const context = React.useContext(AuthContext);
+  
+  // Check for SSR/build scenarios and return safe defaults if needed
+  // This check happens AFTER calling useContext to maintain hook order
   if (typeof window === 'undefined') {
     return createBuildTimeSafeDefaults();
   }
   
-  // CRITICAL: On client's initial render (before mount), return safe defaults
+  // On client's initial render (before mount), return safe defaults
   // This ensures server and initial client render are identical
   if (!isMounted) {
     return createBuildTimeSafeDefaults();
@@ -1043,21 +1046,14 @@ export function useAuthContext(): AuthContextValue {
   // Check if we're in a build/prerender environment
   const isBuildOrPrerender = isBuildPhase || isPrerender || isVercelBuild;
   
-  // If we're in any build/prerender scenario, return safe defaults immediately
-  // This prevents useContext from being called during build/prerender
+  // If we're in any build/prerender scenario, return safe defaults
   if (isBuildOrPrerender) {
     return createBuildTimeSafeDefaults();
   }
   
-  // Only call useContext if we're confirmed to be in client-side runtime and mounted
-  // At this point, window exists, we're not in a build phase, and component is mounted
-  const context = React.useContext(AuthContext);
-  
-  // ULTRA-DEFENSIVE: If no context is available, NEVER throw during builds
-  // Always return safe defaults if context is null - this ensures builds never fail
+  // ULTRA-DEFENSIVE: If no context is available, return safe defaults
+  // This ensures builds never fail and provides graceful fallback
   if (!context) {
-    // During build/SSR/prerender, context will be null - always return defaults
-    // Never throw errors - always default to safe behavior
     return createBuildTimeSafeDefaults();
   }
   

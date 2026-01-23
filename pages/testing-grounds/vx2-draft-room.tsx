@@ -36,8 +36,8 @@ function VX2DraftRoomPage(): JSX.Element {
   const devToolsRef = useRef<DevTools | null>(null);
   // Track if we've auto-started on mobile
   const hasAutoStarted = useRef<boolean>(false);
-  // Force re-render manually when needed
-  const [, forceUpdate] = useState<Record<string, never>>({});
+  // Track if dev tools are ready to trigger UI update
+  const [devToolsReady, setDevToolsReady] = useState<boolean>(false);
   
   // Get roomId from query params, fallback to test roomId for testing
   const roomId = (router.query.roomId && typeof router.query.roomId === 'string' ? router.query.roomId : null) || 'test-room-123';
@@ -60,33 +60,43 @@ function VX2DraftRoomPage(): JSX.Element {
   // Check if mobile user is authorized to access draft room
   // (must come from clicking "Join Tournament" which sets the session flag)
   React.useEffect(() => {
-    if (!isLoaded || !router.isReady) return;
+    if (!router.isReady) return;
     
-    // Desktop users are always authorized
-    if (!isMobile) {
-      setIsAuthorized(true);
-      return;
-    }
-    
-    // On mobile, check if user came from the app (has session flag) OR has roomId in query
-    if (typeof window === 'undefined') return;
-    const cameFromApp = sessionStorage.getItem('topdog_joined_draft');
-    const hasRoomId = router.query.roomId;
-    
-    if (!cameFromApp && !hasRoomId) {
-      // Direct access on mobile without roomId - redirect to app demo (lobby)
-      // Use router.isReady to prevent multiple redirects
-      if (router.isReady) {
-        router.replace('/testing-grounds/vx2-mobile-app-demo');
+    // Desktop users are always authorized - check immediately if we can determine desktop
+    // This allows authorization even if useIsMobileDevice hasn't loaded yet
+    if (typeof window !== 'undefined') {
+      const isDesktop = window.innerWidth >= 768;
+      if (isDesktop) {
+        setIsAuthorized(true);
+        return;
       }
-      return;
     }
     
-    // Clear the flag so refreshing the page will redirect (unless roomId is in query)
-    if (typeof window !== 'undefined' && !hasRoomId) {
-      sessionStorage.removeItem('topdog_joined_draft');
+    // Wait for mobile detection to complete before checking mobile authorization
+    if (!isLoaded) return;
+    
+    // Mobile users need authorization check
+    if (isMobile) {
+      // On mobile, check if user came from the app (has session flag) OR has roomId in query
+      if (typeof window === 'undefined') return;
+      const cameFromApp = sessionStorage.getItem('topdog_joined_draft');
+      const hasRoomId = router.query.roomId;
+      
+      if (!cameFromApp && !hasRoomId) {
+        // Direct access on mobile without roomId - redirect to app demo (lobby)
+        // Use router.isReady to prevent multiple redirects
+        if (router.isReady) {
+          router.replace('/testing-grounds/vx2-mobile-app-demo');
+        }
+        return;
+      }
+      
+      // Clear the flag so refreshing the page will redirect (unless roomId is in query)
+      if (typeof window !== 'undefined' && !hasRoomId) {
+        sessionStorage.removeItem('topdog_joined_draft');
+      }
+      setIsAuthorized(true);
     }
-    setIsAuthorized(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMobile, isLoaded, router.isReady, router.query.roomId]);
   
@@ -115,10 +125,21 @@ function VX2DraftRoomPage(): JSX.Element {
   }, []);
   
   // Desktop: just store tools for manual control
+  // Use ref callback to avoid dependency on changing devTools object
   const handleDevToolsReady = useCallback((tools: { startDraft: () => void; togglePause: () => void; forcePick: () => void; isPaused: boolean; status: string }): void => {
-    devToolsRef.current = tools as DevTools;
-    // Single force update after tools are ready
-    forceUpdate({});
+    // Only update if tools actually changed to prevent infinite loops
+    const wasReady = !!devToolsRef.current;
+    const currentStatus = devToolsRef.current?.status;
+    const currentIsPaused = devToolsRef.current?.isPaused;
+    
+    if (currentStatus !== tools.status || currentIsPaused !== tools.isPaused) {
+      devToolsRef.current = tools as DevTools;
+      // Only trigger re-render if tools weren't ready before (first time setup)
+      // This ensures buttons become enabled when tools first become available
+      if (!wasReady) {
+        setDevToolsReady(true);
+      }
+    }
   }, []);
   
   // Mobile: auto-start draft when tools are ready

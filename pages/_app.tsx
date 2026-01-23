@@ -52,7 +52,10 @@ function MyApp({ Component, pageProps }: AppProps) {
     const init = () => {
       if (typeof window === 'undefined') return;
       try {
-        userMetrics.recordPageVisit(window.location.pathname, document.referrer);
+        // Check if recordPageVisit exists before calling (handles webpack bundling issues)
+        if (userMetrics && typeof userMetrics.recordPageVisit === 'function') {
+          userMetrics.recordPageVisit(window.location.pathname, document.referrer);
+        }
         exposurePreloader.init();
       } catch (e) {
         console.warn('User tracking failed:', e);
