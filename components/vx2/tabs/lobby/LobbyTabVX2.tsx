@@ -39,7 +39,7 @@ import {
 import { EmptyState, ErrorState } from '../../../ui';
 
 // Constants
-import { CARD_SPACING_V3, CARD_GRID_V3 } from './constants/cardSpacingV3';
+import { CARD_SPACING_V3 } from './constants/cardSpacingV3';
 import { BG_COLORS } from '../../core/constants/colors';
 
 // Modal
@@ -53,6 +53,10 @@ const logger = createScopedLogger('[LobbyTab]');
 // ============================================================================
 // CONSTANTS
 // ============================================================================
+
+/** Globe image (no background); used in lobby layout */
+const GLOBE_IMAGE = '/!!_GLOBE_NOBACKGROUND.png';
+const GLOBE_SIZE_PX = 220;
 
 /**
  * Card visual constants
@@ -321,58 +325,92 @@ export default function LobbyTabVX2({
           isolation: 'isolate',
         }}
       >
-        {/* Content Grid - The Layout Engine */}
+        {/* Content: scroll (logo, title, globe) + fixed bottom strip — matches lobby-tab-sandbox */}
         <div
           className="vx2-lobby-content"
           style={{
             flex: 1,
-            display: 'grid',
-            gridTemplateRows: CARD_GRID_V3.template,
-            padding: `${CARD_SPACING_V3.outerPadding}px`,
+            minHeight: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
             zIndex: 1,
             position: 'relative',
-            contain: 'layout',
-            overflow: 'hidden',
           }}
         >
-          {/* Row 1: Logo + Title (auto height) */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <TournamentCardLogo src={CARD_VISUALS.logoImage} alt="Tournament logo" maxHeight={72} />
-            <TournamentTitle title={featuredTournament.title} />
+          {/* Scroll area: logo, title, globe */}
+          <div
+            style={{
+              flex: 1,
+              minHeight: 0,
+              overflow: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            <div
+              style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                padding: `${CARD_SPACING_V3.outerPadding}px`,
+                gap: CARD_SPACING_V3.bottomRowGap,
+                minHeight: 0,
+              }}
+            >
+              {/* Logo + Title */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <TournamentCardLogo src={CARD_VISUALS.logoImage} alt="Tournament logo" maxHeight={60} />
+                <div style={{ marginTop: 14, transform: 'translateY(-34px)' }}>
+                  <TournamentTitle title={featuredTournament.title} fontSize={38} />
+                </div>
+              </div>
+
+              {/* Globe */}
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  minHeight: GLOBE_SIZE_PX,
+                  marginTop: 24,
+                  transform: 'translateY(-24px)',
+                }}
+              >
+                <img
+                  src={GLOBE_IMAGE}
+                  alt=""
+                  width={GLOBE_SIZE_PX}
+                  height={GLOBE_SIZE_PX}
+                  style={{ width: GLOBE_SIZE_PX, height: GLOBE_SIZE_PX, objectFit: 'contain', display: 'block' }}
+                />
+              </div>
+            </div>
           </div>
 
-          {/* Row 2: Spacer (Takes 1fr - flexible space) */}
-          <div
-            className="vx2-lobby-spacer"
-            style={{
-              minHeight: `${CARD_SPACING_V3.spacerMinHeight}px`,
-            }}
-            aria-hidden="true"
-          />
-
-          {/* Row 3: Bottom Anchor (auto height) */}
+          {/* Bottom strip: progress, join, stats */}
           <div
             className="vx2-lobby-bottom"
             style={{
+              flexShrink: 0,
+              padding: `0 ${CARD_SPACING_V3.outerPadding}px ${CARD_SPACING_V3.outerPadding}px`,
               display: 'flex',
               flexDirection: 'column',
-              justifyContent: 'flex-end',
-              gap: `${CARD_SPACING_V3.bottomRowGap}px`,
+              gap: CARD_SPACING_V3.bottomRowGap,
             }}
           >
-            {/* Progress Bar (only if tournament has max entries) */}
-            <TournamentProgressBar
-              currentEntries={featuredTournament.currentEntries}
-              maxEntries={featuredTournament.maxEntries}
-            />
-
-            {/* Join Button */}
-            <TournamentJoinButton
-              onClick={() => handleJoinClick(featuredTournament.id)}
-              label="Join Tournament"
-            />
-
-            {/* Stats Grid */}
+            <div style={{ transform: 'translateY(-14px)' }}>
+              <TournamentProgressBar
+                currentEntries={featuredTournament.currentEntries}
+                maxEntries={featuredTournament.maxEntries}
+              />
+            </div>
+            <div style={{ transform: 'translateY(-4px)' }}>
+              <TournamentJoinButton
+                onClick={() => handleJoinClick(featuredTournament.id)}
+                label="Join Tournament"
+              />
+            </div>
             <TournamentStats
               entryFee={featuredTournament.entryFee}
               entries={featuredTournament.totalEntries}

@@ -20,9 +20,10 @@ export function MobilePhoneFrame({ children }: MobilePhoneFrameProps): React.Rea
       }}
       data-phone-frame="true"
     >
-      {/* Screen - children fill this completely */}
+      {/* Screen - dark bg so rounded corners don’t show white at top-left/top-right of bezel */}
       <div 
-        className="w-full h-full bg-white rounded-[2.5rem] overflow-hidden relative"
+        className="w-full h-full rounded-[2.5rem] overflow-hidden relative"
+        style={{ backgroundColor: '#0f172a' }}
       >
         {/* Dynamic Island - positioned on top of screen content */}
         <div
@@ -38,11 +39,6 @@ export function MobilePhoneFrame({ children }: MobilePhoneFrameProps): React.Rea
         />
         {children}
       </div>
-      {/* Home indicator */}
-      <div
-        className="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1 bg-gray-600 rounded-full"
-        aria-hidden
-      />
     </div>
   );
 }
