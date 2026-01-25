@@ -27,6 +27,8 @@ const SPEC = LOBBY_TAB_SANDBOX_SPEC;
 const LOGO_IMAGE = '/tournament_card_background.png';
 const GLOBE_IMAGE_PRIMARY = '/!!_GLOBE_NOBACKGROUND.png';
 const GLOBE_IMAGE_FALLBACK = '/!!_GLOBE_NOBACKGROUND.png';
+/** Fixed height for the globe area so resizing the globe does not shift other lobby content. Sized so all lobby objects fit in the content area (731px). */
+const GLOBE_SLOT_HEIGHT_PX = 280;
 
 export type LobbyObjectId = 'logoTitle' | 'progressBar' | 'joinButton' | 'stats' | 'globe';
 
@@ -63,6 +65,8 @@ export interface LobbyTabSandboxContentProps {
   globeImageSrc?: string;
   /** When false (sandbox), the lobby content does not scroll; overflow is hidden. Default true. */
   scrollable?: boolean;
+  /** Dev position offsets in px (additive). Y = height movement. Sandbox only. */
+  positionOverrides?: Partial<Record<LobbyObjectId | 'outline', { x?: number; y?: number }>>;
 }
 
 export function LobbyTabSandboxContent({
@@ -77,6 +81,7 @@ export function LobbyTabSandboxContent({
   contentScaleOverride,
   globeImageSrc: globeImageSrcProp,
   scrollable = true,
+  positionOverrides,
 }: LobbyTabSandboxContentProps): React.ReactElement {
   const contentScale = contentScaleOverride ?? SPEC.content_scale;
   const [globeSrc, setGlobeSrc] = useState<string>(GLOBE_IMAGE_PRIMARY);
@@ -95,17 +100,15 @@ export function LobbyTabSandboxContent({
   const outlineInset = outlineOverrides?.inset ?? SPEC.outline.inset_px;
   const outlineRadius = outlineOverrides?.radius ?? SPEC.outline.radius_px;
 
-  /** Outline wraps the hero block only: title, globe, join button, stats */
-  const heroOutlineStyle = outlineOn
+  /** Outline wraps the full content area (from content top down to top of footer).
+   * Inset = distance from content-area edges; at 0px the outline reaches the edge of the footer tabs. */
+  const contentAreaOutlineStyle = outlineOn
     ? (() => {
         const marginFromEdge = Math.max(0, outlineInset - outlineThickness);
-        const outline = SPEC.outline as { color?: string; extends_to_tab_bar?: boolean };
+        const outline = SPEC.outline as { color?: string };
         const outlineColor = outline.color ?? '#3B82F6';
         return {
-          marginTop: SPEC.safe_area_top_px + marginFromEdge,
-          marginLeft: marginFromEdge,
-          marginRight: marginFromEdge,
-          marginBottom: marginFromEdge,
+          margin: marginFromEdge,
           border: `${outlineThickness}px solid ${outlineColor}`,
           borderRadius: outlineRadius,
           boxSizing: 'border-box' as const,
@@ -185,19 +188,24 @@ export function LobbyTabSandboxContent({
       objectsInPhone.stats;
     const heroBlock = (
       <div
-        data-outline-debug={dataOutlineDebug}
         style={{
           display: 'flex',
           flexDirection: 'column',
           padding: `${SPEC.lobby.outer_padding_px}px`,
           gap: `${SPEC.lobby.bottom_row_gap_px}px`,
-          ...(hasHeroContent ? heroOutlineStyle : {}),
         }}
       >
         {objectsInPhone.logoTitle && (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              transform: `translate(${positionOverrides?.logoTitle?.x ?? 0}px, ${positionOverrides?.logoTitle?.y ?? 0}px)`,
+            }}
+          >
             <TournamentCardLogo src={LOGO_IMAGE} alt="Tournament logo" maxHeight={60} />
-            <div style={{ marginTop: 14, transform: 'translateY(-34px)' }}>
+            <div style={{ marginTop: 14, transform: 'translateY(-24px)' }}>
               <TournamentTitle title={tournament.title} fontSize={38} />
             </div>
           </div>
@@ -205,12 +213,15 @@ export function LobbyTabSandboxContent({
         {objectsInPhone.globe && (
           <div
             style={{
+              height: GLOBE_SLOT_HEIGHT_PX,
               display: 'flex',
+              alignItems: 'center',
               justifyContent: 'center',
               width: '100%',
               flexShrink: 0,
               marginTop: '24px',
-              transform: 'translateY(-24px)',
+              overflow: 'hidden',
+              transform: `translateY(-24px) translate(${positionOverrides?.globe?.x ?? 0}px, ${positionOverrides?.globe?.y ?? 0}px)`,
             }}
           >
             <div
@@ -220,8 +231,8 @@ export function LobbyTabSandboxContent({
               style={{
                 width: globeSizePx,
                 height: globeSizePx,
-                minWidth: globeSizePx,
-                minHeight: globeSizePx,
+                minWidth: 0,
+                minHeight: 0,
                 maxWidth: '100%',
                 flexShrink: 0,
                 backgroundImage: `url(${globeUrl})`,
@@ -233,7 +244,11 @@ export function LobbyTabSandboxContent({
           </div>
         )}
         {objectsInPhone.progressBar && (
-          <div style={{ transform: 'translateY(-14px)' }}>
+          <div
+            style={{
+              transform: `translateY(-14px) translate(${positionOverrides?.progressBar?.x ?? 0}px, ${positionOverrides?.progressBar?.y ?? 0}px)`,
+            }}
+          >
             <TournamentProgressBar
               currentEntries={tournament.currentEntries}
               maxEntries={tournament.maxEntries}
@@ -241,16 +256,26 @@ export function LobbyTabSandboxContent({
           </div>
         )}
         {objectsInPhone.joinButton && (
-          <div style={{ transform: 'translateY(-4px)' }}>
+          <div
+            style={{
+              transform: `translateY(-4px) translate(${positionOverrides?.joinButton?.x ?? 0}px, ${positionOverrides?.joinButton?.y ?? 0}px)`,
+            }}
+          >
             <TournamentJoinButton onClick={() => onJoinClick(tournament.id)} label="Join Tournament" />
           </div>
         )}
         {objectsInPhone.stats && (
-          <TournamentStats
-            entryFee={tournament.entryFee}
-            entries={tournament.totalEntries}
-            prize={tournament.firstPlacePrize}
-          />
+          <div
+            style={{
+              transform: `translate(${positionOverrides?.stats?.x ?? 0}px, ${positionOverrides?.stats?.y ?? 0}px)`,
+            }}
+          >
+            <TournamentStats
+              entryFee={tournament.entryFee}
+              entries={tournament.totalEntries}
+              prize={tournament.firstPlacePrize}
+            />
+          </div>
         )}
       </div>
     );
@@ -269,15 +294,19 @@ export function LobbyTabSandboxContent({
 
   const bottomStrip = null;
 
+  const outlineY = positionOverrides?.outline?.y ?? 0;
   return (
     <>
       <div
+        data-outline-debug={dataOutlineDebug}
         style={{
           flex: 1,
           minHeight: 0,
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
+          ...contentAreaOutlineStyle,
+          ...(outlineY !== 0 ? { transform: `translateY(${outlineY}px)` } : {}),
         }}
       >
         <div

@@ -42,7 +42,8 @@ import { EmptyState, ErrorState } from '../../../ui';
 
 // Constants
 import { CARD_SPACING_V3 } from './constants/cardSpacingV3';
-import { LOBBY_TAB_SANDBOX_SPEC } from './constants/lobbyTabSandboxSpec';
+import { LOBBY_TAB_SANDBOX_SPEC, LOBBY_TAB_CURRENT_ITERATION } from './constants/lobbyTabSandboxSpec';
+import { useWorkingLobbyConfig } from './workingLobbyConfig';
 import { BG_COLORS } from '../../core/constants/colors';
 
 // Modal
@@ -141,6 +142,7 @@ export default function LobbyTabVX2({
   // Card dimensions (fixed pixel margins); skipped when in phone frame (use sandbox layout)
   // ----------------------------------------
   const inPhoneFrame = useInPhoneFrame();
+  const workingConfig = useWorkingLobbyConfig();
   const {
     height: cardHeight,
     width: cardWidth,
@@ -342,8 +344,30 @@ export default function LobbyTabVX2({
     />
   );
 
-  // In phone frame: use sandbox lobby view (sandbox is source of truth for lobby tab).
+  // In phone frame: use working lobby config if saved from sandbox, else current iteration.
   if (inPhoneFrame) {
+    const base = { ...LOBBY_TAB_CURRENT_ITERATION };
+    const w = workingConfig;
+    const props = w
+      ? {
+          ...base,
+          ...(w.outlineOn !== undefined || w.outlineThickness !== undefined || w.outlineInset !== undefined || w.outlineRadius !== undefined
+            ? {
+                outlineOverrides: {
+                  on: w.outlineOn ?? base.outlineOverrides?.on,
+                  thickness: w.outlineThickness ?? base.outlineOverrides?.thickness,
+                  inset: w.outlineInset ?? base.outlineOverrides?.inset,
+                  radius: w.outlineRadius ?? base.outlineOverrides?.radius,
+                },
+              }
+            : {}),
+          ...(w.globeSizePx != null && { globeSizePx: w.globeSizePx }),
+          ...(w.objectsInPhone != null && { objectsInPhone: w.objectsInPhone }),
+          ...(w.positionYOffsets != null && Object.keys(w.positionYOffsets).length > 0
+            ? { positionOverrides: Object.fromEntries(Object.entries(w.positionYOffsets).map(([k, v]) => [k, { y: v }])) }
+            : {}),
+        }
+      : base;
     return (
       <div
         className="vx2-lobby-container"
@@ -354,8 +378,7 @@ export default function LobbyTabVX2({
         <LobbyTabSandboxContent
           tournament={featuredTournament}
           onJoinClick={handleJoinClick}
-          contentScaleOverride={1}
-          scrollable={false}
+          {...props}
         />
         {joinModal}
       </div>
@@ -424,7 +447,7 @@ export default function LobbyTabVX2({
             >
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <TournamentCardLogo src={CARD_VISUALS.logoImage} alt="Tournament logo" maxHeight={60} />
-                <div style={{ marginTop: 14, transform: 'translateY(-34px)' }}>
+                <div style={{ marginTop: 14, transform: 'translateY(-24px)' }}>
                   <TournamentTitle title={featuredTournament.title} fontSize={38} />
                 </div>
               </div>

@@ -17,7 +17,8 @@ export const LOBBY_TAB_SANDBOX_SPEC = {
     height_px: 731,
   },
   tab_bar_height_px: 81,
-  safe_area_top_px: 14,
+  /** Top inset for lobby content; frame already reserves island space, so keep minimal to move content up */
+  safe_area_top_px: 0,
   content_scale: 0.92,
   outline: {
     enabled: true,
@@ -33,3 +34,19 @@ export const LOBBY_TAB_SANDBOX_SPEC = {
 } as const;
 
 export type LobbyTabSandboxSpec = typeof LOBBY_TAB_SANDBOX_SPEC;
+
+/**
+ * Props for LobbyTabSandboxContent that match the current lobby sandbox iteration.
+ * Use this in LobbyTabVX2 when in phone frame so the app lobby matches the sandbox.
+ */
+export const LOBBY_TAB_CURRENT_ITERATION = {
+  contentScaleOverride: 1 as const,
+  scrollable: false as const,
+  outlineOverrides: {
+    on: LOBBY_TAB_SANDBOX_SPEC.outline.enabled,
+    thickness: LOBBY_TAB_SANDBOX_SPEC.outline.thickness_px,
+    inset: LOBBY_TAB_SANDBOX_SPEC.outline.inset_px,
+    radius: LOBBY_TAB_SANDBOX_SPEC.outline.radius_px,
+  },
+  globeSizePx: LOBBY_TAB_SANDBOX_SPEC.lobby.globe_size_px,
+} as const;

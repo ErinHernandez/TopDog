@@ -2,6 +2,10 @@
  * Phone frame for desktop viewing.
  * Fixed dimensions: 375×812 (iPhone standard) for the inner screen.
  * With default padding (p-3 = 12px), outer box is 399×836 so inner is exactly 375×812.
+ *
+ * Safe area ends at the bottom of the Dynamic Island (not below it). paddingTop is the
+ * distance from the top of the screen to the bottom of the island, so content starts
+ * exactly where the safe area ends.
  */
 
 import React from 'react';
@@ -9,6 +13,9 @@ import React from 'react';
 const BEZEL_PX = 12;
 const INNER_WIDTH_PX = 375;
 const INNER_HEIGHT_PX = 812;
+
+/** Top safe area: from screen top to bottom of island (8 + 20). Safe area ends at bottom of island. */
+const SAFE_AREA_TOP_TO_ISLAND_BOTTOM_PX = 28;
 
 export interface MobilePhoneFrameProps {
   children: React.ReactNode;
@@ -45,7 +52,20 @@ export function MobilePhoneFrame({ children }: MobilePhoneFrameProps): React.Rea
           }}
           aria-hidden
         />
-        {children}
+        {/* Content starts where safe area ends (bottom of island) */}
+        <div
+          style={{
+            paddingTop: SAFE_AREA_TOP_TO_ISLAND_BOTTOM_PX,
+            height: '100%',
+            width: '100%',
+            boxSizing: 'border-box',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+          }}
+        >
+          {children}
+        </div>
       </div>
     </div>
   );

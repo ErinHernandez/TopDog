@@ -30,6 +30,7 @@ import {
   TournamentStats,
 } from '../../components/vx2/tabs/lobby/elements';
 import { LobbyTabSandboxContent } from '../../components/vx2/tabs/lobby/LobbyTabSandboxContent';
+import { saveWorkingLobbyConfig } from '../../components/vx2/tabs/lobby/workingLobbyConfig';
 import JoinTournamentModal from '../../components/vx2/tabs/lobby/JoinTournamentModal';
 import { AuthProvider } from '../../components/vx2/auth';
 import { InPhoneFrameProvider } from '../../lib/inPhoneFrameContext';
@@ -102,8 +103,12 @@ const MOCK_TOURNAMENT: Tournament = {
 };
 
 const SAVE_KEY = 'lobby-tab-sandbox-config';
+const BACKUP_KEY = 'lobby-tab-sandbox-config-backup';
 
 type LobbyObjectId = 'logoTitle' | 'progressBar' | 'joinButton' | 'stats' | 'globe';
+type PositionTarget = LobbyObjectId | 'outline';
+
+const POSITION_TARGETS: PositionTarget[] = ['logoTitle', 'progressBar', 'joinButton', 'stats', 'globe', 'outline'];
 
 type SandboxConfig = {
   stateOverride: 'default' | 'loading' | 'error' | 'empty';
@@ -113,6 +118,8 @@ type SandboxConfig = {
   outlineInset: number;
   outlineRadius: number;
   globeSizePx: number;
+  /** Y offset in px (height movement) per lobby object + outline. */
+  positionYOffsets?: Partial<Record<PositionTarget, number>>;
 };
 
 const OBJECT_LABELS: Record<LobbyObjectId, string> = {
@@ -121,6 +128,20 @@ const OBJECT_LABELS: Record<LobbyObjectId, string> = {
   joinButton: 'Join button',
   stats: 'Stats',
   globe: 'Globe (no background)',
+};
+
+const POSITION_Y_LABELS: Record<PositionTarget, string> = {
+  ...OBJECT_LABELS,
+  outline: 'Outline',
+};
+
+const DEFAULT_POSITION_Y: Record<PositionTarget, number> = {
+  logoTitle: 0,
+  progressBar: 0,
+  joinButton: 0,
+  stats: 0,
+  globe: 0,
+  outline: 0,
 };
 
 /** Copy icon (outline) for clipboard actions. */
@@ -258,6 +279,39 @@ function loadSavedConfig(): Partial<SandboxConfig> | null {
   }
 }
 
+function loadBackupConfig(): Partial<SandboxConfig> | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = window.localStorage.getItem(BACKUP_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as Partial<SandboxConfig>;
+  } catch {
+    return null;
+  }
+}
+
+function applyConfig(
+  setStateOverride: (v: SandboxConfig['stateOverride']) => void,
+  setObjectsInPhone: (v: Record<LobbyObjectId, boolean> | ((prev: Record<LobbyObjectId, boolean>) => Record<LobbyObjectId, boolean>)) => void,
+  setOutlineOn: (v: boolean) => void,
+  setOutlineThickness: (v: number) => void,
+  setOutlineInset: (v: number) => void,
+  setOutlineRadius: (v: number) => void,
+  setGlobeSizePx: (v: number) => void,
+  setPositionYOffsets: (v: Record<PositionTarget, number> | ((prev: Record<PositionTarget, number>) => Record<PositionTarget, number>)) => void,
+  saved: Partial<SandboxConfig> | null
+): void {
+  if (!saved) return;
+  if (saved.stateOverride != null) setStateOverride(saved.stateOverride);
+  if (saved.objectsInPhone != null) setObjectsInPhone({ ...defaultObjectsInPhone, ...saved.objectsInPhone });
+  if (saved.outlineOn != null) setOutlineOn(saved.outlineOn);
+  if (saved.outlineThickness != null) setOutlineThickness(saved.outlineThickness);
+  if (saved.outlineInset != null) setOutlineInset(saved.outlineInset);
+  if (saved.outlineRadius != null) setOutlineRadius(saved.outlineRadius);
+  if (saved.globeSizePx != null) setGlobeSizePx(saved.globeSizePx);
+  if (saved.positionYOffsets != null) setPositionYOffsets({ ...DEFAULT_POSITION_Y, ...saved.positionYOffsets });
+}
+
 export default function LobbyTabSandboxPage(): React.ReactElement {
   const [stateOverride, setStateOverride] = useState<'default' | 'loading' | 'error' | 'empty'>('default');
   const [objectsInPhone, setObjectsInPhone] = useState<Record<LobbyObjectId, boolean>>(defaultObjectsInPhone);
@@ -267,7 +321,10 @@ export default function LobbyTabSandboxPage(): React.ReactElement {
   const [outlineInset, setOutlineInset] = useState<number>(SPEC.outline.inset_px);
   const [outlineRadius, setOutlineRadius] = useState<number>(SPEC.outline.radius_px);
   const [globeSizePx, setGlobeSizePx] = useState<number>(SPEC.lobby.globe_size_px);
+  const [positionYOffsets, setPositionYOffsets] = useState<Record<PositionTarget, number>>(DEFAULT_POSITION_Y);
   const [savedAt, setSavedAt] = useState<number | null>(null);
+  const [undoneAt, setUndoneAt] = useState<number | null>(null);
+  const [hasBackup, setHasBackup] = useState(false);
   const [copiedAt, setCopiedAt] = useState<number | null>(null);
   const [joinModalTournament, setJoinModalTournament] = useState<Tournament | null>(null);
   const [isJoining, setIsJoining] = useState(false);
@@ -325,15 +382,21 @@ export default function LobbyTabSandboxPage(): React.ReactElement {
   };
 
   React.useEffect(() => {
-    const saved = loadSavedConfig();
-    if (!saved) return;
-    if (saved.stateOverride) setStateOverride(saved.stateOverride);
-    if (saved.objectsInPhone) setObjectsInPhone({ ...defaultObjectsInPhone, ...saved.objectsInPhone });
-    if (saved.outlineOn != null) setOutlineOn(saved.outlineOn);
-    if (saved.outlineThickness != null) setOutlineThickness(saved.outlineThickness);
-    if (saved.outlineInset != null) setOutlineInset(saved.outlineInset);
-    if (saved.outlineRadius != null) setOutlineRadius(saved.outlineRadius);
-    if (saved.globeSizePx != null) setGlobeSizePx(saved.globeSizePx);
+    applyConfig(
+      setStateOverride,
+      setObjectsInPhone,
+      setOutlineOn,
+      setOutlineThickness,
+      setOutlineInset,
+      setOutlineRadius,
+      setGlobeSizePx,
+      setPositionYOffsets,
+      loadSavedConfig()
+    );
+  }, []);
+
+  React.useEffect(() => {
+    setHasBackup(loadBackupConfig() != null);
   }, []);
 
   const toggleInPhone = (id: LobbyObjectId) => {
@@ -349,10 +412,51 @@ export default function LobbyTabSandboxPage(): React.ReactElement {
       outlineInset,
       outlineRadius,
       globeSizePx,
+      positionYOffsets,
     };
     try {
+      const previous = window.localStorage.getItem(SAVE_KEY);
       window.localStorage.setItem(SAVE_KEY, JSON.stringify(config));
+      if (previous != null) {
+        window.localStorage.setItem(BACKUP_KEY, previous);
+      }
+      setHasBackup(previous != null);
       setSavedAt(Date.now());
+      // Make this config the working lobby in VX2 (and future VX) so the app uses it in the phone-frame lobby.
+      saveWorkingLobbyConfig({
+        outlineOn,
+        outlineThickness,
+        outlineInset,
+        outlineRadius,
+        globeSizePx,
+        positionYOffsets: positionYOffsets ?? {},
+        objectsInPhone,
+      });
+    } catch {
+      // ignore
+    }
+  };
+
+  const undoConfig = () => {
+    const backup = loadBackupConfig();
+    if (!backup) return;
+    try {
+      applyConfig(
+        setStateOverride,
+        setObjectsInPhone,
+        setOutlineOn,
+        setOutlineThickness,
+        setOutlineInset,
+        setOutlineRadius,
+        setGlobeSizePx,
+        setPositionYOffsets,
+        backup
+      );
+      const raw = window.localStorage.getItem(BACKUP_KEY);
+      if (raw != null) {
+        window.localStorage.setItem(SAVE_KEY, raw);
+      }
+      setUndoneAt(Date.now());
     } catch {
       // ignore
     }
@@ -366,6 +470,7 @@ export default function LobbyTabSandboxPage(): React.ReactElement {
     setOutlineInset(SPEC.outline.inset_px);
     setOutlineRadius(SPEC.outline.radius_px);
     setGlobeSizePx(SPEC.lobby.globe_size_px);
+    setPositionYOffsets({ ...DEFAULT_POSITION_Y });
   };
 
   React.useEffect(() => {
@@ -379,6 +484,12 @@ export default function LobbyTabSandboxPage(): React.ReactElement {
     const t = window.setTimeout(() => setCopiedAt(null), 2000);
     return () => window.clearTimeout(t);
   }, [copiedAt]);
+
+  React.useEffect(() => {
+    if (undoneAt == null) return;
+    const t = window.setTimeout(() => setUndoneAt(null), 2000);
+    return () => window.clearTimeout(t);
+  }, [undoneAt]);
 
   const t = MOCK_TOURNAMENT;
 
@@ -455,7 +566,8 @@ export default function LobbyTabSandboxPage(): React.ReactElement {
                     border: 'none',
                     cursor: 'pointer',
                   }}
-                  aria-label="Save current sandbox configuration"
+                  aria-label="Save configuration and set as working lobby in VX2"
+                  title="Save and make this the working lobby in VX2 (and future VX) so the app uses it in the phone-frame lobby"
                 >
                   Save
                 </button>
@@ -476,8 +588,31 @@ export default function LobbyTabSandboxPage(): React.ReactElement {
                 >
                   Reset
                 </button>
+                <button
+                  type="button"
+                  onClick={undoConfig}
+                  disabled={!hasBackup}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: 8,
+                    fontSize: 13,
+                    fontWeight: 600,
+                    backgroundColor: hasBackup ? '#F59E0B' : '#4B5563',
+                    color: '#FFF',
+                    border: 'none',
+                    cursor: hasBackup ? 'pointer' : 'not-allowed',
+                    opacity: hasBackup ? 1 : 0.6,
+                  }}
+                  aria-label="Restore previous saved configuration"
+                  title={hasBackup ? 'Restore config from last save (e.g. previous session)' : 'No previous save to restore'}
+                >
+                  Undo
+                </button>
                 {savedAt != null && (
                   <span style={{ color: '#10B981', fontSize: 12, fontWeight: 500 }}>Saved</span>
+                )}
+                {undoneAt != null && (
+                  <span style={{ color: '#F59E0B', fontSize: 12, fontWeight: 500 }}>Restored</span>
                 )}
               </div>
             </div>
@@ -514,7 +649,6 @@ export default function LobbyTabSandboxPage(): React.ReactElement {
                 min={2}
                 max={24}
                 onChange={setOutlineThickness}
-                commitOnRelease
               />
               <SliderRow
                 label="Inset from edges"
@@ -522,7 +656,6 @@ export default function LobbyTabSandboxPage(): React.ReactElement {
                 min={0}
                 max={48}
                 onChange={setOutlineInset}
-                commitOnRelease
               />
               <SliderRow
                 label="Radius"
@@ -530,7 +663,6 @@ export default function LobbyTabSandboxPage(): React.ReactElement {
                 min={0}
                 max={48}
                 onChange={setOutlineRadius}
-                commitOnRelease
               />
             </div>
 
@@ -553,6 +685,36 @@ export default function LobbyTabSandboxPage(): React.ReactElement {
                 step={4}
                 onChange={setGlobeSizePx}
               />
+            </div>
+
+            {/* Position (dev) – height movement only for each lobby object + outline */}
+            <div
+              style={{
+                width: 280,
+                padding: 14,
+                backgroundColor: 'rgba(17, 24, 39, 0.98)',
+                borderRadius: 10,
+                border: '1px solid #374151',
+              }}
+            >
+              <span style={{ color: '#F9FAFB', fontSize: 14, fontWeight: 600, display: 'block', marginBottom: 4 }}>
+                Position (dev) – height
+              </span>
+              <p style={{ color: '#9CA3AF', fontSize: 11, marginBottom: 12 }}>
+                Y offset in px. Positive = down.
+              </p>
+              {POSITION_TARGETS.map((target) => (
+                <div key={target} style={{ marginBottom: target === 'outline' ? 0 : 10 }}>
+                  <SliderRow
+                    label={`${POSITION_Y_LABELS[target]} Y`}
+                    value={positionYOffsets[target]}
+                    min={-120}
+                    max={120}
+                    step={2}
+                    onChange={(n) => setPositionYOffsets((prev) => ({ ...prev, [target]: n }))}
+                  />
+                </div>
+              ))}
             </div>
 
             {/* Current iteration dimensions – agent handoff spec + copy */}
@@ -646,6 +808,14 @@ export default function LobbyTabSandboxPage(): React.ReactElement {
                         contentScaleOverride={1}
                         globeImageSrc={globeSrc}
                         scrollable={false}
+                        positionOverrides={{
+                          logoTitle: { y: positionYOffsets.logoTitle },
+                          progressBar: { y: positionYOffsets.progressBar },
+                          joinButton: { y: positionYOffsets.joinButton },
+                          stats: { y: positionYOffsets.stats },
+                          globe: { y: positionYOffsets.globe },
+                          outline: { y: positionYOffsets.outline },
+                        }}
                       />
                     </div>
                   </SandboxPhoneBody>
