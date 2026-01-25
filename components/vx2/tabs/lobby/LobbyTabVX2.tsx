@@ -59,7 +59,7 @@ const logger = createScopedLogger('[LobbyTab]');
 // ============================================================================
 
 /** Globe image (no background); used in lobby layout */
-const GLOBE_IMAGE = '/!!_GLOBE_NOBACKGROUND.png';
+const GLOBE_IMAGE = '/!!_GLOBE_NOBACKGROUND.webp';
 /** When in phone frame: use LOBBY_TAB_SANDBOX_SPEC for px-per-px match with sandbox. */
 const SPEC = LOBBY_TAB_SANDBOX_SPEC;
 

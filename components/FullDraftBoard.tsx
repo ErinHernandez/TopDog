@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { logoOptions } from './team-logos';
-import { POSITION_HELPERS, POSITIONS } from './draft/v3/constants/positions';
+import { POSITION_HELPERS, POSITIONS } from '@/lib/constants/positions';
 import type { FantasyPosition } from '@/types/player';
 
 // ============================================================================
@@ -112,7 +112,7 @@ const FullDraftBoard: React.FC<FullDraftBoardProps> = ({
 
   const getPositionColor = (position: FantasyPosition | string | undefined): string => {
     if (!position) return '#6b7280';
-    return POSITION_HELPERS.getPositionColor(position as FantasyPosition);
+    return POSITION_HELPERS.getColor(position);
   };
 
   // Robust player name matching function
@@ -194,7 +194,7 @@ const FullDraftBoard: React.FC<FullDraftBoardProps> = ({
     if (totalPicks === 0) return [];
     // Always return in order: QB, RB, WR, TE
     return POSITIONS.map((position) => ({
-      position,
+      position: position as FantasyPosition,
       proportion: (positionCounts[position] || 0) / totalPicks,
       color: getPositionColor(position),
     })).filter((prop) => prop.proportion > 0); // Optionally, keep this filter to skip zero-width bars

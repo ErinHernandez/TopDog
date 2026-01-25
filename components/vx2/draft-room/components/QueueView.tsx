@@ -120,7 +120,7 @@ interface PositionBadgeProps {
   position: Position;
 }
 
-function PositionBadge({ position }: PositionBadgeProps): React.ReactElement {
+const PositionBadge = React.memo(function PositionBadge({ position }: PositionBadgeProps): React.ReactElement {
   const color = POSITION_COLORS[position] || QUEUE_COLORS.textSecondary;
   
   return (
@@ -141,7 +141,7 @@ function PositionBadge({ position }: PositionBadgeProps): React.ReactElement {
       {position}
     </span>
   );
-}
+});
 
 interface IconButtonProps {
   onClick: (e: React.MouseEvent) => void;
@@ -152,7 +152,7 @@ interface IconButtonProps {
   className?: string;
 }
 
-function IconButton({
+const IconButton = React.memo(function IconButton({
   onClick,
   disabled = false,
   ariaLabel,
@@ -188,7 +188,7 @@ function IconButton({
       {children}
     </button>
   );
-}
+});
 
 interface QueuedPlayerRowProps {
   player: QueuedPlayer;
@@ -200,7 +200,7 @@ interface QueuedPlayerRowProps {
   onRemove: (e: React.MouseEvent) => void;
 }
 
-function QueuedPlayerRow({
+const QueuedPlayerRow = React.memo(function QueuedPlayerRow({
   player,
   index,
   isFirst,
@@ -313,13 +313,13 @@ function QueuedPlayerRow({
       </div>
     </div>
   );
-}
+});
 
 interface EmptyStateProps {
   onBrowse?: () => void;
 }
 
-function EmptyState({ onBrowse }: EmptyStateProps): React.ReactElement {
+const EmptyState = React.memo(function EmptyState({ onBrowse }: EmptyStateProps): React.ReactElement {
   return (
     <div
       style={{
@@ -390,13 +390,13 @@ function EmptyState({ onBrowse }: EmptyStateProps): React.ReactElement {
       )}
     </div>
   );
-}
+});
 
 // ============================================================================
 // MAIN COMPONENT
 // ============================================================================
 
-export default function QueueView({
+const QueueView = React.memo(function QueueView({
   queue,
   onRemove,
   onMoveUp,
@@ -527,4 +527,6 @@ export default function QueueView({
       )}
     </div>
   );
-}
+});
+
+export default QueueView;

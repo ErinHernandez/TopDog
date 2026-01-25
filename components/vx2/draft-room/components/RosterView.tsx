@@ -185,7 +185,7 @@ interface PositionBadgeProps {
   size: 'sm' | 'md' | 'lg' | 'xl';
 }
 
-function PositionBadge({ position, size }: PositionBadgeProps): React.ReactElement {
+const PositionBadge = React.memo(function PositionBadge({ position, size }: PositionBadgeProps): React.ReactElement {
   const color = POSITION_COLORS[position as Position] || '#6B7280';
   
   const dimensions = {
@@ -262,7 +262,7 @@ function PositionBadge({ position, size }: PositionBadgeProps): React.ReactEleme
       {position}
     </div>
   );
-}
+});
 
 interface RosterRowProps {
   position: RosterPosition;
@@ -273,7 +273,7 @@ interface RosterRowProps {
   onToggleExpand?: () => void;
 }
 
-function RosterRow({ position, player, isStarter, showTopBorder = false, isExpanded = false, onToggleExpand }: RosterRowProps): React.ReactElement {
+const RosterRow = React.memo(function RosterRow({ position, player, isStarter, showTopBorder = false, isExpanded = false, onToggleExpand }: RosterRowProps): React.ReactElement {
   const badgeSize: 'sm' | 'md' | 'lg' | 'xl' = (isStarter || !player) ? 'lg' : 'md';
   const displayPosition = player ? player.position : position;
   
@@ -375,7 +375,7 @@ function RosterRow({ position, player, isStarter, showTopBorder = false, isExpan
       )}
     </div>
   );
-}
+});
 
 interface TeamSelectorProps {
   participants: Participant[];
@@ -385,7 +385,7 @@ interface TeamSelectorProps {
   draftDirectionUp: boolean;
 }
 
-function TeamSelector({
+const TeamSelector = React.memo(function TeamSelector({
   participants,
   selectedIndex,
   onSelect,
@@ -584,13 +584,13 @@ function TeamSelector({
       </div>
     </div>
   );
-}
+});
 
 // ============================================================================
 // MAIN COMPONENT
 // ============================================================================
 
-export default function RosterView({
+const RosterView = React.memo(function RosterView({
   picks,
   participants,
   userParticipantIndex,
@@ -854,4 +854,6 @@ export default function RosterView({
       />
     </div>
   );
-}
+});
+
+export default RosterView;

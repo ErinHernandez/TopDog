@@ -70,6 +70,14 @@ export interface UseUserResult {
 }
 
 // ============================================================================
+// CONSTANTS
+// ============================================================================
+
+/** Dev login uid from AuthContext; this user gets a synthetic $10,000 balance */
+const DEV_USER_UID = 'dev-user-t';
+const DEV_BALANCE_CENTS = 1_000_000; // $10,000
+
+// ============================================================================
 // HELPERS
 // ============================================================================
 
@@ -129,6 +137,14 @@ export function useUser(): UseUserResult {
     // Anonymous users don't have balance, so skip the Firestore listener
     if (!authUser?.uid || authUser.isAnonymous) {
       setBalanceCents(0);
+      setBalanceLoading(false);
+      setBalanceError(null);
+      return;
+    }
+    
+    // Dev user gets synthetic $10,000 balance (no Firestore doc)
+    if (authUser.uid === DEV_USER_UID) {
+      setBalanceCents(DEV_BALANCE_CENTS);
       setBalanceLoading(false);
       setBalanceError(null);
       return;

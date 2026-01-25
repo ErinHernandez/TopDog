@@ -52,6 +52,8 @@ interface BadgeEntry {
   firstEarned: ReturnType<typeof Timestamp.now>;
   lastUpdated: ReturnType<typeof Timestamp.now>;
   count: number;
+  lastSeen?: ReturnType<typeof Timestamp.now>;
+  pickCount?: number;
 }
 
 /**
@@ -466,13 +468,15 @@ export class LocationIntegrityService {
       if (geoData.countryCode && geoData.countryCode !== 'UNKNOWN') {
         const countryIdx = badges.countries.findIndex(b => b.code === geoData.countryCode);
         if (countryIdx >= 0) {
-          badges.countries[countryIdx].lastSeen = now;
-          badges.countries[countryIdx].pickCount++;
+          badges.countries[countryIdx]!.lastSeen = now;
+          badges.countries[countryIdx]!.pickCount = (badges.countries[countryIdx]!.pickCount || 0) + 1;
         } else {
           badges.countries.push({
             code: geoData.countryCode,
             name: await this.getCountryName(geoData.countryCode),
             firstEarned: now,
+            lastUpdated: now,
+            count: 1,
             lastSeen: now,
             pickCount: 1,
           });
@@ -484,13 +488,15 @@ export class LocationIntegrityService {
         const stateCode = `US-${geoData.stateCode}`;
         const stateIdx = badges.states.findIndex(b => b.code === stateCode);
         if (stateIdx >= 0) {
-          badges.states[stateIdx].lastSeen = now;
-          badges.states[stateIdx].pickCount++;
+          badges.states[stateIdx]!.lastSeen = now;
+          badges.states[stateIdx]!.pickCount = (badges.states[stateIdx]!.pickCount || 0) + 1;
         } else {
           badges.states.push({
             code: stateCode,
             name: await this.getStateName(geoData.stateCode),
             firstEarned: now,
+            lastUpdated: now,
+            count: 1,
             lastSeen: now,
             pickCount: 1,
           });
@@ -504,13 +510,15 @@ export class LocationIntegrityService {
       if (COUNTY_BADGES_ENABLED && geoData.countyCode) {
         const countyIdx = badges.counties.findIndex(b => b.code === geoData.countyCode);
         if (countyIdx >= 0) {
-          badges.counties[countyIdx].lastSeen = now;
-          badges.counties[countyIdx].pickCount++;
+          badges.counties[countyIdx]!.lastSeen = now;
+          badges.counties[countyIdx]!.pickCount = (badges.counties[countyIdx]!.pickCount || 0) + 1;
         } else {
           badges.counties.push({
             code: geoData.countyCode,
             name: await this.getCountyName(geoData.countyCode),
             firstEarned: now,
+            lastUpdated: now,
+            count: 1,
             lastSeen: now,
             pickCount: 1,
           });
@@ -526,16 +534,17 @@ export class LocationIntegrityService {
       if (DIVISION_BADGES_ENABLED && geoData.divisionCode && geoData.countryCode !== 'US') {
         const divIdx = badges.divisions.findIndex(d => d.code === geoData.divisionCode);
         if (divIdx >= 0) {
-          badges.divisions[divIdx].lastSeen = now;
-          badges.divisions[divIdx].pickCount++;
+          badges.divisions[divIdx]!.lastSeen = now;
+          badges.divisions[divIdx]!.pickCount = (badges.divisions[divIdx]!.pickCount || 0) + 1;
         } else {
           badges.divisions.push({
             code: geoData.divisionCode,
             name: geoData.divisionName || await this.getDivisionName(geoData.divisionCode),
             firstEarned: now,
+            lastUpdated: now,
+            count: 1,
             lastSeen: now,
             pickCount: 1,
-            divisionType: geoData.divisionType || undefined,
           });
         }
       }

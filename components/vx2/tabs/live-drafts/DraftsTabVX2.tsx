@@ -48,7 +48,6 @@ interface TabSwitcherProps {
 }
 
 function TabSwitcher({ selected, onSelect }: TabSwitcherProps): React.ReactElement {
-  console.log('[DraftsTabVX2] TabSwitcher rendering, selected:', selected);
   return (
     <div
       className="flex rounded-lg overflow-hidden"
@@ -59,10 +58,7 @@ function TabSwitcher({ selected, onSelect }: TabSwitcherProps): React.ReactEleme
       }}
     >
       <button
-        onClick={() => {
-          console.log('[DraftsTabVX2] Fast button clicked');
-          onSelect('fast');
-        }}
+        onClick={() => onSelect('fast')}
         className="flex-1 py-2.5 px-3 font-semibold transition-all"
         style={{
           fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
@@ -75,10 +71,7 @@ function TabSwitcher({ selected, onSelect }: TabSwitcherProps): React.ReactEleme
         Fast Drafts (30 Sec)
       </button>
       <button
-        onClick={() => {
-          console.log('[DraftsTabVX2] Slow button clicked');
-          onSelect('slow');
-        }}
+        onClick={() => onSelect('slow')}
         className="flex-1 py-2.5 px-3 font-semibold transition-all"
         style={{
           fontSize: `${TYPOGRAPHY.fontSize.sm}px`,

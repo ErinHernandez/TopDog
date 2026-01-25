@@ -6,9 +6,10 @@
  */
 
 import React from 'react';
-import DraftBoardApple from '../draft/v3/mobile/apple/components/DraftBoardApple';
-import { POSITION_COLORS } from '../draft/v3/constants/positions';
+import { POSITION_COLORS } from '@/lib/constants/positions';
 import type { FantasyPosition } from '@/types/player';
+
+// Note: DraftBoardApple was removed - using placeholder until migrated to VX2
 
 // ============================================================================
 // TYPES
@@ -135,14 +136,13 @@ const DraftBoardModal: React.FC<DraftBoardModalProps> = ({
       </div>
 
       {/* Draft Board Content */}
-      <div className="flex-1 min-h-0">
-        <DraftBoardApple
-          picks={mockPicks}
-          participants={mockParticipants}
-          currentPickNumber={mockPicks.length + 1}
-          isMyTurn={false}
-          timer={0}
-        />
+      <div className="flex-1 min-h-0 flex items-center justify-center">
+        {/* TODO: Migrate to VX2 DraftBoard component */}
+        <div className="text-center text-gray-400 p-8">
+          <p className="text-lg mb-2">Draft Board</p>
+          <p className="text-sm">{mockPicks.length} picks made</p>
+          <p className="text-sm">{mockParticipants.length} teams</p>
+        </div>
       </div>
     </div>
   );

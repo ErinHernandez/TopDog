@@ -66,7 +66,7 @@ export interface DraftStatusBarProps {
   /** Pre-draft countdown (60 seconds before draft starts) */
   preDraftCountdown?: number | null;
   /** Draft status */
-  draftStatus?: 'waiting' | 'active' | 'paused' | 'complete';
+  draftStatus?: 'loading' | 'waiting' | 'active' | 'paused' | 'complete';
   /** Callback when grace period ends (after shake animation) */
   onGracePeriodEnd?: () => void;
   /** Callback when exit button is pressed */
@@ -77,7 +77,7 @@ export interface DraftStatusBarProps {
 // COMPONENT
 // ============================================================================
 
-export default function DraftStatusBar({
+const DraftStatusBar = React.memo(function DraftStatusBar({
   timerSeconds,
   isUserTurn,
   onGracePeriodEnd,
@@ -117,7 +117,7 @@ export default function DraftStatusBar({
   // Background logic
   const getBackgroundStyle = (): React.CSSProperties => {
     // Pre-draft countdown - use same color as PicksBar (only when countdown is active)
-    if (draftStatus === 'waiting' && preDraftCountdown !== null && preDraftCountdown > 0) {
+    if (draftStatus === 'waiting' && preDraftCountdown != null && preDraftCountdown > 0) {
       return { backgroundColor: '#101927' }; // Match PicksBar background color
     }
     if (!isUserTurn) {
@@ -195,13 +195,13 @@ export default function DraftStatusBar({
               pointerEvents: 'none',
             }}
             aria-label={
-              draftStatus === 'waiting' && preDraftCountdown !== null && preDraftCountdown > 0
+              draftStatus === 'waiting' && preDraftCountdown != null && preDraftCountdown > 0
                 ? `Draft starts in ${preDraftCountdown} seconds`
                 : `${timerSeconds} seconds remaining`
             }
             aria-live="polite"
           >
-            {draftStatus === 'waiting' && preDraftCountdown !== null && preDraftCountdown > 0
+            {draftStatus === 'waiting' && preDraftCountdown != null && preDraftCountdown > 0
               ? preDraftCountdown
               : timerSeconds}
           </div>
@@ -209,5 +209,7 @@ export default function DraftStatusBar({
       )}
     </div>
   );
-}
+});
+
+export default DraftStatusBar;
 

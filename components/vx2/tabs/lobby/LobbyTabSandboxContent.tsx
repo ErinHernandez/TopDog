@@ -25,8 +25,8 @@ import { LOBBY_TAB_SANDBOX_SPEC } from './constants/lobbyTabSandboxSpec';
 
 const SPEC = LOBBY_TAB_SANDBOX_SPEC;
 const LOGO_IMAGE = '/tournament_card_background.png';
-const GLOBE_IMAGE_PRIMARY = '/!!_GLOBE_NOBACKGROUND.png';
-const GLOBE_IMAGE_FALLBACK = '/!!_GLOBE_NOBACKGROUND.png';
+const GLOBE_IMAGE_PRIMARY = '/!!_GLOBE_NOBACKGROUND.webp';
+const GLOBE_IMAGE_FALLBACK = '/!!_GLOBE_NOBACKGROUND.webp';
 /** Fixed height for the globe area so resizing the globe does not shift other lobby content. Sized so all lobby objects fit in the content area (731px). */
 const GLOBE_SLOT_HEIGHT_PX = 280;
 

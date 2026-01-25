@@ -86,8 +86,8 @@ const LOGO_IMAGE = '/tournament_card_background.png';
 
 const SPEC = LOBBY_TAB_SANDBOX_SPEC;
 /** Globe image (no background) */
-const GLOBE_IMAGE_PRIMARY = '/!!_GLOBE_NOBACKGROUND.png';
-const GLOBE_IMAGE_FALLBACK = '/!!_GLOBE_NOBACKGROUND.png';
+const GLOBE_IMAGE_PRIMARY = '/!!_GLOBE_NOBACKGROUND.webp';
+const GLOBE_IMAGE_FALLBACK = '/!!_GLOBE_NOBACKGROUND.webp';
 
 const MOCK_TOURNAMENT: Tournament = {
   id: 'sandbox-1',

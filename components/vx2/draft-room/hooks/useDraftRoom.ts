@@ -99,6 +99,9 @@ export interface UseDraftRoomResult {
   // Loading/error
   isLoading: boolean;
   error: string | null;
+
+  // Pre-draft countdown (seconds remaining before draft starts)
+  preDraftCountdown: number | null;
   
   // Actions
   draftPlayer: (player: DraftPlayer) => Promise<boolean>;

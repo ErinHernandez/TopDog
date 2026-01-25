@@ -135,7 +135,7 @@ interface FilterButtonProps {
   onToggle: () => void;
 }
 
-function FilterButton({ position, count, isActive, onToggle }: FilterButtonProps): React.ReactElement {
+const FilterButton = React.memo(function FilterButton({ position, count, isActive, onToggle }: FilterButtonProps): React.ReactElement {
   const color = POSITION_COLORS[position];
   
   return (
@@ -158,7 +158,7 @@ function FilterButton({ position, count, isActive, onToggle }: FilterButtonProps
       {position} {count}
     </button>
   );
-}
+});
 
 // --- Search Bar ---
 interface SearchBarProps {
@@ -167,7 +167,7 @@ interface SearchBarProps {
   onClear: () => void;
 }
 
-function SearchBar({ value, onChange, onClear }: SearchBarProps): React.ReactElement {
+const SearchBar = React.memo(function SearchBar({ value, onChange, onClear }: SearchBarProps): React.ReactElement {
   return (
     <div
       style={{
@@ -242,7 +242,7 @@ function SearchBar({ value, onChange, onClear }: SearchBarProps): React.ReactEle
       </button>
     </div>
   );
-}
+});
 
 // --- Column Headers ---
 // Table-based layout for guaranteed column alignment
@@ -257,10 +257,10 @@ interface PlayerRowProps {
   onRowClick: () => void;
 }
 
-function PlayerRow({ 
-  player, 
-  rank, 
-  isQueued, 
+const PlayerRow = React.memo(function PlayerRow({
+  player,
+  rank,
+  isQueued,
   onToggleQueue,
   onRowClick,
 }: PlayerRowProps): React.ReactElement {
@@ -382,13 +382,13 @@ function PlayerRow({
       </td>
     </tr>
   );
-}
+});
 
 // ============================================================================
-// MAIN COMPONENT  
+// MAIN COMPONENT
 // ============================================================================
 
-export default function PlayerList({
+const PlayerList = React.memo(function PlayerList({
   players,
   totalCount,
   isLoading,
@@ -657,4 +657,6 @@ export default function PlayerList({
       </div>
     </div>
   );
-}
+});
+
+export default PlayerList;

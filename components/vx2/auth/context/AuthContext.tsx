@@ -510,11 +510,56 @@ export function AuthProvider({
   }, [auth, db]);
   
   const signInWithEmail = useCallback(async (data: EmailSignInData): Promise<SignInResult> => {
+    dispatch({ type: 'AUTH_LOADING' });
+
+    // Dev login: email "t" / password "t" works in development without Firebase
+    const isDev = typeof process !== 'undefined' && process.env.NODE_ENV === 'development';
+    const isDevCredentials = data.email.trim().toLowerCase() === 't' && data.password === 't';
+    if (isDev && isDevCredentials) {
+      const now = new Date();
+      const devUser: AuthUser = {
+        uid: 'dev-user-t',
+        email: 't',
+        emailVerified: true,
+        phoneNumber: null,
+        displayName: 'Dev User',
+        photoURL: null,
+        isAnonymous: false,
+        providerId: 'password',
+        createdAt: now,
+        lastLoginAt: now,
+      };
+      const devProfile: UserProfile = {
+        uid: devUser.uid,
+        username: 'devuser',
+        email: devUser.email,
+        displayName: devUser.displayName || 'Dev User',
+        countryCode: 'US',
+        createdAt: now,
+        updatedAt: now,
+        isActive: true,
+        profileComplete: true,
+        tournamentsEntered: 0,
+        tournamentsWon: 0,
+        totalWinnings: 0,
+        bestFinish: null,
+        lastLogin: now,
+        preferences: {
+          notifications: true,
+          emailUpdates: true,
+          publicProfile: true,
+          borderColor: '#4285F4',
+        },
+      };
+      dispatch({ type: 'AUTH_STATE_CHANGED', payload: { user: devUser } });
+      dispatch({ type: 'PROFILE_LOADED', payload: { profile: devProfile } });
+      onAuthStateChange?.(devUser);
+      return { success: true, data: devUser };
+    }
+
     if (!auth) {
       return { success: false, error: createAuthError(new Error('Auth not initialized')) };
     }
-    
-    dispatch({ type: 'AUTH_LOADING' });
     
     try {
       const credential = await signInWithEmailAndPassword(auth, data.email, data.password);
@@ -534,7 +579,7 @@ export function AuthProvider({
       dispatch({ type: 'AUTH_ERROR', payload: { error: authError } });
       return { success: false, error: authError };
     }
-  }, [auth, db]);
+  }, [auth, db, onAuthStateChange]);
   
   // ========== Phone Auth ==========
   

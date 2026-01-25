@@ -46,13 +46,13 @@ interface ScrollingUsernameProps {
  * Username that scrolls horizontally when tapped if truncated.
  * Shows full username with smooth scroll animation, then resets.
  */
-const ScrollingUsername: React.FC<ScrollingUsernameProps> = ({
+const ScrollingUsername = React.memo<ScrollingUsernameProps>(function ScrollingUsername({
   name,
   maxChars,
   color,
   fontSize,
   fontWeight,
-}) => {
+}) {
   const [isScrolling, setIsScrolling] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
@@ -113,7 +113,7 @@ const ScrollingUsername: React.FC<ScrollingUsernameProps> = ({
       </span>
     </div>
   );
-};
+});
 
 // ============================================================================
 // PIXEL-PERFECT CONSTANTS (matched from VX PicksBarVX.tsx)
@@ -535,7 +535,7 @@ interface BlankCardProps {
 // ============================================================================
 
 /** Position tracker bar showing draft composition by position */
-function PositionTrackerBar({ picks }: { picks: DraftPlayer[] }) {
+const PositionTrackerBar = React.memo(function PositionTrackerBar({ picks }: { picks: DraftPlayer[] }) {
   if (picks.length === 0) {
     return (
       <div
@@ -576,10 +576,10 @@ function PositionTrackerBar({ picks }: { picks: DraftPlayer[] }) {
         })}
     </div>
   );
-}
+});
 
 /** Status text shown in center of blank card */
-function BlankCardStatus({ 
+const BlankCardStatus = React.memo(function BlankCardStatus({ 
   isCurrent, 
   isUserPick, 
   picksAway,
@@ -627,10 +627,10 @@ function BlankCardStatus({
   }
   
   return null;
-}
+});
 
 /** Shared content area for blank cards (pick number, status, tracker) */
-function BlankCardContent({
+const BlankCardContent = React.memo(function BlankCardContent({
   pickNumber,
   teamCount,
   isCurrent,
@@ -709,7 +709,7 @@ function BlankCardContent({
       </div>
     </div>
   );
-}
+});
 
 /** Derive card styling based on draft state */
 function getBlankCardStyle(
@@ -888,7 +888,7 @@ const BlankCard = React.forwardRef<HTMLDivElement, BlankCardProps>(
 // MAIN COMPONENT
 // ============================================================================
 
-export default function PicksBar({
+const PicksBar = React.memo(function PicksBar({
   picks,
   currentPickNumber,
   participants,
@@ -1168,5 +1168,7 @@ export default function PicksBar({
       )}
     </div>
   );
-}
+});
+
+export default PicksBar;
 

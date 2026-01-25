@@ -75,7 +75,7 @@ export function createWebhookMocks(options: MockRequestOptions = {}): {
       ...options.headers,
     },
     query: options.query,
-    body: options.body,
+    body: options.body as Record<string, unknown> | undefined,
   });
 
   return {

@@ -155,11 +155,11 @@ interface TeamHeaderProps {
   isOnTheClock: boolean;
 }
 
-function TeamHeader({ 
-  participant, 
-  index, 
-  isUser, 
-  userBorderColor, 
+const TeamHeader = React.memo(function TeamHeader({
+  participant,
+  index,
+  isUser,
+  userBorderColor,
   positionCounts,
   isOnTheClock,
 }: TeamHeaderProps): React.ReactElement {
@@ -282,7 +282,7 @@ function TeamHeader({
       </div>
     </div>
   );
-}
+});
 
 interface PickCellProps {
   pickData: PickSlot;
@@ -294,11 +294,11 @@ interface PickCellProps {
   isDraftActive?: boolean;
 }
 
-function PickCell({ 
-  pickData, 
-  teamCount, 
-  timer, 
-  userBorderColor, 
+const PickCell = React.memo(function PickCell({
+  pickData,
+  teamCount,
+  timer,
+  userBorderColor,
   picksAway,
   isNextUserPick,
   isDraftActive,
@@ -483,13 +483,13 @@ function PickCell({
       </div>
     </div>
   );
-}
+});
 
 // ============================================================================
 // MAIN COMPONENT
 // ============================================================================
 
-export default function DraftBoard({
+const DraftBoard = React.memo(function DraftBoard({
   picks,
   currentPickNumber,
   participants,
@@ -793,4 +793,6 @@ export default function DraftBoard({
       />
     </div>
   );
-}
+});
+
+export default DraftBoard;
