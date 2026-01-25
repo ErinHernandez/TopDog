@@ -13,13 +13,15 @@
  * Access: /testing-grounds/lobby-tab-sandbox
  */
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import Head from 'next/head';
-import { TabNavigationProvider } from '../../components/vx2/core';
+import dynamic from 'next/dynamic';
+import { TabNavigationProvider, useTabNavigation } from '../../components/vx2/core';
+import type { TabId } from '../../components/vx2/core/types';
 import { TabBarVX2 } from '../../components/vx2/navigation';
 import MobilePhoneFrame from '../../components/vx2/shell/MobilePhoneFrame';
 import { BG_COLORS } from '../../components/vx2/core/constants';
-import { CARD_SPACING_V3 } from '../../components/vx2/tabs/lobby/constants/cardSpacingV3';
+import { LOBBY_TAB_SANDBOX_SPEC } from '../../components/vx2/tabs/lobby/constants/lobbyTabSandboxSpec';
 import {
   TournamentCardLogo,
   TournamentTitle,
@@ -27,21 +29,63 @@ import {
   TournamentJoinButton,
   TournamentStats,
 } from '../../components/vx2/tabs/lobby/elements';
+import { LobbyTabSandboxContent } from '../../components/vx2/tabs/lobby/LobbyTabSandboxContent';
+import JoinTournamentModal from '../../components/vx2/tabs/lobby/JoinTournamentModal';
+import { AuthProvider } from '../../components/vx2/auth';
+import { InPhoneFrameProvider } from '../../lib/inPhoneFrameContext';
 import type { Tournament } from '../../components/vx2/hooks/data';
+
+const DraftsTab = dynamic(
+  () => import('../../components/vx2/tabs/live-drafts').then((m) => ({ default: m.DraftsTabVX2 })),
+  { ssr: false }
+);
+const MyTeamsTab = dynamic(
+  () => import('../../components/vx2/tabs/my-teams').then((m) => ({ default: m.MyTeamsTabVX2 })),
+  { ssr: false }
+);
+const ExposureTab = dynamic(
+  () => import('../../components/vx2/tabs/exposure').then((m) => ({ default: m.ExposureTabVX2 })),
+  { ssr: false }
+);
+const ProfileTab = dynamic(
+  () => import('../../components/vx2/tabs/profile').then((m) => ({ default: m.ProfileTabVX2 })),
+  { ssr: false }
+);
+
+const TAB_COMPONENTS: Record<TabId, React.ComponentType<object>> = {
+  lobby: () => null,
+  'live-drafts': DraftsTab,
+  'my-teams': MyTeamsTab,
+  exposure: ExposureTab,
+  profile: ProfileTab,
+};
+
+function SandboxPhoneBody({ children }: { children: React.ReactNode }): React.ReactElement {
+  const { state } = useTabNavigation();
+  if (state.activeTab === 'lobby') {
+    return <>{children}</>;
+  }
+  const TabComponent = TAB_COMPONENTS[state.activeTab];
+  if (!TabComponent) {
+    return (
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, color: '#9CA3AF', fontSize: 14 }}>
+        Unknown tab
+      </div>
+    );
+  }
+  return (
+    <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <TabComponent />
+    </div>
+  );
+}
 
 const PAGE_BG = '#1a1a2e';
 const LOGO_IMAGE = '/tournament_card_background.png';
 
-/** Outline dev tool: simple outline with four equal sides. */
-const OUTLINE_DEFAULT_THICKNESS = 8;
-const OUTLINE_DEFAULT_INSET = 8;
-const OUTLINE_DEFAULT_RADIUS = 0;
-const OUTLINE_COLOR = '#3B82F6';
-/** Distance from top edge of phone to content top. */
-const SAFE_AREA_TOP = 14;
-/** Globe image. Set to '/_globe_nobackground.png' when that file is in public/. SVG can fail in <img>, so we default to a working asset. */
-const GLOBE_IMAGE_PRIMARY = '/globe_tournament_III.svg';
-/** Shown when primary fails or as default so an image is always visible */
+const SPEC = LOBBY_TAB_SANDBOX_SPEC;
+/** Globe image (no background) */
+const GLOBE_IMAGE_PRIMARY = '/!!_GLOBE_NOBACKGROUND.png';
 const GLOBE_IMAGE_FALLBACK = '/!!_GLOBE_NOBACKGROUND.png';
 
 const MOCK_TOURNAMENT: Tournament = {
@@ -57,7 +101,19 @@ const MOCK_TOURNAMENT: Tournament = {
   status: 'filling',
 };
 
+const SAVE_KEY = 'lobby-tab-sandbox-config';
+
 type LobbyObjectId = 'logoTitle' | 'progressBar' | 'joinButton' | 'stats' | 'globe';
+
+type SandboxConfig = {
+  stateOverride: 'default' | 'loading' | 'error' | 'empty';
+  objectsInPhone: Record<LobbyObjectId, boolean>;
+  outlineOn: boolean;
+  outlineThickness: number;
+  outlineInset: number;
+  outlineRadius: number;
+  globeSizePx: number;
+};
 
 const OBJECT_LABELS: Record<LobbyObjectId, string> = {
   logoTitle: 'Logo + Title',
@@ -66,6 +122,16 @@ const OBJECT_LABELS: Record<LobbyObjectId, string> = {
   stats: 'Stats',
   globe: 'Globe (no background)',
 };
+
+/** Copy icon (outline) for clipboard actions. */
+function CopyIcon({ size = 18 }: { size?: number }): React.ReactElement {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+    </svg>
+  );
+}
 
 function ObjectToggle({
   id,
@@ -123,6 +189,7 @@ function SliderRow({
   max,
   step = 1,
   onChange,
+  commitOnRelease = false,
 }: {
   label: string;
   value: number;
@@ -130,20 +197,41 @@ function SliderRow({
   max: number;
   step?: number;
   onChange: (n: number) => void;
+  /** When true, only call onChange on pointer up; prevents layout thrash while dragging */
+  commitOnRelease?: boolean;
 }): React.ReactElement {
+  const [live, setLive] = useState(value);
+  const isControlled = !commitOnRelease;
+
+  React.useEffect(() => {
+    if (value !== live) setLive(value);
+  }, [value]);
+
+  const handleChange = (n: number) => {
+    setLive(n);
+    if (isControlled) onChange(n);
+  };
+
+  const handlePointerUp = () => {
+    if (commitOnRelease && live !== value) onChange(live);
+  };
+
+  const display = isControlled ? value : live;
   return (
     <div style={{ marginBottom: 10 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
         <span style={{ color: '#E5E7EB', fontSize: 12 }}>{label}</span>
-        <span style={{ color: '#9CA3AF', fontSize: 12, minWidth: 28, textAlign: 'right' }}>{value}px</span>
+        <span style={{ color: '#9CA3AF', fontSize: 12, minWidth: 28, textAlign: 'right' }}>{display}px</span>
       </div>
       <input
         type="range"
         min={min}
         max={max}
         step={step}
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
+        value={display}
+        onChange={(e) => handleChange(Number(e.target.value))}
+        onMouseUp={commitOnRelease ? handlePointerUp : undefined}
+        onTouchEnd={commitOnRelease ? handlePointerUp : undefined}
         style={{ width: '100%', accentColor: '#3B82F6' }}
         aria-label={label}
       />
@@ -151,27 +239,147 @@ function SliderRow({
   );
 }
 
+const defaultObjectsInPhone: Record<LobbyObjectId, boolean> = {
+  logoTitle: false,
+  progressBar: false,
+  joinButton: false,
+  stats: false,
+  globe: false,
+};
+
+function loadSavedConfig(): Partial<SandboxConfig> | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = window.localStorage.getItem(SAVE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as Partial<SandboxConfig>;
+  } catch {
+    return null;
+  }
+}
+
 export default function LobbyTabSandboxPage(): React.ReactElement {
   const [stateOverride, setStateOverride] = useState<'default' | 'loading' | 'error' | 'empty'>('default');
-  const [objectsInPhone, setObjectsInPhone] = useState<Record<LobbyObjectId, boolean>>({
-    logoTitle: false,
-    progressBar: false,
-    joinButton: false,
-    stats: false,
-    globe: false,
-  });
-  const [globeSrc, setGlobeSrc] = useState<string>(GLOBE_IMAGE_FALLBACK);
-  const [outlineOn, setOutlineOn] = useState(false);
-  const [outlineThickness, setOutlineThickness] = useState(OUTLINE_DEFAULT_THICKNESS);
-  const [outlineInset, setOutlineInset] = useState(OUTLINE_DEFAULT_INSET);
-  const [outlineRadius, setOutlineRadius] = useState(OUTLINE_DEFAULT_RADIUS);
-  const [globeSizePx, setGlobeSizePx] = useState(220);
+  const [objectsInPhone, setObjectsInPhone] = useState<Record<LobbyObjectId, boolean>>(defaultObjectsInPhone);
+  const [globeSrc, setGlobeSrc] = useState<string>(GLOBE_IMAGE_PRIMARY);
+  const [outlineOn, setOutlineOn] = useState<boolean>(SPEC.outline.enabled);
+  const [outlineThickness, setOutlineThickness] = useState<number>(SPEC.outline.thickness_px);
+  const [outlineInset, setOutlineInset] = useState<number>(SPEC.outline.inset_px);
+  const [outlineRadius, setOutlineRadius] = useState<number>(SPEC.outline.radius_px);
+  const [globeSizePx, setGlobeSizePx] = useState<number>(SPEC.lobby.globe_size_px);
+  const [savedAt, setSavedAt] = useState<number | null>(null);
+  const [copiedAt, setCopiedAt] = useState<number | null>(null);
+  const [joinModalTournament, setJoinModalTournament] = useState<Tournament | null>(null);
+  const [isJoining, setIsJoining] = useState(false);
+
+  const handleJoinClick = useCallback((tournamentId: string) => {
+    if (tournamentId === MOCK_TOURNAMENT.id) setJoinModalTournament(MOCK_TOURNAMENT);
+  }, []);
+
+  const handleCloseJoinModal = useCallback(() => {
+    setJoinModalTournament(null);
+  }, []);
+
+  const handleConfirmJoin = useCallback(
+    (options: { entries: number; autopilot: boolean }) => {
+      setIsJoining(true);
+      console.log('Join tournament', joinModalTournament?.id, options);
+      setTimeout(() => {
+        setIsJoining(false);
+        setJoinModalTournament(null);
+      }, 600);
+    },
+    [joinModalTournament?.id],
+  );
+
+  const dimensionsSpec = React.useMemo(() => {
+    const s = {
+      handoff: SPEC.handoff,
+      phone_frame: { ...SPEC.phone_frame },
+      content_area_above_tab_bar: { ...SPEC.content_area_above_tab_bar },
+      tab_bar_height_px: SPEC.tab_bar_height_px,
+      safe_area_top_px: SPEC.safe_area_top_px,
+      content_scale: SPEC.content_scale,
+      outline: {
+        enabled: outlineOn,
+        inset_px: outlineInset,
+        thickness_px: outlineThickness,
+        radius_px: outlineRadius,
+      },
+      lobby: {
+        outer_padding_px: SPEC.lobby.outer_padding_px,
+        bottom_row_gap_px: SPEC.lobby.bottom_row_gap_px,
+        globe_size_px: globeSizePx,
+      },
+    };
+    return JSON.stringify(s, null, 2);
+  }, [outlineOn, outlineInset, outlineThickness, outlineRadius, globeSizePx]);
+
+  const copyDimensionsSpec = () => {
+    navigator.clipboard.writeText(dimensionsSpec).then(
+      () => {
+        setCopiedAt(Date.now());
+      },
+      () => {},
+    );
+  };
+
+  React.useEffect(() => {
+    const saved = loadSavedConfig();
+    if (!saved) return;
+    if (saved.stateOverride) setStateOverride(saved.stateOverride);
+    if (saved.objectsInPhone) setObjectsInPhone({ ...defaultObjectsInPhone, ...saved.objectsInPhone });
+    if (saved.outlineOn != null) setOutlineOn(saved.outlineOn);
+    if (saved.outlineThickness != null) setOutlineThickness(saved.outlineThickness);
+    if (saved.outlineInset != null) setOutlineInset(saved.outlineInset);
+    if (saved.outlineRadius != null) setOutlineRadius(saved.outlineRadius);
+    if (saved.globeSizePx != null) setGlobeSizePx(saved.globeSizePx);
+  }, []);
 
   const toggleInPhone = (id: LobbyObjectId) => {
     setObjectsInPhone((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const hasAnyInPhone = Object.values(objectsInPhone).some(Boolean);
+  const saveConfig = () => {
+    const config: SandboxConfig = {
+      stateOverride,
+      objectsInPhone,
+      outlineOn,
+      outlineThickness,
+      outlineInset,
+      outlineRadius,
+      globeSizePx,
+    };
+    try {
+      window.localStorage.setItem(SAVE_KEY, JSON.stringify(config));
+      setSavedAt(Date.now());
+    } catch {
+      // ignore
+    }
+  };
+
+  const resetToSpecDefaults = () => {
+    setStateOverride('default');
+    setObjectsInPhone({ ...defaultObjectsInPhone });
+    setOutlineOn(SPEC.outline.enabled);
+    setOutlineThickness(SPEC.outline.thickness_px);
+    setOutlineInset(SPEC.outline.inset_px);
+    setOutlineRadius(SPEC.outline.radius_px);
+    setGlobeSizePx(SPEC.lobby.globe_size_px);
+  };
+
+  React.useEffect(() => {
+    if (savedAt == null) return;
+    const t = window.setTimeout(() => setSavedAt(null), 2000);
+    return () => window.clearTimeout(t);
+  }, [savedAt]);
+
+  React.useEffect(() => {
+    if (copiedAt == null) return;
+    const t = window.setTimeout(() => setCopiedAt(null), 2000);
+    return () => window.clearTimeout(t);
+  }, [copiedAt]);
+
   const t = MOCK_TOURNAMENT;
 
   return (
@@ -180,6 +388,7 @@ export default function LobbyTabSandboxPage(): React.ReactElement {
         <title>Lobby Tab Sandbox - TopDog</title>
         <meta name="description" content="Testing environment for Lobby objects – add back into phone one at a time" />
       </Head>
+      <AuthProvider>
       <div
         className="min-h-screen flex items-center justify-center p-8"
         style={{ backgroundColor: PAGE_BG }}
@@ -232,6 +441,45 @@ export default function LobbyTabSandboxPage(): React.ReactElement {
                   ))}
                 </div>
               </div>
+              <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  onClick={saveConfig}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: 8,
+                    fontSize: 13,
+                    fontWeight: 600,
+                    backgroundColor: '#10B981',
+                    color: '#FFF',
+                    border: 'none',
+                    cursor: 'pointer',
+                  }}
+                  aria-label="Save current sandbox configuration"
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  onClick={resetToSpecDefaults}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: 8,
+                    fontSize: 13,
+                    fontWeight: 600,
+                    backgroundColor: '#6B7280',
+                    color: '#FFF',
+                    border: 'none',
+                    cursor: 'pointer',
+                  }}
+                  aria-label="Reset to spec defaults"
+                >
+                  Reset
+                </button>
+                {savedAt != null && (
+                  <span style={{ color: '#10B981', fontSize: 12, fontWeight: 500 }}>Saved</span>
+                )}
+              </div>
             </div>
 
             {/* Outline dev tool – four equal sides around content above footer */}
@@ -266,13 +514,15 @@ export default function LobbyTabSandboxPage(): React.ReactElement {
                 min={2}
                 max={24}
                 onChange={setOutlineThickness}
+                commitOnRelease
               />
               <SliderRow
                 label="Inset from edges"
                 value={outlineInset}
                 min={0}
-                max={24}
+                max={48}
                 onChange={setOutlineInset}
+                commitOnRelease
               />
               <SliderRow
                 label="Radius"
@@ -280,6 +530,7 @@ export default function LobbyTabSandboxPage(): React.ReactElement {
                 min={0}
                 max={48}
                 onChange={setOutlineRadius}
+                commitOnRelease
               />
             </div>
 
@@ -304,8 +555,69 @@ export default function LobbyTabSandboxPage(): React.ReactElement {
               />
             </div>
 
+            {/* Current iteration dimensions – agent handoff spec + copy */}
+            <div
+              style={{
+                width: 320,
+                maxWidth: '100%',
+                padding: 14,
+                backgroundColor: 'rgba(17, 24, 39, 0.98)',
+                borderRadius: 10,
+                border: '1px solid #374151',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                <span style={{ color: '#F9FAFB', fontSize: 14, fontWeight: 600 }}>
+                  Current iteration dimensions
+                </span>
+                <button
+                  type="button"
+                  onClick={copyDimensionsSpec}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: 32,
+                    height: 32,
+                    padding: 0,
+                    border: 'none',
+                    borderRadius: 6,
+                    backgroundColor: copiedAt ? '#10B981' : '#374151',
+                    color: copiedAt ? '#FFF' : '#9CA3AF',
+                    cursor: 'pointer',
+                  }}
+                  aria-label={copiedAt ? 'Copied' : 'Copy dimensions spec'}
+                  title="Copy for agent handoff"
+                >
+                  <CopyIcon size={18} />
+                </button>
+              </div>
+              <p style={{ color: '#9CA3AF', fontSize: 11, marginBottom: 10, lineHeight: 1.35 }}>
+                Exact dimensions for this layout. Copy and hand off to an agent for execution.
+              </p>
+              <pre
+                style={{
+                  margin: 0,
+                  padding: 12,
+                  fontSize: 11,
+                  fontFamily: 'ui-monospace, monospace',
+                  color: '#E5E7EB',
+                  backgroundColor: 'rgba(0,0,0,0.35)',
+                  borderRadius: 8,
+                  overflow: 'auto',
+                  maxHeight: 220,
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-all',
+                  border: '1px solid #374151',
+                }}
+              >
+                {dimensionsSpec}
+              </pre>
+            </div>
+
             <TabNavigationProvider initialTab="lobby">
               <MobilePhoneFrame>
+                <InPhoneFrameProvider value={true}>
                 <div
                   style={{
                     height: '100%',
@@ -315,173 +627,31 @@ export default function LobbyTabSandboxPage(): React.ReactElement {
                     overflow: 'hidden',
                   }}
                 >
-                  <div
-                    data-outline-debug={outlineOn ? 'true' : undefined}
-                    style={{
-                      flex: 1,
-                      minHeight: 0,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      overflow: 'hidden',
-                      ...(outlineOn ? {
-                        marginTop: SAFE_AREA_TOP + outlineInset,
-                        marginLeft: outlineInset,
-                        marginRight: outlineInset,
-                        marginBottom: outlineInset,
-                        border: `${outlineThickness}px solid ${OUTLINE_COLOR}`,
-                        borderRadius: outlineRadius,
-                        boxSizing: 'border-box',
-                      } : {}),
-                    }}
-                  >
-                  <div
-                    style={{
-                      flex: 1,
-                      minHeight: 0,
-                      paddingTop: SAFE_AREA_TOP,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      overflow: 'hidden',
-                    }}
-                  >
-                  <div
-                    style={{
-                      flex: 1,
-                      minHeight: 0,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      transform: 'scale(0.92)',
-                      transformOrigin: 'top center',
-                    }}
-                  >
-                  <div
-                    style={{
-                      flex: 1,
-                      minHeight: 0,
-                      overflow: 'auto',
-                      position: 'relative',
-                      display: 'flex',
-                      flexDirection: 'column',
-                    }}
-                  >
-                    {stateOverride === 'loading' && (
-                      <div
-                        style={{
-                          position: 'absolute',
-                          inset: 16,
-                          backgroundColor: 'rgba(255,255,255,0.08)',
-                          borderRadius: 16,
-                          animation: 'pulse 2s infinite',
+                  <SandboxPhoneBody>
+                    <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+                      <LobbyTabSandboxContent
+                        tournament={t}
+                        onJoinClick={handleJoinClick}
+                        outlineOverrides={{
+                          on: outlineOn,
+                          thickness: outlineThickness,
+                          inset: outlineInset,
+                          radius: outlineRadius,
                         }}
-                        aria-label="Loading"
+                        globeSizePx={globeSizePx}
+                        objectsInPhone={objectsInPhone}
+                        showEmptyPrompt
+                        stateOverride={stateOverride}
+                        data-outline-debug={outlineOn ? 'true' : undefined}
+                        contentScaleOverride={1}
+                        globeImageSrc={globeSrc}
+                        scrollable={false}
                       />
-                    )}
-                    {stateOverride === 'error' && (
-                      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-                        <span style={{ color: '#EF4444', fontSize: 14 }}>Error state</span>
-                      </div>
-                    )}
-                    {stateOverride === 'empty' && (
-                      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-                        <span style={{ color: '#9CA3AF', fontSize: 14 }}>Empty state</span>
-                      </div>
-                    )}
-                    {stateOverride === 'default' && (
-                      <>
-                        {!hasAnyInPhone ? (
-                          <div
-                            style={{
-                              flex: 1,
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              padding: 24,
-                              color: '#6B7280',
-                              fontSize: 13,
-                              textAlign: 'center',
-                            }}
-                          >
-                            Add elements from the panel →
-                          </div>
-                        ) : (
-                          <div
-                            style={{
-                              flex: 1,
-                              display: 'flex',
-                              flexDirection: 'column',
-                              padding: `${CARD_SPACING_V3.outerPadding}px`,
-                              gap: `${CARD_SPACING_V3.bottomRowGap}px`,
-                              minHeight: 0,
-                            }}
-                          >
-                            {objectsInPhone.logoTitle && (
-                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                <TournamentCardLogo src={LOGO_IMAGE} alt="Tournament logo" maxHeight={60} />
-                                <div style={{ marginTop: 14, transform: 'translateY(-34px)' }}>
-                                  <TournamentTitle title={t.title} fontSize={38} />
-                                </div>
-                              </div>
-                            )}
-                            {objectsInPhone.globe && (
-                              <div
-                                style={{
-                                  display: 'flex',
-                                  justifyContent: 'center',
-                                  alignItems: 'center',
-                                  minHeight: globeSizePx,
-                                  marginTop: '24px',
-                                  transform: 'translateY(-24px)',
-                                }}
-                              >
-                                <img
-                                  src={globeSrc}
-                                  alt="Globe"
-                                  width={globeSizePx}
-                                  height={globeSizePx}
-                                  style={{ width: globeSizePx, height: globeSizePx, objectFit: 'contain', display: 'block' }}
-                                  onError={() => setGlobeSrc(GLOBE_IMAGE_FALLBACK)}
-                                />
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </div>
-                  </div>
-                  </div>
-                  {stateOverride === 'default' && (objectsInPhone.progressBar || objectsInPhone.joinButton || objectsInPhone.stats) && (
-                    <div
-                      style={{
-                        flexShrink: 0,
-                        padding: `0 ${CARD_SPACING_V3.outerPadding}px ${CARD_SPACING_V3.outerPadding}px`,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: CARD_SPACING_V3.bottomRowGap,
-                      }}
-                    >
-                      {objectsInPhone.progressBar && (
-                        <div style={{ transform: 'translateY(-14px)' }}>
-                          <TournamentProgressBar currentEntries={t.currentEntries} maxEntries={t.maxEntries} />
-                        </div>
-                      )}
-                      {objectsInPhone.joinButton && (
-                        <div style={{ transform: 'translateY(-4px)' }}>
-                          <TournamentJoinButton onClick={() => {}} label="Join Tournament" />
-                        </div>
-                      )}
-                      {objectsInPhone.stats && (
-                        <TournamentStats
-                          entryFee={t.entryFee}
-                          entries={t.totalEntries}
-                          prize={t.firstPlacePrize}
-                        />
-                      )}
                     </div>
-                  )}
-                  </div>
+                  </SandboxPhoneBody>
                   <TabBarVX2 />
                 </div>
+                </InPhoneFrameProvider>
               </MobilePhoneFrame>
             </TabNavigationProvider>
           </div>
@@ -544,7 +714,7 @@ export default function LobbyTabSandboxPage(): React.ReactElement {
               checked={objectsInPhone.joinButton}
               onToggle={toggleInPhone}
             >
-              <TournamentJoinButton onClick={() => {}} label="Join Tournament" />
+              <TournamentJoinButton onClick={() => handleJoinClick(t.id)} label="Join Tournament" />
             </ObjectToggle>
 
             <ObjectToggle
@@ -583,6 +753,17 @@ export default function LobbyTabSandboxPage(): React.ReactElement {
           </div>
         </div>
       </div>
+      {joinModalTournament && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 99999 }}>
+          <JoinTournamentModal
+            tournament={joinModalTournament}
+            onClose={handleCloseJoinModal}
+            onConfirm={handleConfirmJoin}
+            isJoining={isJoining}
+          />
+        </div>
+      )}
+      </AuthProvider>
     </>
   );
 }

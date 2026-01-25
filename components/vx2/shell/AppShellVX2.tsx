@@ -172,14 +172,14 @@ function InnerShell({ badgeOverrides }: InnerShellProps): React.ReactElement {
           overflow: 'hidden',
         }}
       >
-        {/* Main content - Scrollable */}
+        {/* Main content - flex so TabContentVX2 gets defined height. In phone frame, no marginBottom so content sits flush with tab bar (goal). */}
         <main
           style={{
             flex: 1,
             minHeight: 0,  // CRITICAL: Allow shrinking
-            overflowY: 'auto',
-            overflowX: 'hidden',
-            WebkitOverflowScrolling: 'touch',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
           }}
         >
           <TabContentVX2 />

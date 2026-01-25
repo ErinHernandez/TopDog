@@ -321,22 +321,24 @@ export default function SlowDraftCard({
             className="w-full text-left"
             style={{ marginTop: SLOW_DRAFT_LAYOUT.sectionGap }}
           >
-            {/* Roster strip (compact) */}
-            <div style={{ marginBottom: 10 }}>
-              <div
-                style={{
-                  ...SLOW_DRAFT_TYPOGRAPHY.sectionLabel,
-                  marginBottom: 6,
-                }}
-              >
-                MY ROSTER
+            {/* Roster strip (compact) - hidden for TopDog International 6 */}
+            {draft.tournamentName !== 'TopDog International 6' && (
+              <div style={{ marginBottom: 10 }}>
+                <div
+                  style={{
+                    ...SLOW_DRAFT_TYPOGRAPHY.sectionLabel,
+                    marginBottom: 6,
+                  }}
+                >
+                  MY ROSTER
+                </div>
+                <MyRosterStrip
+                  picks={draft.myPicks}
+                  rosterSize={18}
+                  compact={true}
+                />
               </div>
-              <MyRosterStrip
-                picks={draft.myPicks}
-                rosterSize={18}
-                compact={true}
-              />
-            </div>
+            )}
 
             {/* Position needs (compact) */}
             <PositionNeedsIndicator
@@ -363,14 +365,16 @@ export default function SlowDraftCard({
               animation: `slideDown ${SLOW_DRAFT_ANIMATIONS.expandDuration}ms ${SLOW_DRAFT_ANIMATIONS.expandEasing}`,
             }}
           >
-            {/* Roster strip (expanded with player names) */}
-            <div style={{ marginBottom: SLOW_DRAFT_LAYOUT.sectionGap }}>
-              <MyRosterStrip
-                picks={draft.myPicks}
-                rosterSize={18}
-                compact={false}
-              />
-            </div>
+            {/* Roster strip (expanded with player names) - hidden for TopDog International 6 */}
+            {draft.tournamentName !== 'TopDog International 6' && (
+              <div style={{ marginBottom: SLOW_DRAFT_LAYOUT.sectionGap }}>
+                <MyRosterStrip
+                  picks={draft.myPicks}
+                  rosterSize={18}
+                  compact={false}
+                />
+              </div>
+            )}
 
             {/* Position needs (expanded) */}
             <div style={{ marginBottom: SLOW_DRAFT_LAYOUT.sectionGap }}>

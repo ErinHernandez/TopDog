@@ -9,72 +9,13 @@ import React, { useState, useRef, useEffect } from 'react';
 import type { FilterSortBarProps } from '../types';
 import {
   SORT_OPTIONS,
-  FILTER_OPTIONS,
   SLOW_DRAFT_LAYOUT,
   SLOW_DRAFT_TYPOGRAPHY,
   SLOW_DRAFT_COLORS,
   type SortOption,
-  type FilterOption,
 } from '../constants';
 import { SPACING, RADIUS } from '../../../core/constants/sizes';
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS } from '../../../core/constants/colors';
-
-// ============================================================================
-// FILTER PILL
-// ============================================================================
-
-interface FilterPillProps {
-  label: string;
-  count?: number;
-  isActive: boolean;
-  onTap: () => void;
-}
-
-function FilterPill({ label, count, isActive, onTap }: FilterPillProps): React.ReactElement {
-  return (
-    <button
-      onClick={onTap}
-      className="flex items-center gap-1.5 transition-all active:scale-[0.97]"
-      style={{
-        padding: '6px 12px',
-        borderRadius: RADIUS.lg,
-        backgroundColor: isActive
-          ? STATE_COLORS.active
-          : 'rgba(255, 255, 255, 0.06)',
-        border: isActive
-          ? `1px solid ${STATE_COLORS.active}`
-          : '1px solid rgba(255, 255, 255, 0.1)',
-        whiteSpace: 'nowrap',
-      }}
-    >
-      <span
-        style={{
-          fontSize: 13,
-          fontWeight: 600,
-          color: isActive ? '#fff' : TEXT_COLORS.secondary,
-        }}
-      >
-        {label}
-      </span>
-      {count !== undefined && count > 0 && (
-        <span
-          style={{
-            fontSize: 11,
-            fontWeight: 700,
-            color: isActive ? 'rgba(255, 255, 255, 0.9)' : TEXT_COLORS.muted,
-            backgroundColor: isActive
-              ? 'rgba(255, 255, 255, 0.2)'
-              : 'rgba(255, 255, 255, 0.08)',
-            padding: '2px 6px',
-            borderRadius: 10,
-          }}
-        >
-          {count}
-        </span>
-      )}
-    </button>
-  );
-}
 
 // ============================================================================
 // SORT DROPDOWN
@@ -206,10 +147,7 @@ function SortDropdown({ value, onChange }: SortDropdownProps): React.ReactElemen
 
 export default function FilterSortBar({
   sortBy,
-  filterBy,
   onSortChange,
-  onFilterChange,
-  counts,
 }: FilterSortBarProps): React.ReactElement {
   return (
     <div
@@ -219,32 +157,8 @@ export default function FilterSortBar({
         borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
       }}
     >
-      {/* Top row: Filters + Sort */}
-      <div className="flex items-center justify-between">
-        {/* Filter pills */}
-        <div
-          className="flex gap-2 overflow-x-auto"
-          style={{
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-            marginRight: SPACING.sm,
-          }}
-        >
-          <FilterPill
-            label="All"
-            count={counts.total}
-            isActive={filterBy === 'all'}
-            onTap={() => onFilterChange('all')}
-          />
-          <FilterPill
-            label="My Turn"
-            count={counts.myTurn}
-            isActive={filterBy === 'myTurnOnly'}
-            onTap={() => onFilterChange('myTurnOnly')}
-          />
-        </div>
-
-        {/* Sort dropdown */}
+      {/* Top row: Sort */}
+      <div className="flex items-center justify-end">
         <SortDropdown value={sortBy} onChange={onSortChange} />
       </div>
     </div>

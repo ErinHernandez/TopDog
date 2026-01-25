@@ -101,7 +101,7 @@ const DEV_AUTH_OVERRIDE_KEY = 'devnav-auth-override'; // 'logged-in' | 'logged-o
 // VX2 components are the current/active development - put them first
 const DEFAULT_LINKS = [
   { id: 'vx2-shell', href: '/testing-grounds/vx2-mobile-app-demo', label: 'Mobile App (VX2)', bgColor: '#14532D', bgColorActive: '#1F4D3A', textColor: '#86EFAC' },
-  { id: 'vx2-lobby', href: '/testing-grounds/vx2-mobile-app-demo?tab=lobby', label: 'Lobby Tab (VX2)', bgColor: '#14532D', bgColorActive: '#1F4D3A', textColor: '#86EFAC' },
+  { id: 'vx2-lobby', href: '/testing-grounds/lobby-tab-sandbox', label: 'Lobby Tab Sandbox', bgColor: '#14532D', bgColorActive: '#1F4D3A', textColor: '#86EFAC' },
   { id: 'vx2-draft', href: '/testing-grounds/vx2-draft-room', label: 'Draft Room (VX2)', bgColor: '#14532D', bgColorActive: '#1F4D3A', textColor: '#86EFAC' },
   { id: 'slow-draft-sandbox', href: '/testing-grounds/slow-draft-sandbox', label: 'Slow Draft Sandbox', bgColor: '#14532D', bgColorActive: '#1F4D3A', textColor: '#86EFAC' },
   { id: 'dynamic-island-sandbox', href: '/testing-grounds/dynamic-island-sandbox', label: 'Dynamic Island Sandbox', bgColor: '#D97706', bgColorActive: '#B45309', textColor: '#FDE68A' },
@@ -924,44 +924,47 @@ export default function DevNav() {
                   transition: 'transform 0.1s ease',
                 }}
               >
-                <Link 
-                  href={link.href}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    padding: '6px 10px',
-                    backgroundColor: router.pathname === link.href ? link.bgColorActive : link.bgColor,
-                    color: link.textColor,
-                    borderRadius: 6,
-                    fontSize: 12,
-                    textDecoration: 'none',
-                    cursor: isEditMode ? 'grab' : 'pointer',
-                    border: dragOverLinkId === link.id ? '2px dashed #3B82F6' : '2px solid transparent',
-                  }}
-                  onClick={(e) => {
-                    if (isEditMode) {
-                      e.preventDefault();
-                    }
-                  }}
-                >
-                  {isEditMode && (
-                    <svg 
-                      width="10" 
-                      height="10" 
-                      viewBox="0 0 10 10" 
-                      fill="currentColor"
-                      style={{ marginRight: 6, flexShrink: 0, opacity: 0.5 }}
-                    >
-                      <circle cx="2" cy="2" r="1" />
-                      <circle cx="8" cy="2" r="1" />
-                      <circle cx="2" cy="5" r="1" />
-                      <circle cx="8" cy="5" r="1" />
-                      <circle cx="2" cy="8" r="1" />
-                      <circle cx="8" cy="8" r="1" />
+                {isEditMode ? (
+                  <Link
+                    href={link.href}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '6px 10px',
+                      backgroundColor: link.bgColor,
+                      color: link.textColor,
+                      borderRadius: 6,
+                      fontSize: 12,
+                      textDecoration: 'none',
+                      cursor: 'grab',
+                      border: dragOverLinkId === link.id ? '2px dashed #3B82F6' : '2px solid transparent',
+                    }}
+                    onClick={(e) => e.preventDefault()}
+                  >
+                    <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" style={{ marginRight: 6, flexShrink: 0, opacity: 0.5 }}>
+                      <circle cx="2" cy="2" r="1" /><circle cx="8" cy="2" r="1" /><circle cx="2" cy="5" r="1" /><circle cx="8" cy="5" r="1" /><circle cx="2" cy="8" r="1" /><circle cx="8" cy="8" r="1" />
                     </svg>
-                  )}
-                  {link.label}
-                </Link>
+                    {link.label}
+                  </Link>
+                ) : (
+                  <a
+                    href={link.href}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '6px 10px',
+                      backgroundColor: router.asPath === link.href ? link.bgColorActive : link.bgColor,
+                      color: link.textColor,
+                      borderRadius: 6,
+                      fontSize: 12,
+                      textDecoration: 'none',
+                      cursor: 'pointer',
+                      border: '2px solid transparent',
+                    }}
+                  >
+                    {link.label}
+                  </a>
+                )}
               </div>
             ))}
           </div>

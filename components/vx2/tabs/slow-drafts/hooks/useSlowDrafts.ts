@@ -294,7 +294,7 @@ export function useSlowDrafts(options: UseSlowDraftsOptions = {}): UseSlowDrafts
     refreshInterval = 30000, // 30 second polling by default
   } = options;
 
-  const [sortBy, setSortBy] = useState<SortOption>('myTurnFirst');
+  const [sortBy, setSortBy] = useState<SortOption>('picksUntilTurn');
   const [filterBy, setFilterBy] = useState<FilterOption>('all');
 
   // Build API URL
@@ -435,9 +435,6 @@ export function useSlowDrafts(options: UseSlowDraftsOptions = {}): UseSlowDrafts
 
     // Apply filter (drafts are already filtered to TopDog International only)
     switch (filterBy) {
-      case 'myTurnOnly':
-        filtered = filtered.filter((d) => d.status === 'your-turn');
-        break;
       case 'needsAttention':
         filtered = filtered.filter((d) => {
           const hasUrgentNeeds = d.positionNeeds.some(
@@ -453,13 +450,6 @@ export function useSlowDrafts(options: UseSlowDraftsOptions = {}): UseSlowDrafts
 
     // Apply sort
     switch (sortBy) {
-      case 'myTurnFirst':
-        filtered.sort((a, b) => {
-          if (a.status === 'your-turn' && b.status !== 'your-turn') return -1;
-          if (b.status === 'your-turn' && a.status !== 'your-turn') return 1;
-          return a.picksAway - b.picksAway;
-        });
-        break;
       case 'picksUntilTurn':
         filtered.sort((a, b) => a.picksAway - b.picksAway);
         break;

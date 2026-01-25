@@ -16,6 +16,7 @@ import { DEFAULT_TAB } from '../../core/constants';
 import { useDebouncedCallback } from '../../hooks/ui/useDebounce';
 import TabErrorBoundary from './TabErrorBoundary';
 import { createScopedLogger } from '../../../../lib/clientLogger';
+import { useInPhoneFrame } from '../../../../lib/inPhoneFrameContext';
 
 const logger = createScopedLogger('[TabContentVX2]');
 
@@ -95,8 +96,10 @@ export default function TabContentVX2({
 }: TabContentVX2Props): React.ReactElement {
   logger.debug('Rendering', { className, hasErrorComponent: !!errorComponent });
   const { state, saveTabState, getTabState, getTabConfig } = useTabNavigation();
+  const inPhoneFrame = useInPhoneFrame();
   logger.debug('Tab navigation initialized', { activeTab: state.activeTab });
   const contentRef = useRef<HTMLDivElement>(null);
+  const isLobbyInPhone = state.activeTab === 'lobby' && inPhoneFrame;
   
   // Get tab config with fallback to default tab if not found
   // Use useMemo to ensure proper React tracking and memoization
@@ -215,15 +218,15 @@ export default function TabContentVX2({
   return (
     <div 
       ref={contentRef}
-      className={`flex-1 min-h-0 overflow-y-auto flex flex-col ${className}`}
+      className={`flex-1 min-h-0 flex flex-col ${isLobbyInPhone ? '' : 'overflow-y-auto'} ${className}`}
       onScroll={onScroll}
       style={{
-        // Hide scrollbar but allow scrolling
+        // Lobby in phone frame: no outer scroll so shell marginBottom gap is visible
+        ...(isLobbyInPhone ? { overflow: 'hidden' } : {}),
         scrollbarWidth: 'none',
         msOverflowStyle: 'none',
         WebkitOverflowScrolling: 'touch',
-        // Ensure flex-1 calculates from stable parent height
-        flexBasis: 0, // Force flex-1 to use available space, not content size
+        flexBasis: 0,
       }}
       role="tabpanel"
       id={`tabpanel-${state.activeTab}`}

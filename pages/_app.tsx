@@ -19,6 +19,12 @@ import { useIsMobileDevice } from '../hooks/useIsMobileDevice';
 
 const DEV_NAV_ROUTES = ['/testing-grounds', '/dev'];
 
+/** Sandbox routes that render their own phone frame and dev controls; skip app-level phone so dev UI stays outside. */
+const SANDBOX_ROUTES_OUTSIDE_PHONE = [
+  '/testing-grounds/navbar-sandbox',
+  '/testing-grounds/lobby-tab-sandbox',
+];
+
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
   const isMobile = useIsMobileDevice();
@@ -95,22 +101,32 @@ function MyApp({ Component, pageProps }: AppProps) {
     return withProviders(pageContent);
   }
 
-  // Desktop: Centered phone frame
+  // Sandbox pages with their own phone + dev controls: render raw so DevNav and in-page dev UI stay outside the phone
+  const sandboxDevOutsidePhone = SANDBOX_ROUTES_OUTSIDE_PHONE.some((r) => router.pathname === r);
+
+  // Desktop: Centered phone frame (or raw content for sandboxes that provide their own phone)
   return withProviders(
     <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-      {/* DevNav for testing routes - positioned outside frame */}
+      {/* DevNav for testing routes - always outside phone. Wrapper has explicit size and high z-index so it receives clicks (avoids 0x0 collapse from absolute child). */}
       {showDevNav && (
-        <div className="fixed top-4 left-4 z-50">
+        <div
+          className="fixed top-4 left-4"
+          style={{ zIndex: 99999, width: 220, minHeight: 500, pointerEvents: 'auto' }}
+        >
           <DevNav />
         </div>
       )}
 
-      {/* Phone frame with page content */}
-      <InPhoneFrameProvider value={true}>
-        <MobilePhoneFrame>
-          {pageContent}
-        </MobilePhoneFrame>
-      </InPhoneFrameProvider>
+      {/* Phone frame with page content; skip frame for sandbox routes so dev controls always render outside phone */}
+      {sandboxDevOutsidePhone ? (
+        pageContent
+      ) : (
+        <InPhoneFrameProvider value={true}>
+          <MobilePhoneFrame>
+            {pageContent}
+          </MobilePhoneFrame>
+        </InPhoneFrameProvider>
+      )}
     </div>
   );
 }

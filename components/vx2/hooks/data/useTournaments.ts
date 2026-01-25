@@ -77,7 +77,7 @@ const MOCK_TOURNAMENTS: Tournament[] = [
     totalEntries: '571,480',
     currentEntries: 571480,
     maxEntries: 672672,
-    firstPlacePrize: '$2M',
+    firstPlacePrize: '$2.1M',
     isFeatured: true,
     status: 'filling',
   },

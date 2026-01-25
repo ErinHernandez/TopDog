@@ -32,6 +32,38 @@ import type {
   ProximityFlags,
 } from './types';
 
+// === LOCAL TYPES ===
+
+/**
+ * Admin level from BigDataCloud reverse geocode response
+ */
+interface AdminLevel {
+  adminLevel: number;
+  name?: string;
+  description?: string;
+}
+
+/**
+ * Badge entry stored in userBadges collection
+ */
+interface BadgeEntry {
+  code: string;
+  name?: string;
+  firstEarned: ReturnType<typeof Timestamp.now>;
+  lastUpdated: ReturnType<typeof Timestamp.now>;
+  count: number;
+}
+
+/**
+ * User badges document structure
+ */
+interface UserBadges {
+  countries: BadgeEntry[];
+  states: BadgeEntry[];
+  counties: BadgeEntry[];
+  divisions: BadgeEntry[];
+}
+
 // === CONSTANTS ===
 
 const FIFTY_FEET_IN_METERS = 15.24;
@@ -198,8 +230,8 @@ export class LocationIntegrityService {
 
       // Extract county for US
       if (countryCode === 'US' && stateCode) {
-        const adminLevels = data.localityInfo?.administrative || [];
-        const countyLevel = adminLevels.find((level: any) =>
+        const adminLevels: AdminLevel[] = data.localityInfo?.administrative || [];
+        const countyLevel = adminLevels.find((level) =>
           level.adminLevel === 2 ||
           level.description?.toLowerCase().includes('county')
         );
@@ -416,12 +448,7 @@ export class LocationIntegrityService {
       const badgeSnap = await transaction.get(badgeRef);
       const now = Timestamp.now();
 
-      let badges: {
-        countries: any[];
-        states: any[];
-        counties: any[];
-        divisions: any[];
-      };
+      let badges: UserBadges;
 
       if (!badgeSnap.exists()) {
         badges = { countries: [], states: [], counties: [], divisions: [] };

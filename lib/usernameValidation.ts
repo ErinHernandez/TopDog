@@ -5,16 +5,17 @@
  */
 
 import { getAllowedCharacters, getLocaleDescription } from './localeCharacters';
-import { 
+import {
   getFirestore,
-  collection, 
-  doc, 
-  getDoc, 
-  setDoc, 
+  collection,
+  doc,
+  getDoc,
+  setDoc,
   deleteDoc,
-  query, 
-  where, 
+  query,
+  where,
   getDocs,
+  limit,
   serverTimestamp,
   Timestamp,
   type Firestore,
@@ -779,8 +780,9 @@ export async function checkUsernameAvailability(
     }
     
     // Also check the usernames collection (for reserved usernames)
+    // Note: limit(1) added for consistency with project Firestore query policy
     const usernamesRef = collection(db, 'usernames');
-    const usernameDoc = await getDocs(query(usernamesRef, where('username', '==', normalizedUsername)));
+    const usernameDoc = await getDocs(query(usernamesRef, where('username', '==', normalizedUsername), limit(1)));
     
     if (!usernameDoc.empty) {
       return {

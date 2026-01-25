@@ -1,22 +1,30 @@
 /**
  * Phone frame for desktop viewing.
- * Fixed dimensions: 375×812 (iPhone standard).
- * Children fill 100% of the screen area.
+ * Fixed dimensions: 375×812 (iPhone standard) for the inner screen.
+ * With default padding (p-3 = 12px), outer box is 399×836 so inner is exactly 375×812.
  */
 
 import React from 'react';
+
+const BEZEL_PX = 12;
+const INNER_WIDTH_PX = 375;
+const INNER_HEIGHT_PX = 812;
 
 export interface MobilePhoneFrameProps {
   children: React.ReactNode;
 }
 
 export function MobilePhoneFrame({ children }: MobilePhoneFrameProps): React.ReactElement {
+  const outerW = INNER_WIDTH_PX + BEZEL_PX * 2;
+  const outerH = INNER_HEIGHT_PX + BEZEL_PX * 2;
   return (
     <div
-      className="relative bg-black rounded-[3rem] p-3 shadow-2xl"
+      className="relative bg-black rounded-[3rem] shadow-2xl"
       style={{
-        width: '375px',
-        height: '812px',
+        width: `${outerW}px`,
+        height: `${outerH}px`,
+        padding: `${BEZEL_PX}px`,
+        boxSizing: 'border-box',
       }}
       data-phone-frame="true"
     >

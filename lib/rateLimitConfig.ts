@@ -6,6 +6,7 @@
  */
 
 import { RateLimiter } from './rateLimiter';
+import { createErrorResponse, ErrorType } from './apiErrorHandler';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 // ============================================================================
@@ -187,12 +188,16 @@ export function withRateLimit<T = unknown>(
     res.setHeader('X-RateLimit-Reset', Math.floor(result.resetAt / 1000));
     
     if (!result.allowed) {
-      return res.status(429).json({
-        success: false,
-        error: 'RATE_LIMIT_EXCEEDED',
-        message: 'Too many requests. Please try again later.',
-        retryAfter: result.retryAfterMs ? Math.ceil(result.retryAfterMs / 1000) : 60, // seconds
-      } as T);
+      const retryAfter = result.retryAfterMs ? Math.ceil(result.retryAfterMs / 1000) : 60;
+      res.setHeader('Retry-After', retryAfter);
+
+      const errorResponse = createErrorResponse(
+        ErrorType.RATE_LIMIT,
+        'Too many requests. Please try again later.',
+        { retryAfter },
+        res.getHeader('X-Request-ID') as string | undefined ?? null
+      );
+      return res.status(errorResponse.statusCode).json(errorResponse.body as T);
     }
     
     return handler(req, res);

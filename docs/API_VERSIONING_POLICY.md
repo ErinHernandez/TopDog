@@ -4,6 +4,34 @@
 
 This document defines the API versioning strategy for the BestBall site. API versioning allows us to make improvements and breaking changes without breaking existing clients (especially mobile apps).
 
+---
+
+## Current Route Status
+
+### v1 Routes (Active)
+
+| Route | Non-v1 Equivalent | Status | Migration Notes |
+|-------|------------------|--------|-----------------|
+| `/api/v1/stripe/customer` | `/api/stripe/customer` | ✅ Parity | Use v1 for new clients |
+| `/api/v1/stripe/payment-intent` | `/api/create-payment-intent` | ⚠️ Enhanced | v1 has multi-currency, risk assessment |
+| `/api/v1/user/display-currency` | `/api/user/display-currency` | ✅ Parity | Use v1 for new clients |
+
+### Deprecation Schedule
+
+| Non-v1 Route | Replacement | Deprecation Date | Removal Date |
+|--------------|-------------|------------------|--------------|
+| `/api/create-payment-intent` | `/api/v1/stripe/payment-intent` | TBD | TBD |
+| `/api/stripe/customer` | `/api/v1/stripe/customer` | TBD | TBD |
+| `/api/user/display-currency` | `/api/v1/user/display-currency` | TBD | TBD |
+
+### Migration Recommendation
+
+**New clients (web, mobile):** Always use `/api/v1/*` routes.
+
+**Existing clients:** Continue using non-v1 routes until migration is scheduled. Check for `Deprecation` header in responses.
+
+---
+
 ## Versioning Strategy
 
 ### When to Version

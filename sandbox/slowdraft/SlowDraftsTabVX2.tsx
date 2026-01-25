@@ -244,13 +244,7 @@ export default function SlowDraftsTabVX2({
         style={{ backgroundColor: BG_COLORS.primary }}
       >
         {/* Filter/Sort bar */}
-        <FilterSortBar
-          sortBy={sortBy}
-          filterBy={filterBy}
-          onSortChange={setSortBy}
-          onFilterChange={setFilterBy}
-          counts={counts}
-        />
+        <FilterSortBar sortBy={sortBy} onSortChange={setSortBy} />
 
         <div
           className="flex-1 flex items-center justify-center"

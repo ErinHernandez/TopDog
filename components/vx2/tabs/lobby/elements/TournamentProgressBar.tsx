@@ -21,7 +21,7 @@ export interface TournamentProgressBarProps {
 export function TournamentProgressBar({
   currentEntries,
   maxEntries,
-  fillStyle = 'linear-gradient(90deg, #3B82F6 0%, #1D4ED8 100%)',
+  fillStyle,
 }: TournamentProgressBarProps): React.ReactElement | null {
   // Don't render if no max entries (unlimited tournament)
   if (!maxEntries || maxEntries <= 0) {
@@ -51,7 +51,14 @@ export function TournamentProgressBar({
         style={{
           height: '100%',
           width: `${percentage}%`,
-          background: fillStyle,
+          ...(fillStyle
+            ? { background: fillStyle }
+            : {
+                backgroundImage: 'url(/wr_blue.png)',
+                backgroundSize: '200px',
+                backgroundRepeat: 'repeat',
+                backgroundColor: '#1E40AF',
+              }),
           borderRadius: `${CARD_SPACING_V3.progressBorderRadius}px`,
           transition: 'width 0.3s ease-out',
         }}

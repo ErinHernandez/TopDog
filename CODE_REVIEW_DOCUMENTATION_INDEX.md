@@ -17,6 +17,12 @@
 2. **`CODE_REVIEW_IMPLEMENTATION_STATUS.md`** - Current status
 3. **`CODE_REVIEW_HANDOFF_REFINED.md`** - Original plan
 
+### Research & PR Review Practice
+1. **`docs/CODE_REVIEW_DEEP_RESEARCH.md`** - Deep research: best practices, metrics, tools, and alignment with this repo
+
+### System-Wide Code Review
+1. **`docs/SYSTEM_WIDE_CODE_REVIEW.md`** - Full codebase technical review: API, lib, components, security, Firestore, TypeScript, CI, and prioritized actions
+
 ---
 
 ## 📋 Phase Documentation

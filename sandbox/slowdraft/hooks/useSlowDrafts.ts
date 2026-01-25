@@ -290,7 +290,7 @@ export function useSlowDrafts(): UseSlowDraftsResult {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [sortBy, setSortBy] = useState<SortOption>('myTurnFirst');
+  const [sortBy, setSortBy] = useState<SortOption>('picksUntilTurn');
   const [filterBy, setFilterBy] = useState<FilterOption>('all');
 
   // Initial fetch
@@ -353,9 +353,6 @@ export function useSlowDrafts(): UseSlowDraftsResult {
 
     // Apply filter
     switch (filterBy) {
-      case 'myTurnOnly':
-        filtered = filtered.filter((d) => d.status === 'your-turn');
-        break;
       case 'needsAttention':
         filtered = filtered.filter((d: SlowDraft) => {
           const hasUrgentNeeds = d.positionNeeds.some(
@@ -371,13 +368,6 @@ export function useSlowDrafts(): UseSlowDraftsResult {
 
     // Apply sort
     switch (sortBy) {
-      case 'myTurnFirst':
-        filtered.sort((a, b) => {
-          if (a.status === 'your-turn' && b.status !== 'your-turn') return -1;
-          if (b.status === 'your-turn' && a.status !== 'your-turn') return 1;
-          return a.picksAway - b.picksAway;
-        });
-        break;
       case 'picksUntilTurn':
         filtered.sort((a, b) => a.picksAway - b.picksAway);
         break;

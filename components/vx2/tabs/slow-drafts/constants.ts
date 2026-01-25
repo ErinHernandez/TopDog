@@ -251,14 +251,12 @@ export const TOTAL_ROUNDS = 18;
 // ============================================================================
 
 export type SortOption =
-  | 'myTurnFirst'
   | 'picksUntilTurn'
   | 'timeRemaining'
   | 'draftProgress'
   | 'recentlyActive';
 
 export const SORT_OPTIONS: { value: SortOption; label: string }[] = [
-  { value: 'myTurnFirst', label: 'My Turn First' },
   { value: 'picksUntilTurn', label: 'Picks Until Turn' },
   { value: 'timeRemaining', label: 'Time Remaining' },
   { value: 'draftProgress', label: 'Draft Progress' },
@@ -271,10 +269,9 @@ export const SORT_OPTIONS: { value: SortOption; label: string }[] = [
 
 export type FilterOption =
   | 'all'
-  | 'myTurnOnly'
   | 'needsAttention';
 
 export const FILTER_OPTIONS: { value: FilterOption; label: string; description: string }[] = [
   { value: 'all', label: 'All Drafts', description: 'Show all active slow drafts' },
-  { value: 'myTurnOnly', label: 'My Turn', description: 'Only drafts where it\'s your pick' },
+  { value: 'needsAttention', label: 'Needs Attention', description: 'Urgent timer or position needs' },
 ];
