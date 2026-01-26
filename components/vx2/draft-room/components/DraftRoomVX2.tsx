@@ -42,6 +42,7 @@ import DraftBoard from './DraftBoard';
 import DraftInfo from './DraftInfo';
 import DraftFooter from './DraftFooter';
 import LeaveConfirmModal from './LeaveConfirmModal';
+import NavigateAwayAlertsPromptModal, { DRAFT_ALERTS_PROMPT_SEEN_KEY } from './NavigateAwayAlertsPromptModal';
 import DraftInfoModal from './DraftInfoModal';
 import DraftTutorialModal from './DraftTutorialModal';
 
@@ -351,6 +352,7 @@ export default function DraftRoomVX2({
   
   // Leave confirmation modal state
   const [showLeaveModal, setShowLeaveModal] = useState(false);
+  const [showAlertsPrompt, setShowAlertsPrompt] = useState(false);
   const [showTopBarHint, setShowTopBarHint] = useState(false);
   
   // Info and tutorial modal state
@@ -411,17 +413,33 @@ export default function DraftRoomVX2({
     localStorage.setItem(TUTORIAL_DISABLED_KEY, checked ? 'true' : 'false');
   }, []);
   
-  // Show leave confirmation modal (from top bar)
+  // Show leave confirmation modal (from top bar). On first leave from any draft room, show alerts prompt first.
   const handleLeaveClick = useCallback(() => {
     logger.debug('Leave button clicked - opening modal');
     setShowTopBarHint(false);
-    setShowLeaveModal(true);
+    const seen = typeof window !== 'undefined' && window.localStorage.getItem(DRAFT_ALERTS_PROMPT_SEEN_KEY) === 'true';
+    if (seen) {
+      setShowLeaveModal(true);
+    } else {
+      setShowAlertsPrompt(true);
+    }
   }, []);
 
   // Show leave confirmation modal (from Exit Draft link)
   const handleLeaveFromLink = useCallback(() => {
     logger.debug('Leave from Exit Draft link - opening modal with hint');
     setShowTopBarHint(true);
+    const seen = typeof window !== 'undefined' && window.localStorage.getItem(DRAFT_ALERTS_PROMPT_SEEN_KEY) === 'true';
+    if (seen) {
+      setShowLeaveModal(true);
+    } else {
+      setShowAlertsPrompt(true);
+    }
+  }, []);
+
+  // After alerts prompt (Enable or No thanks) -> show leave confirm
+  const handleAlertsPromptContinue = useCallback(() => {
+    setShowAlertsPrompt(false);
     setShowLeaveModal(true);
   }, []);
   
@@ -667,6 +685,12 @@ export default function DraftRoomVX2({
         />
       </div>
       
+      {/* First-time leave: ask about alerts when navigating away (in-app vs outside app) */}
+      <NavigateAwayAlertsPromptModal
+        isOpen={showAlertsPrompt}
+        onContinue={handleAlertsPromptContinue}
+      />
+
       {/* Leave Confirmation Modal */}
       <LeaveConfirmModal
         isOpen={showLeaveModal}

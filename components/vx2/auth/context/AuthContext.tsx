@@ -34,6 +34,7 @@ import {
   sendPasswordResetEmail as firebaseSendPasswordResetEmail,
   updateProfile as firebaseUpdateProfile,
   linkWithCredential,
+  reauthenticateWithCredential,
   EmailAuthProvider,
   PhoneAuthProvider,
   signInWithPhoneNumber,
@@ -783,24 +784,33 @@ export function AuthProvider({
     }
   }, [db, state.user, state.profile?.countryCode, state.profile?.username]);
   
-  const deleteAccount = useCallback(async (): Promise<AuthResult> => {
+  const deleteAccount = useCallback(async (password?: string): Promise<AuthResult> => {
     if (!auth || !db || !state.user) {
       return { success: false, error: createAuthError(new Error('Not authenticated')) };
     }
-    
+
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      return { success: false, error: createAuthError(new Error('Not authenticated')) };
+    }
+
     try {
+      // Email/password users must re-authenticate with password before deletion
+      if (currentUser.email && password != null && password.length > 0) {
+        const credential = EmailAuthProvider.credential(currentUser.email, password);
+        await reauthenticateWithCredential(currentUser, credential);
+      } else if (currentUser.email && !currentUser.isAnonymous) {
+        return { success: false, error: createAuthError(new Error('Password required to delete account')) };
+      }
+
       // Delete Firestore profile
       await deleteDoc(doc(db, 'users', state.user.uid));
-      
+
       // Delete Firebase user
-      const currentUser = auth.currentUser;
-      if (currentUser) {
-        await currentUser.delete();
-      }
-      
+      await currentUser.delete();
+
       dispatch({ type: 'SIGN_OUT' });
       return { success: true };
-      
     } catch (error) {
       const authError = createAuthError(error);
       return { success: false, error: authError };

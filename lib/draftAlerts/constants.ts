@@ -4,12 +4,13 @@
 
 import { DraftAlertPreferences, DraftAlertType } from './types';
 
+/** Draft alerts default to OFF. Only prompt when user leaves their first draft room. */
 export const DEFAULT_ALERT_PREFERENCES: DraftAlertPreferences = {
-  roomFilled: true,
-  draftStarting: true,
-  twoPicksAway: true,
-  onTheClock: true,
-  tenSecondsRemaining: true,
+  roomFilled: false,
+  draftStarting: false,
+  twoPicksAway: false,
+  onTheClock: false,
+  tenSecondsRemaining: false,
 };
 
 export const ALERT_MESSAGES: Record<string, string> = {

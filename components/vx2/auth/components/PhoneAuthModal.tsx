@@ -15,7 +15,7 @@
  */
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../../core/constants/colors';
+import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS, NAVBAR_BLUE } from '../../core/constants/colors';
 import { SPACING, TYPOGRAPHY, Z_INDEX } from '../../core/constants/sizes';
 import { Close, ChevronLeft } from '../../components/icons';
 import { useAuth } from '../hooks/useAuth';
@@ -159,9 +159,9 @@ function PhoneStep({
         <div className="text-center mb-8">
           <div 
             className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-            style={{ backgroundColor: 'rgba(96, 165, 250, 0.15)' }}
+            style={{ background: 'url(/wr_blue.png) no-repeat center center', backgroundSize: 'cover' }}
           >
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.active} strokeWidth="2">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
               <rect x="5" y="2" width="14" height="20" rx="2" ry="2" strokeLinecap="round" strokeLinejoin="round"/>
               <line x1="12" y1="18" x2="12.01" y2="18" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
@@ -278,7 +278,7 @@ function PhoneStep({
                   }}
                   className="w-full flex items-center gap-3 px-4 py-2 hover:bg-white/5"
                   style={{
-                    backgroundColor: countryCode === country.code ? 'rgba(96, 165, 250, 0.1)' : 'transparent',
+                    backgroundColor: countryCode === country.code ? 'rgba(255,255,255,0.08)' : 'transparent',
                   }}
                 >
                   <span style={{ fontSize: '20px' }}>{country.flag}</span>
@@ -324,7 +324,8 @@ function PhoneStep({
           className="w-full py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2"
           style={{
             fontSize: `${TYPOGRAPHY.fontSize.lg}px`,
-            backgroundColor: canContinue ? STATE_COLORS.active : BG_COLORS.tertiary,
+            background: canContinue ? 'url(/wr_blue.png) no-repeat center center' : BG_COLORS.tertiary,
+            backgroundSize: canContinue ? 'cover' : undefined,
             color: canContinue ? '#000' : TEXT_COLORS.disabled,
             opacity: canContinue ? 1 : 0.5,
           }}
@@ -351,7 +352,14 @@ function PhoneStep({
             <button 
               onClick={onSwitchToEmail}
               className="font-semibold"
-              style={{ color: STATE_COLORS.active }}
+              style={{
+                background: 'url(/wr_blue.png) no-repeat center center',
+                backgroundSize: 'cover',
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                color: 'transparent',
+              }}
             >
               Sign in with Email
             </button>
@@ -473,9 +481,9 @@ function VerifyStep({
       <div className="flex-1 flex flex-col items-center justify-center px-6">
         <div 
           className="w-16 h-16 rounded-full flex items-center justify-center mb-6"
-          style={{ backgroundColor: 'rgba(96, 165, 250, 0.15)' }}
+          style={{ background: 'url(/wr_blue.png) no-repeat center center', backgroundSize: 'cover' }}
         >
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.active} strokeWidth="2">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
             <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </div>
@@ -517,7 +525,7 @@ function VerifyStep({
                 border: error 
                   ? `2px solid ${STATE_COLORS.error}` 
                   : digit 
-                    ? `2px solid ${STATE_COLORS.active}` 
+                    ? `2px solid ${NAVBAR_BLUE.solid}` 
                     : `2px solid ${BORDER_COLORS.default}`,
               }}
             />
@@ -543,7 +551,7 @@ function VerifyStep({
           <div className="flex items-center gap-2 mb-4">
             <div 
               className="animate-spin rounded-full h-4 w-4 border-2"
-              style={{ borderColor: `${STATE_COLORS.active} transparent transparent transparent` }}
+              style={{ borderColor: `${NAVBAR_BLUE.solid} transparent transparent transparent` }}
             />
             <span style={{ color: TEXT_COLORS.secondary }}>Verifying...</span>
           </div>
@@ -562,7 +570,15 @@ function VerifyStep({
             <button 
               onClick={handleResend}
               className="font-semibold"
-              style={{ color: STATE_COLORS.active, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
+              style={{
+                background: 'url(/wr_blue.png) no-repeat center center',
+                backgroundSize: 'cover',
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                color: 'transparent',
+                fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
+              }}
             >
               Resend Code
             </button>
@@ -611,7 +627,8 @@ function SuccessStep({ onClose }: SuccessStepProps): React.ReactElement {
         onClick={onClose}
         className="w-full py-4 rounded-xl font-bold"
         style={{ 
-          backgroundColor: STATE_COLORS.active, 
+          background: 'url(/wr_blue.png) no-repeat center center',
+          backgroundSize: 'cover',
           color: '#000', 
           fontSize: `${TYPOGRAPHY.fontSize.lg}px` 
         }}

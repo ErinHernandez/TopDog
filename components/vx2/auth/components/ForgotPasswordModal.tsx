@@ -78,13 +78,16 @@ function InputStep({
   error,
 }: InputStepProps): React.ReactElement {
   const [touched, setTouched] = useState(false);
+  const [inputFocused, setInputFocused] = useState(false);
   
   const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const isValidPhone = phone.replace(/\D/g, '').length >= 10;
   const isValid = method === 'email' ? isValidEmail : isValidPhone;
   const canSubmit = isValid && !isLoading;
   
+  // Inline error only after blur, hide while focused — see docs/FORM_VALIDATION_PATTERN.md
   const showError = touched && !isValid && (method === 'email' ? email.length > 0 : phone.length > 0);
+  const errorToShow = inputFocused ? null : showError;
   
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && canSubmit) {
@@ -99,25 +102,14 @@ function InputStep({
   
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
+      {/* Header — close only; "Forgot your password?" is in content below */}
       <div 
-        className="flex items-center gap-3 flex-shrink-0"
+        className="flex items-center justify-end flex-shrink-0"
         style={{ 
-          padding: `${SPACING.md}px ${SPACING.lg}px`, 
+          padding: `${SPACING.md + 8}px ${SPACING.lg}px ${SPACING.md}px`, 
           borderBottom: `1px solid ${BORDER_COLORS.default}` 
         }}
       >
-        {onBackToSignIn && (
-          <button onClick={onBackToSignIn} className="p-2" aria-label="Back">
-            <ChevronLeft size={24} color={TEXT_COLORS.muted} />
-          </button>
-        )}
-        <h2 
-          className="flex-1 font-bold" 
-          style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}
-        >
-          Reset Password
-        </h2>
         <button 
           onClick={onClose} 
           className="p-2" 
@@ -135,9 +127,9 @@ function InputStep({
         <div className="text-center mb-8">
           <div 
             className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-            style={{ backgroundColor: 'rgba(96, 165, 250, 0.15)' }}
+            style={{ background: 'url(/wr_blue.png) no-repeat center center', backgroundSize: 'cover' }}
           >
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.active} strokeWidth="2">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2" strokeLinecap="round" strokeLinejoin="round"/>
               <path d="M7 11V7a5 5 0 0110 0v4" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
@@ -161,7 +153,7 @@ function InputStep({
           style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}
         >
           <button
-            onClick={() => { setMethod('email'); setTouched(false); }}
+            onClick={() => { setMethod('email'); setTouched(false); setInputFocused(false); }}
             className="flex-1 py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2"
             style={{
               background: method === 'email' 
@@ -178,7 +170,7 @@ function InputStep({
             Email
           </button>
           <button
-            onClick={() => { setMethod('phone'); setTouched(false); }}
+            onClick={() => { setMethod('phone'); setTouched(false); setInputFocused(false); }}
             className="flex-1 py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2"
             style={{
               background: method === 'phone' 
@@ -217,8 +209,8 @@ function InputStep({
               type="email"
               value={email}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-              onFocus={() => setTouched(false)}
-              onBlur={() => setTouched(true)}
+              onFocus={() => setInputFocused(true)}
+              onBlur={() => { setTouched(true); setInputFocused(false); }}
               placeholder="you@example.com"
               autoComplete="email"
               autoFocus
@@ -227,12 +219,12 @@ function InputStep({
               style={{
                 backgroundColor: 'rgba(255,255,255,0.05)',
                 color: TEXT_COLORS.primary,
-                border: `2px solid ${showError ? STATE_COLORS.error : BORDER_COLORS.default}`,
+                border: `2px solid ${errorToShow ? STATE_COLORS.error : BORDER_COLORS.default}`,
                 fontSize: `${TYPOGRAPHY.fontSize.base}px`,
                 opacity: isLoading ? 0.5 : 1,
               }}
             />
-            {showError && (
+            {errorToShow && (
               <span 
                 className="block mt-1"
                 style={{ color: STATE_COLORS.error, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}
@@ -250,8 +242,8 @@ function InputStep({
               type="tel"
               value={phone}
               onChange={handlePhoneChange}
-              onFocus={() => setTouched(false)}
-              onBlur={() => setTouched(true)}
+              onFocus={() => setInputFocused(true)}
+              onBlur={() => { setTouched(true); setInputFocused(false); }}
               placeholder="+1 (555) 123-4567"
               autoComplete="tel"
               autoFocus
@@ -260,12 +252,12 @@ function InputStep({
               style={{
                 backgroundColor: 'rgba(255,255,255,0.05)',
                 color: TEXT_COLORS.primary,
-                border: `2px solid ${showError ? STATE_COLORS.error : BORDER_COLORS.default}`,
+                border: `2px solid ${errorToShow ? STATE_COLORS.error : BORDER_COLORS.default}`,
                 fontSize: `${TYPOGRAPHY.fontSize.base}px`,
                 opacity: isLoading ? 0.5 : 1,
               }}
             />
-            {showError && (
+            {errorToShow && (
               <span 
                 className="block mt-1"
                 style={{ color: STATE_COLORS.error, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}
@@ -280,7 +272,7 @@ function InputStep({
       {/* Footer */}
       <div 
         className="flex-shrink-0"
-        style={{ padding: SPACING.lg, borderTop: `1px solid ${BORDER_COLORS.default}` }}
+        style={{ padding: SPACING.sm, borderTop: `1px solid ${BORDER_COLORS.default}` }}
       >
         <button
           onClick={onSubmit}
@@ -315,7 +307,14 @@ function InputStep({
             <button 
               onClick={onBackToSignIn}
               className="font-semibold"
-              style={{ color: STATE_COLORS.active }}
+              style={{
+                background: 'url(/wr_blue.png) no-repeat center center',
+                backgroundSize: 'cover',
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                color: 'transparent',
+              }}
             >
               Sign In
             </button>
@@ -373,11 +372,11 @@ function CodeStep({
   
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
+      {/* Header — same top padding as Sign In/Sign Up so X height consistent when present */}
       <div 
         className="flex items-center gap-3 flex-shrink-0"
         style={{ 
-          padding: `${SPACING.md}px ${SPACING.lg}px`, 
+          padding: `${SPACING.md + 8}px ${SPACING.lg}px ${SPACING.md}px`, 
           borderBottom: `1px solid ${BORDER_COLORS.default}` 
         }}
       >
@@ -397,14 +396,14 @@ function CodeStep({
         <div className="text-center mb-8">
           <div 
             className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-            style={{ backgroundColor: 'rgba(96, 165, 250, 0.15)' }}
+            style={{ background: 'url(/wr_blue.png) no-repeat center center', backgroundSize: 'cover' }}
           >
             {method === 'phone' ? (
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.active} strokeWidth="2">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
               </svg>
             ) : (
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.active} strokeWidth="2">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
             )}
@@ -469,7 +468,14 @@ function CodeStep({
               onClick={handleResend}
               disabled={isLoading}
               className="font-semibold"
-              style={{ color: STATE_COLORS.active }}
+              style={{
+                background: 'url(/wr_blue.png) no-repeat center center',
+                backgroundSize: 'cover',
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                color: 'transparent',
+              }}
             >
               resend code
             </button>
@@ -480,7 +486,7 @@ function CodeStep({
       {/* Footer */}
       <div 
         className="flex-shrink-0"
-        style={{ padding: SPACING.lg, borderTop: `1px solid ${BORDER_COLORS.default}` }}
+        style={{ padding: SPACING.sm, borderTop: `1px solid ${BORDER_COLORS.default}` }}
       >
         <button
           onClick={() => onVerify(code)}
@@ -539,11 +545,11 @@ function NewPasswordStep({
   
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
+      {/* Header — same top padding as Sign In/Sign Up so X height is consistent */}
       <div 
         className="flex items-center gap-3 flex-shrink-0"
         style={{ 
-          padding: `${SPACING.md}px ${SPACING.lg}px`, 
+          padding: `${SPACING.md + 8}px ${SPACING.lg}px ${SPACING.md}px`, 
           borderBottom: `1px solid ${BORDER_COLORS.default}` 
         }}
       >
@@ -692,7 +698,7 @@ function NewPasswordStep({
       {/* Footer */}
       <div 
         className="flex-shrink-0"
-        style={{ padding: SPACING.lg, borderTop: `1px solid ${BORDER_COLORS.default}` }}
+        style={{ padding: SPACING.sm, borderTop: `1px solid ${BORDER_COLORS.default}` }}
       >
         <button
           onClick={() => onSubmit(password)}

@@ -12,13 +12,10 @@ import type { JSX } from 'react';
 import Link from 'next/link';
 import { 
   AuthProvider,
-  SignUpModal, 
-  SignInModal, 
-  ForgotPasswordModal, 
   ProfileSettingsModal,
   useAuth 
 } from '../../components/vx2/auth';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS } from '../../components/vx2/core/constants/colors';
+import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../../components/vx2/core/constants/colors';
 import MobilePhoneFrame from '../../components/vx2/shell/MobilePhoneFrame';
 import { useIsMobileDevice } from '../../hooks/useIsMobileDevice';
 
@@ -141,28 +138,146 @@ function AuthTestContent(): JSX.Element {
             </div>
           )}
 
-          <SignUpModal
-            isOpen={activeModal === 'signup'}
-            onClose={closeModal}
-            onSwitchToSignIn={() => openModal('signin')}
-            onSuccess={() => console.log('Sign up successful!')}
-            contentTopInset={0}
-          />
+          {activeModal === 'signup' && (
+            <div
+              className="absolute inset-0 flex flex-col"
+              style={{ backgroundColor: BG_COLORS.primary }}
+            >
+              <div className="flex-1" />
+              <div
+                className="flex-shrink-0 text-center"
+                style={{
+                  paddingTop: 8,
+                  paddingRight: 24,
+                  paddingBottom: 'max(env(safe-area-inset-bottom), 16px)',
+                  paddingLeft: 24,
+                  borderTop: `1px solid ${BORDER_COLORS.default}`,
+                }}
+              >
+                <button
+                  type="button"
+                  className="w-full rounded-xl font-bold"
+                  style={{
+                    fontSize: 17,
+                    height: 56,
+                    background: 'url(/wr_blue.png) no-repeat center center',
+                    backgroundSize: 'cover',
+                    color: '#000',
+                  }}
+                >
+                  Continue
+                </button>
+                <p className="mt-4" style={{ color: TEXT_COLORS.muted, fontSize: 15 }}>
+                  Already have an account?{' '}
+                  <button
+                    type="button"
+                    onClick={() => openModal('signin')}
+                    className="font-semibold bg-transparent border-0 p-0 cursor-pointer"
+                    style={{
+                      background: 'url(/wr_blue.png) no-repeat center center',
+                      backgroundSize: 'cover',
+                      WebkitBackgroundClip: 'text',
+                      backgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      color: 'transparent',
+                      fontSize: 15,
+                    }}
+                  >
+                    Sign In
+                  </button>
+                </p>
+              </div>
+            </div>
+          )}
 
-          <SignInModal
-            isOpen={activeModal === 'signin'}
-            onClose={closeModal}
-            onSwitchToSignUp={() => openModal('signup')}
-            onForgotPassword={() => openModal('forgot')}
-            onSuccess={() => console.log('Sign in successful!')}
-            contentTopInset={0}
-          />
+          {activeModal === 'signin' && (
+            <div
+              className="absolute inset-0 flex flex-col"
+              style={{ backgroundColor: BG_COLORS.primary }}
+            >
+              <div className="flex-1" />
+              <div
+                className="flex-shrink-0 text-center"
+                style={{
+                  paddingTop: 8,
+                  paddingRight: 24,
+                  paddingBottom: 'max(env(safe-area-inset-bottom), 16px)',
+                  paddingLeft: 24,
+                  borderTop: `1px solid ${BORDER_COLORS.default}`,
+                }}
+              >
+                <p style={{ color: TEXT_COLORS.muted, fontSize: 15 }}>
+                  Don&apos;t have an account?{' '}
+                  <button
+                    type="button"
+                    onClick={() => openModal('signup')}
+                    className="font-semibold bg-transparent border-0 p-0 cursor-pointer"
+                    style={{
+                      background: 'url(/wr_blue.png) no-repeat center center',
+                      backgroundSize: 'cover',
+                      WebkitBackgroundClip: 'text',
+                      backgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      color: 'transparent',
+                      fontSize: 15,
+                    }}
+                  >
+                    Sign Up
+                  </button>
+                </p>
+              </div>
+            </div>
+          )}
 
-          <ForgotPasswordModal
-            isOpen={activeModal === 'forgot'}
-            onClose={closeModal}
-            onBackToSignIn={() => openModal('signin')}
-          />
+          {activeModal === 'forgot' && (
+            <div
+              className="absolute inset-0 flex flex-col"
+              style={{ backgroundColor: BG_COLORS.primary }}
+            >
+              <div className="flex-1" />
+              <div
+                className="flex-shrink-0 text-center"
+                style={{
+                  paddingTop: 8,
+                  paddingRight: 24,
+                  paddingBottom: 'max(env(safe-area-inset-bottom), 16px)',
+                  paddingLeft: 24,
+                  borderTop: `1px solid ${BORDER_COLORS.default}`,
+                }}
+              >
+                <button
+                  type="button"
+                  className="w-full py-4 rounded-xl font-bold"
+                  style={{
+                    fontSize: 17,
+                    background: 'url(/wr_blue.png) center center / cover no-repeat',
+                    color: '#fff',
+                  }}
+                >
+                  Send Code
+                </button>
+                <p className="mt-4" style={{ color: TEXT_COLORS.muted, fontSize: 15 }}>
+                  Remember your password?{' '}
+                  <button
+                    type="button"
+                    onClick={() => openModal('signin')}
+                    className="font-semibold bg-transparent border-0 p-0 cursor-pointer"
+                    style={{
+                      background: 'url(/wr_blue.png) no-repeat center center',
+                      backgroundSize: 'cover',
+                      WebkitBackgroundClip: 'text',
+                      backgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      color: 'transparent',
+                      fontSize: 15,
+                    }}
+                  >
+                    Sign In
+                  </button>
+                </p>
+              </div>
+            </div>
+          )}
 
           <ProfileSettingsModal
             isOpen={activeModal === 'profile'}

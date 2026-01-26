@@ -81,7 +81,8 @@ function BiometricButton({
       disabled={disabled}
       className="w-full flex items-center justify-center gap-3 py-4 rounded-xl font-semibold transition-all"
       style={{
-        backgroundColor: STATE_COLORS.active,
+        background: 'url(/wr_blue.png) no-repeat center center',
+        backgroundSize: 'cover',
         color: '#000',
         border: 'none',
         fontSize: 17,
@@ -719,7 +720,15 @@ export function LoginScreenVX2({
                 setError(null);
               }}
               className="mt-6 font-medium"
-              style={{ color: STATE_COLORS.active, fontSize: 15 }}
+              style={{
+                background: 'url(/wr_blue.png) no-repeat center center',
+                backgroundSize: 'cover',
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                color: 'transparent',
+                fontSize: 15,
+              }}
             >
               Use a different number
             </button>

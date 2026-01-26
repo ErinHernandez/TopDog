@@ -86,11 +86,11 @@ export function EnableBiometricsPrompt({
         {/* Icon */}
         <div
           className="flex justify-center pt-8 pb-4"
-          style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)' }}
+          style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}
         >
           <div
             className="w-20 h-20 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: STATE_COLORS.active }}
+            style={{ background: 'url(/wr_blue.png) no-repeat center center', backgroundSize: 'cover' }}
           >
             <svg
               width="40"
@@ -146,7 +146,8 @@ export function EnableBiometricsPrompt({
               disabled={isLoading}
               className="w-full py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2"
               style={{
-                backgroundColor: STATE_COLORS.active,
+                background: 'url(/wr_blue.png) no-repeat center center',
+                backgroundSize: 'cover',
                 color: '#000',
                 fontSize: `${TYPOGRAPHY.fontSize.base}px`,
                 opacity: isLoading ? 0.5 : 1,

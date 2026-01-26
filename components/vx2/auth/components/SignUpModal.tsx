@@ -128,6 +128,7 @@ interface InputProps {
   touched?: boolean;
   inputRef?: React.RefObject<HTMLInputElement | null>;
   onBlur?: () => void;
+  onFocus?: () => void;
   rightElement?: React.ReactNode;
   label?: string;
 }
@@ -143,6 +144,7 @@ function Input({
   touched,
   inputRef,
   onBlur,
+  onFocus,
   rightElement,
   label,
 }: InputProps): React.ReactElement {
@@ -165,6 +167,7 @@ function Input({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onBlur={onBlur}
+          onFocus={onFocus}
           placeholder={placeholder}
           autoComplete={autoComplete}
           disabled={disabled}
@@ -232,6 +235,7 @@ function CredentialsStep({
   error,
 }: CredentialsStepProps): React.ReactElement {
   const [emailTouched, setEmailTouched] = useState(false);
+  const [emailFocused, setEmailFocused] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const emailRef = useRef<HTMLInputElement>(null);
@@ -243,7 +247,9 @@ function CredentialsStep({
     /\d/.test(password);
   const passwordsMatch = password === confirmPassword && confirmPassword.length > 0;
   
+  // Inline email error only after blur (click out), and hide while focused — same as Sign In modal
   const showEmailError = emailTouched && email && !isValidEmail;
+  const emailErrorToShow = emailFocused ? null : (showEmailError ? 'Please enter a valid email' : null);
   const canContinue = isValidEmail && isValidPassword && passwordsMatch;
   
   // Auto-focus email input
@@ -261,10 +267,10 @@ function CredentialsStep({
   
   return (
     <div className="flex flex-col h-full" onKeyDown={handleKeyDown}>
-      {/* Header with Close Button */}
+      {/* Header with Close Button — same padding as SignInModal so X is same height */}
       <div 
         className="flex items-center justify-end flex-shrink-0"
-        style={{ padding: `${SPACING.md}px ${SPACING.lg}px` }}
+        style={{ padding: `${SPACING.md + 8}px ${SPACING.lg}px ${SPACING.md}px` }}
       >
         <button 
           onClick={onClose} 
@@ -280,8 +286,8 @@ function CredentialsStep({
         className="flex-1 overflow-y-auto" 
         style={{ padding: `0 ${SPACING.xl}px`, scrollbarWidth: 'none' }}
       >
-        {/* Logo & Welcome */}
-        <div className="text-center mb-8">
+        {/* Logo & Welcome — same as Sign In (marginTop 22) */}
+        <div className="text-center mb-8" style={{ marginTop: 22 }}>
           <TopDogLogo />
           <p 
             className="mt-6"
@@ -311,17 +317,19 @@ function CredentialsStep({
           </div>
         )}
         
-        <div className="space-y-4">
-          {/* Email Input */}
+        {/* Form block — add 12px top so email/password align with Sign In modal */}
+        <div className="space-y-4" style={{ marginTop: 12 }}>
+          {/* Email Input — show "valid email" only after blur (click out), hide while focused */}
           <Input
             inputRef={emailRef}
             value={email}
             onChange={setEmail}
-            onBlur={() => setEmailTouched(true)}
+            onBlur={() => { setEmailTouched(true); setEmailFocused(false); }}
+            onFocus={() => setEmailFocused(true)}
             placeholder="Email address"
             type="email"
             autoComplete="email"
-            error={showEmailError ? 'Please enter a valid email' : null}
+            error={emailErrorToShow}
             touched={emailTouched}
           />
           
@@ -439,8 +447,8 @@ function CredentialsStep({
       <div 
         className="flex-shrink-0"
         style={{ 
-          padding: `${SPACING.lg}px ${SPACING.xl}px`,
-          paddingBottom: 'max(env(safe-area-inset-bottom), 24px)',
+          padding: `${SPACING.sm}px ${SPACING.xl}px`,
+          paddingBottom: 'max(env(safe-area-inset-bottom), 16px)',
           borderTop: `1px solid ${BORDER_COLORS.default}`,
         }}
       >
@@ -451,7 +459,8 @@ function CredentialsStep({
           style={{
             fontSize: 17,
             height: 56,
-            backgroundColor: canContinue ? STATE_COLORS.active : BG_COLORS.tertiary,
+            background: canContinue ? 'url(/wr_blue.png) no-repeat center center' : BG_COLORS.tertiary,
+            backgroundSize: canContinue ? 'cover' : undefined,
             color: canContinue ? '#000' : TEXT_COLORS.disabled,
             opacity: canContinue ? 1 : 0.6,
           }}
@@ -467,8 +476,16 @@ function CredentialsStep({
             Already have an account?{' '}
             <button 
               onClick={onSwitchToSignIn}
-              className="font-semibold"
-              style={{ color: STATE_COLORS.active }}
+              className="font-semibold bg-transparent border-0 p-0 cursor-pointer"
+              style={{
+                background: 'url(/wr_blue.png) no-repeat center center',
+                backgroundSize: 'cover',
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                color: 'transparent',
+                fontSize: 15,
+              }}
             >
               Sign In
             </button>
@@ -510,10 +527,10 @@ function UsernameStep({
   
   return (
     <div className="flex flex-col h-full" onKeyDown={handleKeyDown}>
-      {/* Header */}
+      {/* Header — same padding as Sign In/Sign Up credentials so height consistent */}
       <div 
         className="flex items-center gap-4 flex-shrink-0"
-        style={{ padding: `${SPACING.md}px ${SPACING.lg}px` }}
+        style={{ padding: `${SPACING.md + 8}px ${SPACING.lg}px ${SPACING.md}px` }}
       >
         <button 
           onClick={onBack} 
@@ -532,9 +549,9 @@ function UsernameStep({
         <div className="text-center mb-8">
           <div 
             className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4"
-            style={{ backgroundColor: 'rgba(96, 165, 250, 0.15)' }}
+            style={{ background: 'url(/wr_blue.png) no-repeat center center', backgroundSize: 'cover' }}
           >
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.active} strokeWidth="2">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
           </div>
@@ -604,8 +621,8 @@ function UsernameStep({
       <div 
         className="flex-shrink-0"
         style={{ 
-          padding: `${SPACING.lg}px ${SPACING.xl}px`,
-          paddingBottom: 'max(env(safe-area-inset-bottom), 24px)',
+          padding: `${SPACING.sm}px ${SPACING.xl}px`,
+          paddingBottom: 'max(env(safe-area-inset-bottom), 16px)',
           borderTop: `1px solid ${BORDER_COLORS.default}`,
         }}
       >
@@ -616,7 +633,8 @@ function UsernameStep({
           style={{
             fontSize: 17,
             height: 56,
-            backgroundColor: canContinue ? STATE_COLORS.active : BG_COLORS.tertiary,
+            background: canContinue ? 'url(/wr_blue.png) no-repeat center center' : BG_COLORS.tertiary,
+            backgroundSize: canContinue ? 'cover' : undefined,
             color: canContinue ? '#000' : TEXT_COLORS.disabled,
             opacity: canContinue ? 1 : 0.6,
           }}
@@ -697,10 +715,10 @@ function EmailVerifyStep({
   
   return (
     <div className="flex flex-col h-full" onKeyDown={handleKeyDown}>
-      {/* Header */}
+      {/* Header — same padding as Sign In/Sign Up credentials so height consistent */}
       <div 
         className="flex items-center gap-4 flex-shrink-0"
-        style={{ padding: `${SPACING.md}px ${SPACING.lg}px` }}
+        style={{ padding: `${SPACING.md + 8}px ${SPACING.lg}px ${SPACING.md}px` }}
       >
         <button 
           onClick={onBack} 
@@ -790,7 +808,14 @@ function EmailVerifyStep({
               onClick={handleResend}
               disabled={isLoading}
               className="font-semibold"
-              style={{ color: STATE_COLORS.active }}
+              style={{
+                background: 'url(/wr_blue.png) no-repeat center center',
+                backgroundSize: 'cover',
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                color: 'transparent',
+              }}
             >
               resend code
             </button>
@@ -802,8 +827,8 @@ function EmailVerifyStep({
       <div 
         className="flex-shrink-0"
         style={{ 
-          padding: `${SPACING.lg}px ${SPACING.xl}px`,
-          paddingBottom: 'max(env(safe-area-inset-bottom), 24px)',
+          padding: `${SPACING.sm}px ${SPACING.xl}px`,
+          paddingBottom: 'max(env(safe-area-inset-bottom), 16px)',
           borderTop: `1px solid ${BORDER_COLORS.default}`,
         }}
       >
@@ -814,7 +839,8 @@ function EmailVerifyStep({
           style={{
             fontSize: 17,
             height: 56,
-            backgroundColor: canSubmit ? STATE_COLORS.active : BG_COLORS.tertiary,
+            background: canSubmit ? 'url(/wr_blue.png) no-repeat center center' : BG_COLORS.tertiary,
+            backgroundSize: canSubmit ? 'cover' : undefined,
             color: canSubmit ? '#000' : TEXT_COLORS.disabled,
             opacity: canSubmit ? 1 : 0.6,
           }}
@@ -907,7 +933,8 @@ function SuccessStep({ email, username, onClose }: SuccessStepProps): React.Reac
         onClick={onClose}
         className="w-full rounded-xl font-bold"
         style={{ 
-          backgroundColor: STATE_COLORS.active,
+          background: 'url(/wr_blue.png) no-repeat center center',
+          backgroundSize: 'cover',
           color: '#000', 
           fontSize: 17,
           height: 56,
