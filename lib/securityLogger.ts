@@ -1,12 +1,13 @@
 /**
  * Security Event Logger
- * 
+ *
  * Logs security-relevant events for monitoring and incident response.
  * All logs should be sent to a secure logging service in production.
  */
 
 import type { NextApiRequest } from 'next';
 import { db } from './firebase';
+import { serverLogger } from './logger/serverLogger';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 // ============================================================================
@@ -97,11 +98,11 @@ export async function logSecurityEvent(
           extra: event,
         });
       } catch (err) {
-        // Sentry not available - log to console
-        console.log('[Security Event]', event);
+        // Sentry not available - log via serverLogger
+        serverLogger.info('Security Event', { ...event, userId: event.userId ?? undefined });
       }
     } else {
-      console.log('[Security Event]', event);
+      serverLogger.info('Security Event', { ...event, userId: event.userId ?? undefined });
     }
 
     // Store in Firestore for audit trail
@@ -110,16 +111,14 @@ export async function logSecurityEvent(
         await addDoc(collection(db, 'security_events'), event);
       } catch (error) {
         // Don't fail the request if logging fails, but log the error
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        console.error('Failed to log security event to Firestore:', errorMessage);
+        serverLogger.error('Failed to log security event to Firestore', error instanceof Error ? error : new Error(String(error)));
       }
     }
 
     return event;
   } catch (error) {
     // Never throw - logging should never break the application
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Error logging security event:', errorMessage);
+    serverLogger.error('Error logging security event', error instanceof Error ? error : new Error(String(error)));
     return null;
   }
 }

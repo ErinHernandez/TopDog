@@ -9,6 +9,7 @@
  */
 
 import { db } from './firebase';
+import { createScopedLogger } from './clientLogger';
 import { 
   collection, 
   doc, 
@@ -34,6 +35,8 @@ import {
   type VIPReservationFilters,
 } from './usernameValidation';
 import { UserRegistrationService, type GetUserProfileResult } from './userRegistration';
+
+const logger = createScopedLogger('[VIPAccountManager]');
 
 // ============================================================================
 // TYPES
@@ -343,7 +346,7 @@ export class VIPAccountManager {
       
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Error finding VIP matches:', error);
+      logger.error('Error finding VIP matches', error instanceof Error ? error : new Error(errorMessage));
       return {
         success: false,
         error: errorMessage,
@@ -402,7 +405,7 @@ export class VIPAccountManager {
       
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Error getting unclaimed VIPs with matches:', error);
+      logger.error('Error getting unclaimed VIPs with matches', error instanceof Error ? error : new Error(errorMessage));
       return {
         success: false,
         error: errorMessage,
@@ -490,16 +493,16 @@ export class VIPAccountManager {
         requestedAt: serverTimestamp(),
       });
       
-      console.log(`Merge request created: ${mergeRequestId}`);
-      
+      logger.info('Merge request created', { mergeRequestId });
+
       return {
         success: true,
         mergeRequest
       };
-      
+
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Error creating merge request:', error);
+      logger.error('Error creating merge request', error instanceof Error ? error : new Error(errorMessage));
       return {
         success: false,
         error: errorMessage
@@ -548,7 +551,8 @@ export class VIPAccountManager {
       
       return snapshot.docs[0].data() as MergeRequest;
     } catch (error) {
-      console.error('Error getting merge request:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      logger.error('Error getting merge request', error instanceof Error ? error : new Error(errorMessage));
       return null;
     }
   }
@@ -581,7 +585,7 @@ export class VIPAccountManager {
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Error getting merge requests:', error);
+      logger.error('Error getting merge requests', error instanceof Error ? error : new Error(errorMessage));
       return {
         success: false,
         error: errorMessage,
@@ -590,7 +594,7 @@ export class VIPAccountManager {
       };
     }
   }
-  
+
   /**
    * Approve a merge request (if different admin than requester)
    */
@@ -626,11 +630,11 @@ export class VIPAccountManager {
       return { success: true };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Error approving merge request:', error);
+      logger.error('Error approving merge request', error instanceof Error ? error : new Error(errorMessage));
       return { success: false, error: errorMessage };
     }
   }
-  
+
   /**
    * Reject a merge request
    */
@@ -668,11 +672,11 @@ export class VIPAccountManager {
       return { success: true };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Error rejecting merge request:', error);
+      logger.error('Error rejecting merge request', error instanceof Error ? error : new Error(errorMessage));
       return { success: false, error: errorMessage };
     }
   }
-  
+
   // ==========================================================================
   // EXECUTE MERGE
   // ==========================================================================
@@ -780,9 +784,9 @@ export class VIPAccountManager {
       // IMPORTANT: This must happen AFTER batch.commit() succeeds to ensure
       // consistency between the database and in-memory state
       claimVIPUsername(reservedUsername, uid);
-      
-      console.log(`VIP merge completed: ${currentUsername} -> ${reservedUsername} for UID ${uid}`);
-      
+
+      logger.info('VIP merge completed', { oldUsername: currentUsername, newUsername: reservedUsername, uid });
+
       return {
         success: true,
         audit: {
@@ -795,14 +799,14 @@ export class VIPAccountManager {
       
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Error executing merge:', error);
+      logger.error('Error executing merge', error instanceof Error ? error : new Error(errorMessage));
       return {
         success: false,
         error: errorMessage
       };
     }
   }
-  
+
   /**
    * Quick merge - create and immediately execute a merge (for admin convenience)
    * Use with caution - bypasses approval workflow
@@ -873,11 +877,11 @@ export class VIPAccountManager {
       return { success: true };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Error accepting merge:', error);
+      logger.error('Error accepting merge', error instanceof Error ? error : new Error(errorMessage));
       return { success: false, error: errorMessage };
     }
   }
-  
+
   /**
    * User declines the username change
    */
@@ -915,11 +919,11 @@ export class VIPAccountManager {
       return { success: true };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Error declining merge:', error);
+      logger.error('Error declining merge', error instanceof Error ? error : new Error(errorMessage));
       return { success: false, error: errorMessage };
     }
   }
-  
+
   // ==========================================================================
   // NOTIFICATIONS
   // ==========================================================================
@@ -947,11 +951,11 @@ export class VIPAccountManager {
       return { success: true };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Error marking user notified:', error);
+      logger.error('Error marking user notified', error instanceof Error ? error : new Error(errorMessage));
       return { success: false, error: errorMessage };
     }
   }
-  
+
   /**
    * Get pending merge request for a user (for showing in their UI)
    */
@@ -982,11 +986,11 @@ export class VIPAccountManager {
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Error getting pending merge for user:', error);
+      logger.error('Error getting pending merge for user', error instanceof Error ? error : new Error(errorMessage));
       return { hasPending: false, error: errorMessage };
     }
   }
-  
+
   // ==========================================================================
   // AUDIT & HISTORY
   // ==========================================================================
@@ -1018,7 +1022,7 @@ export class VIPAccountManager {
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Error getting username change history:', error);
+      logger.error('Error getting username change history', error instanceof Error ? error : new Error(errorMessage));
       return {
         success: false,
         error: errorMessage,
@@ -1027,7 +1031,7 @@ export class VIPAccountManager {
       };
     }
   }
-  
+
   /**
    * Get all username changes (for admin audit)
    */
@@ -1061,7 +1065,7 @@ export class VIPAccountManager {
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Error getting all username changes:', error);
+      logger.error('Error getting all username changes', error instanceof Error ? error : new Error(errorMessage));
       return {
         success: false,
         error: errorMessage,
@@ -1070,7 +1074,7 @@ export class VIPAccountManager {
       };
     }
   }
-  
+
   // ==========================================================================
   // STATISTICS
   // ==========================================================================
@@ -1108,7 +1112,7 @@ export class VIPAccountManager {
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Error getting merge statistics:', error);
+      logger.error('Error getting merge statistics', error instanceof Error ? error : new Error(errorMessage));
       return {
         success: false,
         error: errorMessage,

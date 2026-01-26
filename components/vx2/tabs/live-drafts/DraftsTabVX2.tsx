@@ -100,9 +100,6 @@ export default function DraftsTabVX2({
 }: DraftsTabVX2Props): React.ReactElement {
   const [mode, setMode] = useState<DraftMode>(initialMode);
 
-  // Debug logging - Force HMR
-  console.log('[DraftsTabVX2] Rendering with mode:', mode, '(v2)');
-
   // Handler for entering a draft (bridges the type difference)
   const handleEnterFastDraft = useCallback(
     (draft: LiveDraft) => {

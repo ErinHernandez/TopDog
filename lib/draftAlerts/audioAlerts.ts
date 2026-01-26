@@ -3,6 +3,9 @@
  */
 
 import { DraftAlertType } from './types';
+import { createScopedLogger } from '../clientLogger';
+
+const logger = createScopedLogger('[DraftAlerts]');
 
 const ALERT_SOUNDS: Partial<Record<DraftAlertType, string>> = {
   [DraftAlertType.ON_THE_CLOCK]: '/sounds/your-turn.mp3',
@@ -22,7 +25,7 @@ export async function playAlertSound(alertType: DraftAlertType): Promise<void> {
     await audio.play();
   } catch (error) {
     // Audio playback failed (autoplay blocked, etc.)
-    console.warn('[DraftAlerts] Audio playback failed:', error);
+    logger.warn('Audio playback failed');
   }
 }
 

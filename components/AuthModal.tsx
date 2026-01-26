@@ -15,8 +15,11 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { createScopedLogger } from '@/lib/clientLogger';
 import { UserRegistrationService, type UserProfile } from '../lib/userRegistration';
 import RegistrationModal from './RegistrationModal';
+
+const logger = createScopedLogger('[AuthModal]');
 
 // ============================================================================
 // TYPES
@@ -64,7 +67,7 @@ export default function AuthModal({
             onClose();
           }
         } catch (error) {
-          console.error('Error checking user profile:', error);
+          logger.error('Error checking user profile:', error instanceof Error ? error : new Error(String(error)));
           // If we can't check profile, assume incomplete and show registration
           setShowRegistration(true);
         } finally {
@@ -96,7 +99,7 @@ export default function AuthModal({
         onClose();
       }
     } catch (error) {
-      console.error('Authentication error:', error);
+      logger.error('Authentication error:', error instanceof Error ? error : new Error(String(error)));
       alert('Authentication failed. Please try again.');
     }
   };

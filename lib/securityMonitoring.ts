@@ -1,11 +1,12 @@
 /**
  * Security Monitoring and Alerting
- * 
+ *
  * Provides utilities for monitoring security events, detecting anomalies,
  * and alerting on suspicious activity.
  */
 
 import { logSecurityEvent, SecurityEventType, SecuritySeverity } from './securityLogger';
+import { serverLogger } from './logger/serverLogger';
 
 // ============================================================================
 // TYPES
@@ -199,11 +200,10 @@ async function checkAlerts(eventType: string, ipAddress: string, count: number):
             }),
           }).catch(err => {
             // Don't fail if Slack webhook fails
-            console.error('[SecurityMonitoring] Failed to send Slack alert:', err);
+            serverLogger.error('Failed to send Slack alert', err instanceof Error ? err : new Error(String(err)));
           });
         } catch (err) {
-          const errorMessage = err instanceof Error ? err.message : String(err);
-          console.error('[SecurityMonitoring] Error sending Slack alert:', errorMessage);
+          serverLogger.error('Error sending Slack alert', err instanceof Error ? err : new Error(String(err)));
         }
       }
       
@@ -221,12 +221,12 @@ async function checkAlerts(eventType: string, ipAddress: string, count: number):
           },
         });
       } catch (err) {
-        // Sentry not available - log to console
-        console.warn(`[SECURITY ALERT] ${eventType} rate exceeded: ${count}/${threshold} from ${ipAddress}`);
+        // Sentry not available - log warning
+        serverLogger.warn(`SECURITY ALERT: ${eventType} rate exceeded: ${count}/${threshold} from ${ipAddress}`);
       }
     } else {
-      // Development: log to console
-      console.warn(`[SECURITY ALERT] ${eventType} rate exceeded: ${count}/${threshold} from ${ipAddress}`);
+      // Development: log warning
+      serverLogger.warn(`SECURITY ALERT: ${eventType} rate exceeded: ${count}/${threshold} from ${ipAddress}`);
     }
   }
 }

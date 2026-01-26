@@ -7,10 +7,13 @@
  * NOT from useEffect without interaction (browsers will block)
  */
 
-import { getMessaging, getToken, onMessage, Messaging, isSupported } from 'firebase/messaging';
+import { getMessaging, getToken, onMessage, Messaging, isSupported, MessagePayload } from 'firebase/messaging';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
+import { createScopedLogger } from '../clientLogger';
+
+const logger = createScopedLogger('[FCM]');
 
 // FCM VAPID key from Firebase Console
 const VAPID_KEY = process.env.NEXT_PUBLIC_FCM_VAPID_KEY || '';
@@ -73,7 +76,7 @@ class FCMService {
 
       // 3. Check if FCM is supported
       if (!(await this.isSupported())) {
-        console.warn('[FCM] Not supported on this device');
+        logger.warn('Not supported on this device');
         return null;
       }
 
@@ -91,13 +94,13 @@ class FCMService {
       // 6. Request notification permission (must be from user interaction)
       const permission = await Notification.requestPermission();
       if (permission !== 'granted') {
-        console.warn('[FCM] Notification permission denied');
+        logger.warn('Notification permission denied');
         return null;
       }
 
       // 7. Get FCM token using the specific service worker registration
       if (!VAPID_KEY) {
-        console.warn('[FCM] VAPID key not configured');
+        logger.warn('VAPID key not configured');
         return null;
       }
 
@@ -108,14 +111,14 @@ class FCMService {
 
       if (this.token) {
         await this.saveTokenToFirestore(this.token);
-        console.log('[FCM] ✅ Token obtained and saved');
+        logger.debug('Token obtained and saved');
         this.isInitialized = true;
         return this.token;
       }
 
       return null;
     } catch (error) {
-      console.error('[FCM] Initialization failed:', error);
+      logger.error('Initialization failed', error instanceof Error ? error : new Error(String(error)));
       return null;
     }
   }
@@ -128,7 +131,7 @@ class FCMService {
       const auth = getAuth();
       const user = auth.currentUser;
       if (!user) {
-        console.warn('[FCM] No authenticated user, cannot save token');
+        logger.warn('No authenticated user, cannot save token');
         return;
       }
 
@@ -145,9 +148,9 @@ class FCMService {
         { merge: true }
       );
 
-      console.log('[FCM] Token saved to Firestore');
+      logger.debug('Token saved to Firestore');
     } catch (error) {
-      console.error('[FCM] Failed to save token:', error);
+      logger.error('Failed to save token', error instanceof Error ? error : new Error(String(error)));
     }
   }
 
@@ -162,14 +165,14 @@ class FCMService {
    * Listen for foreground messages
    * These are messages received when app is open
    */
-  onMessage(callback: (payload: any) => void): () => void {
+  onMessage(callback: (payload: MessagePayload) => void): () => void {
     if (!this.messaging) {
-      console.warn('[FCM] Messaging not initialized');
+      logger.warn('Messaging not initialized');
       return () => {};
     }
 
     const unsubscribe = onMessage(this.messaging, (payload) => {
-      console.log('[FCM] Foreground message received:', payload);
+      logger.debug('Foreground message received', { payload });
       callback(payload);
     });
 
@@ -204,7 +207,7 @@ class FCMService {
         );
       }
     } catch (error) {
-      console.error('[FCM] Failed to delete token:', error);
+      logger.error('Failed to delete token', error instanceof Error ? error : new Error(String(error)));
     }
   }
 }

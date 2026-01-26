@@ -474,11 +474,46 @@ export default function DraftRoomVX2({
   }, [draftRoom, onLeave]);
 
   // Handle withdrawal (before draft starts)
-  const handleWithdraw = useCallback(() => {
-    logger.debug('Withdraw confirmed, cleaning up', { hasOnLeave: !!onLeave });
-    // Call leave draft cleanup (same as leaving, but this is withdrawal)
+  const handleWithdraw = useCallback(async () => {
+    logger.debug('Withdraw confirmed, cleaning up', { hasOnLeave: !!onLeave, roomId, userId });
+
+    // Withdrawal-specific logic (runs before draft starts)
+    // 1. Remove user from participants list via API
+    // 2. Process entry fee refund if applicable
+    try {
+      if (userId && roomId) {
+        logger.info('Processing withdrawal request', { userId, roomId });
+
+        const response = await fetch(`/api/drafts/${roomId}/withdraw`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          logger.warn('Withdrawal API returned non-OK status', {
+            status: response.status,
+            error: errorData
+          });
+          // Continue with cleanup even if API fails - user still leaves UI
+        } else {
+          const result = await response.json();
+          logger.info('Withdrawal processed successfully', {
+            refundAmount: result.refundAmount,
+            refundStatus: result.refundStatus,
+            removedFromParticipants: result.removedFromParticipants
+          });
+        }
+      }
+    } catch (error) {
+      // Log but don't block - user should still be able to leave
+      logger.error('Error processing withdrawal', error instanceof Error ? error : new Error(String(error)));
+    }
+
+    // Call leave draft cleanup
     draftRoom.leaveDraft();
-    // TODO: Add withdrawal-specific logic here (e.g., remove from participants, refund entry fee)
+
     // Close modal first
     setShowLeaveModal(false);
     // Trigger navigation - use setTimeout to ensure it happens after state update
@@ -504,7 +539,7 @@ export default function DraftRoomVX2({
     } else {
       logger.warn('onLeave callback not provided for withdrawal');
     }
-  }, [draftRoom, onLeave]);
+  }, [draftRoom, onLeave, roomId, userId]);
   
   // Cancel leaving
   const handleLeaveCancel = useCallback(() => {

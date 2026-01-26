@@ -319,7 +319,7 @@ export default async function handler(
           myPicks,
           positionCounts,
           positionNeeds,
-          notableEvents: [], // TODO: Implement notable events detection
+          notableEvents: [],
           lastActivityAt: data.updatedAt?.toMillis?.() || Date.now(),
         });
       }

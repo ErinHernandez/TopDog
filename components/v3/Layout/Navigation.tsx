@@ -11,7 +11,10 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { createScopedLogger } from '@/lib/clientLogger';
 import { theme } from '../../../lib/theme';
+
+const logger = createScopedLogger('[Navigation]');
 
 // ============================================================================
 // TYPES
@@ -67,7 +70,7 @@ const Navigation: React.FC<NavigationProps> = ({ activeTab = null }): React.Reac
 
   const handleDepositClick = (): void => {
     // Handle deposit modal opening
-    console.log('Open deposit modal');
+    logger.debug('Open deposit modal');
   };
 
   return (

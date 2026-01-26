@@ -8,6 +8,7 @@
 // Use require for firebase-admin to ensure Turbopack compatibility
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const admin = require('firebase-admin') as typeof import('firebase-admin');
+import { serverLogger } from './logger/serverLogger';
 
 // ============================================================================
 // TYPES
@@ -53,7 +54,7 @@ if (admin.apps.length === 0) {
     }
   } catch (error) {
     firebaseAdminInitError = error instanceof Error ? error : new Error(String(error));
-    console.warn('Firebase Admin initialization failed:', firebaseAdminInitError.message);
+    serverLogger.warn('Firebase Admin initialization failed');
   }
 } else {
   firebaseAdminInitialized = true;
@@ -82,22 +83,22 @@ export async function verifyAdminAccess(
   if (process.env.NODE_ENV === 'production') {
     // Explicitly reject dev admin tokens in production
     if (token === 'dev-admin-token') {
-      console.error('[Security] Dev admin token attempted in production');
+      serverLogger.error('Dev admin token attempted in production', new Error('Security violation'));
       return { isAdmin: false, error: 'Invalid authentication token' };
     }
   }
-  
+
   if (process.env.NODE_ENV === 'development' && token === 'dev-admin-token') {
-    console.warn('[AdminAuth] Using development admin token - NOT FOR PRODUCTION');
+    serverLogger.warn('Using development admin token - NOT FOR PRODUCTION');
     return { isAdmin: true, uid: 'dev-admin', email: 'admin@dev.local' };
   }
-  
+
   // Check if Firebase Admin is initialized
   if (!firebaseAdminInitialized) {
-    console.error('[AdminAuth] Firebase Admin not initialized');
-    return { 
-      isAdmin: false, 
-      error: firebaseAdminInitError?.message || 'Admin authentication service unavailable' 
+    serverLogger.error('Firebase Admin not initialized', firebaseAdminInitError || new Error('Unknown initialization error'));
+    return {
+      isAdmin: false,
+      error: firebaseAdminInitError?.message || 'Admin authentication service unavailable'
     };
   }
   
@@ -127,22 +128,18 @@ export async function verifyAdminAccess(
     
     if (adminUids.length > 0 && adminUids.includes(decodedToken.uid)) {
       // Log warning with migration instructions
-      console.warn(
-        `[AdminAuth] DEPRECATED: Using UID-based admin check for ${decodedToken.uid}`,
-        '- Migrate to custom claims using scripts/migrate-admin-claims.js'
-      );
-      return { 
-        isAdmin: true, 
-        uid: decodedToken.uid, 
-        email: decodedToken.email 
+      serverLogger.warn('DEPRECATED: Using UID-based admin check - Migrate to custom claims using scripts/migrate-admin-claims.js');
+      return {
+        isAdmin: true,
+        uid: decodedToken.uid,
+        email: decodedToken.email
       };
     }
     
     return { isAdmin: false, error: 'User is not an admin' };
     
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('[AdminAuth] Token verification error:', errorMessage);
+    serverLogger.error('Token verification error', error instanceof Error ? error : new Error(String(error)));
     return { isAdmin: false, error: 'Invalid or expired token' };
   }
 }
@@ -171,8 +168,7 @@ export async function verifyAdminAccessClient(authToken: string): Promise<boolea
     const data = await response.json() as { isAdmin?: boolean };
     return data.isAdmin === true;
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('[AdminAuth] Client verification error:', errorMessage);
+    serverLogger.error('Client verification error', error instanceof Error ? error : new Error(String(error)));
     return false;
   }
 }

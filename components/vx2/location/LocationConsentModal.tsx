@@ -6,7 +6,10 @@
  */
 
 import React, { useState } from 'react';
+import { createScopedLogger } from '@/lib/clientLogger';
 import { BG_COLORS, TEXT_COLORS, BORDER_COLORS, STATE_COLORS } from '@/components/vx2/core/constants/colors';
+
+const logger = createScopedLogger('[LocationConsentModal]');
 import { SPACING, RADIUS } from '@/components/vx2/core/constants/sizes';
 import { useLocationConsent } from './hooks/useLocationConsent';
 import type { ConsentModalContext } from '@/lib/location/types';
@@ -67,7 +70,7 @@ export function LocationConsentModal({
       await grantConsent(rememberChoice);
       onClose();
     } catch (error) {
-      console.error('Failed to grant consent:', error);
+      logger.error('Failed to grant consent:', error instanceof Error ? error : new Error(String(error)));
     } finally {
       setIsSubmitting(false);
     }
@@ -80,7 +83,7 @@ export function LocationConsentModal({
       await dismissPrompt(rememberChoice);
       onClose();
     } catch (error) {
-      console.error('Failed to dismiss prompt:', error);
+      logger.error('Failed to dismiss prompt:', error instanceof Error ? error : new Error(String(error)));
     } finally {
       setIsSubmitting(false);
     }

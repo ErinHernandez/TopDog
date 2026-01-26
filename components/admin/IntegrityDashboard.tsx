@@ -5,6 +5,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
+import { createScopedLogger } from '@/lib/clientLogger';
 import type {
   DraftRiskScores,
   UserPairAnalysis,
@@ -12,6 +13,8 @@ import type {
   PickLocationRecord,
   PairRiskScore,
 } from '@/lib/integrity/types';
+
+const logger = createScopedLogger('[IntegrityDashboard]');
 
 interface DraftDetail {
   riskScores: DraftRiskScores | null;
@@ -35,7 +38,7 @@ export function IntegrityDashboard() {
       const auth = (await import('firebase/auth')).getAuth();
       const user = auth.currentUser;
       if (!user) {
-        console.error('User not authenticated');
+        logger.error('User not authenticated', new Error('No current user'));
         return;
       }
 
@@ -59,7 +62,7 @@ export function IntegrityDashboard() {
       setDrafts(draftsData);
       setPairs(pairsData);
     } catch (error) {
-      console.error('Failed to load integrity data:', error);
+      logger.error('Failed to load integrity data:', error instanceof Error ? error : new Error(String(error)));
     } finally {
       setLoading(false);
     }
@@ -255,7 +258,7 @@ function DraftDetailView({
       const data = await res.json();
       setDetail(data);
     } catch (error) {
-      console.error('Failed to load draft detail:', error);
+      logger.error('Failed to load draft detail:', error instanceof Error ? error : new Error(String(error)));
     } finally {
       setLoading(false);
     }
@@ -292,7 +295,7 @@ function DraftDetailView({
       onAction();
       onBack();
     } catch (error) {
-      console.error('Failed to record action:', error);
+      logger.error('Failed to record action:', error instanceof Error ? error : new Error(String(error)));
     }
   }
 

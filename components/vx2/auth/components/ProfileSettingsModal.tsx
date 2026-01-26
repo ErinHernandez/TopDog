@@ -414,7 +414,7 @@ function PreferencesTabContent(): React.ReactElement {
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (error) {
-      console.error('Failed to update alert preferences:', error);
+      logger.error('Failed to update alert preferences:', error instanceof Error ? error : new Error(String(error)));
       // Revert on error
       setAlertPreferences(prev => ({ ...prev, [key]: !newValue }));
     } finally {
@@ -556,7 +556,7 @@ function PreferencesTabContent(): React.ReactElement {
                   alert('Failed to enable push notifications. Please check browser permissions.');
                 }
               } catch (error) {
-                console.error('[FCM] Enable failed:', error);
+                logger.error('[FCM] Enable failed:', error instanceof Error ? error : new Error(String(error)));
                 alert('Failed to enable push notifications.');
               } finally {
                 setFcmInitializing(false);

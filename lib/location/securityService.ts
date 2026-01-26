@@ -6,16 +6,19 @@
  * - Account sharing indicators
  */
 
-import { 
-  doc, 
-  getDoc, 
-  updateDoc, 
-  arrayUnion, 
+import {
+  doc,
+  getDoc,
+  updateDoc,
+  arrayUnion,
   serverTimestamp,
-  Timestamp 
+  Timestamp
 } from 'firebase/firestore';
 import { getDb } from '@/lib/firebase-utils';
 import { formatLocationCode } from './geolocationProvider';
+import { createScopedLogger } from '@/lib/clientLogger';
+
+const logger = createScopedLogger('[SecurityService]');
 import type { 
   GeoLocation, 
   KnownLocation, 
@@ -93,7 +96,7 @@ export async function checkLoginSecurity(
       action,
     };
   } catch (error: unknown) {
-    console.error('Error checking login security:', error);
+    logger.error('Error checking login security', error instanceof Error ? error : new Error(String(error)));
     // On error, allow but flag
     return {
       isNewLocation: false,
@@ -148,7 +151,7 @@ export async function logSuspiciousAttempt(
       updatedAt: serverTimestamp(),
     });
   } catch (error: unknown) {
-    console.error('Error logging suspicious attempt:', error);
+    logger.error('Error logging suspicious attempt', error instanceof Error ? error : new Error(String(error)));
   }
 }
 
@@ -170,7 +173,7 @@ export async function getSuspiciousAttempts(
     const data = docSnap.data() as UserLocationDocument;
     return data.security?.suspiciousAttempts || [];
   } catch (error: unknown) {
-    console.error('Error getting suspicious attempts:', error);
+    logger.error('Error getting suspicious attempts', error instanceof Error ? error : new Error(String(error)));
     return [];
   }
 }
@@ -238,7 +241,7 @@ export async function analyzeAccountSharing(
       recommendation,
     };
   } catch (error: unknown) {
-    console.error('Error analyzing account sharing:', error);
+    logger.error('Error analyzing account sharing', error instanceof Error ? error : new Error(String(error)));
     return {
       multipleSimultaneousLocations: false,
       frequentLocationSwitching: false,

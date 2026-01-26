@@ -5,6 +5,9 @@
 import { db } from './firebase';
 import { collection, addDoc, serverTimestamp, getDocs, Timestamp } from 'firebase/firestore';
 import { devTournamentTemplates } from './tournamentConfig';
+import { createScopedLogger } from './clientLogger';
+
+const logger = createScopedLogger('[InitDevTournaments]');
 
 // ============================================================================
 // TYPES
@@ -30,7 +33,7 @@ export const initializeDevTournaments = async (): Promise<void> => {
     throw new Error('Firebase db not initialized');
   }
   try {
-    console.log('Initializing development tournaments...');
+    logger.info('Initializing development tournaments');
     
     // Check if tournaments already exist
     const existingTournaments = await getDocs(collection(db, 'devTournaments'));
@@ -49,15 +52,15 @@ export const initializeDevTournaments = async (): Promise<void> => {
           throw new Error('Firebase db not initialized');
         }
         await addDoc(collection(db, 'devTournaments'), tournament);
-        console.log(`${(template as { name?: string }).name || key} tournament added to development`);
+        logger.debug('Tournament added to development', { name: (template as { name?: string }).name || key });
       }
-      
-      console.log('All development tournaments initialized successfully');
+
+      logger.info('All development tournaments initialized successfully');
     } else {
-      console.log('Development tournaments already exist');
+      logger.debug('Development tournaments already exist');
     }
   } catch (error) {
-    console.error('Error initializing development tournaments:', error);
+    logger.error('Error initializing development tournaments', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 };
@@ -83,11 +86,11 @@ export const addTournamentToDevelopment = async (tournamentKey: string): Promise
     } as DevTournament;
     
     await addDoc(collection(db, 'devTournaments'), tournament);
-    console.log(`${(template as { name?: string }).name || tournamentKey} tournament added to development`);
-    
+    logger.info('Tournament added to development', { name: (template as { name?: string }).name || tournamentKey });
+
     return tournament;
   } catch (error) {
-    console.error('Error adding tournament to development:', error);
+    logger.error('Error adding tournament to development', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 };

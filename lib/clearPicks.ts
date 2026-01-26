@@ -4,6 +4,9 @@
 
 import { db } from './firebase';
 import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { createScopedLogger } from './clientLogger';
+
+const logger = createScopedLogger('[ClearPicks]');
 
 // ============================================================================
 // FUNCTIONS
@@ -18,28 +21,28 @@ export const clearPicksForRoom = async (roomId: string): Promise<void> => {
     if (!db) {
       throw new Error('Firebase db not initialized');
     }
-    console.log(`Clearing picks for room: ${roomId}`);
-    
+    logger.debug('Clearing picks for room', { roomId });
+
     const picksRef = collection(db, 'draftRooms', roomId, 'picks');
     const picksSnapshot = await getDocs(picksRef);
-    
+
     if (picksSnapshot.empty) {
-      console.log('No picks found to clear');
+      logger.debug('No picks found to clear');
       return;
     }
-    
+
     const deletePromises = picksSnapshot.docs.map(pickDoc => {
       if (!db) {
         throw new Error('Firebase db not initialized');
       }
       return deleteDoc(doc(db, 'draftRooms', roomId, 'picks', pickDoc.id));
     });
-    
+
     await Promise.all(deletePromises);
-    console.log(`Successfully cleared ${picksSnapshot.docs.length} picks from room ${roomId}`);
-    
+    logger.debug('Successfully cleared picks', { roomId, count: picksSnapshot.docs.length });
+
   } catch (error) {
-    console.error(`Error clearing picks for room ${roomId}:`, error);
+    logger.error('Error clearing picks for room', error instanceof Error ? error : new Error(String(error)), { roomId });
     throw error;
   }
 };
@@ -53,7 +56,7 @@ export const clearPicksForMultipleRooms = async (roomIds: string[]): Promise<voi
     try {
       await clearPicksForRoom(roomId);
     } catch (error) {
-      console.error(`Failed to clear picks for room ${roomId}:`, error);
+      logger.error('Failed to clear picks for room', error instanceof Error ? error : new Error(String(error)), { roomId });
     }
   }
 };
@@ -68,25 +71,25 @@ export const clearPicksForCompletedRooms = async (): Promise<void> => {
   try {
     const roomsRef = collection(db, 'draftRooms');
     const roomsSnapshot = await getDocs(roomsRef);
-    
-    const completedRooms = roomsSnapshot.docs.filter(doc => 
+
+    const completedRooms = roomsSnapshot.docs.filter(doc =>
       doc.data().status === 'completed'
     );
-    
-    console.log(`Found ${completedRooms.length} completed rooms`);
-    
+
+    logger.debug('Found completed rooms', { count: completedRooms.length });
+
     for (const roomDoc of completedRooms) {
       try {
         await clearPicksForRoom(roomDoc.id);
       } catch (error) {
-        console.error(`Failed to clear picks for room ${roomDoc.id}:`, error);
+        logger.error('Failed to clear picks for room', error instanceof Error ? error : new Error(String(error)), { roomId: roomDoc.id });
       }
     }
-    
-    console.log('Finished clearing picks for all completed rooms');
-    
+
+    logger.debug('Finished clearing picks for all completed rooms');
+
   } catch (error) {
-    console.error('Error clearing picks for completed rooms:', error);
+    logger.error('Error clearing picks for completed rooms', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 };

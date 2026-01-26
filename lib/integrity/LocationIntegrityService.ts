@@ -25,6 +25,9 @@ import {
   deleteDoc,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { createScopedLogger } from '@/lib/clientLogger';
+
+const logger = createScopedLogger('[LocationIntegrity]');
 import type {
   LocationData,
   PickLocationData,
@@ -144,12 +147,14 @@ export class LocationIntegrityService {
       }).catch((error) => {
         // Log but don't fail the pick location recording
         // Drafts always proceed normally regardless of flagging errors
-        console.error('Failed to record collusion flag:', error);
+        logger.error('Failed to record collusion flag', error instanceof Error ? error : new Error(String(error)));
       });
     }
 
     // 6. Queue badge update (async, non-blocking)
-    this.queueBadgeUpdate(userId, geoData).catch(console.error);
+    this.queueBadgeUpdate(userId, geoData).catch((error) => {
+      logger.error('Failed to queue badge update', error instanceof Error ? error : new Error(String(error)));
+    });
 
     return record;
   }
@@ -267,10 +272,10 @@ export class LocationIntegrityService {
         divisionType,
       };
     } catch (error) {
-      console.error('Reverse geocode error:', error);
-      return { 
-        countyCode: null, 
-        countryCode: 'UNKNOWN', 
+      logger.error('Reverse geocode error', error instanceof Error ? error : new Error(String(error)));
+      return {
+        countyCode: null,
+        countryCode: 'UNKNOWN',
         stateCode: null,
         divisionCode: null,
         divisionName: null,

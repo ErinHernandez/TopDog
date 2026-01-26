@@ -34,6 +34,7 @@ import {
 import { requireBaseUrl } from '../../envHelpers';
 import { toDisplayAmount } from '../../paymongo/currencyConfig';
 import type { PayMongoSourceType } from '../../paymongo/paymongoTypes';
+import { serverLogger } from '../../logger/serverLogger';
 
 // ============================================================================
 // PROVIDER IMPLEMENTATION
@@ -141,7 +142,7 @@ class PayMongoProvider implements PaymentProvider {
       };
       
     } catch (error: unknown) {
-      console.error('[PayMongoProvider] createPayment error:', error);
+      serverLogger.error('PayMongoProvider createPayment error', error instanceof Error ? error : new Error(String(error)));
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to create payment',
@@ -234,7 +235,7 @@ class PayMongoProvider implements PaymentProvider {
       };
       
     } catch (error: unknown) {
-      console.error('[PayMongoProvider] createTransfer error:', error);
+      serverLogger.error('PayMongoProvider createTransfer error', error instanceof Error ? error : new Error(String(error)));
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to create transfer',

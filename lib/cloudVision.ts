@@ -1,9 +1,11 @@
 /**
  * Google Cloud Vision API Integration
- * 
+ *
  * Provides text detection, document analysis, label detection, face detection,
  * and object localization using Google Cloud Vision API.
  */
+
+import { serverLogger } from './logger/serverLogger';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const vision = require('@google-cloud/vision');
@@ -92,7 +94,7 @@ export async function detectText(imagePath: string): Promise<string[]> {
     // Return all detected text (excluding the first element which contains the full text)
     return detections.slice(1).map((text: TextAnnotation) => text.description || '');
   } catch (error) {
-    console.error('Error detecting text:', error);
+    serverLogger.error('Error detecting text', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -149,7 +151,7 @@ export async function detectDocumentText(imagePath: string): Promise<DocumentTex
       }))
     };
   } catch (error) {
-    console.error('Error detecting document text:', error);
+    serverLogger.error('Error detecting document text', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -167,7 +169,7 @@ export async function detectLabels(imagePath: string): Promise<Label[]> {
       confidence: label.score || 0
     }));
   } catch (error) {
-    console.error('Error detecting labels:', error);
+    serverLogger.error('Error detecting labels', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -196,7 +198,7 @@ export async function detectFaces(imagePath: string): Promise<FaceAnnotation[]> 
       bounds: face.boundingPoly
     }));
   } catch (error) {
-    console.error('Error detecting faces:', error);
+    serverLogger.error('Error detecting faces', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -215,7 +217,7 @@ export async function detectObjects(imagePath: string): Promise<ObjectAnnotation
       bounds: object.boundingPoly
     }));
   } catch (error) {
-    console.error('Error detecting objects:', error);
+    serverLogger.error('Error detecting objects', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -256,7 +258,7 @@ export async function analyzeImageFromBase64(
       }))
     };
   } catch (error) {
-    console.error('Error analyzing image from base64:', error);
+    serverLogger.error('Error analyzing image from base64', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }

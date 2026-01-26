@@ -19,6 +19,9 @@
  */
 
 import { useEffect, useRef } from 'react';
+import { createScopedLogger } from '@/lib/clientLogger';
+
+const logger = createScopedLogger('[useStableViewportHeight]');
 
 // Minimum height change (in pixels) to trigger an update
 // This prevents updates from address bar (typically 50-70px)
@@ -43,7 +46,7 @@ export function useStableViewportHeight(): void {
       lastHeightRef.current = height;
       // Debug logging in development
       if (process.env.NODE_ENV === 'development') {
-        console.log('[useStableViewportHeight] Set --stable-vh to', `${vh}px`, 'from height', height);
+        logger.debug(`Set --stable-vh to ${vh}px from height ${height}`);
       }
     };
 

@@ -6,13 +6,35 @@
  */
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { createScopedLogger } from '@/lib/clientLogger';
 import { useAuth } from '@/components/vx2/auth/hooks/useAuth';
+
+const logger = createScopedLogger('[useCustomization]');
 import {
   CustomizationPreferences,
   DEFAULT_PREFERENCES,
   FlagOption,
   UserLocations,
+  LocationRecord,
 } from '@/lib/customization/types';
+
+/**
+ * Badge data structure from Firestore userBadges collection
+ */
+interface BadgeLocationEntry {
+  code: string;
+  name: string;
+  firstEarned?: unknown;
+  lastUpdated?: unknown;
+  count?: number;
+}
+
+interface UserBadgeData {
+  countries?: BadgeLocationEntry[];
+  states?: BadgeLocationEntry[];
+  counties?: BadgeLocationEntry[];
+  divisions?: BadgeLocationEntry[];
+}
 import {
   subscribeToPreferences,
   subscribeToLocations,
@@ -153,7 +175,7 @@ export function useCustomization(): UseCustomizationReturn {
     }
 
     let locationsData: UserLocations | null = null;
-    let badgeData: any = null;
+    let badgeData: UserBadgeData | null = null;
 
     // Helper to combine and set flags
     const updateFlags = () => {
@@ -167,7 +189,7 @@ export function useCustomization(): UseCustomizationReturn {
           type: 'country' as const,
         })));
       } else if (badgeData?.countries?.length) {
-        flags.push(...badgeData.countries.map((c: any) => ({
+        flags.push(...badgeData.countries.map((c: BadgeLocationEntry) => ({
           code: c.code,
           name: c.name,
           type: 'country' as const,
@@ -182,7 +204,7 @@ export function useCustomization(): UseCustomizationReturn {
           type: 'state' as const,
         })));
       } else if (badgeData?.states?.length) {
-        flags.push(...badgeData.states.map((s: any) => ({
+        flags.push(...badgeData.states.map((s: BadgeLocationEntry) => ({
           code: s.code,
           name: s.name,
           type: 'state' as const,
@@ -191,7 +213,7 @@ export function useCustomization(): UseCustomizationReturn {
       
       // Add counties from badges only
       if (badgeData?.counties?.length) {
-        flags.push(...badgeData.counties.map((c: any) => ({
+        flags.push(...badgeData.counties.map((c: BadgeLocationEntry) => ({
           code: c.code,
           name: c.name,
           type: 'county' as const,
@@ -200,7 +222,7 @@ export function useCustomization(): UseCustomizationReturn {
       
       // Add divisions from badges (international administrative divisions)
       if (badgeData?.divisions?.length) {
-        flags.push(...badgeData.divisions.map((d: any) => ({
+        flags.push(...badgeData.divisions.map((d: BadgeLocationEntry) => ({
           code: d.code,
           name: d.name,
           type: 'division' as const,
@@ -236,12 +258,12 @@ export function useCustomization(): UseCustomizationReturn {
                 setFlagsLoading(false);
               }
             } catch (detectErr) {
-              console.warn('Location detection failed:', detectErr);
+              logger.warn('Location detection failed:', detectErr);
               setAvailableFlags(process.env.NODE_ENV === 'development' ? DEV_FLAGS : []);
               setFlagsLoading(false);
             }
           } catch (err) {
-            console.error('Auto-location setup failed:', err);
+            logger.error('Auto-location setup failed:', err instanceof Error ? err : new Error(String(err)));
             setAvailableFlags(process.env.NODE_ENV === 'development' ? DEV_FLAGS : []);
             setFlagsLoading(false);
           }
@@ -266,7 +288,7 @@ export function useCustomization(): UseCustomizationReturn {
         updateFlags();
       },
       (err) => {
-        console.error('Badge subscription error:', err);
+        logger.error('Badge subscription error:', err instanceof Error ? err : new Error(String(err)));
         setFlagsLoading(false);
       }
     );
@@ -328,7 +350,7 @@ export function useCustomization(): UseCustomizationReturn {
       // Also track via the new system
       await trackLocation(user.uid);
     } catch (err) {
-      console.error('Error enabling location tracking:', err);
+      logger.error('Error enabling location tracking:', err instanceof Error ? err : new Error(String(err)));
       setError(err as Error);
     }
   }, [user?.uid, grantConsent]);

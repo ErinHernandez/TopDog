@@ -1,25 +1,25 @@
 /**
  * Error Tracking Service
- * 
+ *
  * Centralized error tracking with Sentry integration.
  * Currently stubbed - enable by setting NEXT_PUBLIC_SENTRY_DSN environment variable.
- * 
+ *
  * @example
  * ```ts
  * import { captureError, captureMessage, setUser } from '@/lib/errorTracking';
- * 
+ *
  * // Capture an error with context
- * captureError(error, { 
+ * captureError(error, {
  *   tags: { component: 'DraftRoom' },
  *   extra: { draftId: '123' }
  * });
- * 
+ *
  * // Set user context for all future errors
  * setUser({ id: userId, username });
  * ```
- * 
+ *
  * ## Setup Instructions
- * 
+ *
  * 1. Create a Sentry project at https://sentry.io
  * 2. Get your DSN from Project Settings > Client Keys
  * 3. Add to .env.local:
@@ -27,9 +27,13 @@
  *    NEXT_PUBLIC_SENTRY_DSN=https://xxxxx@xxxxx.ingest.sentry.io/xxxxx
  *    ```
  * 4. Restart the dev server
- * 
+ *
  * The integration will automatically enable when the DSN is present.
  */
+
+import { createScopedLogger } from './clientLogger';
+
+const logger = createScopedLogger('[ErrorTracking]');
 
 // ============================================================================
 // TYPES
@@ -109,20 +113,20 @@ async function initSentry(): Promise<any> {
       beforeSend(event: unknown) {
         // Don't send in development unless explicitly enabled
         if (IS_DEV && typeof localStorage !== 'undefined' && !localStorage.getItem('sentry_debug')) {
-          console.log('[Sentry] Would send:', event);
+          logger.debug('Sentry would send event', { event });
           return null;
         }
         return event;
       },
     });
-    
+
     SentryInstance = Sentry;
-    console.log('[ErrorTracking] Sentry initialized');
+    logger.info('Sentry initialized');
     return Sentry;
   } catch (err) {
     // Sentry not installed or failed to load - this is fine
     if (IS_DEV) {
-      console.log('[ErrorTracking] Sentry not available (install @sentry/nextjs to enable)');
+      logger.debug('Sentry not available (install @sentry/nextjs to enable)');
     }
     return null;
   }
@@ -147,8 +151,8 @@ export async function captureError(
   context?: ErrorContext
 ): Promise<string | null> {
   // Always log locally
-  console.error('[ErrorTracking]', error.message, context?.extra);
-  
+  logger.error(error.message, error, context?.extra);
+
   if (!IS_ENABLED) return null;
   
   const Sentry = await initSentry();
@@ -192,7 +196,7 @@ export async function captureMessage(
   context?: ErrorContext
 ): Promise<string | null> {
   if (!IS_ENABLED) {
-    console.log('[ErrorTracking] Message:', message, context?.extra);
+    logger.info(message, context?.extra);
     return null;
   }
   

@@ -11,6 +11,7 @@ import crypto from 'crypto';
 import { getDb } from '../firebase-utils';
 import { doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 import { captureError } from '../errorTracking';
+import { serverLogger } from '../logger/serverLogger';
 import type {
   PayMongoSource,
   PayMongoPayment,
@@ -41,7 +42,7 @@ const PAYMONGO_WEBHOOK_SECRET = process.env.PAYMONGO_WEBHOOK_SECRET;
 const PAYMONGO_BASE_URL = 'https://api.paymongo.com/v1';
 
 if (!PAYMONGO_SECRET_KEY) {
-  console.warn('[PayMongoService] PAYMONGO_SECRET_KEY not configured');
+  serverLogger.warn('PAYMONGO_SECRET_KEY not configured');
 }
 
 // ============================================================================
@@ -396,7 +397,7 @@ export function verifyWebhookSignature(
   signature: string
 ): boolean {
   if (!PAYMONGO_WEBHOOK_SECRET) {
-    console.error('[PayMongoService] PAYMONGO_WEBHOOK_SECRET not configured');
+    serverLogger.error('PAYMONGO_WEBHOOK_SECRET not configured', new Error('Missing webhook secret'));
     return false;
   }
   

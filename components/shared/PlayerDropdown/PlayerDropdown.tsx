@@ -16,7 +16,10 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
+import { createScopedLogger } from '@/lib/clientLogger';
 import { playerDataService } from '../../../lib/playerData/PlayerDataService';
+
+const logger = createScopedLogger('[PlayerDropdown]');
 import { DROPDOWN_STYLES, DROPDOWN_DIMENSIONS, CONTEXT_OVERRIDES } from './PlayerDropdownStyles';
 import PlayerDropdownRow from './PlayerDropdownRow';
 import PlayerExpandedCard from '../PlayerExpandedCard';
@@ -192,7 +195,7 @@ const PlayerDropdown: React.FC<PlayerDropdownProps> = ({
     } catch (err) {
       const error = err as Error;
       setDataError(error.message);
-      console.error('Failed to load players:', error);
+      logger.error('Failed to load players:', error instanceof Error ? error : new Error(String(error)));
     } finally {
       setIsLoading(false);
     }

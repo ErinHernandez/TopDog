@@ -1,20 +1,22 @@
 /**
  * NFL Single Game / Box Score API
- * 
- * GET /api/nfl/game/[id]
- * 
+ *
+ * GET /api/nfl/game/[id]?season=2025&week=1
+ *
  * Returns detailed box score for a specific game.
- * Includes player stats, scoring plays, etc.
+ * Requires season and week query parameters as the underlying API needs them.
+ *
+ * The 'id' can be:
+ * - A game ID (numeric)
+ * - A team code (e.g., "KC", "PHI") to get that team's game for the specified week
  */
 
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { fetchBoxScore } from '../../../../lib/sportsdataio';
-import { POSITIONS } from '../../../../lib/constants/positions';
-import { 
-  withErrorHandling, 
-  validateMethod, 
+import { fetchBoxScore, fetchBoxScoresByWeek } from '../../../../lib/sportsdataio';
+import {
+  withErrorHandling,
+  validateMethod,
   requireEnvVar,
-  createSuccessResponse,
   ErrorType,
   createErrorResponse,
 } from '../../../../lib/apiErrorHandler';
@@ -137,12 +139,92 @@ export interface GameBoxScoreResponse {
 }
 
 // ============================================================================
+// HELPERS
+// ============================================================================
+
+/**
+ * Transform raw box score data to API response format
+ */
+function transformBoxScore(boxScore: BoxScore): GameBoxScoreResponse {
+  const score = boxScore.Score || {};
+  const playerGames = boxScore.PlayerGames || [];
+  const scoringPlays = boxScore.ScoringPlays || [];
+
+  return {
+    gameId: score.ScoreID,
+    gameKey: score.GameKey,
+    season: score.Season,
+    week: score.Week,
+    date: score.Date,
+    dateTime: score.DateTime,
+    homeTeam: score.HomeTeam,
+    awayTeam: score.AwayTeam,
+    homeScore: score.HomeScore,
+    awayScore: score.AwayScore,
+    scoring: {
+      home: {
+        q1: score.HomeScoreQuarter1,
+        q2: score.HomeScoreQuarter2,
+        q3: score.HomeScoreQuarter3,
+        q4: score.HomeScoreQuarter4,
+        ot: score.HomeScoreOvertime,
+        total: score.HomeScore,
+      },
+      away: {
+        q1: score.AwayScoreQuarter1,
+        q2: score.AwayScoreQuarter2,
+        q3: score.AwayScoreQuarter3,
+        q4: score.AwayScoreQuarter4,
+        ot: score.AwayScoreOvertime,
+        total: score.AwayScore,
+      },
+    },
+    status: score.Status,
+    quarter: score.Quarter,
+    timeRemaining: score.TimeRemaining,
+    possession: score.Possession,
+    down: score.Down,
+    distance: score.Distance,
+    yardLine: score.YardLine,
+    redZone: score.RedZone,
+    playerStats: playerGames.map((player: PlayerGame) => ({
+      playerId: player.PlayerID,
+      name: player.Name,
+      team: player.Team,
+      position: player.Position,
+      fantasyPointsPPR: player.FantasyPointsPPR || 0,
+      passingYards: player.PassingYards || 0,
+      passingTDs: player.PassingTouchdowns || 0,
+      rushingYards: player.RushingYards || 0,
+      rushingTDs: player.RushingTouchdowns || 0,
+      receptions: player.Receptions || 0,
+      receivingYards: player.ReceivingYards || 0,
+      receivingTDs: player.ReceivingTouchdowns || 0,
+    })),
+    scoringPlays: scoringPlays,
+  };
+}
+
+/**
+ * Check if a string is a valid NFL team code
+ */
+function isTeamCode(str: string): boolean {
+  const teamCodes = [
+    'ARI', 'ATL', 'BAL', 'BUF', 'CAR', 'CHI', 'CIN', 'CLE',
+    'DAL', 'DEN', 'DET', 'GB', 'HOU', 'IND', 'JAX', 'KC',
+    'LAC', 'LAR', 'LV', 'MIA', 'MIN', 'NE', 'NO', 'NYG',
+    'NYJ', 'PHI', 'PIT', 'SEA', 'SF', 'TB', 'TEN', 'WAS',
+  ];
+  return teamCodes.includes(str.toUpperCase());
+}
+
+// ============================================================================
 // HANDLER
 // ============================================================================
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<GameBoxScoreResponse>
+  res: NextApiResponse<GameBoxScoreResponse | { error: { code: string; message: string } }>
 ): Promise<unknown> {
   return withErrorHandling(req, res, async (req, res, logger): Promise<unknown> => {
     // Validate HTTP method
@@ -151,38 +233,117 @@ export default async function handler(
     // Check required environment variables
     const apiKey = requireEnvVar('SPORTSDATAIO_API_KEY', logger);
 
-    const { id } = req.query;
-    
+    const { id, season, week } = req.query;
+
     if (!id) {
-      const error = new Error('Game ID required');
-      error.name = 'ValidationError';
-      throw error;
-    }
-    
-    logger.info('Fetching game box score', { gameId: id });
-    
-    // fetchBoxScore requires season, week, team - we need to use fetchBoxScoresByWeek and filter
-    // For now, we'll need to get season/week from query params or use a different approach
-    // This is a placeholder - the actual implementation should parse the game ID or get season/week
-    const gameIdNum = parseInt(id as string, 10);
-    if (isNaN(gameIdNum)) {
       const errorResponse = createErrorResponse(
         ErrorType.VALIDATION,
-        'Invalid game ID format',
-        { gameId: id },
+        'Game ID or team code is required',
+        {},
         res.getHeader('X-Request-ID') as string | undefined
       );
-      return res.status(errorResponse.statusCode).json(errorResponse.body as unknown as GameBoxScoreResponse);
+      return res.status(errorResponse.statusCode).json(errorResponse.body);
     }
-    
-    // TODO: This needs proper implementation - fetchBoxScore requires season, week, team
-    // For now, return an error indicating this endpoint needs refactoring
-    const errorResponse = createErrorResponse(
-      ErrorType.NOT_FOUND,
-      'Game box score by ID not yet implemented - requires season, week, and team parameters',
-      { gameId: id },
-      res.getHeader('X-Request-ID') as string | undefined
-    );
-    return res.status(errorResponse.statusCode).json(errorResponse.body as unknown as GameBoxScoreResponse);
+
+    // Validate season and week parameters
+    if (!season || !week) {
+      const errorResponse = createErrorResponse(
+        ErrorType.VALIDATION,
+        'Season and week query parameters are required. Example: /api/nfl/game/KC?season=2025&week=1',
+        { id },
+        res.getHeader('X-Request-ID') as string | undefined
+      );
+      return res.status(errorResponse.statusCode).json(errorResponse.body);
+    }
+
+    const seasonNum = parseInt(season as string, 10);
+    const weekNum = parseInt(week as string, 10);
+
+    if (isNaN(seasonNum) || seasonNum < 2000 || seasonNum > 2100) {
+      const errorResponse = createErrorResponse(
+        ErrorType.VALIDATION,
+        'Invalid season parameter',
+        { season },
+        res.getHeader('X-Request-ID') as string | undefined
+      );
+      return res.status(errorResponse.statusCode).json(errorResponse.body);
+    }
+
+    if (isNaN(weekNum) || weekNum < 1 || weekNum > 22) {
+      const errorResponse = createErrorResponse(
+        ErrorType.VALIDATION,
+        'Invalid week parameter (must be 1-22)',
+        { week },
+        res.getHeader('X-Request-ID') as string | undefined
+      );
+      return res.status(errorResponse.statusCode).json(errorResponse.body);
+    }
+
+    const idStr = id as string;
+
+    // Check if the ID is a team code or a game ID
+    if (isTeamCode(idStr)) {
+      // Fetch box score by team code
+      logger.info('Fetching box score by team', { team: idStr, season: seasonNum, week: weekNum });
+
+      try {
+        const boxScore = await fetchBoxScore(apiKey, seasonNum, weekNum, idStr.toUpperCase());
+        const response = transformBoxScore(boxScore as BoxScore);
+        return res.status(200).json(response);
+      } catch (error) {
+        logger.error('Failed to fetch box score', error instanceof Error ? error : new Error(String(error)));
+        const errorResponse = createErrorResponse(
+          ErrorType.NOT_FOUND,
+          `No game found for ${idStr.toUpperCase()} in week ${weekNum} of ${seasonNum}`,
+          { team: idStr, season: seasonNum, week: weekNum },
+          res.getHeader('X-Request-ID') as string | undefined
+        );
+        return res.status(errorResponse.statusCode).json(errorResponse.body);
+      }
+    } else {
+      // Assume it's a game ID - fetch all box scores for the week and find the matching one
+      const gameIdNum = parseInt(idStr, 10);
+
+      if (isNaN(gameIdNum)) {
+        const errorResponse = createErrorResponse(
+          ErrorType.VALIDATION,
+          'Invalid game ID format. Must be a number or a team code (e.g., KC, PHI)',
+          { gameId: id },
+          res.getHeader('X-Request-ID') as string | undefined
+        );
+        return res.status(errorResponse.statusCode).json(errorResponse.body);
+      }
+
+      logger.info('Fetching box score by game ID', { gameId: gameIdNum, season: seasonNum, week: weekNum });
+
+      try {
+        const boxScores = await fetchBoxScoresByWeek(apiKey, seasonNum, weekNum);
+        const matchingBoxScore = (boxScores as BoxScore[]).find(
+          (bs) => bs.Score?.ScoreID === gameIdNum
+        );
+
+        if (!matchingBoxScore) {
+          const errorResponse = createErrorResponse(
+            ErrorType.NOT_FOUND,
+            `Game ID ${gameIdNum} not found in week ${weekNum} of ${seasonNum}`,
+            { gameId: gameIdNum, season: seasonNum, week: weekNum },
+            res.getHeader('X-Request-ID') as string | undefined
+          );
+          return res.status(errorResponse.statusCode).json(errorResponse.body);
+        }
+
+        const response = transformBoxScore(matchingBoxScore);
+        return res.status(200).json(response);
+      } catch (error) {
+        logger.error('Failed to fetch box scores', error instanceof Error ? error : new Error(String(error)));
+        const errorResponse = createErrorResponse(
+          ErrorType.INTERNAL,
+          'Failed to fetch game data',
+          { gameId: gameIdNum, season: seasonNum, week: weekNum },
+          res.getHeader('X-Request-ID') as string | undefined
+        );
+        return res.status(errorResponse.statusCode).json(errorResponse.body);
+      }
+    }
   });
 }

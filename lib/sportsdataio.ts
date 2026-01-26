@@ -15,6 +15,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { serverLogger } from './logger/serverLogger';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const playerModel = require('./playerModel');
 
@@ -476,7 +477,7 @@ function writeCache(data: unknown[]): void {
     data: data
   };
   fs.writeFileSync(CACHE_FILE, JSON.stringify(cache, null, 2));
-  console.log(`[SportsDataIO] Cache written: ${Array.isArray(data) ? data.length : 0} players`);
+  serverLogger.debug('Cache written', { playerCount: Array.isArray(data) ? data.length : 0 });
 }
 
 /**
@@ -554,7 +555,7 @@ function writeCacheFor(dataType: DataType, data: unknown): void {
     data
   };
   fs.writeFileSync(filePath, JSON.stringify(cache, null, 2));
-  console.log(`[SportsDataIO] Cache written for ${dataType}: ${Array.isArray(data) ? data.length + ' items' : 'object'}`);
+  serverLogger.debug('Cache written', { dataType, itemCount: Array.isArray(data) ? data.length : 1 });
 }
 
 /**
@@ -566,7 +567,7 @@ async function fetchWithCache<T>(
   forceRefresh: boolean = false
 ): Promise<T> {
   if (!forceRefresh && isCacheValidFor(dataType)) {
-    console.log(`[SportsDataIO] Using cached ${dataType}`);
+    serverLogger.debug('Using cached data', { dataType });
     return readCacheFor(dataType) as T;
   }
   
@@ -587,8 +588,8 @@ export async function fetchProjections(
   season: number = new Date().getFullYear()
 ): Promise<SportsDataIOPlayer[]> {
   const url = `https://api.sportsdata.io/v3/nfl/projections/json/PlayerSeasonProjectionStats/${season}?key=${apiKey}`;
-  
-  console.log(`[SportsDataIO] Fetching projections for ${season} season...`);
+
+  serverLogger.debug('Fetching projections', { season });
   
   const response = await fetch(url);
   
@@ -598,8 +599,8 @@ export async function fetchProjections(
   }
   
   const data = await response.json() as SportsDataIOPlayer[];
-  console.log(`[SportsDataIO] Fetched ${data.length} player projections`);
-  
+  serverLogger.debug('Fetched projections', { playerCount: data.length });
+
   return data;
 }
 
@@ -611,7 +612,7 @@ export async function getProjections(
   forceRefresh: boolean = false
 ): Promise<unknown[]> {
   if (!forceRefresh && isCacheValid()) {
-    console.log('[SportsDataIO] Using cached projections');
+    serverLogger.debug('Using cached projections');
     return readCache() || [];
   }
   
@@ -677,13 +678,13 @@ export async function fetchSchedule(
   season: number = new Date().getFullYear()
 ): Promise<unknown[]> {
   const url = `${BASE_URL}/scores/json/Schedules/${season}?key=${apiKey}`;
-  console.log(`[SportsDataIO] Fetching schedule for ${season}...`);
-  
+  serverLogger.debug('Fetching schedule', { season });
+
   const response = await fetch(url);
   if (!response.ok) throw new Error(`Schedule API error: ${response.status}`);
-  
+
   const data = await response.json();
-  console.log(`[SportsDataIO] Fetched ${Array.isArray(data) ? data.length : 0} games`);
+  serverLogger.debug('Fetched schedule', { gameCount: Array.isArray(data) ? data.length : 0 });
   return data as unknown[];
 }
 
@@ -707,13 +708,13 @@ export async function getSchedule(
  */
 export async function fetchInjuries(apiKey: string): Promise<Injury[]> {
   const url = `${BASE_URL}/scores/json/Injuries?key=${apiKey}`;
-  console.log(`[SportsDataIO] Fetching injuries...`);
-  
+  serverLogger.debug('Fetching injuries');
+
   const response = await fetch(url);
   if (!response.ok) throw new Error(`Injuries API error: ${response.status}`);
-  
+
   const data = await response.json();
-  console.log(`[SportsDataIO] Fetched ${Array.isArray(data) ? data.length : 0} injuries`);
+  serverLogger.debug('Fetched injuries', { count: Array.isArray(data) ? data.length : 0 });
   return data as Injury[];
 }
 
@@ -752,13 +753,13 @@ export async function getInjuriesMap(
  */
 export async function fetchDepthCharts(apiKey: string): Promise<DepthChart[]> {
   const url = `${BASE_URL}/scores/json/DepthCharts?key=${apiKey}`;
-  console.log(`[SportsDataIO] Fetching depth charts...`);
-  
+  serverLogger.debug('Fetching depth charts');
+
   const response = await fetch(url);
   if (!response.ok) throw new Error(`Depth Charts API error: ${response.status}`);
-  
+
   const data = await response.json();
-  console.log(`[SportsDataIO] Fetched ${Array.isArray(data) ? data.length : 0} depth chart entries`);
+  serverLogger.debug('Fetched depth charts', { entryCount: Array.isArray(data) ? data.length : 0 });
   return data as DepthChart[];
 }
 
@@ -801,13 +802,13 @@ export async function fetchPlayerStats(
   season: number = new Date().getFullYear() - 1
 ): Promise<unknown[]> {
   const url = `${BASE_URL}/stats/json/PlayerSeasonStats/${season}?key=${apiKey}`;
-  console.log(`[SportsDataIO] Fetching player stats for ${season}...`);
-  
+  serverLogger.debug('Fetching player stats', { season });
+
   const response = await fetch(url);
   if (!response.ok) throw new Error(`Player Stats API error: ${response.status}`);
-  
+
   const data = await response.json();
-  console.log(`[SportsDataIO] Fetched ${Array.isArray(data) ? data.length : 0} player stats`);
+  serverLogger.debug('Fetched player stats', { count: Array.isArray(data) ? data.length : 0 });
   return data as unknown[];
 }
 
@@ -831,13 +832,13 @@ export async function getPlayerStats(
  */
 export async function fetchTeams(apiKey: string): Promise<Team[]> {
   const url = `${BASE_URL}/scores/json/Teams?key=${apiKey}`;
-  console.log(`[SportsDataIO] Fetching teams...`);
-  
+  serverLogger.debug('Fetching teams');
+
   const response = await fetch(url);
   if (!response.ok) throw new Error(`Teams API error: ${response.status}`);
-  
+
   const data = await response.json();
-  console.log(`[SportsDataIO] Fetched ${Array.isArray(data) ? data.length : 0} teams`);
+  serverLogger.debug('Fetched teams', { count: Array.isArray(data) ? data.length : 0 });
   return data as Team[];
 }
 
@@ -846,13 +847,13 @@ export async function fetchTeams(apiKey: string): Promise<Team[]> {
  */
 export async function fetchAllTeams(apiKey: string): Promise<Team[]> {
   const url = `${BASE_URL}/scores/json/TeamsBasic?key=${apiKey}`;
-  console.log(`[SportsDataIO] Fetching all teams with full details...`);
-  
+  serverLogger.debug('Fetching all teams with full details');
+
   const response = await fetch(url);
   if (!response.ok) throw new Error(`All Teams API error: ${response.status}`);
-  
+
   const data = await response.json();
-  console.log(`[SportsDataIO] Fetched ${Array.isArray(data) ? data.length : 0} teams with full details`);
+  serverLogger.debug('Fetched all teams', { count: Array.isArray(data) ? data.length : 0 });
   return data as Team[];
 }
 
@@ -982,13 +983,13 @@ export async function getTeamByKey(
  */
 export async function fetchNews(apiKey: string): Promise<NewsItem[]> {
   const url = `${BASE_URL}/scores/json/News?key=${apiKey}`;
-  console.log(`[SportsDataIO] Fetching news...`);
-  
+  serverLogger.debug('Fetching news');
+
   const response = await fetch(url);
   if (!response.ok) throw new Error(`News API error: ${response.status}`);
-  
+
   const data = await response.json();
-  console.log(`[SportsDataIO] Fetched ${Array.isArray(data) ? data.length : 0} news items`);
+  serverLogger.debug('Fetched news', { itemCount: Array.isArray(data) ? data.length : 0 });
   return data as NewsItem[];
 }
 
@@ -1029,13 +1030,13 @@ export async function fetchByeWeeks(
   season: number = new Date().getFullYear()
 ): Promise<Array<{ Team: string; Week: number }>> {
   const url = `${BASE_URL}/scores/json/Byes/${season}?key=${apiKey}`;
-  console.log(`[SportsDataIO] Fetching bye weeks for ${season}...`);
-  
+  serverLogger.debug('Fetching bye weeks', { season });
+
   const response = await fetch(url);
   if (!response.ok) throw new Error(`Bye Weeks API error: ${response.status}`);
-  
+
   const data = await response.json();
-  console.log(`[SportsDataIO] Fetched ${Array.isArray(data) ? data.length : 0} bye week entries`);
+  serverLogger.debug('Fetched bye weeks', { entryCount: Array.isArray(data) ? data.length : 0 });
   return data as Array<{ Team: string; Week: number }>;
 }
 
@@ -1081,13 +1082,13 @@ export async function fetchWeeklyProjections(
   week: number
 ): Promise<unknown[]> {
   const url = `${BASE_URL}/projections/json/PlayerGameProjectionStatsByWeek/${season}/${week}?key=${apiKey}`;
-  console.log(`[SportsDataIO] Fetching week ${week} projections for ${season}...`);
-  
+  serverLogger.debug('Fetching weekly projections', { season, week });
+
   const response = await fetch(url);
   if (!response.ok) throw new Error(`Weekly Projections API error: ${response.status}`);
-  
+
   const data = await response.json();
-  console.log(`[SportsDataIO] Fetched ${Array.isArray(data) ? data.length : 0} weekly projections`);
+  serverLogger.debug('Fetched weekly projections', { count: Array.isArray(data) ? data.length : 0 });
   return data as unknown[];
 }
 
@@ -1100,13 +1101,13 @@ export async function fetchWeeklyProjections(
  */
 export async function fetchPlayers(apiKey: string): Promise<SportsDataIOPlayer[]> {
   const url = `${BASE_URL}/scores/json/Players?key=${apiKey}`;
-  console.log(`[SportsDataIO] Fetching all players...`);
-  
+  serverLogger.debug('Fetching all players');
+
   const response = await fetch(url);
   if (!response.ok) throw new Error(`Players API error: ${response.status}`);
-  
+
   const data = await response.json();
-  console.log(`[SportsDataIO] Fetched ${Array.isArray(data) ? data.length : 0} players`);
+  serverLogger.debug('Fetched all players', { count: Array.isArray(data) ? data.length : 0 });
   return data as SportsDataIOPlayer[];
 }
 
@@ -1132,13 +1133,13 @@ export async function fetchHeadshots(apiKey: string): Promise<Array<{
   [key: string]: unknown;
 }>> {
   const url = `${BASE_URL}/scores/json/Headshots?key=${apiKey}`;
-  console.log(`[SportsDataIO] Fetching headshots...`);
-  
+  serverLogger.debug('Fetching headshots');
+
   const response = await fetch(url);
   if (!response.ok) throw new Error(`Headshots API error: ${response.status}`);
-  
+
   const data = await response.json();
-  console.log(`[SportsDataIO] Fetched ${Array.isArray(data) ? data.length : 0} headshots`);
+  serverLogger.debug('Fetched headshots', { count: Array.isArray(data) ? data.length : 0 });
   return data as Array<{
     PlayerID: number;
     Name: string;
@@ -1273,8 +1274,8 @@ export async function fetchTimeframes(apiKey: string): Promise<Array<{
   [key: string]: unknown;
 }>> {
   const url = `${BASE_URL}/scores/json/Timeframes/current?key=${apiKey}`;
-  console.log(`[SportsDataIO] Fetching timeframes...`);
-  
+  serverLogger.debug('Fetching timeframes');
+
   const response = await fetch(url);
   if (!response.ok) throw new Error(`Timeframes API error: ${response.status}`);
   
@@ -1326,13 +1327,13 @@ export async function fetchScoresByWeek(
   week: number
 ): Promise<GameScore[]> {
   const url = `${BASE_URL}/scores/json/ScoresByWeek/${season}/${week}?key=${apiKey}`;
-  console.log(`[SportsDataIO] Fetching scores for ${season} week ${week}...`);
-  
+  serverLogger.debug('Fetching scores', { season, week });
+
   const response = await fetch(url);
   if (!response.ok) throw new Error(`Scores API error: ${response.status}`);
-  
+
   const data = await response.json();
-  console.log(`[SportsDataIO] Fetched ${Array.isArray(data) ? data.length : 0} scores`);
+  serverLogger.debug('Fetched scores', { count: Array.isArray(data) ? data.length : 0 });
   return data as GameScore[];
 }
 
@@ -1358,8 +1359,8 @@ export async function fetchBoxScore(
   team: string
 ): Promise<unknown> {
   const url = `${BASE_URL}/stats/json/BoxScore/${season}/${week}/${team}?key=${apiKey}`;
-  console.log(`[SportsDataIO] Fetching box score for ${team}...`);
-  
+  serverLogger.debug('Fetching box score', { team, season, week });
+
   const response = await fetch(url);
   if (!response.ok) throw new Error(`Box Score API error: ${response.status}`);
   
@@ -1376,13 +1377,13 @@ export async function fetchBoxScoresByWeek(
   week: number
 ): Promise<unknown[]> {
   const url = `${BASE_URL}/stats/json/BoxScores/${season}/${week}?key=${apiKey}`;
-  console.log(`[SportsDataIO] Fetching box scores for ${season} week ${week}...`);
-  
+  serverLogger.debug('Fetching box scores', { season, week });
+
   const response = await fetch(url);
   if (!response.ok) throw new Error(`Box Scores API error: ${response.status}`);
-  
+
   const data = await response.json();
-  console.log(`[SportsDataIO] Fetched ${Array.isArray(data) ? data.length : 0} box scores`);
+  serverLogger.debug('Fetched box scores', { count: Array.isArray(data) ? data.length : 0 });
   return data as unknown[];
 }
 
@@ -1492,13 +1493,13 @@ export async function fetchLivePlayerStats(
   week: number
 ): Promise<unknown[]> {
   const url = `${BASE_URL}/stats/json/PlayerGameStatsByWeek/${season}/${week}?key=${apiKey}`;
-  console.log(`[SportsDataIO] Fetching live player stats for ${season} week ${week}...`);
-  
+  serverLogger.debug('Fetching live player stats', { season, week });
+
   const response = await fetch(url);
   if (!response.ok) throw new Error(`Live Player Stats API error: ${response.status}`);
-  
+
   const data = await response.json();
-  console.log(`[SportsDataIO] Fetched ${Array.isArray(data) ? data.length : 0} player game stats`);
+  serverLogger.debug('Fetched player game stats', { count: Array.isArray(data) ? data.length : 0 });
   return data as unknown[];
 }
 
@@ -1576,13 +1577,13 @@ export async function fetchPlayerSeasonStats(
   season: number = new Date().getFullYear()
 ): Promise<unknown[]> {
   const url = `${BASE_URL}/stats/json/PlayerSeasonStats/${season}?key=${apiKey}`;
-  console.log(`[SportsDataIO] Fetching player season stats for ${season}...`);
-  
+  serverLogger.debug('Fetching player season stats', { season });
+
   const response = await fetch(url);
   if (!response.ok) throw new Error(`Player Season Stats API error: ${response.status}`);
-  
+
   const data = await response.json();
-  console.log(`[SportsDataIO] Fetched ${Array.isArray(data) ? data.length : 0} player season stats`);
+  serverLogger.debug('Fetched player season stats', { count: Array.isArray(data) ? data.length : 0 });
   return data as unknown[];
 }
 
@@ -1601,14 +1602,14 @@ export async function getPlayerSeasonStats(
     try {
       const cache = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));
       if (Date.now() - cache.timestamp < ttl) {
-        console.log(`[SportsDataIO] Using cached season stats for ${season}`);
+        serverLogger.debug('Using cached season stats', { season });
         return cache.data;
       }
-    } catch (e) {
+    } catch {
       // Ignore cache read errors
     }
   }
-  
+
   const data = await fetchPlayerSeasonStats(apiKey, season);
   
   ensureCacheDir();
@@ -1631,13 +1632,13 @@ export async function fetchPlayerGameStats(
   week: number
 ): Promise<unknown[]> {
   const url = `${BASE_URL}/stats/json/PlayerGameStatsByWeek/${season}/${week}?key=${apiKey}`;
-  console.log(`[SportsDataIO] Fetching player game stats for ${season} week ${week}...`);
-  
+  serverLogger.debug('Fetching player game stats', { season, week });
+
   const response = await fetch(url);
   if (!response.ok) throw new Error(`Player Game Stats API error: ${response.status}`);
-  
+
   const data = await response.json();
-  console.log(`[SportsDataIO] Fetched ${Array.isArray(data) ? data.length : 0} player game stats`);
+  serverLogger.debug('Fetched player game stats', { count: Array.isArray(data) ? data.length : 0 });
   return data as unknown[];
 }
 
@@ -1657,14 +1658,14 @@ export async function getPlayerGameStats(
     try {
       const cache = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));
       if (Date.now() - cache.timestamp < ttl) {
-        console.log(`[SportsDataIO] Using cached game stats for ${season} week ${week}`);
+        serverLogger.debug('Using cached game stats', { season, week });
         return cache.data;
       }
-    } catch (e) {
+    } catch {
       // Ignore cache read errors
     }
   }
-  
+
   const data = await fetchPlayerGameStats(apiKey, season, week);
   
   ensureCacheDir();
@@ -1687,13 +1688,13 @@ export async function fetchPlayerRedZoneStats(
   season: number = new Date().getFullYear()
 ): Promise<unknown[]> {
   const url = `${BASE_URL}/stats/json/PlayerSeasonRedZoneStats/${season}?key=${apiKey}`;
-  console.log(`[SportsDataIO] Fetching red zone stats for ${season}...`);
-  
+  serverLogger.debug('Fetching red zone stats', { season });
+
   const response = await fetch(url);
   if (!response.ok) throw new Error(`Red Zone Stats API error: ${response.status}`);
-  
+
   const data = await response.json();
-  console.log(`[SportsDataIO] Fetched ${Array.isArray(data) ? data.length : 0} red zone stats`);
+  serverLogger.debug('Fetched red zone stats', { count: Array.isArray(data) ? data.length : 0 });
   return data as unknown[];
 }
 
@@ -1712,14 +1713,14 @@ export async function getPlayerRedZoneStats(
     try {
       const cache = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));
       if (Date.now() - cache.timestamp < ttl) {
-        console.log(`[SportsDataIO] Using cached red zone stats for ${season}`);
+        serverLogger.debug('Using cached red zone stats', { season });
         return cache.data;
       }
-    } catch (e) {
+    } catch {
       // Ignore cache read errors
     }
   }
-  
+
   const data = await fetchPlayerRedZoneStats(apiKey, season);
   
   ensureCacheDir();
@@ -1813,13 +1814,13 @@ export async function getWeeklyFantasyStats(
  */
 export async function fetchADP(apiKey: string): Promise<ADPData[]> {
   const url = `${BASE_URL}/fantasy/json/DraftKings/DraftKingsADP?key=${apiKey}`;
-  console.log(`[SportsDataIO] Fetching ADP...`);
-  
+  serverLogger.debug('Fetching ADP');
+
   const response = await fetch(url);
   if (!response.ok) throw new Error(`ADP API error: ${response.status}`);
-  
+
   const data = await response.json();
-  console.log(`[SportsDataIO] Fetched ${Array.isArray(data) ? data.length : 0} ADP entries`);
+  serverLogger.debug('Fetched ADP', { entryCount: Array.isArray(data) ? data.length : 0 });
   return data as ADPData[];
 }
 
@@ -1859,13 +1860,13 @@ export async function deriveADPFromProjections(apiKey: string): Promise<ADPData[
  */
 export async function fetchFantasyRankings(apiKey: string): Promise<unknown[]> {
   const url = `${BASE_URL}/fantasy/json/DraftKings/DraftKingsPlayerOwnership?key=${apiKey}`;
-  console.log(`[SportsDataIO] Fetching fantasy rankings...`);
-  
+  serverLogger.debug('Fetching fantasy rankings');
+
   const response = await fetch(url);
   if (!response.ok) throw new Error(`Fantasy Rankings API error: ${response.status}`);
-  
+
   const data = await response.json();
-  console.log(`[SportsDataIO] Fetched ${Array.isArray(data) ? data.length : 0} fantasy rankings`);
+  serverLogger.debug('Fetched fantasy rankings', { count: Array.isArray(data) ? data.length : 0 });
   return data as unknown[];
 }
 
@@ -2083,7 +2084,7 @@ export function clearAllCaches(): void {
       fs.unlinkSync(filePath);
     }
   });
-  console.log('[SportsDataIO] All caches cleared');
+  serverLogger.info('All caches cleared');
 }
 
 // ============================================================================

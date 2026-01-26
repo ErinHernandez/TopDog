@@ -12,6 +12,7 @@ import type { IncomingMessage } from 'http';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { createCanvas } = require('canvas');
 import { extractTextFromImage, readTextFromImage, type OCRResult, type ReadResult } from './azureVision';
+import { serverLogger } from './logger/serverLogger';
 
 // ============================================================================
 // TYPES
@@ -139,7 +140,7 @@ export async function createClayTestImage(pageNumber: number): Promise<string> {
     
     return pngPath;
   } catch (error) {
-    console.error('Error creating Clay test image:', error);
+    serverLogger.error('Error creating Clay test image', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -153,7 +154,7 @@ export async function processClayPdfWithAzureVision(
   analysisType: AnalysisType = 'read'
 ): Promise<OCRResult | ReadResult> {
   try {
-    console.log(`Processing ESPN Clay PDF: ${pdfUrl}, Page: ${pageNumber}`);
+    serverLogger.debug('Processing ESPN Clay PDF', { pdfUrl, pageNumber });
     
     // For now, we'll create test images that simulate the Clay projections
     // In a production system, you'd convert the actual PDF pages to images
@@ -171,13 +172,12 @@ export async function processClayPdfWithAzureVision(
     try {
       await fs.unlink(testImagePath);
     } catch (cleanupError) {
-      const errorMessage = cleanupError instanceof Error ? cleanupError.message : 'Unknown error';
-      console.warn('Could not clean up temporary file:', errorMessage);
+      serverLogger.warn('Could not clean up temporary file');
     }
-    
+
     return result;
   } catch (error) {
-    console.error('Error processing Clay PDF with Azure Vision:', error);
+    serverLogger.error('Error processing Clay PDF with Azure Vision', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -195,7 +195,7 @@ export async function processMultipleClayPdfPages(
   
   for (let page = startPage; page <= endPage; page++) {
     try {
-      console.log(`Processing Clay PDF page ${page}...`);
+      serverLogger.debug('Processing Clay PDF page', { page });
       const result = await processClayPdfWithAzureVision(pdfUrl, page, analysisType);
       results.push({
         page,
@@ -204,7 +204,7 @@ export async function processMultipleClayPdfPages(
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error(`Error processing Clay PDF page ${page}:`, error);
+      serverLogger.error('Error processing Clay PDF page', error instanceof Error ? error : new Error(String(error)), { page });
       results.push({
         page,
         success: false,
@@ -248,7 +248,7 @@ export async function convertPdfPageToBase64(pdfPath: string, pageNumber: number
     await fs.unlink(imagePath);
     return `data:image/png;base64,${base64Image}`;
   } catch (error) {
-    console.error('Error converting PDF page to base64:', error);
+    serverLogger.error('Error converting PDF page to base64', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }

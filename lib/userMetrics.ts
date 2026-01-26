@@ -4,6 +4,9 @@
 
 import { auth } from './firebase';
 import type { User } from 'firebase/auth';
+import { createScopedLogger } from './clientLogger';
+
+const logger = createScopedLogger('[UserMetrics]');
 
 // ============================================================================
 // TYPES
@@ -443,7 +446,13 @@ class UserMetrics {
       const metrics = localStorage.getItem(this.metricsKey);
       return metrics ? JSON.parse(metrics) as UserMetrics : {} as UserMetrics;
     } catch (error) {
-      console.warn('Failed to get user metrics:', error);
+      logger.warn('Failed to get user metrics, clearing corrupted data');
+      // Clear corrupted data from localStorage to prevent future errors
+      try {
+        localStorage.removeItem(this.metricsKey);
+      } catch (clearError) {
+        logger.warn('Could not clear corrupted metrics from localStorage');
+      }
       return {} as UserMetrics;
     }
   }
@@ -457,7 +466,7 @@ class UserMetrics {
       // Send to analytics immediately
       this.sendToAnalytics('metrics_updated', metrics);
     } catch (error) {
-      console.warn('Failed to save user metrics:', error);
+      logger.warn('Failed to save user metrics');
     }
   }
 
@@ -544,19 +553,17 @@ class UserMetrics {
         sessionStorage.setItem(this.draftCompletionKey, timestamp.toString());
       }
 
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Draft completion recorded with full personal data:', {
-          tournamentName,
-          draftId,
-          userId: this.userId,
-          sessionId: this.sessionId,
-          timestamp
-        });
-      }
+      logger.debug('Draft completion recorded', {
+        tournamentName,
+        draftId,
+        userId: this.userId,
+        sessionId: this.sessionId,
+        timestamp
+      });
 
       return metrics;
     } catch (error) {
-      console.warn('Failed to record draft completion:', error);
+      logger.warn('Failed to record draft completion');
       return null;
     }
   }
@@ -567,7 +574,7 @@ class UserMetrics {
       const metrics = this.getMetrics();
       return metrics.lastDraftCompletion || null;
     } catch (error) {
-      console.warn('Failed to get last draft completion:', error);
+      logger.warn('Failed to get last draft completion');
       return null;
     }
   }
@@ -584,7 +591,7 @@ class UserMetrics {
       
       return hoursDiff <= hours;
     } catch (error) {
-      console.warn('Failed to check recent draft activity:', error);
+      logger.warn('Failed to check recent draft activity');
       return false;
     }
   }
@@ -611,7 +618,7 @@ class UserMetrics {
       }
       return null;
     } catch (error) {
-      console.warn('Failed to get exposure data cache:', error);
+      logger.warn('Failed to get exposure data cache');
       this.clearExposureDataCache();
       return null;
     }
@@ -627,11 +634,9 @@ class UserMetrics {
       localStorage.setItem(this.exposureDataKey, dataString);
       localStorage.setItem(this.exposureTimestampKey, timestamp);
       
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Exposure data cached successfully');
-      }
+      logger.debug('Exposure data cached successfully');
     } catch (error) {
-      console.warn('Failed to save exposure data cache:', error);
+      logger.warn('Failed to save exposure data cache');
     }
   }
 
@@ -642,7 +647,7 @@ class UserMetrics {
       localStorage.removeItem(this.exposureDataKey);
       localStorage.removeItem(this.exposureTimestampKey);
     } catch (error) {
-      console.warn('Failed to clear exposure data cache:', error);
+      logger.warn('Failed to clear exposure data cache');
     }
   }
 
@@ -694,7 +699,7 @@ class UserMetrics {
         timestamp
       });
     } catch (error) {
-      console.warn('Failed to record page visit:', error);
+      logger.warn('Failed to record page visit');
     }
   }
 
@@ -713,7 +718,7 @@ class UserMetrics {
         }
       });
     } catch (error) {
-      console.warn('Failed to send to Google Analytics:', error);
+      logger.warn('Failed to send to Google Analytics');
     }
   }
 
@@ -727,11 +732,9 @@ class UserMetrics {
       if (auth && auth.currentUser) {
         try {
           authToken = await auth.currentUser.getIdToken();
-        } catch (error) {
+        } catch {
           // If token fetch fails, continue without auth (for development)
-          if (process.env.NODE_ENV === 'development') {
-            console.warn('Failed to get auth token for analytics:', error);
-          }
+          logger.debug('Failed to get auth token for analytics');
         }
       }
       
@@ -746,17 +749,13 @@ class UserMetrics {
       
       if (authToken) {
         headers['Authorization'] = `Bearer ${authToken}`;
-        if (isDevelopment) {
-          console.debug('[Analytics] Sending request with Firebase auth token');
-        }
+        logger.debug('Sending request with Firebase auth token');
       } else if (isDevelopment) {
         // Development fallback - use dev-token if Firebase Admin is not configured
         headers['Authorization'] = 'Bearer dev-token';
-        console.debug('[Analytics] Sending request with dev-token (no Firebase auth token available)');
+        logger.debug('Sending request with dev-token (no Firebase auth token available)');
       } else {
-        if (isDevelopment) {
-          console.warn('[Analytics] No auth token available and not in development mode');
-        }
+        logger.warn('No auth token available and not in development mode');
       }
       
       // Send to your analytics endpoint
@@ -773,23 +772,18 @@ class UserMetrics {
           })
         });
         
-        // Log non-2xx responses in development for debugging
-        if (isDevelopment && !response.ok) {
+        // Log non-2xx responses for debugging
+        if (!response.ok) {
           const errorText = await response.text().catch(() => 'Unknown error');
-          console.warn(`Analytics API returned ${response.status}:`, errorText);
+          logger.debug('Analytics API error', { status: response.status, error: errorText });
         }
-      } catch (error) {
+      } catch {
         // Silently fail - don't block user experience
-        if (isDevelopment) {
-          console.warn('Analytics API call failed:', error);
-        }
-        // Don't re-throw - silently fail to not block user experience
+        logger.debug('Analytics API call failed');
       }
-    } catch (error) {
+    } catch {
       // Silently fail
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('Analytics send error:', error);
-      }
+      logger.debug('Analytics send error');
     }
   }
 
@@ -815,7 +809,7 @@ class UserMetrics {
           metrics.pageVisits[metrics.pageVisits.length - 1] as PageVisit : null
       };
     } catch (error) {
-      console.warn('Failed to get activity summary:', error);
+      logger.warn('Failed to get activity summary');
       return {
         userId: this.userId,
         sessionId: this.sessionId,
@@ -851,7 +845,7 @@ class UserMetrics {
         timestamp: Date.now()
       };
     } catch (error) {
-      console.warn('Failed to export comprehensive user data:', error);
+      logger.warn('Failed to export comprehensive user data');
       return {
         userId: this.userId,
         sessionId: this.sessionId,
@@ -889,7 +883,7 @@ class UserMetrics {
         fullMetrics: metrics // Include everything
       };
     } catch (error) {
-      console.warn('Failed to export metrics for research:', error);
+      logger.warn('Failed to export metrics for research');
       return {};
     }
   }
@@ -1278,7 +1272,7 @@ class UserMetrics {
         this.userInteractions = this.userInteractions.slice(-1000);
       }
     } catch (error) {
-      console.warn('Failed to track user behavior:', error);
+      logger.warn('Failed to track user behavior');
     }
   }
 }

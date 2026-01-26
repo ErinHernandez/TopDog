@@ -10,6 +10,9 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
+import { createScopedLogger } from '@/lib/clientLogger';
+
+const logger = createScopedLogger('[PayMongoCallback]');
 
 // ============================================================================
 // TYPES
@@ -56,7 +59,7 @@ export default function PayMongoCallback(): React.ReactElement {
       }, 2000);
       
     } catch (error) {
-      console.error('[PayMongo Callback] Error:', error);
+      logger.error('Error processing callback', error instanceof Error ? error : new Error(String(error)));
       setStatus('error');
       setMessage('An error occurred. Your payment may still be processing.');
     }

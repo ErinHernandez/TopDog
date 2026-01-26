@@ -6,10 +6,23 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { collection, query, orderBy, onSnapshot, getDocs } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, getDocs, DocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { db } from '../../../../lib/firebase';
 import { useAuth } from '../../auth'; // VX2 auth hook
 import { MyTeam, UseMyTeamsResult } from './useMyTeams';
+import { createScopedLogger } from '@/lib/clientLogger';
+
+const logger = createScopedLogger('[useMyTeamsSeasonal]');
+
+/**
+ * Roster player data from Firestore
+ */
+interface FirestoreRosterPlayer {
+  name: string;
+  team: string;
+  pickNumber: number;
+  position: string;
+}
 
 // ============================================================================
 // SEASONAL LOGIC
@@ -210,7 +223,7 @@ export function useMyTeamsSeasonal(): UseMyTeamsResult {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred';
       setError(errorMessage);
-      console.error('[useMyTeamsSeasonal] Fetch error:', err);
+      logger.error('Fetch error', err instanceof Error ? err : new Error(String(err)));
     } finally {
       setIsLoading(false);
       setIsRefetching(false);
@@ -229,7 +242,7 @@ export function useMyTeamsSeasonal(): UseMyTeamsResult {
       // After Week 17, off-season, or non-game day: Use one-time fetch
       // Team data is static on non-game days (player news doesn't change team data)
       // After Week 17, tournaments are complete and teams are final
-      console.log('[useMyTeamsSeasonal] Non-game day, after Week 17, or off-season: Using one-time fetch');
+      logger.debug('Non-game day, after Week 17, or off-season: Using one-time fetch');
       fetchData();
       return;
     }
@@ -237,7 +250,7 @@ export function useMyTeamsSeasonal(): UseMyTeamsResult {
     // Game day or post-game day during active tournament: Use real-time listener
     // Team data (points, status, rankings) updates during/after games
     // Only active until Week 17 ends
-    console.log('[useMyTeamsSeasonal] Game day or post-game during active tournament: Using real-time listener');
+    logger.debug('Game day or post-game during active tournament: Using real-time listener');
     setIsLoading(true);
     setError(null);
 
@@ -266,7 +279,7 @@ export function useMyTeamsSeasonal(): UseMyTeamsResult {
         setError(null);
       },
       (err) => {
-        console.error('[useMyTeamsSeasonal] Snapshot error:', err);
+        logger.error('Snapshot error', err instanceof Error ? err : new Error(String(err)));
         setError(err.message);
         setIsLoading(false);
       }
@@ -323,18 +336,18 @@ export function useMyTeamsGameDayOptimized(): UseMyTeamsResult {
   }, []);
 
   // Helper function to transform Firestore document to MyTeam
-  const transform = useCallback((doc: any): MyTeam => {
-    const data = doc.data();
+  const transform = useCallback((doc: DocumentSnapshot<DocumentData>): MyTeam => {
+    const data = doc.data() || {};
     return {
       id: doc.id,
-      name: data.tournamentName || 'Unnamed Team',
-      tournament: data.tournamentName,
-      tournamentId: data.tournamentId,
-      rank: data.rank,
+      name: (data.tournamentName as string) || 'Unnamed Team',
+      tournament: (data.tournamentName as string) || 'Unknown Tournament',
+      tournamentId: (data.tournamentId as string) || doc.id,
+      rank: data.rank as number | undefined,
       totalTeams: undefined,
-      projectedPoints: data.totalPoints || 0,
-      draftedAt: data.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
-      players: (data.roster || []).map((p: any) => ({
+      projectedPoints: (data.totalPoints as number) || 0,
+      draftedAt: (data.createdAt as { toDate?: () => Date })?.toDate?.()?.toISOString() || new Date().toISOString(),
+      players: ((data.roster as FirestoreRosterPlayer[]) || []).map((p: FirestoreRosterPlayer) => ({
         name: p.name,
         team: p.team,
         bye: 0,

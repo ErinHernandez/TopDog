@@ -7,6 +7,9 @@
 import { db, safeFirebaseOperation, isAuthEnabled, auth } from './firebase';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { POSITIONS } from './constants/positions';
+import { createScopedLogger } from './clientLogger';
+
+const logger = createScopedLogger('[AutodraftLimits]');
 
 // ============================================================================
 // TYPES
@@ -61,7 +64,7 @@ export const getAutodraftLimits = async (userId: string | null = null): Promise<
     if (userDoc.exists()) {
       const userData = userDoc.data();
       if (userData.autodraftLimits) {
-        console.log('📥 AUTODRAFT: Loaded limits from Firebase:', userData.autodraftLimits);
+        logger.debug('Loaded limits from Firebase', { limits: userData.autodraftLimits });
         return validateAutodraftLimits(userData.autodraftLimits);
       }
     }
@@ -95,7 +98,7 @@ export const setAutodraftLimits = async (
   const uid = userId || (auth?.currentUser?.uid || null);
   
   if (!uid || !isAuthEnabled()) {
-    console.log('💾 AUTODRAFT: Saved limits to localStorage only (no Firebase auth)');
+    logger.debug('Saved limits to localStorage only (no Firebase auth)');
     return validatedLimits;
   }
 
@@ -125,7 +128,7 @@ export const setAutodraftLimits = async (
       });
     }
     
-    console.log('☁️ AUTODRAFT: Synced limits to Firebase:', validatedLimits);
+    logger.debug('Synced limits to Firebase', { limits: validatedLimits });
     return validatedLimits;
   }, validatedLimits);
   
@@ -147,10 +150,15 @@ export const getLocalAutodraftLimits = (): AutodraftLimits => {
       return validateAutodraftLimits(parsed);
     }
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Error loading autodraft limits from localStorage:', errorMessage);
+    logger.error('Error loading autodraft limits from localStorage', error instanceof Error ? error : new Error(String(error)));
+    // Clear corrupted data from localStorage to prevent future errors
+    try {
+      localStorage.removeItem('autodraftLimits');
+    } catch (clearError) {
+      logger.warn('Could not clear corrupted autodraftLimits from localStorage');
+    }
   }
-  
+
   return DEFAULT_AUTODRAFT_LIMITS;
 };
 
@@ -165,11 +173,10 @@ export const setLocalAutodraftLimits = (limits: Partial<AutodraftLimits>): Autod
   try {
     const validatedLimits = validateAutodraftLimits(limits);
     localStorage.setItem('autodraftLimits', JSON.stringify(validatedLimits));
-    console.log('💾 AUTODRAFT: Saved limits to localStorage:', validatedLimits);
+    logger.debug('Saved limits to localStorage', { limits: validatedLimits });
     return validatedLimits;
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Error saving autodraft limits to localStorage:', errorMessage);
+    logger.error('Error saving autodraft limits to localStorage', error instanceof Error ? error : new Error(String(error)));
     return DEFAULT_AUTODRAFT_LIMITS;
   }
 };
@@ -222,8 +229,8 @@ export const setDevUserAutodraftLimits = async (limits: Partial<AutodraftLimits>
     TE: 3
   };
   
-  console.log('🧪 AUTODRAFT: Setting dev user limits:', testLimits);
-  
+  logger.debug('Setting dev user limits', { limits: testLimits });
+
   // Set for current user (dev user)
   return await setAutodraftLimits(testLimits);
 };

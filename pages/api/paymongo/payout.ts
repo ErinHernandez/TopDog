@@ -9,10 +9,11 @@
  */
 
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { 
+import {
   createPayout,
   createPayMongoTransaction,
   getSavedBankAccounts,
+  saveBankAccount,
   generateReference,
 } from '../../../lib/paymongo';
 import { toSmallestUnit, validateWithdrawalAmount, toDisplayAmount } from '../../../lib/paymongo/currencyConfig';
@@ -210,10 +211,54 @@ export default async function handler(
         userId: body.userId,
         saveForFuture: body.newBankAccount.saveForFuture,
       });
-      
-      // TODO: Save for future if requested
-      // Note: This TODO should be addressed in a future update
-      // Implementation would involve saving the bank account to user's saved accounts
+
+      // Save bank account for future use if requested
+      if (body.newBankAccount.saveForFuture) {
+        try {
+          // Create masked account number for display (show last 4 digits)
+          const accountNumberMasked = accountNumber.length > 4
+            ? '*'.repeat(accountNumber.length - 4) + accountNumber.slice(-4)
+            : accountNumber;
+
+          // Map bank code to bank name
+          const bankNames: Record<string, string> = {
+            'BPI': 'Bank of the Philippine Islands',
+            'BDO': 'BDO Unibank',
+            'UNIONBANK': 'UnionBank of the Philippines',
+            'METROBANK': 'Metropolitan Bank & Trust',
+            'LANDBANK': 'Land Bank of the Philippines',
+            'PNB': 'Philippine National Bank',
+            'RCBC': 'Rizal Commercial Banking Corporation',
+            'SECURITYBANK': 'Security Bank Corporation',
+            'CHINABANK': 'China Banking Corporation',
+            'EASTWEST': 'EastWest Banking Corporation',
+          };
+          const bankName = bankNames[bankCode.toUpperCase()] || bankCode;
+
+          const savedAccount = await saveBankAccount(body.userId, {
+            bankCode,
+            bankName,
+            accountNumber,
+            accountNumberMasked,
+            accountHolderName,
+            isDefault: false, // Don't automatically make it default
+          });
+          logger.info('Bank account saved for future use', {
+            component: 'paymongo',
+            operation: 'saveBankAccount',
+            userId: body.userId,
+            accountId: savedAccount.id,
+          });
+        } catch (saveError) {
+          // Log but don't fail the payout - saving is optional
+          logger.warn('Failed to save bank account for future use', {
+            component: 'paymongo',
+            operation: 'saveBankAccount',
+            userId: body.userId,
+            error: saveError instanceof Error ? saveError.message : String(saveError),
+          });
+        }
+      }
     } else {
       logger.info('Fetching saved bank account', {
         component: 'paymongo',

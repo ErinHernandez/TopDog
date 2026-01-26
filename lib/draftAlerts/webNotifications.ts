@@ -6,6 +6,9 @@
  */
 
 import { DraftAlertState, DraftAlertType } from './types';
+import { createScopedLogger } from '../clientLogger';
+
+const logger = createScopedLogger('[DraftAlerts]');
 
 /**
  * Check if web notifications are supported and permitted
@@ -87,7 +90,7 @@ export async function showWebNotification(
 
     return true;
   } catch (error) {
-    console.warn('[DraftAlerts] Failed to show web notification:', error);
+    logger.warn('Failed to show web notification');
     return false;
   }
 }

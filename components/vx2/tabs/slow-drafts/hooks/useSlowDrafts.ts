@@ -7,6 +7,9 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import useSWR from 'swr';
+import { createScopedLogger } from '@/lib/clientLogger';
+
+const logger = createScopedLogger('[useSlowDrafts]');
 import type {
   SlowDraft,
   MyPick,
@@ -50,7 +53,7 @@ async function fetcher<T>(url: string): Promise<T> {
     return data as T;
   } catch (error) {
     // Return empty array on any error to trigger mock data fallback
-    console.warn('[useSlowDrafts] Fetcher error, falling back to mock data:', error);
+    logger.warn('Fetcher error, falling back to mock data');
     return [] as T;
   }
 }
@@ -319,7 +322,7 @@ export function useSlowDrafts(options: UseSlowDraftsOptions = {}): UseSlowDrafts
         // Silently fall back to mock data - don't log errors in development
         // as we expect API to fail when userId is not provided
         if (process.env.NODE_ENV === 'production') {
-          console.error('[useSlowDrafts] API error:', err);
+          logger.error('API error', err instanceof Error ? err : new Error(String(err)));
         }
       },
       // Don't throw errors - gracefully fall back to mock data
@@ -376,7 +379,7 @@ export function useSlowDrafts(options: UseSlowDraftsOptions = {}): UseSlowDrafts
       const shouldInclude = isTopDogInternational && !isExcluded;
       
       if (!shouldInclude && process.env.NODE_ENV === 'development') {
-        console.log('[useSlowDrafts] Filtering out:', draft.tournamentName, {
+        logger.debug(`Filtering out: ${draft.tournamentName}`, {
           isTopDogInternational,
           isExcluded,
           name
@@ -388,7 +391,7 @@ export function useSlowDrafts(options: UseSlowDraftsOptions = {}): UseSlowDrafts
     
     // Debug log in development
     if (process.env.NODE_ENV === 'development') {
-      console.log('[useSlowDrafts] Filter results:', {
+      logger.debug('Filter results', {
         total: allDrafts.length,
         filtered: filtered.length,
         removed: allDrafts.length - filtered.length,
@@ -420,7 +423,8 @@ export function useSlowDrafts(options: UseSlowDraftsOptions = {}): UseSlowDrafts
 
     // Debug log counts in development
     if (process.env.NODE_ENV === 'development') {
-      console.log('[useSlowDrafts] Counts calculated:', countsResult, {
+      logger.debug('Counts calculated', {
+        ...countsResult,
         fromDraftsCount: drafts.length,
         tournamentNames: drafts.map(d => d.tournamentName),
       });

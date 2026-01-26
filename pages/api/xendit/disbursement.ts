@@ -9,10 +9,11 @@
  */
 
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { 
+import {
   createDisbursement,
   createXenditTransaction,
   getSavedDisbursementAccounts,
+  saveDisbursementAccount,
   generateReference,
 } from '../../../lib/xendit';
 import { validateWithdrawalAmount } from '../../../lib/xendit/currencyConfig';
@@ -205,10 +206,64 @@ export default async function handler(
         userId: body.userId,
         saveForFuture: body.newAccount.saveForFuture,
       });
-      
-      // TODO: Save for future if requested
-      // Note: This TODO should be addressed in a future update
-      // Implementation would involve saving the account to user's saved accounts
+
+      // Save account for future use if requested
+      if (body.newAccount.saveForFuture) {
+        try {
+          // Create masked account number for display (show last 4 digits)
+          const accountNumberMasked = accountNumber.length > 4
+            ? '*'.repeat(accountNumber.length - 4) + accountNumber.slice(-4)
+            : accountNumber;
+
+          // Determine account type and channel name
+          const isEwallet = ['GCASH', 'GRABPAY', 'PAYMAYA', 'SHOPEEPAY'].includes(bankCode.toUpperCase());
+          const type = isEwallet ? 'ewallet' : 'bank' as const;
+
+          // Map channel code to channel name
+          const channelNames: Record<string, string> = {
+            // Banks
+            'BCA': 'Bank Central Asia',
+            'BNI': 'Bank Negara Indonesia',
+            'BRI': 'Bank Rakyat Indonesia',
+            'MANDIRI': 'Bank Mandiri',
+            'CIMB': 'CIMB Niaga',
+            'PERMATA': 'PermataBank',
+            'BSI': 'Bank Syariah Indonesia',
+            // E-wallets
+            'GCASH': 'GCash',
+            'GRABPAY': 'GrabPay',
+            'PAYMAYA': 'PayMaya',
+            'SHOPEEPAY': 'ShopeePay',
+            'OVO': 'OVO',
+            'DANA': 'DANA',
+          };
+          const channelName = channelNames[bankCode.toUpperCase()] || bankCode;
+
+          const savedAccount = await saveDisbursementAccount(body.userId, {
+            type,
+            channelCode: bankCode,
+            channelName,
+            accountNumber,
+            accountNumberMasked,
+            accountHolderName,
+            isDefault: false, // Don't automatically make it default
+          });
+          logger.info('Disbursement account saved for future use', {
+            component: 'xendit',
+            operation: 'saveDisbursementAccount',
+            userId: body.userId,
+            accountId: savedAccount.id,
+          });
+        } catch (saveError) {
+          // Log but don't fail the disbursement - saving is optional
+          logger.warn('Failed to save disbursement account for future use', {
+            component: 'xendit',
+            operation: 'saveDisbursementAccount',
+            userId: body.userId,
+            error: saveError instanceof Error ? saveError.message : String(saveError),
+          });
+        }
+      }
     } else {
       logger.info('Fetching saved disbursement account', {
         component: 'xendit',

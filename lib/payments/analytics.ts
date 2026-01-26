@@ -14,6 +14,7 @@
 import { getDb } from '../firebase-utils';
 import { doc, setDoc, increment, serverTimestamp, collection, addDoc } from 'firebase/firestore';
 import { isPaystackCountry, PAYSTACK_COUNTRIES } from './types';
+import { serverLogger } from '../logger/serverLogger';
 
 // ============================================================================
 // TYPES
@@ -112,7 +113,7 @@ export async function trackPaymentEvent(data: PaymentAnalyticsData): Promise<voi
     await updateAggregates(data);
   } catch (error) {
     // Don't fail the main operation if analytics fails
-    console.error('[PaymentAnalytics] Failed to track event:', error);
+    serverLogger.error('PaymentAnalytics failed to track event', error instanceof Error ? error : new Error(String(error)));
   }
 }
 

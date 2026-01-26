@@ -1,11 +1,15 @@
 /**
  * Web Vitals Collection
- * 
+ *
  * Client-side utility for collecting and reporting Core Web Vitals
  * and other performance metrics to the performance API.
- * 
+ *
  * @module lib/performance/webVitals
  */
+
+import { createScopedLogger } from '../clientLogger';
+
+const logger = createScopedLogger('[WebVitals]');
 
 // ============================================================================
 // TYPES
@@ -76,7 +80,7 @@ export function collectLCP(onMetric: (metric: WebVitalsMetric) => void): void {
     observer.observe({ entryTypes: ['largest-contentful-paint'] });
   } catch (error) {
     // PerformanceObserver not supported or error
-    console.warn('[WebVitals] LCP collection failed:', error);
+    logger.warn('LCP collection failed');
   }
 }
 
@@ -110,7 +114,7 @@ export function collectFID(onMetric: (metric: WebVitalsMetric) => void): void {
 
     observer.observe({ entryTypes: ['first-input'] });
   } catch (error) {
-    console.warn('[WebVitals] FID collection failed:', error);
+    logger.warn('FID collection failed');
   }
 }
 
@@ -166,7 +170,7 @@ export function collectCLS(onMetric: (metric: WebVitalsMetric) => void): void {
       }
     });
   } catch (error) {
-    console.warn('[WebVitals] CLS collection failed:', error);
+    logger.warn('CLS collection failed');
   }
 }
 
@@ -197,7 +201,7 @@ export function collectFCP(onMetric: (metric: WebVitalsMetric) => void): void {
 
     observer.observe({ entryTypes: ['paint'] });
   } catch (error) {
-    console.warn('[WebVitals] FCP collection failed:', error);
+    logger.warn('FCP collection failed');
   }
 }
 
@@ -225,7 +229,7 @@ export function collectTTFB(onMetric: (metric: WebVitalsMetric) => void): void {
       });
     }
   } catch (error) {
-    console.warn('[WebVitals] TTFB collection failed:', error);
+    logger.warn('TTFB collection failed');
   }
 }
 
@@ -341,8 +345,8 @@ function sendMetrics(
       },
       body: JSON.stringify(metrics),
       keepalive: true, // Keep request alive even if page unloads
-    }).catch((error) => {
-      console.warn('[WebVitals] Failed to send metrics:', error);
+    }).catch(() => {
+      logger.warn('Failed to send metrics');
     });
   }
 }

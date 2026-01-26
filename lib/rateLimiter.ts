@@ -39,6 +39,7 @@ import {
 import { initializeApp, getApps } from 'firebase/app';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { FirebaseApp } from 'firebase/app';
+import { serverLogger } from './logger/serverLogger';
 
 // Initialize Firebase if not already initialized
 const firebaseConfig = {
@@ -242,8 +243,8 @@ export class RateLimiter {
       
       return result;
     } catch (error) {
-      console.error('Rate limiter error:', error);
-      
+      serverLogger.error('Rate limiter error', error instanceof Error ? error : new Error(String(error)));
+
       // On error, allow request (fail open for availability)
       // But log the error for monitoring and alerting
       
@@ -322,7 +323,7 @@ export class RateLimiter {
         resetAt: windowEndMs,
       };
     } catch (error) {
-      console.error('Rate limiter status error:', error);
+      serverLogger.error('Rate limiter status error', error instanceof Error ? error : new Error(String(error)));
       return {
         allowed: true,
         remaining: this.config.maxRequests,
@@ -351,7 +352,7 @@ export class RateLimiter {
       
       return { deleted: snapshot.docs.length };
     } catch (error) {
-      console.error('Rate limiter cleanup error:', error);
+      serverLogger.error('Rate limiter cleanup error', error instanceof Error ? error : new Error(String(error)));
       return { deleted: 0 };
     }
   }

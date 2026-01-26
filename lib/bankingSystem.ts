@@ -3,6 +3,8 @@
  * Handles deposit creation and banking operations
  */
 
+import { serverLogger } from './logger/serverLogger';
+
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -36,7 +38,7 @@ export const createDeposit = async (
   userData: UserData | null | undefined
 ): Promise<DepositResult> => {
   // Mock implementation - in real app this would integrate with actual banking system
-  console.log(`Creating deposit of $${amount} using ${method} for user ${userData?.id}`);
+  serverLogger.info(`Creating deposit of $${amount} using ${method} for user ${userData?.id}`);
   
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 1000));

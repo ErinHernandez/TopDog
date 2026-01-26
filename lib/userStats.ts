@@ -5,6 +5,9 @@
 
 import { db, safeFirebaseOperation, isAuthEnabled } from './firebase';
 import { doc, updateDoc, getDoc, setDoc, increment, arrayUnion, serverTimestamp, Timestamp } from 'firebase/firestore';
+import { createScopedLogger } from './clientLogger';
+
+const logger = createScopedLogger('[UserStats]');
 
 // ============================================================================
 // TYPES
@@ -307,8 +310,7 @@ export const initializeUserStats = async (userId: string): Promise<UserStats> =>
     await setDoc(doc(db, 'users', userId), userStats);
     return userStats;
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Error initializing user stats:', errorMessage);
+    logger.error('Error initializing user stats', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 };
@@ -355,8 +357,7 @@ export const updateDepositStats = async (userId: string, amount: number): Promis
     
     await updateDoc(userRef, updates);
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Error updating deposit stats:', errorMessage);
+    logger.error('Error updating deposit stats', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 };
@@ -402,8 +403,7 @@ export const updateTournamentEntryStats = async (
     
     await updateDoc(userRef, updates);
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Error updating tournament entry stats:', errorMessage);
+    logger.error('Error updating tournament entry stats', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 };
@@ -426,7 +426,7 @@ export const updateTournamentResultStats = async (
     const userDoc = await getDoc(userRef);
     
     if (!userDoc.exists()) {
-      console.warn('User document does not exist for tournament result update');
+      logger.warn('User document does not exist for tournament result update');
       return;
     }
     
@@ -497,8 +497,7 @@ export const updateTournamentResultStats = async (
     
     await updateDoc(userRef, updates);
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Error updating tournament result stats:', errorMessage);
+    logger.error('Error updating tournament result stats', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 };
@@ -560,8 +559,7 @@ export const updateDraftStats = async (userId: string, draftData: DraftData): Pr
     
     await updateDoc(userRef, updates);
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Error updating draft stats:', errorMessage);
+    logger.error('Error updating draft stats', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 };
@@ -594,8 +592,7 @@ export const updateActivityStats = async (userId: string, sessionData: SessionDa
     
     await updateDoc(userRef, updates);
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Error updating activity stats:', errorMessage);
+    logger.error('Error updating activity stats', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 };
@@ -726,7 +723,7 @@ export const getUserStats = async (userId: string): Promise<UserStats | null> =>
 
   // If authentication is not enabled, return mock data
   if (!isAuthEnabled()) {
-    console.log('🔄 Using mock user stats (Firebase auth not enabled)');
+    logger.debug('Using mock user stats (Firebase auth not enabled)');
     return getMockUserStats(userId);
   }
 

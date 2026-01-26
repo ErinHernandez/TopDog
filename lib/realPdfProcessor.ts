@@ -12,6 +12,7 @@ import type { IncomingMessage } from 'http';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sharp = require('sharp');
 import { extractTextFromImage, readTextFromImage, type OCRResult, type ReadResult } from './azureVision';
+import { serverLogger } from './logger/serverLogger';
 
 // ============================================================================
 // TYPES
@@ -94,8 +95,8 @@ export interface ClayTestPlayer {
  */
 export async function downloadPdfFromUrl(url: string): Promise<Buffer> {
   return new Promise((resolve, reject) => {
-    console.log(`📥 Downloading PDF from: ${url}`);
-    
+    serverLogger.debug('Downloading PDF', { url });
+
     https.get(url, (response: IncomingMessage) => {
       if (response.statusCode !== 200) {
         reject(new Error(`Failed to download PDF: ${response.statusCode}`));
@@ -106,7 +107,7 @@ export async function downloadPdfFromUrl(url: string): Promise<Buffer> {
       response.on('data', (chunk: Buffer) => chunks.push(chunk));
       response.on('end', () => {
         const buffer = Buffer.concat(chunks);
-        console.log(`✅ Downloaded PDF: ${buffer.length} bytes`);
+        serverLogger.debug('Downloaded PDF', { bytes: buffer.length });
         resolve(buffer);
       });
     }).on('error', reject);
@@ -124,10 +125,10 @@ export async function savePdfToFile(
     await fs.mkdir('./temp', { recursive: true });
     const filepath = `./temp/${filename}`;
     await fs.writeFile(filepath, pdfBuffer);
-    console.log(`💾 Saved PDF to: ${filepath}`);
+    serverLogger.debug('Saved PDF to file', { filepath });
     return filepath;
   } catch (error) {
-    console.error('Error saving PDF:', error);
+    serverLogger.error('Error saving PDF', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -222,7 +223,7 @@ export async function createRealisticClayImage(pageNumber: number): Promise<stri
     
     return pngPath;
   } catch (error) {
-    console.error('Error creating realistic Clay image:', error);
+    serverLogger.error('Error creating realistic Clay image', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -236,14 +237,14 @@ export async function processRealClayPdf(
   analysisType: AnalysisType = 'read'
 ): Promise<OCRResult | ReadResult> {
   try {
-    console.log(`🚀 Processing real ESPN Clay PDF: ${pdfUrl}, Page: ${pageNumber}`);
-    
+    serverLogger.debug('Processing real ESPN Clay PDF', { pdfUrl, pageNumber, analysisType });
+
     // Step 1: Download the PDF (simulated for now)
-    console.log(`📥 Simulating PDF download from: ${pdfUrl}`);
-    
+    serverLogger.debug('Simulating PDF download', { pdfUrl });
+
     // Step 2: Create realistic test image
     const imagePath = await createRealisticClayImage(pageNumber);
-    
+
     // Step 3: Process image through Azure Computer Vision
     let result: OCRResult | ReadResult;
     if (analysisType === 'ocr') {
@@ -251,19 +252,19 @@ export async function processRealClayPdf(
     } else {
       result = await readTextFromImage(imagePath);
     }
-    
+
     // Step 4: Clean up temporary files
     try {
       await fs.unlink(imagePath);
-      console.log(`🧹 Cleaned up image: ${imagePath}`);
+      serverLogger.debug('Cleaned up image', { imagePath });
     } catch (cleanupError) {
       const errorMessage = cleanupError instanceof Error ? cleanupError.message : 'Unknown error';
-      console.warn('Could not clean up image file:', errorMessage);
+      serverLogger.warn('Could not clean up image file', { error: errorMessage });
     }
-    
+
     return result;
   } catch (error) {
-    console.error('Error processing real Clay PDF:', error);
+    serverLogger.error('Error processing real Clay PDF', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -278,24 +279,24 @@ export async function processMultipleRealClayPdfPages(
   analysisType: AnalysisType = 'read'
 ): Promise<PageProcessingResult[]> {
   const results: PageProcessingResult[] = [];
-  
+
   try {
-    console.log(`📥 Simulating PDF download for pages ${startPage}-${endPage}...`);
-    
+    serverLogger.debug('Simulating PDF download for pages', { startPage, endPage });
+
     for (let page = startPage; page <= endPage; page++) {
       try {
-        console.log(`📄 Processing real Clay PDF page ${page}...`);
+        serverLogger.debug('Processing real Clay PDF page', { page });
         const result = await processRealClayPdf(pdfUrl, page, analysisType);
-        
+
         results.push({
           page,
           success: true,
           result
         });
-        
+
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        console.error(`Error processing page ${page}:`, error);
+        serverLogger.error(`Error processing page ${page}`, error instanceof Error ? error : new Error(String(error)));
         results.push({
           page,
           success: false,
@@ -303,12 +304,12 @@ export async function processMultipleRealClayPdfPages(
         });
       }
     }
-    
+
   } catch (error) {
-    console.error('Error in multi-page processing:', error);
+    serverLogger.error('Error in multi-page processing', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
-  
+
   return results;
 }
 
@@ -318,22 +319,22 @@ export async function processMultipleRealClayPdfPages(
 export function parsePlayerData(text: string): ParsedPlayer[] {
   const players: ParsedPlayer[] = [];
   const lines = text.split('\n');
-  
-  console.log('🔍 Parsing text lines:', lines.length);
-  
+
+  serverLogger.debug('Parsing text lines', { lineCount: lines.length });
+
   // First, let's clean and normalize the text
   const cleanedLines = lines
     .map(line => line.trim())
     .filter(line => line.length > 0)
     .filter(line => !line.includes('ESPN Clay Projections') && !line.includes('Source:'))
     .filter(line => !line.includes('Rank Player Name') && !line.includes('Pos Team'));
-  
-  console.log(`🧹 Cleaned to ${cleanedLines.length} relevant lines`);
-  
+
+  serverLogger.debug('Cleaned to relevant lines', { cleanedLineCount: cleanedLines.length });
+
   // Use advanced pattern matching to find complete player entries
   const playerEntries = findCompletePlayerEntries(cleanedLines);
-  console.log(`🎯 Found ${playerEntries.length} complete player entries`);
-  
+  serverLogger.debug('Found complete player entries', { entryCount: playerEntries.length });
+
   // Parse each player entry with enhanced validation
   for (const entry of playerEntries) {
     const player = parsePlayerWithValidation(entry);
@@ -341,8 +342,8 @@ export function parsePlayerData(text: string): ParsedPlayer[] {
       players.push(player);
     }
   }
-  
-  console.log(`🎯 Successfully parsed ${players.length} players`);
+
+  serverLogger.debug('Successfully parsed players', { playerCount: players.length });
   return players;
 }
 
@@ -509,22 +510,21 @@ function mergeRelatedEntries(entries: PlayerEntry[]): PlayerEntry[] {
  * Parse player with enhanced validation
  */
 function parsePlayerWithValidation(entry: PlayerEntry): ParsedPlayer | null {
-  console.log(`🔍 Processing entry: [${entry.lines.join(' | ')}]`);
-  console.log(`📊 Entry confidence: ${entry.confidence.toFixed(2)}`);
-  
+  serverLogger.debug('Processing entry', { lines: entry.lines.join(' | '), confidence: entry.confidence.toFixed(2) });
+
   // Extract player info and stats using enhanced parsing
   const playerData = extractPlayerDataWithValidation(entry);
   if (!playerData.name || !playerData.position || !playerData.team) {
-    console.log(`❌ Missing player info: name=${playerData.name}, pos=${playerData.position}, team=${playerData.team}`);
+    serverLogger.debug('Missing player info', { name: playerData.name, position: playerData.position, team: playerData.team });
     return null;
   }
-  
+
   // Validate the extracted data
   if (!validatePlayerData(playerData)) {
-    console.log(`❌ Player data validation failed`);
+    serverLogger.debug('Player data validation failed');
     return null;
   }
-  
+
   const player: ParsedPlayer = {
     rank: entry.rank,
     name: playerData.name,
@@ -538,8 +538,8 @@ function parsePlayerWithValidation(entry: PlayerEntry): ParsedPlayer | null {
     recTDs: playerData.recTDs,
     fantasyPoints: playerData.fantasyPoints
   };
-  
-  console.log(`✅ Parsed player: ${playerData.name} (${playerData.position}, ${playerData.team}) - Rank ${entry.rank} - ${playerData.fantasyPoints} pts`);
+
+  serverLogger.debug('Parsed player', { name: playerData.name, position: playerData.position, team: playerData.team, rank: entry.rank, fantasyPoints: playerData.fantasyPoints });
   return player;
 }
 
@@ -562,7 +562,7 @@ function extractPlayerDataWithValidation(entry: PlayerEntry): PlayerData {
   
   // Join all lines to get the full context
   const fullText = entry.lines.join(' ');
-  console.log(`📝 Full text: "${fullText}"`);
+  serverLogger.debug('Full text for extraction', { fullText });
   
   // Extract player info using multiple validation patterns
   extractPlayerInfoWithValidation(fullText, playerData);
@@ -608,11 +608,11 @@ function extractPlayerInfoWithValidation(text: string, playerData: PlayerData): 
  * Extract statistics with validation
  */
 function extractStatisticsWithValidation(text: string, playerData: PlayerData): void {
-  console.log(`📊 Extracting stats from: "${text}"`);
-  
+  serverLogger.debug('Extracting stats from text', { text });
+
   // Extract all numbers with their context and validation
   const numbers = extractNumbersWithValidation(text);
-  console.log(`🔢 Found numbers with validation:`, numbers);
+  serverLogger.debug('Found numbers with validation', { count: numbers.length });
   
   // Classify numbers using advanced algorithms
   classifyNumbersWithAdvancedLogic(numbers, playerData);
@@ -685,9 +685,9 @@ function classifyNumbersWithAdvancedLogic(numbers: NumberWithContext[], playerDa
   // Remove the rank number from consideration
   const rank = playerData.rank || 0;
   const filteredNumbers = numbers.filter(num => num.value !== rank);
-  
-  console.log(`🔢 Filtered numbers (excluding rank ${rank}):`, filteredNumbers.map(n => `${n.value}(${n.confidence.toFixed(2)})`));
-  
+
+  serverLogger.debug('Filtered numbers (excluding rank)', { rank, numbers: filteredNumbers.map(n => `${n.value}(${n.confidence.toFixed(2)})`) });
+
   // Sort by confidence and value for better classification
   const sortedNumbers = [...filteredNumbers].sort((a, b) => {
     // First sort by confidence, then by value
@@ -696,45 +696,45 @@ function classifyNumbersWithAdvancedLogic(numbers: NumberWithContext[], playerDa
     }
     return b.value - a.value;
   });
-  
+
   for (const num of sortedNumbers) {
     // Use position-specific logic for better classification
     const position = playerData.position;
-    
+
     // Fantasy points are typically between 100-500
     if (playerData.fantasyPoints === 0 && num.value >= 100 && num.value <= 500) {
       playerData.fantasyPoints = num.value;
-      console.log(`🎯 Assigned ${num.value} as fantasy points (confidence: ${num.confidence.toFixed(2)})`);
+      serverLogger.debug('Assigned fantasy points', { value: num.value, confidence: num.confidence.toFixed(2) });
     }
     // Passing yards for QBs: 3000-6000
     else if (playerData.passYards === 0 && num.value >= 3000 && num.value <= 6000 && position === 'QB') {
       playerData.passYards = num.value;
-      console.log(`🎯 Assigned ${num.value} as passing yards (confidence: ${num.confidence.toFixed(2)})`);
+      serverLogger.debug('Assigned passing yards', { value: num.value, confidence: num.confidence.toFixed(2) });
     }
     // Rushing yards: 800-2000
     else if (playerData.rushYards === 0 && num.value >= 800 && num.value <= 2000) {
       playerData.rushYards = num.value;
-      console.log(`🎯 Assigned ${num.value} as rushing yards (confidence: ${num.confidence.toFixed(2)})`);
+      serverLogger.debug('Assigned rushing yards', { value: num.value, confidence: num.confidence.toFixed(2) });
     }
     // Receiving yards: 800-2000
     else if (playerData.recYards === 0 && num.value >= 800 && num.value <= 2000) {
       playerData.recYards = num.value;
-      console.log(`🎯 Assigned ${num.value} as receiving yards (confidence: ${num.confidence.toFixed(2)})`);
+      serverLogger.debug('Assigned receiving yards', { value: num.value, confidence: num.confidence.toFixed(2) });
     }
     // Passing TDs: 20-50
     else if (playerData.passTDs === 0 && num.value >= 20 && num.value <= 50 && position === 'QB') {
       playerData.passTDs = num.value;
-      console.log(`🎯 Assigned ${num.value} as passing TDs (confidence: ${num.confidence.toFixed(2)})`);
+      serverLogger.debug('Assigned passing TDs', { value: num.value, confidence: num.confidence.toFixed(2) });
     }
     // Rushing TDs: 5-20
     else if (playerData.rushTDs === 0 && num.value >= 5 && num.value <= 20) {
       playerData.rushTDs = num.value;
-      console.log(`🎯 Assigned ${num.value} as rushing TDs (confidence: ${num.confidence.toFixed(2)})`);
+      serverLogger.debug('Assigned rushing TDs', { value: num.value, confidence: num.confidence.toFixed(2) });
     }
     // Receiving TDs: 5-20
     else if (playerData.recTDs === 0 && num.value >= 5 && num.value <= 20) {
       playerData.recTDs = num.value;
-      console.log(`🎯 Assigned ${num.value} as receiving TDs (confidence: ${num.confidence.toFixed(2)})`);
+      serverLogger.debug('Assigned receiving TDs', { value: num.value, confidence: num.confidence.toFixed(2) });
     }
   }
 }
@@ -751,7 +751,7 @@ function findFantasyPointsWithValidation(text: string, playerData: PlayerData): 
         const value = parseFloat(match);
         if (value >= 100 && value <= 500) {
           playerData.fantasyPoints = value;
-          console.log(`🎯 Found fantasy points: ${value} (from "${match}")`);
+          serverLogger.debug('Found fantasy points', { value, match });
           break;
         }
       }
@@ -765,52 +765,52 @@ function findFantasyPointsWithValidation(text: string, playerData: PlayerData): 
 function validatePlayerData(playerData: PlayerData): boolean {
   // Validate name
   if (!playerData.name || playerData.name.length < 2 || playerData.name.length > 50) {
-    console.log(`❌ Name validation failed: "${playerData.name}"`);
+    serverLogger.debug('Name validation failed', { name: playerData.name });
     return false;
   }
-  
+
   // Validate position
   if (!playerData.position || !['QB', 'RB', 'WR', 'TE'].includes(playerData.position)) {
-    console.log(`❌ Position validation failed: "${playerData.position}"`);
+    serverLogger.debug('Position validation failed', { position: playerData.position });
     return false;
   }
-  
+
   // Validate team - be more flexible with team codes
   if (!playerData.team || playerData.team.length < 2 || playerData.team.length > 3 || !/^[A-Z]{2,3}$/.test(playerData.team)) {
-    console.log(`❌ Team validation failed: "${playerData.team}"`);
+    serverLogger.debug('Team validation failed', { team: playerData.team });
     return false;
   }
-  
+
   // Validate statistics ranges - be more permissive
   if (playerData.passYards < 0 || playerData.passYards > 15000) {
-    console.log(`❌ Pass yards validation failed: ${playerData.passYards}`);
+    serverLogger.debug('Pass yards validation failed', { passYards: playerData.passYards });
     return false;
   }
   if (playerData.passTDs < 0 || playerData.passTDs > 100) {
-    console.log(`❌ Pass TDs validation failed: ${playerData.passTDs}`);
+    serverLogger.debug('Pass TDs validation failed', { passTDs: playerData.passTDs });
     return false;
   }
   if (playerData.rushYards < 0 || playerData.rushYards > 5000) {
-    console.log(`❌ Rush yards validation failed: ${playerData.rushYards}`);
+    serverLogger.debug('Rush yards validation failed', { rushYards: playerData.rushYards });
     return false;
   }
   if (playerData.rushTDs < 0 || playerData.rushTDs > 50) {
-    console.log(`❌ Rush TDs validation failed: ${playerData.rushTDs}`);
+    serverLogger.debug('Rush TDs validation failed', { rushTDs: playerData.rushTDs });
     return false;
   }
   if (playerData.recYards < 0 || playerData.recYards > 3000) {
-    console.log(`❌ Rec yards validation failed: ${playerData.recYards}`);
+    serverLogger.debug('Rec yards validation failed', { recYards: playerData.recYards });
     return false;
   }
   if (playerData.recTDs < 0 || playerData.recTDs > 30) {
-    console.log(`❌ Rec TDs validation failed: ${playerData.recTDs}`);
+    serverLogger.debug('Rec TDs validation failed', { recTDs: playerData.recTDs });
     return false;
   }
   if (playerData.fantasyPoints < 0 || playerData.fantasyPoints > 1000) {
-    console.log(`❌ Fantasy points validation failed: ${playerData.fantasyPoints}`);
+    serverLogger.debug('Fantasy points validation failed', { fantasyPoints: playerData.fantasyPoints });
     return false;
   }
-  
+
   return true;
 }
 

@@ -10,6 +10,7 @@ const ComputerVisionClient = require('@azure/cognitiveservices-computervision').
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const ApiKeyCredentials = require('@azure/ms-rest-js').ApiKeyCredentials;
 import * as fs from 'fs/promises';
+import { serverLogger } from './logger/serverLogger';
 
 // ============================================================================
 // TYPES
@@ -81,7 +82,7 @@ async function convertFileToBase64(filePath: string): Promise<string> {
     const imageBuffer = await fs.readFile(filePath);
     return imageBuffer.toString('base64');
   } catch (error) {
-    console.error('Error converting file to base64:', error);
+    serverLogger.error('Error converting file to base64', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -138,7 +139,7 @@ export async function extractTextFromImage(imageUrl: string): Promise<OCRResult>
       };
     }
   } catch (error) {
-    console.error('Error extracting text from image:', error);
+    serverLogger.error('Error extracting text from image', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -203,7 +204,7 @@ export async function readTextFromImage(imageUrl: string): Promise<ReadResult> {
       fullResult: readResult
     };
   } catch (error) {
-    console.error('Error reading text from image:', error);
+    serverLogger.error('Error reading text from image', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -235,7 +236,7 @@ export async function analyzeImage(imageUrl: string): Promise<unknown> {
     
     return result;
   } catch (error) {
-    console.error('Error analyzing image:', error);
+    serverLogger.error('Error analyzing image', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -259,7 +260,7 @@ export async function detectObjects(imageUrl: string): Promise<unknown> {
     
     return result;
   } catch (error) {
-    console.error('Error detecting objects:', error);
+    serverLogger.error('Error detecting objects', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -283,7 +284,7 @@ export async function detectFaces(imageUrl: string): Promise<unknown> {
     
     return result;
   } catch (error) {
-    console.error('Error detecting faces:', error);
+    serverLogger.error('Error detecting faces', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -307,7 +308,7 @@ export async function getImageTags(imageUrl: string): Promise<unknown> {
     
     return result;
   } catch (error) {
-    console.error('Error getting image tags:', error);
+    serverLogger.error('Error getting image tags', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -337,7 +338,7 @@ export async function describeImage(imageUrl: string): Promise<unknown> {
     
     return result;
   } catch (error) {
-    console.error('Error describing image:', error);
+    serverLogger.error('Error describing image', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -364,7 +365,7 @@ export async function analyzeImageFromBase64(
     
     return result;
   } catch (error) {
-    console.error('Error analyzing base64 image:', error);
+    serverLogger.error('Error analyzing base64 image', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }

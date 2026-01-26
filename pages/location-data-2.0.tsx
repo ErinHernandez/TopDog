@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useUser } from '../lib/userContext';
+import { createScopedLogger } from '@/lib/clientLogger';
+
+const logger = createScopedLogger('[LocationData]');
 
 type StateAbbreviation = string;
 type Region = 'northeast' | 'southeast' | 'midwest' | 'southwest' | 'west' | 'territories';
@@ -88,7 +91,7 @@ export default function LocationData2() {
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Unknown error';
         setError(errorMessage);
-        console.error('Error loading SVG:', err);
+        logger.error('Error loading SVG', err instanceof Error ? err : new Error(String(err)));
       } finally {
         setIsLoading(false);
       }

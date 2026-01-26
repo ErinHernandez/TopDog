@@ -5,6 +5,7 @@
  */
 
 import { getAllowedCharacters, getLocaleDescription } from './localeCharacters';
+import { createScopedLogger } from './clientLogger';
 import {
   getFirestore,
   collection,
@@ -24,6 +25,8 @@ import {
 } from 'firebase/firestore';
 import { initializeApp, getApps, type FirebaseApp } from 'firebase/app';
 import { db } from './firebase';
+
+const logger = createScopedLogger('[UsernameValidation]');
 
 // ============================================================================
 // CONSTANTS
@@ -276,7 +279,7 @@ export async function reserveUsernameForVIP({
     };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Error reserving VIP username:', errorMessage);
+    logger.error('Error reserving VIP username', error instanceof Error ? error : new Error(errorMessage));
     return { success: false, error: errorMessage };
   }
 }
@@ -347,12 +350,12 @@ export async function removeVIPReservation(
     
     // Delete reservation
     await deleteDoc(reservationDoc.ref);
-    console.log(`VIP reservation removed: ${normalizedUsername} by ${removedBy}`);
-    
+    logger.info('VIP reservation removed', { username: normalizedUsername, removedBy });
+
     return { success: true };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Error removing VIP reservation:', errorMessage);
+    logger.error('Error removing VIP reservation', error instanceof Error ? error : new Error(errorMessage));
     return { success: false, error: errorMessage };
   }
 }
@@ -408,7 +411,8 @@ export async function checkVIPReservation(username: string): Promise<VIPReservat
     
     return { isReserved: true, reservation };
   } catch (error) {
-    console.error('Error checking VIP reservation:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error('Error checking VIP reservation', error instanceof Error ? error : new Error(errorMessage));
     return { isReserved: false };
   }
 }
@@ -457,13 +461,13 @@ export async function claimVIPUsername(
       claimedByUid: uid,
       claimedAt: serverTimestamp(),
     }, { merge: true });
-    
-    console.log(`VIP username claimed: ${normalizedUsername} by UID: ${uid}`);
-    
+
+    logger.info('VIP username claimed', { username: normalizedUsername, uid });
+
     return { success: true };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Error claiming VIP username:', errorMessage);
+    logger.error('Error claiming VIP username', error instanceof Error ? error : new Error(errorMessage));
     return { success: false, error: errorMessage };
   }
 }
@@ -518,7 +522,8 @@ export async function getAllVIPReservations(
       return true;
     });
   } catch (error) {
-    console.error('Error getting VIP reservations:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error('Error getting VIP reservations', error instanceof Error ? error : new Error(errorMessage));
     return [];
   }
 }
@@ -546,7 +551,8 @@ export async function getVIPReservationStats(): Promise<VIPReservationStats> {
       }).length,
     };
   } catch (error) {
-    console.error('Error getting VIP reservation stats:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error('Error getting VIP reservation stats', error instanceof Error ? error : new Error(errorMessage));
     return {
       total: 0,
       claimed: 0,
@@ -598,7 +604,8 @@ export async function cleanupExpiredVIPReservations(): Promise<CleanupResult> {
     
     return { removed: removed.length, usernames: removed };
   } catch (error) {
-    console.error('Error cleaning up expired VIP reservations:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error('Error cleaning up expired VIP reservations', error instanceof Error ? error : new Error(errorMessage));
     return { removed: 0, usernames: [] };
   }
 }
@@ -611,7 +618,8 @@ export async function exportVIPReservations(): Promise<string> {
     const reservations = await getAllVIPReservations();
     return JSON.stringify(reservations, null, 2);
   } catch (error) {
-    console.error('Error exporting VIP reservations:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error('Error exporting VIP reservations', error instanceof Error ? error : new Error(errorMessage));
     return JSON.stringify([], null, 2);
   }
 }
@@ -656,15 +664,15 @@ export async function importVIPReservations(json: string): Promise<ImportResult>
         }
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
-        console.error(`Error importing reservation for ${reservation.username}:`, errorMessage);
+        logger.error('Error importing reservation', error instanceof Error ? error : new Error(errorMessage), { username: reservation.username });
         failed++;
       }
     }
-    
+
     return { imported, failed };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Error importing VIP reservations:', errorMessage);
+    logger.error('Error importing VIP reservations', error instanceof Error ? error : new Error(errorMessage));
     return { imported: 0, failed: 0, error: errorMessage };
   }
 }
@@ -797,7 +805,7 @@ export async function checkUsernameAvailability(
     };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Error checking username availability:', errorMessage);
+    logger.error('Error checking username availability', error instanceof Error ? error : new Error(errorMessage));
     return {
       isAvailable: false,
       message: 'Error checking username availability'

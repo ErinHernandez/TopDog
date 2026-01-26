@@ -12,6 +12,9 @@
  */
 
 import React from 'react';
+import { createScopedLogger } from '../clientLogger';
+
+const logger = createScopedLogger('[DraftVersionTracking]');
 
 /**
  * Track draft version access
@@ -57,7 +60,7 @@ export async function trackDraftVersion(
     // Silent failure - analytics shouldn't break the app
     // Only log in development
     if (process.env.NODE_ENV === 'development') {
-      console.warn('[DraftVersionTracking] Failed to track version:', error);
+      logger.warn('Failed to track version');
     }
   }
 }

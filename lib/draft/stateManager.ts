@@ -1,22 +1,26 @@
 /**
  * Draft State Manager
- * 
+ *
  * Centralized state management for draft rooms with validation and atomic updates.
  * Provides a structured approach to managing draft room state to prevent race conditions
  * and ensure consistency.
- * 
+ *
  * Usage:
  * ```typescript
  * const stateManager = new DraftStateManager({
  *   roomId: 'room123',
  *   onStateChange: (state) => console.log('State updated:', state)
  * });
- * 
+ *
  * // Update state atomically
  * await stateManager.updateRoom({ status: 'active' });
  * await stateManager.addPick(pick);
  * ```
  */
+
+import { createScopedLogger } from '../clientLogger';
+
+const logger = createScopedLogger('[DraftStateManager]');
 
 // ============================================================================
 // TYPES & INTERFACES
@@ -272,7 +276,7 @@ export class DraftStateManager {
       try {
         callback(currentState);
       } catch (error) {
-        console.error('[DraftStateManager] Subscriber error:', error);
+        logger.error('Subscriber error', error instanceof Error ? error : new Error(String(error)));
       }
     });
 
@@ -280,7 +284,7 @@ export class DraftStateManager {
       try {
         this.onStateChange(currentState);
       } catch (error) {
-        console.error('[DraftStateManager] onStateChange error:', error);
+        logger.error('onStateChange error', error instanceof Error ? error : new Error(String(error)));
       }
     }
   }
@@ -309,7 +313,7 @@ export class DraftStateManager {
     if (validate) {
       const validation = newState.validate();
       if (!validation.isValid) {
-        console.warn('[DraftStateManager] State validation failed:', validation.errors);
+        logger.warn('State validation failed');
         if (options.strictValidation) {
           throw new Error(`State validation failed: ${validation.errors.join(', ')}`);
         }
@@ -356,9 +360,7 @@ export class DraftStateManager {
       // Validate pick number
       const expectedPickNumber = state.picks.length + 1;
       if (pick.pickNumber !== expectedPickNumber && !options.allowGap) {
-        console.warn(
-          `[DraftStateManager] Pick number mismatch: expected ${expectedPickNumber}, got ${pick.pickNumber}`
-        );
+        logger.warn(`Pick number mismatch: expected ${expectedPickNumber}, got ${pick.pickNumber}`);
       }
 
       // Add pick

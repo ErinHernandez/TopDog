@@ -6,11 +6,21 @@
  */
 
 import type { ProjectionData, GetProjectionsOptions } from './types';
+import { serverLogger } from '../logger/serverLogger';
 
 // Import existing SportsDataIO functions
 // Use require for CommonJS module compatibility
 // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
 const sportsdataio = require('../sportsdataio');
+
+/**
+ * Raw projection data from SportsDataIO API
+ */
+interface SportsDataIOProjection {
+  Position: string;
+  FantasyPointsPPR?: number;
+  [key: string]: unknown;
+}
 
 /**
  * Get projections from SportsDataIO
@@ -31,8 +41,9 @@ export async function getPlayerProjections(
   try {
     projections = await sportsdataio.getProjections(apiKey, options.forceRefresh || false);
   } catch (error) {
-    console.error('[DataSources] SportsDataIO getProjections error:', error);
-    throw new Error(`Failed to fetch projections from SportsDataIO: ${error.message}`);
+    serverLogger.error('SportsDataIO getProjections error', error instanceof Error ? error : new Error(String(error)));
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    throw new Error(`Failed to fetch projections from SportsDataIO: ${errorMessage}`);
   }
   
   if (!Array.isArray(projections)) {
@@ -40,23 +51,25 @@ export async function getPlayerProjections(
   }
 
   // Filter by position if specified
-  let filtered = projections;
+  let filtered: SportsDataIOProjection[] = projections;
   if (options.position) {
     const positions = options.position.toUpperCase().split(',');
-    filtered = projections.filter((p: any) => positions.includes(p.Position));
+    filtered = projections.filter((p: SportsDataIOProjection) => positions.includes(p.Position));
   }
 
   // Sort by PPR fantasy points
-  filtered.sort((a: any, b: any) => (b.FantasyPointsPPR || 0) - (a.FantasyPointsPPR || 0));
+  filtered.sort((a: SportsDataIOProjection, b: SportsDataIOProjection) =>
+    ((b.FantasyPointsPPR || 0) as number) - ((a.FantasyPointsPPR || 0) as number)
+  );
 
   // Apply limit
   const limited = options.limit ? filtered.slice(0, options.limit) : filtered;
 
   // Add source tracking
-  return limited.map((p: any) => ({
+  return limited.map((p: SportsDataIOProjection) => ({
     ...p,
     _source: 'sportsdataio' as const,
-  }));
+  })) as ProjectionData[];
 }
 
 /**

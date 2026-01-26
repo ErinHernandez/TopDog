@@ -11,14 +11,15 @@
  * ```
  */
 
-import { 
-  collection, 
-  query, 
-  where, 
+import {
+  collection,
+  query,
+  where,
   getDocs,
   Timestamp,
 } from 'firebase/firestore';
 import { db } from './firebase';
+import { serverLogger } from './logger/serverLogger';
 
 // ============================================================================
 // CONSTANTS
@@ -129,7 +130,7 @@ export async function checkSuggestionsAvailability(
       available.push(suggestion);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error(`Error checking suggestion ${suggestion}:`, errorMessage);
+      serverLogger.error(`Error checking suggestion ${suggestion}`, error instanceof Error ? error : new Error(errorMessage));
       // Continue to next suggestion on error
     }
   }

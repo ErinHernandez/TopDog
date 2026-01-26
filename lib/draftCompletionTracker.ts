@@ -5,6 +5,9 @@
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const userMetrics = require('./userMetrics').default || require('./userMetrics').userMetrics;
+import { createScopedLogger } from './clientLogger';
+
+const logger = createScopedLogger('[DraftCompletionTracker]');
 
 // ============================================================================
 // TYPES
@@ -44,7 +47,7 @@ class DraftCompletionTracker {
     try {
       if (this.isTracking) {
         if (process.env.NODE_ENV === 'development') {
-          console.log('Draft completion already being recorded, skipping...');
+          logger.debug('Draft completion already being recorded, skipping...');
         }
         return;
       }
@@ -84,14 +87,10 @@ class DraftCompletionTracker {
       });
 
       if (process.env.NODE_ENV === 'development') {
-        console.log('✅ Draft completion recorded with comprehensive personal data:', {
+        logger.debug('Draft completion recorded with comprehensive personal data', {
           tournamentName,
           draftId,
-          timestamp: new Date().toISOString(),
-          personalData,
-          sessionData,
-          deviceData,
-          locationData
+          timestamp: new Date().toISOString()
         });
       }
 
@@ -100,8 +99,7 @@ class DraftCompletionTracker {
 
       return metrics;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error('❌ Failed to record draft completion:', errorMessage);
+      logger.error('Failed to record draft completion', error instanceof Error ? error : new Error(String(error)));
       return null;
     } finally {
       this.isTracking = false;
@@ -118,13 +116,12 @@ class DraftCompletionTracker {
       
       // Force refresh exposure data since user just completed a draft
       await exposurePreloader.forceRefresh();
-      
+
       if (process.env.NODE_ENV === 'development') {
-        console.log('🔄 Exposure data refresh triggered after draft completion');
+        logger.debug('Exposure data refresh triggered after draft completion');
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      console.warn('Failed to trigger exposure data refresh:', errorMessage);
+      logger.warn('Failed to trigger exposure data refresh');
     }
   }
 
@@ -141,7 +138,7 @@ class DraftCompletionTracker {
         hasRecentActivity: summary.hasRecentActivity
       };
     } catch (error) {
-      console.warn('Failed to get draft stats:', error);
+      logger.warn('Failed to get draft stats');
       return {};
     }
   }
@@ -171,7 +168,7 @@ class DraftCompletionTracker {
       
       return hasVisitedExposure;
     } catch (error) {
-      console.warn('Failed to check if should show exposure data:', error);
+      logger.warn('Failed to check if should show exposure data');
       return true; // Default to showing
     }
   }
@@ -183,7 +180,7 @@ class DraftCompletionTracker {
     try {
       return userMetrics.exportMetricsForResearch();
     } catch (error) {
-      console.warn('Failed to export research data:', error);
+      logger.warn('Failed to export research data');
       return {};
     }
   }

@@ -3,6 +3,8 @@
  * Provides functions to fetch player data and statistics from ESPN
  */
 
+import { serverLogger } from './logger/serverLogger';
+
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -221,7 +223,7 @@ class ESPNPlayerAPI {
     }
     
     // If player not found, log warning - this shouldn't happen
-    console.warn(`ESPN ID not found for player: ${playerName}. Please add to KNOWN_PLAYER_IDS.`);
+    serverLogger.warn(`ESPN ID not found for player: ${playerName}. Please add to KNOWN_PLAYER_IDS.`);
     return null;
   }
 
@@ -287,8 +289,7 @@ class ESPNPlayerAPI {
       this.cache.set(cacheKey, playerInfo);
       return playerInfo;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error('Error fetching player info:', errorMessage);
+      serverLogger.error('Error fetching player info', error instanceof Error ? error : new Error(String(error)));
       return null;
     }
   }
@@ -375,8 +376,7 @@ class ESPNPlayerAPI {
       this.cache.set(cacheKey, playerStats);
       return playerStats;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error('Error fetching player stats:', errorMessage);
+      serverLogger.error('Error fetching player stats', error instanceof Error ? error : new Error(String(error)));
       return null;
     }
   }
@@ -437,8 +437,7 @@ class ESPNPlayerAPI {
       this.cache.set(cacheKey, players);
       return players;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error('Error fetching all players:', errorMessage);
+      serverLogger.error('Error fetching all players', error instanceof Error ? error : new Error(String(error)));
       return [];
     }
   }
@@ -469,8 +468,7 @@ class ESPNPlayerAPI {
         playerId
       };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error('Error getting comprehensive player data:', errorMessage);
+      serverLogger.error('Error getting comprehensive player data', error instanceof Error ? error : new Error(String(error)));
       throw error; // Let the calling code handle the error
     }
   }

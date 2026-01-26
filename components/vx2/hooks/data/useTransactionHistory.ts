@@ -12,6 +12,9 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { db } from '../../../../lib/firebase';
+import { createScopedLogger } from '@/lib/clientLogger';
+
+const logger = createScopedLogger('[useTransactionHistory]');
 import { 
   collection, 
   query, 
@@ -336,7 +339,7 @@ export function useTransactionHistory(
       const data = await fetchTransactionsFromFirebase(userId, maxResults);
       setAllTransactions(data);
     } catch (err) {
-      console.error('[useTransactionHistory] Fetch error:', err);
+      logger.error('Fetch error', err instanceof Error ? err : new Error(String(err)));
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setIsLoading(false);
@@ -400,7 +403,7 @@ export function useTransactionHistory(
         setError(null);
       },
       (err) => {
-        console.error('[useTransactionHistory] Snapshot error:', err);
+        logger.error('Snapshot error', err instanceof Error ? err : new Error(String(err)));
         setError(err.message);
         setIsLoading(false);
       }

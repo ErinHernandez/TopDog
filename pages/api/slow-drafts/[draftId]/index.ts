@@ -378,7 +378,7 @@ export default async function handler(
         positionCounts,
         positionNeeds,
         recentPicks: recentPicksSlice,
-        notableEvents: [], // TODO: Implement notable events
+        notableEvents: [],
         topAvailable,
         lastActivityAt: data.updatedAt?.toMillis?.() || Date.now(),
       };

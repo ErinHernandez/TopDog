@@ -14,6 +14,9 @@
 import React, { Component, ReactNode, ErrorInfo } from 'react';
 import type { JSX } from 'react';
 import { useRouter, NextRouter } from 'next/router';
+import { createScopedLogger } from '@/lib/clientLogger';
+
+const logger = createScopedLogger('[GlobalErrorBoundary]');
 
 // ============================================================================
 // TYPES
@@ -90,8 +93,7 @@ class GlobalErrorBoundaryClass extends Component<ErrorBoundaryProps, ErrorBounda
       componentStack: errorInfo.componentStack,
     };
 
-    console.error('[GlobalErrorBoundary] Caught error:', {
-      message: error.message,
+    logger.error('Caught error', error, {
       ...errorContext,
     });
 
@@ -116,7 +118,7 @@ class GlobalErrorBoundaryClass extends Component<ErrorBoundaryProps, ErrorBounda
         level: 'error',
       });
     } catch (trackingError) {
-      console.error('[GlobalErrorBoundary] Failed to report to Sentry:', trackingError);
+      logger.error('Failed to report to Sentry', trackingError instanceof Error ? trackingError : new Error(String(trackingError)));
     }
 
     // Google Analytics exception tracking (production only)
@@ -162,7 +164,7 @@ class GlobalErrorBoundaryClass extends Component<ErrorBoundaryProps, ErrorBounda
 
     if (retryCount >= maxRetries) {
       // Too many retries, suggest reload instead
-      console.warn('[GlobalErrorBoundary] Max retries reached, suggesting reload');
+      logger.warn('Max retries reached, suggesting reload');
       return;
     }
 
@@ -174,7 +176,7 @@ class GlobalErrorBoundaryClass extends Component<ErrorBoundaryProps, ErrorBounda
         retryCount: prevState.retryCount + 1,
       }),
       () => {
-        console.log(`[GlobalErrorBoundary] Retry attempt ${this.state.retryCount}`);
+        logger.info(`Retry attempt ${this.state.retryCount}`);
       }
     );
   };

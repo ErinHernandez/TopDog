@@ -16,7 +16,10 @@
  */
 
 import React from 'react';
+import { createScopedLogger } from '@/lib/clientLogger';
 import { createTeamGradient } from '../../../lib/gradientUtils';
+
+const logger = createScopedLogger('[PlayerDropdownContent]');
 import { DROPDOWN_STYLES, DROPDOWN_DIMENSIONS } from './PlayerDropdownStyles';
 import type { PlayerFull } from '@/types/player';
 
@@ -150,7 +153,7 @@ const PlayerDropdownContent: React.FC<PlayerDropdownContentProps> = ({
   };
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>): void => {
-    console.log(`Failed to load logo for team: ${player.team}`);
+    logger.debug(`Failed to load logo for team: ${player.team}`);
     const target = e.currentTarget;
     target.style.display = 'none';
   };

@@ -4,6 +4,8 @@
  * for creating mock drafts with simulated participants
  */
 
+import { serverLogger } from './logger/serverLogger';
+
 // ============================================================================
 // DATA
 // ============================================================================
@@ -120,7 +122,7 @@ export const MOCK_DRAFTER_NAMES: readonly string[] = [
  */
 export const getRandomMockDrafters = (count: number = 11): string[] => {
   if (MOCK_DRAFTER_NAMES.length === 0) {
-    console.warn('No mock drafter names available in index');
+    serverLogger.warn('No mock drafter names available in index');
     return [];
   }
   

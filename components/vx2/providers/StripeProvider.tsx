@@ -17,10 +17,13 @@
  */
 
 import React, { useMemo, useState, useEffect } from 'react';
+import { createScopedLogger } from '@/lib/clientLogger';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import type { StripeElementsOptions, Appearance, Stripe } from '@stripe/stripe-js';
 import { BG_COLORS, TEXT_COLORS, BORDER_COLORS, STATE_COLORS } from '../core/constants/colors';
+
+const logger = createScopedLogger('[StripeProvider]');
 
 // ============================================================================
 // STRIPE INITIALIZATION
@@ -37,12 +40,12 @@ if (stripePublishableKey) {
   try {
     stripePromise = loadStripe(stripePublishableKey).catch((error: unknown): Stripe | null => {
       const err = error instanceof Error ? error : new Error(String(error));
-      console.warn('[StripeProvider] Failed to load Stripe.js:', err.message);
+      logger.warn(`Failed to load Stripe.js: ${err.message}`);
       stripeLoadError = err;
       return null;
     });
   } catch (error) {
-    console.warn('[StripeProvider] Error initializing Stripe:', error);
+    logger.warn(`Error initializing Stripe: ${error}`);
     stripeLoadError = error as Error;
     stripePromise = null;
   }
@@ -213,7 +216,7 @@ export function StripeProvider({
         setStripeError('Failed to load Stripe');
       }
     }).catch((error) => {
-      console.warn('[StripeProvider] Stripe load error:', error);
+      logger.warn(`Stripe load error: ${error}`);
       setStripeError(error.message || 'Failed to load Stripe');
     });
   }, []);
@@ -253,7 +256,7 @@ export function StripeProvider({
   // Don't render if Stripe key is not configured or failed to load
   if (!stripePromise || stripeError) {
     if (process.env.NODE_ENV === 'development') {
-      console.warn('[StripeProvider] Stripe not available:', stripeError || 'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY not configured');
+      logger.warn(`Stripe not available: ${stripeError || 'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY not configured'}`);
     }
     return <>{children}</>;
   }

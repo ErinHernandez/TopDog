@@ -1,10 +1,11 @@
 /**
  * Location Service
- * 
+ *
  * Manages location tracking and storage in Firebase.
  * Only tracks when user has granted consent.
  */
 
+import { createScopedLogger } from '@/lib/clientLogger';
 import { 
   doc, 
   getDoc, 
@@ -22,6 +23,7 @@ import type {
   UserLocationDocument 
 } from './types';
 
+const logger = createScopedLogger('[LocationService]');
 const COLLECTION = 'userLocations';
 
 /**
@@ -74,7 +76,7 @@ export async function trackLocation(userId: string): Promise<GeoLocation | null>
     
     return location;
   } catch (error: unknown) {
-    console.error('Error tracking location:', error);
+    logger.error('Error tracking location', error instanceof Error ? error : new Error(String(error)));
     return null;
   }
 }
@@ -123,7 +125,7 @@ async function updateKnownLocation(
       updatedAt: serverTimestamp(),
     });
   } catch (error: unknown) {
-    console.error('Error updating known location:', error);
+    logger.error('Error updating known location', error instanceof Error ? error : new Error(String(error)));
   }
 }
 
@@ -147,7 +149,7 @@ export async function getUserLocations(userId: string): Promise<UserLocations> {
       states: data.locations?.states || [],
     };
   } catch (error: unknown) {
-    console.error('Error getting user locations:', error);
+    logger.error('Error getting user locations', error instanceof Error ? error : new Error(String(error)));
     return { countries: [], states: [] };
   }
 }
@@ -168,7 +170,7 @@ export async function getKnownLocations(userId: string): Promise<KnownLocation[]
     const data = docSnap.data() as UserLocationDocument;
     return data.security?.knownLocations || [];
   } catch (error: unknown) {
-    console.error('Error getting known locations:', error);
+    logger.error('Error getting known locations', error instanceof Error ? error : new Error(String(error)));
     return [];
   }
 }
@@ -201,7 +203,7 @@ export async function markLocationTrusted(
       });
     }
   } catch (error: unknown) {
-    console.error('Error marking location trusted:', error);
+    logger.error('Error marking location trusted', error instanceof Error ? error : new Error(String(error)));
   }
 }
 
@@ -233,7 +235,7 @@ export async function untrustLocation(
       });
     }
   } catch (error: unknown) {
-    console.error('Error untrusting location:', error);
+    logger.error('Error untrusting location', error instanceof Error ? error : new Error(String(error)));
   }
 }
 

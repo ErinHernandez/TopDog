@@ -6,6 +6,7 @@
  */
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { createScopedLogger } from '@/lib/clientLogger';
 import { 
   collection, 
   query, 
@@ -21,6 +22,8 @@ import { useAuth } from '../../auth/hooks/useAuth';
 import { FirestoreTeam } from '../../../../types/firestore';
 import { MyTeam, TeamPlayer, UseMyTeamsResult } from './useMyTeams';
 import { shouldUseRealTime } from '../../../../lib/tournament/seasonUtils';
+
+const logger = createScopedLogger('[useMyTeamsFirebase]');
 
 // ============================================================================
 // DATA TRANSFORMATION
@@ -99,13 +102,13 @@ async function fetchMyTeamsOnce(userId: string): Promise<MyTeam[]> {
         const transformed = transformFirestoreTeamToMyTeam(data);
         teams.push(transformed);
       } catch (error) {
-        console.error(`[fetchMyTeamsOnce] Error transforming team ${doc.id}:`, error);
+        logger.error(`Error transforming team ${doc.id}:`, error instanceof Error ? error : new Error(String(error)));
       }
     });
 
     return teams;
   } catch (error) {
-    console.error('[fetchMyTeamsOnce] Error:', error);
+    logger.error('Fetch error:', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -131,14 +134,14 @@ function setupTeamsListener(
           const transformed = transformFirestoreTeamToMyTeam(data);
           teams.push(transformed);
         } catch (error) {
-          console.error(`[setupTeamsListener] Error transforming team ${doc.id}:`, error);
+          logger.error(`Error transforming team ${doc.id}:`, error instanceof Error ? error : new Error(String(error)));
         }
       });
 
       onUpdate(teams);
     },
     (error) => {
-      console.error('[setupTeamsListener] Snapshot error:', error);
+      logger.error('Snapshot error:', error instanceof Error ? error : new Error(String(error)));
       onError(new Error(error.message));
     }
   );
@@ -207,7 +210,7 @@ export function useMyTeamsFirebase(): UseMyTeamsResult {
       if (isMountedRef.current) {
         setError(errorMessage);
       }
-      console.error('[useMyTeamsFirebase] Fetch error:', err);
+      logger.error('Fetch error:', err instanceof Error ? err : new Error(String(err)));
     } finally {
       // FIX: Check if mounted before setting loading state
       if (isMountedRef.current) {

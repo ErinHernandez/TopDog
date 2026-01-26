@@ -11,6 +11,7 @@ import crypto from 'crypto';
 import { getDb } from '../firebase-utils';
 import { doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 import { captureError } from '../errorTracking';
+import { serverLogger } from '../logger/serverLogger';
 import type {
   XenditVirtualAccount,
   XenditEWalletCharge,
@@ -39,7 +40,7 @@ const XENDIT_WEBHOOK_TOKEN = process.env.XENDIT_WEBHOOK_TOKEN;
 const XENDIT_BASE_URL = 'https://api.xendit.co';
 
 if (!XENDIT_SECRET_KEY) {
-  console.warn('[XenditService] XENDIT_SECRET_KEY not configured');
+  serverLogger.warn('XENDIT_SECRET_KEY not configured');
 }
 
 // ============================================================================
@@ -339,7 +340,7 @@ export async function deleteDisbursementAccount(userId: string, accountId: strin
  */
 export function verifyWebhookToken(token: string): boolean {
   if (!XENDIT_WEBHOOK_TOKEN) {
-    console.error('[XenditService] XENDIT_WEBHOOK_TOKEN not configured');
+    serverLogger.error('XENDIT_WEBHOOK_TOKEN not configured', new Error('Missing webhook token'));
     return false;
   }
 

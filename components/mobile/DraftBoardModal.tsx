@@ -1,15 +1,15 @@
 /**
  * DraftBoardModal - Full Screen Draft Board Overlay
- * 
+ *
  * Extracted from pages/mobile.js for maintainability
- * Shows the complete draft board for a team
+ * Shows the complete draft board for a team using the VX2 DraftBoard component
  */
 
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { POSITION_COLORS } from '@/lib/constants/positions';
 import type { FantasyPosition } from '@/types/player';
-
-// Note: DraftBoardApple was removed - using placeholder until migrated to VX2
+import DraftBoard from '@/components/vx2/draft-room/components/DraftBoard';
+import type { DraftPick, Participant, Position } from '@/components/vx2/draft-room/types';
 
 // ============================================================================
 // TYPES
@@ -35,72 +35,125 @@ export interface DraftBoardModalProps {
   onClose: () => void;
 }
 
-interface MockPick {
-  pickNumber: number;
-  player: {
-    name: string;
-    position: string;
-    team: string;
-    adp?: number;
-  };
-  timestamp: number;
-  teamCompositionAtTime: string;
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+const TEAM_COUNT = 12;
+const ROSTER_SIZE = 18;
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+/**
+ * Convert team player data to DraftPick format for VX2 DraftBoard
+ */
+function convertTeamToPicks(
+  team: Team,
+  userParticipantIndex: number
+): DraftPick[] {
+  const picks: DraftPick[] = [];
+  let pickNumber = 1;
+
+  // Convert team players to picks format
+  Object.entries(team.players).forEach(([position, players]) => {
+    players.forEach((player) => {
+      const actualPickNumber = player.pick || pickNumber++;
+      const round = Math.ceil(actualPickNumber / TEAM_COUNT);
+      const pickInRound = ((actualPickNumber - 1) % TEAM_COUNT) + 1;
+
+      picks.push({
+        id: `pick-${actualPickNumber}`,
+        pickNumber: actualPickNumber,
+        round,
+        pickInRound,
+        player: {
+          id: `player-${actualPickNumber}`,
+          name: player.name,
+          position: position as Position,
+          team: player.team,
+          adp: player.adp || actualPickNumber,
+          projectedPoints: 0,
+          byeWeek: 0,
+        },
+        participantId: `participant-${userParticipantIndex}`,
+        participantIndex: userParticipantIndex,
+        timestamp: Date.now(),
+      });
+    });
+  });
+
+  // Sort picks by pick number
+  picks.sort((a, b) => a.pickNumber - b.pickNumber);
+
+  return picks;
 }
 
-interface MockParticipant {
-  name: string;
-  team: string;
+/**
+ * Create mock participants for a 12-team league
+ */
+function createMockParticipants(teamName: string): Participant[] {
+  const participants: Participant[] = [];
+
+  for (let i = 0; i < TEAM_COUNT; i++) {
+    participants.push({
+      id: `participant-${i}`,
+      name: i === 0 ? teamName : `Team ${i + 1}`,
+      draftPosition: i,
+      isUser: i === 0,
+    });
+  }
+
+  return participants;
 }
 
 // ============================================================================
 // COMPONENT
 // ============================================================================
 
-const DraftBoardModal: React.FC<DraftBoardModalProps> = ({ 
-  team, 
-  onClose 
+const DraftBoardModal: React.FC<DraftBoardModalProps> = ({
+  team,
+  onClose
 }): React.ReactElement | null => {
   if (!team) return null;
 
-  // Convert team data to draft board format
-  const mockPicks: MockPick[] = [];
-  let pickNumber = 1;
-  
-  // Convert team players to picks format
-  Object.entries(team.players).forEach(([position, players]) => {
-    players.forEach((player) => {
-      mockPicks.push({
-        pickNumber: player.pick || pickNumber++,
-        player: {
-          name: player.name,
-          position: position,
-          team: player.team,
-          adp: player.adp,
-        },
-        timestamp: Date.now(),
-        teamCompositionAtTime: POSITION_COLORS[position as FantasyPosition]?.primary || '#6b7280',
-      });
-    });
-  });
+  const userParticipantIndex = 0;
 
-  // Sort picks by pick number
-  mockPicks.sort((a, b) => (a.pickNumber || 999) - (b.pickNumber || 999));
+  // Convert team data to VX2 format
+  const picks = useMemo(
+    () => convertTeamToPicks(team, userParticipantIndex),
+    [team]
+  );
 
-  // Mock participants (12-team league)
-  const mockParticipants: MockParticipant[] = [
-    { name: team.name, team: 'Your Team' },
-    { name: 'Team 2', team: 'Opponent' },
-    { name: 'Team 3', team: 'Opponent' },
-    { name: 'Team 4', team: 'Opponent' },
-    { name: 'Team 5', team: 'Opponent' },
-    { name: 'Team 6', team: 'Opponent' },
-    { name: 'Team 7', team: 'Opponent' },
-    { name: 'Team 8', team: 'Opponent' },
-    { name: 'Team 9', team: 'Opponent' },
-    { name: 'Team 10', team: 'Opponent' },
-    { name: 'Team 11', team: 'Opponent' },
-    { name: 'Team 12', team: 'Opponent' },
-  ];
+  const participants = useMemo(
+    () => createMockParticipants(team.name),
+    [team.name]
+  );
+
+  // Total picks for the draft
+  const totalPicks = TEAM_COUNT * ROSTER_SIZE;
+  const currentPickNumber = picks.length + 1;
+
+  // Get pick for a specific slot (used by DraftBoard)
+  const getPickForSlot = useCallback(
+    (round: number, participantIndex: number): DraftPick | null => {
+      // Calculate pick number based on snake draft order
+      const isEvenRound = round % 2 === 0;
+      const pickInRound = isEvenRound
+        ? TEAM_COUNT - participantIndex
+        : participantIndex + 1;
+      const pickNumber = (round - 1) * TEAM_COUNT + pickInRound;
+
+      // Find the pick if it's for the user's team
+      if (participantIndex === userParticipantIndex) {
+        return picks.find(p => p.pickNumber === pickNumber) || null;
+      }
+
+      return null;
+    },
+    [picks]
+  );
 
   const handleClose = (): void => {
     onClose();
@@ -109,16 +162,16 @@ const DraftBoardModal: React.FC<DraftBoardModalProps> = ({
   return (
     <div className="absolute inset-0 z-50 bg-[#101927] flex flex-col">
       {/* Header */}
-      <div 
-        className="flex items-center justify-between p-4 border-b border-gray-700" 
+      <div
+        className="flex items-center justify-between p-4 border-b border-gray-700"
         style={{ background: 'url(/wr_blue.png) no-repeat center center', backgroundSize: 'cover' }}
       >
         <div className="flex items-center">
           {/* Edit Icon */}
-          <svg 
-            className="w-6 h-6 text-white mr-3" 
-            fill="none" 
-            stroke="currentColor" 
+          <svg
+            className="w-6 h-6 text-white mr-3"
+            fill="none"
+            stroke="currentColor"
             viewBox="0 0 24 24"
             aria-hidden="true"
           >
@@ -126,7 +179,7 @@ const DraftBoardModal: React.FC<DraftBoardModalProps> = ({
           </svg>
           <h2 className="text-xl font-semibold text-white">{team.name}</h2>
         </div>
-        <button 
+        <button
           onClick={handleClose}
           className="w-8 h-8 rounded-full hover:bg-gray-700/50 flex items-center justify-center transition-colors"
           aria-label="Close draft board"
@@ -135,14 +188,16 @@ const DraftBoardModal: React.FC<DraftBoardModalProps> = ({
         </button>
       </div>
 
-      {/* Draft Board Content */}
-      <div className="flex-1 min-h-0 flex items-center justify-center">
-        {/* TODO: Migrate to VX2 DraftBoard component */}
-        <div className="text-center text-gray-400 p-8">
-          <p className="text-lg mb-2">Draft Board</p>
-          <p className="text-sm">{mockPicks.length} picks made</p>
-          <p className="text-sm">{mockParticipants.length} teams</p>
-        </div>
+      {/* Draft Board Content - Using VX2 DraftBoard Component */}
+      <div className="flex-1 min-h-0 overflow-hidden">
+        <DraftBoard
+          picks={picks}
+          currentPickNumber={currentPickNumber}
+          participants={participants}
+          userParticipantIndex={userParticipantIndex}
+          isDraftActive={false}
+          getPickForSlot={getPickForSlot}
+        />
       </div>
     </div>
   );

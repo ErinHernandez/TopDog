@@ -10,7 +10,10 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { createScopedLogger } from '@/lib/clientLogger';
 import { BG_COLORS, TEXT_COLORS, BRAND_COLORS, STATE_COLORS } from '../../core/constants/colors';
+
+const logger = createScopedLogger('[TournamentCard]');
 import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
 import type { Tournament } from '../../hooks/data';
 import { TournamentCardBottomSection } from './TournamentCardBottomSection';
@@ -148,20 +151,20 @@ export function TournamentCard({
         const pngUrl = bgUrl.replace('.webp', '.png').split('?')[0]; // Remove query params if any
         
         if (process.env.NODE_ENV === 'development') {
-          console.log('[TournamentCard] WebP failed, trying PNG fallback:', pngUrl);
+          logger.debug(`WebP failed, trying PNG fallback: ${pngUrl}`);
         }
         
         const fallbackImg = new Image();
         fallbackImg.onload = () => {
           if (process.env.NODE_ENV === 'development') {
-            console.log('[TournamentCard] PNG fallback loaded successfully');
+            logger.debug('PNG fallback loaded successfully');
           }
           setImageLoaded(true);
           setUseFallback(true);
         };
         fallbackImg.onerror = () => {
           if (process.env.NODE_ENV === 'development') {
-            console.warn('[TournamentCard] Both WebP and PNG failed to load, using fallback color');
+            logger.warn('Both WebP and PNG failed to load, using fallback color');
           }
           // If PNG also fails, show with fallback color
           setImageLoaded(true);
@@ -176,13 +179,13 @@ export function TournamentCard({
     
     img.onload = () => {
       if (process.env.NODE_ENV === 'development') {
-        console.log('[TournamentCard] Background image loaded:', bgUrl);
+        logger.debug(`Background image loaded: ${bgUrl}`);
       }
       setImageLoaded(true);
     };
     img.onerror = () => {
       if (process.env.NODE_ENV === 'development') {
-        console.warn('[TournamentCard] Background image failed to load:', bgUrl);
+        logger.warn(`Background image failed to load: ${bgUrl}`);
       }
       tryFallback();
     };

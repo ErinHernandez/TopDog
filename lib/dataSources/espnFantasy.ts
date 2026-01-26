@@ -1,11 +1,12 @@
 /**
  * ESPN Fantasy API Client
- * 
+ *
  * Provides access to ESPN Fantasy Football API with authentication,
  * rate limiting, and error handling.
  */
 
 import https from 'https';
+import { serverLogger } from '../logger/serverLogger';
 import type {
   ProjectionData,
   HistoricalStats,
@@ -285,7 +286,7 @@ export async function getPlayerProjections(
 
     return limited;
   } catch (error) {
-    console.error('[ESPN Fantasy API] Error fetching projections:', error);
+    serverLogger.error('ESPN Fantasy API: Error fetching projections', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -316,10 +317,10 @@ export async function getPlayerHistoricalStats(
     
     // For now, return null as this requires more investigation of ESPN's actual response format
     // This will be implemented based on actual API testing
-    console.warn('[ESPN Fantasy API] Historical stats endpoint needs implementation based on actual API structure');
+    serverLogger.warn('ESPN Fantasy API: Historical stats endpoint needs implementation based on actual API structure');
     return null;
   } catch (error) {
-    console.error('[ESPN Fantasy API] Error fetching historical stats:', error);
+    serverLogger.error('ESPN Fantasy API: Error fetching historical stats', error instanceof Error ? error : new Error(String(error)));
     return null;
   }
 }
@@ -347,10 +348,10 @@ export async function getPlayerAdvancedMetrics(
     // Find player and extract advanced metrics
     // Note: This requires investigation of ESPN's actual response format
     // Placeholder implementation
-    console.warn('[ESPN Fantasy API] Advanced metrics endpoint needs implementation based on actual API structure');
+    serverLogger.warn('ESPN Fantasy API: Advanced metrics endpoint needs implementation based on actual API structure');
     return null;
   } catch (error) {
-    console.error('[ESPN Fantasy API] Error fetching advanced metrics:', error);
+    serverLogger.error('ESPN Fantasy API: Error fetching advanced metrics', error instanceof Error ? error : new Error(String(error)));
     return null;
   }
 }

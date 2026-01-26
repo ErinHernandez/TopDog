@@ -16,6 +16,9 @@ import { GlobalErrorBoundary } from '../components/ui';
 import { MobilePhoneFrame } from '../components/vx2/shell/MobilePhoneFrame';
 import { InPhoneFrameProvider } from '../lib/inPhoneFrameContext';
 import { useIsMobileDevice } from '../hooks/useIsMobileDevice';
+import { createScopedLogger } from '@/lib/clientLogger';
+
+const logger = createScopedLogger('[App]');
 
 const DEV_NAV_ROUTES = ['/testing-grounds', '/dev'];
 
@@ -38,7 +41,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     if (process.env.NODE_ENV === 'production') {
       import('../lib/envValidation')
         .then(({ initializeEnvValidation }) => initializeEnvValidation())
-        .catch((e) => console.error('Env validation failed:', e));
+        .catch((e) => logger.error('Env validation failed', e instanceof Error ? e : new Error(String(e))));
     }
   }, []);
 
@@ -48,7 +51,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         const { initializeAuth } = await import('../lib/firebase');
         await initializeAuth();
       } catch {
-        console.log('Firebase init failed - app may use mock data');
+        logger.debug('Firebase init failed - app may use mock data');
       }
     };
     initFirebase();
@@ -64,7 +67,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         }
         exposurePreloader.init();
       } catch (e) {
-        console.warn('User tracking failed:', e);
+        logger.warn('User tracking failed', { error: String(e) });
       }
     };
     setTimeout(init, 500);

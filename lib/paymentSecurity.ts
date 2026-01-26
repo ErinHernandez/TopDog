@@ -3,6 +3,9 @@
  */
 
 import * as crypto from 'crypto';
+import { createScopedLogger } from './clientLogger';
+
+const logger = createScopedLogger('[PaymentSecurity]');
 
 // ============================================================================
 // TYPES
@@ -233,7 +236,7 @@ export class WebhookSecurity {
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error(`Webhook signature verification failed for ${processor}:`, errorMessage);
+      logger.error(`Webhook signature verification failed for ${processor}: ${errorMessage}`);
       return false;
     }
   }
@@ -471,7 +474,7 @@ export class SecurityLogger {
     };
     
     // Log to multiple destinations
-    console.log('[SECURITY]', JSON.stringify(logEntry));
+    logger.info('[SECURITY]', { ...logEntry });
     
     // Send to external logging service
     if (process.env.SECURITY_LOG_ENDPOINT) {
@@ -532,8 +535,8 @@ export const SECURITY_CONFIG: SecurityConfig = {
 // Initialize security monitoring
 if (typeof window === 'undefined') {
   // Server-side initialization
-  console.log('🛡️ Payment Security System initialized with 31 processors');
-  console.log('📊 Rate limits configured for all processor tiers');
-  console.log('🚨 Fraud detection rules active');
-  console.log('⚡ Circuit breakers configured with fallback processors');
+  logger.debug('Payment Security System initialized', {
+    processorCount: 31,
+    features: ['rate_limits', 'fraud_detection', 'circuit_breakers']
+  });
 }

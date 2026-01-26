@@ -5,6 +5,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { serverLogger } from './logger/serverLogger';
 
 // ============================================================================
 // TYPES
@@ -103,13 +104,13 @@ class DataManager {
       if (fs.existsSync(this.databasePath)) {
         const rawData = fs.readFileSync(this.databasePath, 'utf8');
         this.database = JSON.parse(rawData) as Database;
-        console.log(`✅ Loaded database with ${this.getTotalPlayers()} players`);
+        serverLogger.debug('Loaded database', { playerCount: this.getTotalPlayers() });
       } else {
-        console.log('⚠️  Database not found, creating new one');
+        serverLogger.debug('Database not found, creating new one');
         this.database = this.createEmptyDatabase();
       }
     } catch (error) {
-      console.error('❌ Error loading database:', error);
+      serverLogger.error('Error loading database', error instanceof Error ? error : new Error(String(error)));
       this.database = this.createEmptyDatabase();
     }
   }
@@ -138,29 +139,28 @@ class DataManager {
   saveDatabase(): boolean {
     try {
       if (!this.database) {
-        console.error('❌ No database to save');
+        serverLogger.error('No database to save');
         return false;
       }
 
       // Update timestamp
       this.database.meta.lastUpdated = new Date().toISOString();
-      
+
       // Create backup
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
       const backupPath = this.databasePath.replace('.json', `_backup_${timestamp}.json`);
-      
+
       if (fs.existsSync(this.databasePath)) {
         fs.copyFileSync(this.databasePath, backupPath);
       }
-      
+
       // Save main database
       fs.writeFileSync(this.databasePath, JSON.stringify(this.database, null, 2));
-      console.log(`✅ Database saved successfully`);
-      console.log(`📁 Backup created: ${path.basename(backupPath)}`);
-      
+      serverLogger.info('Database saved successfully', { backup: path.basename(backupPath) });
+
       return true;
     } catch (error) {
-      console.error('❌ Error saving database:', error);
+      serverLogger.error('Error saving database', error instanceof Error ? error : new Error(String(error)));
       return false;
     }
   }
@@ -201,7 +201,7 @@ class DataManager {
 
     const player = this.findPlayer(playerName);
     if (!player) {
-      console.log(`❌ Player not found: ${playerName}`);
+      serverLogger.warn('Player not found for historical stats', { playerName });
       return false;
     }
 
@@ -222,8 +222,8 @@ class DataManager {
 
     // Merge stats
     Object.assign(player.historical[yearStr], stats);
-    
-    console.log(`✅ Added ${year} stats for ${player.name}`);
+
+    serverLogger.debug('Added historical stats', { year, playerName: player.name });
     return true;
   }
 
@@ -233,7 +233,7 @@ class DataManager {
 
     const player = this.findPlayer(playerName);
     if (!player) {
-      console.log(`❌ Player not found: ${playerName}`);
+      serverLogger.warn('Player not found for ADP data', { playerName });
       return false;
     }
 
@@ -250,8 +250,8 @@ class DataManager {
 
     player.draft.adp = adp;
     player.draft.adpSource = source;
-    
-    console.log(`✅ Added ADP ${adp} for ${player.name} (${source})`);
+
+    serverLogger.debug('Added ADP data', { playerName: player.name, adp, source });
     return true;
   }
 
@@ -272,8 +272,7 @@ class DataManager {
       const usedRanks = new Set<number>();
       const validationErrors: string[] = [];
 
-      console.log(`📊 Importing ${dataType} data from ${path.basename(csvFilePath)}`);
-      console.log(`📋 Headers: ${headers.join(', ')}`);
+      serverLogger.info('Starting CSV import', { dataType, file: path.basename(csvFilePath), headers: headers.join(', ') });
       
       for (let i = 1; i < lines.length; i++) {
         const values = lines[i].split(',').map(v => v.trim());
@@ -336,18 +335,19 @@ class DataManager {
 
       // Report validation issues
       if (validationErrors.length > 0) {
-        console.warn('⚠️ Validation Errors Found:');
-        validationErrors.slice(0, 10).forEach(error => console.warn(`  ${error}`));
-        if (validationErrors.length > 10) {
-          console.warn(`  ... and ${validationErrors.length - 10} more errors`);
-        }
-      }
-      
-      if (duplicateRanks.size > 0) {
-        console.error(`🚨 DATA QUALITY ISSUE: Duplicate ranks detected: ${Array.from(duplicateRanks).join(', ')}`);
+        serverLogger.warn('Validation errors found during import', {
+          errorCount: validationErrors.length,
+          sampleErrors: validationErrors.slice(0, 10)
+        });
       }
 
-      console.log(`✅ Import complete: ${imported} successful, ${errors} errors, ${duplicateRanks.size} duplicate ranks`);
+      if (duplicateRanks.size > 0) {
+        serverLogger.error('Data quality issue: duplicate ranks detected', undefined, {
+          duplicateRanks: Array.from(duplicateRanks).join(', ')
+        });
+      }
+
+      serverLogger.info('Import complete', { imported, errors, duplicateRanks: duplicateRanks.size });
       return { 
         imported, 
         errors, 
@@ -356,7 +356,7 @@ class DataManager {
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('❌ Error importing CSV:', error);
+      serverLogger.error('Error importing CSV', error instanceof Error ? error : new Error(errorMessage));
       return { imported: 0, errors: 1, duplicateRanks: [], validationErrors: [errorMessage] };
     }
   }
@@ -435,7 +435,7 @@ class DataManager {
       }
     });
 
-    console.log(`✅ Updated team info for ${updated} players`);
+    serverLogger.debug('Updated team info', { playersUpdated: updated });
     return updated;
   }
 

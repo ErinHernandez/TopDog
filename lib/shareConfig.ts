@@ -1,9 +1,13 @@
 /**
  * Share Configuration System
- * 
+ *
  * Centralized configuration for different types of shareable content
  * across the mobile application
  */
+
+import { createScopedLogger } from './clientLogger';
+
+const logger = createScopedLogger('[ShareConfig]');
 
 // ============================================================================
 // TYPES
@@ -315,7 +319,7 @@ export const trackShare = (type: ShareType, platform: Platform, success: boolean
   }
   
   // Console log for development
-  console.log(`Share tracked: ${type} via ${platform} - ${success ? 'success' : 'failed'}`);
+  logger.debug(`Share tracked: ${type} via ${platform} - ${success ? 'success' : 'failed'}`);
 };
 
 const shareConfig = {

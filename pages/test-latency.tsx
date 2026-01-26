@@ -9,6 +9,9 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { measureLatency, LatencyTracker, compensateTimer } from '../lib/draft/latencyCompensation';
+import { createScopedLogger } from '@/lib/clientLogger';
+
+const logger = createScopedLogger('[TestLatency]');
 
 interface LatencyTestResult {
   rtt: number;
@@ -43,7 +46,7 @@ const TestLatencyPage: React.FC = () => {
       setMeasurements(prev => [...prev, measurement].slice(-10));
       setStats(tracker.getStats());
     } catch (error) {
-      console.error('Latency measurement failed:', error);
+      logger.error('Latency measurement failed', error instanceof Error ? error : new Error(String(error)));
       alert('Latency measurement failed. Check console for details.');
     } finally {
       setIsMeasuring(false);
@@ -61,7 +64,7 @@ const TestLatencyPage: React.FC = () => {
       }
       setStats(tracker.getStats());
     } catch (error) {
-      console.error('Latency measurements failed:', error);
+      logger.error('Latency measurements failed', error instanceof Error ? error : new Error(String(error)));
       alert('Latency measurements failed. Check console for details.');
     } finally {
       setIsMeasuring(false);

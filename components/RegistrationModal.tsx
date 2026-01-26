@@ -15,12 +15,15 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { createScopedLogger } from '@/lib/clientLogger';
 import { UserRegistrationService, type UserProfile } from '../lib/userRegistration';
 import { validateUsername, getUsernameRequirements } from '../lib/usernameValidation';
 import { getApprovedCountriesSorted } from '../lib/localeCharacters';
 import { db } from '../lib/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import type { AuthUser } from './AuthModal';
+
+const logger = createScopedLogger('[RegistrationModal]');
 
 // ============================================================================
 // TYPES
@@ -130,7 +133,7 @@ export default function RegistrationModal({
           });
         } catch (error) {
           const err = error as Error;
-          console.error('Error checking username availability:', err);
+          logger.error('Error checking username availability:', err instanceof Error ? err : new Error(String(err)));
           setUsernameAvailability({
             isAvailable: false,
             message: 'Error checking availability',
@@ -193,7 +196,7 @@ export default function RegistrationModal({
       }
     } catch (error) {
       const err = error as Error;
-      console.error('Registration error:', err);
+      logger.error('Registration error:', err instanceof Error ? err : new Error(String(err)));
       alert('Registration failed. Please try again.');
     } finally {
       setIsSubmitting(false);

@@ -1,7 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { createScopedLogger } from '@/lib/clientLogger';
 import { logoOptions } from './team-logos';
 import { POSITION_HELPERS, POSITIONS } from '@/lib/constants/positions';
 import type { FantasyPosition } from '@/types/player';
+
+const logger = createScopedLogger('[FullDraftBoard]');
 
 // ============================================================================
 // TYPES
@@ -450,7 +453,7 @@ const FullDraftBoard: React.FC<FullDraftBoardProps> = ({
                                     display: 'block',
                                   }}
                                   onError={(e) => {
-                                    console.log('Logo failed to load:', `/logos/nfl/${playerData.team?.toLowerCase()}.png`);
+                                    logger.debug(`Logo failed to load: /logos/nfl/${playerData.team?.toLowerCase()}.png`);
                                     // Fallback to text if logo fails to load
                                     const target = e.target as HTMLImageElement;
                                     target.style.display = 'none';
@@ -460,7 +463,7 @@ const FullDraftBoard: React.FC<FullDraftBoardProps> = ({
                                     }
                                   }}
                                   onLoad={() => {
-                                    console.log('Logo loaded successfully:', `/logos/nfl/${playerData.team?.toLowerCase()}.png`);
+                                    logger.debug(`Logo loaded successfully: /logos/nfl/${playerData.team?.toLowerCase()}.png`);
                                   }}
                                 />
                                 <span 

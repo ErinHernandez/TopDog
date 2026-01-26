@@ -121,9 +121,9 @@ export class CrossDraftAnalyzer {
         if (analysis.overallRiskLevel === 'critical') criticalPairs++;
         if (analysis.overallRiskLevel === 'high') highRiskPairs++;
 
-      } catch (error: any) {
+      } catch (error: unknown) {
         failedPairs++;
-        const errorMessage = error?.message || String(error);
+        const errorMessage = error instanceof Error ? error.message : String(error);
 
         // Only keep first 20 errors to prevent memory issues
         if (errors.length < 20) {

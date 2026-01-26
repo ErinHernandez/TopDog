@@ -7,15 +7,34 @@
  * @module lib/firebase/queryOptimization
  */
 
-import { 
-  Query, 
-  query, 
-  limit, 
-  orderBy, 
+import {
+  Query,
+  query,
+  limit,
+  orderBy,
   where,
   startAfter,
   Timestamp,
+  WhereFilterOp,
+  DocumentSnapshot,
 } from 'firebase/firestore';
+import { createScopedLogger } from '../clientLogger';
+
+const logger = createScopedLogger('[QueryOptimization]');
+
+/**
+ * Filter condition for Firestore queries
+ */
+export interface QueryFilter {
+  field: string;
+  operator: WhereFilterOp;
+  value: unknown;
+}
+
+/**
+ * Pagination cursor - can be a DocumentSnapshot or field values
+ */
+export type PaginationCursor = DocumentSnapshot | unknown[];
 
 // ============================================================================
 // TYPES
@@ -29,9 +48,9 @@ export interface QueryOptions {
   /** Order direction */
   orderDirection?: 'asc' | 'desc';
   /** Start after this document (for pagination) */
-  startAfter?: any;
+  startAfter?: PaginationCursor;
   /** Filter conditions */
-  filters?: Array<{ field: string; operator: string; value: any }>;
+  filters?: QueryFilter[];
 }
 
 // ============================================================================
@@ -56,7 +75,7 @@ export function buildOptimizedQuery(
     for (const filter of options.filters) {
       optimizedQuery = query(
         optimizedQuery,
-        where(filter.field, filter.operator as any, filter.value)
+        where(filter.field, filter.operator, filter.value)
       );
     }
   }
@@ -95,15 +114,15 @@ export function optimizeDraftPicksQuery(
   roomId: string,
   options: {
     limit?: number;
-    startAfter?: any;
+    startAfter?: PaginationCursor;
     round?: number;
   } = {}
 ): Query {
-  const filters: Array<{ field: string; operator: string; value: any }> = [];
+  const filters: QueryFilter[] = [];
 
   // Filter by round if specified (uses composite index)
   if (options.round !== undefined) {
-    filters.push({ field: 'round', operator: '==', value: options.round });
+    filters.push({ field: 'round', operator: '==' as WhereFilterOp, value: options.round });
   }
 
   return buildOptimizedQuery(baseQuery, {
@@ -138,7 +157,7 @@ export function optimizeUserQuery(
  */
 export function generateCacheKey(
   collection: string,
-  filters?: Record<string, any>
+  filters?: Record<string, unknown>
 ): string {
   const filterStr = filters
     ? Object.entries(filters)
@@ -207,7 +226,7 @@ export async function measureQueryPerformance<T>(
 
   // Log slow queries (>500ms)
   if (duration > 500) {
-    console.warn(`Slow query detected: ${queryName} took ${duration.toFixed(2)}ms`);
+    logger.warn(`Slow query detected: ${queryName} took ${duration.toFixed(2)}ms`);
   }
 
   return { result, duration };

@@ -1,11 +1,12 @@
 /**
  * Stripe Service Layer
- * 
+ *
  * Centralized Stripe operations with idempotency, error handling, and logging.
  * This service wraps all Stripe API calls and integrates with our logging/error tracking.
  */
 
 import Stripe from 'stripe';
+import { serverLogger } from '../logger/serverLogger';
 import { getDb } from '../firebase-utils';
 import { doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 import { captureError } from '../errorTracking';
@@ -38,7 +39,7 @@ const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
 const STRIPE_CONNECT_CLIENT_ID = process.env.STRIPE_CONNECT_CLIENT_ID;
 
 if (!STRIPE_SECRET_KEY) {
-  console.warn('[StripeService] STRIPE_SECRET_KEY not configured');
+  serverLogger.warn('STRIPE_SECRET_KEY not configured');
 }
 
 /**
@@ -94,7 +95,7 @@ export async function getOrCreateCustomer(
           }
         } catch (err: unknown) {
           // Customer might have been deleted, create a new one
-          console.warn('[StripeService] Stored customer ID invalid, creating new customer');
+          serverLogger.warn('Stored customer ID invalid, creating new customer');
         }
       }
     }
@@ -574,8 +575,8 @@ export async function createPayout(
         // USD equivalent = localAmount / rate (since rate = local/USD)
         withdrawalAmountUSD = withdrawalDisplayAmount / exchangeRate;
         
-        // Log conversion for debugging (using console since no logger available)
-        console.log('[StripeService] Exchange rate conversion for withdrawal', {
+        // Log conversion for debugging
+        serverLogger.debug('Exchange rate conversion for withdrawal', {
           currency: currencyUpper,
           localAmount: withdrawalDisplayAmount,
           exchangeRate,
@@ -584,10 +585,9 @@ export async function createPayout(
         });
       } catch (error) {
         const err = error as Error;
-        console.error('[StripeService] Failed to fetch exchange rate for withdrawal', {
+        serverLogger.error('Failed to fetch exchange rate for withdrawal', err, {
           currency: currencyUpper,
           withdrawalAmount: withdrawalDisplayAmount,
-          error: err.message,
         });
         
         throw new Error(
@@ -1127,7 +1127,7 @@ export async function assessPaymentRisk(
     };
   } catch (error: unknown) {
     // Don't fail the payment if risk assessment fails, just log
-    console.error('[StripeService] Risk assessment failed:', error);
+    serverLogger.error('Risk assessment failed', error instanceof Error ? error : new Error(String(error)));
     return {
       score: 0,
       factors: ['assessment_failed'],

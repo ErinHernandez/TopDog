@@ -4,6 +4,9 @@ import PaymentSecurityDashboard from '../components/PaymentSecurityDashboard';
 import { paymentSystem } from '../lib/paymentSystemIntegration';
 import { getAuth, onAuthStateChanged, type User } from 'firebase/auth';
 import type { GetServerSideProps } from 'next';
+import { createScopedLogger } from '@/lib/clientLogger';
+
+const logger = createScopedLogger('[PaymentSecurityDashboard]');
 
 interface AuthState {
   user: User | null;
@@ -120,12 +123,12 @@ export default function PaymentSecurityDashboardPage() {
                   // Admin verified, continue
                 } else {
                   // In dev, still allow but warn
-                  console.warn('[PaymentSecurityDashboard] User is not admin, but allowing in dev mode');
+                  logger.warn('User is not admin, but allowing in dev mode');
                 }
               }
             }
           } catch (err) {
-            console.warn('[PaymentSecurityDashboard] Admin check error, allowing in dev mode:', err);
+            logger.warn('Admin check error, allowing in dev mode', { error: String(err) });
           }
         }
       } else {
@@ -168,7 +171,7 @@ export default function PaymentSecurityDashboardPage() {
           
           // Admin verified, continue
         } catch (err) {
-          console.error('[PaymentSecurityDashboard] Admin verification error:', err);
+          logger.error('Admin verification error', err instanceof Error ? err : new Error(String(err)));
           setError('Failed to verify admin access. Please try again.');
           setLoading(false);
           return;

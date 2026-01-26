@@ -41,9 +41,6 @@ import {
   type User as FirebaseUser,
   type ConfirmationResult,
 } from 'firebase/auth';
-import { createScopedLogger } from '../../../../lib/clientLogger';
-
-const logger = createScopedLogger('[AuthContext]');
 import {
   getFirestore,
   doc,
@@ -79,6 +76,9 @@ import {
   USERNAME_CONSTRAINTS,
 } from '../constants';
 import { validateUsername, checkUsernameAvailability } from '../../../../lib/usernameValidation';
+import { createScopedLogger } from '@/lib/clientLogger';
+
+const logger = createScopedLogger('[AuthContext]');
 
 // ============================================================================
 // INITIAL STATE
@@ -342,7 +342,7 @@ export function AuthProvider({
               10000, // 10 second timeout
               'Profile load timed out'
             ).catch((error) => {
-              console.warn('[AuthContext] Profile load failed or timed out:', error.message);
+              logger.warn(`Profile load failed or timed out: ${error.message}`);
               return null; // Return null to continue with defaults
             });
             
@@ -488,7 +488,7 @@ export function AuthProvider({
         }
       } catch (locationError) {
         // Don't fail signup if location detection fails - just log it
-        console.warn('Failed to record location during signup:', locationError);
+        logger.warn('Failed to record location during signup');
       }
       
       // Send verification email
@@ -873,7 +873,7 @@ export function AuthProvider({
         10000, // 10 second timeout
         'Profile refresh timed out'
       ).catch((error) => {
-        console.warn('[AuthContext] Profile refresh failed or timed out:', error.message);
+        logger.warn(`Profile refresh failed or timed out: ${error.message}`);
         return null; // Return null to continue without updating
       });
       

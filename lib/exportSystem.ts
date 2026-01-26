@@ -143,8 +143,6 @@ class UniversalExportSystem {
    * Export draft data - for anyone who participated
    */
   exportDraftData(draftId: string, userId: string, format: ExportFormat = 'csv'): string | null {
-    console.log(`📁 Exporting draft data for user ${userId}...`);
-    
     try {
       // Get all picks from the draft
       const allPicks = this.getDraftPicks(draftId);
@@ -174,8 +172,7 @@ class UniversalExportSystem {
       };
 
       return this.formatExport(exportData as unknown as Record<string, unknown>, format);
-    } catch (error) {
-      console.error('❌ Export error:', error);
+    } catch {
       return null;
     }
   }
@@ -184,8 +181,6 @@ class UniversalExportSystem {
    * Export tournament data - for participants and researchers
    */
   exportTournamentData(tournamentId: string, format: ExportFormat = 'csv', options: ExportOptions = {}): string | null {
-    console.log(`📊 Exporting tournament data...`);
-    
     try {
       const tournament = this.getTournament(tournamentId);
       const allPicks = this.getTournamentPicks(tournamentId);
@@ -229,8 +224,7 @@ class UniversalExportSystem {
       }
 
       return this.formatExport(exportData as unknown as Record<string, unknown>, format);
-    } catch (error) {
-      console.error('❌ Tournament export error:', error);
+    } catch {
       return null;
     }
   }
@@ -239,8 +233,6 @@ class UniversalExportSystem {
    * Export player performance data
    */
   exportPlayerData(playerId: string, format: ExportFormat = 'csv'): string | null {
-    console.log(`👤 Exporting player data for ${playerId}...`);
-    
     try {
       // Get all picks of this player across all tournaments
       const playerPicks = this.getPlayerPicks(playerId);
@@ -274,8 +266,7 @@ class UniversalExportSystem {
       };
 
       return this.formatExport(exportData as unknown as Record<string, unknown>, format);
-    } catch (error) {
-      console.error('❌ Player export error:', error);
+    } catch {
       return null;
     }
   }
@@ -284,8 +275,6 @@ class UniversalExportSystem {
    * Export user draft history
    */
   exportUserHistory(userId: string, format: ExportFormat = 'csv', timeframe: Timeframe = 'season'): string | null {
-    console.log(`📈 Exporting user history for ${userId}...`);
-    
     try {
       const userPicks = this.getUserPicks(userId, timeframe);
       const userDrafts = this.getUserDrafts(userId, timeframe);
@@ -315,8 +304,7 @@ class UniversalExportSystem {
       };
 
       return this.formatExport(exportData as unknown as Record<string, unknown>, format);
-    } catch (error) {
-      console.error('❌ User history export error:', error);
+    } catch {
       return null;
     }
   }

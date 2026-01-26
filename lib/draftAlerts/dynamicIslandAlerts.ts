@@ -6,6 +6,9 @@
 
 import { DraftAlertState } from './types';
 import { isNativeBridgeAvailable } from '../dynamicIsland';
+import { createScopedLogger } from '../clientLogger';
+
+const logger = createScopedLogger('[DraftAlerts]');
 
 /**
  * Show alert in Dynamic Island
@@ -33,7 +36,7 @@ export async function showDynamicIslandAlert(
 
     return true;
   } catch (error) {
-    console.warn('[DraftAlerts] Failed to show Dynamic Island alert:', error);
+    logger.warn('Failed to show Dynamic Island alert');
     return false;
   }
 }

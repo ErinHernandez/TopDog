@@ -1,12 +1,15 @@
 /**
  * useDraftAlerts Hook
- * 
+ *
  * Monitors draft state and triggers alerts based on conditions
  * CORRECTED: Fixed timer threshold, added error handling, round context
  */
 
 import { useEffect, useRef } from 'react';
+import { createScopedLogger } from '@/lib/clientLogger';
 import { DraftAlertType, AlertTriggerContext } from '../../../../lib/draftAlerts/types';
+
+const logger = createScopedLogger('[useDraftAlerts]');
 import { alertManager } from '../../../../lib/draftAlerts/alertManager';
 import { isLiveActivitySupported, isDynamicIslandSupported } from '../../../../lib/dynamicIsland';
 import { DEFAULT_ALERT_PREFERENCES } from '../../../../lib/draftAlerts/constants';
@@ -70,7 +73,7 @@ export function useDraftAlerts({
       await alertManager.triggerAlert(alertType, context);
     } catch (error) {
       // Log but don't crash the draft experience
-      console.error(`[DraftAlerts] Failed to trigger ${alertType}:`, error);
+      logger.error(`Failed to trigger ${alertType}:`, error instanceof Error ? error : new Error(String(error)));
     }
   };
 

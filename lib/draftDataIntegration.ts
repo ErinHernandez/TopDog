@@ -5,6 +5,9 @@
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { tournamentCollector } = require('./tournamentDataCollector.js');
+import { createScopedLogger } from './clientLogger';
+
+const logger = createScopedLogger('[DraftDataIntegration]');
 
 // ============================================================================
 // TYPES
@@ -83,7 +86,7 @@ class DraftDataIntegration {
     participants: Participant[],
     tournamentId: string | null = null
   ): CurrentDraftData {
-    console.log('🏈 Initializing draft data collection...');
+    logger.debug('Initializing draft data collection');
     
     // Create tournament if needed
     let finalTournamentId: string = tournamentId || '';
@@ -123,8 +126,8 @@ class DraftDataIntegration {
     };
 
     this.draftStartTime = Date.now();
-    
-    console.log(`✅ Draft data collection initialized for room ${roomId}`);
+
+    logger.debug('Draft data collection initialized', { roomId });
     return this.currentDraftData;
   }
 
@@ -133,7 +136,7 @@ class DraftDataIntegration {
    */
   recordDraftPick(pickData: PickDataInput): Record<string, unknown> | null {
     if (!this.currentDraftData) {
-      console.warn('⚠️ No draft data collection initialized');
+      logger.warn('No draft data collection initialized');
       return null;
     }
 
@@ -183,7 +186,7 @@ class DraftDataIntegration {
     // Reset pick timer for next pick
     this.pickStartTime = Date.now();
 
-    console.log(`📝 Recorded pick ${this.currentDraftData.pickNumber - 1}: ${pickData.playerName} by ${pickData.username || 'Unknown'}`);
+    logger.debug('Recorded pick', { pickNumber: this.currentDraftData.pickNumber - 1, playerName: pickData.playerName, username: pickData.username || 'Unknown' });
     return recordedPick;
   }
 
@@ -192,7 +195,7 @@ class DraftDataIntegration {
    */
   startPickTimer(userId: string): void {
     this.pickStartTime = Date.now();
-    console.log(`⏱️ Pick timer started for user ${userId}`);
+    logger.debug('Pick timer started', { userId });
   }
 
   /**
@@ -200,14 +203,14 @@ class DraftDataIntegration {
    */
   completeDraft(): Record<string, unknown> | null {
     if (!this.currentDraftData) {
-      console.warn('⚠️ No draft data to complete');
+      logger.warn('No draft data to complete');
       return null;
     }
 
     const completed = tournamentCollector.completeDraft(this.currentDraftData.draftId);
-    
+
     const draftDuration = Math.round((Date.now() - (this.draftStartTime || 0)) / 1000);
-    console.log(`✅ Draft completed in ${draftDuration} seconds`);
+    logger.debug('Draft completed', { durationSeconds: draftDuration });
     
     // Reset state
     this.currentDraftData = null;
@@ -278,8 +281,8 @@ class DraftDataIntegration {
         player.seasonTotal
       );
     });
-    
-    console.log(`📊 Updated performance for ${playerPerformanceData.length} players`);
+
+    logger.debug('Updated performance for players', { count: playerPerformanceData.length });
   }
 }
 

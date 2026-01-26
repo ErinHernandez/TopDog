@@ -60,7 +60,7 @@ import { ProfileTabVX2 as ProfileTab } from '../../tabs/profile';
 
 // Debug: Log what DraftsTab is (only in development, client-side)
 if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
-  console.log('[TabContentVX2] DraftsTab component loaded:', DraftsTab?.name || 'unknown');
+  logger.debug(`DraftsTab component loaded: ${DraftsTab?.name || 'unknown'}`);
 }
 
 // ============================================================================

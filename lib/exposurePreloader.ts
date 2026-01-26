@@ -5,6 +5,9 @@
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const userMetrics = require('./userMetrics').default || require('./userMetrics').userMetrics;
+import { createScopedLogger } from './clientLogger';
+
+const logger = createScopedLogger('[ExposurePreloader]');
 
 // ============================================================================
 // TYPES
@@ -82,13 +85,13 @@ class ExposurePreloader {
   private async performPreload(): Promise<ExposureData | null> {
     try {
       if (process.env.NODE_ENV === 'development') {
-        console.log('Starting exposure data preload...');
+        logger.debug('Starting exposure data preload...');
       }
-      
+
       // Check if we need to preload based on user activity
       if (!this.shouldPreload()) {
         if (process.env.NODE_ENV === 'development') {
-          console.log('Skipping preload - not needed based on user activity');
+          logger.debug('Skipping preload - not needed based on user activity');
         }
         return null;
       }
@@ -97,7 +100,7 @@ class ExposurePreloader {
       const cachedData = userMetrics.getExposureDataCache();
       if (cachedData) {
         if (process.env.NODE_ENV === 'development') {
-          console.log('Using cached exposure data');
+          logger.debug('Using cached exposure data');
         }
         return cachedData as ExposureData;
       }
@@ -113,15 +116,14 @@ class ExposurePreloader {
       
       // Cache the processed data
       userMetrics.saveExposureDataCache(processedData);
-      
+
       if (process.env.NODE_ENV === 'development') {
-        console.log('Exposure data preloaded and cached successfully');
+        logger.debug('Exposure data preloaded and cached successfully');
       }
       return processedData;
-      
+
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      console.warn('Exposure data preload failed:', errorMessage);
+      logger.warn('Exposure data preload failed');
       return null;
     } finally {
       this.isPreloading = false;
@@ -164,7 +166,7 @@ class ExposurePreloader {
 
       return false;
     } catch (error) {
-      console.warn('Error checking if should preload:', error);
+      logger.warn('Error checking if should preload');
       return true; // Default to preloading if we can't determine
     }
   }

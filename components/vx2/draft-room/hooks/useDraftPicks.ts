@@ -35,8 +35,22 @@ import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { generatePlayerId } from '../utils';
 import { usePlayerPool } from '../../../../lib/playerPool/usePlayerPool';
 import type { PoolPlayer } from '../../../../lib/playerPool/types';
+import type { Timestamp } from 'firebase/firestore';
 
 const logger = createScopedLogger('[useDraftPicks]');
+
+/**
+ * Firebase pick document structure from Firestore
+ */
+interface FirebasePickDocument {
+  id?: string;
+  pickNumber: number;
+  player: string | { name: string; [key: string]: unknown };
+  participantId?: string;
+  picker?: string;
+  pickerId?: string;
+  timestamp?: { toMillis?: () => number } | number;
+}
 
 // ============================================================================
 // TYPES
@@ -137,7 +151,7 @@ export function useDraftPicks({
   }, [poolPlayers]);
   
   // Convert Firebase pick data to DraftPick format
-  const convertFirebasePick = useCallback((firebasePick: any, teamCount: number): DraftPick | null => {
+  const convertFirebasePick = useCallback((firebasePick: FirebasePickDocument, teamCount: number): DraftPick | null => {
     // Extract player name (Firebase stores as string)
     let playerName: string;
     if (typeof firebasePick.player === 'string') {
@@ -180,7 +194,9 @@ export function useDraftPicks({
       player,
       participantId: participants[participantIndex].id,
       participantIndex,
-      timestamp: firebasePick.timestamp?.toMillis?.() || firebasePick.timestamp || Date.now(),
+      timestamp: typeof firebasePick.timestamp === 'object' && firebasePick.timestamp?.toMillis
+        ? firebasePick.timestamp.toMillis()
+        : (typeof firebasePick.timestamp === 'number' ? firebasePick.timestamp : Date.now()),
     };
   }, [playerMapByName, participants]);
   
@@ -229,8 +245,8 @@ export function useDraftPicks({
       picksQuery,
       (snapshot) => {
         const teamCount = participants.length || DRAFT_DEFAULTS.teamCount;
-        const firebasePicks = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        
+        const firebasePicks = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as FirebasePickDocument));
+
         // Convert Firebase picks to DraftPick format
         const convertedPicks: DraftPick[] = [];
         for (const firebasePick of firebasePicks) {

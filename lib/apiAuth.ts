@@ -6,6 +6,7 @@
  */
 
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { serverLogger } from './logger/serverLogger';
 
 // Use require for firebase-admin to ensure Turbopack compatibility
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -85,7 +86,7 @@ if (admin.apps.length === 0) {
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.warn('Firebase Admin initialization failed for API auth:', errorMessage);
+    serverLogger.warn(`Firebase Admin initialization failed for API auth: ${errorMessage}`);
   }
 } else {
   firebaseAdminInitialized = true;
@@ -112,7 +113,7 @@ export async function verifyAuthToken(authHeader: string | undefined): Promise<A
   if (process.env.NODE_ENV === 'production') {
     // Explicitly reject dev tokens in production
     if (token === 'dev-token') {
-      console.error('[Security] Dev token attempted in production');
+      serverLogger.error('Dev token attempted in production', new Error('Security violation'));
       return { uid: null, error: 'Invalid authentication token' };
     }
   }
@@ -138,8 +139,7 @@ export async function verifyAuthToken(authHeader: string | undefined): Promise<A
       email: decodedToken.email || undefined
     };
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Token verification error:', errorMessage);
+    serverLogger.error('Token verification error', error instanceof Error ? error : new Error(String(error)));
     return { uid: null, error: 'Invalid or expired token' };
   }
 }

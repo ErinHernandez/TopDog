@@ -18,8 +18,11 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { createScopedLogger } from '@/lib/clientLogger';
 import { useAuth } from '../../auth';
 import { getFirestore, doc, onSnapshot } from 'firebase/firestore';
+
+const logger = createScopedLogger('[useUser]');
 
 // ============================================================================
 // TYPES
@@ -183,7 +186,7 @@ export function useUser(): UseUserResult {
         setBalanceLoading(false);
       },
       (error) => {
-        console.warn('[useUser] Balance fetch error:', error.message);
+        logger.warn(`Balance fetch error: ${error.message}`);
         setBalanceError('Failed to load balance');
         setBalanceCents(0);
         setBalanceLoading(false);

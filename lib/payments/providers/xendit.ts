@@ -21,6 +21,7 @@ import {
   XENDIT_PAYMENT_METHODS,
   XENDIT_COUNTRIES,
 } from '../types';
+import { serverLogger } from '../../logger/serverLogger';
 import {
   createVirtualAccount,
   createEWalletCharge,
@@ -91,7 +92,7 @@ class XenditProvider implements PaymentProvider {
       }
       
     } catch (error: unknown) {
-      console.error('[XenditProvider] createPayment error:', error);
+      serverLogger.error('XenditProvider createPayment error', error instanceof Error ? error : new Error(String(error)));
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to create payment',
@@ -179,7 +180,7 @@ class XenditProvider implements PaymentProvider {
       };
       
     } catch (error: unknown) {
-      console.error('[XenditProvider] createTransfer error:', error);
+      serverLogger.error('XenditProvider createTransfer error', error instanceof Error ? error : new Error(String(error)));
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to create transfer',

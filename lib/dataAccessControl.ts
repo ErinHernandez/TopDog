@@ -4,6 +4,10 @@
  * Protects competitive integrity during active seasons
  */
 
+import { createScopedLogger } from './clientLogger';
+
+const logger = createScopedLogger('[DataAccessControl]');
+
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -82,7 +86,7 @@ class DataAccessControl {
     const config = this.seasonConfig[currentSeason];
     
     if (!config) {
-      console.warn(`No season config found for ${currentSeason}`);
+      logger.warn(`No season config found for ${currentSeason}`);
       return false; // Default to allowing access if no config
     }
 

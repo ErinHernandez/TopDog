@@ -21,7 +21,10 @@
  */
 
 import React, { useState, useCallback, useMemo } from 'react';
+import { createScopedLogger } from '@/lib/clientLogger';
 import type { SlowDraftsTabProps, SlowDraft } from './types';
+
+const logger = createScopedLogger('[SlowDraftsTabVX2]');
 import { SLOW_DRAFT_LAYOUT } from './constants';
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS } from '../../core/constants/colors';
 import { SPACING, RADIUS } from '../../core/constants/sizes';
@@ -160,7 +163,8 @@ export default function SlowDraftsTabVX2({
   // Debug: Log counts when they change
   React.useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
-      console.log('[SlowDraftsTabVX2] Counts updated:', counts, {
+      logger.debug('Counts updated', {
+        ...counts,
         sortedFilteredDraftsCount: sortedFilteredDrafts.length,
       });
     }
@@ -195,7 +199,7 @@ export default function SlowDraftsTabVX2({
           await hookQuickPick(draftId, playerId);
         }
       } catch (err) {
-        console.error('Quick pick failed:', err);
+        logger.error('Quick pick failed', err instanceof Error ? err : new Error(String(err)));
       }
     },
     [externalQuickPick, hookQuickPick, userId]
