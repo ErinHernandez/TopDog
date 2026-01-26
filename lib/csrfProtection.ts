@@ -5,7 +5,7 @@
  * Uses the double-submit cookie pattern for stateless CSRF protection.
  */
 
-import { randomBytes } from 'crypto';
+import { randomBytes, timingSafeEqual } from 'crypto';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 // CSRF token cookie name
@@ -21,25 +21,40 @@ export function generateCSRFToken(): string {
 }
 
 /**
- * Validate CSRF token from request
+ * Validate CSRF token from request using constant-time comparison
  * @param {NextApiRequest} req - Next.js request object
  * @returns {boolean} True if token is valid
  */
 export function validateCSRFToken(req: NextApiRequest): boolean {
-  // Get token from header
-  const headerToken = req.headers[CSRF_TOKEN_HEADER] || 
-                     req.headers['x-csrf-token'] as string | undefined;
-  
+  // Get token from header (normalize header name to lowercase)
+  const headerToken = req.headers[CSRF_TOKEN_HEADER] as string | undefined;
+
   // Get token from cookie
   const cookieToken = req.cookies?.[CSRF_TOKEN_COOKIE];
-  
-  // Both must be present and match
+
+  // Both must be present
   if (!headerToken || !cookieToken) {
     return false;
   }
-  
-  // Use constant-time comparison to prevent timing attacks
-  return headerToken === cookieToken && headerToken.length > 0;
+
+  // Both must have content
+  if (headerToken.length === 0 || cookieToken.length === 0) {
+    return false;
+  }
+
+  // Convert to buffers for constant-time comparison
+  const headerBuffer = Buffer.from(headerToken, 'utf8');
+  const cookieBuffer = Buffer.from(cookieToken, 'utf8');
+
+  // Length check - perform dummy comparison to maintain constant timing
+  if (headerBuffer.length !== cookieBuffer.length) {
+    // Dummy comparison to prevent length oracle attacks
+    timingSafeEqual(cookieBuffer, cookieBuffer);
+    return false;
+  }
+
+  // Constant-time comparison to prevent timing attacks
+  return timingSafeEqual(headerBuffer, cookieBuffer);
 }
 
 /**

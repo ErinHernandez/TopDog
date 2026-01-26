@@ -108,20 +108,12 @@ export async function verifyAuthToken(authHeader: string | undefined): Promise<A
   
   const token = authHeader.split('Bearer ')[1];
   
-  // Development fallback (only in development mode)
-  // CRITICAL: This MUST be disabled in production - never allow in production builds
-  if (process.env.NODE_ENV === 'production') {
-    // Explicitly reject dev tokens in production
-    if (token === 'dev-token') {
-      serverLogger.error('Dev token attempted in production', new Error('Security violation'));
-      return { uid: null, error: 'Invalid authentication token' };
-    }
-  }
-  
-  if (process.env.NODE_ENV === 'development' && token === 'dev-token') {
-    return { uid: 'dev-uid', email: 'dev@example.com' };
-  }
-  
+  // SECURITY: All dev token logic has been removed.
+  // For local development, use Firebase Auth Emulator instead:
+  // 1. Start Firebase emulators: `firebase emulators:start`
+  // 2. Set FIREBASE_AUTH_EMULATOR_HOST=localhost:9099 in .env.local
+  // 3. Use real Firebase tokens from emulator for API testing
+
   // Check if Firebase Admin was initialized successfully
   if (!firebaseAdminInitialized) {
     return { 

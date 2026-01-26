@@ -23,6 +23,48 @@ import { createScopedLogger } from '../clientLogger';
 const logger = createScopedLogger('[DraftStateManager]');
 
 // ============================================================================
+// CONCURRENCY PRIMITIVES
+// ============================================================================
+
+/**
+ * Simple mutex for ensuring atomic state updates
+ * Prevents race conditions when multiple updates are requested simultaneously
+ */
+class Mutex {
+  private locked: boolean = false;
+  private queue: Array<() => void> = [];
+
+  async acquire(): Promise<void> {
+    return new Promise((resolve) => {
+      if (!this.locked) {
+        this.locked = true;
+        resolve();
+      } else {
+        this.queue.push(resolve);
+      }
+    });
+  }
+
+  release(): void {
+    if (this.queue.length > 0) {
+      const next = this.queue.shift();
+      if (next) next();
+    } else {
+      this.locked = false;
+    }
+  }
+
+  async withLock<T>(fn: () => Promise<T> | T): Promise<T> {
+    await this.acquire();
+    try {
+      return await fn();
+    } finally {
+      this.release();
+    }
+  }
+}
+
+// ============================================================================
 // TYPES & INTERFACES
 // ============================================================================
 
@@ -102,6 +144,7 @@ export interface UpdateStateOptions {
   skipNotify?: boolean;
   strictValidation?: boolean;
   allowGap?: boolean;
+  skipLock?: boolean; // For internal recursive calls that already hold the lock
 }
 
 export interface RoomUpdateData {
@@ -235,19 +278,46 @@ export class DraftStateManager {
   private roomId?: string;
   private state: DraftState;
   private subscribers: Set<StateCallback>;
-  private pendingUpdates: unknown[];
-  private isProcessing: boolean;
+  private mutex: Mutex;
   private onStateChange: StateCallback | null;
   private validationEnabled: boolean;
+  private isDestroyed: boolean;
+  private stateVersion: number; // For optimistic concurrency control
 
   constructor(options: DraftStateManagerOptions = {}) {
     this.roomId = options.roomId;
     this.state = new DraftState(options.initialState);
     this.subscribers = new Set();
-    this.pendingUpdates = [];
-    this.isProcessing = false;
+    this.mutex = new Mutex();
     this.onStateChange = options.onStateChange || null;
     this.validationEnabled = options.validationEnabled !== false; // Default true
+    this.isDestroyed = false;
+    this.stateVersion = 0;
+  }
+
+  /**
+   * Destroy the state manager and clean up resources
+   * Prevents memory leaks by clearing all subscribers
+   */
+  destroy(): void {
+    this.isDestroyed = true;
+    this.subscribers.clear();
+    this.onStateChange = null;
+    logger.info('DraftStateManager destroyed', { roomId: this.roomId });
+  }
+
+  /**
+   * Check if manager is still active
+   */
+  isActive(): boolean {
+    return !this.isDestroyed;
+  }
+
+  /**
+   * Get current state version for optimistic concurrency
+   */
+  getStateVersion(): number {
+    return this.stateVersion;
   }
 
   /**
@@ -259,76 +329,128 @@ export class DraftStateManager {
 
   /**
    * Subscribe to state changes
+   * Returns an unsubscribe function that is safe to call multiple times
    */
   subscribe(callback: StateCallback): () => void {
+    if (this.isDestroyed) {
+      logger.warn('Attempted to subscribe to destroyed DraftStateManager', { roomId: this.roomId });
+      return () => {}; // Return no-op unsubscribe
+    }
+
     this.subscribers.add(callback);
+
+    // Return idempotent unsubscribe function
+    let isUnsubscribed = false;
     return () => {
-      this.subscribers.delete(callback);
+      if (!isUnsubscribed) {
+        isUnsubscribed = true;
+        this.subscribers.delete(callback);
+      }
     };
   }
 
   /**
    * Notify subscribers of state change
+   * Handles destroyed state and errors gracefully
    */
   private notifySubscribers(): void {
+    // Don't notify if destroyed
+    if (this.isDestroyed) {
+      return;
+    }
+
     const currentState = this.getState();
+    const stateVersion = this.stateVersion;
+
+    // Notify each subscriber, removing any that throw repeatedly
     this.subscribers.forEach(callback => {
       try {
         callback(currentState);
       } catch (error) {
-        logger.error('Subscriber error', error instanceof Error ? error : new Error(String(error)));
+        logger.error('Subscriber error', error instanceof Error ? error : new Error(String(error)), {
+          roomId: this.roomId,
+          stateVersion
+        });
+        // Don't remove subscriber on single error - they may recover
       }
     });
 
-    if (this.onStateChange) {
+    if (this.onStateChange && !this.isDestroyed) {
       try {
         this.onStateChange(currentState);
       } catch (error) {
-        logger.error('onStateChange error', error instanceof Error ? error : new Error(String(error)));
+        logger.error('onStateChange error', error instanceof Error ? error : new Error(String(error)), {
+          roomId: this.roomId,
+          stateVersion
+        });
       }
     }
   }
 
   /**
-   * Update state atomically
+   * Update state atomically with mutex protection
    */
   async updateState(
     updater: StateUpdater | Partial<DraftStateData>,
     options: UpdateStateOptions = {}
   ): Promise<DraftState> {
-    const { validate = this.validationEnabled, skipNotify = false } = options;
-
-    // Clone current state
-    const newState = this.state.clone();
-
-    // Apply update function
-    if (typeof updater === 'function') {
-      updater(newState);
-    } else {
-      // If updater is an object, merge it into state
-      Object.assign(newState, updater);
+    // Check if manager has been destroyed
+    if (this.isDestroyed) {
+      throw new Error('Cannot update state: DraftStateManager has been destroyed');
     }
 
-    // Validate state if enabled
-    if (validate) {
-      const validation = newState.validate();
-      if (!validation.isValid) {
-        logger.warn('State validation failed');
-        if (options.strictValidation) {
-          throw new Error(`State validation failed: ${validation.errors.join(', ')}`);
+    const { validate = this.validationEnabled, skipNotify = false, skipLock = false } = options;
+
+    // Use mutex to prevent race conditions (unless called internally with lock already held)
+    const performUpdate = async (): Promise<DraftState> => {
+      // Clone current state
+      const newState = this.state.clone();
+      const previousVersion = this.stateVersion;
+
+      // Apply update function
+      if (typeof updater === 'function') {
+        updater(newState);
+      } else {
+        // If updater is an object, merge it into state
+        Object.assign(newState, updater);
+      }
+
+      // Validate state if enabled
+      if (validate) {
+        const validation = newState.validate();
+        if (!validation.isValid) {
+          logger.warn('State validation failed', {
+            errors: validation.errors,
+            roomId: this.roomId
+          });
+          if (options.strictValidation) {
+            throw new Error(`State validation failed: ${validation.errors.join(', ')}`);
+          }
+          // Even in non-strict mode, reject clearly invalid states
+          if (validation.errors.some(e => e.includes('Pick number mismatch'))) {
+            throw new Error(`Critical state error: ${validation.errors.join(', ')}`);
+          }
         }
       }
+
+      // Update state and increment version
+      this.state = newState;
+      this.stateVersion = previousVersion + 1;
+
+      // Notify subscribers (outside the lock to prevent deadlocks)
+      if (!skipNotify && !this.isDestroyed) {
+        // Schedule notification asynchronously to release lock faster
+        queueMicrotask(() => this.notifySubscribers());
+      }
+
+      return this.getState();
+    };
+
+    if (skipLock) {
+      return performUpdate();
     }
 
-    // Update state
-    this.state = newState;
-
-    // Notify subscribers
-    if (!skipNotify) {
-      this.notifySubscribers();
-    }
-
-    return this.getState();
+    return this.mutex.withLock(performUpdate);
   }
 
   /**
@@ -354,30 +476,55 @@ export class DraftStateManager {
 
   /**
    * Add a pick (validates pick number and player availability)
+   * Uses mutex to ensure atomic pick additions
    */
   async addPick(pick: DraftPick, options: AddPickOptions = {}): Promise<DraftState> {
-    return this.updateState((state) => {
-      // Validate pick number
-      const expectedPickNumber = state.picks.length + 1;
+    // Wrap in mutex to prevent duplicate picks from race conditions
+    return this.mutex.withLock(async () => {
+      // Validate pick number BEFORE making any changes
+      const expectedPickNumber = this.state.picks.length + 1;
+
       if (pick.pickNumber !== expectedPickNumber && !options.allowGap) {
-        logger.warn(`Pick number mismatch: expected ${expectedPickNumber}, got ${pick.pickNumber}`);
+        const errorMsg = `Pick number mismatch: expected ${expectedPickNumber}, got ${pick.pickNumber}`;
+        logger.warn(errorMsg, { roomId: this.roomId });
+
+        // In strict mode, reject mismatched picks entirely
+        if (options.strictValidation) {
+          throw new Error(errorMsg);
+        }
       }
 
-      // Add pick
-      state.picks.push({ ...pick });
-      state.currentPickNumber = expectedPickNumber + 1;
+      // Check if player is already picked (prevent duplicates)
+      const playerName = pick.player?.name || pick.name || '';
+      if (playerName) {
+        const alreadyPicked = this.state.picks.some(p => {
+          const pName = (p.player && typeof p.player === 'object' && 'name' in p.player)
+            ? p.player.name as string
+            : p.name || '';
+          return pName === playerName;
+        });
 
-      // Remove player from queue if present
-      if (pick.player?.name || pick.name) {
-        const playerName = pick.player?.name || pick.name || '';
-        state.queue = state.queue.filter(
-          q => {
-            const qName = (typeof q === 'object' && q !== null && 'name' in q) ? q.name : String(q);
-            return qName !== playerName;
-          }
-        );
+        if (alreadyPicked) {
+          throw new Error(`Player "${playerName}" has already been picked`);
+        }
       }
-    }, { strictValidation: options.strictValidation });
+
+      return this.updateState((state) => {
+        // Add pick with corrected pick number
+        state.picks.push({ ...pick, pickNumber: expectedPickNumber });
+        state.currentPickNumber = expectedPickNumber + 1;
+
+        // Remove player from queue if present
+        if (playerName) {
+          state.queue = state.queue.filter(
+            q => {
+              const qName = (typeof q === 'object' && q !== null && 'name' in q) ? q.name : String(q);
+              return qName !== playerName;
+            }
+          );
+        }
+      }, { strictValidation: options.strictValidation, skipLock: true }); // skipLock since we already hold it
+    });
   }
 
   /**
@@ -512,16 +659,36 @@ export class DraftStateManager {
 
   /**
    * Batch update multiple state changes atomically
+   * All updates are applied within a single lock to prevent interleaving
    */
-  async batchUpdate(updaters: Array<StateUpdater | Partial<DraftStateData>>): Promise<DraftState> {
-    return this.updateState((state) => {
-      updaters.forEach(updater => {
-        if (typeof updater === 'function') {
-          updater(state);
-        } else {
-          Object.assign(state, updater);
-        }
-      });
+  async batchUpdate(
+    updaters: Array<StateUpdater | Partial<DraftStateData>>,
+    options: UpdateStateOptions = {}
+  ): Promise<DraftState> {
+    return this.mutex.withLock(async () => {
+      return this.updateState((state) => {
+        updaters.forEach(updater => {
+          if (typeof updater === 'function') {
+            updater(state);
+          } else {
+            Object.assign(state, updater);
+          }
+        });
+      }, { ...options, skipLock: true }); // skipLock since we already hold it
+    });
+  }
+
+  /**
+   * Execute a function with exclusive access to state
+   * Useful for complex operations that need to read-then-write atomically
+   */
+  async withExclusiveAccess<T>(fn: (state: DraftState) => Promise<T> | T): Promise<T> {
+    if (this.isDestroyed) {
+      throw new Error('Cannot access state: DraftStateManager has been destroyed');
+    }
+
+    return this.mutex.withLock(async () => {
+      return fn(this.getState());
     });
   }
 }

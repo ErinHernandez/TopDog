@@ -8,7 +8,7 @@
 import Stripe from 'stripe';
 import { serverLogger } from '../logger/serverLogger';
 import { getDb } from '../firebase-utils';
-import { doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, getDocs, serverTimestamp, runTransaction } from 'firebase/firestore';
 import { captureError } from '../errorTracking';
 import { requireAppUrl } from '../envHelpers';
 import { getStripeExchangeRate } from './exchangeRates';
@@ -1007,44 +1007,143 @@ export async function createOrUpdateWebhookEvent(
 // ============================================================================
 
 /**
- * Update user's balance in Firebase (called by webhook handlers)
+ * Balance update result with transaction details
+ */
+export interface BalanceUpdateResult {
+  previousBalance: number;
+  newBalance: number;
+  amountDollars: number;
+  operation: 'add' | 'subtract';
+  timestamp: string;
+}
+
+/**
+ * Update user's balance in Firebase using atomic transaction
+ *
+ * SECURITY: Uses Firestore transaction to prevent race conditions where
+ * concurrent updates could result in incorrect balances.
+ *
+ * @param userId - Firebase user ID
+ * @param amountCents - Amount in cents (will be converted to dollars)
+ * @param operation - 'add' for deposits, 'subtract' for withdrawals
+ * @param idempotencyKey - Optional key to prevent duplicate operations
+ * @returns Promise resolving to balance update result
  */
 export async function updateUserBalance(
   userId: string,
   amountCents: number,
-  operation: 'add' | 'subtract'
+  operation: 'add' | 'subtract',
+  idempotencyKey?: string
 ): Promise<number> {
   try {
     const db = getDb();
     const userRef = doc(db, 'users', userId);
-    const userDoc = await getDoc(userRef);
-    
-    if (!userDoc.exists()) {
-      throw new Error('User not found');
-    }
-    
-    const currentBalance = (userDoc.data().balance || 0) as number;
     const amountDollars = amountCents / 100;
-    
-    const newBalance = operation === 'add'
-      ? currentBalance + amountDollars
-      : currentBalance - amountDollars;
-    
-    if (newBalance < 0) {
-      throw new Error('Insufficient balance');
+
+    // SECURITY: Check for duplicate operations if idempotency key provided
+    if (idempotencyKey) {
+      const balanceOpsRef = collection(db, 'balanceOperations');
+      const duplicateQuery = query(
+        balanceOpsRef,
+        where('idempotencyKey', '==', idempotencyKey)
+      );
+      const duplicateSnapshot = await getDocs(duplicateQuery);
+
+      if (!duplicateSnapshot.empty) {
+        serverLogger.warn('Duplicate balance operation detected', null, {
+          userId,
+          idempotencyKey,
+          operation,
+        });
+        // Return the existing balance instead of processing duplicate
+        const userDoc = await getDoc(userRef);
+        return (userDoc.data()?.balance || 0) as number;
+      }
     }
-    
-    // Use setDoc with merge for safety
-    await setDoc(userRef, {
-      balance: newBalance,
-      lastBalanceUpdate: serverTimestamp(),
-    }, { merge: true });
-    
-    return newBalance;
+
+    // SECURITY: Use atomic transaction to prevent race conditions
+    const result = await runTransaction(db, async (transaction) => {
+      const userDoc = await transaction.get(userRef);
+
+      if (!userDoc.exists()) {
+        throw new Error('User not found');
+      }
+
+      const currentBalance = (userDoc.data().balance || 0) as number;
+
+      const newBalance = operation === 'add'
+        ? currentBalance + amountDollars
+        : currentBalance - amountDollars;
+
+      // SECURITY: Prevent negative balances
+      if (newBalance < 0) {
+        throw new Error(`Insufficient balance. Current: ${currentBalance.toFixed(2)}, Requested: ${amountDollars.toFixed(2)}`);
+      }
+
+      // Update balance atomically within transaction
+      transaction.update(userRef, {
+        balance: newBalance,
+        lastBalanceUpdate: serverTimestamp(),
+      });
+
+      // If idempotency key provided, record this operation
+      if (idempotencyKey) {
+        const balanceOpRef = doc(collection(db, 'balanceOperations'));
+        transaction.set(balanceOpRef, {
+          userId,
+          idempotencyKey,
+          operation,
+          amountCents,
+          amountDollars,
+          previousBalance: currentBalance,
+          newBalance,
+          createdAt: serverTimestamp(),
+        });
+      }
+
+      return {
+        previousBalance: currentBalance,
+        newBalance,
+      };
+    });
+
+    serverLogger.info('Balance updated successfully', {
+      userId,
+      operation,
+      amountDollars,
+      previousBalance: result.previousBalance,
+      newBalance: result.newBalance,
+      idempotencyKey,
+    });
+
+    return result.newBalance;
   } catch (error: unknown) {
     await captureError(error as Error, {
       tags: { component: 'stripe', operation: 'updateUserBalance' },
       extra: { userId, amountCents, operation },
+    });
+    throw error;
+  }
+}
+
+/**
+ * Get user's current balance (read-only, does not modify)
+ */
+export async function getUserBalance(userId: string): Promise<number> {
+  try {
+    const db = getDb();
+    const userRef = doc(db, 'users', userId);
+    const userDoc = await getDoc(userRef);
+
+    if (!userDoc.exists()) {
+      return 0;
+    }
+
+    return (userDoc.data().balance || 0) as number;
+  } catch (error: unknown) {
+    await captureError(error as Error, {
+      tags: { component: 'stripe', operation: 'getUserBalance' },
+      extra: { userId },
     });
     throw error;
   }

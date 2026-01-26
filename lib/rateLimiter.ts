@@ -70,6 +70,22 @@ export interface RateLimitConfig {
   endpoint: string;
   /** How often to clean up expired entries (default: 1 hour) */
   cleanupIntervalMs?: number;
+  /**
+   * SECURITY: Fail-closed behavior on errors (default: true)
+   * When true, requests are rejected if rate limiter fails
+   * When false, requests are allowed (fail-open - NOT RECOMMENDED)
+   */
+  failClosed?: boolean;
+  /**
+   * Number of consecutive failures before circuit breaker opens
+   * When circuit is open, requests use cached/default behavior
+   * (default: 5)
+   */
+  circuitBreakerThreshold?: number;
+  /**
+   * How long circuit stays open before trying again (default: 30 seconds)
+   */
+  circuitBreakerResetMs?: number;
 }
 
 /**
@@ -84,8 +100,12 @@ export interface RateLimitResult {
   retryAfterMs: number | null;
   /** Timestamp when window resets */
   resetAt: number;
-  /** Internal flag: true if rate limiter failed and allowed request */
+  /** Internal flag: true if rate limiter failed and denied request (fail-closed) */
+  _failedClosed?: boolean;
+  /** Internal flag: true if rate limiter failed and allowed request (fail-open - deprecated) */
   _failedOpen?: boolean;
+  /** Internal flag: true if circuit breaker is open */
+  _circuitOpen?: boolean;
 }
 
 /**
@@ -108,11 +128,28 @@ export interface CleanupResult {
 }
 
 // ============================================================================
+// CIRCUIT BREAKER STATE
+// ============================================================================
+
+interface CircuitBreakerState {
+  consecutiveFailures: number;
+  lastFailureAt: number;
+  isOpen: boolean;
+}
+
+// Global circuit breaker state per endpoint (in-memory for this instance)
+const circuitBreakerStates = new Map<string, CircuitBreakerState>();
+
+// ============================================================================
 // RATE LIMITER CLASS
 // ============================================================================
 
 export class RateLimiter {
-  public config: Required<RateLimitConfig>;
+  public config: Required<RateLimitConfig> & {
+    failClosed: boolean;
+    circuitBreakerThreshold: number;
+    circuitBreakerResetMs: number;
+  };
   private collection: CollectionReference;
 
   constructor(config: RateLimitConfig) {
@@ -121,9 +158,75 @@ export class RateLimiter {
       windowMs: config.windowMs,
       endpoint: config.endpoint,
       cleanupIntervalMs: config.cleanupIntervalMs || 60 * 60 * 1000, // 1 hour default
+      // SECURITY: Default to fail-closed behavior
+      failClosed: config.failClosed !== false, // true unless explicitly set to false
+      circuitBreakerThreshold: config.circuitBreakerThreshold || 5,
+      circuitBreakerResetMs: config.circuitBreakerResetMs || 30 * 1000, // 30 seconds
     };
-    
+
     this.collection = collection(db, 'rate_limits');
+
+    // Initialize circuit breaker state for this endpoint
+    if (!circuitBreakerStates.has(this.config.endpoint)) {
+      circuitBreakerStates.set(this.config.endpoint, {
+        consecutiveFailures: 0,
+        lastFailureAt: 0,
+        isOpen: false,
+      });
+    }
+  }
+
+  /**
+   * Get circuit breaker state for this endpoint
+   */
+  private getCircuitState(): CircuitBreakerState {
+    return circuitBreakerStates.get(this.config.endpoint) || {
+      consecutiveFailures: 0,
+      lastFailureAt: 0,
+      isOpen: false,
+    };
+  }
+
+  /**
+   * Record a successful operation (reset circuit breaker)
+   */
+  private recordSuccess(): void {
+    const state = this.getCircuitState();
+    state.consecutiveFailures = 0;
+    state.isOpen = false;
+    circuitBreakerStates.set(this.config.endpoint, state);
+  }
+
+  /**
+   * Record a failure (increment circuit breaker counter)
+   */
+  private recordFailure(): void {
+    const state = this.getCircuitState();
+    state.consecutiveFailures++;
+    state.lastFailureAt = Date.now();
+
+    if (state.consecutiveFailures >= this.config.circuitBreakerThreshold) {
+      state.isOpen = true;
+      serverLogger.warn('Rate limiter circuit breaker opened', null, {
+        endpoint: this.config.endpoint,
+        consecutiveFailures: state.consecutiveFailures,
+        threshold: this.config.circuitBreakerThreshold,
+      });
+    }
+
+    circuitBreakerStates.set(this.config.endpoint, state);
+  }
+
+  /**
+   * Check if circuit breaker should allow a test request
+   */
+  private shouldAllowCircuitTest(): boolean {
+    const state = this.getCircuitState();
+    if (!state.isOpen) return true;
+
+    // Check if enough time has passed to try again
+    const timeSinceLastFailure = Date.now() - state.lastFailureAt;
+    return timeSinceLastFailure >= this.config.circuitBreakerResetMs;
   }
 
   /**
@@ -162,10 +265,33 @@ export class RateLimiter {
     const key = this.getRateLimitKey(clientId);
     const now = Date.now();
     const windowEnd = now + this.config.windowMs;
-    
+
+    // Check circuit breaker state
+    const circuitState = this.getCircuitState();
+    if (circuitState.isOpen && !this.shouldAllowCircuitTest()) {
+      serverLogger.info('Rate limiter circuit breaker open, using fail-closed', {
+        endpoint: this.config.endpoint,
+        clientId,
+        consecutiveFailures: circuitState.consecutiveFailures,
+      });
+
+      // Circuit is open - use fail-closed behavior without hitting Firestore
+      if (this.config.failClosed) {
+        return {
+          allowed: false,
+          remaining: 0,
+          retryAfterMs: this.config.circuitBreakerResetMs,
+          resetAt: now + this.config.circuitBreakerResetMs,
+          _circuitOpen: true,
+          _failedClosed: true,
+        };
+      }
+    }
+
     const rateLimitRef = doc(this.collection, key);
-    
+
     try {
+      // Use transaction for atomic increment
       // Use transaction for atomic increment
       const result = await runTransaction(db, async (transaction) => {
         const rateLimitDoc = await transaction.get(rateLimitRef);
@@ -240,14 +366,21 @@ export class RateLimiter {
           resetAt: windowEndMs,
         };
       });
-      
+
+      // Record success for circuit breaker
+      this.recordSuccess();
+
       return result;
     } catch (error) {
-      serverLogger.error('Rate limiter error', error instanceof Error ? error : new Error(String(error)));
+      serverLogger.error('Rate limiter error', error instanceof Error ? error : new Error(String(error)), {
+        endpoint: this.config.endpoint,
+        failClosed: this.config.failClosed,
+        clientId,
+      });
 
-      // On error, allow request (fail open for availability)
-      // But log the error for monitoring and alerting
-      
+      // Record failure for circuit breaker
+      this.recordFailure();
+
       // Track rate limiter failures for alerting
       if (typeof window === 'undefined') {
         // Server-side: report to Sentry
@@ -258,21 +391,46 @@ export class RateLimiter {
             tags: {
               component: 'rate_limiter',
               endpoint: this.config.endpoint,
-              action: 'fail_open'
+              action: this.config.failClosed ? 'fail_closed' : 'fail_open',
             },
-            level: 'warning'
+            level: 'error', // Elevated from warning since this affects security
           });
         } catch (sentryError) {
           // Sentry not available, continue
         }
       }
-      
+
+      // SECURITY: Default to fail-closed behavior (reject requests on error)
+      // This prevents attackers from bypassing rate limits by causing errors
+      if (this.config.failClosed) {
+        serverLogger.warn('Rate limiter fail-closed: rejecting request due to error', null, {
+          endpoint: this.config.endpoint,
+          clientId,
+        });
+
+        return {
+          allowed: false,
+          remaining: 0,
+          retryAfterMs: 60 * 1000, // Suggest retry in 1 minute
+          resetAt: now + 60 * 1000,
+          _failedClosed: true,
+        };
+      }
+
+      // DEPRECATED: Fail-open behavior (only if explicitly configured)
+      // WARNING: This allows attackers to bypass rate limiting by causing errors
+      serverLogger.warn('DEPRECATED: Rate limiter fail-open behavior used', null, {
+        endpoint: this.config.endpoint,
+        clientId,
+        recommendation: 'Set failClosed: true in RateLimitConfig',
+      });
+
       return {
         allowed: true,
         remaining: this.config.maxRequests,
         retryAfterMs: null,
         resetAt: now + this.config.windowMs,
-        _failedOpen: true, // Flag for downstream tracking
+        _failedOpen: true,
       };
     }
   }

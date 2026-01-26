@@ -78,20 +78,12 @@ export async function verifyAdminAccess(
   
   const token = authHeader.split('Bearer ')[1];
   
-  // Development fallback (only in development mode)
-  // CRITICAL: This MUST be disabled in production - never allow in production builds
-  if (process.env.NODE_ENV === 'production') {
-    // Explicitly reject dev admin tokens in production
-    if (token === 'dev-admin-token') {
-      serverLogger.error('Dev admin token attempted in production', new Error('Security violation'));
-      return { isAdmin: false, error: 'Invalid authentication token' };
-    }
-  }
-
-  if (process.env.NODE_ENV === 'development' && token === 'dev-admin-token') {
-    serverLogger.warn('Using development admin token - NOT FOR PRODUCTION');
-    return { isAdmin: true, uid: 'dev-admin', email: 'admin@dev.local' };
-  }
+  // SECURITY: All dev admin token logic has been removed.
+  // For local development admin testing:
+  // 1. Start Firebase emulators: `firebase emulators:start`
+  // 2. Set FIREBASE_AUTH_EMULATOR_HOST=localhost:9099 in .env.local
+  // 3. Use: npx ts-node scripts/set-admin-claim.ts <your-test-uid>
+  // 4. Use real Firebase tokens from emulator for API testing
 
   // Check if Firebase Admin is initialized
   if (!firebaseAdminInitialized) {
@@ -118,17 +110,44 @@ export async function verifyAdminAccess(
     
     // FALLBACK: Check against admin UIDs list from environment variable
     // This is a fallback for migration period - custom claims should be preferred
-    // NOTE: This fallback should be removed after migration is complete and verified
+    // NOTE: This fallback will be DISABLED after the deprecation date
     // Migration script: scripts/migrate-admin-claims.js
     // Verification endpoint: /api/admin/verify-claims
+    const ADMIN_UIDS_DEPRECATION_DATE = new Date('2026-02-15T00:00:00Z');
+    const now = new Date();
+
     const adminUidsEnv = process.env.ADMIN_UIDS;
     const adminUids = (adminUidsEnv?.split(',') || [])
       .map(uid => uid.trim())
       .filter(Boolean);
-    
+
     if (adminUids.length > 0 && adminUids.includes(decodedToken.uid)) {
-      // Log warning with migration instructions
-      serverLogger.warn('DEPRECATED: Using UID-based admin check - Migrate to custom claims using scripts/migrate-admin-claims.js');
+      // After deprecation date, completely disable ADMIN_UIDS
+      if (now >= ADMIN_UIDS_DEPRECATION_DATE) {
+        serverLogger.error('ADMIN_UIDS is deprecated and disabled', null, {
+          uid: decodedToken.uid,
+          deprecationDate: ADMIN_UIDS_DEPRECATION_DATE.toISOString(),
+          action: 'User must be migrated to Firebase custom claims'
+        });
+        return {
+          isAdmin: false,
+          uid: decodedToken.uid,
+          error: 'ADMIN_UIDS authentication is deprecated. Contact support to migrate to Firebase custom claims.'
+        };
+      }
+
+      // Before deprecation date, allow with strong warning
+      const daysUntilDeprecation = Math.ceil(
+        (ADMIN_UIDS_DEPRECATION_DATE.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+      );
+
+      serverLogger.warn('DEPRECATED: Using UID-based admin check', null, {
+        uid: decodedToken.uid,
+        daysUntilDeprecation,
+        deprecationDate: ADMIN_UIDS_DEPRECATION_DATE.toISOString(),
+        action: 'Migrate to custom claims using: npx ts-node scripts/set-admin-claim.ts ' + decodedToken.uid
+      });
+
       return {
         isAdmin: true,
         uid: decodedToken.uid,

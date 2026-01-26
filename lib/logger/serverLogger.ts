@@ -84,12 +84,13 @@ class ServerLogger {
     this.output(this.formatEntry('info', message, context));
   }
 
-  warn(message: string, context?: ServerLogContext): void {
-    this.output(this.formatEntry('warn', message, context));
+  warn(message: string, error?: Error | null, context?: ServerLogContext): void {
+    const entry = this.formatEntry('warn', message, context, error || undefined);
+    this.output(entry);
   }
 
-  error(message: string, error?: Error, context?: ServerLogContext): void {
-    const entry = this.formatEntry('error', message, context, error);
+  error(message: string, error?: Error | null, context?: ServerLogContext): void {
+    const entry = this.formatEntry('error', message, context, error || undefined);
     this.output(entry);
 
     // Also send to Sentry

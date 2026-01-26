@@ -38,14 +38,15 @@ import { captureError } from '../../../lib/errorTracking';
 import { logger } from '../../../lib/structuredLogger';
 import { getDb } from '../../../lib/firebase-utils';
 import { doc, updateDoc, getDoc, serverTimestamp } from 'firebase/firestore';
-import { 
-  withErrorHandling, 
+import {
+  withErrorHandling,
   validateMethod,
   createSuccessResponse,
   createErrorResponse,
   ErrorType,
   type ApiLogger,
 } from '../../../lib/apiErrorHandler';
+import { acquireWebhookLock } from '../../../lib/webhooks/atomicLock';
 
 // ============================================================================
 // CONFIG
@@ -183,84 +184,145 @@ export default async function handler(
       return res.status(200).json({ received: false, error: errorResponse.body.error.message });
     }
     
-    // Check for duplicate event (idempotency)
-    const existingEvent = await findEventByStripeId(event.id);
-    if (existingEvent?.status === 'processed') {
-      logger.info('Duplicate webhook event - already processed', { 
-        component: 'stripe',
-        operation: 'webhook',
-        eventType: event.type, 
-        eventId: event.id,
-        processedAt: existingEvent.processedAt,
-      });
-      
-      const successResponse = createSuccessResponse({
-        received: true,
-        eventId: event.id,
-        eventType: event.type,
-        success: true,
-        actions: ['already_processed'],
-      }, 200, logger);
-      
-      return res.status(successResponse.statusCode).json(successResponse.body);
-    }
-    
-    // Create or update event record for tracking
-    await createOrUpdateWebhookEvent(event.id, event.type, {
+    // ATOMIC LOCK: Acquire exclusive processing lock to prevent race conditions
+    // This replaces the previous non-atomic duplicate check
+    const lock = await acquireWebhookLock(event.id, event.type, 'stripe', {
       livemode: event.livemode,
       apiVersion: event.api_version,
     });
-    
-    // Log webhook event
-    logger.info('Webhook received', { 
+
+    if (!lock.acquired) {
+      if (lock.reason === 'already_processed') {
+        logger.info('Duplicate webhook event - already processed', {
+          component: 'stripe',
+          operation: 'webhook',
+          eventType: event.type,
+          eventId: event.id,
+        });
+
+        return res.status(200).json({
+          received: true,
+          eventId: event.id,
+          eventType: event.type,
+          success: true,
+          duplicate: true,
+          actions: ['already_processed'],
+        });
+      }
+
+      if (lock.reason === 'already_processing') {
+        logger.info('Webhook being processed by another handler', {
+          component: 'stripe',
+          operation: 'webhook',
+          eventType: event.type,
+          eventId: event.id,
+        });
+
+        // Return 200 to prevent Stripe retry (other handler will complete)
+        return res.status(200).json({
+          received: true,
+          eventId: event.id,
+          eventType: event.type,
+          processing: true,
+          actions: ['deferred_to_existing_handler'],
+        });
+      }
+
+      if (lock.reason === 'max_attempts_exceeded') {
+        logger.error('Webhook max processing attempts exceeded', null, {
+          component: 'stripe',
+          operation: 'webhook',
+          eventType: event.type,
+          eventId: event.id,
+        });
+
+        return res.status(200).json({
+          received: true,
+          eventId: event.id,
+          eventType: event.type,
+          success: false,
+          error: 'Max processing attempts exceeded',
+          actions: ['abandoned'],
+        });
+      }
+    }
+
+    // At this point, lock.acquired is guaranteed to be true
+    // TypeScript needs explicit narrowing
+    if (!lock.acquired) {
+      // This should never happen due to early returns above
+      return res.status(500).json({ error: 'Internal error: lock state inconsistent' });
+    }
+
+    // Log webhook event - lock acquired
+    logger.info('Webhook received, processing started', {
       component: 'stripe',
       operation: 'webhook',
-      eventType: event.type, 
+      eventType: event.type,
       eventId: event.id,
-      isRetry: existingEvent?.status === 'failed',
-      retryCount: existingEvent?.retryCount || 0,
     });
-    
+
     try {
       // Process event
       const result = await processEvent(event, logger);
-      
+
       if (!result.success) {
-        // Log webhook processing failure
+        // Mark as failed to allow retry
+        await lock.markFailed(result.error || 'Unknown processing error');
+
         logger.error('Webhook processing failed', new Error(result.error || 'Unknown error'), {
           component: 'stripe',
           operation: 'webhook',
           eventType: event.type,
           eventId: event.id,
         });
-        // Still return 200 to prevent retries for handled errors
+
+        // Return 500 to trigger Stripe retry
+        return res.status(500).json({
+          received: true,
+          eventId: event.id,
+          eventType: event.type,
+          ...result,
+        });
       }
-      
+
+      // Success - release lock and mark as processed
+      await lock.releaseLock();
+
       const successResponse = createSuccessResponse({
         received: true,
         eventId: event.id,
         eventType: event.type,
         ...result,
       }, 200, logger);
-      
+
       return res.status(successResponse.statusCode).json(successResponse.body);
     } catch (error) {
-      // For webhooks, we must always return 200 to prevent retries
-      // Log the error for investigation but don't let it propagate
       const err = error as Error;
-      logger.error('Webhook processing error', err, { 
-        component: 'stripe', 
-        operation: 'webhook' 
+
+      // Mark webhook as failed to allow retry (if lock was acquired)
+      if (lock.acquired) {
+        await lock.markFailed(err.message || 'Unknown processing error');
+      }
+
+      logger.error('Webhook processing error', err, {
+        component: 'stripe',
+        operation: 'webhook',
+        eventType: event.type,
+        eventId: event.id,
       });
+
       await captureError(err, {
         tags: { component: 'stripe', operation: 'webhook' },
+        extra: { eventId: event.id, eventType: event.type },
       });
-      
-      // Always return 200 to prevent Stripe from retrying
-      // This is a webhook-specific requirement
-      return res.status(200).json({
+
+      // Return 500 to trigger Stripe retry for unexpected errors
+      return res.status(500).json({
         received: true,
-        error: err.message || 'Processing error - logged for investigation',
+        eventId: event.id,
+        eventType: event.type,
+        error: err.message || 'Processing error - will retry',
       });
     }
   });

@@ -22,10 +22,11 @@ const logger = createScopedLogger('[App]');
 
 const DEV_NAV_ROUTES = ['/testing-grounds', '/dev'];
 
-/** Sandbox routes that render their own phone frame and dev controls; skip app-level phone so dev UI stays outside. */
+/** Sandbox routes that render outside the phone (own layout or web-only). Skip app-level phone so dev UI / auth stay outside. */
 const SANDBOX_ROUTES_OUTSIDE_PHONE = [
   '/testing-grounds/navbar-sandbox',
   '/testing-grounds/lobby-tab-sandbox',
+  '/testing-grounds/vx2-auth-test', // Page shows phone + auth outside it; mobile access blocked
 ];
 
 function MyApp({ Component, pageProps }: AppProps) {

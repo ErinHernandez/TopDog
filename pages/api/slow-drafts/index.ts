@@ -22,6 +22,7 @@ import {
   validateMethod,
   createSuccessResponse,
 } from '../../../lib/apiErrorHandler';
+import { withAuth, verifyUserAccess, type AuthenticatedRequest } from '../../../lib/apiAuth';
 
 // ============================================================================
 // TYPES
@@ -177,22 +178,37 @@ function calculateTimeLeftSeconds(
 // HANDLER
 // ============================================================================
 
-export default async function handler(
-  req: NextApiRequest,
+async function slowDraftsHandler(
+  req: AuthenticatedRequest,
   res: NextApiResponse
-) {
-  return withErrorHandling(req, res, async (req, res, logger) => {
+): Promise<void> {
+  await withErrorHandling(req, res, async (_req, res, logger) => {
     validateMethod(req, ['GET'], logger);
 
-    // Get userId from query (in production, get from auth session)
-    const { userId } = req.query;
+    // SECURITY: Get authenticated user from token (using outer req which has user)
+    const authenticatedUserId = req.user?.uid;
 
-    if (!userId || typeof userId !== 'string') {
-      return res.status(400).json({
+    if (!authenticatedUserId) {
+      return res.status(401).json({
         ok: false,
-        error: { code: 'MISSING_USER_ID', message: 'userId is required' },
+        error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
       });
     }
+
+    // If userId query param provided, verify it matches authenticated user
+    // This prevents users from accessing other users' drafts
+    const { userId: requestedUserId } = req.query;
+    if (requestedUserId && typeof requestedUserId === 'string') {
+      if (!verifyUserAccess(authenticatedUserId, requestedUserId)) {
+        return res.status(403).json({
+          ok: false,
+          error: { code: 'FORBIDDEN', message: 'Cannot access other user drafts' },
+        });
+      }
+    }
+
+    // Use authenticated user ID for all queries
+    const userId = authenticatedUserId;
 
     logger.info('Fetching slow drafts', {
       component: 'slow-drafts',
@@ -388,3 +404,6 @@ export default async function handler(
     }
   });
 }
+
+// Export with authentication middleware - requires valid Firebase token
+export default withAuth(slowDraftsHandler);

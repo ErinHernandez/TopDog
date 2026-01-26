@@ -9,7 +9,7 @@
 
 import crypto from 'crypto';
 import { getDb } from '../firebase-utils';
-import { doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, getDocs, serverTimestamp, runTransaction } from 'firebase/firestore';
 import { captureError } from '../errorTracking';
 import { serverLogger } from '../logger/serverLogger';
 import type {
@@ -1094,37 +1094,103 @@ export async function createOrUpdateWebhookEvent(
 // ============================================================================
 
 /**
- * Update user balance
+ * Update user balance atomically using Firestore transaction
+ *
+ * SECURITY: Uses runTransaction to prevent race conditions where concurrent
+ * updates could result in incorrect balances (e.g., double crediting).
+ *
+ * @param userId - Firebase user ID
+ * @param amount - Amount in dollars (not cents)
+ * @param operation - 'add' for deposits, 'subtract' for withdrawals
+ * @param idempotencyKey - Optional key to prevent duplicate operations
+ * @returns Promise resolving to new balance
  */
 async function updateUserBalance(
   userId: string,
   amount: number,
-  operation: 'add' | 'subtract'
+  operation: 'add' | 'subtract',
+  idempotencyKey?: string
 ): Promise<number> {
   const db = getDb();
   const userRef = doc(db, 'users', userId);
-  const userDoc = await getDoc(userRef);
-  
-  if (!userDoc.exists()) {
-    throw new Error('User not found');
+
+  // SECURITY: Check for duplicate operations if idempotency key provided
+  if (idempotencyKey) {
+    const balanceOpsRef = collection(db, 'balanceOperations');
+    const duplicateQuery = query(
+      balanceOpsRef,
+      where('idempotencyKey', '==', idempotencyKey)
+    );
+    const duplicateSnapshot = await getDocs(duplicateQuery);
+
+    if (!duplicateSnapshot.empty) {
+      serverLogger.warn('Paystack: Duplicate balance operation detected', null, {
+        userId,
+        idempotencyKey,
+        operation,
+      });
+      // Return the existing balance instead of processing duplicate
+      const userDoc = await getDoc(userRef);
+      return (userDoc.data()?.balance || 0) as number;
+    }
   }
-  
-  const currentBalance = (userDoc.data().balance || 0) as number;
-  
-  const newBalance = operation === 'add'
-    ? currentBalance + amount
-    : currentBalance - amount;
-  
-  if (newBalance < 0) {
-    throw new Error('Insufficient balance');
-  }
-  
-  await setDoc(userRef, {
-    balance: newBalance,
-    lastBalanceUpdate: serverTimestamp(),
-  }, { merge: true });
-  
-  return newBalance;
+
+  // SECURITY: Use atomic transaction to prevent race conditions
+  const result = await runTransaction(db, async (transaction) => {
+    const userDoc = await transaction.get(userRef);
+
+    if (!userDoc.exists()) {
+      throw new Error('User not found');
+    }
+
+    const currentBalance = (userDoc.data().balance || 0) as number;
+
+    const newBalance = operation === 'add'
+      ? currentBalance + amount
+      : currentBalance - amount;
+
+    // SECURITY: Prevent negative balances
+    if (newBalance < 0) {
+      throw new Error(`Insufficient balance. Current: ${currentBalance.toFixed(2)}, Requested: ${amount.toFixed(2)}`);
+    }
+
+    // Update balance atomically within transaction
+    transaction.update(userRef, {
+      balance: newBalance,
+      lastBalanceUpdate: serverTimestamp(),
+    });
+
+    // If idempotency key provided, record this operation
+    if (idempotencyKey) {
+      const balanceOpRef = doc(collection(db, 'balanceOperations'));
+      transaction.set(balanceOpRef, {
+        userId,
+        idempotencyKey,
+        provider: 'paystack',
+        operation,
+        amount,
+        previousBalance: currentBalance,
+        newBalance,
+        createdAt: serverTimestamp(),
+      });
+    }
+
+    return {
+      previousBalance: currentBalance,
+      newBalance,
+    };
+  });
+
+  serverLogger.info('Paystack: Balance updated successfully', {
+    userId,
+    operation,
+    amount,
+    previousBalance: result.previousBalance,
+    newBalance: result.newBalance,
+    idempotencyKey,
+  });
+
+  return result.newBalance;
 }
 
 // ============================================================================

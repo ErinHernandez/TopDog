@@ -6,6 +6,8 @@
  */
 
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { z } from 'zod';
+import { ValidationError, isValidationError } from './validation/schemas';
 
 // ============================================================================
 // TYPES
@@ -292,8 +294,36 @@ export function withErrorHandling(
       let message = 'An internal server error occurred';
       let details: Record<string, unknown> = {};
 
-      // Handle known error types
-      if (error.name === 'ValidationError' || error.message?.includes('required')) {
+      // Handle Zod validation errors (Zod v4 uses 'issues' instead of 'errors')
+      if (error instanceof z.ZodError) {
+        errorType = ErrorType.VALIDATION;
+        statusCode = 400;
+        message = 'Validation failed';
+        // Zod v4 uses 'issues', v3 uses 'errors'
+        const issues = error.issues || (error as unknown as { errors?: Array<{path: (string|number)[]; message: string; code: string}> }).errors || [];
+        details = {
+          safeForProduction: true,
+          errors: issues.map(err => ({
+            field: err.path.join('.'),
+            message: err.message,
+            code: err.code,
+          })),
+        };
+      // Handle custom ValidationError from our schemas
+      } else if (isValidationError(error)) {
+        errorType = ErrorType.VALIDATION;
+        statusCode = 400;
+        message = error.message || 'Validation failed';
+        details = {
+          safeForProduction: true,
+          errors: error.errors.map(err => ({
+            field: err.path.join('.'),
+            message: err.message,
+            code: err.code,
+          })),
+        };
+      // Handle other known error types
+      } else if (error.name === 'ValidationError' || error.message?.includes('required')) {
         errorType = ErrorType.VALIDATION;
         statusCode = 400;
         message = error.message || 'Invalid request parameters';
@@ -445,6 +475,58 @@ export function createSuccessResponse<T = unknown>(
       timestamp: new Date().toISOString(),
     },
   };
+}
+
+/**
+ * Validate request body using Zod schema
+ * Throws ValidationError if validation fails
+ */
+export function validateRequestBody<T>(
+  req: NextApiRequest,
+  schema: z.ZodSchema<T>,
+  logger: ApiLogger
+): T {
+  const result = schema.safeParse(req.body);
+
+  if (!result.success) {
+    // Zod v4 uses 'issues', v3 uses 'errors'
+    const issues = result.error.issues || (result.error as unknown as { errors?: Array<{path: (string|number)[]; message: string}> }).errors || [];
+    logger.warn('Request body validation failed', {
+      errors: issues.map(e => ({
+        path: e.path.join('.'),
+        message: e.message,
+      })),
+    });
+    throw result.error;
+  }
+
+  return result.data;
+}
+
+/**
+ * Validate request query parameters using Zod schema
+ * Throws ValidationError if validation fails
+ */
+export function validateRequestQuery<T>(
+  req: NextApiRequest,
+  schema: z.ZodSchema<T>,
+  logger: ApiLogger
+): T {
+  const result = schema.safeParse(req.query);
+
+  if (!result.success) {
+    // Zod v4 uses 'issues', v3 uses 'errors'
+    const issues = result.error.issues || (result.error as unknown as { errors?: Array<{path: (string|number)[]; message: string}> }).errors || [];
+    logger.warn('Request query validation failed', {
+      errors: issues.map(e => ({
+        path: e.path.join('.'),
+        message: e.message,
+      })),
+    });
+    throw result.error;
+  }
+
+  return result.data;
 }
 
 /**
