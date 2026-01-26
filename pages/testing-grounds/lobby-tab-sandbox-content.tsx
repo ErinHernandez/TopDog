@@ -303,4 +303,31 @@ export function LobbyTabSandboxContent({
   );
 }
 
-export default LobbyTabSandboxContent;
+/** Mock tournament so the page can prerender without props (used when this file is the route). */
+const MOCK_TOURNAMENT: Tournament = {
+  id: 'sandbox-content-1',
+  title: 'THE TOPDOG INTERNATIONAL',
+  entryFee: '$25',
+  entryFeeCents: 2500,
+  totalEntries: '571,480',
+  currentEntries: 571480,
+  maxEntries: 1000000,
+  firstPlacePrize: '$2.1M',
+  isFeatured: true,
+  status: 'filling',
+};
+
+/**
+ * Page wrapper for /testing-grounds/lobby-tab-sandbox-content.
+ * Provides required props so prerender does not access tournament.currentEntries on undefined.
+ */
+function LobbyTabSandboxContentPage(): React.ReactElement {
+  return (
+    <LobbyTabSandboxContent
+      tournament={MOCK_TOURNAMENT}
+      onJoinClick={() => {}}
+    />
+  );
+}
+
+export default LobbyTabSandboxContentPage;
