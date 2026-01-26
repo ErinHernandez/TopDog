@@ -107,8 +107,8 @@ function AuthTestContent(): JSX.Element {
   
   return (
     <div className="flex items-center justify-center gap-8 p-4 min-h-screen">
-      {/* Phone: placeholder + modals under test render inside */}
-      <MobilePhoneFrame>
+      {/* Phone: placeholder + modals under test render inside; modals go over safe area */}
+      <MobilePhoneFrame contentOverSafeArea>
         <div
           className="relative w-full h-full overflow-hidden"
           style={{ backgroundColor: BG_COLORS.primary }}
@@ -146,6 +146,7 @@ function AuthTestContent(): JSX.Element {
             onClose={closeModal}
             onSwitchToSignIn={() => openModal('signin')}
             onSuccess={() => console.log('Sign up successful!')}
+            contentTopInset={0}
           />
 
           <SignInModal
@@ -154,6 +155,7 @@ function AuthTestContent(): JSX.Element {
             onSwitchToSignUp={() => openModal('signup')}
             onForgotPassword={() => openModal('forgot')}
             onSuccess={() => console.log('Sign in successful!')}
+            contentTopInset={0}
           />
 
           <ForgotPasswordModal
@@ -166,6 +168,7 @@ function AuthTestContent(): JSX.Element {
             isOpen={activeModal === 'profile'}
             onClose={closeModal}
             onAccountDeleted={() => console.log('Account deleted!')}
+            contentTopInset={0}
           />
         </div>
       </MobilePhoneFrame>

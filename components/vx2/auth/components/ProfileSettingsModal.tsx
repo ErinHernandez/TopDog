@@ -32,6 +32,8 @@ export interface ProfileSettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAccountDeleted?: () => void;
+  /** Top offset in px. Use 0 to align to safe-area edge (e.g. inside phone frame). Default 60. */
+  contentTopInset?: number;
 }
 
 type ProfileTab = 'profile' | 'preferences' | 'security' | 'delete';
@@ -1450,6 +1452,7 @@ export function ProfileSettingsModal({
   isOpen,
   onClose,
   onAccountDeleted,
+  contentTopInset = 60,
 }: ProfileSettingsModalProps): React.ReactElement | null {
   const [activeTab, setActiveTab] = useState<ProfileTab>('profile');
   const [showNameModal, setShowNameModal] = useState(false);
@@ -1495,7 +1498,7 @@ export function ProfileSettingsModal({
     <div 
       className="absolute left-0 right-0 bottom-0 flex flex-col"
       style={{ 
-        top: '60px', 
+        top: `${contentTopInset}px`, 
         backgroundColor: BG_COLORS.secondary, 
         zIndex: Z_INDEX.modal 
       }}

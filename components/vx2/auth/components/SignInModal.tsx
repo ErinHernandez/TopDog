@@ -39,6 +39,8 @@ export interface SignInModalProps {
   onSwitchToSignUp?: () => void;
   onForgotPassword?: () => void;
   onSuccess?: () => void;
+  /** Top offset in px. Use 0 to align to safe-area edge (e.g. inside phone frame). Default 60. */
+  contentTopInset?: number;
 }
 
 // ============================================================================
@@ -120,6 +122,7 @@ interface InputProps {
   touched?: boolean;
   inputRef?: React.RefObject<HTMLInputElement | null>;
   onBlur?: () => void;
+  onFocus?: () => void;
   rightElement?: React.ReactNode;
 }
 
@@ -134,6 +137,7 @@ function Input({
   touched,
   inputRef,
   onBlur,
+  onFocus,
   rightElement,
 }: InputProps): React.ReactElement {
   const hasError = touched && error;
@@ -147,6 +151,7 @@ function Input({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onBlur={onBlur}
+          onFocus={onFocus}
           placeholder={placeholder}
           autoComplete={autoComplete}
           disabled={disabled}
@@ -196,6 +201,7 @@ export function SignInModal({
   onSwitchToSignUp,
   onForgotPassword,
   onSuccess,
+  contentTopInset = 60,
 }: SignInModalProps): React.ReactElement | null {
   // Form state
   const [step, setStep] = useState<SignInStep>('credentials');
@@ -206,9 +212,11 @@ export function SignInModal({
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   
-  // Validation state
+  // Validation state (touched = user has left the field / blurred)
   const [identifierTouched, setIdentifierTouched] = useState(false);
   const [passwordTouched, setPasswordTouched] = useState(false);
+  const [identifierFocused, setIdentifierFocused] = useState(false);
+  const [passwordFocused, setPasswordFocused] = useState(false);
   
   // Loading/error state
   const [isLoading, setIsLoading] = useState(false);
@@ -279,6 +287,8 @@ export function SignInModal({
       setShowPassword(false);
       setIdentifierTouched(false);
       setPasswordTouched(false);
+      setIdentifierFocused(false);
+      setPasswordFocused(false);
       setShakeError(false);
     }
   }, [isOpen]);
@@ -314,10 +324,8 @@ export function SignInModal({
   
   // Handle sign in
   const handleSignIn = useCallback(async () => {
-    // Mark fields as touched for validation
-    setIdentifierTouched(true);
-    setPasswordTouched(true);
-    
+    // Inline "valid email" / "password required" warnings are shown only on blur
+    // (touched is set in each input's onBlur). Do not set touched here.
     if (!identifier) {
       setError('Please enter your email or phone number');
       triggerShake();
@@ -424,7 +432,7 @@ export function SignInModal({
     <div 
       className="absolute left-0 right-0 bottom-0 flex flex-col"
       style={{ 
-        top: '60px', 
+        top: `${contentTopInset}px`, 
         backgroundColor: BG_COLORS.secondary, 
         zIndex: Z_INDEX.modal 
       }}
@@ -432,7 +440,7 @@ export function SignInModal({
       {/* Header with Close Button */}
       <div 
         className="flex items-center justify-end flex-shrink-0"
-        style={{ padding: `${SPACING.md}px ${SPACING.lg}px` }}
+        style={{ padding: `${SPACING.md + 8}px ${SPACING.lg}px ${SPACING.md}px` }}
       >
         <button 
           onClick={onClose} 
@@ -443,7 +451,7 @@ export function SignInModal({
         </button>
       </div>
       
-      {/* Content */}
+      {/* Content – logo stays high; form block pushed down 3× last move (72px) */}
       <div 
         ref={formRef}
         className={`flex-1 overflow-y-auto ${shakeError ? 'animate-shake' : ''}`}
@@ -454,7 +462,7 @@ export function SignInModal({
         onKeyDown={handleKeyDown}
       >
         {/* Logo */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-8" style={{ marginTop: 22 }}>
           <TopDogLogo />
           {step === 'phoneCode' && (
             <p 
@@ -466,6 +474,7 @@ export function SignInModal({
           )}
         </div>
         
+        <div style={{ marginTop: 94 }}>
         {/* Biometric Button - shown first if available */}
         {biometricsAvailable && step === 'credentials' && (
           <>
@@ -500,16 +509,17 @@ export function SignInModal({
         
         {step === 'credentials' && (
           <div className="space-y-4">
-            {/* Email/Phone Input */}
+            {/* Email/Phone Input — show "valid email" warning only after blur (click out) */}
             <Input
               inputRef={identifierRef}
               value={identifier}
               onChange={setIdentifier}
-              onBlur={() => setIdentifierTouched(true)}
+              onBlur={() => { setIdentifierTouched(true); setIdentifierFocused(false); }}
+              onFocus={() => setIdentifierFocused(true)}
               placeholder="Email or phone number"
               autoComplete="email tel"
               disabled={isLoading}
-              error={identifierError}
+              error={identifierFocused ? null : identifierError}
               touched={identifierTouched}
             />
             
@@ -529,12 +539,13 @@ export function SignInModal({
                 inputRef={passwordRef}
                 value={password}
                 onChange={setPassword}
-                onBlur={() => setPasswordTouched(true)}
+                onBlur={() => { setPasswordTouched(true); setPasswordFocused(false); }}
+                onFocus={() => setPasswordFocused(true)}
                 placeholder="Password"
                 type={showPassword ? 'text' : 'password'}
                 autoComplete="current-password"
                 disabled={isLoading}
-                error={passwordError}
+                error={passwordFocused ? null : passwordError}
                 touched={passwordTouched}
                 rightElement={
                   <button
@@ -564,24 +575,36 @@ export function SignInModal({
             {/* Remember Me & Forgot Password - show with password field */}
             {inputType !== 'phone' && (
               <div className="flex items-center justify-between pt-2">
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-5 h-5 rounded"
-                    style={{ accentColor: STATE_COLORS.active }}
-                  />
+                <button
+                  type="button"
+                  onClick={() => setRememberMe(!rememberMe)}
+                  className="flex items-center gap-3 cursor-pointer bg-transparent border-0 p-0 text-left"
+                >
+                  <div
+                    className="w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-all"
+                    style={{
+                      backgroundImage: rememberMe ? 'url(/wr_blue.png)' : 'none',
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                      border: rememberMe ? 'none' : `2px solid ${BORDER_COLORS.default}`,
+                    }}
+                  >
+                    {rememberMe && (
+                      <svg width="12" height="10" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 5L4.5 8.5L11 1" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    )}
+                  </div>
                   <span style={{ color: TEXT_COLORS.secondary, fontSize: 15 }}>
                     Remember me
                   </span>
-                </label>
+                </button>
                 
                 {onForgotPassword && (
                   <button
                     onClick={onForgotPassword}
                     className="font-medium"
-                    style={{ color: STATE_COLORS.active, fontSize: 15 }}
+                    style={{ color: TEXT_COLORS.secondary, fontSize: 15 }}
                   >
                     Forgot password?
                   </button>
@@ -633,79 +656,111 @@ export function SignInModal({
             </button>
           </div>
         )}
+
+        {/* Primary action – just above footer line */}
+        {step === 'credentials' ? (
+          <div className="mt-6 pt-2" style={{ paddingBottom: 4 }}>
+            <button
+              onClick={handleSignIn}
+              disabled={!canSignIn}
+              className="w-full rounded-xl font-bold transition-all flex items-center justify-center gap-2"
+              style={{
+                fontSize: 17,
+                height: 56,
+                ...(canSignIn
+                  ? {
+                      background: 'url(/wr_blue.png) no-repeat center center',
+                      backgroundSize: 'cover',
+                      color: '#000',
+                      border: 'none',
+                    }
+                  : {
+                      backgroundColor: BG_COLORS.tertiary,
+                      color: TEXT_COLORS.disabled,
+                    }),
+                opacity: canSignIn ? 1 : 0.6,
+              }}
+            >
+              {isLoading ? (
+                <>
+                  <div 
+                    className="animate-spin rounded-full h-5 w-5 border-2"
+                    style={{ borderColor: '#000 transparent transparent transparent' }}
+                  />
+                  {inputType === 'phone' ? 'Sending code...' : 'Signing in...'}
+                </>
+              ) : (
+                inputType === 'phone' ? 'Send Code' : 'Sign In'
+              )}
+            </button>
+          </div>
+        ) : (
+          <div className="mt-6 pt-2" style={{ paddingBottom: 4 }}>
+            <button
+              onClick={handleVerifyPhoneCode}
+              disabled={phoneCode.length !== 6 || isLoading}
+              className="w-full rounded-xl font-bold transition-all flex items-center justify-center gap-2"
+              style={{
+                fontSize: 17,
+                height: 56,
+                ...(phoneCode.length === 6 && !isLoading
+                  ? {
+                      background: 'url(/wr_blue.png) no-repeat center center',
+                      backgroundSize: 'cover',
+                      color: '#000',
+                      border: 'none',
+                    }
+                  : {
+                      backgroundColor: BG_COLORS.tertiary,
+                      color: TEXT_COLORS.disabled,
+                    }),
+                opacity: phoneCode.length === 6 && !isLoading ? 1 : 0.6,
+              }}
+            >
+              {isLoading ? (
+                <>
+                  <div 
+                    className="animate-spin rounded-full h-5 w-5 border-2"
+                    style={{ borderColor: '#000 transparent transparent transparent' }}
+                  />
+                  Verifying...
+                </>
+              ) : (
+                'Verify'
+              )}
+            </button>
+          </div>
+        )}
+        </div>
       </div>
       
-      {/* Footer */}
+      {/* Footer – line + "Don't have an account?" only */}
       <div 
         className="flex-shrink-0"
         style={{ 
-          padding: `${SPACING.lg}px ${SPACING.xl}px`,
+          padding: `${SPACING.md}px ${SPACING.xl}px`,
           paddingBottom: 'max(env(safe-area-inset-bottom), 24px)',
           borderTop: `1px solid ${BORDER_COLORS.default}`,
         }}
       >
-        {step === 'credentials' ? (
-          <button
-            onClick={handleSignIn}
-            disabled={!canSignIn}
-            className="w-full rounded-xl font-bold transition-all flex items-center justify-center gap-2"
-            style={{
-              fontSize: 17,
-              height: 56,
-              backgroundColor: canSignIn ? STATE_COLORS.active : BG_COLORS.tertiary,
-              color: canSignIn ? '#000' : TEXT_COLORS.disabled,
-              opacity: canSignIn ? 1 : 0.6,
-            }}
-          >
-            {isLoading ? (
-              <>
-                <div 
-                  className="animate-spin rounded-full h-5 w-5 border-2"
-                  style={{ borderColor: '#000 transparent transparent transparent' }}
-                />
-                {inputType === 'phone' ? 'Sending code...' : 'Signing in...'}
-              </>
-            ) : (
-              inputType === 'phone' ? 'Send Code' : 'Sign In'
-            )}
-          </button>
-        ) : (
-          <button
-            onClick={handleVerifyPhoneCode}
-            disabled={phoneCode.length !== 6 || isLoading}
-            className="w-full rounded-xl font-bold transition-all flex items-center justify-center gap-2"
-            style={{
-              fontSize: 17,
-              height: 56,
-              backgroundColor: phoneCode.length === 6 && !isLoading ? STATE_COLORS.active : BG_COLORS.tertiary,
-              color: phoneCode.length === 6 && !isLoading ? '#000' : TEXT_COLORS.disabled,
-              opacity: phoneCode.length === 6 && !isLoading ? 1 : 0.6,
-            }}
-          >
-            {isLoading ? (
-              <>
-                <div 
-                  className="animate-spin rounded-full h-5 w-5 border-2"
-                  style={{ borderColor: '#000 transparent transparent transparent' }}
-                />
-                Verifying...
-              </>
-            ) : (
-              'Verify'
-            )}
-          </button>
-        )}
-        
         {onSwitchToSignUp && step === 'credentials' && (
           <p 
-            className="text-center mt-4"
+            className="text-center"
             style={{ color: TEXT_COLORS.muted, fontSize: 15 }}
           >
             Don&apos;t have an account?{' '}
             <button 
               onClick={onSwitchToSignUp}
-              className="font-semibold"
-              style={{ color: STATE_COLORS.active }}
+              className="font-semibold bg-transparent border-0 p-0 cursor-pointer"
+              style={{
+                background: 'url(/wr_blue.png) no-repeat center center',
+                backgroundSize: 'cover',
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                color: 'transparent',
+                fontSize: 15,
+              }}
             >
               Sign Up
             </button>

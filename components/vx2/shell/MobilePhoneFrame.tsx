@@ -15,15 +15,18 @@ const INNER_WIDTH_PX = 375;
 const INNER_HEIGHT_PX = 812;
 
 /** Top safe area: from screen top to bottom of island (8 + 20). Safe area ends at bottom of island. */
-const SAFE_AREA_TOP_TO_ISLAND_BOTTOM_PX = 28;
+export const SAFE_AREA_TOP_TO_ISLAND_BOTTOM_PX = 28;
 
 export interface MobilePhoneFrameProps {
   children: React.ReactNode;
+  /** When true, content starts at 0 so modals can go over safe area. Default false. */
+  contentOverSafeArea?: boolean;
 }
 
-export function MobilePhoneFrame({ children }: MobilePhoneFrameProps): React.ReactElement {
+export function MobilePhoneFrame({ children, contentOverSafeArea = false }: MobilePhoneFrameProps): React.ReactElement {
   const outerW = INNER_WIDTH_PX + BEZEL_PX * 2;
   const outerH = INNER_HEIGHT_PX + BEZEL_PX * 2;
+  const contentTop = contentOverSafeArea ? 0 : SAFE_AREA_TOP_TO_ISLAND_BOTTOM_PX;
   return (
     <div
       className="relative bg-black rounded-[3rem] shadow-2xl"
@@ -38,12 +41,18 @@ export function MobilePhoneFrame({ children }: MobilePhoneFrameProps): React.Rea
       {/* Screen - dark bg so rounded corners don’t show white at top-left/top-right of bezel */}
       <div 
         className="w-full h-full rounded-[2.5rem] overflow-hidden relative"
-        style={{ backgroundColor: '#0f172a' }}
+        style={{ 
+          padding: 8,
+          boxSizing: 'border-box',
+          background: 'url(/wr_blue.png) no-repeat center center',
+          backgroundSize: 'cover',
+        }}
       >
-        {/* Dynamic Island - positioned on top of screen content */}
+        {/* Dynamic Island - in border zone so it moves with the frame */}
         <div
-          className="absolute top-2 left-1/2 -translate-x-1/2"
+          className="absolute left-1/2 -translate-x-1/2"
           style={{
+            top: 8,
             width: '70px',
             height: '20px',
             backgroundColor: '#000',
@@ -52,10 +61,14 @@ export function MobilePhoneFrame({ children }: MobilePhoneFrameProps): React.Rea
           }}
           aria-hidden
         />
-        {/* Content starts where safe area ends (bottom of island) */}
-        <div
+        <div 
+          className="w-full h-full rounded-[2.125rem] overflow-hidden relative"
+          style={{ backgroundColor: '#0f172a' }}
+        >
+          {/* Content: contentOverSafeArea=0 lets modals go over safe area */}
+          <div
           style={{
-            paddingTop: SAFE_AREA_TOP_TO_ISLAND_BOTTOM_PX,
+            paddingTop: contentTop,
             height: '100%',
             width: '100%',
             boxSizing: 'border-box',
@@ -65,6 +78,7 @@ export function MobilePhoneFrame({ children }: MobilePhoneFrameProps): React.Rea
           }}
         >
           {children}
+        </div>
         </div>
       </div>
     </div>

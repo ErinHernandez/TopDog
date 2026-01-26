@@ -36,6 +36,8 @@ export interface SignUpModalProps {
   onClose: () => void;
   onSwitchToSignIn?: () => void;
   onSuccess?: () => void;
+  /** Top offset in px. Use 0 to align to safe-area edge (e.g. inside phone frame). Default 60. */
+  contentTopInset?: number;
 }
 
 type SignUpStep = 'credentials' | 'username' | 'emailVerify' | 'success';
@@ -925,7 +927,8 @@ export function SignUpModal({
   isOpen, 
   onClose, 
   onSwitchToSignIn,
-  onSuccess 
+  onSuccess,
+  contentTopInset = 60,
 }: SignUpModalProps): React.ReactElement | null {
   const [step, setStep] = useState<SignUpStep>('credentials');
   const [email, setEmail] = useState('');
@@ -1011,7 +1014,7 @@ export function SignUpModal({
     <div 
       className="absolute left-0 right-0 bottom-0 flex flex-col"
       style={{ 
-        top: '60px', 
+        top: `${contentTopInset}px`, 
         backgroundColor: BG_COLORS.secondary, 
         zIndex: Z_INDEX.modal 
       }}
