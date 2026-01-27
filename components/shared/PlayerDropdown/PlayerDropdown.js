@@ -1,6 +1,6 @@
 /**
  * PlayerDropdown - Reusable Player Dropdown Component
- * 
+ *
  * Identical styling to draft room dropdown, configurable for different contexts.
  * Supports daily data updates and cross-application usage.
  */
@@ -10,6 +10,9 @@ import { playerDataService } from '../../../lib/playerData/PlayerDataService';
 import { DROPDOWN_STYLES, DROPDOWN_DIMENSIONS, CONTEXT_OVERRIDES } from './PlayerDropdownStyles';
 import PlayerDropdownRow from './PlayerDropdownRow';
 import PlayerExpandedCard from '../PlayerExpandedCard';
+import { createScopedLogger } from '../../../lib/clientLogger';
+
+const logger = createScopedLogger('[PlayerDropdown]');
 
 export default function PlayerDropdown({
   // Data props
@@ -96,7 +99,7 @@ export default function PlayerDropdown({
       setPlayers(playerData);
     } catch (err) {
       setDataError(err.message);
-      console.error('Failed to load players:', err);
+      logger.error('Failed to load players', err);
     } finally {
       setIsLoading(false);
     }

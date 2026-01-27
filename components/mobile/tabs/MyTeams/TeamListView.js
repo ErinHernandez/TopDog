@@ -1,6 +1,6 @@
 /**
  * TeamListView - Shows list of user's teams with search/filter
- * 
+ *
  * Extracted from MyTeamsTab for maintainability.
  */
 
@@ -8,6 +8,9 @@ import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { FixedSizeList as List } from 'react-window';
 import { NFL_TEAMS, BYE_WEEKS } from '../../../../lib/nflConstants';
 import { getTotalPlayers } from './mockTeamData';
+import { createScopedLogger } from '../../../../lib/clientLogger';
+
+const logger = createScopedLogger('[TeamList]');
 
 // Helper function to calculate total projected points for a team
 function getTotalProjectedPoints(team) {
@@ -20,7 +23,7 @@ function getTotalProjectedPoints(team) {
       }, 0);
     }, 0);
   } catch (error) {
-    console.error('Error calculating projected points:', error);
+    logger.error('Error calculating projected points', error);
     return 0;
   }
 }
@@ -43,7 +46,7 @@ function getTeamByeWeeks(team) {
     });
     return Array.from(byeWeeks).sort((a, b) => a - b);
   } catch (error) {
-    console.error('Error calculating bye weeks:', error);
+    logger.error('Error calculating bye weeks', error);
     return [];
   }
 }
@@ -147,11 +150,11 @@ export default function TeamListView({
 }) {
   // Handle missing props gracefully
   if (!Array.isArray(teams)) {
-    console.warn('TeamListView: teams prop is not an array');
+    logger.warn('teams prop is not an array');
     teams = [];
   }
   if (!Array.isArray(allPlayers)) {
-    console.warn('TeamListView: allPlayers prop is not an array');
+    logger.warn('allPlayers prop is not an array');
     allPlayers = [];
   }
   const [searchQuery, setSearchQuery] = useState('');

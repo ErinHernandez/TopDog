@@ -14,13 +14,14 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { getPlayers } from '../../../lib/sportsdataio';
 import { transformPlayerBasic } from '../../../lib/playerModel';
 import type { SportsDataIOPlayer } from '../../../types/api';
-import { 
-  withErrorHandling, 
-  validateMethod, 
+import {
+  withErrorHandling,
+  validateMethod,
   requireEnvVar,
   createSuccessResponse,
   ErrorType,
 } from '../../../lib/apiErrorHandler';
+import { setCacheHeaders } from '../../../lib/api/cacheHeaders';
 
 // ============================================================================
 // TYPES
@@ -127,12 +128,20 @@ export default async function handler(
     // Limit results
     const limited = limit ? transformed.slice(0, parseInt(limit as string, 10)) : transformed;
     
+    // Set cache headers - player data changes infrequently
+    // Use public-long (1 hour) for general requests, no-cache if refresh=true
+    if (forceRefresh) {
+      setCacheHeaders(res, 'no-cache');
+    } else {
+      setCacheHeaders(res, 'public-long');
+    }
+
     const response = createSuccessResponse({
       count: limited.length,
       total: transformed.length,
       data: limited,
     }, 200, logger);
-    
+
     return res.status(response.statusCode).json(response.body.data as PlayersResponse);
   });
 }

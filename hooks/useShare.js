@@ -1,12 +1,15 @@
 /**
  * useShare Hook
- * 
+ *
  * Custom hook for handling sharing functionality across the mobile app
  * Provides easy access to share methods and modal management
  */
 
 import { useState, useCallback } from 'react';
 import { generateShareData, trackShare } from '../lib/shareConfig';
+import { createScopedLogger } from '../lib/clientLogger';
+
+const logger = createScopedLogger('[useShare]');
 
 export const useShare = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -33,7 +36,7 @@ export const useShare = () => {
         return { success: true, method: 'clipboard', message: 'Link copied to clipboard!' };
       }
     } catch (error) {
-      console.error('Quick share failed:', error);
+      logger.error('Quick share failed', error, { shareType });
       trackShare(shareType, 'quick_share', false);
       return { success: false, error: error.message };
     } finally {
@@ -65,7 +68,7 @@ export const useShare = () => {
       trackShare(shareType, platform, true);
       return { success: true, platform };
     } catch (error) {
-      console.error(`Share to ${platform} failed:`, error);
+      logger.error('Share to platform failed', error, { shareType, platform });
       trackShare(shareType, platform, false);
       return { success: false, error: error.message };
     }
@@ -79,7 +82,7 @@ export const useShare = () => {
       trackShare(shareType, 'clipboard', true);
       return { success: true, message: 'Link copied to clipboard!' };
     } catch (error) {
-      console.error('Copy to clipboard failed:', error);
+      logger.error('Copy to clipboard failed', error);
       trackShare(shareType, 'clipboard', false);
       return { success: false, error: error.message };
     }

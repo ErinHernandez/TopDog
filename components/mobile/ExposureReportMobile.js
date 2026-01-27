@@ -1,6 +1,6 @@
 /**
  * ExposureReportMobile - Mobile-Optimized Exposure Report
- * 
+ *
  * Refactored to use extracted sub-components for maintainability.
  */
 
@@ -11,6 +11,9 @@ import { usePlayerData } from '../../lib/playerDataContext';
 import { teamMatchesSearch } from '../../lib/nflConstants';
 import { POSITIONS } from '../draft/v3/constants/positions';
 import { ExposurePlayerRow, PositionFilterBar } from './ExposureReport';
+import { createScopedLogger } from '../../lib/clientLogger';
+
+const logger = createScopedLogger('[ExposureMobile]');
 
 const ExposureReportMobile = () => {
   const [exposureData, setExposureData] = useState(null);
@@ -41,7 +44,7 @@ const ExposureReportMobile = () => {
         setExposureData(csvExposureData);
         setLoading(false);
       } catch (error) {
-        console.error('Error loading exposure data:', error);
+        logger.error('Error loading exposure data', error);
         setLoading(false);
       }
     };

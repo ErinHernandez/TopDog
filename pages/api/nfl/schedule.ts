@@ -11,12 +11,13 @@
 
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getSchedule } from '../../../lib/sportsdataio';
-import { 
-  withErrorHandling, 
-  validateMethod, 
+import {
+  withErrorHandling,
+  validateMethod,
   requireEnvVar,
   createSuccessResponse,
 } from '../../../lib/apiErrorHandler';
+import { setCacheHeaders } from '../../../lib/api/cacheHeaders';
 
 // ============================================================================
 // TYPES
@@ -77,12 +78,20 @@ export default async function handler(
       return aDate - bDate;
     });
     
+    // Set cache headers - schedule data changes infrequently
+    // Use public-long (1 hour) for general requests, no-cache if refresh=true
+    if (forceRefresh) {
+      setCacheHeaders(res, 'no-cache');
+    } else {
+      setCacheHeaders(res, 'public-long');
+    }
+
     const response = createSuccessResponse({
       season: seasonYear,
       count: schedule.length,
       data: schedule,
     }, 200, logger);
-    
+
     return res.status(response.statusCode).json(response.body.data as ScheduleResponse);
   });
 }

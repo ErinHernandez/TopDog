@@ -5,6 +5,9 @@ import { collection, addDoc, serverTimestamp, getDocs, updateDoc, doc, getDoc, s
 import { updateTournamentEntryStats } from '../lib/userStats';
 import { useUser } from '../lib/userContext';
 import AuthModal from './AuthModal';
+import { createScopedLogger } from '../lib/clientLogger';
+
+const logger = createScopedLogger('[JoinTournament]');
 
 const mainPrizes = [
   { place: '1st', amount: '$2,000,000' },
@@ -127,8 +130,8 @@ export default function JoinTournamentModal({ open, onClose, tournamentType = 't
       
       if (waitingRooms.length < 5) {
         const roomsToCreate = 5 - waitingRooms.length;
-        console.log(`Creating ${roomsToCreate} additional rooms...`);
-        
+        logger.debug(`Creating ${roomsToCreate} additional rooms`);
+
         for (let i = 0; i < roomsToCreate; i++) {
           await addDoc(collection(db, 'draftRooms'), {
             name: `${config.name} Room ${Date.now() + i}`,
@@ -148,51 +151,46 @@ export default function JoinTournamentModal({ open, onClose, tournamentType = 't
         }
       }
     } catch (error) {
-      console.error('Error ensuring minimum rooms:', error);
+      logger.error('Error ensuring minimum rooms', error);
     }
   };
 
   const handleEnterTournament = async () => {
-    console.log('Enter Tournament button clicked');
-    console.log('User object:', user);
-    console.log('User balance:', userBalance);
-    
+    logger.debug('Enter Tournament button clicked', { userId: user?.uid, hasBalance: !!userBalance });
+
     // Check if user is authenticated
     if (!user) {
-      console.log('No user found, showing auth modal');
+      logger.debug('No user found, showing auth modal');
       setShowAuthModal(true);
       return;
     }
 
     setIsJoining(true);
     try {
-      console.log('Starting tournament entry process...');
-      console.log('User ID:', user.uid);
-      console.log('Tournament type:', config.type);
-      console.log('Entry fee:', config.entryFee);
-      console.log('User balance object:', userBalance);
-      console.log('User balance value:', userBalance?.balance);
-      
+      logger.debug('Starting tournament entry process', {
+        userId: user.uid,
+        tournamentType: config.type,
+        entryFee: config.entryFee,
+        balance: userBalance?.balance
+      });
+
       // Check user balance first
       const currentBalance = userBalance?.balance || 0;
-      console.log('Current balance:', currentBalance, 'Entry fee:', config.entryFee);
-      
+
       if (currentBalance < config.entryFee) {
-        console.log('Insufficient balance - showing alert');
+        logger.debug('Insufficient balance', { currentBalance, entryFee: config.entryFee });
         alert(`Insufficient balance. You need $${config.entryFee} but only have $${currentBalance}. Please deposit more funds.`);
         setIsJoining(false);
         return;
       }
-      
-      console.log('Balance check passed, proceeding with tournament entry');
+
+      logger.debug('Balance check passed, proceeding with tournament entry');
 
       // Use the new comprehensive statistics system
-      console.log('Updating tournament entry stats...');
       await updateTournamentEntryStats(user.uid, config.type, config.entryFee);
-      console.log('Tournament entry stats updated successfully');
+      logger.debug('Tournament entry stats updated');
 
       // Record the tournament entry transaction
-      console.log('Recording tournament entry transaction...');
       await addDoc(collection(db, 'transactions'), {
         userId: user.uid,
         type: 'tournament_entry',
@@ -202,28 +200,25 @@ export default function JoinTournamentModal({ open, onClose, tournamentType = 't
         status: 'completed',
         createdAt: serverTimestamp()
       });
-      console.log('Tournament entry transaction recorded');
+      logger.debug('Tournament entry transaction recorded');
 
-      console.log('Ensuring minimum rooms exist...');
       await ensureMinimumRooms();
-      
-      console.log('Finding available rooms...');
-      console.log('Selected draft speed:', selectedDraftSpeed);
-      console.log('Looking for timer seconds:', selectedDraftSpeed === '8h' ? 28800 : 30);
+
+      const timerSeconds = selectedDraftSpeed === '8h' ? 28800 : 30;
+      logger.debug('Finding available rooms', { selectedDraftSpeed, timerSeconds });
       const roomsSnapshot = await getDocs(collection(db, 'draftRooms'));
       const roomsData = roomsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      const availableRooms = roomsData.filter(room => 
+      const availableRooms = roomsData.filter(room =>
         room.type === config.type &&
-        room.status === 'waiting' && 
+        room.status === 'waiting' &&
         (room.participants?.length || 0) < (room.maxParticipants || 12) &&
-        room.settings?.timerSeconds === (selectedDraftSpeed === '8h' ? 28800 : 30)
+        room.settings?.timerSeconds === timerSeconds
       );
-      console.log('Available rooms found:', availableRooms.length);
-      console.log('Room timer settings found:', availableRooms.map(room => ({ id: room.id, timer: room.settings?.timerSeconds })));
-      
+      logger.debug('Available rooms found', { count: availableRooms.length });
+
       if (availableRooms.length === 0) {
         // Fallback: create a new room
-        console.log('No available rooms, creating new room...');
+        logger.debug('No available rooms, creating new room');
         const newRoomRef = await addDoc(collection(db, 'draftRooms'), {
           name: `${config.name} Room ${Date.now()}`,
           type: config.type,
@@ -234,48 +229,42 @@ export default function JoinTournamentModal({ open, onClose, tournamentType = 't
           maxParticipants: 12,
           draftOrder: [],
           settings: {
-            timerSeconds: selectedDraftSpeed === '8h' ? 28800 : 30, // 8 hours = 28800 seconds, 30 seconds = 30
+            timerSeconds,
             totalRounds: 18,
             autoStart: false
           }
         });
-        console.log('New room created with ID:', newRoomRef.id);
-        console.log('Navigating to:', `/draft/${config.route}/${newRoomRef.id}`);
-        router.push(`/draft/${config.route}/${newRoomRef.id}`);
+        logger.info('New room created', { roomId: newRoomRef.id });
+        const draftPath = `/draft/${config.route}/${newRoomRef.id}`;
+        router.push(draftPath);
         // Fallback in case router.push doesn't work
         setTimeout(() => {
-          if (window.location.pathname !== `/draft/${config.route}/${newRoomRef.id}`) {
-            console.log('Router push failed, using window.location');
-            window.location.href = `/draft/${config.route}/${newRoomRef.id}`;
+          if (window.location.pathname !== draftPath) {
+            logger.warn('Router push failed, using window.location', { path: draftPath });
+            window.location.href = draftPath;
           }
         }, 1000);
       } else {
         // Join a random available room
-        console.log('Joining existing room...');
         const selectedRoom = availableRooms[Math.floor(Math.random() * availableRooms.length)];
-        console.log('Selected room:', selectedRoom.id);
+        logger.debug('Joining existing room', { roomId: selectedRoom.id });
         await updateDoc(doc(db, 'draftRooms', selectedRoom.id), {
           participants: [...(selectedRoom.participants || []), user.uid]
         });
-        console.log('Successfully joined room');
-        console.log('Navigating to:', `/draft/${config.route}/${selectedRoom.id}`);
-        router.push(`/draft/${config.route}/${selectedRoom.id}`);
+        logger.info('Successfully joined room', { roomId: selectedRoom.id });
+        const draftPath = `/draft/${config.route}/${selectedRoom.id}`;
+        router.push(draftPath);
         // Fallback in case router.push doesn't work
         setTimeout(() => {
-          if (window.location.pathname !== `/draft/${config.route}/${selectedRoom.id}`) {
-            console.log('Router push failed, using window.location');
-            window.location.href = `/draft/${config.route}/${selectedRoom.id}`;
+          if (window.location.pathname !== draftPath) {
+            logger.warn('Router push failed, using window.location', { path: draftPath });
+            window.location.href = draftPath;
           }
         }, 1000);
       }
       onClose();
     } catch (error) {
-      console.error('Error joining room:', error);
-      console.error('Error details:', {
-        message: error.message,
-        code: error.code,
-        stack: error.stack
-      });
+      logger.error('Error joining room', error, { code: error.code });
       alert(`Error joining draft room: ${error.message}. Please try again.`);
     } finally {
       setIsJoining(false);
@@ -283,13 +272,12 @@ export default function JoinTournamentModal({ open, onClose, tournamentType = 't
   };
 
   const handleAuthSuccess = (authenticatedUser) => {
-    console.log('Authentication successful:', authenticatedUser.uid);
+    logger.debug('Authentication successful', { userId: authenticatedUser.uid });
     setShowAuthModal(false);
     // Refresh user data after authentication
     updateUserData();
   };
 
-  console.log('Modal render - open:', open, 'tournamentType:', tournamentType);
   if (!open) return null;
 
   return (

@@ -23,21 +23,22 @@ import {
   handlePayoutPaid,
   handlePayoutFailed,
 } from '../../../lib/paymongo';
-import type { 
-  PayMongoWebhookPayload, 
+import type {
+  PayMongoWebhookPayload,
   PayMongoSourceAttributes,
   PayMongoPaymentAttributes,
   PayMongoPayoutAttributes,
 } from '../../../lib/paymongo/paymongoTypes';
 import { captureError } from '../../../lib/errorTracking';
 import { logger } from '../../../lib/structuredLogger';
-import { 
-  withErrorHandling, 
-  validateMethod, 
+import {
+  withErrorHandling,
+  validateMethod,
   createErrorResponse,
   createSuccessResponse,
-  ErrorType 
+  ErrorType
 } from '../../../lib/apiErrorHandler';
+import { acquireWebhookLock } from '../../../lib/webhooks/atomicLock';
 
 // ============================================================================
 // CONFIG
@@ -96,17 +97,42 @@ export default async function handler(
       const payload: PayMongoWebhookPayload = JSON.parse(rawBody.toString());
       const eventType = payload.data.attributes.type;
       const eventData = payload.data.attributes.data;
-      
-      logger.info('Processing webhook event', { 
+      const eventId = payload.data.id;
+
+      logger.info('Processing webhook event', {
         component: 'paymongo',
         operation: 'webhook',
         eventType,
-        eventId: payload.data.id,
+        eventId,
         dataId: eventData.id,
       });
-      
+
+      // SECURITY: Acquire atomic lock to prevent duplicate processing
+      const lock = await acquireWebhookLock(eventId, eventType, 'paymongo', {
+        dataId: eventData.id,
+      });
+
+      if (!lock.acquired) {
+        logger.info('Webhook event already handled', {
+          component: 'paymongo',
+          operation: 'webhook',
+          eventId,
+          eventType,
+          reason: lock.reason,
+        });
+
+        // Return 200 to acknowledge receipt (prevents retries)
+        return res.status(200).json({
+          received: true,
+          duplicate: lock.reason === 'already_processed',
+          processing: lock.reason === 'already_processing',
+          reason: lock.reason,
+        });
+      }
+
       let result: { success: boolean; actions: string[] };
-      
+
+      try {
       // Route to appropriate handler
       switch (eventType) {
         case 'source.chargeable':
@@ -166,22 +192,33 @@ export default async function handler(
           result = { success: true, actions: ['unhandled_event'] };
       }
       
-      logger.info('Webhook event processed', { 
+      // Release lock on successful processing
+      await lock.releaseLock();
+
+      logger.info('Webhook event processed', {
         component: 'paymongo',
         operation: 'webhook',
         eventType,
-        success: result.success, 
+        eventId,
+        success: result.success,
         actions: result.actions,
       });
-      
+
       const response = createSuccessResponse({
         received: true,
         success: result.success,
         actions: result.actions,
       }, 200, logger);
-      
+
       return res.status(response.statusCode).json(response.body);
-      
+
+      } catch (processingError) {
+        // Mark lock as failed if processing fails
+        const errMsg = processingError instanceof Error ? processingError.message : 'Unknown processing error';
+        await lock.markFailed(errMsg);
+        throw processingError; // Re-throw to outer catch
+      }
+
     } catch (error) {
       // For webhooks, we must always return 200 to prevent retries
       // Log the error for investigation but don't let it propagate
@@ -190,11 +227,11 @@ export default async function handler(
       await captureError(err, {
         tags: { component: 'paymongo', operation: 'webhook' },
       });
-      
+
       // Always return 200 to prevent PayMongo from retrying
       // This is a webhook-specific requirement
-      return res.status(200).json({ 
-        received: true, 
+      return res.status(200).json({
+        received: true,
         error: error instanceof Error ? error.message : 'Unknown error',
       });
     }

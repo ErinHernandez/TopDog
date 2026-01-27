@@ -503,39 +503,80 @@ export async function getOrCreateCustomer(
  * SECURITY: Uses crypto.timingSafeEqual to prevent timing attacks.
  * A timing attack could allow an attacker to guess the signature byte-by-byte
  * by measuring response times when comparing signatures.
+ *
+ * This implementation is constant-time regardless of input validity:
+ * - Always computes the hash
+ * - Always performs the timing-safe comparison
+ * - Early return conditions are masked with dummy operations
  */
 export function verifyWebhookSignature(
   payload: string | Buffer,
   signature: string
 ): boolean {
+  // Track validation failures but don't return early
+  let isValid = true;
+
   if (!PAYSTACK_WEBHOOK_SECRET) {
     serverLogger.error('PAYSTACK_WEBHOOK_SECRET not configured');
-    return false;
+    isValid = false;
   }
 
-  // Validate signature format (should be hex string)
-  if (!signature || typeof signature !== 'string') {
-    return false;
-  }
-
+  // SECURITY: Always compute the hash to prevent timing leak
+  // Use a dummy secret if the real one isn't configured
+  const secretToUse = PAYSTACK_WEBHOOK_SECRET || 'dummy_secret_for_constant_time';
   const hash = crypto
-    .createHmac('sha512', PAYSTACK_WEBHOOK_SECRET)
+    .createHmac('sha512', secretToUse)
     .update(typeof payload === 'string' ? payload : payload.toString())
     .digest('hex');
 
-  // Use timing-safe comparison to prevent timing attacks
-  // Both buffers must be the same length for timingSafeEqual
-  const hashBuffer = Buffer.from(hash, 'hex');
-  const signatureBuffer = Buffer.from(signature, 'hex');
+  // SECURITY: Validate signature format without early return
+  // Missing or non-string signature fails validation
+  const signatureToUse = (signature && typeof signature === 'string')
+    ? signature
+    : hash; // Use computed hash as dummy to ensure valid hex
 
-  // If lengths differ, signature is invalid (but still do constant-time check)
-  if (hashBuffer.length !== signatureBuffer.length) {
-    // Perform a dummy comparison to maintain constant time
-    crypto.timingSafeEqual(hashBuffer, hashBuffer);
-    return false;
+  if (!signature || typeof signature !== 'string') {
+    isValid = false;
   }
 
-  return crypto.timingSafeEqual(hashBuffer, signatureBuffer);
+  // SECURITY: Validate hex format - signature should only contain hex chars
+  // Invalid hex will cause Buffer.from to produce unexpected results
+  const hexRegex = /^[0-9a-fA-F]+$/;
+  if (!hexRegex.test(signatureToUse)) {
+    isValid = false;
+  }
+
+  // SECURITY: Use timing-safe comparison to prevent timing attacks
+  // Both buffers must be the same length for timingSafeEqual
+  const hashBuffer = Buffer.from(hash, 'hex');
+
+  // Safely create signature buffer - if invalid hex, use hash length buffer
+  let signatureBuffer: Buffer;
+  try {
+    signatureBuffer = Buffer.from(signatureToUse, 'hex');
+  } catch {
+    // If hex parsing fails, use a same-length dummy buffer
+    signatureBuffer = Buffer.alloc(hashBuffer.length);
+    isValid = false;
+  }
+
+  // SECURITY: Length mismatch means invalid signature
+  // Still perform constant-time comparison with padded/truncated buffer
+  if (hashBuffer.length !== signatureBuffer.length) {
+    // Create a buffer of matching length for constant-time comparison
+    const paddedBuffer = Buffer.alloc(hashBuffer.length);
+    signatureBuffer.copy(paddedBuffer, 0, 0, Math.min(signatureBuffer.length, hashBuffer.length));
+    crypto.timingSafeEqual(hashBuffer, paddedBuffer);
+    isValid = false;
+  } else {
+    // Perform the actual comparison
+    const comparisonResult = crypto.timingSafeEqual(hashBuffer, signatureBuffer);
+    if (!comparisonResult) {
+      isValid = false;
+    }
+  }
+
+  return isValid;
 }
 
 /**

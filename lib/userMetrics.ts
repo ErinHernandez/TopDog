@@ -744,18 +744,16 @@ class UserMetrics {
       };
       
       // Add Authorization header if we have a token
-      const isDevelopment = process.env.NODE_ENV === 'development' || 
-                          (typeof window !== 'undefined' && window.location.hostname === 'localhost');
-      
+      // SECURITY: Only send requests with valid Firebase auth tokens
+      // Dev-token fallback has been removed for security - use Firebase Auth Emulator in development
       if (authToken) {
         headers['Authorization'] = `Bearer ${authToken}`;
-        logger.debug('Sending request with Firebase auth token');
-      } else if (isDevelopment) {
-        // Development fallback - use dev-token if Firebase Admin is not configured
-        headers['Authorization'] = 'Bearer dev-token';
-        logger.debug('Sending request with dev-token (no Firebase auth token available)');
+        logger.debug('Sending analytics with Firebase auth token');
       } else {
-        logger.warn('No auth token available and not in development mode');
+        // No auth token - skip authenticated analytics in development
+        // In production, this would indicate a session issue
+        logger.debug('Skipping authenticated analytics - no auth token available');
+        return; // Don't send unauthenticated analytics requests
       }
       
       // Send to your analytics endpoint

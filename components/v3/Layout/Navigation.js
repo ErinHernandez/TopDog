@@ -6,6 +6,9 @@
 import React from 'react';
 import Link from 'next/link';
 import { theme } from '../../../lib/theme';
+import { createScopedLogger } from '../../../lib/clientLogger';
+
+const logger = createScopedLogger('[Navigation]');
 
 const Navigation = ({ activeTab = null }) => {
   const navigationItems = [
@@ -88,8 +91,8 @@ const Navigation = ({ activeTab = null }) => {
             <button
               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors text-sm"
               onClick={() => {
-                // Handle deposit modal opening
-                console.log('Open deposit modal');
+                // TODO: Implement deposit modal opening
+                logger.debug('Deposit button clicked - modal not yet implemented');
               }}
             >
               Deposit

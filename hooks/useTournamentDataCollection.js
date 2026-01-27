@@ -5,6 +5,9 @@
 
 import { useEffect, useRef } from 'react';
 import { draftDataCollector } from '../lib/draftDataIntegration.js';
+import { createScopedLogger } from '../lib/clientLogger';
+
+const logger = createScopedLogger('[TournamentData]');
 
 export function useTournamentDataCollection(roomId, participants, picks) {
   const isInitialized = useRef(false);
@@ -13,8 +16,8 @@ export function useTournamentDataCollection(roomId, participants, picks) {
   // Initialize data collection when draft starts
   useEffect(() => {
     if (roomId && participants?.length > 0 && !isInitialized.current) {
-      console.log('🏈 Initializing tournament data collection...');
-      
+      logger.debug('Initializing tournament data collection', { roomId });
+
       try {
         draftDataCollector.initializeDraftDataCollection(
           roomId,
@@ -24,11 +27,11 @@ export function useTournamentDataCollection(roomId, participants, picks) {
             teamName: p.teamName || `${p.name || p.username}'s Team`
           }))
         );
-        
+
         isInitialized.current = true;
-        console.log('✅ Tournament data collection initialized');
+        logger.debug('Tournament data collection initialized');
       } catch (error) {
-        console.error('❌ Failed to initialize tournament data collection:', error);
+        logger.error('Failed to initialize tournament data collection', error);
       }
     }
   }, [roomId, participants]);
@@ -67,9 +70,9 @@ export function useTournamentDataCollection(roomId, participants, picks) {
             projectedPoints: playerData.proj || pick.projectedPoints
           });
           
-          console.log(`📝 Recorded pick: ${pick.player} by ${pick.user}`);
+          logger.debug('Recorded pick', { player: pick.player, user: pick.user });
         } catch (error) {
-          console.error('❌ Failed to record pick:', error, pick);
+          logger.error('Failed to record pick', error, { player: pick.player });
         }
       });
       
@@ -81,11 +84,11 @@ export function useTournamentDataCollection(roomId, participants, picks) {
   useEffect(() => {
     return () => {
       if (isInitialized.current) {
-        console.log('🏁 Draft completed, finalizing data collection...');
+        logger.debug('Draft completed, finalizing data collection');
         try {
           draftDataCollector.completeDraft();
         } catch (error) {
-          console.error('❌ Failed to complete draft data collection:', error);
+          logger.error('Failed to complete draft data collection', error);
         }
       }
     };

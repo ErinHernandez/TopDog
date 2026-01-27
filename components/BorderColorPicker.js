@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useUserPreferences } from '../hooks/useUserPreferences';
+import { createScopedLogger } from '../lib/clientLogger';
+
+const logger = createScopedLogger('[BorderColorPicker]');
 
 /**
  * Border Color Picker Component
@@ -32,12 +35,12 @@ export default function BorderColorPicker() {
     try {
       const result = await updateBorderColor(color);
       if (result.success) {
-        console.log('Border color updated successfully');
+        logger.debug('Border color updated', { color });
       } else {
-        console.error('Failed to update border color:', result.error);
+        logger.error('Failed to update border color', null, { error: result.error });
       }
     } catch (error) {
-      console.error('Error updating border color:', error);
+      logger.error('Error updating border color', error);
     } finally {
       setIsUpdating(false);
     }

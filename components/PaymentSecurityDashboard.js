@@ -3,6 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { paymentHealthMonitor } from '../lib/paymentHealthMonitor';
 import { fraudDetectionEngine } from '../lib/fraudDetection';
 import { GLOBAL_PAYMENT_METHODS } from '../lib/paymentMethodConfig';
+import { createScopedLogger } from '../lib/clientLogger';
+
+const logger = createScopedLogger('[PaymentDashboard]');
 
 const PaymentSecurityDashboard = () => {
   const [healthStatus, setHealthStatus] = useState({});
@@ -44,7 +47,7 @@ const PaymentSecurityDashboard = () => {
       setAlerts(prev => [...newAlerts, ...prev].slice(0, 50)); // Keep last 50 alerts
       
     } catch (error) {
-      console.error('Failed to refresh dashboard data:', error);
+      logger.error('Failed to refresh dashboard data', error);
     }
   };
   

@@ -20,10 +20,8 @@ import {
   handleChargeFailed,
   handleTransferSuccess,
   handleTransferFailed,
-  findWebhookEventByReference,
   markWebhookEventAsProcessed,
   markWebhookEventAsFailed,
-  createOrUpdateWebhookEvent,
 } from '../../../lib/paystack';
 import type {
   PaystackWebhookPayload,
@@ -33,13 +31,37 @@ import type {
 } from '../../../lib/paystack/paystackTypes';
 import { captureError } from '../../../lib/errorTracking';
 import { logger } from '../../../lib/structuredLogger';
-import { 
-  withErrorHandling, 
-  validateMethod, 
+import {
+  withErrorHandling,
+  validateMethod,
   createErrorResponse,
   createSuccessResponse,
-  ErrorType 
+  ErrorType
 } from '../../../lib/apiErrorHandler';
+import { RateLimiter } from '../../../lib/rateLimiter';
+import { acquireWebhookLock } from '../../../lib/webhooks/atomicLock';
+
+// ============================================================================
+// RATE LIMITER FOR FAILED VERIFICATION ATTEMPTS
+// ============================================================================
+
+/**
+ * SECURITY: Rate limit failed webhook signature verification attempts
+ * This prevents brute force attacks on the webhook endpoint
+ *
+ * Configuration:
+ * - 10 failed attempts allowed per minute per IP
+ * - Fail-closed: If rate limiter fails, reject the request
+ * - Circuit breaker after 5 consecutive failures
+ */
+const failedVerificationLimiter = new RateLimiter({
+  endpoint: 'paystack_webhook_failed_verification',
+  maxRequests: 10,
+  windowMs: 60 * 1000, // 1 minute
+  failClosed: true,
+  circuitBreakerThreshold: 5,
+  circuitBreakerResetMs: 30 * 1000,
+});
 
 // ============================================================================
 // CONFIGURATION
@@ -102,25 +124,44 @@ export default async function handler(
       // Get signature from headers
       const signature = req.headers['x-paystack-signature'] as string;
       
-      if (!signature) {
-        logger.warn('Missing signature header', { component: 'paystack', operation: 'webhook' });
-        const errorResponse = createErrorResponse(
-          ErrorType.UNAUTHORIZED,
-          'Missing signature',
-          {},
-          res.getHeader('X-Request-ID') as string
-        );
-        return res.status(errorResponse.statusCode).json({
-          received: false,
-          error: errorResponse.body.error.message,
-        });
-      }
-      
       // Verify signature
-      const isValid = verifyWebhookSignature(rawBody, signature);
-      
-      if (!isValid) {
-        logger.warn('Invalid signature', { component: 'paystack', operation: 'webhook' });
+      const isValid = verifyWebhookSignature(rawBody, signature || '');
+
+      if (!signature || !isValid) {
+        // SECURITY: Rate limit failed verification attempts to prevent brute force
+        const clientIp = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ||
+                        req.socket?.remoteAddress ||
+                        'unknown';
+
+        const rateLimitResult = await failedVerificationLimiter.check({
+          headers: { 'x-forwarded-for': clientIp },
+          socket: { remoteAddress: clientIp },
+        } as NextApiRequest);
+
+        if (!rateLimitResult.allowed) {
+          logger.warn('Paystack webhook brute force detected - rate limited', {
+            component: 'paystack',
+            operation: 'webhook',
+            ip: clientIp,
+            remaining: rateLimitResult.remaining,
+            retryAfterMs: rateLimitResult.retryAfterMs,
+          });
+
+          // Return 429 for rate limited requests
+          return res.status(429).json({
+            received: false,
+            error: 'Too many failed verification attempts',
+          });
+        }
+
+        logger.warn('Invalid or missing signature', {
+          component: 'paystack',
+          operation: 'webhook',
+          ip: clientIp,
+          hasSignature: !!signature,
+          failedAttempts: rateLimitResult.maxRequests - rateLimitResult.remaining,
+        });
+
         const errorResponse = createErrorResponse(
           ErrorType.UNAUTHORIZED,
           'Invalid signature',
@@ -150,67 +191,79 @@ export default async function handler(
         reference,
       });
 
-      // Check for duplicate event (replay protection)
-      if (reference) {
-        const existingEvent = await findWebhookEventByReference(reference, event);
-        if (existingEvent?.status === 'processed') {
-          logger.info('Duplicate webhook event - already processed', {
-            component: 'paystack',
-            operation: 'webhook',
-            event,
-            reference,
-          });
-          return res.status(200).json({
-            received: true,
-            event,
-            actions: ['duplicate_skipped'],
-          });
-        }
+      // SECURITY: Acquire atomic lock to prevent duplicate processing
+      // This eliminates race conditions between checking and processing
+      const eventId = reference || `paystack_${Date.now()}`;
+      const lock = await acquireWebhookLock(eventId, event, 'paystack', {
+        reference,
+      });
 
-        // Create/update event record for tracking
-        await createOrUpdateWebhookEvent(reference, event, {
-          receivedAt: new Date().toISOString(),
+      if (!lock.acquired) {
+        logger.info('Paystack webhook event already handled', {
+          component: 'paystack',
+          operation: 'webhook',
+          eventId,
+          event,
+          reason: lock.reason,
+        });
+
+        // Return 200 to acknowledge receipt (prevents retries)
+        return res.status(200).json({
+          received: true,
+          event,
+          actions: [lock.reason === 'already_processed' ? 'duplicate_skipped' : 'already_processing'],
         });
       }
 
       // Handle events
       let result: { success: boolean; actions: string[] };
 
-      switch (event) {
-        case 'charge.success':
-          result = await handleChargeSuccess(data as ChargeSuccessWebhookData);
-          break;
-          
-        case 'charge.failed':
-          result = await handleChargeFailed(data as ChargeFailedWebhookData);
-          break;
-          
-        case 'transfer.success':
-          result = await handleTransferSuccess(data as TransferWebhookData);
-          break;
-          
-        case 'transfer.failed':
-        case 'transfer.reversed':
-          result = await handleTransferFailed(data as TransferWebhookData);
-          break;
-          
-        default:
-          // Log unhandled events
-          logger.info('Unhandled event type', { component: 'paystack', operation: 'webhook', event });
-          result = { success: true, actions: ['unhandled_event'] };
-      }
+      try {
+        switch (event) {
+          case 'charge.success':
+            result = await handleChargeSuccess(data as ChargeSuccessWebhookData);
+            break;
 
-      // Mark event as processed or failed
-      if (reference) {
-        if (result.success) {
-          await markWebhookEventAsProcessed(reference, event, {
-            actions: result.actions,
-          });
-        } else {
-          await markWebhookEventAsFailed(reference, event, 'Processing failed', {
-            actions: result.actions,
-          });
+          case 'charge.failed':
+            result = await handleChargeFailed(data as ChargeFailedWebhookData);
+            break;
+
+          case 'transfer.success':
+            result = await handleTransferSuccess(data as TransferWebhookData);
+            break;
+
+          case 'transfer.failed':
+          case 'transfer.reversed':
+            result = await handleTransferFailed(data as TransferWebhookData);
+            break;
+
+          default:
+            // Log unhandled events
+            logger.info('Unhandled event type', { component: 'paystack', operation: 'webhook', event });
+            result = { success: true, actions: ['unhandled_event'] };
         }
+
+        // Release lock on successful processing
+        await lock.releaseLock();
+
+        // Also update legacy webhook event tracking for backward compatibility
+        if (reference) {
+          if (result.success) {
+            await markWebhookEventAsProcessed(reference, event, {
+              actions: result.actions,
+            });
+          } else {
+            await markWebhookEventAsFailed(reference, event, 'Processing failed', {
+              actions: result.actions,
+            });
+          }
+        }
+
+      } catch (processingError) {
+        // Mark lock as failed if processing fails
+        const errMsg = processingError instanceof Error ? processingError.message : 'Unknown processing error';
+        await lock.markFailed(errMsg);
+        throw processingError; // Re-throw to outer catch
       }
 
       // Respond to Paystack with success

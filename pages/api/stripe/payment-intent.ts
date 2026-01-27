@@ -13,9 +13,9 @@
  */
 
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { 
-  withErrorHandling, 
-  validateMethod, 
+import {
+  withErrorHandling,
+  validateMethod,
   createSuccessResponse,
   createErrorResponse,
   ErrorType,
@@ -34,6 +34,7 @@ import {
 import { withCSRFProtection } from '../../../lib/csrfProtection';
 import { logPaymentTransaction, getClientIP } from '../../../lib/securityLogger';
 import { v4 as uuidv4 } from 'uuid';
+import { paymentCreationLimiter, getRateLimitKey } from '../../../lib/rateLimiters';
 
 // ============================================================================
 // TYPES
@@ -225,20 +226,41 @@ function getAllowedPaymentMethods(
 
 // Wrap handler with CSRF protection
 const handler = async function(
-  req: NextApiRequest, 
+  req: NextApiRequest,
   res: NextApiResponse
 ) {
   return withErrorHandling(req, res, async (req, res, logger) => {
     validateMethod(req, ['POST'], logger);
-    
+
     const body = req.body as PaymentIntentRequestBody;
     const clientIP = getClientIP(req);
-    
+
+    // SECURITY: Rate limit payment creation attempts
+    const rateLimitKey = getRateLimitKey(body.userId, clientIP);
+    const rateLimitResult = await paymentCreationLimiter.check({
+      headers: { 'x-forwarded-for': clientIP },
+      socket: { remoteAddress: clientIP },
+    } as NextApiRequest);
+
+    if (!rateLimitResult.allowed) {
+      logger.warn('Payment creation rate limited', {
+        userId: body.userId,
+        ip: clientIP,
+        remaining: rateLimitResult.remaining,
+        retryAfterMs: rateLimitResult.retryAfterMs,
+      });
+
+      return res.status(429).json({
+        error: 'Too many payment attempts. Please try again later.',
+        retryAfterMs: rateLimitResult.retryAfterMs,
+      });
+    }
+
     // Validate required fields
     const { amountCents, userId, email } = body;
     const currency = (body.currency ?? 'USD').toUpperCase();
     const country = (body.country ?? body.riskContext?.country ?? 'US').toUpperCase();
-    
+
     if (!amountCents || !userId) {
       const error = createErrorResponse(
         ErrorType.VALIDATION,

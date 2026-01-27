@@ -113,7 +113,7 @@ export default function PlayerDropdownContent({
             display: 'block'
           }}
           onError={(e) => {
-            console.log(`Failed to load logo for team: ${player.team}`);
+            // Hide broken image gracefully
             e.target.style.display = 'none';
           }}
         />

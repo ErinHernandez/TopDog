@@ -45,6 +45,11 @@ if (!PAYMONGO_SECRET_KEY) {
   serverLogger.warn('PAYMONGO_SECRET_KEY not configured');
 }
 
+// SECURITY: Enforce live webhook secret in production
+if (process.env.NODE_ENV === 'production' && !PAYMONGO_WEBHOOK_SECRET) {
+  throw new Error('CRITICAL: PAYMONGO_WEBHOOK_SECRET is required in production environment');
+}
+
 // ============================================================================
 // HTTP CLIENT
 // ============================================================================
@@ -420,9 +425,23 @@ export function verifyWebhookSignature(
     return false;
   }
   
-  // Use live signature in production, test signature in development
-  const expectedSignature = process.env.NODE_ENV === 'production' ? liveSignature : (liveSignature || testSignature);
-  
+  // SECURITY: In production, ONLY accept live signatures (never test signatures)
+  // This prevents test webhooks from being replayed in production
+  if (process.env.NODE_ENV === 'production') {
+    if (!liveSignature) {
+      serverLogger.error('PayMongo webhook missing live signature in production', new Error('Missing li= signature'), {
+        hasTestSignature: !!testSignature,
+        timestamp,
+      });
+      return false;
+    }
+  }
+
+  // Use live signature in production, allow test signature only in development
+  const expectedSignature = process.env.NODE_ENV === 'production'
+    ? liveSignature
+    : (liveSignature || testSignature);
+
   if (!expectedSignature) {
     return false;
   }

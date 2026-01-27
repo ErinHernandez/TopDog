@@ -12,6 +12,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { getDb } from '@/lib/firebase-utils';
 import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
 import { verifyAuthToken } from '@/lib/apiAuth';
+import serverLogger from '@/lib/logger/serverLogger';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
   if (req.method !== 'GET') {
@@ -60,7 +61,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       reasons,
     });
   } catch (err) {
-    console.error('[deletion-eligibility]', err);
+    serverLogger.error('[deletion-eligibility] Failed to check eligibility', err instanceof Error ? err : null, { uid });
     return res.status(500).json({
       ok: false,
       error: { code: 'INTERNAL_ERROR', message: 'Failed to check eligibility' },

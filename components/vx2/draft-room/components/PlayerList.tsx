@@ -14,6 +14,7 @@
  */
 
 import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import { VariableSizeList as List } from 'react-window';
 import type { DraftPlayer, Position, PlayerSortOption } from '../types';
 import { POSITION_COLORS } from '../constants';
 import { BG_COLORS, TEXT_COLORS } from '../../core/constants/colors';
@@ -248,7 +249,297 @@ const SearchBar = React.memo(function SearchBar({ value, onChange, onClear }: Se
 // Table-based layout for guaranteed column alignment
 // Headers are integrated into the table structure
 
-// --- Player Row ---
+// --- Virtualized Player List ---
+// PERFORMANCE: Uses react-window to only render visible rows
+// This dramatically reduces render time for 400+ player lists
+
+const EXPANDED_ROW_HEIGHT = 180; // Approximate height of expanded card
+
+interface VirtualizedPlayerListProps {
+  players: DraftPlayer[];
+  expandedPlayerId: string | null;
+  isQueued: (playerId: string) => boolean;
+  isMyTurn: boolean;
+  sortMode: SortMode;
+  onToggleQueue: (player: DraftPlayer) => void;
+  onRowClick: (playerId: string) => void;
+  onDraft: (player: DraftPlayer) => void;
+  onSortAdp: () => void;
+  onSortProj: () => void;
+  onSortRank: () => void;
+  onExpandedClose: () => void;
+  initialScrollOffset?: number;
+  onScroll?: (position: number) => void;
+}
+
+const VirtualizedPlayerList = React.memo(function VirtualizedPlayerList({
+  players,
+  expandedPlayerId,
+  isQueued,
+  isMyTurn,
+  sortMode,
+  onToggleQueue,
+  onRowClick,
+  onDraft,
+  onSortAdp,
+  onSortProj,
+  onSortRank,
+  onExpandedClose,
+  initialScrollOffset = 0,
+  onScroll,
+}: VirtualizedPlayerListProps): React.ReactElement {
+  const listRef = useRef<List>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerHeight, setContainerHeight] = useState(400);
+
+  // Measure container height
+  useEffect(() => {
+    const updateHeight = () => {
+      if (containerRef.current) {
+        setContainerHeight(containerRef.current.clientHeight - 40); // Subtract header height
+      }
+    };
+    updateHeight();
+    window.addEventListener('resize', updateHeight);
+    return () => window.removeEventListener('resize', updateHeight);
+  }, []);
+
+  // Reset list when expanded player changes (to recalculate row sizes)
+  useEffect(() => {
+    if (listRef.current) {
+      listRef.current.resetAfterIndex(0);
+    }
+  }, [expandedPlayerId]);
+
+  // Calculate row height - variable based on expanded state
+  const getItemSize = useCallback((index: number) => {
+    const player = players[index];
+    if (player && player.id === expandedPlayerId) {
+      return PLAYER_LIST_PX.rowHeight + EXPANDED_ROW_HEIGHT;
+    }
+    return PLAYER_LIST_PX.rowHeight;
+  }, [players, expandedPlayerId]);
+
+  // Handle scroll events
+  const handleScroll = useCallback(({ scrollOffset }: { scrollOffset: number }) => {
+    if (onScroll) {
+      onScroll(scrollOffset);
+    }
+  }, [onScroll]);
+
+  // Row renderer for react-window
+  const Row = useCallback(({ index, style }: { index: number; style: React.CSSProperties }) => {
+    const player = players[index];
+    const isExpanded = player.id === expandedPlayerId;
+
+    return (
+      <div style={style}>
+        <PlayerRowDiv
+          player={player}
+          rank={player.rank ?? null}
+          isQueued={isQueued(player.id)}
+          onToggleQueue={() => onToggleQueue(player)}
+          onRowClick={() => onRowClick(player.id)}
+        />
+        {isExpanded && (
+          <div style={{ padding: '8px 4px' }}>
+            <PlayerExpandedCard
+              player={{
+                id: player.id,
+                name: player.name,
+                team: player.team,
+                position: player.position,
+                adp: player.adp,
+                projectedPoints: player.projectedPoints,
+              }}
+              isMyTurn={isMyTurn}
+              onDraft={() => {
+                onDraft(player);
+                onExpandedClose();
+              }}
+              onClose={onExpandedClose}
+            />
+          </div>
+        )}
+      </div>
+    );
+  }, [players, expandedPlayerId, isQueued, isMyTurn, onToggleQueue, onRowClick, onDraft, onExpandedClose]);
+
+  return (
+    <div ref={containerRef} style={{ flex: 1, minHeight: 0 }}>
+      {/* Sticky Header */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          height: 40,
+          borderBottom: `1px solid ${PLAYER_LIST_COLORS.rowBorder}`,
+          backgroundColor: BG_COLORS.primary,
+          paddingLeft: 4,
+          paddingRight: 4,
+        }}
+      >
+        <div
+          onClick={onSortAdp}
+          style={{
+            width: PLAYER_LIST_PX.adpColumnWidth,
+            textAlign: 'center',
+            fontSize: 14,
+            fontWeight: 500,
+            color: sortMode === 'adp' ? TEXT_COLORS.primary : TEXT_COLORS.secondary,
+            cursor: 'pointer',
+          }}
+        >
+          <span style={{ borderBottom: sortMode === 'adp' ? '2px solid #6B7280' : 'none', paddingBottom: 2 }}>
+            ADP
+          </span>
+        </div>
+        <div style={{ flex: 1 }} />
+        <div style={{ width: PLAYER_LIST_PX.queueButtonContainerWidth }} />
+        <div
+          onClick={onSortProj}
+          style={{
+            width: PLAYER_LIST_PX.projColumnWidth,
+            textAlign: 'center',
+            fontSize: 13,
+            fontWeight: 500,
+            color: sortMode === 'proj' ? TEXT_COLORS.primary : TEXT_COLORS.secondary,
+            cursor: 'pointer',
+          }}
+        >
+          <span style={{ borderBottom: sortMode === 'proj' ? '2px solid #6B7280' : 'none', paddingBottom: 2 }}>
+            PROJ
+          </span>
+        </div>
+        <div
+          onClick={onSortRank}
+          style={{
+            width: PLAYER_LIST_PX.rankColumnWidth,
+            textAlign: 'center',
+            fontSize: 13,
+            fontWeight: 500,
+            color: sortMode === 'rank' ? TEXT_COLORS.primary : TEXT_COLORS.secondary,
+            cursor: 'pointer',
+          }}
+        >
+          <span style={{ borderBottom: sortMode === 'rank' ? '2px solid #6B7280' : 'none', paddingBottom: 2 }}>
+            RANK
+          </span>
+        </div>
+      </div>
+
+      {/* Virtualized List */}
+      <List
+        ref={listRef}
+        height={containerHeight}
+        itemCount={players.length}
+        itemSize={getItemSize}
+        width="100%"
+        initialScrollOffset={initialScrollOffset}
+        onScroll={handleScroll}
+        overscanCount={5}
+        style={{ scrollbarWidth: 'none' }}
+      >
+        {Row}
+      </List>
+    </div>
+  );
+});
+
+// --- Player Row (Div-based for virtualization) ---
+interface PlayerRowDivProps {
+  player: DraftPlayer;
+  rank: number | null;
+  isQueued: boolean;
+  onToggleQueue: () => void;
+  onRowClick: () => void;
+}
+
+const PlayerRowDiv = React.memo(function PlayerRowDiv({
+  player,
+  rank,
+  isQueued,
+  onToggleQueue,
+  onRowClick,
+}: PlayerRowDivProps): React.ReactElement {
+  const positionColor = POSITION_COLORS[player.position];
+
+  return (
+    <div
+      onClick={onRowClick}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        height: PLAYER_LIST_PX.rowHeight,
+        backgroundColor: PLAYER_LIST_COLORS.rowBg,
+        cursor: 'pointer',
+        borderBottom: `1px solid ${PLAYER_LIST_COLORS.rowBorder}`,
+        paddingLeft: 4,
+        paddingRight: 4,
+      }}
+    >
+      {/* ADP Column */}
+      <div style={{ width: PLAYER_LIST_PX.adpColumnWidth, textAlign: 'center', fontSize: PLAYER_LIST_PX.statFontSize, color: '#9CA3AF', fontVariantNumeric: 'tabular-nums' }}>
+        {player.adp?.toFixed(1) || '-'}
+      </div>
+
+      {/* Player Info */}
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8, paddingLeft: 6, minWidth: 0 }}>
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <div style={{ fontSize: PLAYER_LIST_PX.playerNameFontSize, fontWeight: 500, color: TEXT_COLORS.primary, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {player.name}
+          </div>
+          <div style={{ fontSize: PLAYER_LIST_PX.playerTeamFontSize, color: TEXT_COLORS.secondary, display: 'flex', alignItems: 'center', gap: 4 }}>
+            <span style={{ color: positionColor, fontWeight: 600 }}>{player.position}</span>
+            <span>{player.team}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Queue Button */}
+      <div
+        style={{
+          width: PLAYER_LIST_PX.queueButtonContainerWidth,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <button
+          onClick={(e) => { e.stopPropagation(); onToggleQueue(); }}
+          aria-label={isQueued ? 'Remove from queue' : 'Add to queue'}
+          style={{
+            width: PLAYER_LIST_PX.queueButtonSize,
+            height: PLAYER_LIST_PX.queueButtonSize,
+            borderRadius: '50%',
+            border: `2px solid ${isQueued ? PLAYER_LIST_COLORS.queueButtonActiveBorder : PLAYER_LIST_COLORS.queueButtonBorder}`,
+            backgroundColor: isQueued ? PLAYER_LIST_COLORS.queueButtonActiveBg : 'transparent',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <span style={{ color: isQueued ? PLAYER_LIST_COLORS.queueButtonActiveBorder : PLAYER_LIST_COLORS.queueButtonBorder, fontSize: 16 }}>
+            {isQueued ? '✓' : '+'}
+          </span>
+        </button>
+      </div>
+
+      {/* PROJ Column */}
+      <div style={{ width: PLAYER_LIST_PX.projColumnWidth, textAlign: 'center', fontSize: PLAYER_LIST_PX.statFontSize, color: '#9CA3AF', fontVariantNumeric: 'tabular-nums' }}>
+        {player.projectedPoints?.toFixed(1) || '-'}
+      </div>
+
+      {/* RANK Column */}
+      <div style={{ width: PLAYER_LIST_PX.rankColumnWidth, textAlign: 'center', fontSize: PLAYER_LIST_PX.playerRankFontSize, fontWeight: 600, color: TEXT_COLORS.primary, fontVariantNumeric: 'tabular-nums' }}>
+        {rank || '-'}
+      </div>
+    </div>
+  );
+});
+
+// --- Player Row (Table-based - kept for compatibility) ---
 interface PlayerRowProps {
   player: DraftPlayer;
   rank: number | null;
@@ -527,132 +818,22 @@ const PlayerList = React.memo(function PlayerList({
             No players found
           </div>
         ) : (
-          <table
-            style={{
-              width: 'calc(100% - 8px)',
-              marginLeft: 4,
-              marginRight: 4,
-              borderCollapse: 'collapse',
-              tableLayout: 'fixed',
-            }}
-          >
-            <colgroup>
-              <col style={{ width: PLAYER_LIST_PX.adpColumnWidth }} />
-              <col style={{ width: 'auto' }} />
-              <col style={{ width: PLAYER_LIST_PX.queueButtonContainerWidth }} />
-              <col style={{ width: PLAYER_LIST_PX.projColumnWidth }} />
-              <col style={{ width: PLAYER_LIST_PX.rankColumnWidth }} />
-            </colgroup>
-            <thead
-              style={{
-                position: 'sticky',
-                top: 0,
-                zIndex: 10,
-                backgroundColor: BG_COLORS.primary,
-              }}
-            >
-              <tr style={{ borderBottom: `1px solid ${PLAYER_LIST_COLORS.rowBorder}` }}>
-                <th
-                  onClick={handleSortAdp}
-                  style={{
-                    padding: `${PLAYER_LIST_PX.headerPaddingY}px 4px`,
-                    textAlign: 'center',
-                    fontSize: 14,
-                    fontWeight: 500,
-                    color: sortMode === 'adp' ? TEXT_COLORS.primary : TEXT_COLORS.secondary,
-                    cursor: 'pointer',
-                    background: 'transparent',
-                    border: 'none',
-                  }}
-                >
-                  <span style={{
-                    borderBottom: sortMode === 'adp' ? '2px solid #6B7280' : '2px solid transparent',
-                    paddingBottom: 2,
-                  }}>
-                    ADP
-                  </span>
-                </th>
-                <th style={{ padding: `${PLAYER_LIST_PX.headerPaddingY}px 4px`, background: 'transparent' }} />
-                <th style={{ padding: `${PLAYER_LIST_PX.headerPaddingY}px 4px`, background: 'transparent' }} />
-                <th
-                  onClick={handleSortProj}
-                  style={{
-                    padding: `${PLAYER_LIST_PX.headerPaddingY}px 4px`,
-                    textAlign: 'center',
-                    fontSize: 13,
-                    fontWeight: 500,
-                    color: sortMode === 'proj' ? TEXT_COLORS.primary : TEXT_COLORS.secondary,
-                    cursor: 'pointer',
-                    background: 'transparent',
-                    border: 'none',
-                  }}
-                >
-                  <span style={{
-                    borderBottom: sortMode === 'proj' ? '2px solid #6B7280' : '2px solid transparent',
-                    paddingBottom: 2,
-                  }}>
-                    PROJ
-                  </span>
-                </th>
-                <th
-                  onClick={handleSortRank}
-                  style={{
-                    padding: `${PLAYER_LIST_PX.headerPaddingY}px 4px`,
-                    textAlign: 'center',
-                    fontSize: 13,
-                    fontWeight: 500,
-                    color: sortMode === 'rank' ? TEXT_COLORS.primary : TEXT_COLORS.secondary,
-                    cursor: 'pointer',
-                    background: 'transparent',
-                    border: 'none',
-                  }}
-                >
-                  <span style={{
-                    borderBottom: sortMode === 'rank' ? '2px solid #6B7280' : '2px solid transparent',
-                    paddingBottom: 2,
-                  }}>
-                    RANK
-                  </span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {players.map((player) => (
-                <React.Fragment key={player.id}>
-                  <PlayerRow
-                    player={player}
-                    rank={player.rank ?? null}
-                    isQueued={isQueued(player.id)}
-                    onToggleQueue={() => onToggleQueue(player)}
-                    onRowClick={() => handleRowClick(player.id)}
-                  />
-                  {/* Expanded Card */}
-                  {expandedPlayerId === player.id && (
-                    <tr>
-                      <td colSpan={5} style={{ padding: '8px 4px' }}>
-                        <PlayerExpandedCard
-                          player={{
-                            id: player.id,
-                            name: player.name,
-                            team: player.team,
-                            position: player.position,
-                            adp: player.adp,
-                            projectedPoints: player.projectedPoints,
-                          }}
-                          isMyTurn={isMyTurn}
-                          onDraft={() => {
-                            onDraft(player);
-                            setExpandedPlayerId(null);
-                          }}
-                          onClose={() => setExpandedPlayerId(null)}
-                        />
-                      </td>
-                    </tr>
-                  )}
-                </React.Fragment>
-              ))}
-            </tbody>
-          </table>
+          <VirtualizedPlayerList
+            players={players}
+            expandedPlayerId={expandedPlayerId}
+            isQueued={isQueued}
+            isMyTurn={isMyTurn}
+            sortMode={sortMode}
+            onToggleQueue={onToggleQueue}
+            onRowClick={handleRowClick}
+            onDraft={onDraft}
+            onSortAdp={handleSortAdp}
+            onSortProj={handleSortProj}
+            onSortRank={handleSortRank}
+            onExpandedClose={() => setExpandedPlayerId(null)}
+            initialScrollOffset={initialScrollPosition}
+            onScroll={onScrollPositionChange}
+          />
         )}
       </div>
     </div>

@@ -19,20 +19,44 @@ import {
   handleEWalletCapture,
   handleDisbursementCallback,
 } from '../../../lib/xendit';
-import type { 
+import type {
   VirtualAccountPaymentCallback,
   XenditEWalletCharge,
   DisbursementCallback,
 } from '../../../lib/xendit/xenditTypes';
 import { captureError } from '../../../lib/errorTracking';
 import { logger } from '../../../lib/structuredLogger';
-import { 
-  withErrorHandling, 
-  validateMethod, 
+import {
+  withErrorHandling,
+  validateMethod,
   createErrorResponse,
   createSuccessResponse,
-  ErrorType 
+  ErrorType
 } from '../../../lib/apiErrorHandler';
+import { RateLimiter } from '../../../lib/rateLimiter';
+import { acquireWebhookLock } from '../../../lib/webhooks/atomicLock';
+
+// ============================================================================
+// RATE LIMITER FOR FAILED VERIFICATION ATTEMPTS
+// ============================================================================
+
+/**
+ * SECURITY: Rate limit failed webhook token verification attempts
+ * This prevents brute force attacks on the webhook endpoint
+ *
+ * Configuration:
+ * - 10 failed attempts allowed per minute per IP
+ * - Fail-closed: If rate limiter fails, reject the request
+ * - Circuit breaker after 5 consecutive failures
+ */
+const failedVerificationLimiter = new RateLimiter({
+  endpoint: 'xendit_webhook_failed_verification',
+  maxRequests: 10,
+  windowMs: 60 * 1000, // 1 minute
+  failClosed: true,
+  circuitBreakerThreshold: 5,
+  circuitBreakerResetMs: 30 * 1000,
+});
 
 // ============================================================================
 // CONFIG
@@ -64,9 +88,41 @@ export default async function handler(
       
       // Verify webhook token
       const webhookToken = req.headers['x-callback-token'] as string;
-      
+
       if (!webhookToken || !verifyWebhookToken(webhookToken)) {
-        logger.warn('Invalid or missing callback token', { component: 'xendit', operation: 'webhook' });
+        // SECURITY: Rate limit failed verification attempts to prevent brute force
+        const clientIp = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ||
+                        req.socket?.remoteAddress ||
+                        'unknown';
+
+        const rateLimitResult = await failedVerificationLimiter.check({
+          headers: { 'x-forwarded-for': clientIp },
+          socket: { remoteAddress: clientIp },
+        } as NextApiRequest);
+
+        if (!rateLimitResult.allowed) {
+          logger.warn('Xendit webhook brute force detected - rate limited', {
+            component: 'xendit',
+            operation: 'webhook',
+            ip: clientIp,
+            remaining: rateLimitResult.remaining,
+            retryAfterMs: rateLimitResult.retryAfterMs,
+          });
+
+          // Return 429 for rate limited requests
+          return res.status(429).json({
+            error: 'Too many failed verification attempts',
+            retryAfterMs: rateLimitResult.retryAfterMs,
+          });
+        }
+
+        logger.warn('Invalid or missing callback token', {
+          component: 'xendit',
+          operation: 'webhook',
+          ip: clientIp,
+          failedAttempts: rateLimitResult.maxRequests - rateLimitResult.remaining,
+        });
+
         const errorResponse = createErrorResponse(
           ErrorType.UNAUTHORIZED,
           'Invalid callback token',
@@ -78,10 +134,41 @@ export default async function handler(
       
       // Parse payload
       const payload = JSON.parse(bodyString);
-      
+
+      // Extract event ID for deduplication
+      // Xendit uses different ID fields based on event type
+      const eventId = payload.id || payload.payment_id || payload.external_id || `xendit_${Date.now()}`;
+      const eventType = payload.status || (payload.channel_code ? 'ewallet' : 'va_payment');
+
+      // SECURITY: Acquire atomic lock to prevent duplicate processing
+      const lock = await acquireWebhookLock(eventId, eventType, 'xendit', {
+        paymentId: payload.payment_id,
+        externalId: payload.external_id,
+        status: payload.status,
+      });
+
+      if (!lock.acquired) {
+        logger.info('Xendit webhook event already handled', {
+          component: 'xendit',
+          operation: 'webhook',
+          eventId,
+          eventType,
+          reason: lock.reason,
+        });
+
+        // Return 200 to acknowledge receipt (prevents retries)
+        return res.status(200).json({
+          received: true,
+          duplicate: lock.reason === 'already_processed',
+          processing: lock.reason === 'already_processing',
+          reason: lock.reason,
+        });
+      }
+
       // Determine event type from payload structure
       let result: { success: boolean; actions: string[] };
-      
+
+      try {
       if (payload.payment_id && payload.callback_virtual_account_id) {
         // Virtual Account payment
         logger.info('Processing VA payment', {
@@ -128,21 +215,32 @@ export default async function handler(
         result = { success: true, actions: ['unknown_event_type'] };
       }
       
-      logger.info('Webhook processed', { 
+      // Release lock on successful processing
+      await lock.releaseLock();
+
+      logger.info('Webhook processed', {
         component: 'xendit',
         operation: 'webhook',
-        success: result.success, 
+        eventId,
+        success: result.success,
         actions: result.actions,
       });
-      
+
       const response = createSuccessResponse({
         received: true,
         success: result.success,
         actions: result.actions,
       }, 200, logger);
-      
+
       return res.status(response.statusCode).json(response.body);
-      
+
+      } catch (processingError) {
+        // Mark lock as failed if processing fails
+        const errMsg = processingError instanceof Error ? processingError.message : 'Unknown processing error';
+        await lock.markFailed(errMsg);
+        throw processingError; // Re-throw to outer catch
+      }
+
     } catch (error) {
       // For webhooks, we must always return 200 to prevent retries
       // Log the error for investigation but don't let it propagate
@@ -151,11 +249,11 @@ export default async function handler(
       await captureError(err, {
         tags: { component: 'xendit', operation: 'webhook' },
       });
-      
+
       // Always return 200 to prevent Xendit from retrying
       // This is a webhook-specific requirement
-      return res.status(200).json({ 
-        received: true, 
+      return res.status(200).json({
+        received: true,
         error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
