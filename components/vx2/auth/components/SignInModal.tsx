@@ -19,7 +19,6 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../../core/constants/colors';
 import { SPACING, TYPOGRAPHY, Z_INDEX } from '../../core/constants/sizes';
-import { Close } from '../../components/icons';
 import { useAuth } from '../hooks/useAuth';
 import {
   isPlatformAuthenticatorAvailable,
@@ -53,7 +52,7 @@ function TopDogLogo(): React.ReactElement {
       <img 
         src="/logo.png" 
         alt="TopDog" 
-        style={{ height: 48 }}
+        style={{ height: 56 }}
       />
     </div>
   );
@@ -438,237 +437,232 @@ export function SignInModal({
         zIndex: Z_INDEX.modal 
       }}
     >
-      {/* Header with Close Button */}
-      <div 
-        className="flex items-center justify-end flex-shrink-0"
-        style={{ padding: `${SPACING.md + 8}px ${SPACING.lg}px ${SPACING.md}px` }}
-      >
-        <button 
-          onClick={onClose} 
-          className="p-2 rounded-full transition-colors hover:bg-white/10" 
-          aria-label="Close"
-        >
-          <Close size={24} color={TEXT_COLORS.muted} />
-        </button>
-      </div>
-      
-      {/* Content – logo stays high; form block pushed down 3× last move (72px) */}
+      {/* Content */}
       <div 
         ref={formRef}
         className={`flex-1 overflow-y-auto ${shakeError ? 'animate-shake' : ''}`}
         style={{ 
-          padding: `0 ${SPACING.xl}px ${SPACING.xl}px`,
+          padding: `40px ${SPACING.xl}px 20px`,
           scrollbarWidth: 'none',
+          display: 'flex',
+          flexDirection: 'column',
         }}
         onKeyDown={handleKeyDown}
       >
-        {/* Logo */}
-        <div className="text-center mb-8" style={{ marginTop: 22 }}>
-          <TopDogLogo />
-          {step === 'phoneCode' && (
+        {/* Phone Code Message */}
+        {step === 'phoneCode' && (
+          <div className="text-center mb-6 mt-10">
             <p 
-              className="mt-6"
               style={{ color: TEXT_COLORS.secondary, fontSize: 17 }}
             >
               Verify your phone
             </p>
-          )}
-        </div>
-        
-        <div style={{ marginTop: 94 }}>
-        {/* Biometric Button - shown first if available */}
-        {biometricsAvailable && step === 'credentials' && (
-          <>
-            <BiometricButton
-              onClick={handleBiometricSignIn}
-              disabled={isLoading}
-              label={`Sign in with ${getBiometricTypeName()}`}
-            />
-            <Divider />
-          </>
-        )}
-        
-        {/* Error Message */}
-        {error && (
-          <div 
-            className="mb-4 p-4 rounded-xl flex items-center gap-3"
-            style={{ 
-              backgroundColor: 'rgba(239, 68, 68, 0.1)', 
-              border: `1px solid ${STATE_COLORS.error}20`,
-            }}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.error} strokeWidth="2">
-              <circle cx="12" cy="12" r="10" />
-              <line x1="12" y1="8" x2="12" y2="12" />
-              <line x1="12" y1="16" x2="12.01" y2="16" />
-            </svg>
-            <span style={{ color: STATE_COLORS.error, fontSize: 15 }}>
-              {error}
-            </span>
           </div>
         )}
         
-        {step === 'credentials' && (
-          <div className="space-y-4">
-            {/* Email/Phone Input — show "valid email" warning only after blur (click out) */}
-            <Input
-              inputRef={identifierRef}
-              value={identifier}
-              onChange={setIdentifier}
-              onBlur={() => { setIdentifierTouched(true); setIdentifierFocused(false); }}
-              onFocus={() => setIdentifierFocused(true)}
-              placeholder="Email or phone number"
-              autoComplete="email tel"
-              disabled={isLoading}
-              error={identifierFocused ? null : identifierError}
-              touched={identifierTouched}
-            />
-            
-            {/* Input type indicator - only show for phone */}
-            {identifier && inputType === 'phone' && !identifierError && (
-              <p 
-                className="px-1 -mt-2"
-                style={{ color: TEXT_COLORS.muted, fontSize: 13 }}
-              >
-                We'll send you a verification code
-              </p>
-            )}
-            
-            {/* Password Input - show for email and unknown (default to email) */}
-            {inputType !== 'phone' && (
-              <Input
-                inputRef={passwordRef}
-                value={password}
-                onChange={setPassword}
-                onBlur={() => { setPasswordTouched(true); setPasswordFocused(false); }}
-                onFocus={() => setPasswordFocused(true)}
-                placeholder="Password"
-                type={showPassword ? 'text' : 'password'}
-                autoComplete="current-password"
+        {/* Form Section */}
+        <div className="flex-1 flex flex-col justify-center">
+          {/* Biometric Button - shown first if available */}
+          {biometricsAvailable && step === 'credentials' && (
+            <>
+              <BiometricButton
+                onClick={handleBiometricSignIn}
                 disabled={isLoading}
-                error={passwordFocused ? null : passwordError}
-                touched={passwordTouched}
-                rightElement={
+                label={`Sign in with ${getBiometricTypeName()}`}
+              />
+              <Divider />
+            </>
+          )}
+          
+          {/* Error Message */}
+          {error && (
+            <div 
+              className="mb-4 p-4 rounded-xl flex items-center gap-3"
+              style={{ 
+                backgroundColor: 'rgba(239, 68, 68, 0.1)', 
+                border: `1px solid ${STATE_COLORS.error}20`,
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.error} strokeWidth="2">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
+              <span style={{ color: STATE_COLORS.error, fontSize: 15 }}>
+                {error}
+              </span>
+            </div>
+          )}
+          
+          {/* Credentials Step */}
+          {step === 'credentials' && (
+            <div className="space-y-4">
+              {/* Logo */}
+              <div className="mb-6">
+                <TopDogLogo />
+              </div>
+              
+              {/* Email/Phone Input */}
+              <Input
+                inputRef={identifierRef}
+                value={identifier}
+                onChange={setIdentifier}
+                onBlur={() => { setIdentifierTouched(true); setIdentifierFocused(false); }}
+                onFocus={() => setIdentifierFocused(true)}
+                placeholder="Email or phone number"
+                autoComplete="email tel"
+                disabled={isLoading}
+                error={identifierFocused ? null : identifierError}
+                touched={identifierTouched}
+              />
+              
+              {/* Input type indicator - only show for phone */}
+              {identifier && inputType === 'phone' && !identifierError && (
+                <p 
+                  className="px-1 -mt-2"
+                  style={{ color: TEXT_COLORS.muted, fontSize: 13 }}
+                >
+                  We'll send you a verification code
+                </p>
+              )}
+              
+              {/* Password Input - show for email and unknown (default to email) */}
+              {inputType !== 'phone' && (
+                <Input
+                  inputRef={passwordRef}
+                  value={password}
+                  onChange={setPassword}
+                  onBlur={() => { setPasswordTouched(true); setPasswordFocused(false); }}
+                  onFocus={() => setPasswordFocused(true)}
+                  placeholder="Password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  disabled={isLoading}
+                  error={passwordFocused ? null : passwordError}
+                  touched={passwordTouched}
+                  rightElement={
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="p-1 rounded transition-colors hover:bg-white/10"
+                      style={{ color: TEXT_COLORS.muted }}
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      tabIndex={-1}
+                    >
+                      {showPassword ? (
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" strokeLinecap="round" strokeLinejoin="round"/>
+                          <line x1="1" y1="1" x2="23" y2="23" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      ) : (
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" strokeLinecap="round" strokeLinejoin="round"/>
+                          <circle cx="12" cy="12" r="3" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      )}
+                    </button>
+                  }
+                />
+              )}
+              
+              {/* Remember Me & Forgot Password */}
+              {inputType !== 'phone' && (
+                <div className="flex items-center justify-between pt-2">
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="p-1 rounded transition-colors hover:bg-white/10"
-                    style={{ color: TEXT_COLORS.muted }}
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
-                    tabIndex={-1}
+                    onClick={() => setRememberMe(!rememberMe)}
+                    className="flex items-center gap-3 cursor-pointer bg-transparent border-0 p-0 text-left"
                   >
-                    {showPassword ? (
-                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" strokeLinecap="round" strokeLinejoin="round"/>
-                        <line x1="1" y1="1" x2="23" y2="23" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    ) : (
-                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" strokeLinecap="round" strokeLinejoin="round"/>
-                        <circle cx="12" cy="12" r="3" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    )}
+                    <div
+                      className="w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-all"
+                      style={{
+                        backgroundImage: rememberMe ? 'url(/wr_blue.png)' : 'none',
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        border: rememberMe ? 'none' : `2px solid ${BORDER_COLORS.default}`,
+                      }}
+                    >
+                      {rememberMe && (
+                        <svg width="12" height="10" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M1 5L4.5 8.5L11 1" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      )}
+                    </div>
+                    <span style={{ color: TEXT_COLORS.secondary, fontSize: 15 }}>
+                      Remember me
+                    </span>
                   </button>
-                }
+                  
+                  {onForgotPassword && (
+                    <button
+                      onClick={onForgotPassword}
+                      className="font-medium"
+                      style={{ color: TEXT_COLORS.secondary, fontSize: 15 }}
+                    >
+                      Forgot password?
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+          
+          {/* Phone Code Step */}
+          {step === 'phoneCode' && (
+            <div className="text-center">
+              <p 
+                className="mb-6"
+                style={{ color: TEXT_COLORS.secondary, fontSize: 15 }}
+              >
+                Enter the 6-digit code sent to<br />
+                <span className="font-medium" style={{ color: TEXT_COLORS.primary }}>{identifier}</span>
+              </p>
+              
+              <input
+                type="text"
+                value={phoneCode}
+                onChange={(e) => setPhoneCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                placeholder="000000"
+                autoComplete="one-time-code"
+                disabled={isLoading}
+                autoFocus
+                className="w-full px-5 py-4 rounded-xl outline-none transition-all text-center tracking-[0.5em] font-mono"
+                style={{
+                  backgroundColor: 'rgba(255,255,255,0.05)',
+                  color: TEXT_COLORS.primary,
+                  border: `2px solid ${BORDER_COLORS.default}`,
+                  fontSize: 24,
+                  height: 64,
+                  opacity: isLoading ? 0.5 : 1,
+                }}
               />
-            )}
-            
-            {/* Remember Me & Forgot Password - show with password field */}
-            {inputType !== 'phone' && (
-              <div className="flex items-center justify-between pt-2">
-                <button
-                  type="button"
-                  onClick={() => setRememberMe(!rememberMe)}
-                  className="flex items-center gap-3 cursor-pointer bg-transparent border-0 p-0 text-left"
-                >
-                  <div
-                    className="w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-all"
-                    style={{
-                      backgroundImage: rememberMe ? 'url(/wr_blue.png)' : 'none',
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center',
-                      border: rememberMe ? 'none' : `2px solid ${BORDER_COLORS.default}`,
-                    }}
-                  >
-                    {rememberMe && (
-                      <svg width="12" height="10" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M1 5L4.5 8.5L11 1" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    )}
-                  </div>
-                  <span style={{ color: TEXT_COLORS.secondary, fontSize: 15 }}>
-                    Remember me
-                  </span>
-                </button>
-                
-                {onForgotPassword && (
-                  <button
-                    onClick={onForgotPassword}
-                    className="font-medium"
-                    style={{ color: TEXT_COLORS.secondary, fontSize: 15 }}
-                  >
-                    Forgot password?
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-        
-        {step === 'phoneCode' && (
-          <div className="text-center">
-            <p 
-              className="mb-6"
-              style={{ color: TEXT_COLORS.secondary, fontSize: 15 }}
-            >
-              Enter the 6-digit code sent to<br />
-              <span className="font-medium" style={{ color: TEXT_COLORS.primary }}>{identifier}</span>
-            </p>
-            
-            <input
-              type="text"
-              value={phoneCode}
-              onChange={(e) => setPhoneCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-              placeholder="000000"
-              autoComplete="one-time-code"
-              disabled={isLoading}
-              autoFocus
-              className="w-full px-5 py-4 rounded-xl outline-none transition-all text-center tracking-[0.5em] font-mono"
-              style={{
-                backgroundColor: 'rgba(255,255,255,0.05)',
-                color: TEXT_COLORS.primary,
-                border: `2px solid ${BORDER_COLORS.default}`,
-                fontSize: 24,
-                height: 64,
-                opacity: isLoading ? 0.5 : 1,
-              }}
-            />
-            
-            <button
-              onClick={() => {
-                setStep('credentials');
-                setPhoneCode('');
-                setError(null);
-              }}
-              className="mt-6 font-medium"
-              style={{
-                background: 'url(/wr_blue.png) no-repeat center center',
-                backgroundSize: 'cover',
-                WebkitBackgroundClip: 'text',
-                backgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                color: 'transparent',
-                fontSize: 15,
-              }}
-            >
-              Use a different number
-            </button>
-          </div>
-        )}
+              
+              <button
+                onClick={() => {
+                  setStep('credentials');
+                  setPhoneCode('');
+                  setError(null);
+                }}
+                className="mt-6 font-medium"
+                style={{
+                  background: 'url(/wr_blue.png) no-repeat center center',
+                  backgroundSize: 'cover',
+                  WebkitBackgroundClip: 'text',
+                  backgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  color: 'transparent',
+                  fontSize: 15,
+                }}
+              >
+                Use a different number
+              </button>
+            </div>
+          )}
+        </div>
 
-        {/* Primary action – just above footer line */}
-        {step === 'credentials' ? (
-          <div className="mt-6 pt-2" style={{ paddingBottom: 4 }}>
+        {/* Primary Action Button */}
+        <div className="mt-6">
+          {step === 'credentials' ? (
             <button
               onClick={handleSignIn}
               disabled={!canSignIn}
@@ -702,9 +696,7 @@ export function SignInModal({
                 inputType === 'phone' ? 'Send Code' : 'Sign In'
               )}
             </button>
-          </div>
-        ) : (
-          <div className="mt-6 pt-2" style={{ paddingBottom: 4 }}>
+          ) : (
             <button
               onClick={handleVerifyPhoneCode}
               disabled={phoneCode.length !== 6 || isLoading}
@@ -738,8 +730,7 @@ export function SignInModal({
                 'Verify'
               )}
             </button>
-          </div>
-        )}
+          )}
         </div>
       </div>
       
@@ -747,8 +738,7 @@ export function SignInModal({
       <div 
         className="flex-shrink-0"
         style={{ 
-          padding: `${SPACING.sm}px ${SPACING.xl}px`,
-          paddingBottom: 'max(env(safe-area-inset-bottom), 16px)',
+          padding: `12px ${SPACING.xl}px 16px`,
           borderTop: `1px solid ${BORDER_COLORS.default}`,
         }}
       >
