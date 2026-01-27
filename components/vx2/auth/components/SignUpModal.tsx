@@ -317,8 +317,8 @@ function CredentialsStep({
           </div>
         )}
         
-        {/* Form block — add 12px top so email/password align with Sign In modal */}
-        <div className="space-y-4" style={{ marginTop: 12 }}>
+        {/* Form block — aligned with Sign In modal email input position */}
+        <div className="space-y-4" style={{ marginTop: 44.5 }}>
           {/* Email Input — show "valid email" only after blur (click out), hide while focused */}
           <Input
             inputRef={emailRef}
