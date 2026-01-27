@@ -330,6 +330,13 @@ export default function DraftRoomVX2({
   
   // Expose dev tools to parent - use ref to track previous values and prevent infinite loops
   const prevDevToolsRef = useRef<{ status: string; isPaused: boolean } | null>(null);
+
+  // SECURITY FIX: Store latest onLeave callback in ref to prevent stale closure issues
+  // when setTimeout captures an outdated reference to the callback
+  const onLeaveRef = useRef(onLeave);
+  useEffect(() => {
+    onLeaveRef.current = onLeave;
+  }, [onLeave]);
   
   React.useEffect(() => {
     if (!onDevToolsReady || draftRoom.isLoading) return;
@@ -461,13 +468,14 @@ export default function DraftRoomVX2({
 
   // Confirm leaving (during active draft)
   const handleLeaveConfirm = useCallback(() => {
-    logger.debug('Leave confirmed, cleaning up', { hasOnLeave: !!onLeave });
+    logger.debug('Leave confirmed, cleaning up', { hasOnLeave: !!onLeaveRef.current });
     // Call leave draft cleanup
     draftRoom.leaveDraft();
     // Close modal first
     setShowLeaveModal(false);
     // Trigger navigation - use setTimeout to ensure it happens after state update
-    if (onLeave) {
+    // SECURITY FIX: Use ref to get latest onLeave callback, avoiding stale closure
+    if (onLeaveRef.current) {
       logger.debug('Scheduling onLeave callback');
       // Clear any existing timeout
       if (leaveTimeoutRef.current) {
@@ -476,10 +484,10 @@ export default function DraftRoomVX2({
       // Use setTimeout to ensure navigation happens after modal closes
       leaveTimeoutRef.current = setTimeout(() => {
         // Only call onLeave if component is still mounted
-        if (isMountedRef.current) {
+        if (isMountedRef.current && onLeaveRef.current) {
           try {
             logger.debug('Calling onLeave callback');
-            onLeave();
+            onLeaveRef.current();
           } catch (error) {
             logger.error('Error in onLeave callback', error as Error);
           }
@@ -489,11 +497,11 @@ export default function DraftRoomVX2({
     } else {
       logger.warn('onLeave callback not provided');
     }
-  }, [draftRoom, onLeave]);
+  }, [draftRoom]);
 
   // Handle withdrawal (before draft starts)
   const handleWithdraw = useCallback(async () => {
-    logger.debug('Withdraw confirmed, cleaning up', { hasOnLeave: !!onLeave, roomId, userId });
+    logger.debug('Withdraw confirmed, cleaning up', { hasOnLeave: !!onLeaveRef.current, roomId, userId });
 
     // Withdrawal-specific logic (runs before draft starts)
     // 1. Remove user from participants list via API
@@ -535,7 +543,8 @@ export default function DraftRoomVX2({
     // Close modal first
     setShowLeaveModal(false);
     // Trigger navigation - use setTimeout to ensure it happens after state update
-    if (onLeave) {
+    // SECURITY FIX: Use ref to get latest onLeave callback, avoiding stale closure
+    if (onLeaveRef.current) {
       logger.debug('Scheduling onLeave callback after withdrawal');
       // Clear any existing timeout
       if (leaveTimeoutRef.current) {
@@ -544,10 +553,10 @@ export default function DraftRoomVX2({
       // Use setTimeout to ensure navigation happens after modal closes
       leaveTimeoutRef.current = setTimeout(() => {
         // Only call onLeave if component is still mounted
-        if (isMountedRef.current) {
+        if (isMountedRef.current && onLeaveRef.current) {
           try {
             logger.debug('Calling onLeave callback after withdrawal');
-            onLeave();
+            onLeaveRef.current();
           } catch (error) {
             logger.error('Error in onLeave callback after withdrawal', error as Error);
           }
@@ -557,7 +566,7 @@ export default function DraftRoomVX2({
     } else {
       logger.warn('onLeave callback not provided for withdrawal');
     }
-  }, [draftRoom, onLeave, roomId, userId]);
+  }, [draftRoom, roomId, userId]);
   
   // Cancel leaving
   const handleLeaveCancel = useCallback(() => {

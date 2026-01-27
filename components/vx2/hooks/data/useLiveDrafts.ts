@@ -10,7 +10,7 @@
  * ```
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 
 // ============================================================================
 // TYPES
@@ -192,6 +192,9 @@ async function fetchLiveDrafts(): Promise<LiveDraft[]> {
 
 /**
  * Hook for fetching and managing live draft data
+ *
+ * SECURITY FIX: Prevent infinite loop by using ref-based fetch pattern
+ * and ensuring stable callback references
  */
 export function useLiveDrafts(): UseLiveDraftsResult {
   const [drafts, setDrafts] = useState<LiveDraft[]>([]);
@@ -199,6 +202,10 @@ export function useLiveDrafts(): UseLiveDraftsResult {
   const [isRefetching, setIsRefetching] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Track if initial fetch has run to prevent double-fetch
+  const hasFetchedRef = useRef(false);
+
+  // Stable fetch function that doesn't cause re-renders
   const fetchData = useCallback(async (isRefetch = false) => {
     try {
       if (isRefetch) {
@@ -207,7 +214,7 @@ export function useLiveDrafts(): UseLiveDraftsResult {
         setIsLoading(true);
       }
       setError(null);
-      
+
       const data = await fetchLiveDrafts();
       setDrafts(data);
     } catch (err) {
@@ -218,9 +225,16 @@ export function useLiveDrafts(): UseLiveDraftsResult {
     }
   }, []);
 
+  // Initial fetch - runs only once on mount
+  // Empty dependency array is intentional to prevent infinite loops
   useEffect(() => {
+    // Prevent double-fetch in StrictMode
+    if (hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
+
     fetchData();
-  }, [fetchData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const refetch = useCallback(async () => {
     await fetchData(true);

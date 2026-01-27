@@ -108,7 +108,7 @@ const initialMontanaData: LocationData = {
 };
 
 // Idaho - Season-long fantasy sports not allowed
-const initialIdahoData = {
+const initialIdahoData: LocationData = {
   id: 'idaho',
   name: 'Idaho',
   country: 'United States',
@@ -280,7 +280,7 @@ const initialArizonaData: LocationData = {
 };
 
 // Delaware - Season-long fantasy sports not allowed
-const initialDelawareData = {
+const initialDelawareData: LocationData = {
   id: 'delaware',
   name: 'Delaware',
   country: 'United States',
@@ -451,7 +451,7 @@ const initialIllinoisData: LocationData = {
 };
 
 // Indiana - Season-long fantasy sports not allowed
-const initialIndianaData = {
+const initialIndianaData: LocationData = {
   id: 'indiana',
   name: 'Indiana',
   country: 'United States',
@@ -517,7 +517,7 @@ const initialIowaData: LocationData = {
 };
 
 // Louisiana - Season-long fantasy sports not allowed
-const initialLouisianaData = {
+const initialLouisianaData: LocationData = {
   id: 'louisiana',
   name: 'Louisiana',
   country: 'United States',
@@ -583,7 +583,7 @@ const initialMichiganData: LocationData = {
 };
 
 // Mississippi - Season-long fantasy sports not allowed
-const initialMississippiData = {
+const initialMississippiData: LocationData = {
   id: 'mississippi',
   name: 'Mississippi',
   country: 'United States',
@@ -649,7 +649,7 @@ const initialNewYorkData: LocationData = {
 };
 
 // Tennessee - Season-long fantasy sports not allowed
-const initialTennesseeData = {
+const initialTennesseeData: LocationData = {
   id: 'tennessee',
   name: 'Tennessee',
   country: 'United States',
@@ -1060,7 +1060,7 @@ const initialCaliforniaData: LocationData = {
 };
 
 // Colorado - Season-long fantasy sports allowed
-const initialColoradoData = {
+const initialColoradoData: LocationData = {
   id: 'colorado',
   name: 'Colorado',
   country: 'United States',
@@ -2085,7 +2085,7 @@ const initialMassachusettsData: LocationData = {
 };
 
 // New Jersey - Season-long fantasy sports allowed
-const initialNewJerseyData = {
+const initialNewJerseyData: LocationData = {
   id: 'newjersey',
   name: 'New Jersey',
   country: 'United States',
@@ -3114,7 +3114,7 @@ const initialAlaskaData: LocationData = {
 };
 
 // Georgia - Unregulated but generally allowed
-const initialGeorgiaData = {
+const initialGeorgiaData: LocationData = {
   id: 'georgia',
   name: 'Georgia',
   country: 'United States',
@@ -3436,7 +3436,7 @@ const initialMinnesotaData: LocationData = {
 };
 
 // Nebraska - Unregulated but generally allowed
-const initialNebraskaData = {
+const initialNebraskaData: LocationData = {
   id: 'nebraska',
   name: 'Nebraska',
   country: 'United States',
@@ -3639,7 +3639,7 @@ const initialNewMexicoData: LocationData = {
 };
 
 // North Carolina - Unregulated but generally allowed
-const initialNorthCarolinaData = {
+const initialNorthCarolinaData: LocationData = {
   id: 'northcarolina',
   name: 'North Carolina',
   country: 'United States',
@@ -4027,7 +4027,7 @@ const initialRhodeIslandData: LocationData = {
 };
 
 // South Carolina - Unregulated but generally allowed
-const initialSouthCarolinaData = {
+const initialSouthCarolinaData: LocationData = {
   id: 'southcarolina',
   name: 'South Carolina',
   country: 'United States',
@@ -4230,7 +4230,7 @@ const initialSouthDakotaData: LocationData = {
 };
 
 // Utah - Unregulated but generally allowed
-const initialUtahData = {
+const initialUtahData: LocationData = {
   id: 'utah',
   name: 'Utah',
   country: 'United States',

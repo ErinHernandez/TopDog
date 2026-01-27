@@ -66,7 +66,7 @@ export function NavigateAwayAlertsPromptModal({
         try {
           await Notification.requestPermission();
         } catch (e) {
-          logger.warn('Notification.requestPermission failed', e instanceof Error ? e : new Error(String(e)));
+          logger.error('Notification.requestPermission failed', e instanceof Error ? e : new Error(String(e)));
         }
       }
       if (typeof window !== 'undefined') {

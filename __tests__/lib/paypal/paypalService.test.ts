@@ -4,7 +4,6 @@
  * Unit tests for PayPal service layer functions
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   PAYPAL_DEPOSIT_LIMITS,
   PAYPAL_WITHDRAWAL_LIMITS,
@@ -13,16 +12,16 @@ import {
 import { getSecurityTier } from '../../../lib/paypal/paypalWithdrawals';
 
 // Mock Firebase
-vi.mock('../../../lib/firebase-utils', () => ({
-  getDb: vi.fn(() => ({})),
+jest.mock('../../../lib/firebase-utils', () => ({
+  getDb: jest.fn(() => ({})),
 }));
 
 // Mock logger
-vi.mock('../../../lib/logger/serverLogger', () => ({
+jest.mock('../../../lib/logger/serverLogger', () => ({
   serverLogger: {
-    info: vi.fn(),
-    warn: vi.fn(),
-    error: vi.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
   },
 }));
 

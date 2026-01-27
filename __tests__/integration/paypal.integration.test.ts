@@ -5,41 +5,40 @@
  * These tests verify the full request/response cycle
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { createMocks } from 'node-mocks-http';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 // Mock Firebase
-vi.mock('../../lib/firebase-utils', () => ({
-  getDb: vi.fn(() => ({})),
+jest.mock('../../lib/firebase-utils', () => ({
+  getDb: jest.fn(() => ({})),
 }));
 
 // Mock Firebase Firestore
-vi.mock('firebase/firestore', () => ({
-  doc: vi.fn(),
-  getDoc: vi.fn(),
-  setDoc: vi.fn(),
-  updateDoc: vi.fn(),
-  collection: vi.fn(),
-  addDoc: vi.fn(),
-  query: vi.fn(),
-  where: vi.fn(),
-  getDocs: vi.fn(),
-  serverTimestamp: vi.fn(() => new Date().toISOString()),
+jest.mock('firebase/firestore', () => ({
+  doc: jest.fn(),
+  getDoc: jest.fn(),
+  setDoc: jest.fn(),
+  updateDoc: jest.fn(),
+  collection: jest.fn(),
+  addDoc: jest.fn(),
+  query: jest.fn(),
+  where: jest.fn(),
+  getDocs: jest.fn(),
+  serverTimestamp: jest.fn(() => new Date().toISOString()),
 }));
 
 // Mock authentication
-vi.mock('../../lib/apiAuth', () => ({
-  verifyAuth: vi.fn(),
+jest.mock('../../lib/apiAuth', () => ({
+  verifyAuth: jest.fn(),
 }));
 
 // Mock PayPal client
-vi.mock('../../lib/paypal/paypalClient', () => ({
-  isPayPalEnabled: vi.fn(() => true),
-  paypalApiRequest: vi.fn(),
-  centsToPayPalAmount: vi.fn((cents: number) => (cents / 100).toFixed(2)),
-  paypalAmountToCents: vi.fn((amount: string) => Math.round(parseFloat(amount) * 100)),
-  getPayPalConfig: vi.fn(() => ({
+jest.mock('../../lib/paypal/paypalClient', () => ({
+  isPayPalEnabled: jest.fn(() => true),
+  paypalApiRequest: jest.fn(),
+  centsToPayPalAmount: jest.fn((cents: number) => (cents / 100).toFixed(2)),
+  paypalAmountToCents: jest.fn((amount: string) => Math.round(parseFloat(amount) * 100)),
+  getPayPalConfig: jest.fn(() => ({
     clientId: 'test-client-id',
     clientSecret: 'test-client-secret',
     apiBase: 'https://api-m.sandbox.paypal.com',
@@ -47,22 +46,22 @@ vi.mock('../../lib/paypal/paypalClient', () => ({
 }));
 
 // Mock logger
-vi.mock('../../lib/logger/serverLogger', () => ({
+jest.mock('../../lib/logger/serverLogger', () => ({
   serverLogger: {
-    info: vi.fn(),
-    warn: vi.fn(),
-    error: vi.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
   },
 }));
 
 // Mock error tracking
-vi.mock('../../lib/errorTracking', () => ({
-  captureError: vi.fn(),
+jest.mock('../../lib/errorTracking', () => ({
+  captureError: jest.fn(),
 }));
 
 describe('PayPal Integration Tests', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
   });
 
   describe('Order Creation Flow', () => {

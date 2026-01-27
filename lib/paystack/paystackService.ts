@@ -369,7 +369,7 @@ export async function initiateTransfer(
   const amountInUSDCents = Math.ceil(amountInUSD * 100);
 
   if (currentBalance < amountInUSDCents) {
-    serverLogger.warn('Insufficient balance for transfer', {
+    serverLogger.warn('Insufficient balance for transfer', null, {
       currentBalance,
       amountInUSDCents,
       amountInLocalCurrency,

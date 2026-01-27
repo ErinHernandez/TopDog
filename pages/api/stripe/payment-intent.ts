@@ -240,7 +240,7 @@ const handler = async function(
     const rateLimitResult = await paymentCreationLimiter.check({
       headers: { 'x-forwarded-for': clientIP },
       socket: { remoteAddress: clientIP },
-    } as NextApiRequest);
+    } as unknown as NextApiRequest);
 
     if (!rateLimitResult.allowed) {
       logger.warn('Payment creation rate limited', {

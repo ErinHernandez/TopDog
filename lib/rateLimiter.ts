@@ -100,6 +100,8 @@ export interface RateLimitResult {
   retryAfterMs: number | null;
   /** Timestamp when window resets */
   resetAt: number;
+  /** Maximum requests allowed in window (for logging/debugging) */
+  maxRequests?: number;
   /** Internal flag: true if rate limiter failed and denied request (fail-closed) */
   _failedClosed?: boolean;
   /** Internal flag: true if rate limiter failed and allowed request (fail-open - deprecated) */
@@ -282,6 +284,7 @@ export class RateLimiter {
           remaining: 0,
           retryAfterMs: this.config.circuitBreakerResetMs,
           resetAt: now + this.config.circuitBreakerResetMs,
+          maxRequests: this.config.maxRequests,
           _circuitOpen: true,
           _failedClosed: true,
         };
@@ -309,15 +312,16 @@ export class RateLimiter {
           };
           
           transaction.set(rateLimitRef, newData);
-          
+
           return {
             allowed: true,
             remaining: this.config.maxRequests - 1,
             retryAfterMs: null,
             resetAt: windowEnd,
+            maxRequests: this.config.maxRequests,
           };
         }
-        
+
         // Check if window has expired
         const windowEndMs = data.windowEnd?.toMillis?.() || (data.windowEnd as unknown as number);
         if (now > windowEndMs) {
@@ -332,15 +336,16 @@ export class RateLimiter {
           };
           
           transaction.set(rateLimitRef, newData);
-          
+
           return {
             allowed: true,
             remaining: this.config.maxRequests - 1,
             retryAfterMs: null,
             resetAt: windowEnd,
+            maxRequests: this.config.maxRequests,
           };
         }
-        
+
         // Check if limit exceeded
         const currentCount = data.count || 0;
         if (currentCount >= this.config.maxRequests) {
@@ -349,6 +354,7 @@ export class RateLimiter {
             remaining: 0,
             retryAfterMs: windowEndMs - now,
             resetAt: windowEndMs,
+            maxRequests: this.config.maxRequests,
           };
         }
         
@@ -364,6 +370,7 @@ export class RateLimiter {
           remaining: this.config.maxRequests - newCount,
           retryAfterMs: null,
           resetAt: windowEndMs,
+          maxRequests: this.config.maxRequests,
         };
       });
 
@@ -413,6 +420,7 @@ export class RateLimiter {
           remaining: 0,
           retryAfterMs: 60 * 1000, // Suggest retry in 1 minute
           resetAt: now + 60 * 1000,
+          maxRequests: this.config.maxRequests,
           _failedClosed: true,
         };
       }
@@ -430,6 +438,7 @@ export class RateLimiter {
         remaining: this.config.maxRequests,
         retryAfterMs: null,
         resetAt: now + this.config.windowMs,
+        maxRequests: this.config.maxRequests,
         _failedOpen: true,
       };
     }
@@ -455,12 +464,13 @@ export class RateLimiter {
           remaining: this.config.maxRequests,
           retryAfterMs: null,
           resetAt: now + this.config.windowMs,
+          maxRequests: this.config.maxRequests,
         };
       }
-      
+
       const data = rateLimitDoc.data() as RateLimitDocument;
       const windowEndMs = data.windowEnd?.toMillis?.() || (data.windowEnd as unknown as number);
-      
+
       // Check if window expired
       if (now > windowEndMs) {
         return {
@@ -468,17 +478,19 @@ export class RateLimiter {
           remaining: this.config.maxRequests,
           retryAfterMs: null,
           resetAt: now + this.config.windowMs,
+          maxRequests: this.config.maxRequests,
         };
       }
-      
+
       const currentCount = data.count || 0;
       const remaining = Math.max(0, this.config.maxRequests - currentCount);
-      
+
       return {
         allowed: remaining > 0,
         remaining,
         retryAfterMs: remaining > 0 ? null : windowEndMs - now,
         resetAt: windowEndMs,
+        maxRequests: this.config.maxRequests,
       };
     } catch (error) {
       serverLogger.error('Rate limiter status error', error instanceof Error ? error : new Error(String(error)));
@@ -487,6 +499,7 @@ export class RateLimiter {
         remaining: this.config.maxRequests,
         retryAfterMs: null,
         resetAt: now + this.config.windowMs,
+        maxRequests: this.config.maxRequests,
       };
     }
   }

@@ -401,6 +401,25 @@ function CredentialsStep({
           />
         </div>
         
+        {/* Continue Button - moved above password requirements */}
+        <div className="mt-6">
+          <button
+            onClick={onContinue}
+            disabled={!canContinue}
+            className="w-full rounded-xl font-bold transition-all"
+            style={{
+              fontSize: 17,
+              height: 56,
+              background: canContinue ? 'url(/wr_blue.png) no-repeat center center' : BG_COLORS.tertiary,
+              backgroundSize: canContinue ? 'cover' : undefined,
+              color: canContinue ? '#000' : TEXT_COLORS.disabled,
+              opacity: canContinue ? 1 : 0.6,
+            }}
+          >
+            Continue
+          </button>
+        </div>
+        
         {/* Password Requirements */}
         <div 
           className="p-4 rounded-xl mt-6"
@@ -449,28 +468,11 @@ function CredentialsStep({
         style={{ 
           padding: `${SPACING.sm}px ${SPACING.xl}px`,
           paddingBottom: 'max(env(safe-area-inset-bottom), 16px)',
-          borderTop: `1px solid ${BORDER_COLORS.default}`,
         }}
       >
-        <button
-          onClick={onContinue}
-          disabled={!canContinue}
-          className="w-full rounded-xl font-bold transition-all"
-          style={{
-            fontSize: 17,
-            height: 56,
-            background: canContinue ? 'url(/wr_blue.png) no-repeat center center' : BG_COLORS.tertiary,
-            backgroundSize: canContinue ? 'cover' : undefined,
-            color: canContinue ? '#000' : TEXT_COLORS.disabled,
-            opacity: canContinue ? 1 : 0.6,
-          }}
-        >
-          Continue
-        </button>
-        
         {onSwitchToSignIn && (
           <p 
-            className="text-center mt-4"
+            className="text-center"
             style={{ color: TEXT_COLORS.muted, fontSize: 15 }}
           >
             Already have an account?{' '}

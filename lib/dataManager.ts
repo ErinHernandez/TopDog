@@ -201,7 +201,7 @@ class DataManager {
 
     const player = this.findPlayer(playerName);
     if (!player) {
-      serverLogger.warn('Player not found for historical stats', { playerName });
+      serverLogger.warn('Player not found for historical stats', null, { playerName });
       return false;
     }
 
@@ -233,7 +233,7 @@ class DataManager {
 
     const player = this.findPlayer(playerName);
     if (!player) {
-      serverLogger.warn('Player not found for ADP data', { playerName });
+      serverLogger.warn('Player not found for ADP data', null, { playerName });
       return false;
     }
 
@@ -335,7 +335,7 @@ class DataManager {
 
       // Report validation issues
       if (validationErrors.length > 0) {
-        serverLogger.warn('Validation errors found during import', {
+        serverLogger.warn('Validation errors found during import', null, {
           errorCount: validationErrors.length,
           sampleErrors: validationErrors.slice(0, 10)
         });

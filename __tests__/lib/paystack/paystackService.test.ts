@@ -53,13 +53,15 @@ jest.mock('../../../lib/logger/serverLogger', () => ({
 
 // Mock retry utils
 jest.mock('../../../lib/paystack/retryUtils', () => ({
-  withPaystackRetry: jest.fn((fn) => fn()),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  withPaystackRetry: jest.fn((fn: () => any) => fn()),
 }));
 
 // Mock exchange rates
 jest.mock('../../../lib/stripe/exchangeRates', () => ({
-  getStripeExchangeRate: jest.fn().mockResolvedValue({ rate: 1550, timestamp: Date.now() }),
-  convertToUSD: jest.fn((amount, rate) => amount / rate),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getStripeExchangeRate: (jest.fn() as jest.Mock<any>).mockResolvedValue({ rate: 1550, timestamp: Date.now() }),
+  convertToUSD: jest.fn((amount: number, rate: number) => amount / rate),
 }));
 
 describe('PaystackService', () => {

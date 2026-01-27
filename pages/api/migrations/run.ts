@@ -22,6 +22,7 @@ import {
 import { logger } from '../../../lib/structuredLogger';
 import { runMigrations, migrations } from '../../../lib/migrations';
 import { withAuth } from '../../../lib/apiAuth';
+import { verifyAdminAccess } from '../../../lib/adminAuth';
 import type { AuthenticatedRequest } from '../../../lib/apiTypes';
 
 // ============================================================================
@@ -55,14 +56,60 @@ async function handler(
   const authenticatedReq = req as AuthenticatedRequest;
   // Only allow POST
   validateMethod(authenticatedReq, ['POST'], logger);
-  
-  // Check authentication (admin only in production)
-  if (process.env.NODE_ENV === 'production') {
-    // In production, verify admin access
-    // This is a placeholder - implement proper admin check
-    logger.warn('Migration API called in production - admin check needed');
+
+  // SECURITY: Always verify admin access - no environment bypasses
+  // Migrations can modify database schema and data, so admin-only
+  const adminResult = await verifyAdminAccess(authenticatedReq.headers.authorization);
+
+  if (!adminResult.isAdmin) {
+    logger.warn('Non-admin migration attempt blocked', {
+      uid: adminResult.uid,
+      error: adminResult.error,
+    });
+
+    const errorResponse = createErrorResponse(
+      ErrorType.FORBIDDEN,
+      'Admin access required for migrations'
+    );
+    res.status(errorResponse.statusCode).json({
+      success: false,
+      results: [{
+        version: 0,
+        name: 'auth_error',
+        success: false,
+        error: 'Admin access required',
+      }],
+      dryRun: false,
+    });
+    return;
   }
-  
+
+  // Require explicit confirmation header for safety
+  const confirmHeader = authenticatedReq.headers['x-confirm-migration'];
+  if (confirmHeader !== 'CONFIRMED') {
+    logger.warn('Migration called without confirmation header', {
+      uid: adminResult.uid,
+    });
+
+    const errorResponse = createErrorResponse(
+      ErrorType.VALIDATION,
+      'Migration requires X-Confirm-Migration: CONFIRMED header'
+    );
+    res.status(errorResponse.statusCode).json({
+      success: false,
+      results: [{
+        version: 0,
+        name: 'confirmation_required',
+        success: false,
+        error: 'Set X-Confirm-Migration: CONFIRMED header to proceed',
+      }],
+      dryRun: false,
+    });
+    return;
+  }
+
+  logger.info('Admin migration started', { adminUid: adminResult.uid });
+
   const { dryRun = false } = authenticatedReq.body as RunMigrationsRequest;
   
   logger.info('Running migrations', { dryRun, migrationCount: migrations.length });

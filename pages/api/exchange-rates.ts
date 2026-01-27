@@ -53,8 +53,8 @@ async function fetchExchangeRates(): Promise<Record<string, number>> {
 
     return data.rates;
   } catch (error) {
-    serverLogger.error('Failed to fetch exchange rates', {
-      error: (error as Error).message,
+    serverLogger.error('Failed to fetch exchange rates', error instanceof Error ? error : null, {
+      errorMessage: (error as Error).message,
     });
 
     // Return cached rates if available, otherwise fallback
@@ -144,8 +144,8 @@ export default async function handler(
       timestamp: Date.now(),
     });
   } catch (error) {
-    serverLogger.error('Exchange rates API error', {
-      error: (error as Error).message,
+    serverLogger.error('Exchange rates API error', error instanceof Error ? error : null, {
+      errorMessage: (error as Error).message,
     });
 
     return res.status(500).json({

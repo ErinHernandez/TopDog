@@ -136,7 +136,7 @@ export default async function handler(
         const rateLimitResult = await failedVerificationLimiter.check({
           headers: { 'x-forwarded-for': clientIp },
           socket: { remoteAddress: clientIp },
-        } as NextApiRequest);
+        } as unknown as NextApiRequest);
 
         if (!rateLimitResult.allowed) {
           logger.warn('Paystack webhook brute force detected - rate limited', {
@@ -159,7 +159,7 @@ export default async function handler(
           operation: 'webhook',
           ip: clientIp,
           hasSignature: !!signature,
-          failedAttempts: rateLimitResult.maxRequests - rateLimitResult.remaining,
+          failedAttempts: (rateLimitResult.maxRequests ?? 0) - rateLimitResult.remaining,
         });
 
         const errorResponse = createErrorResponse(

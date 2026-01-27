@@ -14,13 +14,19 @@
 import { jest, describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-// Mock Firebase
-const mockTransaction = jest.fn();
-const mockGetDoc = jest.fn();
-const mockSetDoc = jest.fn();
-const mockUpdateDoc = jest.fn();
-const mockDeleteDoc = jest.fn();
-const mockGetDocs = jest.fn();
+// Mock Firebase - properly typed mocks
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockTransaction = jest.fn<any>();
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockGetDoc = jest.fn<any>();
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockSetDoc = jest.fn<any>();
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockUpdateDoc = jest.fn<any>();
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockDeleteDoc = jest.fn<any>();
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockGetDocs = jest.fn<any>();
 
 jest.mock('firebase/firestore', () => ({
   getFirestore: jest.fn(() => ({})),
@@ -71,7 +77,7 @@ function createMockRequest(overrides: Partial<NextApiRequest> = {}): NextApiRequ
 function createMockResponse(): NextApiResponse & { _status: number; _json: unknown; _headers: Record<string, string> } {
   const res = {
     _status: 200,
-    _json: null,
+    _json: null as unknown,
     _headers: {} as Record<string, string>,
     status(code: number) {
       this._status = code;
@@ -86,7 +92,7 @@ function createMockResponse(): NextApiResponse & { _status: number; _json: unkno
       return this;
     },
   };
-  return res as NextApiResponse & { _status: number; _json: unknown; _headers: Record<string, string> };
+  return res as unknown as NextApiResponse & { _status: number; _json: unknown; _headers: Record<string, string> };
 }
 
 describe('RateLimiter', () => {
@@ -243,10 +249,10 @@ describe('RateLimiter', () => {
 
   describe('check', () => {
     it('should allow request when under limit', async () => {
-      mockTransaction.mockImplementation(async (_db, fn) => {
+      mockTransaction.mockImplementation(async (_db: unknown, fn: (t: unknown) => unknown) => {
         // Simulate transaction with no existing document
         return fn({
-          get: jest.fn().mockResolvedValue({ exists: () => false }),
+          get: (jest.fn() as jest.Mock<any>).mockResolvedValue({ exists: () => false }),
           set: jest.fn(),
         });
       });
@@ -267,9 +273,9 @@ describe('RateLimiter', () => {
     it('should deny request when limit exceeded', async () => {
       const windowEnd = Date.now() + 60000;
 
-      mockTransaction.mockImplementation(async (_db, fn) => {
+      mockTransaction.mockImplementation(async (_db: unknown, fn: (t: unknown) => unknown) => {
         return fn({
-          get: jest.fn().mockResolvedValue({
+          get: (jest.fn() as jest.Mock<any>).mockResolvedValue({
             exists: () => true,
             data: () => ({
               count: 10,
@@ -297,9 +303,9 @@ describe('RateLimiter', () => {
     it('should reset window after expiration', async () => {
       const expiredWindowEnd = Date.now() - 1000; // Window expired 1 second ago
 
-      mockTransaction.mockImplementation(async (_db, fn) => {
+      mockTransaction.mockImplementation(async (_db: unknown, fn: (t: unknown) => unknown) => {
         return fn({
-          get: jest.fn().mockResolvedValue({
+          get: (jest.fn() as jest.Mock<any>).mockResolvedValue({
             exists: () => true,
             data: () => ({
               count: 10,
@@ -439,9 +445,9 @@ describe('RateLimiter', () => {
 
   describe('rateLimitMiddleware', () => {
     it('should set rate limit headers', async () => {
-      mockTransaction.mockImplementation(async (_db, fn) => {
+      mockTransaction.mockImplementation(async (_db: unknown, fn: (t: unknown) => unknown) => {
         return fn({
-          get: jest.fn().mockResolvedValue({ exists: () => false }),
+          get: (jest.fn() as jest.Mock<any>).mockResolvedValue({ exists: () => false }),
           set: jest.fn(),
         });
       });
@@ -464,9 +470,9 @@ describe('RateLimiter', () => {
     });
 
     it('should return 429 when rate limited', async () => {
-      mockTransaction.mockImplementation(async (_db, fn) => {
+      mockTransaction.mockImplementation(async (_db: unknown, fn: (t: unknown) => unknown) => {
         return fn({
-          get: jest.fn().mockResolvedValue({
+          get: (jest.fn() as jest.Mock<any>).mockResolvedValue({
             exists: () => true,
             data: () => ({
               count: 10,
@@ -494,9 +500,9 @@ describe('RateLimiter', () => {
     });
 
     it('should call next middleware when allowed', async () => {
-      mockTransaction.mockImplementation(async (_db, fn) => {
+      mockTransaction.mockImplementation(async (_db: unknown, fn: (t: unknown) => unknown) => {
         return fn({
-          get: jest.fn().mockResolvedValue({ exists: () => false }),
+          get: (jest.fn() as jest.Mock<any>).mockResolvedValue({ exists: () => false }),
           set: jest.fn(),
         });
       });
@@ -510,9 +516,9 @@ describe('RateLimiter', () => {
       const middleware = rateLimitMiddleware(limiter);
       const req = createMockRequest();
       const res = createMockResponse();
-      const next = jest.fn();
+      const next = jest.fn() as jest.Mock<() => void>;
 
-      await middleware(req, res, next);
+      await middleware(req, res, next as unknown as () => void);
 
       expect(next).toHaveBeenCalled();
     });

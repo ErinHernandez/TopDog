@@ -98,7 +98,7 @@ export default async function handler(
         const rateLimitResult = await failedVerificationLimiter.check({
           headers: { 'x-forwarded-for': clientIp },
           socket: { remoteAddress: clientIp },
-        } as NextApiRequest);
+        } as unknown as NextApiRequest);
 
         if (!rateLimitResult.allowed) {
           logger.warn('Xendit webhook brute force detected - rate limited', {
@@ -120,7 +120,7 @@ export default async function handler(
           component: 'xendit',
           operation: 'webhook',
           ip: clientIp,
-          failedAttempts: rateLimitResult.maxRequests - rateLimitResult.remaining,
+          failedAttempts: (rateLimitResult.maxRequests ?? 0) - rateLimitResult.remaining,
         });
 
         const errorResponse = createErrorResponse(

@@ -83,61 +83,47 @@ if (admin.apps.length === 0) {
 
 /**
  * Verify authentication token and get user UID
+ *
+ * SECURITY: All development bypasses have been removed to prevent
+ * security vulnerabilities from leaking into production.
+ * For local development, use the Firebase Auth Emulator instead.
  */
 async function verifyAuth(authHeader: string | undefined): Promise<AuthResult> {
-  const isDevelopment = process.env.NODE_ENV === 'development';
-  
   // Handle missing authorization header
   if (!authHeader) {
-    if (isDevelopment) {
-      // In development, allow requests without auth header
-      return { uid: 'dev-uid' };
-    }
     return { uid: null, error: 'Missing authorization header' };
   }
-  
+
   if (!authHeader.startsWith('Bearer ')) {
     return { uid: null, error: 'Invalid authorization header format' };
   }
-  
+
   // Extract token (handle multiple spaces or edge cases)
   const token = authHeader.replace(/^Bearer\s+/i, '').trim();
-  
-  // For development: accept dev-token as valid authentication
-  if (isDevelopment && token === 'dev-token') {
-    return { uid: 'dev-uid' };
+
+  if (!token) {
+    return { uid: null, error: 'Empty token' };
   }
-  
-  // If Firebase Admin is not initialized, allow in development
+
+  // If Firebase Admin is not initialized, reject the request
   if (!firebaseAdminInitialized) {
-    if (isDevelopment) {
-      // In development, if Firebase Admin isn't configured, allow any token
-      // This handles the case where FIREBASE_SERVICE_ACCOUNT is not set
-      return { uid: 'dev-uid' };
-    }
-    return { 
-      uid: null, 
-      error: 'Authentication service unavailable' 
+    logger.error('Firebase Admin not initialized - cannot verify tokens', new Error('Firebase Admin not initialized'), {
+      component: 'analytics',
+      operation: 'token-verification',
+    });
+    return {
+      uid: null,
+      error: 'Authentication service unavailable'
     };
   }
-  
-  // Verify with Firebase Admin for production tokens
+
+  // Verify with Firebase Admin
   try {
     const adminAuth = admin.auth();
     const decodedToken = await adminAuth.verifyIdToken(token);
     return { uid: decodedToken.uid };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    // In development, if token verification fails for any reason,
-    // fall back to dev-uid for easier development
-    if (isDevelopment) {
-      logger.warn('Token verification failed in development, allowing as dev-uid', {
-        component: 'analytics',
-        operation: 'token-verification',
-        error: errorMessage,
-      });
-      return { uid: 'dev-uid' };
-    }
     logger.error('Token verification error', error, {
       component: 'analytics',
       operation: 'token-verification',
@@ -213,16 +199,12 @@ const handler = async function(
     const authResult = await verifyAuth(authHeader);
     
     if (!authResult.uid) {
-      // In development, log more details for debugging
-      if (process.env.NODE_ENV === 'development') {
-        logger.debug('Analytics auth failed', {
-          hasAuthHeader: !!authHeader,
-          authHeaderPrefix: authHeader?.substring(0, 20),
-          error: authResult.error,
-          firebaseAdminInitialized
-        });
-      }
-      
+      // Log auth failure for debugging (no sensitive data)
+      logger.debug('Analytics auth failed', {
+        hasAuthHeader: !!authHeader,
+        error: authResult.error,
+      });
+
       const error = createErrorResponse(
         ErrorType.UNAUTHORIZED,
         authResult.error || 'Authentication required'
@@ -233,22 +215,13 @@ const handler = async function(
     const { event, userId, sessionId, timestamp } = req.body as AnalyticsRequest;
 
     // Validate that userId in body matches authenticated user (if provided)
-    // In development, be more lenient with dev-uid
+    // SECURITY: Strict validation - no environment-based bypasses
     if (userId && userId !== authResult.uid) {
-      // In development, if we're using dev-uid, allow any userId or no userId
-      if (process.env.NODE_ENV === 'development' && authResult.uid === 'dev-uid') {
-        // Allow any userId in development mode
-        logger.debug('Development mode: allowing userId mismatch', { 
-          providedUserId: userId, 
-          authUid: authResult.uid 
-        });
-      } else {
-        const error = createErrorResponse(
-          ErrorType.FORBIDDEN,
-          'User ID mismatch'
-        );
-        return res.status(error.statusCode).json(error.body as unknown as AnalyticsResponse);
-      }
+      const error = createErrorResponse(
+        ErrorType.FORBIDDEN,
+        'User ID mismatch'
+      );
+      return res.status(error.statusCode).json(error.body as unknown as AnalyticsResponse);
     }
 
     // Log analytics event with authenticated user ID

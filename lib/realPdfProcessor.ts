@@ -259,7 +259,7 @@ export async function processRealClayPdf(
       serverLogger.debug('Cleaned up image', { imagePath });
     } catch (cleanupError) {
       const errorMessage = cleanupError instanceof Error ? cleanupError.message : 'Unknown error';
-      serverLogger.warn('Could not clean up image file', { error: errorMessage });
+      serverLogger.warn('Could not clean up image file', null, { errorMessage });
     }
 
     return result;

@@ -233,37 +233,122 @@ async function handleCaptureRefunded(
   const captureId = resource.id as string;
   const amount = resource.amount as { currency_code: string; value: string };
   const amountCents = paypalAmountToCents(amount.value);
+  const orderId = (resource.supplementary_data as { related_ids?: { order_id?: string } })?.related_ids?.order_id;
 
-  serverLogger.info('PayPal capture refunded', { captureId, amountCents });
+  serverLogger.info('PayPal capture refunded', { captureId, amountCents, orderId });
 
-  // Find the original transaction and update it
   const db = getDb();
-  // TODO: Query transactions by captureId and update status
+  const actions: string[] = [];
+
+  // Find and update the original order/transaction
+  if (orderId) {
+    const orderRef = doc(db, 'paypal_orders', orderId);
+    const orderDoc = await getDoc(orderRef);
+
+    if (orderDoc.exists()) {
+      const orderData = orderDoc.data();
+      const userId = orderData.userId;
+
+      // Update order status
+      await updateDoc(orderRef, {
+        status: 'REFUNDED',
+        refundedAt: serverTimestamp(),
+        refundAmount: amountCents,
+        refundCaptureId: captureId,
+      });
+      actions.push('order_updated');
+
+      // Deduct the refund from user's balance (they got their money back from PayPal)
+      if (userId && amountCents > 0) {
+        try {
+          await updateUserBalance(
+            userId,
+            amountCents,
+            'subtract',
+            `paypal_refund_${captureId}` // Idempotency key
+          );
+          actions.push('balance_deducted');
+
+          await logPaymentEvent(userId, 'paypal_refund_processed', {
+            captureId,
+            orderId,
+            amountCents,
+          });
+          actions.push('refund_event_logged');
+        } catch (balanceError) {
+          // Log but don't fail - balance might already be 0
+          serverLogger.warn('Failed to deduct refund from balance', balanceError as Error, {
+            userId,
+            amountCents,
+            captureId,
+          });
+          actions.push('balance_deduction_failed');
+        }
+      }
+    }
+  }
 
   return {
     success: true,
     eventType: 'PAYMENT.CAPTURE.REFUNDED',
     eventId: captureId,
-    actions: ['refund_logged'],
+    actions: actions.length > 0 ? actions : ['refund_logged'],
   };
 }
 
 async function handlePayoutSuccess(
   resource: Record<string, unknown>
 ): Promise<WebhookProcessingResult> {
-  const batchId = (resource.batch_header as { payout_batch_id: string })?.payout_batch_id;
+  const batchHeader = resource.batch_header as {
+    payout_batch_id: string;
+    batch_status: string;
+    amount?: { currency: string; value: string };
+  };
+  const batchId = batchHeader?.payout_batch_id;
 
-  serverLogger.info('PayPal payout batch succeeded', { batchId });
+  serverLogger.info('PayPal payout batch succeeded', { batchId, status: batchHeader?.batch_status });
 
-  // Update held withdrawals if applicable
   const db = getDb();
-  // TODO: Update related withdrawal records
+  const actions: string[] = [];
+
+  if (batchId) {
+    // Update the payout batch record
+    const batchRef = doc(db, 'paypal_payouts', batchId);
+    const batchDoc = await getDoc(batchRef);
+
+    if (batchDoc.exists()) {
+      await updateDoc(batchRef, {
+        status: 'SUCCESS',
+        completedAt: serverTimestamp(),
+      });
+      actions.push('batch_updated');
+
+      // Log success for the user
+      const batchData = batchDoc.data();
+      if (batchData.userId) {
+        await logPaymentEvent(batchData.userId, 'paypal_payout_success', {
+          batchId,
+          amount: batchHeader?.amount,
+        });
+        actions.push('success_logged');
+      }
+    } else {
+      // Create record if it doesn't exist (external payout)
+      await setDoc(batchRef, {
+        batchId,
+        status: 'SUCCESS',
+        completedAt: serverTimestamp(),
+        source: 'webhook',
+      });
+      actions.push('batch_created');
+    }
+  }
 
   return {
     success: true,
     eventType: 'PAYMENT.PAYOUTSBATCH.SUCCESS',
     eventId: batchId,
-    actions: ['payout_success_logged'],
+    actions: actions.length > 0 ? actions : ['payout_success_logged'],
   };
 }
 
@@ -271,17 +356,95 @@ async function handlePayoutItemFailed(
   resource: Record<string, unknown>
 ): Promise<WebhookProcessingResult> {
   const itemId = resource.payout_item_id as string;
-  const error = resource.errors as { message: string } | undefined;
+  const errors = resource.errors as { name?: string; message?: string }[] | undefined;
+  const payoutItem = resource.payout_item as {
+    amount?: { currency: string; value: string };
+    sender_item_id?: string;
+  };
+  const transactionStatus = resource.transaction_status as string;
 
-  serverLogger.error('PayPal payout item failed', null, { itemId, error });
+  serverLogger.error('PayPal payout item failed', null, {
+    itemId,
+    errors,
+    transactionStatus,
+    senderItemId: payoutItem?.sender_item_id,
+  });
 
-  // TODO: Restore user balance and notify them
+  const db = getDb();
+  const actions: string[] = [];
+
+  // The sender_item_id typically contains our internal reference (userId or withdrawalId)
+  const senderItemId = payoutItem?.sender_item_id;
+
+  if (senderItemId) {
+    // Try to find the related withdrawal record
+    const withdrawalRef = doc(db, 'withdrawals', senderItemId);
+    const withdrawalDoc = await getDoc(withdrawalRef);
+
+    if (withdrawalDoc.exists()) {
+      const withdrawalData = withdrawalDoc.data();
+      const userId = withdrawalData.userId;
+      const amountCents = withdrawalData.amountCents;
+
+      // Update withdrawal status
+      await updateDoc(withdrawalRef, {
+        status: 'FAILED',
+        failedAt: serverTimestamp(),
+        failureReason: errors?.[0]?.message || 'Payout failed',
+        paypalItemId: itemId,
+      });
+      actions.push('withdrawal_updated');
+
+      // CRITICAL: Restore user's balance since the payout failed
+      if (userId && amountCents > 0) {
+        try {
+          await updateUserBalance(
+            userId,
+            amountCents,
+            'add',
+            `paypal_payout_failed_${itemId}` // Idempotency key
+          );
+          actions.push('balance_restored');
+
+          // Log the failure and balance restoration
+          await logPaymentEvent(userId, 'paypal_payout_failed', {
+            itemId,
+            amountCents,
+            error: errors?.[0]?.message,
+            balanceRestored: true,
+          });
+          actions.push('failure_logged');
+
+          serverLogger.info('User balance restored after payout failure', {
+            userId,
+            amountCents,
+            itemId,
+          });
+        } catch (balanceError) {
+          // This is critical - log for manual intervention
+          serverLogger.error('CRITICAL: Failed to restore balance after payout failure', balanceError as Error, {
+            userId,
+            amountCents,
+            itemId,
+            requiresManualIntervention: true,
+          });
+          actions.push('balance_restoration_failed_CRITICAL');
+        }
+      }
+    } else {
+      serverLogger.warn('Could not find withdrawal record for failed payout', null, {
+        senderItemId,
+        itemId,
+      });
+      actions.push('withdrawal_not_found');
+    }
+  }
 
   return {
     success: true,
     eventType: 'PAYMENT.PAYOUTS-ITEM.FAILED',
     eventId: itemId,
-    actions: ['payout_failure_logged'],
+    actions: actions.length > 0 ? actions : ['payout_failure_logged'],
   };
 }
 

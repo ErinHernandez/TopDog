@@ -43,7 +43,7 @@ function createMockResponse(): NextApiResponse & {
 } {
   const res = {
     _status: 200,
-    _json: null,
+    _json: null as unknown,
     _headers: {} as Record<string, string | string[]>,
     _ended: false,
     status(code: number) {
@@ -60,7 +60,7 @@ function createMockResponse(): NextApiResponse & {
       return this;
     },
   };
-  return res as NextApiResponse & {
+  return res as unknown as NextApiResponse & {
     _status: number;
     _json: unknown;
     _headers: Record<string, string | string[]>;

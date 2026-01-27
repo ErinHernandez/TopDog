@@ -133,14 +133,41 @@ export interface UserProfile {
 // CONFIGURATION
 // ============================================================================
 
-const MONITOR_ACCOUNT_CONFIG: MonitorAccountConfig = {
-  username: 'ocularpatdowns', // Will be normalized to lowercase
-  email: 'ffnsfwff@gmail.com',
-  password: 'xx',
-  displayName: 'OcularPatdowns',
-  countryCode: 'US',
-  initialBalance: 1000.00, // Starting balance in dollars
-};
+/**
+ * Get monitor account configuration from environment variables
+ * SECURITY: Credentials are stored in environment, not in source code
+ *
+ * Required environment variables:
+ * - MONITOR_ACCOUNT_USERNAME: The username for the monitor account
+ * - MONITOR_ACCOUNT_EMAIL: The email for the monitor account
+ * - MONITOR_ACCOUNT_PASSWORD: Generated password (use a secrets manager)
+ *
+ * Optional environment variables:
+ * - MONITOR_ACCOUNT_DISPLAY_NAME: Display name (defaults to username)
+ * - MONITOR_ACCOUNT_COUNTRY: Country code (defaults to 'US')
+ * - MONITOR_ACCOUNT_INITIAL_BALANCE: Initial balance (defaults to 1000)
+ */
+function getMonitorAccountConfig(): MonitorAccountConfig {
+  const username = process.env.MONITOR_ACCOUNT_USERNAME;
+  const email = process.env.MONITOR_ACCOUNT_EMAIL;
+  const password = process.env.MONITOR_ACCOUNT_PASSWORD;
+
+  if (!username || !email || !password) {
+    throw new Error(
+      'Monitor account configuration missing. Required environment variables: ' +
+        'MONITOR_ACCOUNT_USERNAME, MONITOR_ACCOUNT_EMAIL, MONITOR_ACCOUNT_PASSWORD'
+    );
+  }
+
+  return {
+    username: username.toLowerCase().trim(),
+    email,
+    password,
+    displayName: process.env.MONITOR_ACCOUNT_DISPLAY_NAME || username,
+    countryCode: process.env.MONITOR_ACCOUNT_COUNTRY || 'US',
+    initialBalance: parseFloat(process.env.MONITOR_ACCOUNT_INITIAL_BALANCE || '1000'),
+  };
+}
 
 // ============================================================================
 // FIREBASE INITIALIZATION
@@ -208,7 +235,23 @@ export default async function handler(
       });
     }
     
-    const { username, email, password, displayName, countryCode, initialBalance } = MONITOR_ACCOUNT_CONFIG;
+    // Get configuration from environment variables (not hardcoded)
+    let monitorConfig: MonitorAccountConfig;
+    try {
+      monitorConfig = getMonitorAccountConfig();
+    } catch (configError) {
+      const errorResponse = createErrorResponse(
+        ErrorType.CONFIGURATION,
+        configError instanceof Error ? configError.message : 'Configuration error'
+      );
+      return res.status(errorResponse.statusCode).json({
+        success: false,
+        error: 'CONFIG_ERROR',
+        message: errorResponse.body.error.message,
+      });
+    }
+
+    const { username, email, password, displayName, countryCode, initialBalance } = monitorConfig;
     const normalizedUsername = username.toLowerCase().trim();
     
     logger.info('Creating monitor account', {

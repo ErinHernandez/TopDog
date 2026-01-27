@@ -58,7 +58,7 @@ export default async function handler(
 
     // DEPRECATION: Log usage of deprecated endpoint
     const clientIp = getClientIp(req.headers as Record<string, string | string[] | undefined>);
-    serverLogger.warn('DEPRECATED: /api/create-payment-intent called - use /api/stripe/payment-intent', {
+    serverLogger.warn('DEPRECATED: /api/create-payment-intent called - use /api/stripe/payment-intent', null, {
       ip: clientIp,
       userAgent: req.headers['user-agent'],
       userId: (req.body as CreatePaymentIntentRequest).userId,

@@ -106,8 +106,7 @@ function InputStep({
       <div 
         className="flex items-center justify-end flex-shrink-0"
         style={{ 
-          padding: `${SPACING.md + 8}px ${SPACING.lg}px ${SPACING.md}px`, 
-          borderBottom: `1px solid ${BORDER_COLORS.default}` 
+          padding: `${SPACING.md + 8}px ${SPACING.lg}px ${SPACING.md}px`
         }}
       >
         <button 
@@ -272,7 +271,7 @@ function InputStep({
       {/* Footer */}
       <div 
         className="flex-shrink-0"
-        style={{ padding: SPACING.sm, borderTop: `1px solid ${BORDER_COLORS.default}` }}
+        style={{ padding: SPACING.sm }}
       >
         <button
           onClick={onSubmit}
@@ -376,8 +375,7 @@ function CodeStep({
       <div 
         className="flex items-center gap-3 flex-shrink-0"
         style={{ 
-          padding: `${SPACING.md + 8}px ${SPACING.lg}px ${SPACING.md}px`, 
-          borderBottom: `1px solid ${BORDER_COLORS.default}` 
+          padding: `${SPACING.md + 8}px ${SPACING.lg}px ${SPACING.md}px`
         }}
       >
         <button onClick={onBack} className="p-2" aria-label="Back">
@@ -486,7 +484,7 @@ function CodeStep({
       {/* Footer */}
       <div 
         className="flex-shrink-0"
-        style={{ padding: SPACING.sm, borderTop: `1px solid ${BORDER_COLORS.default}` }}
+        style={{ padding: SPACING.sm }}
       >
         <button
           onClick={() => onVerify(code)}
@@ -549,8 +547,7 @@ function NewPasswordStep({
       <div 
         className="flex items-center gap-3 flex-shrink-0"
         style={{ 
-          padding: `${SPACING.md + 8}px ${SPACING.lg}px ${SPACING.md}px`, 
-          borderBottom: `1px solid ${BORDER_COLORS.default}` 
+          padding: `${SPACING.md + 8}px ${SPACING.lg}px ${SPACING.md}px`
         }}
       >
         <h2 
@@ -698,7 +695,7 @@ function NewPasswordStep({
       {/* Footer */}
       <div 
         className="flex-shrink-0"
-        style={{ padding: SPACING.sm, borderTop: `1px solid ${BORDER_COLORS.default}` }}
+        style={{ padding: SPACING.sm }}
       >
         <button
           onClick={() => onSubmit(password)}
