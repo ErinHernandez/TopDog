@@ -41,7 +41,6 @@ function NavbarSandboxPage(): JSX.Element {
   }, [timerSeconds, isUserTurn, isRunning]);
   
   const handleLeave = (): void => {
-    console.log('Leave clicked');
     router.push('/testing-grounds/vx2-draft-room');
   };
   
@@ -52,18 +51,15 @@ function NavbarSandboxPage(): JSX.Element {
   }, []);
   
   const handleGracePeriodEnd = useCallback((): void => {
-    console.log('Grace period ended - auto-pick would trigger now');
     setGraceStatus('expired');
     setIsRunning(false);
   }, []);
-  
+
   const handleInfo = useCallback((): void => {
-    console.log('Info button clicked');
     setIsInfoModalOpen(true);
   }, []);
-  
+
   const handleTutorial = useCallback((): void => {
-    console.log('Tutorial clicked');
     setIsInfoModalOpen(false);
     setIsTutorialOpen(true);
   }, []);
@@ -139,7 +135,7 @@ function NavbarSandboxPage(): JSX.Element {
                 <DraftTutorialModal
                   isOpen={isTutorialOpen}
                   onClose={() => setIsTutorialOpen(false)}
-                  onRules={() => console.log('Rules clicked')}
+                  onRules={() => {}}
                   format="Snake"
                 />
               </div>

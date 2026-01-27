@@ -430,8 +430,8 @@ export default function PlayoffTeamsSandbox() {
     setViewMode('podDetail');
   }, []);
 
-  const handleSelectTeam = useCallback((team: PlayoffTeam, pod: PlayoffPod) => {
-    console.log('Selected team:', team.name, 'from pod:', pod.name);
+  const handleSelectTeam = useCallback((_team: PlayoffTeam, _pod: PlayoffPod) => {
+    // Team selection handler - no-op for sandbox testing
   }, []);
 
   const handleSelectOpponent = useCallback((opponent: PlayoffTeam) => {

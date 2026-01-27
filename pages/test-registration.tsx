@@ -92,9 +92,9 @@ export default function TestRegistration() {
     email: 'test@example.com'
   };
 
-  const handleRegistrationSuccess = (userProfile: UserProfile) => {
-    console.log('Registration successful:', userProfile);
-    alert('Registration successful! Check console for details.');
+  const handleRegistrationSuccess = (_userProfile: UserProfile) => {
+    // Note: User profile data is intentionally not logged to prevent PII leakage
+    alert('Registration successful!');
   };
 
   return (

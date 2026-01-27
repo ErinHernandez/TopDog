@@ -128,7 +128,8 @@ export function PayPalButton({
   const onPayPalError = useCallback(
     (err: Record<string, unknown>) => {
       setIsProcessing(false);
-      console.error('PayPal error:', err);
+      // Note: Raw PayPal error objects are not logged to prevent potential data leakage
+      // Error details are safely passed to the onError callback for proper handling
       onError(new Error('PayPal encountered an error. Please try again.'));
     },
     [onError]

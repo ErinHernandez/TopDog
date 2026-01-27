@@ -25,7 +25,7 @@ export default function LobbyTabSandboxMinimalPage(): React.ReactElement {
         className="min-h-screen flex items-center justify-center p-8"
         style={{ backgroundColor: PAGE_BG }}
       >
-        <LobbySandbox onJoinClick={(id) => console.log('Join clicked:', id)} />
+        <LobbySandbox onJoinClick={() => {}} />
       </div>
     </>
   );

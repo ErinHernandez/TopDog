@@ -52,18 +52,15 @@ export default function FullDraftBoardDev(): JSX.Element {
     setCurrentPick(1);
     setPicks([]);
     setIsDraftPaused(false);
-    console.log('🎯 Mock draft started');
   };
 
   // Pause/Resume draft
   const pauseDraft = (): void => {
     setIsDraftPaused(true);
-    console.log('⏸️ Draft paused');
   };
 
   const resumeDraft = (): void => {
     setIsDraftPaused(false);
-    console.log('▶️ Draft resumed');
   };
 
   // Simulate 12 picks
@@ -78,8 +75,6 @@ export default function FullDraftBoardDev(): JSX.Element {
       return;
     }
 
-    console.log('🎲 SIMULATING 12 PICKS...');
-    
     // Simulate 12 picks
     for (let i = 0; i < 12 && currentPick + i <= mockPlayers.length; i++) {
       const pickNumber = currentPick + i;
@@ -101,15 +96,13 @@ export default function FullDraftBoardDev(): JSX.Element {
         };
         
         setPicks(prev => [...prev, newPick]);
-        console.log(`Pick ${pickNumber}: ${drafter} selects ${player.name}`);
-        
+
         // Small delay to see the picks happening
         await new Promise(resolve => setTimeout(resolve, 200));
       }
     }
     
     setCurrentPick(prev => Math.min(prev + 12, mockPlayers.length + 1));
-    console.log('✅ 12 picks simulated');
   };
 
   // Make a single pick
@@ -136,7 +129,6 @@ export default function FullDraftBoardDev(): JSX.Element {
     
     setPicks(prev => [...prev, newPick]);
     setCurrentPick(prev => prev + 1);
-    console.log(`Pick ${currentPick}: ${drafter} selects ${player.name}`);
   };
 
   // Get available players (not yet picked)

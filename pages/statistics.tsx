@@ -6,6 +6,7 @@ import { useUser } from '../lib/userContext';
 import { getUserStats, calculateUserRank, type UserStats, type UserRank } from '../lib/userStats';
 import { POSITIONS } from '../lib/constants/positions';
 import type { Timestamp } from 'firebase/firestore';
+import { logger } from '../lib/logger';
 
 type TabType = 'overview' | 'financial' | 'tournaments' | 'drafts' | 'performance' | 'activity';
 
@@ -51,7 +52,7 @@ export default function Statistics() {
         setUserRank(rank);
       }
     } catch (error) {
-      console.error('Error fetching user stats:', error);
+      logger.error('Error fetching user stats', error instanceof Error ? error : undefined, { userId });
     } finally {
       setLoading(false);
     }

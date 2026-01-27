@@ -339,8 +339,8 @@ export default function LobbyTabSandboxPage(): React.ReactElement {
 
   const handleConfirmJoin = useCallback(
     (options: { entries: number; autopilot: boolean }) => {
+      void options; // Acknowledge options for sandbox testing
       setIsJoining(true);
-      console.log('Join tournament', joinModalTournament?.id, options);
       setTimeout(() => {
         setIsJoining(false);
         setJoinModalTournament(null);

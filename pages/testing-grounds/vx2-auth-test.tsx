@@ -149,7 +149,6 @@ function AuthTestContent(): JSX.Element {
             onClose={closeModal}
             onSwitchToSignIn={() => openModal('signin')}
             onSuccess={() => {
-              console.log('Sign up successful!');
               closeModal();
             }}
             contentTopInset={0}
@@ -161,7 +160,6 @@ function AuthTestContent(): JSX.Element {
             onSwitchToSignUp={() => openModal('signup')}
             onForgotPassword={() => openModal('forgot')}
             onSuccess={() => {
-              console.log('Sign in successful!');
               closeModal();
             }}
             contentTopInset={0}
@@ -176,7 +174,7 @@ function AuthTestContent(): JSX.Element {
           <ProfileSettingsModal
             isOpen={activeModal === 'profile'}
             onClose={closeModal}
-            onAccountDeleted={() => console.log('Account deleted!')}
+            onAccountDeleted={() => {}}
             contentTopInset={0}
           />
         </div>
