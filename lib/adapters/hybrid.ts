@@ -25,6 +25,15 @@ import type { DocumentData } from 'firebase/firestore';
 // TYPES
 // ============================================================================
 
+/**
+ * Base interface for documents that can be used with the hybrid adapter.
+ * Documents must have an id and optionally an updatedAt timestamp for conflict detection.
+ */
+export interface HybridDocument {
+  id: string;
+  updatedAt?: Date | number | string;
+}
+
 export interface HybridAdapterConfig {
   /** Collection name in Firebase */
   collection: string;
@@ -109,7 +118,7 @@ const networkStatus = new NetworkStatus();
 // HYBRID ADAPTER
 // ============================================================================
 
-export class HybridAdapter<T extends DocumentData> {
+export class HybridAdapter<T extends DocumentData & HybridDocument> {
   private config: Required<HybridAdapterConfig>;
   private syncInterval: ReturnType<typeof setInterval> | null = null;
   private isSyncing: boolean = false;
@@ -279,7 +288,7 @@ export class HybridAdapter<T extends DocumentData> {
         // Cache locally
         await Promise.all(
           firebaseData.map((doc) =>
-            this.config.localStorage.set((doc as any).id, doc, { fromServer: true })
+            this.config.localStorage.set(doc.id, doc, { fromServer: true })
           )
         );
 
@@ -306,9 +315,8 @@ export class HybridAdapter<T extends DocumentData> {
       );
 
       for (const doc of firebaseData) {
-        const id = (doc as any).id;
-        if (id) {
-          await this.config.localStorage.set(id, doc, { fromServer: true });
+        if (doc.id) {
+          await this.config.localStorage.set(doc.id, doc, { fromServer: true });
         }
       }
     } catch (error) {
@@ -540,8 +548,8 @@ export class HybridAdapter<T extends DocumentData> {
    */
   private hasConflict(localData: T, serverData: T): boolean {
     // Simple implementation: compare updatedAt timestamps
-    const localUpdatedAt = (localData as any).updatedAt;
-    const serverUpdatedAt = (serverData as any).updatedAt;
+    const localUpdatedAt = localData.updatedAt;
+    const serverUpdatedAt = serverData.updatedAt;
 
     if (!localUpdatedAt || !serverUpdatedAt) {
       return false;
@@ -713,7 +721,7 @@ export class HybridAdapter<T extends DocumentData> {
 /**
  * Create a hybrid adapter for a collection
  */
-export function createHybridAdapter<T extends DocumentData>(
+export function createHybridAdapter<T extends DocumentData & HybridDocument>(
   config: HybridAdapterConfig
 ): HybridAdapter<T> {
   return new HybridAdapter<T>(config);

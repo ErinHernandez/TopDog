@@ -177,7 +177,8 @@ export async function isUsernameAvailable(
     const vipQuery = query(
       vipRef,
       where('usernameLower', '==', normalized),
-      where('claimed', '==', false)
+      where('claimed', '==', false),
+      limit(1) // Username should be unique
     );
     const vipSnapshot = await getDocs(vipQuery);
     
@@ -525,14 +526,24 @@ export async function cleanupRecycledUsernames(): Promise<CleanupResult> {
 /**
  * Migrate existing users to usernames collection
  * One-time migration script
+ * 
+ * WARNING: This function performs a full collection scan.
+ * Only run during planned maintenance windows.
  */
 export async function migrateExistingUsernames(): Promise<MigrationResult> {
+  // Guard to prevent accidental production execution
+  if (process.env.NODE_ENV === 'production' && !process.env.ALLOW_MIGRATION) {
+    logger.error('Migration cannot run in production without ALLOW_MIGRATION flag');
+    return { migrated: 0, errors: 1 };
+  }
+  
   if (!db) {
     return { migrated: 0, errors: 1 };
   }
 
   try {
     const usersRef = collection(db, USERS_COLLECTION);
+    // MIGRATION ONLY: Intentional full collection scan - not for request path
     const usersSnapshot = await getDocs(usersRef);
     
     let migrated = 0;

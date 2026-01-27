@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { db } from '../lib/firebase';
-import { collection, addDoc, serverTimestamp, getDocs, updateDoc, doc, getDoc, setDoc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, getDocs, updateDoc, doc, getDoc, setDoc, query, limit } from 'firebase/firestore';
 import { updateTournamentEntryStats } from '../lib/userStats';
 import { useUser } from '../lib/userContext';
 import AuthModal from './AuthModal';
@@ -121,7 +121,7 @@ export default function JoinTournamentModal({ open, onClose, tournamentType = 't
 
   const ensureMinimumRooms = async () => {
     try {
-      const roomsSnapshot = await getDocs(collection(db, 'draftRooms'));
+      const roomsSnapshot = await getDocs(query(collection(db, 'draftRooms'), limit(50)));
       const roomsData = roomsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       const waitingRooms = roomsData.filter(room => 
         room.type === config.type &&
@@ -206,7 +206,7 @@ export default function JoinTournamentModal({ open, onClose, tournamentType = 't
 
       const timerSeconds = selectedDraftSpeed === '8h' ? 28800 : 30;
       logger.debug('Finding available rooms', { selectedDraftSpeed, timerSeconds });
-      const roomsSnapshot = await getDocs(collection(db, 'draftRooms'));
+      const roomsSnapshot = await getDocs(query(collection(db, 'draftRooms'), limit(50)));
       const roomsData = roomsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       const availableRooms = roomsData.filter(room =>
         room.type === config.type &&

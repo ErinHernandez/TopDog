@@ -20,9 +20,11 @@ This document defines the API versioning strategy for the BestBall site. API ver
 
 | Non-v1 Route | Replacement | Deprecation Date | Removal Date |
 |--------------|-------------|------------------|--------------|
-| `/api/create-payment-intent` | `/api/v1/stripe/payment-intent` | TBD | TBD |
-| `/api/stripe/customer` | `/api/v1/stripe/customer` | TBD | TBD |
-| `/api/user/display-currency` | `/api/v1/user/display-currency` | TBD | TBD |
+| `/api/create-payment-intent` | `/api/v1/stripe/payment-intent` | 2026-04-01 | 2026-10-01 |
+| `/api/stripe/customer` | `/api/v1/stripe/customer` | 2026-04-01 | 2026-10-01 |
+| `/api/user/display-currency` | `/api/v1/user/display-currency` | 2026-04-01 | 2026-10-01 |
+
+> **Note:** Starting 2026-04-01, non-v1 routes will return deprecation headers. All clients should migrate to `/api/v1/*` before 2026-10-01.
 
 ### Migration Recommendation
 
@@ -180,6 +182,7 @@ When creating `/api/v2/`:
 
 ---
 
-**Last Updated:** January 2025  
+**Last Updated:** January 2026  
 **Current Version:** v1  
+**Deprecation Status:** v0 (non-v1) routes deprecated 2026-04-01, removal 2026-10-01  
 **Next Review:** When planning v2

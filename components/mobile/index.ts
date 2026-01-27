@@ -2,6 +2,14 @@
  * Mobile Components Index
  * 
  * Central export for all mobile components organized by category
+ * 
+ * @deprecated This module is deprecated. Use components from @/components/vx2/ instead.
+ * See docs/MOBILE_UI_OWNERSHIP.md for migration guide.
+ * 
+ * Migration timeline:
+ * - Q2 2026: Identify all usages
+ * - Q3 2026: Migrate to vx2
+ * - Q4 2026: Remove this directory
  */
 
 // Layout

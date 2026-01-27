@@ -20,10 +20,14 @@ import {
   where, 
   writeBatch,
   serverTimestamp,
+  limit,
+  startAfter,
+  orderBy,
   type DocumentData,
   type Timestamp,
   type Query,
   type CollectionReference,
+  type QueryDocumentSnapshot,
 } from 'firebase/firestore';
 import { 
   checkVIPReservation, 
@@ -286,9 +290,9 @@ export class VIPAccountManager {
       const matches: VIPMatch[] = [];
       const usersRef = collection(db, 'users');
       
-      // Search by email if provided
+      // Search by email if provided (limit to 10 - email should be unique)
       if (searchCriteria.email) {
-        const emailQuery = query(usersRef, where('email', '==', searchCriteria.email.toLowerCase()));
+        const emailQuery = query(usersRef, where('email', '==', searchCriteria.email.toLowerCase()), limit(10));
         const emailResults = await getDocs(emailQuery);
         emailResults.forEach(doc => {
           matches.push({
@@ -300,41 +304,85 @@ export class VIPAccountManager {
       }
       
       // Search by partial username match
+      // NOTE: This performs a client-side filter. For production scale, consider
+      // using Firestore full-text search extensions or Algolia
       if (searchCriteria.usernameContains) {
-        const allUsers = await getDocs(usersRef);
         const searchTerm = searchCriteria.usernameContains.toUpperCase();
+        const MAX_USERS_TO_SCAN = 1000; // Limit to prevent runaway queries
         
-        allUsers.forEach(doc => {
-          const userData = doc.data();
-          if (userData.username && 
-              userData.username.includes(searchTerm) &&
-              !matches.find(m => m.uid === userData.uid)) {
-            matches.push({
-              ...userData,
-              matchReason: 'username_partial_match',
-              matchConfidence: 'medium'
-            } as VIPMatch);
+        // Paginate through users in batches
+        let lastDoc: QueryDocumentSnapshot<DocumentData> | null = null;
+        let scannedCount = 0;
+        
+        while (scannedCount < MAX_USERS_TO_SCAN) {
+          const batchSize = Math.min(500, MAX_USERS_TO_SCAN - scannedCount);
+          let batchQuery = query(usersRef, orderBy('uid'), limit(batchSize));
+          if (lastDoc) {
+            batchQuery = query(usersRef, orderBy('uid'), startAfter(lastDoc), limit(batchSize));
           }
-        });
+          
+          const batch = await getDocs(batchQuery);
+          if (batch.empty) break;
+          
+          batch.forEach(doc => {
+            const userData = doc.data();
+            if (userData.username && 
+                userData.username.includes(searchTerm) &&
+                !matches.find(m => m.uid === userData.uid)) {
+              matches.push({
+                ...userData,
+                matchReason: 'username_partial_match',
+                matchConfidence: 'medium'
+              } as VIPMatch);
+            }
+          });
+          
+          lastDoc = batch.docs[batch.docs.length - 1];
+          scannedCount += batch.size;
+          
+          if (batch.size < batchSize) break; // No more documents
+        }
       }
       
       // Search by display name
+      // NOTE: This performs a client-side filter. For production scale, consider
+      // using Firestore full-text search extensions or Algolia
       if (searchCriteria.displayNameContains) {
-        const allUsers = await getDocs(usersRef);
         const searchTerm = searchCriteria.displayNameContains.toLowerCase();
+        const MAX_USERS_TO_SCAN = 1000; // Limit to prevent runaway queries
         
-        allUsers.forEach(doc => {
-          const userData = doc.data();
-          if (userData.displayName && 
-              userData.displayName.toLowerCase().includes(searchTerm) &&
-              !matches.find(m => m.uid === userData.uid)) {
-            matches.push({
-              ...userData,
-              matchReason: 'display_name_match',
-              matchConfidence: 'medium'
-            } as VIPMatch);
+        // Paginate through users in batches
+        let lastDoc: QueryDocumentSnapshot<DocumentData> | null = null;
+        let scannedCount = 0;
+        
+        while (scannedCount < MAX_USERS_TO_SCAN) {
+          const batchSize = Math.min(500, MAX_USERS_TO_SCAN - scannedCount);
+          let batchQuery = query(usersRef, orderBy('uid'), limit(batchSize));
+          if (lastDoc) {
+            batchQuery = query(usersRef, orderBy('uid'), startAfter(lastDoc), limit(batchSize));
           }
-        });
+          
+          const batch = await getDocs(batchQuery);
+          if (batch.empty) break;
+          
+          batch.forEach(doc => {
+            const userData = doc.data();
+            if (userData.displayName && 
+                userData.displayName.toLowerCase().includes(searchTerm) &&
+                !matches.find(m => m.uid === userData.uid)) {
+              matches.push({
+                ...userData,
+                matchReason: 'display_name_match',
+                matchConfidence: 'medium'
+              } as VIPMatch);
+            }
+          });
+          
+          lastDoc = batch.docs[batch.docs.length - 1];
+          scannedCount += batch.size;
+          
+          if (batch.size < batchSize) break; // No more documents
+        }
       }
       
       return {
@@ -540,7 +588,7 @@ export class VIPAccountManager {
       if (statusFilter) {
         q = query(mergeRequestsRef, where('uid', '==', uid), where('status', 'in', statusFilter));
       } else {
-        q = query(mergeRequestsRef, where('uid', '==', uid));
+        q = query(mergeRequestsRef, where('uid', '==', uid), limit(100));
       }
       
       const snapshot = await getDocs(q);
@@ -572,7 +620,9 @@ export class VIPAccountManager {
       let q: Query | CollectionReference = mergeRequestsRef;
       
       if (filters.status) {
-        q = query(mergeRequestsRef, where('status', '==', filters.status));
+        q = query(mergeRequestsRef, where('status', '==', filters.status), limit(500));
+      } else {
+        q = query(mergeRequestsRef, limit(500));
       }
       
       const snapshot = await getDocs(q);
@@ -971,7 +1021,8 @@ export class VIPAccountManager {
         where('uid', '==', uid),
         where('status', 'in', ['pending', 'approved']),
         where('requireUserAcceptance', '==', true),
-        where('userAccepted', '==', false)
+        where('userAccepted', '==', false),
+        limit(10) // Should only have one pending at a time
       );
       
       const snapshot = await getDocs(q);
@@ -1005,7 +1056,7 @@ export class VIPAccountManager {
       }
 
       const auditRef = collection(db, 'username_change_audit');
-      const q = query(auditRef, where('uid', '==', uid));
+      const q = query(auditRef, where('uid', '==', uid), limit(100));
       const snapshot = await getDocs(q);
       
       const history = snapshot.docs.map(doc => doc.data() as UsernameChangeAudit);
@@ -1047,7 +1098,9 @@ export class VIPAccountManager {
       let q: Query | CollectionReference = auditRef;
       
       if (filters.changeType) {
-        q = query(auditRef, where('changeType', '==', filters.changeType));
+        q = query(auditRef, where('changeType', '==', filters.changeType), limit(500));
+      } else {
+        q = query(auditRef, limit(500));
       }
       
       const snapshot = await getDocs(q);
@@ -1089,7 +1142,8 @@ export class VIPAccountManager {
       }
 
       const mergeRequestsRef = collection(db, 'merge_requests');
-      const snapshot = await getDocs(mergeRequestsRef);
+      // Limit statistics query - for exact counts, use Firestore aggregation queries
+      const snapshot = await getDocs(query(mergeRequestsRef, limit(500)));
       
       const requests = snapshot.docs.map(doc => doc.data() as MergeRequest);
       

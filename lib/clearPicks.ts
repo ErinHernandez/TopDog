@@ -3,7 +3,7 @@
  */
 
 import { db } from './firebase';
-import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, deleteDoc, doc, query, limit } from 'firebase/firestore';
 import { createScopedLogger } from './clientLogger';
 
 const logger = createScopedLogger('[ClearPicks]');
@@ -24,7 +24,7 @@ export const clearPicksForRoom = async (roomId: string): Promise<void> => {
     logger.debug('Clearing picks for room', { roomId });
 
     const picksRef = collection(db, 'draftRooms', roomId, 'picks');
-    const picksSnapshot = await getDocs(picksRef);
+    const picksSnapshot = await getDocs(query(picksRef, limit(500)));
 
     if (picksSnapshot.empty) {
       logger.debug('No picks found to clear');
@@ -70,7 +70,7 @@ export const clearPicksForCompletedRooms = async (): Promise<void> => {
   }
   try {
     const roomsRef = collection(db, 'draftRooms');
-    const roomsSnapshot = await getDocs(roomsRef);
+    const roomsSnapshot = await getDocs(query(roomsRef, limit(100)));
 
     const completedRooms = roomsSnapshot.docs.filter(doc =>
       doc.data().status === 'completed'

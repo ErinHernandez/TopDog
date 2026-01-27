@@ -3,7 +3,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { db } from '../../../lib/firebase';
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, Timestamp } from 'firebase/firestore';
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, Timestamp, query, limit } from 'firebase/firestore';
 
 interface Tournament {
   id: string;
@@ -68,7 +68,7 @@ export default function DevTournaments() {
       return;
     }
     try {
-      const querySnapshot = await getDocs(collection(db, 'devTournaments'));
+      const querySnapshot = await getDocs(query(collection(db, 'devTournaments'), limit(100)));
       const tournaments = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()

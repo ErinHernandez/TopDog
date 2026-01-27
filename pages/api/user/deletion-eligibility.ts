@@ -5,30 +5,44 @@
  * - Balance must be $0 (must withdraw/claim all funds first)
  * - Must not be in any active tournaments (or must schedule deletion for when they're done)
  *
- * Response: { ok, canDelete, balanceCents, activeTeamCount, reasons[] }
+ * Response: { ok: true, data: { canDelete, balanceCents, activeTeamCount, reasons }, timestamp }
  */
 
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getDb } from '@/lib/firebase-utils';
-import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs, query, limit } from 'firebase/firestore';
 import { verifyAuthToken } from '@/lib/apiAuth';
-import { serverLogger } from '@/lib/logger/serverLogger';
+import {
+  withErrorHandling,
+  validateMethod,
+  createSuccessResponse,
+  createErrorResponse,
+  ErrorType,
+  type ApiLogger,
+} from '@/lib/apiErrorHandler';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
-  if (req.method !== 'GET') {
-    res.setHeader('Allow', 'GET');
-    return res.status(405).json({ ok: false, error: { code: 'METHOD_NOT_ALLOWED', message: 'Only GET allowed' } });
-  }
+export default async function handler(req: NextApiRequest, res: NextApiResponse): Promise<unknown> {
+  return withErrorHandling(req, res, async (req, res, logger: ApiLogger) => {
+    // Validate HTTP method
+    validateMethod(req, ['GET'], logger);
 
-  const authResult = await verifyAuthToken(req.headers.authorization as string);
-  if (!authResult.uid) {
-    return res.status(401).json({ ok: false, error: { code: 'UNAUTHORIZED', message: authResult.error || 'Authentication required' } });
-  }
+    // Verify authentication
+    const authResult = await verifyAuthToken(req.headers.authorization as string);
+    if (!authResult.uid) {
+      const errorResponse = createErrorResponse(
+        ErrorType.UNAUTHORIZED,
+        authResult.error || 'Authentication required',
+        {},
+        null
+      );
+      return res.status(errorResponse.statusCode).json(errorResponse.body);
+    }
 
-  const uid = authResult.uid;
-  const reasons: string[] = [];
+    const uid = authResult.uid;
+    const reasons: string[] = [];
 
-  try {
+    logger.info('Checking deletion eligibility', { uid });
+
     const db = getDb();
     const userRef = doc(db, 'users', uid);
     const userSnap = await getDoc(userRef);
@@ -41,7 +55,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         : 0;
 
     const teamsRef = collection(db, 'users', uid, 'teams');
-    const teamsSnap = await getDocs(teamsRef);
+    const teamsSnap = await getDocs(query(teamsRef, limit(500)));
     const activeTeamCount = teamsSnap.size;
 
     if (balanceCents > 0) {
@@ -53,18 +67,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const canDelete = reasons.length === 0;
 
-    return res.status(200).json({
-      ok: true,
-      canDelete,
-      balanceCents,
-      activeTeamCount,
-      reasons,
-    });
-  } catch (err) {
-    serverLogger.error('[deletion-eligibility] Failed to check eligibility', err instanceof Error ? err : null, { uid });
-    return res.status(500).json({
-      ok: false,
-      error: { code: 'INTERNAL_ERROR', message: 'Failed to check eligibility' },
-    });
-  }
+    logger.info('Deletion eligibility checked', { uid, canDelete, balanceCents, activeTeamCount });
+
+    const response = createSuccessResponse(
+      { canDelete, balanceCents, activeTeamCount, reasons },
+      200,
+      logger
+    );
+    return res.status(response.statusCode).json(response.body);
+  });
 }

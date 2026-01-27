@@ -17,6 +17,7 @@ import {
   query,
   where,
   orderBy,
+  limit,
   serverTimestamp,
   Timestamp,
   type Unsubscribe as FirestoreUnsubscribe,
@@ -231,7 +232,7 @@ export class FirebaseAdapter implements DraftAdapter {
       }
 
       const picksRef = collection(db, 'draftRooms', roomId, 'picks');
-      const q = query(picksRef, orderBy('pickNumber', 'asc'));
+      const q = query(picksRef, orderBy('pickNumber', 'asc'), limit(500));
       const snapshot = await getDocs(q);
 
       return snapshot.docs.map((doc) =>
@@ -333,9 +334,9 @@ export class FirebaseAdapter implements DraftAdapter {
         throw new Error('Firebase not initialized');
       }
 
-      // Fetch players from the players collection
+      // Fetch players from the players collection (limit to 600 - typical draft pool size)
       const playersRef = collection(db, 'players');
-      const snapshot = await getDocs(playersRef);
+      const snapshot = await getDocs(query(playersRef, limit(600)));
 
       const players: DraftPlayer[] = snapshot.docs.map((doc) => {
         const data = doc.data();

@@ -3,7 +3,7 @@
  */
 
 import { db } from './firebase';
-import { collection, addDoc, serverTimestamp, getDocs, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, getDocs, Timestamp, query, limit } from 'firebase/firestore';
 import { devTournamentTemplates } from './tournamentConfig';
 import { createScopedLogger } from './clientLogger';
 
@@ -35,8 +35,8 @@ export const initializeDevTournaments = async (): Promise<void> => {
   try {
     logger.info('Initializing development tournaments');
     
-    // Check if tournaments already exist
-    const existingTournaments = await getDocs(collection(db, 'devTournaments'));
+    // Check if tournaments already exist (only need to check for existence)
+    const existingTournaments = await getDocs(query(collection(db, 'devTournaments'), limit(10)));
     
     if (existingTournaments.empty) {
       // Add development tournament templates

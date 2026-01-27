@@ -32,7 +32,7 @@ const PAYPAL_PAYMENT_METHODS: PaymentMethod[] = [
     id: 'paypal',
     name: 'PayPal',
     category: 'wallet',
-    provider: 'paypal' as any, // Type will be added to PaymentProviderName
+    provider: 'paypal',
     countries: ['US'], // Currently US only per plan
     currencies: ['USD'],
     isAsync: false,
@@ -45,7 +45,7 @@ const PAYPAL_PAYMENT_METHODS: PaymentMethod[] = [
  * PayPal Payment Provider Implementation
  */
 class PayPalProvider implements PaymentProvider {
-  readonly name = 'paypal' as any; // Type will be added to PaymentProviderName
+  readonly name = 'paypal' as const;
 
   /**
    * Get countries supported by PayPal

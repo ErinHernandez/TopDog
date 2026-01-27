@@ -8,7 +8,7 @@
  * Note: Error boundaries must be class components (React limitation).
  * The wrapper pattern provides router access for the "Go Home" action.
  * 
- * @module components/shared/GlobalErrorBoundary
+ * @module components/ui/GlobalErrorBoundary
  */
 
 import React, { Component, ReactNode, ErrorInfo } from 'react';

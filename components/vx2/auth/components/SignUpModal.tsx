@@ -1052,10 +1052,20 @@ export function SignUpModal({
           right: -8,
           bottom: -8,
           background: 'url(/wr_blue.png) no-repeat center center',
-          backgroundSize: 'cover',
+          backgroundSize: '100% 100%',
           borderRadius: '2.5rem',
           zIndex: -1,
           pointerEvents: 'none',
+          maskImage: `
+            linear-gradient(to bottom, black 0, black 8px, transparent 8px, transparent calc(100% - 8px), black calc(100% - 8px), black 100%),
+            linear-gradient(to right, black 0, black 8px, transparent 8px, transparent calc(100% - 8px), black calc(100% - 8px), black 100%)
+          `,
+          maskComposite: 'intersect',
+          WebkitMaskImage: `
+            linear-gradient(to bottom, black 0, black 8px, transparent 8px, transparent calc(100% - 8px), black calc(100% - 8px), black 100%),
+            linear-gradient(to right, black 0, black 8px, transparent 8px, transparent calc(100% - 8px), black calc(100% - 8px), black 100%)
+          `,
+          WebkitMaskComposite: 'source-in',
         }}
         aria-hidden="true"
       />
