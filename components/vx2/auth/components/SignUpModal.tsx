@@ -52,7 +52,7 @@ function TopDogLogo(): React.ReactElement {
       <img 
         src="/logo.png" 
         alt="TopDog" 
-        style={{ height: 48 }}
+        style={{ height: 56 }}
       />
     </div>
   );
@@ -267,27 +267,19 @@ function CredentialsStep({
   
   return (
     <div className="flex flex-col h-full" onKeyDown={handleKeyDown}>
-      {/* Header with Close Button — same padding as SignInModal so X is same height */}
-      <div 
-        className="flex items-center justify-end flex-shrink-0"
-        style={{ padding: `${SPACING.md + 8}px ${SPACING.lg}px ${SPACING.md}px` }}
-      >
-        <button 
-          onClick={onClose} 
-          className="p-2 rounded-full transition-colors hover:bg-white/10" 
-          aria-label="Close"
-        >
-          <Close size={24} color={TEXT_COLORS.muted} />
-        </button>
-      </div>
-      
-      {/* Content */}
+      {/* Content — centered vertically within phone frame */}
       <div 
         className="flex-1 overflow-y-auto" 
-        style={{ padding: `0 ${SPACING.xl}px`, scrollbarWidth: 'none' }}
+        style={{ 
+          padding: `0 ${SPACING.xl}px`, 
+          scrollbarWidth: 'none',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+        }}
       >
-        {/* Logo & Welcome — same as Sign In (marginTop 22) */}
-        <div className="text-center mb-8" style={{ marginTop: 22 }}>
+        {/* Logo & Welcome */}
+        <div className="text-center mb-8">
           <TopDogLogo />
           <p 
             className="mt-6"
@@ -317,8 +309,8 @@ function CredentialsStep({
           </div>
         )}
         
-        {/* Form block — aligned with Sign In modal email input position */}
-        <div className="space-y-4" style={{ marginTop: 44.5 }}>
+        {/* Form block — centered and organized */}
+        <div className="space-y-4" style={{ width: '311px', marginLeft: 'auto', marginRight: 'auto' }}>
           {/* Email Input — show "valid email" only after blur (click out), hide while focused */}
           <Input
             inputRef={emailRef}
@@ -739,9 +731,12 @@ function EmailVerifyStep({
         <div className="text-center mb-8">
           <div 
             className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4"
-            style={{ backgroundColor: 'rgba(96, 165, 250, 0.15)' }}
+            style={{ 
+              background: 'url(/wr_blue.png) no-repeat center center',
+              backgroundSize: 'cover',
+            }}
           >
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.active} strokeWidth="2">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
           </div>
@@ -1040,14 +1035,31 @@ export function SignUpModal({
   if (!isOpen) return null;
   
   return (
-    <div 
+    <div
       className="absolute left-0 right-0 bottom-0 flex flex-col"
-      style={{ 
-        top: `${contentTopInset}px`, 
-        backgroundColor: BG_COLORS.secondary, 
-        zIndex: Z_INDEX.modal 
+      style={{
+        top: `${contentTopInset}px`,
+        backgroundColor: BG_COLORS.secondary,
+        zIndex: Z_INDEX.modal,
       }}
     >
+      {/* Blue outline wrapper - auth modal branding */}
+      <div
+        style={{
+          position: 'absolute',
+          top: -8,
+          left: -8,
+          right: -8,
+          bottom: -8,
+          background: 'url(/wr_blue.png) no-repeat center center',
+          backgroundSize: 'cover',
+          borderRadius: '2.5rem',
+          zIndex: -1,
+          pointerEvents: 'none',
+        }}
+        aria-hidden="true"
+      />
+
       {step === 'credentials' && (
         <CredentialsStep
           email={email}

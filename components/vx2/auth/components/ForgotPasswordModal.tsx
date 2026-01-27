@@ -120,15 +120,16 @@ function InputStep({
       
       {/* Content */}
       <div 
-        className="flex-1 flex flex-col justify-center px-6"
+        className="flex-1 flex flex-col px-6"
+        style={{ paddingTop: '40px', paddingBottom: '20px' }}
         onKeyDown={handleKeyDown}
       >
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           <div 
-            className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+            className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-3"
             style={{ background: 'url(/wr_blue.png) no-repeat center center', backgroundSize: 'cover' }}
           >
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2" strokeLinecap="round" strokeLinejoin="round"/>
               <path d="M7 11V7a5 5 0 0110 0v4" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
@@ -148,7 +149,7 @@ function InputStep({
         
         {/* Method Toggle */}
         <div 
-          className="flex mb-5 p-1.5 rounded-xl"
+          className="flex mb-4 p-1.5 rounded-xl"
           style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}
         >
           <button
@@ -203,7 +204,7 @@ function InputStep({
         
         {/* Email Input */}
         {method === 'email' && (
-          <div className="mb-6">
+          <div className="mb-4">
             <input
               type="email"
               value={email}
@@ -236,7 +237,7 @@ function InputStep({
         
         {/* Phone Input */}
         {method === 'phone' && (
-          <div className="mb-6">
+          <div className="mb-4">
             <input
               type="tel"
               value={phone}
@@ -271,7 +272,7 @@ function InputStep({
       {/* Footer */}
       <div 
         className="flex-shrink-0"
-        style={{ padding: SPACING.sm }}
+        style={{ padding: `12px ${SPACING.xl}px 16px` }}
       >
         <button
           onClick={onSubmit}
@@ -299,7 +300,7 @@ function InputStep({
         
         {onBackToSignIn && (
           <p 
-            className="text-center mt-4"
+            className="text-center mt-3"
             style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
           >
             Remember your password?{' '}
@@ -390,7 +391,7 @@ function CodeStep({
       </div>
       
       {/* Content */}
-      <div className="flex-1 flex flex-col justify-center px-6">
+      <div className="flex-1 flex flex-col justify-center px-6" style={{ marginTop: '-4px' }}>
         <div className="text-center mb-8">
           <div 
             className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
@@ -566,7 +567,7 @@ function NewPasswordStep({
       </div>
       
       {/* Content */}
-      <div className="flex-1 flex flex-col justify-center px-6">
+      <div className="flex-1 flex flex-col justify-center px-6" style={{ marginTop: '-4px' }}>
         <div className="text-center mb-8">
           <div 
             className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
@@ -829,14 +830,31 @@ export function ForgotPasswordModal({
   if (!isOpen) return null;
   
   return (
-    <div 
+    <div
       className="absolute left-0 right-0 bottom-0 flex flex-col"
-      style={{ 
-        top: 0, 
-        backgroundColor: BG_COLORS.secondary, 
-        zIndex: Z_INDEX.modal 
+      style={{
+        top: 0,
+        backgroundColor: BG_COLORS.secondary,
+        zIndex: Z_INDEX.modal,
       }}
     >
+      {/* Blue outline wrapper - auth modal branding */}
+      <div
+        style={{
+          position: 'absolute',
+          top: -8,
+          left: -8,
+          right: -8,
+          bottom: -8,
+          background: 'url(/wr_blue.png) no-repeat center center',
+          backgroundSize: 'cover',
+          borderRadius: '2.5rem',
+          zIndex: -1,
+          pointerEvents: 'none',
+        }}
+        aria-hidden="true"
+      />
+
       {step === 'input' && (
         <InputStep
           method={method}

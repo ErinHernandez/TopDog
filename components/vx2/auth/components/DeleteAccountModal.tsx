@@ -73,7 +73,7 @@ export function DeleteAccountModal({
         reasons: data.reasons ?? [],
       });
     } catch (e) {
-      logger.warn('Fetch eligibility failed', e instanceof Error ? e : new Error(String(e)));
+      logger.warn('Fetch eligibility failed', { error: e instanceof Error ? e : new Error(String(e)) });
       setError('Could not load eligibility');
       setEligibility(null);
     } finally {

@@ -12,7 +12,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { getDb } from '@/lib/firebase-utils';
 import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
 import { verifyAuthToken } from '@/lib/apiAuth';
-import serverLogger from '@/lib/logger/serverLogger';
+import { serverLogger } from '@/lib/logger/serverLogger';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
   if (req.method !== 'GET') {

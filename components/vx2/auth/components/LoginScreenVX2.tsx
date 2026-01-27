@@ -555,8 +555,8 @@ export function LoginScreenVX2({
           <div 
             className="mb-4 p-5 rounded-xl text-center"
             style={{ 
-              backgroundColor: 'rgba(96, 165, 250, 0.1)', 
-              border: '1px solid rgba(96, 165, 250, 0.3)',
+              background: 'url(/wr_blue.png) no-repeat center center',
+              backgroundSize: 'cover',
             }}
           >
             <p style={{ color: TEXT_COLORS.primary, fontSize: 16, marginBottom: 12 }}>

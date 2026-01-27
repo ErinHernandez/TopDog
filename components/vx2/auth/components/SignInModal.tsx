@@ -429,14 +429,31 @@ export function SignInModal({
   if (!isOpen) return null;
   
   return (
-    <div 
+    <div
       className="absolute left-0 right-0 bottom-0 flex flex-col"
-      style={{ 
-        top: `${contentTopInset}px`, 
-        backgroundColor: BG_COLORS.secondary, 
-        zIndex: Z_INDEX.modal 
+      style={{
+        top: `${contentTopInset}px`,
+        backgroundColor: BG_COLORS.secondary,
+        zIndex: Z_INDEX.modal,
       }}
     >
+      {/* Blue outline wrapper - auth modal branding */}
+      <div
+        style={{
+          position: 'absolute',
+          top: -8,
+          left: -8,
+          right: -8,
+          bottom: -8,
+          background: 'url(/wr_blue.png) no-repeat center center',
+          backgroundSize: 'cover',
+          borderRadius: '2.5rem',
+          zIndex: -1,
+          pointerEvents: 'none',
+        }}
+        aria-hidden="true"
+      />
+
       {/* Content */}
       <div 
         ref={formRef}

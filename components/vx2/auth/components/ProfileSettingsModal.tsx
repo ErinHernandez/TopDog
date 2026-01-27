@@ -77,21 +77,64 @@ function ProfileTabContent({ onEditName, onAddEmail, onAddPhone, onOpenDeleteMod
     <div className="space-y-6">
       {/* Customization Section */}
       <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <div>
-            <span 
-              className="font-medium block"
-              style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}
+        {/* Example Player Box */}
+        <div className="flex justify-center">
+          <div 
+            className="flex-shrink-0 flex flex-col"
+            style={{ 
+              width: '96px',
+              height: '105px',
+              border: '4px solid',
+              borderColor: fixedBorderColor, // Fixed border color - matches unpicked card border (#6B7280)
+              backgroundColor: '#374151', // Matches PICKS_BAR_PX.cardBg
+              borderRadius: '6px', 
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
+              position: 'relative',
+            }}
+          >
+            {/* Header - matches draft room card header structure */}
+            <div 
+              style={{ 
+                height: '28px', // 20px visible + 8px overlap
+                marginTop: '-8px', // Overlaps top border
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '0 4px',
+                backgroundColor: fixedBorderColor, // Border color used as header background
+                borderTopLeftRadius: '6px',
+                borderTopRightRadius: '6px',
+                fontSize: '11px',
+                fontWeight: 500,
+                color: '#FFFFFF',
+                textTransform: 'uppercase',
+                textAlign: 'center',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
             >
-              Profile Customization
-            </span>
-            <span 
-              className="block mt-1"
-              style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
+              {profile?.username || 'Username'}
+            </div>
+            
+            {/* Content area - matches draft room card content */}
+            <div 
+              style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                minHeight: '78px',
+                position: 'relative',
+                backgroundColor: innerCellColor, // Customizable inner area
+              }}
             >
-              Customize player cell backgrounds
-            </span>
+            </div>
           </div>
+        </div>
+        
+        <div className="flex items-center justify-center">
           <button
             onClick={() => router.push('/profile-customization')}
             className="px-3 py-1.5 rounded-lg font-medium text-sm"
@@ -104,81 +147,8 @@ function ProfileTabContent({ onEditName, onAddEmail, onAddPhone, onOpenDeleteMod
             Customize
           </button>
         </div>
-        
-        {/* Example Player Box */}
-        <div className="flex justify-center">
-          <div 
-            className="flex-shrink-0 text-sm font-medium flex flex-col"
-            style={{ 
-              width: '120px',
-              height: '140px',
-              borderWidth: '6px',
-              borderStyle: 'solid',
-              borderColor: fixedBorderColor, // Fixed border color - matches unpicked card border
-              borderTopWidth: '32px', 
-              backgroundColor: innerCellColor, // Customizable inner area
-              borderRadius: '11px', 
-              overflow: 'visible'
-            }}
-          >
-            {/* Username in border area */}
-            <div 
-              className="absolute left-0 right-0 font-bold text-center truncate whitespace-nowrap overflow-hidden"
-              style={{ 
-                fontSize: '12px', 
-                color: '#000',
-                backgroundColor: 'transparent',
-                zIndex: 10,
-                padding: '2px',
-                top: '-16px', 
-                transform: 'translateY(-50%)',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                maxWidth: '100%',
-                width: '100%',
-                textTransform: 'uppercase'
-              }}
-            >
-              {profile?.username || 'Username'}
-            </div>
-            
-            {/* Customizable inner area (where player name would go) */}
-            <div className="flex-1 flex items-center justify-center">
-              <div 
-                className="text-center"
-                style={{
-                  fontSize: '12px',
-                  color: TEXT_COLORS.muted,
-                }}
-              >
-                Player Name
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
-      {/* Avatar & Username */}
-      <div className="flex items-center gap-4">
-        <div 
-          className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold"
-          style={{ background: 'url(/wr_blue.png) no-repeat center center', backgroundSize: 'cover', color: '#000' }}
-        >
-          {profile?.username?.[0]?.toUpperCase() || '?'}
-        </div>
-        <div className="flex-1">
-          <span 
-            className="font-bold"
-            style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}
-          >
-            {profile?.username || 'No username'}
-          </span>
-          <p style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
-            Member since {profile?.createdAt ? new Date(profile.createdAt).toLocaleDateString() : 'Unknown'}
-          </p>
-        </div>
-      </div>
 
       {/* Name */}
       <div 
@@ -189,17 +159,6 @@ function ProfileTabContent({ onEditName, onAddEmail, onAddPhone, onOpenDeleteMod
           <span style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
             Name
           </span>
-          <button
-            onClick={onEditName}
-            className="px-2 py-0.5 rounded-full text-xs"
-            style={{ 
-              background: 'url(/wr_blue.png) no-repeat center center',
-              backgroundSize: 'cover',
-              color: '#000',
-            }}
-          >
-            {displayName ? 'Edit' : 'Add'}
-          </button>
         </div>
         <p style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}>
           {displayName || 'Not added yet'}
@@ -237,19 +196,7 @@ function ProfileTabContent({ onEditName, onAddEmail, onAddPhone, onOpenDeleteMod
               {emailSent ? 'Email sent' : 'Verify'}
               </button>
             )
-          ) : (
-            <button
-              onClick={onAddEmail}
-              className="px-2 py-0.5 rounded-full text-xs"
-              style={{ 
-                background: 'url(/wr_blue.png) no-repeat center center',
-                backgroundSize: 'cover',
-                color: '#000',
-              }}
-            >
-              Add
-            </button>
-          )}
+          ) : null}
         </div>
         <p style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}>
           {user?.email || 'Not added yet'}
@@ -265,19 +212,6 @@ function ProfileTabContent({ onEditName, onAddEmail, onAddPhone, onOpenDeleteMod
           <span style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
             Phone
           </span>
-          {!user?.phoneNumber && (
-            <button
-              onClick={onAddPhone}
-              className="px-2 py-0.5 rounded-full text-xs"
-              style={{ 
-                background: 'url(/wr_blue.png) no-repeat center center',
-                backgroundSize: 'cover',
-                color: '#000',
-              }}
-            >
-              Add
-            </button>
-          )}
         </div>
           <p style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}>
           {user?.phoneNumber || 'Not added yet'}
@@ -1322,8 +1256,8 @@ export function ProfileSettingsModal({
       <div 
         className="flex items-center justify-between flex-shrink-0"
         style={{ 
-          padding: `${SPACING.md + 8}px ${SPACING.lg}px ${SPACING.md}px`, 
-          borderBottom: `1px solid ${BORDER_COLORS.default}` 
+          padding: `${SPACING.md + 8}px ${SPACING.lg}px ${SPACING.md}px`,
+          borderBottom: `1px solid ${BORDER_COLORS.default}`,
         }}
       >
         <h2 
@@ -1350,16 +1284,12 @@ export function ProfileSettingsModal({
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className="flex-1 py-3 font-medium transition-colors relative"
+            className="flex-1 py-3 transition-colors relative"
             style={{
-              color: activeTab === tab.id ? 'transparent' : TEXT_COLORS.muted,
-              background: activeTab === tab.id ? 'url(/wr_blue.png) no-repeat center center' : undefined,
-              backgroundSize: activeTab === tab.id ? 'cover' : undefined,
-              WebkitBackgroundClip: activeTab === tab.id ? 'text' : undefined,
-              backgroundClip: activeTab === tab.id ? 'text' : undefined,
-              WebkitTextFillColor: activeTab === tab.id ? 'transparent' : undefined,
+              color: TEXT_COLORS.muted,
               borderBottom: '2px solid transparent',
               fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
+              fontWeight: activeTab === tab.id ? 600 : 500,
             }}
           >
             <span style={{ position: 'relative', zIndex: 1 }}>{tab.label}</span>

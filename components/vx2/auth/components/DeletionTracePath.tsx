@@ -33,6 +33,7 @@ export interface DeletionTracePathProps {
 
 export function DeletionTracePath({ onComplete, disabled }: DeletionTracePathProps): React.ReactElement {
   const [progress, setProgress] = useState(0);
+  const [points, setPoints] = useState<{ x: number; y: number }[]>([]);
   const [pathLength, setPathLength] = useState(320);
   const pathRef = useRef<SVGPathElement | null>(null);
 

@@ -120,9 +120,12 @@ function AuthTestContent(): JSX.Element {
             >
               <div
                 className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
-                style={{ backgroundColor: 'rgba(96, 165, 250, 0.15)' }}
+                style={{ 
+                  background: 'url(/wr_blue.png) no-repeat center center',
+                  backgroundSize: 'cover',
+                }}
               >
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.active} strokeWidth="2">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2">
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
@@ -221,8 +224,11 @@ function AuthTestContent(): JSX.Element {
               onClick={() => openModal('signup')}
               className="w-full py-2.5 rounded-lg font-semibold text-sm transition-all"
               style={{ 
-                backgroundColor: activeModal === 'signup' ? STATE_COLORS.active : 'rgba(96, 165, 250, 0.2)',
-                color: activeModal === 'signup' ? '#000' : STATE_COLORS.active,
+                background: activeModal === 'signup' 
+                  ? 'url(/wr_blue.png) no-repeat center center'
+                  : 'rgba(255,255,255,0.08)',
+                backgroundSize: 'cover',
+                color: activeModal === 'signup' ? '#000' : TEXT_COLORS.primary,
               }}
             >
               Sign Up Modal
@@ -232,7 +238,10 @@ function AuthTestContent(): JSX.Element {
               onClick={() => openModal('signin')}
               className="w-full py-2.5 rounded-lg font-semibold text-sm transition-all"
               style={{ 
-                backgroundColor: activeModal === 'signin' ? STATE_COLORS.active : 'rgba(255,255,255,0.08)',
+                background: activeModal === 'signin' 
+                  ? 'url(/wr_blue.png) no-repeat center center'
+                  : 'rgba(255,255,255,0.08)',
+                backgroundSize: 'cover',
                 color: activeModal === 'signin' ? '#000' : TEXT_COLORS.primary,
               }}
             >
@@ -243,7 +252,10 @@ function AuthTestContent(): JSX.Element {
               onClick={() => openModal('forgot')}
               className="w-full py-2.5 rounded-lg font-semibold text-sm transition-all"
               style={{ 
-                backgroundColor: activeModal === 'forgot' ? STATE_COLORS.active : 'rgba(255,255,255,0.08)',
+                background: activeModal === 'forgot' 
+                  ? 'url(/wr_blue.png) no-repeat center center'
+                  : 'rgba(255,255,255,0.08)',
+                backgroundSize: 'cover',
                 color: activeModal === 'forgot' ? '#000' : TEXT_COLORS.primary,
               }}
             >
@@ -254,7 +266,10 @@ function AuthTestContent(): JSX.Element {
               onClick={() => openModal('profile')}
               className="w-full py-2.5 rounded-lg font-semibold text-sm transition-all"
               style={{ 
-                backgroundColor: activeModal === 'profile' ? STATE_COLORS.active : 'rgba(255,255,255,0.08)',
+                background: activeModal === 'profile' 
+                  ? 'url(/wr_blue.png) no-repeat center center'
+                  : 'rgba(255,255,255,0.08)',
+                backgroundSize: 'cover',
                 color: activeModal === 'profile' ? '#000' : TEXT_COLORS.primary,
               }}
             >
@@ -348,7 +363,16 @@ export default function Page(): JSX.Element {
         </p>
         <Link 
           href="/testing-grounds" 
-          style={{ color: '#60A5FA', textDecoration: 'underline', marginTop: 8 }}
+          style={{ 
+            background: 'url(/wr_blue.png) no-repeat center center',
+            backgroundSize: 'cover',
+            WebkitBackgroundClip: 'text',
+            backgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            color: 'transparent',
+            textDecoration: 'underline', 
+            marginTop: 8 
+          }}
         >
           Back to testing grounds
         </Link>

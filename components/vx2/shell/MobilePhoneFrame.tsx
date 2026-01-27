@@ -41,11 +41,10 @@ export function MobilePhoneFrame({ children, contentOverSafeArea = false }: Mobi
       {/* Screen - dark bg so rounded corners don’t show white at top-left/top-right of bezel */}
       <div 
         className="w-full h-full rounded-[2.5rem] overflow-hidden relative"
-        style={{ 
+        style={{
           padding: 8,
           boxSizing: 'border-box',
-          background: 'url(/wr_blue.png) no-repeat center center',
-          backgroundSize: 'cover',
+          background: '#000',
         }}
       >
         {/* Dynamic Island - in border zone so it moves with the frame */}
