@@ -1094,13 +1094,59 @@ export function PaystackWithdrawModalVX2({
   const [error, setError] = useState<string | null>(null);
   const [transactionId, setTransactionId] = useState<string | null>(null);
 
+  // Load recipients callback
+  const loadRecipients = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/paystack/transfer/recipient?userId=${userId}`);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (data.ok && data.data?.recipients) {
+        setRecipients(data.data.recipients);
+        const defaultRecipient = data.data.recipients.find((r: PaystackTransferRecipient) => r.isDefault);
+        if (defaultRecipient) {
+          setSelectedRecipient(defaultRecipient);
+        }
+      }
+    } catch (err) {
+      logger.error('Failed to load recipients', err);
+    }
+  }, [userId]);
+
+  // Load banks callback
+  const loadBanks = useCallback(async () => {
+    try {
+      const countryMap: Record<string, string> = {
+        NG: 'nigeria',
+        GH: 'ghana',
+        ZA: 'south_africa',
+        KE: 'kenya',
+      };
+      const response = await fetch(`/api/paystack/transfer/recipient?banks=${countryMap[userCountry]}`);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (data.ok && data.data?.banks) {
+        setBanks(data.data.banks);
+      }
+    } catch (err) {
+      logger.error('Failed to load banks', err);
+    }
+  }, [userCountry]);
+
   // Load recipients and banks on mount
   useEffect(() => {
     if (isOpen && userId) {
       loadRecipients();
       loadBanks();
     }
-  }, [isOpen, userId, userCountry]);
+  }, [isOpen, userId, loadRecipients, loadBanks]);
 
   // Reset on close
   useEffect(() => {
@@ -1117,50 +1163,6 @@ export function PaystackWithdrawModalVX2({
       setTransactionId(null);
     }
   }, [isOpen]);
-
-  const loadRecipients = async () => {
-    try {
-      const response = await fetch(`/api/paystack/transfer/recipient?userId=${userId}`);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      if (data.ok && data.data?.recipients) {
-        setRecipients(data.data.recipients);
-        const defaultRecipient = data.data.recipients.find((r: PaystackTransferRecipient) => r.isDefault);
-        if (defaultRecipient) {
-          setSelectedRecipient(defaultRecipient);
-        }
-      }
-    } catch (err) {
-      logger.error('Failed to load recipients', err);
-    }
-  };
-
-  const loadBanks = async () => {
-    try {
-      const countryMap: Record<string, string> = {
-        NG: 'nigeria',
-        GH: 'ghana',
-        ZA: 'south_africa',
-        KE: 'kenya',
-      };
-      const response = await fetch(`/api/paystack/transfer/recipient?banks=${countryMap[userCountry]}`);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      if (data.ok && data.data?.banks) {
-        setBanks(data.data.banks);
-      }
-    } catch (err) {
-      logger.error('Failed to load banks', err);
-    }
-  };
 
   const handleAddRecipient = async (recipientData: {
     type: TransferRecipientType;

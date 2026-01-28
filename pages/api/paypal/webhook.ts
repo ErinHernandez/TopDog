@@ -22,6 +22,9 @@ import {
   updateDoc,
   setDoc,
   serverTimestamp,
+  runTransaction,
+  increment,
+  Timestamp,
 } from 'firebase/firestore';
 import type { PayPalWebhookEventType, WebhookProcessingResult } from '../../../lib/paypal/paypalTypes';
 import { paypalAmountToCents } from '../../../lib/paypal/paypalClient';
@@ -37,6 +40,9 @@ export const config = {
 // WEBHOOK LOCK MANAGEMENT (Prevent duplicate processing)
 // ============================================================================
 
+/** Processing timeout in milliseconds (5 minutes) */
+const PROCESSING_TIMEOUT_MS = 5 * 60 * 1000;
+
 interface WebhookLock {
   acquired: boolean;
   reason?: string;
@@ -44,6 +50,27 @@ interface WebhookLock {
   markFailed: (error: string) => Promise<void>;
 }
 
+/**
+ * Check if a processing attempt has timed out
+ */
+function isProcessingTimedOut(startedAt: Date | Timestamp | undefined): boolean {
+  if (!startedAt) return true;
+
+  const startTime =
+    startedAt instanceof Timestamp ? startedAt.toDate() : startedAt;
+  const elapsed = Date.now() - startTime.getTime();
+
+  return elapsed >= PROCESSING_TIMEOUT_MS;
+}
+
+/**
+ * SECURITY FIX (Bug #7): Use Firestore transaction for atomic lock acquisition.
+ *
+ * The previous implementation had a race condition where two concurrent requests
+ * could both read the lock document, both see it doesn't exist/isn't completed,
+ * and both try to acquire the lock. This fix uses a Firestore transaction to
+ * ensure atomicity.
+ */
 async function acquireWebhookLock(
   eventId: string,
   eventType: string,
@@ -53,54 +80,102 @@ async function acquireWebhookLock(
   const db = getDb();
   const lockRef = doc(db, 'webhook_locks', `${provider}_${eventId}`);
 
-  const lockDoc = await getDoc(lockRef);
+  try {
+    // Use a Firestore transaction to atomically check and acquire the lock
+    const result = await runTransaction(db, async (transaction) => {
+      const lockDoc = await transaction.get(lockRef);
 
-  if (lockDoc.exists()) {
-    const lockData = lockDoc.data();
-    if (lockData.status === 'completed') {
+      if (lockDoc.exists()) {
+        const lockData = lockDoc.data();
+
+        // Already fully processed - do not reprocess
+        if (lockData.status === 'completed') {
+          return {
+            acquired: false as const,
+            reason: 'already_processed' as const,
+          };
+        }
+
+        // Currently being processed - check for timeout
+        if (lockData.status === 'processing') {
+          const startedAt = lockData.startedAt;
+
+          if (!isProcessingTimedOut(startedAt)) {
+            // Still within timeout window - another handler is processing
+            return {
+              acquired: false as const,
+              reason: 'processing' as const,
+            };
+          }
+
+          // Processing timed out - allow retry
+          serverLogger.warn('PayPal webhook processing timed out, allowing retry', null, {
+            eventId,
+            provider,
+          });
+        }
+
+        // Failed status or timed out - update lock and acquire
+        transaction.update(lockRef, {
+          status: 'processing',
+          startedAt: serverTimestamp(),
+          attempts: increment(1),
+          error: null,
+          failedAt: null,
+        });
+
+        return { acquired: true as const };
+      }
+
+      // No existing record - create new lock atomically
+      transaction.set(lockRef, {
+        eventId,
+        eventType,
+        provider,
+        status: 'processing',
+        startedAt: serverTimestamp(),
+        attempts: 1,
+        metadata,
+        createdAt: serverTimestamp(),
+      });
+
+      return { acquired: true as const };
+    });
+
+    if (!result.acquired) {
       return {
         acquired: false,
-        reason: 'already_processed',
+        reason: result.reason,
         releaseLock: async () => {},
         markFailed: async () => {},
       };
     }
-    if (lockData.status === 'processing' && Date.now() - lockData.startedAt?.toMillis() < 60000) {
-      return {
-        acquired: false,
-        reason: 'processing',
-        releaseLock: async () => {},
-        markFailed: async () => {},
-      };
-    }
+
+    // Return lock control functions
+    return {
+      acquired: true,
+      releaseLock: async () => {
+        await updateDoc(lockRef, {
+          status: 'completed',
+          completedAt: serverTimestamp(),
+        });
+      },
+      markFailed: async (error: string) => {
+        await updateDoc(lockRef, {
+          status: 'failed',
+          error,
+          failedAt: serverTimestamp(),
+        });
+      },
+    };
+  } catch (error) {
+    serverLogger.error('Failed to acquire PayPal webhook lock', error as Error, {
+      eventId,
+      provider,
+      eventType,
+    });
+    throw error;
   }
-
-  // Acquire lock
-  await setDoc(lockRef, {
-    eventId,
-    eventType,
-    provider,
-    status: 'processing',
-    startedAt: serverTimestamp(),
-    metadata,
-  });
-
-  return {
-    acquired: true,
-    releaseLock: async () => {
-      await updateDoc(lockRef, {
-        status: 'completed',
-        completedAt: serverTimestamp(),
-      });
-    },
-    markFailed: async (error: string) => {
-      await updateDoc(lockRef, {
-        status: 'failed',
-        error,
-        failedAt: serverTimestamp(),
-      });
-    },
-  };
 }
 
 // ============================================================================
@@ -133,6 +208,13 @@ async function handleOrderApproved(
   };
 }
 
+/**
+ * SECURITY FIX (Bug #4): Use single Firestore transaction for atomic balance update.
+ *
+ * The previous implementation updated the balance and set balanceUpdated in separate
+ * operations. If a crash occurred between them, the balance could be updated twice
+ * on retry. This fix uses a single transaction to ensure atomicity.
+ */
 async function handleCaptureCompleted(
   resource: Record<string, unknown>
 ): Promise<WebhookProcessingResult> {
@@ -145,41 +227,100 @@ async function handleCaptureCompleted(
 
   serverLogger.info('PayPal capture completed', { captureId, orderId, amountCents });
 
+  const actions: string[] = [];
+
   // Update order status in Firebase
   if (orderId) {
     const db = getDb();
     const orderRef = doc(db, 'paypal_orders', orderId);
-    const orderDoc = await getDoc(orderRef);
 
-    if (orderDoc.exists()) {
-      const orderData = orderDoc.data();
+    try {
+      // Use a single transaction to atomically update order status, balance, and flag
+      const result = await runTransaction(db, async (transaction) => {
+        const orderDoc = await transaction.get(orderRef);
 
-      // Only process if not already completed
-      if (orderData.status !== 'COMPLETED') {
-        await updateDoc(orderRef, {
+        if (!orderDoc.exists()) {
+          return { success: false, reason: 'order_not_found' };
+        }
+
+        const orderData = orderDoc.data();
+
+        // Only process if not already completed
+        if (orderData.status === 'COMPLETED') {
+          return { success: true, reason: 'already_completed', balanceUpdated: false };
+        }
+
+        // Update order status
+        transaction.update(orderRef, {
           status: 'COMPLETED',
           captureId,
           capturedAt: serverTimestamp(),
         });
 
-        // If balance wasn't updated via API (edge case), update it here
+        // If balance wasn't updated via API (edge case), update it atomically
         if (!orderData.balanceUpdated) {
-          await updateUserBalance(
-            orderData.userId,
-            amountCents,
-            'add',
-            `webhook_capture_${captureId}`
-          );
+          const userId = orderData.userId;
+          const userRef = doc(db, 'users', userId);
+          const userDoc = await transaction.get(userRef);
 
-          await updateDoc(orderRef, { balanceUpdated: true });
+          if (!userDoc.exists()) {
+            throw new Error(`User ${userId} not found`);
+          }
 
-          await logPaymentEvent(orderData.userId, 'paypal_capture_completed_webhook', {
+          const currentBalance = userDoc.data().balanceCents || 0;
+          const newBalance = currentBalance + amountCents;
+
+          // Atomically update both user balance and order's balanceUpdated flag
+          transaction.update(userRef, {
+            balanceCents: newBalance,
+            updatedAt: serverTimestamp(),
+          });
+
+          transaction.update(orderRef, {
+            balanceUpdated: true,
+            balanceUpdatedAt: serverTimestamp(),
+            balanceUpdatedAmount: amountCents,
+          });
+
+          return {
+            success: true,
+            reason: 'balance_updated',
+            balanceUpdated: true,
+            userId,
+            newBalance,
+          };
+        }
+
+        return { success: true, reason: 'status_updated', balanceUpdated: false };
+      });
+
+      if (result.success) {
+        actions.push(result.reason);
+
+        if (result.balanceUpdated && result.userId) {
+          // Log the payment event (outside transaction since it's not critical)
+          await logPaymentEvent(result.userId, 'paypal_capture_completed_webhook', {
             captureId,
             orderId,
             amountCents,
+            newBalance: result.newBalance,
           });
+          actions.push('event_logged');
         }
+      } else {
+        serverLogger.warn('PayPal capture completed handler failed', null, {
+          captureId,
+          orderId,
+          reason: result.reason,
+        });
       }
+    } catch (error) {
+      serverLogger.error('PayPal capture completed transaction failed', error as Error, {
+        captureId,
+        orderId,
+        amountCents,
+      });
+      throw error;
     }
   }
 
@@ -187,7 +328,7 @@ async function handleCaptureCompleted(
     success: true,
     eventType: 'PAYMENT.CAPTURE.COMPLETED',
     eventId: captureId,
-    actions: ['capture_processed'],
+    actions: actions.length > 0 ? actions : ['capture_processed'],
   };
 }
 

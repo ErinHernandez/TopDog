@@ -40,14 +40,16 @@ import { db } from '../../../lib/firebase';
 import { isApprovedCountry } from '../../../lib/localeCharacters';
 import { createSignupLimiter } from '../../../lib/rateLimiter';
 import { logger } from '../../../lib/structuredLogger';
-import { 
-  withErrorHandling, 
-  validateMethod, 
+import {
+  withErrorHandling,
+  validateMethod,
+  validateRequestBody,
   validateBody,
   createErrorResponse,
   createSuccessResponse,
-  ErrorType 
+  ErrorType
 } from '../../../lib/apiErrorHandler';
+import { signupRequestSchema } from '../../../lib/validation/schemas';
 import { recordLocationVisit, grantLocationConsent } from '../../../lib/customization/geolocation';
 import { COUNTRY_NAMES, US_STATE_NAMES } from '../../../lib/customization/flags';
 
@@ -55,14 +57,8 @@ import { COUNTRY_NAMES, US_STATE_NAMES } from '../../../lib/customization/flags'
 // TYPES
 // ============================================================================
 
-interface SignupRequest {
-  uid: string;
-  username: string;
-  email?: string;
-  countryCode?: string;
-  stateCode?: string;
-  displayName?: string;
-}
+// Types are now inferred from Zod schemas in lib/validation/schemas.ts
+// import type { SignupRequest } from '../../../lib/validation/schemas';
 
 interface UsernameValidation {
   isValid: boolean;
@@ -252,7 +248,7 @@ export default async function handler(
       countryCode = 'US',
       stateCode,
       displayName 
-    } = req.body as SignupRequest;
+    } = validateRequestBody(req, signupRequestSchema, logger);
     
     logger.info('Processing user signup', {
       component: 'auth',

@@ -37,7 +37,7 @@ import {
 import { captureError } from '../../../lib/errorTracking';
 import { logger } from '../../../lib/structuredLogger';
 import { getDb } from '../../../lib/firebase-utils';
-import { doc, updateDoc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, updateDoc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import {
   withErrorHandling,
   validateMethod,
@@ -559,8 +559,8 @@ async function handlePaymentIntentSucceeded(
     actions.push('transaction_created');
   }
   
-  // Credit user balance
-  await updateUserBalance(userId, paymentIntent.amount, 'add');
+  // Credit user balance (pass currency for zero-decimal currency handling)
+  await updateUserBalance(userId, paymentIntent.amount, 'add', undefined, currency);
   actions.push('balance_credited');
   
   // Update user's last deposit currency for display currency auto-tracking
@@ -762,9 +762,9 @@ async function handleTransferCreated(
     return { success: true, actions: ['already_processed'] };
   }
   
-  // Debit user balance
-  await updateUserBalance(userId, transfer.amount, 'subtract');
-  
+  // Debit user balance (pass currency for zero-decimal currency handling)
+  await updateUserBalance(userId, transfer.amount, 'subtract', undefined, currency);
+
   // Create transaction record with currency
   await createTransaction({
     userId,
@@ -797,10 +797,10 @@ async function handleTransferFailed(
   }
   
   const currency = transfer.currency.toUpperCase();
-  
-  // Restore user balance
-  await updateUserBalance(userId, transfer.amount, 'add');
-  
+
+  // Restore user balance (pass currency for zero-decimal currency handling)
+  await updateUserBalance(userId, transfer.amount, 'add', undefined, currency);
+
   // Update transaction
   const existingTx = await findTransactionByTransfer(transfer.id);
   if (existingTx) {
@@ -909,6 +909,10 @@ async function handleDisputeCreated(
 
 /**
  * Handle refund
+ *
+ * SECURITY: Track individual refund events by refund ID to prevent double-deduction.
+ * The charge.amount_refunded is cumulative, so we must process each refund individually
+ * by looking at the latest refund in the refunds list.
  */
 async function handleChargeRefunded(
   charge: Stripe.Charge
@@ -917,39 +921,100 @@ async function handleChargeRefunded(
   if (!paymentIntent) {
     return { success: true, actions: ['no_payment_intent'] };
   }
-  
+
   const currency = charge.currency.toUpperCase();
-  
+
   // Find original transaction
   const transaction = await findTransactionByPaymentIntent(paymentIntent);
   if (!transaction) {
     return { success: false, error: 'Original transaction not found' };
   }
-  
+
   const userId = transaction.userId;
-  const refundAmount = charge.amount_refunded;
-  
-  // Debit refunded amount from balance
-  await updateUserBalance(userId, refundAmount, 'subtract');
-  
-  // Create refund transaction record with currency
-  await createTransaction({
-    userId,
-    type: 'refund',
-    amountCents: -refundAmount,
-    currency,
-    stripePaymentIntentId: paymentIntent,
-    description: 'Refund',
-    referenceId: transaction.id,
-  });
-  
-  // Log audit event
-  await logPaymentEvent(userId, 'refund_processed', {
-    transactionId: transaction.id,
-    amountCents: refundAmount,
-    severity: 'medium',
-    metadata: { currency },
-  });
-  
-  return { success: true, actions: ['refund_processed', 'balance_adjusted'] };
+
+  // SECURITY FIX (Bug #3): Process each refund individually by its ID
+  // The charge.refunds contains all refunds - we need to find and process only new ones
+  const refunds = charge.refunds?.data || [];
+
+  if (refunds.length === 0) {
+    return { success: true, actions: ['no_refunds_found'] };
+  }
+
+  const actions: string[] = [];
+  const db = getDb();
+
+  // Process each refund that hasn't been processed yet
+  for (const refund of refunds) {
+    const refundId = refund.id;
+    const refundAmount = refund.amount;
+
+    // Check if this specific refund has already been processed
+    const refundDocRef = doc(db, 'stripe_refunds', refundId);
+    const refundDoc = await getDoc(refundDocRef);
+
+    if (refundDoc.exists()) {
+      // This refund was already processed - skip to prevent double-deduction
+      actions.push(`refund_${refundId}_already_processed`);
+      continue;
+    }
+
+    // Mark this refund as being processed BEFORE deducting balance
+    // to prevent race conditions with concurrent webhook deliveries
+    await setDoc(refundDocRef, {
+      refundId,
+      chargeId: charge.id,
+      paymentIntentId: paymentIntent,
+      userId,
+      amountCents: refundAmount,
+      currency,
+      status: 'processing',
+      createdAt: serverTimestamp(),
+    });
+
+    try {
+      // Debit refunded amount from balance (pass currency for zero-decimal currency handling)
+      await updateUserBalance(userId, refundAmount, 'subtract', undefined, currency);
+
+      // Create refund transaction record with currency
+      await createTransaction({
+        userId,
+        type: 'refund',
+        amountCents: -refundAmount,
+        currency,
+        stripePaymentIntentId: paymentIntent,
+        stripeRefundId: refundId,
+        description: 'Refund',
+        referenceId: transaction.id,
+      });
+
+      // Mark refund as completed
+      await updateDoc(refundDocRef, {
+        status: 'completed',
+        completedAt: serverTimestamp(),
+      });
+
+      // Log audit event
+      await logPaymentEvent(userId, 'refund_processed', {
+        transactionId: transaction.id,
+        amountCents: refundAmount,
+        severity: 'medium',
+        metadata: { currency, refundId },
+      });
+
+      actions.push(`refund_${refundId}_processed`);
+    } catch (error) {
+      // Mark refund as failed for retry
+      await updateDoc(refundDocRef, {
+        status: 'failed',
+        error: (error as Error).message,
+        failedAt: serverTimestamp(),
+      });
+      throw error;
+    }
+  }
+
+  return {
+    success: true,
+    actions: actions.length > 0 ? actions : ['no_new_refunds']
+  };
 }

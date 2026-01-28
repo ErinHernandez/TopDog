@@ -421,7 +421,7 @@ export function useMyTeamsGameDayOptimized(): UseMyTeamsResult {
     setIsLoading(true);
     // ... fetch logic
     setIsLoading(false);
-  }, [userId]);
+  }, []);
 
   return {
     teams,

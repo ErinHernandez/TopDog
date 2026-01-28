@@ -25,7 +25,7 @@ import {
   createSuccessResponse,
   createErrorResponse,
   ErrorType 
-} from '../../../../lib/apiErrorHandler.js';
+} from '../../../../lib/apiErrorHandler';
 
 // Rate limiter for stats API (60 per minute)
 const rateLimiter = new RateLimiter({

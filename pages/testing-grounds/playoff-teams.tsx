@@ -412,7 +412,7 @@ export default function PlayoffTeamsSandbox() {
 
   const pod = useMemo(() => {
     return generatePlayoffPod(selectedScenario, selectedWeek);
-  }, [selectedScenario, selectedWeek, refreshKey]);
+  }, [selectedScenario, selectedWeek]);
 
   // Generate multiple pods for list view
   const pods = useMemo(() => {

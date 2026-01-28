@@ -483,14 +483,11 @@ class GlobalErrorBoundaryClass extends Component<ErrorBoundaryProps, ErrorBounda
 // ============================================================================
 
 // Wrapper to inject Next.js router (class components can't use hooks directly)
+// Note: useRouter must be called unconditionally. Tests should mock the router context.
 function GlobalErrorBoundary(props: Omit<ErrorBoundaryProps, 'router'>): JSX.Element {
-  let router: NextRouter | null = null;
-  try {
-    // useRouter can throw if called outside Next.js context (e.g., tests)
-    router = useRouter();
-  } catch {
-    // Router not available, continue without it
-  }
+  // Always call useRouter unconditionally - Next.js handles missing context gracefully
+  // In test environments, mock RouterContext or use next-router-mock
+  const router = useRouter();
   return <GlobalErrorBoundaryClass {...props} router={router} />;
 }
 

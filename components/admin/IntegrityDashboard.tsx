@@ -4,7 +4,7 @@
  * Admin dashboard for reviewing collusion flags.
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { createScopedLogger } from '@/lib/clientLogger';
 import type {
   DraftRiskScores,
@@ -241,11 +241,7 @@ function DraftDetailView({
   const [actionReason, setActionReason] = useState('');
   const [actionNotes, setActionNotes] = useState('');
 
-  useEffect(() => {
-    loadDetail();
-  }, [draftId]);
-
-  async function loadDetail() {
+  const loadDetail = useCallback(async () => {
     try {
       const auth = (await import('firebase/auth')).getAuth();
       const user = auth.currentUser;
@@ -262,7 +258,11 @@ function DraftDetailView({
     } finally {
       setLoading(false);
     }
-  }
+  }, [draftId]);
+
+  useEffect(() => {
+    loadDetail();
+  }, [loadDetail]);
 
   async function handleAction(action: string) {
     if (!actionReason.trim()) {

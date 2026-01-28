@@ -5,7 +5,7 @@
  * Uses exchange rate service for international users
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 interface BalanceDisplayProps {
   /** Balance in cents */
@@ -31,13 +31,7 @@ export function BalanceDisplay({
   const [isLoading, setIsLoading] = useState(false);
 
   // Fetch local currency estimate for non-USD users
-  useEffect(() => {
-    if (userCurrency && userCurrency !== 'USD') {
-      fetchLocalEstimate();
-    }
-  }, [balanceCents, userCurrency]);
-
-  const fetchLocalEstimate = async () => {
+  const fetchLocalEstimate = useCallback(async () => {
     if (!userCurrency || userCurrency === 'USD') return;
 
     setIsLoading(true);
@@ -52,7 +46,13 @@ export function BalanceDisplay({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [userCurrency, balanceCents]);
+
+  useEffect(() => {
+    if (userCurrency && userCurrency !== 'USD') {
+      fetchLocalEstimate();
+    }
+  }, [fetchLocalEstimate, userCurrency]);
 
   // Format USD balance
   const usdFormatted = (balanceCents / 100).toLocaleString('en-US', {

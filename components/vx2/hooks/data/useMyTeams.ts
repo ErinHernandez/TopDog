@@ -319,12 +319,7 @@ async function fetchMyTeams(): Promise<MyTeam[]> {
  * Set useFirebaseTeams: true in lib/tournamentConfig.js to enable Firebase.
  */
 export function useMyTeams(): UseMyTeamsResult {
-  // Check feature flag - if Firebase is enabled, use Firebase hook
-  if (useFirebaseTeams) {
-    return useMyTeamsWithFirebase();
-  }
-
-  // Default: Use mock data (existing implementation below)
+  // Initialize all hooks unconditionally (before feature flag check)
   const [teams, setTeams] = useState<MyTeam[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefetching, setIsRefetching] = useState(false);
@@ -338,7 +333,7 @@ export function useMyTeams(): UseMyTeamsResult {
         setIsLoading(true);
       }
       setError(null);
-      
+
       const data = await fetchMyTeams();
       setTeams(data);
     } catch (err) {
@@ -357,6 +352,15 @@ export function useMyTeams(): UseMyTeamsResult {
     await fetchData(true);
   }, [fetchData]);
 
+  // Call Firebase hook unconditionally (hooks must be called unconditionally)
+  const firebaseResult = useMyTeamsWithFirebase();
+
+  // Check feature flag and return appropriate result
+  if (useFirebaseTeams) {
+    return firebaseResult;
+  }
+
+  // Default: Return mock data implementation
   return {
     teams,
     isLoading,

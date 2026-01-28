@@ -18,10 +18,12 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { 
   withErrorHandling, 
   validateMethod, 
+  validateRequestBody,
   createSuccessResponse,
   createErrorResponse,
   ErrorType,
 } from '../../../../lib/apiErrorHandler';
+import { stripePaymentIntentRequestSchema } from '../../../../lib/validation/schemas';
 import {
   getOrCreateCustomer,
   createPaymentIntent,
@@ -41,35 +43,8 @@ import { v4 as uuidv4 } from 'uuid';
 // TYPES
 // ============================================================================
 
-interface PaymentIntentRequestBody {
-  /** Amount in smallest unit of currency (cents for USD, etc.) */
-  amountCents: number;
-  /** ISO 4217 currency code (defaults to 'USD') */
-  currency?: string;
-  /** User's country code for payment method filtering */
-  country?: string;
-  /** Firebase user ID */
-  userId: string;
-  /** User's email (optional, used for new customers) */
-  email?: string;
-  /** User's display name */
-  name?: string;
-  /** Payment method types to allow */
-  paymentMethodTypes?: string[];
-  /** Whether to save the payment method */
-  savePaymentMethod?: boolean;
-  /** Existing payment method ID to charge */
-  paymentMethodId?: string;
-  /** Idempotency key (optional, will be generated if not provided) */
-  idempotencyKey?: string;
-  /** Risk context for fraud detection */
-  riskContext?: {
-    ipAddress?: string;
-    country?: string;
-    deviceId?: string;
-    sessionId?: string;
-  };
-}
+// Types are now inferred from Zod schemas in lib/validation/schemas.ts
+// import type { StripePaymentIntentRequest } from '../../../../lib/validation/schemas';
 
 // ============================================================================
 // CONSTANTS - ALL SUPPORTED PAYMENT METHODS
@@ -236,21 +211,14 @@ const handler = async function(
     // Set API version header
     res.setHeader('API-Version', '1');
     
-    const body = req.body as PaymentIntentRequestBody;
+    // Validate request body with Zod schema
+    const body = validateRequestBody(req, stripePaymentIntentRequestSchema, logger);
     const clientIP = getClientIP(req);
     
-    // Validate required fields
+    // Extract validated fields (Zod already validated these)
     const { amountCents, userId, email } = body;
-    const currency = (body.currency || 'USD').toUpperCase();
+    const currency = body.currency.toUpperCase();
     const country = (body.country || body.riskContext?.country || 'US').toUpperCase();
-    
-    if (!amountCents || !userId) {
-      const error = createErrorResponse(
-        ErrorType.VALIDATION,
-        'amountCents and userId are required'
-      );
-      return res.status(error.statusCode).json(error.body);
-    }
     
     // Validate amount against currency-specific limits
     const currencyConfig = getCurrencyConfig(currency);
@@ -269,10 +237,19 @@ const handler = async function(
     
     // Filter requested payment methods to only allowed ones
     const requestedMethods = body.paymentMethodTypes || ['card'];
-    const paymentMethodTypes = requestedMethods.filter(
-      (type): type is PaymentMethodType => 
-        allowedMethods.includes(type as AllowedPaymentMethod)
-    );
+    // Convert to allowed format and filter
+    const paymentMethodTypes = requestedMethods
+      .map(type => {
+        // Convert 'applepay'/'googlepay' to 'apple_pay'/'google_pay' if needed
+        if (type === 'applepay') return 'apple_pay';
+        if (type === 'googlepay') return 'google_pay';
+        return type;
+      })
+      .filter((type): type is PaymentMethodType => {
+        // Check if type is in allowed methods (normalize for comparison)
+        const normalized = type === 'apple_pay' ? 'applepay' : type === 'google_pay' ? 'googlepay' : type;
+        return allowedMethods.includes(normalized as AllowedPaymentMethod);
+      });
     
     // If no valid methods remain, default to card
     if (paymentMethodTypes.length === 0) {
@@ -412,5 +389,6 @@ const handler = async function(
 };
 
 // Export with CSRF protection
+// Type assertion needed for middleware chain compatibility
 type CSRFHandler = (req: NextApiRequest, res: NextApiResponse) => Promise<void> | void;
-export default withCSRFProtection(handler as unknown as CSRFHandler);
+export default withCSRFProtection(handler as CSRFHandler);

@@ -85,3 +85,4 @@ temp/
 # Backup files
 *.bak
 .env*.local
+service-account-key.json

@@ -410,7 +410,7 @@ export function useTransactionHistory(
     );
     
     return () => unsubscribe();
-  }, [userId, maxResults, realTime]);
+  }, [userId, maxResults, realTime, fetchData]);
 
   const refetch = useCallback(async () => {
     if (!realTime) {

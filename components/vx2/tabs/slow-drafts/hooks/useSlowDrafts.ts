@@ -343,7 +343,10 @@ export function useSlowDrafts(options: UseSlowDraftsOptions = {}): UseSlowDrafts
   }, [userId, apiUrl, swrError]);
 
   // Combine data sources - prefer API data, fallback to mock
-  const allDrafts = apiDrafts || mockDrafts || [];
+  const allDrafts = useMemo(
+    () => apiDrafts || mockDrafts || [],
+    [apiDrafts, mockDrafts]
+  );
   // Only show loading if we're trying to use API and don't have mock data yet
   const isLoading = Boolean(swrLoading && apiUrl && !mockDrafts);
   // Don't show error to user if we have mock data as fallback

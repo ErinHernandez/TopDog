@@ -111,6 +111,8 @@ export interface Transaction {
   stripePayoutId?: string;
   /** Stripe Transfer ID (for Connect payouts) */
   stripeTransferId?: string;
+  /** Stripe Refund ID (for refund deduplication) */
+  stripeRefundId?: string;
   /** Payment method description (e.g., "Visa ****4242") */
   paymentMethod?: string;
   /** Human-readable description */
@@ -151,6 +153,7 @@ export interface CreateTransactionInput {
   stripePaymentIntentId?: string;
   stripePayoutId?: string;
   stripeTransferId?: string;
+  stripeRefundId?: string;
   paymentMethod?: string;
   description?: string;
   referenceId?: string;

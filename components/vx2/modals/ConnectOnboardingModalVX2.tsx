@@ -334,28 +334,15 @@ export function ConnectOnboardingModalVX2({
   const [error, setError] = useState<string | null>(null);
   const pollCountRef = useRef(0);
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  
-  // Check existing account status on mount
-  useEffect(() => {
-    if (isOpen && userId) {
-      checkAccountStatus();
-    }
-    
-    return () => {
-      if (pollIntervalRef.current) {
-        clearInterval(pollIntervalRef.current);
-      }
-    };
-  }, [isOpen, userId]);
-  
-  const checkAccountStatus = async () => {
+
+  const checkAccountStatus = useCallback(async () => {
     try {
       const response = await fetch(`/api/stripe/connect/account?userId=${userId}`);
       const data = await response.json();
-      
+
       if (data.success && data.data) {
         setAccountStatus(data.data);
-        
+
         if (data.data.onboardingComplete) {
           setStep('complete');
         } else if (data.data.onboardingUrl) {
@@ -365,7 +352,20 @@ export function ConnectOnboardingModalVX2({
     } catch (err) {
       logger.error('Failed to check account status', err);
     }
-  };
+  }, [userId]);
+
+  // Check existing account status on mount
+  useEffect(() => {
+    if (isOpen && userId) {
+      checkAccountStatus();
+    }
+
+    return () => {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+      }
+    };
+  }, [isOpen, userId, checkAccountStatus]);
   
   const createAccount = async () => {
     setStep('creating');

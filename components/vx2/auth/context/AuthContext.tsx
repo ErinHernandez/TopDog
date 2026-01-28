@@ -100,6 +100,19 @@ const initialState: AuthState = {
 // ============================================================================
 
 /**
+ * Wraps a promise with a timeout
+ * If the promise doesn't resolve within timeoutMs, rejects with error
+ */
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number, errorMessage: string): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => {
+      setTimeout(() => reject(new Error(errorMessage)), timeoutMs);
+    }),
+  ]);
+}
+
+/**
  * Convert Firebase User to AuthUser
  */
 function firebaseUserToAuthUser(user: FirebaseUser): AuthUser {
@@ -292,22 +305,7 @@ export function AuthProvider({
       return null;
     }
   }, []);
-  
-  // ========== Timeout Helper ==========
-  
-  /**
-   * Wraps a promise with a timeout
-   * If the promise doesn't resolve within timeoutMs, rejects with error
-   */
-  const withTimeout = useCallback(<T,>(promise: Promise<T>, timeoutMs: number, errorMessage: string): Promise<T> => {
-    return Promise.race([
-      promise,
-      new Promise<T>((_, reject) => {
-        setTimeout(() => reject(new Error(errorMessage)), timeoutMs);
-      }),
-    ]);
-  }, []);
-  
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -876,7 +874,7 @@ export function AuthProvider({
   
   const refreshProfile = useCallback(async (): Promise<void> => {
     if (!db || !state.user) return;
-    
+
     try {
       const profileDoc = await withTimeout(
         getDoc(doc(db, 'users', state.user.uid)),
@@ -886,7 +884,7 @@ export function AuthProvider({
         logger.warn(`Profile refresh failed or timed out: ${error.message}`);
         return null; // Return null to continue without updating
       });
-      
+
       if (profileDoc && profileDoc.exists()) {
         const profileData = profileDoc.data();
         const profile: UserProfile = {
@@ -916,7 +914,7 @@ export function AuthProvider({
     } catch (error) {
       logger.error('Error refreshing profile', error instanceof Error ? error : new Error(String(error)));
     }
-  }, [db, state.user, withTimeout]);
+  }, [db, state.user]);
   
   const clearError = useCallback(() => {
     dispatch({ type: 'CLEAR_ERROR' });

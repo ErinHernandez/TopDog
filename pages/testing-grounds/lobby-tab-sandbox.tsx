@@ -226,7 +226,7 @@ function SliderRow({
 
   React.useEffect(() => {
     if (value !== live) setLive(value);
-  }, [value]);
+  }, [value, live]);
 
   const handleChange = (n: number) => {
     setLive(n);
@@ -346,7 +346,7 @@ export default function LobbyTabSandboxPage(): React.ReactElement {
         setJoinModalTournament(null);
       }, 600);
     },
-    [joinModalTournament?.id],
+    [],
   );
 
   const dimensionsSpec = React.useMemo(() => {

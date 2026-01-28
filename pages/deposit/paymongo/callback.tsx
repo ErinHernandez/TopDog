@@ -7,7 +7,7 @@
  * @module pages/deposit/paymongo/callback
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { createScopedLogger } from '@/lib/clientLogger';

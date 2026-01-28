@@ -46,10 +46,18 @@ export async function showWebNotification(
     // Try service worker first for better reliability
     if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
       const registration = await navigator.serviceWorker.ready;
-      // Note: 'actions' is not in the standard NotificationOptions type
-      // but is supported by service worker notifications
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const notificationOptions: any = {
+      // Service worker notifications support 'actions' which isn't in standard NotificationOptions
+      interface ServiceWorkerNotificationOptions extends NotificationOptions {
+        actions?: Array<{
+          action: string;
+          title: string;
+          icon?: string;
+        }>;
+        badge?: string;
+        data?: Record<string, unknown>;
+      }
+      
+      const notificationOptions: ServiceWorkerNotificationOptions = {
         body: alertState.message,
         icon: '/icon-192x192.png',
         badge: '/icon-96x96.png',

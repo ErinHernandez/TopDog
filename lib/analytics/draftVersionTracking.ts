@@ -78,13 +78,14 @@ export function useDraftVersionTracking(
   roomId?: string | null,
   userId?: string | null
 ): void {
-  // Only run in browser
-  if (typeof window === 'undefined') {
-    return;
-  }
-
   // Use useEffect to track on mount
+  // Hook must be called unconditionally at the top level
   React.useEffect(() => {
+    // Only run in browser
+    if (typeof window === 'undefined') {
+      return;
+    }
+
     if (roomId) {
       trackDraftVersion(version, roomId, userId);
     }

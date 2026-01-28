@@ -83,19 +83,8 @@ interface VerifyAdminResponse {
 
 export default function PaymentSecurityDashboardPage() {
   const { user, isAuthenticated, mounted } = useSafeAuth();
-  
-  // Prevent execution during build/prerender phase (after hooks are called)
-  if (typeof window === 'undefined' && isBuildPhase()) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading Payment Security Dashboard...</p>
-        </div>
-      </div>
-    );
-  }
 
+  // Move all hooks to the top, before any conditional returns
   const [systemStatus, setSystemStatus] = useState<SystemStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -191,6 +180,18 @@ export default function PaymentSecurityDashboardPage() {
     
     checkAdminAccess();
   }, [user, isAuthenticated, mounted]);
+
+  // Prevent execution during build/prerender phase (after all hooks are called)
+  if (typeof window === 'undefined' && isBuildPhase()) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading Payment Security Dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Show loading state during SSR or while checking auth
   if (!mounted || loading) {

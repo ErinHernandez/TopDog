@@ -78,7 +78,8 @@
     "node_modules",
     ".next",
     "out",
-    "components/vx",
-    "functions"
+    "functions",
+    "__tests__",
+    "cypress"
   ]
 }

@@ -38,33 +38,7 @@ export function PayPalButton({
   // Get client ID from environment
   const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
 
-  // Validate client ID
-  if (!clientId) {
-    return (
-      <div className="text-red-500 text-sm p-4 bg-red-50 rounded-lg">
-        PayPal is not configured. Please contact support.
-      </div>
-    );
-  }
-
-  // Validate amount - minimum
-  if (amountCents < PAYPAL_DEPOSIT_LIMITS.minAmountCents) {
-    return (
-      <div className="text-amber-600 text-sm p-4 bg-amber-50 rounded-lg">
-        Minimum deposit is ${PAYPAL_DEPOSIT_LIMITS.minAmountCents / 100} (cost of one draft entry)
-      </div>
-    );
-  }
-
-  // Validate amount - maximum
-  if (amountCents > PAYPAL_DEPOSIT_LIMITS.maxAmountCents) {
-    return (
-      <div className="text-amber-600 text-sm p-4 bg-amber-50 rounded-lg">
-        Maximum deposit is ${PAYPAL_DEPOSIT_LIMITS.maxAmountCents / 100} (150 drafts)
-      </div>
-    );
-  }
-
+  // All hooks must be called unconditionally at the top level
   // Create order handler
   const createOrder = useCallback(async (): Promise<string> => {
     setIsProcessing(true);
@@ -140,6 +114,34 @@ export function PayPalButton({
     setIsProcessing(false);
     onCancel();
   }, [onCancel]);
+
+  // Validation checks - after all hooks are called
+  // Validate client ID
+  if (!clientId) {
+    return (
+      <div className="text-red-500 text-sm p-4 bg-red-50 rounded-lg">
+        PayPal is not configured. Please contact support.
+      </div>
+    );
+  }
+
+  // Validate amount - minimum
+  if (amountCents < PAYPAL_DEPOSIT_LIMITS.minAmountCents) {
+    return (
+      <div className="text-amber-600 text-sm p-4 bg-amber-50 rounded-lg">
+        Minimum deposit is ${PAYPAL_DEPOSIT_LIMITS.minAmountCents / 100} (cost of one draft entry)
+      </div>
+    );
+  }
+
+  // Validate amount - maximum
+  if (amountCents > PAYPAL_DEPOSIT_LIMITS.maxAmountCents) {
+    return (
+      <div className="text-amber-600 text-sm p-4 bg-amber-50 rounded-lg">
+        Maximum deposit is ${PAYPAL_DEPOSIT_LIMITS.maxAmountCents / 100} (150 drafts)
+      </div>
+    );
+  }
 
   return (
     <div className={`paypal-button-container ${disabled || isProcessing ? 'opacity-50 pointer-events-none' : ''}`}>

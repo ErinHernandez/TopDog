@@ -113,6 +113,7 @@ export function useConnectionStatus({
   const onReconnectedRef = useRef(onReconnected);
   const onDisconnectedRef = useRef(onDisconnected);
   const onReconnectFailedRef = useRef(onReconnectFailed);
+  const scheduleReconnectRef = useRef<(() => void) | null>(null);
 
   // Update callback refs
   useEffect(() => {
@@ -134,7 +135,7 @@ export function useConnectionStatus({
 
       // Trigger reconnection when coming back online
       if (autoReconnect && state === 'disconnected') {
-        attemptReconnect();
+        scheduleReconnectRef.current?.();
       }
     };
 
@@ -204,7 +205,7 @@ export function useConnectionStatus({
           if (isOnline) {
             setState('reconnecting');
             if (autoReconnect) {
-              scheduleReconnect();
+              scheduleReconnectRef.current?.();
             }
           } else {
             setState('disconnected');
@@ -223,7 +224,7 @@ export function useConnectionStatus({
         setState('connected');
       }
     }
-  }, [db, roomId, isOnline, autoReconnect, isFirestoreConnected, reconnectAttempts]);
+  }, [roomId, isOnline, autoReconnect, isFirestoreConnected, reconnectAttempts]);
 
   // -------------------------------------------------------------------------
   // RECONNECTION LOGIC
@@ -269,7 +270,7 @@ export function useConnectionStatus({
     reconnectTimeoutRef.current = setTimeout(() => {
       attemptReconnect();
     }, delay);
-  }, [reconnectAttempts, maxReconnectAttempts, calculateReconnectDelay]);
+  }, [reconnectAttempts, maxReconnectAttempts, calculateReconnectDelay, attemptReconnect]);
 
   const attemptReconnect = useCallback(async () => {
     if (!db) return;
@@ -289,14 +290,14 @@ export function useConnectionStatus({
       logger.error('Reconnection attempt failed', error as Error);
 
       if (reconnectAttempts + 1 < maxReconnectAttempts) {
-        scheduleReconnect();
+        scheduleReconnectRef.current?.();
       } else {
         setState('error');
         setErrorMessage('Failed to reconnect');
         onReconnectFailedRef.current?.();
       }
     }
-  }, [db, reconnectAttempts, maxReconnectAttempts, scheduleReconnect]);
+  }, [reconnectAttempts, maxReconnectAttempts]);
 
   // -------------------------------------------------------------------------
   // CLEANUP
@@ -312,6 +313,14 @@ export function useConnectionStatus({
       }
     };
   }, []);
+
+  // -------------------------------------------------------------------------
+  // UPDATE SCHEDULE RECONNECT REF
+  // -------------------------------------------------------------------------
+
+  useEffect(() => {
+    scheduleReconnectRef.current = scheduleReconnect;
+  }, [scheduleReconnect]);
 
   // -------------------------------------------------------------------------
   // ACTIONS
@@ -334,7 +343,7 @@ export function useConnectionStatus({
     } catch (error) {
       logger.error('Disconnect failed', error as Error);
     }
-  }, [db]);
+  }, []);
 
   const reset = useCallback(() => {
     setReconnectAttempts(0);

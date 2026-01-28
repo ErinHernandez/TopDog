@@ -46,14 +46,29 @@ import { acquireWebhookLock } from '../../../lib/webhooks/atomicLock';
 // ============================================================================
 
 /**
- * SECURITY: Rate limit failed webhook signature verification attempts
- * This prevents brute force attacks on the webhook endpoint
+ * SECURITY FIX (Bug #5): Rate limit ALL webhook requests BEFORE processing
+ *
+ * The previous implementation only rate-limited after signature verification failed,
+ * allowing attackers to consume server resources (CPU for signature verification,
+ * memory for body parsing) before being rate-limited.
+ *
+ * This fix adds a general rate limiter that runs BEFORE any processing.
  *
  * Configuration:
- * - 10 failed attempts allowed per minute per IP
+ * - 100 requests per minute per IP for general rate limiting
+ * - 10 failed verification attempts per minute per IP (stricter)
  * - Fail-closed: If rate limiter fails, reject the request
  * - Circuit breaker after 5 consecutive failures
  */
+const generalWebhookLimiter = new RateLimiter({
+  endpoint: 'paystack_webhook_general',
+  maxRequests: 100, // Allow legitimate high volume from Paystack
+  windowMs: 60 * 1000, // 1 minute
+  failClosed: true,
+  circuitBreakerThreshold: 5,
+  circuitBreakerResetMs: 30 * 1000,
+});
+
 const failedVerificationLimiter = new RateLimiter({
   endpoint: 'paystack_webhook_failed_verification',
   maxRequests: 10,
@@ -116,7 +131,36 @@ export default async function handler(
   return withErrorHandling(req, res, async (req, res, logger) => {
     // Validate HTTP method
     validateMethod(req, ['POST'], logger);
-    
+
+    // Get client IP for rate limiting
+    const clientIp = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ||
+                    req.socket?.remoteAddress ||
+                    'unknown';
+
+    // SECURITY FIX (Bug #5): Rate limit BEFORE any processing to prevent resource exhaustion
+    // This check must happen before signature verification or body parsing
+    const generalRateLimitResult = await generalWebhookLimiter.check({
+      headers: { 'x-forwarded-for': clientIp },
+      socket: { remoteAddress: clientIp },
+    } as unknown as NextApiRequest);
+
+    if (!generalRateLimitResult.allowed) {
+      logger.warn('Paystack webhook rate limited - too many requests', {
+        component: 'paystack',
+        operation: 'webhook',
+        ip: clientIp,
+        remaining: generalRateLimitResult.remaining,
+        retryAfterMs: generalRateLimitResult.retryAfterMs,
+      });
+
+      // Return 429 for rate limited requests
+      // Note: Paystack will retry, but this prevents resource exhaustion attacks
+      return res.status(429).json({
+        received: false,
+        error: 'Too many requests - please retry later',
+      });
+    }
+
     try {
       // Read raw body (must be done before signature verification)
       const rawBody = await readRawBody(req);
@@ -128,11 +172,7 @@ export default async function handler(
       const isValid = verifyWebhookSignature(rawBody, signature || '');
 
       if (!signature || !isValid) {
-        // SECURITY: Rate limit failed verification attempts to prevent brute force
-        const clientIp = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ||
-                        req.socket?.remoteAddress ||
-                        'unknown';
-
+        // SECURITY: Additional rate limit for failed verification attempts (stricter than general limit)
         const rateLimitResult = await failedVerificationLimiter.check({
           headers: { 'x-forwarded-for': clientIp },
           socket: { remoteAddress: clientIp },

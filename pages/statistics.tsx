@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -37,16 +37,16 @@ export default function Statistics() {
   
   const userId = user?.uid;
 
-  const fetchUserStats = async (): Promise<void> => {
+  const fetchUserStats = useCallback(async (): Promise<void> => {
     if (!userId) {
       setLoading(false);
       return;
     }
-    
+
     try {
       const stats = await getUserStats(userId);
       setUserStats(stats);
-      
+
       if (stats) {
         const rank = calculateUserRank(stats);
         setUserRank(rank);
@@ -56,13 +56,13 @@ export default function Statistics() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
 
   useEffect(() => {
     if (userId) {
       fetchUserStats();
     }
-  }, [userId]);
+  }, [userId, fetchUserStats]);
 
   const formatCurrency = (amount: number | undefined | null): string => {
     return new Intl.NumberFormat('en-US', {

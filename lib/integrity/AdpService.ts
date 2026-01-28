@@ -148,7 +148,15 @@ export class AdpService {
     // const data = await response.json();
 
     // Transform to AdpData format
-    // const players = data.map((p: any) => ({
+    // interface SourcePlayer {
+    //   id: string;
+    //   name: string;
+    //   position: string;
+    //   team: string;
+    //   averageDraftPosition: number;
+    //   positionRank: number;
+    // }
+    // const players = data.map((p: SourcePlayer) => ({
     //   playerId: p.id,
     //   playerName: p.name,
     //   position: p.position,

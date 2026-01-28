@@ -65,20 +65,13 @@ export function XenditWithdrawModalVX2({
   const [error, setError] = useState<string | null>(null);
   const [transactionId, setTransactionId] = useState<string | null>(null);
   
-  // Load saved accounts
-  useEffect(() => {
-    if (isOpen && userId) {
-      loadSavedAccounts();
-    }
-  }, [isOpen, userId]);
-  
-  const loadSavedAccounts = async () => {
+  const loadSavedAccounts = useCallback(async () => {
     try {
       const response = await fetch(`/api/user/disbursement-accounts?userId=${userId}`);
       if (response.ok) {
         const data = await response.json();
         setSavedAccounts(data.accounts || []);
-        
+
         // Auto-select default account
         const defaultAccount = data.accounts?.find((a: XenditSavedDisbursementAccount) => a.isDefault);
         if (defaultAccount) {
@@ -88,7 +81,14 @@ export function XenditWithdrawModalVX2({
     } catch (err) {
       logger.error('Failed to load accounts', err);
     }
-  };
+  }, [userId]);
+
+  // Load saved accounts
+  useEffect(() => {
+    if (isOpen && userId) {
+      loadSavedAccounts();
+    }
+  }, [isOpen, userId, loadSavedAccounts]);
   
   // Validation
   const amountValidation = useMemo(() => {

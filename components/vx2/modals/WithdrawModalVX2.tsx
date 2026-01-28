@@ -528,27 +528,20 @@ export default function WithdrawModalVX2({
   const [isCheckingConnect, setIsCheckingConnect] = useState(true);
   const [payoutId, setPayoutId] = useState<string | null>(null);
 
-  // Check Connect account status on mount
-  useEffect(() => {
-    if (isOpen && userId) {
-      checkConnectStatus();
-    }
-  }, [isOpen, userId]);
-
-  const checkConnectStatus = async () => {
+  const checkConnectStatus = useCallback(async () => {
     setIsCheckingConnect(true);
     try {
       const response = await fetch(`/api/stripe/connect/account?userId=${userId}`);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
-      
+
       if (data.success && data.data) {
         setConnectStatus(data.data);
-        
+
         // If Connect is set up, create a placeholder payout method
         if (data.data.onboardingComplete || data.data.payoutsEnabled) {
           setPayoutMethods([{
@@ -572,7 +565,14 @@ export default function WithdrawModalVX2({
     } finally {
       setIsCheckingConnect(false);
     }
-  };
+  }, [userId]);
+
+  // Check Connect account status on mount
+  useEffect(() => {
+    if (isOpen && userId) {
+      checkConnectStatus();
+    }
+  }, [isOpen, userId, checkConnectStatus]);
 
   // Check if biometrics are available on mount
   useEffect(() => {
@@ -699,7 +699,7 @@ export default function WithdrawModalVX2({
   const handleConnectComplete = useCallback(() => {
     setShowConnectOnboarding(false);
     checkConnectStatus();
-  }, []);
+  }, [checkConnectStatus]);
 
   const handleBack = useCallback(() => {
     if (step === 'biometric') setStep('amount');

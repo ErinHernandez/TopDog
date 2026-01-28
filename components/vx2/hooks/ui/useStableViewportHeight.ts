@@ -40,6 +40,9 @@ export function useStableViewportHeight(): void {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
+    // Capture the timeout ref at effect start to avoid stale closure issues
+    const currentTimeout = timeoutRef.current;
+
     const setVhProperty = (height: number) => {
       const vh = height * 0.01;
       document.documentElement.style.setProperty('--stable-vh', `${vh}px`);
@@ -95,8 +98,9 @@ export function useStableViewportHeight(): void {
     window.addEventListener('orientationchange', handleOrientationChange);
 
     return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
+      // Use captured timeout value in cleanup
+      if (currentTimeout) {
+        clearTimeout(currentTimeout);
       }
       if (window.visualViewport) {
         window.visualViewport.removeEventListener('resize', handleResize);

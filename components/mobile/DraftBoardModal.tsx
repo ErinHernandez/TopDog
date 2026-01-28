@@ -116,24 +116,18 @@ const DraftBoardModal: React.FC<DraftBoardModalProps> = ({
   team,
   onClose
 }): React.ReactElement | null => {
-  if (!team) return null;
-
   const userParticipantIndex = 0;
 
-  // Convert team data to VX2 format
+  // Convert team data to VX2 format - hooks must be called unconditionally
   const picks = useMemo(
-    () => convertTeamToPicks(team, userParticipantIndex),
+    () => (team ? convertTeamToPicks(team, userParticipantIndex) : []),
     [team]
   );
 
   const participants = useMemo(
-    () => createMockParticipants(team.name),
-    [team.name]
+    () => (team ? createMockParticipants(team.name) : []),
+    [team]
   );
-
-  // Total picks for the draft
-  const totalPicks = TEAM_COUNT * ROSTER_SIZE;
-  const currentPickNumber = picks.length + 1;
 
   // Get pick for a specific slot (used by DraftBoard)
   const getPickForSlot = useCallback(
@@ -154,6 +148,12 @@ const DraftBoardModal: React.FC<DraftBoardModalProps> = ({
     },
     [picks]
   );
+
+  // Early return AFTER all hooks are called
+  if (!team) return null;
+
+  // Total picks for the draft
+  const currentPickNumber = picks.length + 1;
 
   const handleClose = (): void => {
     onClose();

@@ -1023,22 +1023,33 @@ export interface BalanceUpdateResult {
  * SECURITY: Uses Firestore transaction to prevent race conditions where
  * concurrent updates could result in incorrect balances.
  *
+ * SECURITY FIX (Bug #6): Added currency parameter to handle zero-decimal currencies.
+ * For currencies like JPY, KRW, VND, the amount is already in the smallest unit
+ * and should NOT be divided by 100.
+ *
  * @param userId - Firebase user ID
- * @param amountCents - Amount in cents (will be converted to dollars)
+ * @param amountSmallestUnit - Amount in smallest unit (cents for USD, yen for JPY, etc.)
  * @param operation - 'add' for deposits, 'subtract' for withdrawals
  * @param idempotencyKey - Optional key to prevent duplicate operations
+ * @param currency - ISO 4217 currency code (defaults to 'USD')
  * @returns Promise resolving to balance update result
  */
 export async function updateUserBalance(
   userId: string,
-  amountCents: number,
+  amountSmallestUnit: number,
   operation: 'add' | 'subtract',
-  idempotencyKey?: string
+  idempotencyKey?: string,
+  currency: string = 'USD'
 ): Promise<number> {
   try {
     const db = getDb();
     const userRef = doc(db, 'users', userId);
-    const amountDollars = amountCents / 100;
+
+    // SECURITY FIX (Bug #6): Use currency-aware conversion to handle zero-decimal currencies
+    // For USD: 2500 cents -> 25.00 dollars
+    // For JPY: 2500 yen -> 2500 yen (zero-decimal, no conversion)
+    // For BHD: 2500 fils -> 2.500 dinars (three-decimal)
+    const amountDisplayUnits = toDisplayAmount(amountSmallestUnit, currency);
 
     // SECURITY: Check for duplicate operations if idempotency key provided
     if (idempotencyKey) {
@@ -1054,6 +1065,7 @@ export async function updateUserBalance(
           userId,
           idempotencyKey,
           operation,
+          currency,
         });
         // Return the existing balance instead of processing duplicate
         const userDoc = await getDoc(userRef);
@@ -1072,12 +1084,12 @@ export async function updateUserBalance(
       const currentBalance = (userDoc.data().balance || 0) as number;
 
       const newBalance = operation === 'add'
-        ? currentBalance + amountDollars
-        : currentBalance - amountDollars;
+        ? currentBalance + amountDisplayUnits
+        : currentBalance - amountDisplayUnits;
 
       // SECURITY: Prevent negative balances
       if (newBalance < 0) {
-        throw new Error(`Insufficient balance. Current: ${currentBalance.toFixed(2)}, Requested: ${amountDollars.toFixed(2)}`);
+        throw new Error(`Insufficient balance. Current: ${currentBalance.toFixed(2)}, Requested: ${amountDisplayUnits.toFixed(2)}`);
       }
 
       // Update balance atomically within transaction
@@ -1093,8 +1105,9 @@ export async function updateUserBalance(
           userId,
           idempotencyKey,
           operation,
-          amountCents,
-          amountDollars,
+          amountSmallestUnit,
+          amountDisplayUnits,
+          currency,
           previousBalance: currentBalance,
           newBalance,
           createdAt: serverTimestamp(),
@@ -1110,7 +1123,8 @@ export async function updateUserBalance(
     serverLogger.info('Balance updated successfully', {
       userId,
       operation,
-      amountDollars,
+      amountDisplayUnits,
+      currency,
       previousBalance: result.previousBalance,
       newBalance: result.newBalance,
       idempotencyKey,
@@ -1120,7 +1134,7 @@ export async function updateUserBalance(
   } catch (error: unknown) {
     await captureError(error as Error, {
       tags: { component: 'stripe', operation: 'updateUserBalance' },
-      extra: { userId, amountCents, operation },
+      extra: { userId, amountSmallestUnit, operation, currency },
     });
     throw error;
   }
