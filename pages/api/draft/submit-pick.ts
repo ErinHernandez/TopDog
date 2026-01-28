@@ -350,14 +350,29 @@ export default async function handler(
       if (result.isLastPick) {
         try {
           const { collusionFlagService } = await import('../../../lib/integrity/CollusionFlagService');
-          // This triggers post-draft analysis asynchronously - does not block
-          collusionFlagService.markDraftCompleted(roomId).catch((error) => {
-            // Log but don't fail - draft is already complete
-            logger.error('Failed to mark draft as completed for collusion analysis', error as Error, {
+          const { fireAndForget } = await import('../../../lib/utils/fireAndForget');
+          
+          // Use fire-and-forget wrapper to ensure errors don't block draft completion
+          fireAndForget(
+            collusionFlagService.markDraftCompleted(roomId),
+            {
+              operation: 'mark-draft-completed',
               component: 'draft',
-              operation: 'submit-pick',
-              roomId,
-            });
+              context: { roomId },
+              onError: (error: Error) => {
+                logger.error('Failed to mark draft as completed for collusion analysis', error, {
+                  component: 'draft',
+                  operation: 'submit-pick',
+                  roomId,
+                });
+              },
+            }
+          );
+          
+          logger.info('Queued collusion analysis', {
+            component: 'draft',
+            operation: 'submit-pick',
+            roomId,
           });
         } catch (error) {
           // Log but don't fail the pick - draft completion is not dependent on analysis

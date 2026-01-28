@@ -22,7 +22,11 @@ import {
   validateMethod,
   createSuccessResponse,
 } from '../../../lib/apiErrorHandler';
-import { withAuth, verifyUserAccess, type AuthenticatedRequest } from '../../../lib/apiAuth';
+import { withAuth, type AuthenticatedRequest } from '../../../lib/apiAuth';
+import {
+  TOURNAMENT_FILTERS,
+  matchesTournamentFilter,
+} from '../../../lib/config/tournamentFilters';
 
 // ============================================================================
 // TYPES
@@ -195,19 +199,8 @@ async function slowDraftsHandler(
       });
     }
 
-    // If userId query param provided, verify it matches authenticated user
-    // This prevents users from accessing other users' drafts
-    const { userId: requestedUserId } = req.query;
-    if (requestedUserId && typeof requestedUserId === 'string') {
-      if (!verifyUserAccess(authenticatedUserId, requestedUserId)) {
-        return res.status(403).json({
-          ok: false,
-          error: { code: 'FORBIDDEN', message: 'Cannot access other user drafts' },
-        });
-      }
-    }
-
-    // Use authenticated user ID for all queries
+    // SECURITY: Always use authenticated user ID - never trust query params
+    // Remove userId query parameter entirely to prevent IDOR vulnerabilities
     const userId = authenticatedUserId;
 
     logger.info('Fetching slow drafts', {
@@ -237,7 +230,37 @@ async function slowDraftsHandler(
         limit(50)
       );
 
-      const snapshot = await getDocs(q);
+      // SECURITY: Add specific error handling for Firestore errors
+      let snapshot;
+      try {
+        snapshot = await getDocs(q);
+      } catch (firestoreError) {
+        const error = firestoreError as { code?: string; message?: string };
+        
+        // Handle permission errors gracefully
+        if (error.code === 'permission-denied' || 
+            (error.message && error.message.includes('Missing or insufficient permissions'))) {
+          logger.warn('Firestore permission error in slow drafts query', {
+            component: 'slow-drafts',
+            userId,
+            error: firestoreError instanceof Error ? {
+              name: firestoreError.name,
+              message: firestoreError.message,
+              stack: firestoreError.stack,
+            } : String(firestoreError),
+          });
+          return res.status(403).json({
+            ok: false,
+            error: {
+              code: 'FORBIDDEN',
+              message: 'Access denied',
+            },
+          });
+        }
+        
+        // Re-throw other errors to be caught by outer try-catch
+        throw firestoreError;
+      }
       const slowDrafts: SlowDraftResponse[] = [];
 
       for (const docSnap of snapshot.docs) {
@@ -250,8 +273,8 @@ async function slowDraftsHandler(
         // Find if user is a participant
         const participants = data.participants || [];
         const userParticipant = participants.find(
-          (p: { userId?: string; id?: string }) =>
-            p.userId === userId || p.id === userId
+          (p: { userId?: string; id?: string; participantId?: string }) =>
+            p.userId === userId || p.id === userId || p.participantId === userId
         );
 
         if (!userParticipant) continue;
@@ -340,34 +363,15 @@ async function slowDraftsHandler(
         });
       }
 
-      // Filter to only TopDog International tournaments - STRICT FILTER
-      const filteredDrafts = slowDrafts.filter((draft) => {
-        const name = draft.tournamentName.toLowerCase().trim();
-        
-        // STRICT: Only allow exact "TopDog International" variants
-        // Must start with "topdog international" (case insensitive)
-        const isTopDogInternational = /^topdog\s+international/.test(name) ||
-                                      name === 'topdog international i' ||
-                                      name === 'topdog international ii' ||
-                                      name === 'topdog international iii' ||
-                                      name.startsWith('topdog international');
-        
-        // Explicitly exclude all other tournaments
-        const isExcluded = name.includes('best ball') ||
-                          name.includes('summer') ||
-                          name.includes('ultimate') ||
-                          name.includes('draft masters') ||
-                          name.includes('gridiron') ||
-                          name.includes('championship') ||
-                          name.includes('showdown') ||
-                          name.includes('bowl') ||
-                          name.includes('league') ||
-                          name.includes('premier') ||
-                          name.includes('elite') ||
-                          name.includes('regional');
-        
-        return isTopDogInternational && !isExcluded;
-      });
+      // Filter tournaments using configurable filter
+      // Configuration can be overridden via environment variables:
+      // - TOURNAMENT_FILTER_SLOW_DRAFTS_INCLUDE
+      // - TOURNAMENT_FILTER_SLOW_DRAFTS_EXCLUDE
+      // - TOURNAMENT_FILTER_SLOW_DRAFTS_STRICT
+      const filterConfig = TOURNAMENT_FILTERS.slowDrafts;
+      const filteredDrafts = slowDrafts.filter((draft) =>
+        matchesTournamentFilter(draft.tournamentName, filterConfig)
+      );
 
       // Sort by your-turn first, then by picksAway
       filteredDrafts.sort((a, b) => {

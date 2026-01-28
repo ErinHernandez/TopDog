@@ -21,12 +21,16 @@ import {
   withErrorHandling,
   validateMethod,
   validateBody,
+  validateRequestBody,
   createSuccessResponse,
   createErrorResponse,
   ErrorType,
 } from '../../../lib/apiErrorHandler';
+import { xenditCreateDisbursementSchema } from '../../../lib/validation/schemas';
 import { db } from '../../../lib/firebase';
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { withAuth } from '../../../lib/apiAuth';
+import { withRateLimit, createPaymentRateLimiter } from '../../../lib/rateLimitConfig';
 
 // ============================================================================
 // TYPES
@@ -60,7 +64,10 @@ interface CreateDisbursementResponse {
 // HANDLER
 // ============================================================================
 
-export default async function handler(
+// Create rate limiter for Xendit disbursements (10 per hour)
+const xenditDisbursementLimiter = createPaymentRateLimiter('xenditDisbursement');
+
+async function handler(
   req: NextApiRequest,
   res: NextApiResponse<CreateDisbursementResponse>
 ): Promise<void> {
@@ -72,38 +79,8 @@ export default async function handler(
       operation: 'createDisbursement',
     });
     
-    const body = req.body as CreateDisbursementBody;
-    
-    // Validate required fields
-    validateBody(req, ['amount', 'userId', 'accountId'], logger);
-    
-    // Validate amount type and value
-    if (typeof body.amount !== 'number' || body.amount <= 0) {
-      const response = createErrorResponse(
-        ErrorType.VALIDATION,
-        'Invalid amount. Must be a positive number',
-        { amount: body.amount },
-        null
-      );
-      return res.status(response.statusCode).json({ 
-        success: false, 
-        error: 'Invalid amount' 
-      });
-    }
-    
-    // Validate userId type
-    if (typeof body.userId !== 'string') {
-      const response = createErrorResponse(
-        ErrorType.VALIDATION,
-        'User ID must be a string',
-        {},
-        null
-      );
-      return res.status(response.statusCode).json({ 
-        success: false, 
-        error: 'User ID is required' 
-      });
-    }
+    // SECURITY: Validate request body using Zod schema
+    const body = validateRequestBody(req, xenditCreateDisbursementSchema, logger);
     
     logger.info('Validating disbursement request', {
       component: 'xendit',
@@ -381,14 +358,12 @@ export default async function handler(
         status: result.status,
       });
       
-      const response = createSuccessResponse({
+      return res.status(200).json({
         success: true,
         disbursementId: result.disbursementId,
         transactionId: transaction.id,
         status: result.status,
-      }, 200, logger);
-      
-      return res.status(response.statusCode).json(response.body);
+      });
       
     } catch (disbursementError) {
       // Restore balance if disbursement fails
@@ -461,5 +436,12 @@ export default async function handler(
     }
   });
 }
+
+// Export with authentication and rate limiting
+// Cast to any to resolve type mismatch between NextApiRequest and AuthenticatedRequest
+export default withAuth(
+  withRateLimit(handler, xenditDisbursementLimiter) as any,
+  { required: true, allowAnonymous: false }
+);
 
 

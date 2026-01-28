@@ -26,10 +26,12 @@ import {
   withErrorHandling,
   validateMethod,
   validateBody,
+  validateRequestBody,
   createSuccessResponse,
   createErrorResponse,
   ErrorType,
 } from '../../../../lib/apiErrorHandler';
+import { paystackInitiateTransferSchema } from '../../../../lib/validation/schemas';
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp, runTransaction } from 'firebase/firestore';
 import { db } from '../../../../lib/firebase';
 import { getStripeExchangeRate, convertToUSD } from '../../../../lib/stripe/exchangeRates';
@@ -105,6 +107,8 @@ export default async function handler(
       operation: 'transfer-initiate',
     });
     
+    // SECURITY: Validate request body using Zod schema
+    const body = validateRequestBody(req, paystackInitiateTransferSchema, logger);
     const {
       userId,
       amountSmallestUnit,
@@ -113,41 +117,11 @@ export default async function handler(
       reason,
       twoFactorToken,
       idempotencyKey,
-    } = req.body as InitiateTransferRequest;
+    } = body;
     
-    // Validate required fields
-    validateBody(req, ['userId', 'amountSmallestUnit', 'currency', 'recipientCode'], logger);
+    const currencyUpper = currency; // Already validated by Zod
     
-    // Validate amount type and value
-    if (typeof amountSmallestUnit !== 'number' || amountSmallestUnit <= 0) {
-      const response = createErrorResponse(
-        ErrorType.VALIDATION,
-        'Valid amount is required. Must be a positive number',
-        { amountSmallestUnit },
-        res.getHeader('X-Request-ID') as string
-      );
-      return res.status(response.statusCode).json({
-        ok: false,
-        error: { code: 'invalid_amount', message: 'Valid amount is required' },
-      });
-    }
-    
-    // Validate currency
-    const currencyUpper = currency?.toUpperCase();
-    if (!currencyUpper || !['NGN', 'GHS', 'ZAR', 'KES'].includes(currencyUpper)) {
-      const response = createErrorResponse(
-        ErrorType.VALIDATION,
-        'Valid currency (NGN, GHS, ZAR, KES) is required',
-        { currency },
-        res.getHeader('X-Request-ID') as string
-      );
-      return res.status(response.statusCode).json({
-        ok: false,
-        error: { code: 'invalid_currency', message: 'Valid currency (NGN, GHS, ZAR, KES) is required' },
-      });
-    }
-    
-    // Validate amount using Paystack rules
+    // Additional validation using Paystack rules (beyond Zod schema)
     const validation = validatePaystackAmount(amountSmallestUnit, currencyUpper);
     if (!validation.isValid) {
       const response = createErrorResponse(

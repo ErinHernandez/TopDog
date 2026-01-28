@@ -24,11 +24,13 @@ import type { AuthenticatedRequest } from '../../../lib/apiTypes';
 import { 
   withErrorHandling, 
   validateMethod, 
+  validateRequestBody,
   createSuccessResponse,
   createErrorResponse,
   ErrorType,
   type ApiLogger,
 } from '../../../lib/apiErrorHandler';
+import { setDisplayCurrencySchema, resetDisplayCurrencySchema } from '../../../lib/validation/schemas';
 import {
   getDisplayCurrency,
   setDisplayCurrencyPreference,
@@ -184,21 +186,15 @@ async function handlePut(
   res: NextApiResponse,
   logger: ApiLogger
 ) {
-  const { userId, country, currency } = req.body as Partial<SetDisplayCurrencyBody>;
+  // SECURITY: Validate request body using Zod schema
+  const body = validateRequestBody(req, setDisplayCurrencySchema, logger);
+  const { userId, country, currency } = body;
   
   // Verify user access
-  if (req.user && !verifyUserAccess(req.user.uid, userId || '')) {
+  if (req.user && !verifyUserAccess(req.user.uid, userId)) {
     const error = createErrorResponse(
       ErrorType.FORBIDDEN,
       'Access denied'
-    );
-    return res.status(error.statusCode).json(error.body);
-  }
-  
-  if (!userId || !country || !currency) {
-    const error = createErrorResponse(
-      ErrorType.VALIDATION,
-      'userId, country, and currency are required'
     );
     return res.status(error.statusCode).json(error.body);
   }
@@ -255,10 +251,12 @@ async function handleDelete(
   res: NextApiResponse,
   logger: ApiLogger
 ) {
-  const { userId, country } = req.body as Partial<ResetDisplayCurrencyBody>;
+  // SECURITY: Validate request body using Zod schema
+  const body = validateRequestBody(req, resetDisplayCurrencySchema, logger);
+  const { userId, country } = body;
   
   // Verify user access
-  if (req.user && !verifyUserAccess(req.user.uid, userId || '')) {
+  if (req.user && !verifyUserAccess(req.user.uid, userId)) {
     const error = createErrorResponse(
       ErrorType.FORBIDDEN,
       'Access denied'

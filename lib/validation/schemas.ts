@@ -90,6 +90,15 @@ export const currencyCodeSchema = z
   .regex(/^[A-Z]{3}$/, 'Invalid currency code');
 
 /**
+ * Country code (ISO 3166-1 alpha-2)
+ */
+export const countryCodeSchema = z
+  .string()
+  .length(2, 'Country code must be 2 characters')
+  .toUpperCase()
+  .regex(/^[A-Z]{2}$/, 'Invalid country code format');
+
+/**
  * UUID v4
  */
 export const uuidSchema = z
@@ -152,6 +161,195 @@ export const withdrawalRequestSchema = z.object({
 export type WithdrawalRequestInput = z.infer<typeof withdrawalRequestSchema>;
 
 /**
+ * PayPal withdrawal request
+ */
+export const paypalWithdrawRequestSchema = z.object({
+  amountCents: z
+    .number()
+    .int('Amount must be a whole number in cents')
+    .positive('Amount must be positive')
+    .min(100, 'Minimum withdrawal is $1.00') // $1.00 = 100 cents
+    .max(1_000_000, 'Maximum withdrawal is $10,000.00'), // $10,000 = 1,000,000 cents
+  linkedAccountId: z
+    .string()
+    .min(1, 'Linked account ID is required')
+    .max(200, 'Linked account ID too long'),
+  confirmationMethod: z.enum(['email', 'sms']).optional(),
+});
+
+export type PayPalWithdrawRequest = z.infer<typeof paypalWithdrawRequestSchema>;
+
+/**
+ * Paystack create transfer recipient request
+ */
+export const paystackCreateRecipientSchema = z.object({
+  userId: firebaseUserIdSchema,
+  type: z.enum(['nuban', 'mobile_money', 'basa']),
+  name: z.string().min(1, 'Name is required').max(200, 'Name too long'),
+  accountNumber: z.string().min(10, 'Account number too short').max(20, 'Account number too long'),
+  bankCode: z.string().min(3, 'Bank code too short').max(10, 'Bank code too long').optional(),
+  country: z.enum(['NG', 'GH', 'ZA', 'KE']),
+  setAsDefault: z.boolean().optional(),
+});
+
+export type PaystackCreateRecipientRequest = z.infer<typeof paystackCreateRecipientSchema>;
+
+/**
+ * Paystack delete transfer recipient request
+ */
+export const paystackDeleteRecipientSchema = z.object({
+  userId: firebaseUserIdSchema,
+  recipientCode: z.string().min(1, 'Recipient code is required').max(100, 'Recipient code too long'),
+});
+
+export type PaystackDeleteRecipientRequest = z.infer<typeof paystackDeleteRecipientSchema>;
+
+/**
+ * Paystack initiate transfer request
+ */
+export const paystackInitiateTransferSchema = z.object({
+  userId: firebaseUserIdSchema,
+  amountSmallestUnit: z
+    .number()
+    .int('Amount must be a whole number')
+    .positive('Amount must be positive')
+    .min(100, 'Minimum transfer amount is 100 (smallest unit)'),
+  currency: z.enum(['NGN', 'GHS', 'ZAR', 'KES']),
+  recipientCode: z.string().min(1, 'Recipient code is required').max(100, 'Recipient code too long'),
+  reason: z.string().max(500, 'Reason too long').optional(),
+  twoFactorToken: z.string().max(200, '2FA token too long').optional(),
+  idempotencyKey: z.string().uuid('Invalid idempotency key format').optional(),
+});
+
+export type PaystackInitiateTransferRequest = z.infer<typeof paystackInitiateTransferSchema>;
+
+/**
+ * Stripe setup intent request
+ */
+export const stripeSetupIntentRequestSchema = z.object({
+  userId: firebaseUserIdSchema,
+  email: emailSchema,
+  name: z.string().max(200, 'Name too long').optional(),
+  paymentMethodTypes: z.array(z.enum(['card'])).optional(),
+  idempotencyKey: z.string().uuid('Invalid idempotency key format').optional(),
+});
+
+export type StripeSetupIntentRequest = z.infer<typeof stripeSetupIntentRequestSchema>;
+
+/**
+ * Stripe cancel payment request
+ */
+export const stripeCancelPaymentRequestSchema = z.object({
+  paymentIntentId: z.string().min(1, 'Payment intent ID is required').max(200, 'Payment intent ID too long'),
+  userId: firebaseUserIdSchema,
+  reason: z.enum(['requested_by_customer', 'abandoned', 'fraudulent']).optional(),
+});
+
+export type StripeCancelPaymentRequest = z.infer<typeof stripeCancelPaymentRequestSchema>;
+
+/**
+ * Analytics request
+ */
+export const analyticsRequestSchema = z.object({
+  event: z.string().min(1, 'Event name is required').max(100, 'Event name too long'),
+  userId: firebaseUserIdSchema.optional(),
+  sessionId: z.string().uuid('Invalid session ID format').optional(),
+  timestamp: z.number().int().positive('Timestamp must be positive').optional(),
+  properties: z.record(z.string(), z.unknown()).optional(),
+});
+
+export type AnalyticsRequest = z.infer<typeof analyticsRequestSchema>;
+
+/**
+ * Set display currency request
+ */
+export const setDisplayCurrencySchema = z.object({
+  userId: firebaseUserIdSchema,
+  country: countryCodeSchema,
+  currency: currencyCodeSchema,
+});
+
+export type SetDisplayCurrencyRequest = z.infer<typeof setDisplayCurrencySchema>;
+
+/**
+ * Reset display currency request
+ */
+export const resetDisplayCurrencySchema = z.object({
+  userId: firebaseUserIdSchema,
+  country: countryCodeSchema,
+});
+
+export type ResetDisplayCurrencyRequest = z.infer<typeof resetDisplayCurrencySchema>;
+
+/**
+ * Draft withdraw request
+ */
+export const draftWithdrawRequestSchema = z.object({
+  userId: firebaseUserIdSchema,
+  draftId: z.string().min(1, 'Draft ID is required').max(200, 'Draft ID too long'),
+});
+
+export type DraftWithdrawRequest = z.infer<typeof draftWithdrawRequestSchema>;
+
+/**
+ * Paymongo create payout request
+ */
+export const paymongoCreatePayoutSchema = z.object({
+  amount: z
+    .number()
+    .positive('Amount must be positive')
+    .min(0.01, 'Minimum amount is 0.01')
+    .max(100000, 'Maximum amount is 100,000'),
+  userId: firebaseUserIdSchema,
+  bankAccountId: z.string().min(1, 'Bank account ID is required').max(200, 'Bank account ID too long'),
+  newBankAccount: z.object({
+    bankCode: z.string().min(3).max(10),
+    accountNumber: z.string().min(10).max(20),
+    accountHolderName: z.string().min(1).max(200),
+    saveForFuture: z.boolean().optional(),
+  }).optional(),
+});
+
+export type PaymongoCreatePayoutRequest = z.infer<typeof paymongoCreatePayoutSchema>;
+
+/**
+ * Xendit create disbursement request
+ */
+export const xenditCreateDisbursementSchema = z.object({
+  amount: z
+    .number()
+    .positive('Amount must be positive')
+    .min(10000, 'Minimum amount is 10,000 IDR')
+    .max(100000000, 'Maximum amount is 100,000,000 IDR'),
+  userId: firebaseUserIdSchema,
+  accountId: z.string().min(1, 'Account ID is required').max(200, 'Account ID too long'),
+  newAccount: z.object({
+    bankCode: z.string().min(3, 'Bank code too short').max(10, 'Bank code too long'),
+    accountNumber: z.string().min(10, 'Account number too short').max(20, 'Account number too long'),
+    accountHolderName: z.string().min(1, 'Account holder name is required').max(200, 'Account holder name too long'),
+    saveForFuture: z.boolean().optional(),
+  }).optional(),
+});
+
+export type XenditCreateDisbursementRequest = z.infer<typeof xenditCreateDisbursementSchema>;
+
+/**
+ * PayPal create order request
+ */
+export const paypalCreateOrderSchema = z.object({
+  amountCents: amountCentsSchema,
+  userId: firebaseUserIdSchema,
+  currency: currencyCodeSchema.default('USD'),
+  riskContext: z.object({
+    ipAddress: z.string().regex(/^(?:(?:25[0-5]|2[0-4]\d|1?\d{1,2})\.){3}(?:25[0-5]|2[0-4]\d|1?\d{1,2})$/, 'Invalid IP address').optional(),
+    userAgent: z.string().max(500, 'User agent too long').optional(),
+    deviceId: z.string().max(200, 'Device ID too long').optional(),
+  }).optional(),
+});
+
+export type PayPalCreateOrderRequest = z.infer<typeof paypalCreateOrderSchema>;
+
+/**
  * Stripe webhook event
  */
 export const stripeWebhookEventSchema = z.object({
@@ -162,6 +360,184 @@ export const stripeWebhookEventSchema = z.object({
   }),
   created: z.number().int().positive(),
 });
+
+/**
+ * Payment method type string (validated by getAllowedPaymentMethods function)
+ * Using string array since validation happens in business logic
+ */
+export const paymentMethodTypeSchema = z.string().min(1).max(50);
+
+/**
+ * Risk context for fraud detection
+ */
+export const riskContextSchema = z.object({
+  ipAddress: z.string().regex(/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$|^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/).optional(),
+  country: z.string().length(2).optional(),
+  deviceId: z.string().max(255).optional(),
+  sessionId: z.string().max(255).optional(),
+}).optional();
+
+/**
+ * Stripe Payment Intent Request Body
+ */
+export const stripePaymentIntentRequestSchema = z.object({
+  amountCents: amountCentsSchema,
+  currency: currencyCodeSchema.optional().default('USD'),
+  country: z.string().length(2).optional(),
+  userId: firebaseUserIdSchema,
+  email: emailSchema.optional(),
+  name: z.string().max(255).optional(),
+  paymentMethodTypes: z.array(z.string().min(1).max(50)).optional(),
+  savePaymentMethod: z.boolean().optional().default(false),
+  paymentMethodId: z.string().max(255).optional(),
+  idempotencyKey: uuidSchema.optional(),
+  riskContext: riskContextSchema,
+});
+
+export type StripePaymentIntentRequest = z.infer<typeof stripePaymentIntentRequestSchema>;
+
+/**
+ * PayMongo Create Payment Request Body
+ */
+export const paymongoCreatePaymentSchema = z.object({
+  sourceId: z.string().min(1).max(255),
+  userId: firebaseUserIdSchema,
+  description: z.string().max(500).optional(),
+});
+
+export type PayMongoCreatePaymentRequest = z.infer<typeof paymongoCreatePaymentSchema>;
+
+/**
+ * PayStack Initialize Payment Request Body
+ */
+export const paystackInitializeSchema = z.object({
+  amountSmallestUnit: z
+    .number()
+    .int('Amount must be a whole number')
+    .positive('Amount must be positive')
+    .min(100, 'Minimum amount is 100 (smallest unit)'),
+  currency: z.enum(['NGN', 'GHS', 'ZAR', 'KES']).optional().default('NGN'),
+  userId: firebaseUserIdSchema,
+  email: emailSchema,
+  country: countryCodeSchema.optional(),
+  channel: z.enum(['card', 'ussd', 'mobile_money', 'bank_transfer']).optional().default('card'),
+  ussdType: z.string().max(50).optional(),
+  mobileMoneyPhone: z.string().max(20).optional(),
+  mobileMoneyProvider: z.enum(['mtn', 'vodafone', 'tigo', 'mpesa']).optional(),
+  callbackUrl: urlSchema.optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
+});
+
+export type PayStackInitializeRequest = z.infer<typeof paystackInitializeSchema>;
+
+/**
+ * Xendit E-Wallet Payment Request Body
+ */
+export const xenditEwalletSchema = z.object({
+  amountCents: amountCentsSchema,
+  currency: currencyCodeSchema.optional().default('PHP'),
+  userId: firebaseUserIdSchema,
+  email: emailSchema,
+  ewalletType: z.enum(['gcash', 'grabpay', 'paymaya']),
+  metadata: z.record(z.string(), z.unknown()).optional(),
+});
+
+export type XenditEwalletRequest = z.infer<typeof xenditEwalletSchema>;
+
+/**
+ * Xendit Virtual Account Request Body
+ */
+export const xenditVirtualAccountSchema = z.object({
+  amountCents: amountCentsSchema,
+  currency: currencyCodeSchema.optional().default('IDR'),
+  userId: firebaseUserIdSchema,
+  email: emailSchema,
+  bankCode: z.string().min(1).max(50),
+  metadata: z.record(z.string(), z.unknown()).optional(),
+});
+
+export type XenditVirtualAccountRequest = z.infer<typeof xenditVirtualAccountSchema>;
+
+// ============================================================================
+// AUTH SCHEMAS
+// ============================================================================
+
+/**
+ * State code (US states)
+ */
+export const stateCodeSchema = z
+  .string()
+  .length(2, 'State code must be 2 characters')
+  .toUpperCase()
+  .regex(/^[A-Z]{2}$/, 'Invalid state code format')
+  .optional();
+
+/**
+ * User signup request
+ */
+export const signupRequestSchema = z.object({
+  uid: firebaseUserIdSchema,
+  username: usernameSchema,
+  email: emailSchema.optional(),
+  countryCode: countryCodeSchema.optional().default('US'),
+  stateCode: stateCodeSchema,
+  displayName: displayNameSchema.optional(),
+});
+
+export type SignupRequest = z.infer<typeof signupRequestSchema>;
+
+/**
+ * Username claim request
+ */
+export const claimUsernameSchema = z.object({
+  username: usernameSchema,
+  claimToken: z.string().min(1).max(255),
+  userId: firebaseUserIdSchema,
+});
+
+export type ClaimUsernameRequest = z.infer<typeof claimUsernameSchema>;
+
+/**
+ * Username check request
+ */
+export const checkUsernameSchema = z.object({
+  username: usernameSchema,
+  countryCode: countryCodeSchema.optional().default('US'),
+});
+
+export type CheckUsernameRequest = z.infer<typeof checkUsernameSchema>;
+
+/**
+ * Username change request
+ */
+export const changeUsernameSchema = z.object({
+  newUsername: usernameSchema,
+  countryCode: countryCodeSchema.optional().default('US'),
+});
+
+export type ChangeUsernameRequest = z.infer<typeof changeUsernameSchema>;
+
+/**
+ * Reserve username request (admin)
+ */
+export const reserveUsernameSchema = z.object({
+  username: usernameSchema,
+  userId: firebaseUserIdSchema.optional(),
+  expiresAt: isoDateSchema.optional(),
+  reason: z.string().max(500).optional(),
+});
+
+export type ReserveUsernameRequest = z.infer<typeof reserveUsernameSchema>;
+
+/**
+ * Check batch usernames request
+ */
+export const checkBatchUsernamesSchema = z.object({
+  usernames: z.array(usernameSchema).min(1).max(100),
+  countryCode: countryCodeSchema.optional().default('US'),
+});
+
+export type CheckBatchUsernamesRequest = z.infer<typeof checkBatchUsernamesSchema>;
 
 // ============================================================================
 // DRAFT SCHEMAS
@@ -369,6 +745,42 @@ export function isValidationError(error: unknown): error is ValidationError {
 }
 
 // ============================================================================
+// FANTASY PLAYER SCHEMAS
+// ============================================================================
+
+/**
+ * Fantasy player schema for external API responses
+ * Handles both camelCase and PascalCase field names from external APIs
+ */
+export const fantasyPlayerSchema = z.object({
+  Position: z.string().optional(),
+  position: z.string().optional(),
+  Name: z.string().optional(),
+  name: z.string().optional(),
+  Team: z.string().optional(),
+  team: z.string().optional(),
+  AverageDraftPositionPPR: z.number().optional(),
+  adpPPR: z.number().optional(),
+  AverageDraftPosition: z.number().optional(),
+  adp: z.number().optional(),
+  ProjectedFantasyPointsPPR: z.number().optional(),
+  projectedPointsPPR: z.number().optional(),
+  ProjectedFantasyPoints: z.number().optional(),
+  projectedPoints: z.number().optional(),
+  PositionRank: z.number().optional(),
+  positionRank: z.number().optional(),
+  ByeWeek: z.number().optional(),
+  byeWeek: z.number().optional(),
+  AverageDraftPositionRank: z.number().optional(),
+  overallRank: z.number().optional(),
+}).passthrough(); // Allow additional fields
+
+/**
+ * Array of fantasy players from external API
+ */
+export const fantasyPlayersResponseSchema = z.array(fantasyPlayerSchema);
+
+// ============================================================================
 // SANITIZATION HELPERS
 // ============================================================================
 
@@ -420,6 +832,23 @@ export default {
   createPaymentIntentSchema,
   withdrawalRequestSchema,
   stripeWebhookEventSchema,
+  paymentMethodTypeSchema,
+  riskContextSchema,
+  stripePaymentIntentRequestSchema,
+  paymongoCreatePaymentSchema,
+  paystackInitializeSchema,
+  xenditEwalletSchema,
+  xenditVirtualAccountSchema,
+
+  // Auth schemas
+  countryCodeSchema,
+  stateCodeSchema,
+  signupRequestSchema,
+  claimUsernameSchema,
+  checkUsernameSchema,
+  changeUsernameSchema,
+  reserveUsernameSchema,
+  checkBatchUsernamesSchema,
 
   // Draft schemas
   draftRoomIdSchema,

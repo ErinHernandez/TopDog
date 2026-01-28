@@ -22,8 +22,10 @@ import { db } from '../../../../lib/firebase';
 import {
   withErrorHandling,
   validateMethod,
+  validateRequestBody,
   createSuccessResponse,
 } from '../../../../lib/apiErrorHandler';
+import { draftWithdrawRequestSchema } from '../../../../lib/validation/schemas';
 
 // ============================================================================
 // TYPES
@@ -54,8 +56,7 @@ export default async function handler(
     validateMethod(req, ['POST'], logger);
 
     const { draftId } = req.query;
-    const { userId } = req.body as WithdrawRequest;
-
+    
     if (!draftId || typeof draftId !== 'string') {
       return res.status(400).json({
         ok: false,
@@ -63,10 +64,15 @@ export default async function handler(
       });
     }
 
-    if (!userId || typeof userId !== 'string') {
+    // SECURITY: Validate request body using Zod schema
+    const body = validateRequestBody(req, draftWithdrawRequestSchema, logger);
+    const { userId } = body;
+    
+    // Verify draftId matches the one in the body (if provided)
+    if (body.draftId && body.draftId !== draftId) {
       return res.status(400).json({
         ok: false,
-        error: { code: 'INVALID_USER_ID', message: 'User ID is required' },
+        error: { code: 'DRAFT_ID_MISMATCH', message: 'Draft ID in body does not match URL parameter' },
       });
     }
 

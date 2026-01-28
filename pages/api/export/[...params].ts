@@ -19,6 +19,7 @@ import {
 import { withAuth, verifyUserAccess } from '../../../lib/apiAuth';
 import { createExportRateLimiter, withRateLimit } from '../../../lib/rateLimitConfig';
 import { logSecurityEvent, getClientIP, SecurityEventType } from '../../../lib/securityLogger';
+import { verifyDraftOwnership, verifyUserOwnership } from '../../../lib/export/ownershipVerification';
 
 // ============================================================================
 // TYPES
@@ -156,13 +157,91 @@ const handler = function(
     // Check data access restrictions first
     const { userId: requesterId } = authenticatedReq.query as ExportQueryParams;
     
-    // Verify user access - users can only export their own data
-    if (authenticatedReq.user && requesterId && !verifyUserAccess(authenticatedReq.user.uid, requesterId)) {
+    // SECURITY: Verify ownership for each export type before processing
+    if (!authenticatedReq.user) {
+      return res.status(401).json({ 
+        error: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+
+    const authenticatedUserId = authenticatedReq.user.uid;
+
+    // Verify ownership based on export type
+    switch (exportType) {
+      case 'draft':
+        if (!id) {
+          const error = new Error('Draft ID is required');
+          error.name = 'ValidationError';
+          throw error;
+        }
+        const ownsDraft = await verifyDraftOwnership(id, authenticatedUserId);
+        if (!ownsDraft) {
+          await logSecurityEvent(
+            SecurityEventType.DATA_ACCESS,
+            'high',
+            { 
+              endpoint: '/api/export',
+              exportType: 'draft',
+              reason: 'unauthorized_draft_access',
+              draftId: id,
+              userId: authenticatedUserId
+            },
+            authenticatedUserId,
+            clientIP
+          );
+          return res.status(403).json({ 
+            error: 'FORBIDDEN',
+            message: 'Access denied',
+          });
+        }
+        break;
+        
+      case 'user':
+        if (!id) {
+          const error = new Error('User ID is required');
+          error.name = 'ValidationError';
+          throw error;
+        }
+        const ownsUser = await verifyUserOwnership(id, authenticatedUserId);
+        if (!ownsUser) {
+          await logSecurityEvent(
+            SecurityEventType.DATA_ACCESS,
+            'high',
+            { 
+              endpoint: '/api/export',
+              exportType: 'user',
+              reason: 'unauthorized_user_access',
+              requestedUserId: id,
+              authenticatedUserId: authenticatedUserId
+            },
+            authenticatedUserId,
+            clientIP
+          );
+          return res.status(403).json({ 
+            error: 'FORBIDDEN',
+            message: 'Access denied',
+          });
+        }
+        break;
+        
+      case 'tournament':
+        // Tournaments may be public, but verify access if needed
+        // For now, allow access (can be extended later)
+        break;
+        
+      case 'player':
+        // Player data is public, no ownership check needed
+        break;
+    }
+    
+    // Also verify userId query param if provided (legacy check)
+    if (requesterId && !verifyUserAccess(authenticatedUserId, requesterId)) {
       logger.warn('Export request blocked - unauthorized access', {
         exportType,
         id,
         requestedUserId: requesterId,
-        authenticatedUserId: authenticatedReq.user.uid,
+        authenticatedUserId: authenticatedUserId,
       });
       
       await logSecurityEvent(
@@ -173,9 +252,9 @@ const handler = function(
           exportType,
           reason: 'unauthorized_user_access',
           requestedUserId: requesterId,
-          authenticatedUserId: authenticatedReq.user.uid
+          authenticatedUserId: authenticatedUserId
         },
-        authenticatedReq.user.uid,
+        authenticatedUserId,
         clientIP
       );
       
@@ -185,7 +264,7 @@ const handler = function(
       });
     }
     
-    const validation = dataAccessControl.validateExportRequest(exportType, id, requesterId);
+    const validation = dataAccessControl.validateExportRequest(exportType, id, requesterId || authenticatedUserId);
     
     if (!validation.allowed) {
       logger.warn('Export request blocked by access control', {
@@ -237,12 +316,14 @@ const handler = function(
 
     if (!exportData) {
       logger.warn('No data found for export', { exportType, id });
+      const requestId = res.getHeader('X-Request-ID') as string || null;
       const errorResponse = createErrorResponse(
         ErrorType.NOT_FOUND,
         'No data found for export',
-        { exportType, id }
+        { exportType, id },
+        requestId
       );
-      return res.status(errorResponse.statusCode).json(errorResponse.body as unknown as ExportResponse);
+      return res.status(errorResponse.statusCode).json(errorResponse.body);
     }
 
     // Set appropriate content type and filename

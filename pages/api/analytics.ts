@@ -11,10 +11,12 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { 
   withErrorHandling, 
   validateMethod, 
+  validateRequestBody,
   createSuccessResponse,
   createErrorResponse,
   ErrorType,
 } from '../../lib/apiErrorHandler';
+import { analyticsRequestSchema } from '../../lib/validation/schemas';
 import { createAnalyticsRateLimiter, withRateLimit } from '../../lib/rateLimitConfig';
 import { logRateLimitExceeded, getClientIP } from '../../lib/securityLogger';
 import { logger } from '../../lib/structuredLogger';
@@ -212,7 +214,9 @@ const handler = async function(
       return res.status(error.statusCode).json(error.body as unknown as AnalyticsResponse);
     }
 
-    const { event, userId, sessionId, timestamp } = req.body as AnalyticsRequest;
+    // SECURITY: Validate request body using Zod schema
+    const body = validateRequestBody(req, analyticsRequestSchema, logger);
+    const { event, userId, sessionId, timestamp, properties } = body;
 
     // Validate that userId in body matches authenticated user (if provided)
     // SECURITY: Strict validation - no environment-based bypasses

@@ -6,7 +6,8 @@
  */
 
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { withErrorHandling, validateMethod } from '../../../lib/apiErrorHandler';
+import { withErrorHandling, validateMethod, validateRequestBody } from '../../../lib/apiErrorHandler';
+import { paypalCreateOrderSchema } from '../../../lib/validation/schemas';
 import { withCSRFProtection } from '../../../lib/csrfProtection';
 import { verifyAuthToken } from '../../../lib/apiAuth';
 import { createPayPalOrder, assessPaymentRisk, logPaymentEvent } from '../../../lib/paypal/paypalService';
@@ -36,12 +37,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(401).json({ error: authResult.error || 'Unauthorized' });
     }
 
-    const { amountCents, riskContext = {} } = req.body as CreateOrderBody;
-
-    // Validate amount
-    if (!amountCents || typeof amountCents !== 'number') {
-      return res.status(400).json({ error: 'Invalid amount' });
-    }
+    // SECURITY: Validate request body using Zod schema
+    const body = validateRequestBody(req, paypalCreateOrderSchema, logger);
+    const { amountCents, riskContext = {} } = body;
 
     if (amountCents < PAYPAL_DEPOSIT_LIMITS.minAmountCents) {
       return res.status(400).json({

@@ -6,7 +6,7 @@
  */
 
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { withErrorHandling, validateMethod } from '../../../lib/apiErrorHandler';
+import { withErrorHandling, validateMethod, validateRequestBody } from '../../../lib/apiErrorHandler';
 import { withCSRFProtection } from '../../../lib/csrfProtection';
 import { verifyAuthToken } from '../../../lib/apiAuth';
 import { requestWithdrawal } from '../../../lib/paypal/paypalWithdrawals';
@@ -14,12 +14,8 @@ import { logPaymentEvent } from '../../../lib/paypal/paypalService';
 import { isPayPalEnabled } from '../../../lib/paypal/paypalClient';
 import { getDb } from '../../../lib/firebase-utils';
 import { doc, getDoc } from 'firebase/firestore';
-
-interface WithdrawBody {
-  amountCents: number;
-  linkedAccountId: string;
-  confirmationMethod?: 'email' | 'sms';
-}
+import { withRateLimit, createPaymentRateLimiter } from '../../../lib/rateLimitConfig';
+import { paypalWithdrawRequestSchema } from '../../../lib/validation/schemas';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   return withErrorHandling(req, res, async (req, res, logger) => {
@@ -38,17 +34,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const { amountCents, linkedAccountId, confirmationMethod } = req.body as WithdrawBody;
-
-    // Validate amount
-    if (!amountCents || typeof amountCents !== 'number' || amountCents <= 0) {
-      return res.status(400).json({ error: 'Invalid amount' });
-    }
-
-    // Validate linked account ID
-    if (!linkedAccountId || typeof linkedAccountId !== 'string') {
-      return res.status(400).json({ error: 'Invalid linked account' });
-    }
+    // SECURITY: Validate request body using Zod schema
+    const body = validateRequestBody(req, paypalWithdrawRequestSchema, logger);
+    const { amountCents, linkedAccountId, confirmationMethod } = body;
 
     // Get user's current balance
     const db = getDb();
@@ -102,6 +90,11 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   });
 }
 
-// Export with CSRF protection
+// Create rate limiter for PayPal withdrawals (5 per hour)
+const paypalWithdrawLimiter = createPaymentRateLimiter('paypalWithdraw');
+
+// Export with CSRF protection and rate limiting
 type CSRFHandler = (req: NextApiRequest, res: NextApiResponse) => Promise<void> | void;
-export default withCSRFProtection(handler as unknown as CSRFHandler);
+export default withCSRFProtection(
+  withRateLimit(handler, paypalWithdrawLimiter) as unknown as CSRFHandler
+);

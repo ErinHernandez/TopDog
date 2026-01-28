@@ -21,10 +21,12 @@ import {
   withErrorHandling,
   validateMethod,
   validateBody,
+  validateRequestBody,
   createSuccessResponse,
   createErrorResponse,
   ErrorType,
 } from '../../../lib/apiErrorHandler';
+import { paymongoCreatePayoutSchema } from '../../../lib/validation/schemas';
 import { db } from '../../../lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 
@@ -72,24 +74,8 @@ export default async function handler(
       operation: 'createPayout',
     });
     
-    const body = req.body as CreatePayoutBody;
-    
-    // Validate required fields
-    validateBody(req, ['amount', 'userId', 'bankAccountId'], logger);
-    
-    // Validate amount type and value
-    if (typeof body.amount !== 'number' || body.amount <= 0) {
-      const response = createErrorResponse(
-        ErrorType.VALIDATION,
-        'Invalid amount. Must be a positive number',
-        { amount: body.amount },
-        null
-      );
-      return res.status(response.statusCode).json({ 
-        success: false, 
-        error: 'Invalid amount' 
-      });
-    }
+    // SECURITY: Validate request body using Zod schema
+    const body = validateRequestBody(req, paymongoCreatePayoutSchema, logger);
     
     // Validate userId type
     if (typeof body.userId !== 'string') {
