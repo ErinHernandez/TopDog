@@ -33,6 +33,7 @@
  */
 
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { createScopedLogger } from '@/lib/clientLogger';
 import type {
   UseUsernameValidationReturn,
   UsernameValidationResult,
@@ -44,6 +45,8 @@ import {
   validateUsername,
   getUsernameRequirements,
 } from '../../../../lib/usernameValidation';
+
+const logger = createScopedLogger('[useUsernameValidation]');
 
 // ============================================================================
 // TYPES
@@ -168,7 +171,7 @@ export function useUsernameValidation(
       
       return availabilityResult;
     } catch (error) {
-      console.error('Error checking username availability:', error);
+      logger.error('Error checking username availability:', error instanceof Error ? error : new Error(String(error)));
       const errorResult: UsernameAvailabilityResult = {
         isAvailable: false,
         message: 'Error checking availability',

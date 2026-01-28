@@ -990,11 +990,9 @@ export function PaystackDepositModalVX2({
   
   // Handle currency change
   const handleCurrencyChange = useCallback((newCurrency: string) => {
-    if (newCurrency !== selectedCurrencyCode) {
-      logger.debug('Paystack modal currency changed', { from: selectedCurrencyCode, to: newCurrency, isPaystack: isPaystackCurrency(newCurrency) });
-      setSelectedCurrencyCode(newCurrency);
-      // Amount stays in USD, no need to reset
-    }
+    logger.debug('Paystack modal currency changed', { from: selectedCurrencyCode, to: newCurrency, isPaystack: isPaystackCurrency(newCurrency) });
+    setSelectedCurrencyCode(newCurrency);
+    // Amount stays in USD, no need to reset
   }, [selectedCurrencyCode]);
   
   // State - store amount in USD for consistency
@@ -1174,13 +1172,51 @@ export function PaystackDepositModalVX2({
     }
   }, [selectedAmount, currencyCode, userId, userEmail, userCountry, selectedBank]);
   
+  // Poll payment status
+  const pollPaymentStatus = useCallback(async (ref: string, attempts: number = 0) => {
+    if (attempts >= 30) { // Max 5 minutes (30 * 10s)
+      setError('Payment verification timed out. Please check your transaction history.');
+      setStep('error');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/paystack/verify?reference=${ref}`);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (data.ok && data.data?.status === 'success') {
+        setStep('success');
+        onSuccess?.(transactionId || ref, selectedAmount, currencyCode);
+        return;
+      }
+
+      if (data.data?.status === 'failed') {
+        setError(data.data.gatewayResponse || 'Payment failed');
+        setStep('error');
+        return;
+      }
+
+      // Still pending, poll again
+      setTimeout(() => pollPaymentStatus(ref, attempts + 1), 10000);
+    } catch (err) {
+      logger.error('Status poll failed', err);
+      // Continue polling
+      setTimeout(() => pollPaymentStatus(ref, attempts + 1), 10000);
+    }
+  }, [onSuccess, selectedAmount, currencyCode, transactionId]);
+
   // Initialize mobile money payment
   const initializeMobileMoneyPayment = useCallback(async () => {
     if (!mobileMoneyProvider || !phoneNumber) return;
-    
+
     setIsProcessing(true);
     setError(null);
-    
+
     try {
       const response = await fetch('/api/paystack/initialize', {
         method: 'POST',
@@ -1196,21 +1232,21 @@ export function PaystackDepositModalVX2({
           mobileMoneyProvider: mobileMoneyProvider.id,
         }),
       });
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
-      
+
       if (!data.ok) {
         throw new Error(data.error?.message || 'Failed to initialize mobile money payment');
       }
-      
+
       setTransactionId(data.data.transactionId);
       setReference(data.data.reference);
       setDisplayText(data.data.displayText || 'Please approve the payment on your phone');
-      
+
       // Start polling for status
       pollPaymentStatus(data.data.reference);
     } catch (err) {
@@ -1221,61 +1257,23 @@ export function PaystackDepositModalVX2({
     } finally {
       setIsProcessing(false);
     }
-  }, [selectedAmount, currencyCode, userId, userEmail, userCountry, mobileMoneyProvider, phoneNumber]);
-  
-  // Poll payment status
-  const pollPaymentStatus = useCallback(async (ref: string, attempts = 0) => {
-    if (attempts >= 30) { // Max 5 minutes (30 * 10s)
-      setError('Payment verification timed out. Please check your transaction history.');
-      setStep('error');
-      return;
-    }
-    
-    try {
-      const response = await fetch(`/api/paystack/verify?reference=${ref}`);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      
-      if (data.ok && data.data?.status === 'success') {
-        setStep('success');
-        onSuccess?.(transactionId || ref, selectedAmount, currencyCode);
-        return;
-      }
-      
-      if (data.data?.status === 'failed') {
-        setError(data.data.gatewayResponse || 'Payment failed');
-        setStep('error');
-        return;
-      }
-      
-      // Still pending, poll again
-      setTimeout(() => pollPaymentStatus(ref, attempts + 1), 10000);
-    } catch (err) {
-      logger.error('Status poll failed', err);
-      // Continue polling
-      setTimeout(() => pollPaymentStatus(ref, attempts + 1), 10000);
-    }
-  }, [transactionId, selectedAmount, currencyCode, onSuccess]);
+  }, [selectedAmount, currencyCode, userId, userEmail, userCountry, mobileMoneyProvider, phoneNumber, pollPaymentStatus]);
   
   // Check USSD status manually
   const checkUssdStatus = useCallback(async () => {
     if (!reference) return;
-    
+
     setIsLoading(true);
-    
+
     try {
       const response = await fetch(`/api/paystack/verify?reference=${reference}`);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
-      
+
       if (data.ok && data.data?.status === 'success') {
         setStep('success');
         onSuccess?.(transactionId || reference, selectedAmount, currencyCode);
@@ -1292,12 +1290,12 @@ export function PaystackDepositModalVX2({
     } finally {
       setIsLoading(false);
     }
-  }, [reference, transactionId, selectedAmount, currencyCode, onSuccess]);
+  }, [onSuccess, reference, selectedAmount, currencyCode, transactionId]);
   
   // Handle method continue
   const handleMethodContinue = useCallback(() => {
     if (!selectedMethod) return;
-    
+
     switch (selectedMethod) {
       case 'card':
         setStep('processing');
@@ -1315,7 +1313,7 @@ export function PaystackDepositModalVX2({
         initializeCardPayment(); // Uses same flow with different channel
         break;
     }
-  }, [selectedMethod, initializeCardPayment]);
+  }, [selectedMethod, initializeCardPayment, setStep, setShowBankSelector]);
   
   if (!isOpen) return null;
   

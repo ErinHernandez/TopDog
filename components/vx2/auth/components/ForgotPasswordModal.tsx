@@ -17,6 +17,7 @@ import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../../core/
 import { SPACING, TYPOGRAPHY, Z_INDEX } from '../../core/constants/sizes';
 import { Close, ChevronLeft } from '../../components/icons';
 import { useAuth } from '../hooks/useAuth';
+import { useCountdown } from '../../hooks/ui/useCountdown';
 import { createScopedLogger } from '../../../../lib/clientLogger';
 
 const logger = createScopedLogger('[ForgotPasswordModal]');
@@ -78,13 +79,16 @@ function InputStep({
   error,
 }: InputStepProps): React.ReactElement {
   const [touched, setTouched] = useState(false);
+  const [inputFocused, setInputFocused] = useState(false);
   
   const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const isValidPhone = phone.replace(/\D/g, '').length >= 10;
   const isValid = method === 'email' ? isValidEmail : isValidPhone;
   const canSubmit = isValid && !isLoading;
   
+  // Inline error only after blur, hide while focused — see docs/FORM_VALIDATION_PATTERN.md
   const showError = touched && !isValid && (method === 'email' ? email.length > 0 : phone.length > 0);
+  const errorToShow = inputFocused ? null : showError;
   
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && canSubmit) {
@@ -99,25 +103,13 @@ function InputStep({
   
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
+      {/* Header — close only; "Forgot your password?" is in content below */}
       <div 
-        className="flex items-center gap-3 flex-shrink-0"
+        className="flex items-center justify-end flex-shrink-0"
         style={{ 
-          padding: `${SPACING.md}px ${SPACING.lg}px`, 
-          borderBottom: `1px solid ${BORDER_COLORS.default}` 
+          padding: `${SPACING.md + 8}px ${SPACING.lg}px ${SPACING.md}px`
         }}
       >
-        {onBackToSignIn && (
-          <button onClick={onBackToSignIn} className="p-2" aria-label="Back">
-            <ChevronLeft size={24} color={TEXT_COLORS.muted} />
-          </button>
-        )}
-        <h2 
-          className="flex-1 font-bold" 
-          style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}
-        >
-          Reset Password
-        </h2>
         <button 
           onClick={onClose} 
           className="p-2" 
@@ -129,15 +121,16 @@ function InputStep({
       
       {/* Content */}
       <div 
-        className="flex-1 flex flex-col justify-center px-6"
+        className="flex-1 flex flex-col px-6"
+        style={{ paddingTop: '40px', paddingBottom: '20px' }}
         onKeyDown={handleKeyDown}
       >
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           <div 
-            className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-            style={{ backgroundColor: 'rgba(96, 165, 250, 0.15)' }}
+            className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-3"
+            style={{ background: 'url(/wr_blue.png) no-repeat center center', backgroundSize: 'cover' }}
           >
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.active} strokeWidth="2">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2" strokeLinecap="round" strokeLinejoin="round"/>
               <path d="M7 11V7a5 5 0 0110 0v4" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
@@ -157,11 +150,11 @@ function InputStep({
         
         {/* Method Toggle */}
         <div 
-          className="flex mb-5 p-1.5 rounded-xl"
+          className="flex mb-4 p-1.5 rounded-xl"
           style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}
         >
           <button
-            onClick={() => { setMethod('email'); setTouched(false); }}
+            onClick={() => { setMethod('email'); setTouched(false); setInputFocused(false); }}
             className="flex-1 py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2"
             style={{
               background: method === 'email' 
@@ -178,7 +171,7 @@ function InputStep({
             Email
           </button>
           <button
-            onClick={() => { setMethod('phone'); setTouched(false); }}
+            onClick={() => { setMethod('phone'); setTouched(false); setInputFocused(false); }}
             className="flex-1 py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2"
             style={{
               background: method === 'phone' 
@@ -212,13 +205,13 @@ function InputStep({
         
         {/* Email Input */}
         {method === 'email' && (
-          <div className="mb-6">
+          <div className="mb-4">
             <input
               type="email"
               value={email}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-              onFocus={() => setTouched(false)}
-              onBlur={() => setTouched(true)}
+              onFocus={() => setInputFocused(true)}
+              onBlur={() => { setTouched(true); setInputFocused(false); }}
               placeholder="you@example.com"
               autoComplete="email"
               autoFocus
@@ -227,12 +220,12 @@ function InputStep({
               style={{
                 backgroundColor: 'rgba(255,255,255,0.05)',
                 color: TEXT_COLORS.primary,
-                border: `2px solid ${showError ? STATE_COLORS.error : BORDER_COLORS.default}`,
+                border: `2px solid ${errorToShow ? STATE_COLORS.error : BORDER_COLORS.default}`,
                 fontSize: `${TYPOGRAPHY.fontSize.base}px`,
                 opacity: isLoading ? 0.5 : 1,
               }}
             />
-            {showError && (
+            {errorToShow && (
               <span 
                 className="block mt-1"
                 style={{ color: STATE_COLORS.error, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}
@@ -245,13 +238,13 @@ function InputStep({
         
         {/* Phone Input */}
         {method === 'phone' && (
-          <div className="mb-6">
+          <div className="mb-4">
             <input
               type="tel"
               value={phone}
               onChange={handlePhoneChange}
-              onFocus={() => setTouched(false)}
-              onBlur={() => setTouched(true)}
+              onFocus={() => setInputFocused(true)}
+              onBlur={() => { setTouched(true); setInputFocused(false); }}
               placeholder="+1 (555) 123-4567"
               autoComplete="tel"
               autoFocus
@@ -260,12 +253,12 @@ function InputStep({
               style={{
                 backgroundColor: 'rgba(255,255,255,0.05)',
                 color: TEXT_COLORS.primary,
-                border: `2px solid ${showError ? STATE_COLORS.error : BORDER_COLORS.default}`,
+                border: `2px solid ${errorToShow ? STATE_COLORS.error : BORDER_COLORS.default}`,
                 fontSize: `${TYPOGRAPHY.fontSize.base}px`,
                 opacity: isLoading ? 0.5 : 1,
               }}
             />
-            {showError && (
+            {errorToShow && (
               <span 
                 className="block mt-1"
                 style={{ color: STATE_COLORS.error, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}
@@ -280,7 +273,7 @@ function InputStep({
       {/* Footer */}
       <div 
         className="flex-shrink-0"
-        style={{ padding: SPACING.lg, borderTop: `1px solid ${BORDER_COLORS.default}` }}
+        style={{ padding: `12px ${SPACING.xl}px 16px` }}
       >
         <button
           onClick={onSubmit}
@@ -308,14 +301,21 @@ function InputStep({
         
         {onBackToSignIn && (
           <p 
-            className="text-center mt-4"
+            className="text-center mt-3"
             style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
           >
             Remember your password?{' '}
             <button 
               onClick={onBackToSignIn}
               className="font-semibold"
-              style={{ color: STATE_COLORS.active }}
+              style={{
+                background: 'url(/wr_blue.png) no-repeat center center',
+                backgroundSize: 'cover',
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                color: 'transparent',
+              }}
             >
               Sign In
             </button>
@@ -350,35 +350,26 @@ function CodeStep({
   error,
 }: CodeStepProps): React.ReactElement {
   const [code, setCode] = useState('');
-  const [cooldown, setCooldown] = useState(60);
-  
+  const { seconds: cooldown, isActive: cooldownActive, start: startCooldown } = useCountdown(60, { autoStart: true });
+
   const maskedContact = method === 'phone'
     ? contact.slice(0, -4).replace(/\d/g, '*') + contact.slice(-4)
     : contact.replace(/(.{2})(.*)(@.*)/, '$1****$3');
-  
+
   const canSubmit = code.length === 6 && !isLoading;
-  
-  useEffect(() => {
-    if (cooldown > 0) {
-      const timer = setTimeout(() => setCooldown((c: number) => c - 1), 1000);
-      return () => clearTimeout(timer);
-    }
-    return undefined;
-  }, [cooldown]);
-  
+
   const handleResend = () => {
     onResend();
-    setCooldown(60);
+    startCooldown();
   };
   
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
+      {/* Header — same top padding as Sign In/Sign Up so X height consistent when present */}
       <div 
         className="flex items-center gap-3 flex-shrink-0"
         style={{ 
-          padding: `${SPACING.md}px ${SPACING.lg}px`, 
-          borderBottom: `1px solid ${BORDER_COLORS.default}` 
+          padding: `${SPACING.md + 8}px ${SPACING.lg}px ${SPACING.md}px`
         }}
       >
         <button onClick={onBack} className="p-2" aria-label="Back">
@@ -393,18 +384,18 @@ function CodeStep({
       </div>
       
       {/* Content */}
-      <div className="flex-1 flex flex-col justify-center px-6">
+      <div className="flex-1 flex flex-col justify-center px-6" style={{ marginTop: '-4px' }}>
         <div className="text-center mb-8">
           <div 
             className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-            style={{ backgroundColor: 'rgba(96, 165, 250, 0.15)' }}
+            style={{ background: 'url(/wr_blue.png) no-repeat center center', backgroundSize: 'cover' }}
           >
             {method === 'phone' ? (
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.active} strokeWidth="2">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
               </svg>
             ) : (
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.active} strokeWidth="2">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
             )}
@@ -462,14 +453,21 @@ function CodeStep({
         >
           Didn't receive it?{' '}
           {method === 'email' && <span>Check your spam folder or </span>}
-          {cooldown > 0 ? (
+          {cooldownActive ? (
             <span>resend in {cooldown}s</span>
           ) : (
             <button
               onClick={handleResend}
               disabled={isLoading}
               className="font-semibold"
-              style={{ color: STATE_COLORS.active }}
+              style={{
+                background: 'url(/wr_blue.png) no-repeat center center',
+                backgroundSize: 'cover',
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                color: 'transparent',
+              }}
             >
               resend code
             </button>
@@ -480,7 +478,7 @@ function CodeStep({
       {/* Footer */}
       <div 
         className="flex-shrink-0"
-        style={{ padding: SPACING.lg, borderTop: `1px solid ${BORDER_COLORS.default}` }}
+        style={{ padding: SPACING.sm }}
       >
         <button
           onClick={() => onVerify(code)}
@@ -539,12 +537,11 @@ function NewPasswordStep({
   
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
+      {/* Header — same top padding as Sign In/Sign Up so X height is consistent */}
       <div 
         className="flex items-center gap-3 flex-shrink-0"
         style={{ 
-          padding: `${SPACING.md}px ${SPACING.lg}px`, 
-          borderBottom: `1px solid ${BORDER_COLORS.default}` 
+          padding: `${SPACING.md + 8}px ${SPACING.lg}px ${SPACING.md}px`
         }}
       >
         <h2 
@@ -563,7 +560,7 @@ function NewPasswordStep({
       </div>
       
       {/* Content */}
-      <div className="flex-1 flex flex-col justify-center px-6">
+      <div className="flex-1 flex flex-col justify-center px-6" style={{ marginTop: '-4px' }}>
         <div className="text-center mb-8">
           <div 
             className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
@@ -692,7 +689,7 @@ function NewPasswordStep({
       {/* Footer */}
       <div 
         className="flex-shrink-0"
-        style={{ padding: SPACING.lg, borderTop: `1px solid ${BORDER_COLORS.default}` }}
+        style={{ padding: SPACING.sm }}
       >
         <button
           onClick={() => onSubmit(password)}
@@ -826,14 +823,41 @@ export function ForgotPasswordModal({
   if (!isOpen) return null;
   
   return (
-    <div 
+    <div
       className="absolute left-0 right-0 bottom-0 flex flex-col"
-      style={{ 
-        top: 0, 
-        backgroundColor: BG_COLORS.secondary, 
-        zIndex: Z_INDEX.modal 
+      style={{
+        top: 0,
+        backgroundColor: BG_COLORS.secondary,
+        zIndex: Z_INDEX.modal,
       }}
     >
+      {/* Blue outline wrapper - auth modal branding */}
+      <div
+        style={{
+          position: 'absolute',
+          top: -8,
+          left: -8,
+          right: -8,
+          bottom: -8,
+          background: 'url(/wr_blue.png) no-repeat center center',
+          backgroundSize: '100% 100%',
+          borderRadius: '2.5rem',
+          zIndex: -1,
+          pointerEvents: 'none',
+          maskImage: `
+            linear-gradient(to bottom, black 0, black 8px, transparent 8px, transparent calc(100% - 8px), black calc(100% - 8px), black 100%),
+            linear-gradient(to right, black 0, black 8px, transparent 8px, transparent calc(100% - 8px), black calc(100% - 8px), black 100%)
+          `,
+          maskComposite: 'intersect',
+          WebkitMaskImage: `
+            linear-gradient(to bottom, black 0, black 8px, transparent 8px, transparent calc(100% - 8px), black calc(100% - 8px), black 100%),
+            linear-gradient(to right, black 0, black 8px, transparent 8px, transparent calc(100% - 8px), black calc(100% - 8px), black 100%)
+          `,
+          WebkitMaskComposite: 'source-in',
+        }}
+        aria-hidden="true"
+      />
+
       {step === 'input' && (
         <InputStep
           method={method}

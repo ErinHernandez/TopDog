@@ -17,6 +17,7 @@ import { SPACING, Z_INDEX } from '../../core/constants/sizes';
 import { ChevronLeft } from '../../components/icons';
 import { UsernameInput } from './UsernameInput';
 import { useAuth } from '../hooks/useAuth';
+import { useCountdown } from '../../hooks/ui/useCountdown';
 import { PASSWORD_CONSTRAINTS } from '../constants';
 
 // ============================================================================
@@ -116,6 +117,7 @@ interface InputProps {
   touched?: boolean;
   inputRef?: React.RefObject<HTMLInputElement | null>;
   onBlur?: () => void;
+  onFocus?: () => void;
   rightElement?: React.ReactNode;
   autoFocus?: boolean;
 }
@@ -131,6 +133,7 @@ function Input({
   touched,
   inputRef,
   onBlur,
+  onFocus,
   rightElement,
   autoFocus,
 }: InputProps): React.ReactElement {
@@ -145,6 +148,7 @@ function Input({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onBlur={onBlur}
+          onFocus={onFocus}
           placeholder={placeholder}
           autoComplete={autoComplete}
           disabled={disabled}
@@ -211,6 +215,7 @@ function CredentialsStep({
   error,
 }: CredentialsStepProps): React.ReactElement {
   const [emailTouched, setEmailTouched] = useState(false);
+  const [emailFocused, setEmailFocused] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const emailRef = useRef<HTMLInputElement>(null);
@@ -222,7 +227,9 @@ function CredentialsStep({
     /\d/.test(password);
   const passwordsMatch = password === confirmPassword && confirmPassword.length > 0;
   
+  // Inline email error only after blur (click out), hide while focused — see docs/FORM_VALIDATION_PATTERN.md
   const showEmailError = emailTouched && email && !isValidEmail;
+  const emailErrorToShow = emailFocused ? null : (showEmailError ? 'Please enter a valid email' : null);
   const canContinue = isValidEmail && isValidPassword && passwordsMatch;
   
   // Keyboard handling
@@ -297,16 +304,17 @@ function CredentialsStep({
         )}
         
         <div className="space-y-4">
-          {/* Email Input */}
+          {/* Email Input — show "valid email" only after blur, hide while focused */}
           <Input
             inputRef={emailRef}
             value={email}
             onChange={setEmail}
-            onBlur={() => setEmailTouched(true)}
+            onBlur={() => { setEmailTouched(true); setEmailFocused(false); }}
+            onFocus={() => setEmailFocused(true)}
             placeholder="Email address"
             type="email"
             autoComplete="email"
-            error={showEmailError ? 'Please enter a valid email' : null}
+            error={emailErrorToShow}
             touched={emailTouched}
             autoFocus
           />
@@ -563,9 +571,9 @@ function UsernameStep({
         <div className="text-center mb-8">
           <div 
             className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4"
-            style={{ backgroundColor: 'rgba(96, 165, 250, 0.15)' }}
+            style={{ background: 'url(/wr_blue.png) no-repeat center center', backgroundSize: 'cover' }}
           >
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.active} strokeWidth="2">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
           </div>
@@ -684,24 +692,16 @@ function EmailVerifyStep({
   error,
 }: EmailVerifyStepProps): React.ReactElement {
   const [code, setCode] = useState('');
-  const [cooldown, setCooldown] = useState(60);
+  const { seconds: cooldown, isActive: cooldownActive, start: startCooldown } = useCountdown(60, { autoStart: true });
   const [isVerifying, setIsVerifying] = useState(false);
   const [verifyError, setVerifyError] = useState<string | null>(null);
-  
+
   const maskedEmail = email.replace(/(.{2})(.*)(@.*)/, '$1****$3');
   const canSubmit = code.length === 6 && !isVerifying;
-  
-  useEffect(() => {
-    if (cooldown > 0) {
-      const timer = setTimeout(() => setCooldown(c => c - 1), 1000);
-      return () => clearTimeout(timer);
-    }
-    return undefined;
-  }, [cooldown]);
-  
+
   const handleResend = () => {
     onResend();
-    setCooldown(60);
+    startCooldown();
   };
   
   const handleVerify = useCallback(async () => {
@@ -775,9 +775,9 @@ function EmailVerifyStep({
         <div className="text-center mb-8">
           <div 
             className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4"
-            style={{ backgroundColor: 'rgba(96, 165, 250, 0.15)' }}
+            style={{ background: 'url(/wr_blue.png) no-repeat center center', backgroundSize: 'cover' }}
           >
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.active} strokeWidth="2">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
           </div>
@@ -839,14 +839,21 @@ function EmailVerifyStep({
           style={{ color: TEXT_COLORS.muted, fontSize: 14 }}
         >
           Didn't receive it? Check your spam folder or{' '}
-          {cooldown > 0 ? (
+          {cooldownActive ? (
             <span>resend in {cooldown}s</span>
           ) : (
             <button
               onClick={handleResend}
               disabled={isLoading}
               className="font-semibold"
-              style={{ color: STATE_COLORS.active }}
+              style={{
+                background: 'url(/wr_blue.png) no-repeat center center',
+                backgroundSize: 'cover',
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                color: 'transparent',
+              }}
             >
               resend code
             </button>

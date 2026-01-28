@@ -12,7 +12,9 @@ import type {
   SeasonStats,
   HistoricalPlayer,
 } from './types';
+import { createScopedLogger } from '@/lib/clientLogger';
 
+const logger = createScopedLogger('[HistoricalStats]');
 const HISTORY_BASE_PATH = '/data/history';
 
 // In-memory cache for loaded data (persists during session)
@@ -36,15 +38,15 @@ async function loadFile<T>(path: string): Promise<T | null> {
   try {
     const response = await fetch(fullPath);
     if (!response.ok) {
-      console.warn(`[HistoricalStats] File not found: ${fullPath}`);
+      logger.warn(`File not found: ${fullPath}`);
       return null;
     }
-    
+
     const data = await response.json();
     cache.set(fullPath, data);
     return data as T;
   } catch (error: unknown) {
-    console.error(`[HistoricalStats] Failed to load: ${fullPath}`, error);
+    logger.error(`Failed to load: ${fullPath}`, error instanceof Error ? error : new Error(String(error)));
     return null;
   }
 }
@@ -204,7 +206,7 @@ export async function preloadHistoricalData(): Promise<void> {
     getManifest(),
     getPlayerIndex(),
   ]);
-  console.log('[HistoricalStats] Core data preloaded');
+  logger.debug('Core data preloaded');
 }
 
 /**

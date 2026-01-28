@@ -34,6 +34,7 @@ import {
   sendPasswordResetEmail as firebaseSendPasswordResetEmail,
   updateProfile as firebaseUpdateProfile,
   linkWithCredential,
+  reauthenticateWithCredential,
   EmailAuthProvider,
   PhoneAuthProvider,
   signInWithPhoneNumber,
@@ -41,9 +42,6 @@ import {
   type User as FirebaseUser,
   type ConfirmationResult,
 } from 'firebase/auth';
-import { createScopedLogger } from '../../../../lib/clientLogger';
-
-const logger = createScopedLogger('[AuthContext]');
 import {
   getFirestore,
   doc,
@@ -79,6 +77,9 @@ import {
   USERNAME_CONSTRAINTS,
 } from '../constants';
 import { validateUsername, checkUsernameAvailability } from '../../../../lib/usernameValidation';
+import { createScopedLogger } from '@/lib/clientLogger';
+
+const logger = createScopedLogger('[AuthContext]');
 
 // ============================================================================
 // INITIAL STATE
@@ -97,6 +98,19 @@ const initialState: AuthState = {
 // ============================================================================
 // HELPERS
 // ============================================================================
+
+/**
+ * Wraps a promise with a timeout
+ * If the promise doesn't resolve within timeoutMs, rejects with error
+ */
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number, errorMessage: string): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => {
+      setTimeout(() => reject(new Error(errorMessage)), timeoutMs);
+    }),
+  ]);
+}
 
 /**
  * Convert Firebase User to AuthUser
@@ -291,22 +305,7 @@ export function AuthProvider({
       return null;
     }
   }, []);
-  
-  // ========== Timeout Helper ==========
-  
-  /**
-   * Wraps a promise with a timeout
-   * If the promise doesn't resolve within timeoutMs, rejects with error
-   */
-  const withTimeout = useCallback(<T,>(promise: Promise<T>, timeoutMs: number, errorMessage: string): Promise<T> => {
-    return Promise.race([
-      promise,
-      new Promise<T>((_, reject) => {
-        setTimeout(() => reject(new Error(errorMessage)), timeoutMs);
-      }),
-    ]);
-  }, []);
-  
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -342,7 +341,7 @@ export function AuthProvider({
               10000, // 10 second timeout
               'Profile load timed out'
             ).catch((error) => {
-              console.warn('[AuthContext] Profile load failed or timed out:', error.message);
+              logger.warn(`Profile load failed or timed out: ${error.message}`);
               return null; // Return null to continue with defaults
             });
             
@@ -488,7 +487,7 @@ export function AuthProvider({
         }
       } catch (locationError) {
         // Don't fail signup if location detection fails - just log it
-        console.warn('Failed to record location during signup:', locationError);
+        logger.warn('Failed to record location during signup');
       }
       
       // Send verification email
@@ -510,11 +509,56 @@ export function AuthProvider({
   }, [auth, db]);
   
   const signInWithEmail = useCallback(async (data: EmailSignInData): Promise<SignInResult> => {
+    dispatch({ type: 'AUTH_LOADING' });
+
+    // Dev login: email "t" / password "t" works in development without Firebase
+    const isDev = typeof process !== 'undefined' && process.env.NODE_ENV === 'development';
+    const isDevCredentials = data.email.trim().toLowerCase() === 't' && data.password === 't';
+    if (isDev && isDevCredentials) {
+      const now = new Date();
+      const devUser: AuthUser = {
+        uid: 'dev-user-t',
+        email: 't',
+        emailVerified: true,
+        phoneNumber: null,
+        displayName: 'Dev User',
+        photoURL: null,
+        isAnonymous: false,
+        providerId: 'password',
+        createdAt: now,
+        lastLoginAt: now,
+      };
+      const devProfile: UserProfile = {
+        uid: devUser.uid,
+        username: 'devuser',
+        email: devUser.email,
+        displayName: devUser.displayName || 'Dev User',
+        countryCode: 'US',
+        createdAt: now,
+        updatedAt: now,
+        isActive: true,
+        profileComplete: true,
+        tournamentsEntered: 0,
+        tournamentsWon: 0,
+        totalWinnings: 0,
+        bestFinish: null,
+        lastLogin: now,
+        preferences: {
+          notifications: true,
+          emailUpdates: true,
+          publicProfile: true,
+          borderColor: '#4285F4',
+        },
+      };
+      dispatch({ type: 'AUTH_STATE_CHANGED', payload: { user: devUser } });
+      dispatch({ type: 'PROFILE_LOADED', payload: { profile: devProfile } });
+      onAuthStateChange?.(devUser);
+      return { success: true, data: devUser };
+    }
+
     if (!auth) {
       return { success: false, error: createAuthError(new Error('Auth not initialized')) };
     }
-    
-    dispatch({ type: 'AUTH_LOADING' });
     
     try {
       const credential = await signInWithEmailAndPassword(auth, data.email, data.password);
@@ -534,7 +578,7 @@ export function AuthProvider({
       dispatch({ type: 'AUTH_ERROR', payload: { error: authError } });
       return { success: false, error: authError };
     }
-  }, [auth, db]);
+  }, [auth, db, onAuthStateChange]);
   
   // ========== Phone Auth ==========
   
@@ -738,24 +782,33 @@ export function AuthProvider({
     }
   }, [db, state.user, state.profile?.countryCode, state.profile?.username]);
   
-  const deleteAccount = useCallback(async (): Promise<AuthResult> => {
+  const deleteAccount = useCallback(async (password?: string): Promise<AuthResult> => {
     if (!auth || !db || !state.user) {
       return { success: false, error: createAuthError(new Error('Not authenticated')) };
     }
-    
+
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      return { success: false, error: createAuthError(new Error('Not authenticated')) };
+    }
+
     try {
+      // Email/password users must re-authenticate with password before deletion
+      if (currentUser.email && password != null && password.length > 0) {
+        const credential = EmailAuthProvider.credential(currentUser.email, password);
+        await reauthenticateWithCredential(currentUser, credential);
+      } else if (currentUser.email && !currentUser.isAnonymous) {
+        return { success: false, error: createAuthError(new Error('Password required to delete account')) };
+      }
+
       // Delete Firestore profile
       await deleteDoc(doc(db, 'users', state.user.uid));
-      
+
       // Delete Firebase user
-      const currentUser = auth.currentUser;
-      if (currentUser) {
-        await currentUser.delete();
-      }
-      
+      await currentUser.delete();
+
       dispatch({ type: 'SIGN_OUT' });
       return { success: true };
-      
     } catch (error) {
       const authError = createAuthError(error);
       return { success: false, error: authError };
@@ -821,17 +874,17 @@ export function AuthProvider({
   
   const refreshProfile = useCallback(async (): Promise<void> => {
     if (!db || !state.user) return;
-    
+
     try {
       const profileDoc = await withTimeout(
         getDoc(doc(db, 'users', state.user.uid)),
         10000, // 10 second timeout
         'Profile refresh timed out'
       ).catch((error) => {
-        console.warn('[AuthContext] Profile refresh failed or timed out:', error.message);
+        logger.warn(`Profile refresh failed or timed out: ${error.message}`);
         return null; // Return null to continue without updating
       });
-      
+
       if (profileDoc && profileDoc.exists()) {
         const profileData = profileDoc.data();
         const profile: UserProfile = {
@@ -861,7 +914,7 @@ export function AuthProvider({
     } catch (error) {
       logger.error('Error refreshing profile', error instanceof Error ? error : new Error(String(error)));
     }
-  }, [db, state.user, withTimeout]);
+  }, [db, state.user]);
   
   const clearError = useCallback(() => {
     dispatch({ type: 'CLEAR_ERROR' });

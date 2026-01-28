@@ -5,6 +5,7 @@
 
 import { GLOBAL_PAYMENT_METHODS, PaymentMethodId } from './paymentMethodConfig';
 import { HEALTH_CHECKS, SecurityLogger } from './paymentSecurity';
+import { serverLogger } from './logger/serverLogger';
 
 // ============================================================================
 // TYPES
@@ -112,7 +113,7 @@ class PaymentHealthMonitor {
   }
   
   startMonitoring(): void {
-    console.log('🔍 Starting payment processor health monitoring...');
+    serverLogger.info('Starting payment processor health monitoring');
     
     // Initial health check
     this.performHealthChecks();
@@ -134,7 +135,7 @@ class PaymentHealthMonitor {
       clearInterval(this.healthCheckInterval);
       this.healthCheckInterval = null;
     }
-    console.log('⏹️ Payment processor health monitoring stopped');
+    serverLogger.info('Payment processor health monitoring stopped');
   }
   
   async performHealthChecks(): Promise<void> {
@@ -448,7 +449,7 @@ class PaymentHealthMonitor {
   }
   
   private triggerEmergencyAlert(criticalProcessors: PaymentMethodId[]): void {
-    console.error('🚨 CRITICAL: Core payment processors are down!', criticalProcessors);
+    serverLogger.error('CRITICAL: Core payment processors are down!', new Error(`Processors down: ${criticalProcessors.join(', ')}`));
     
     // In production, this would trigger:
     // - PagerDuty alerts

@@ -23,17 +23,25 @@ import type {
   TransferRecipientType,
   PaystackTransferRecipient,
 } from '../../../../lib/paystack/paystackTypes';
-import { 
+import {
   withErrorHandling,
   validateMethod,
   validateBody,
+  validateRequestBody,
   createSuccessResponse,
   createErrorResponse,
   ErrorType,
   type ApiLogger,
 } from '../../../../lib/apiErrorHandler';
+import { paystackCreateRecipientSchema, paystackDeleteRecipientSchema } from '../../../../lib/validation/schemas';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../../../lib/firebase';
+import {
+  withAuth,
+  verifyUserAccess,
+  type AuthenticatedRequest,
+  type ApiHandler as AuthApiHandler,
+} from '../../../../lib/apiAuth';
 
 // ============================================================================
 // TYPES
@@ -74,26 +82,40 @@ interface RecipientResponse {
 // HANDLER
 // ============================================================================
 
-export default async function handler(
+/**
+ * SECURITY FIX (Bug #8): Added withAuth wrapper for authentication.
+ *
+ * The previous implementation had no authentication check, allowing
+ * unauthenticated users to create, list, or delete transfer recipients.
+ * This fix wraps the handler with withAuth to require authentication,
+ * and adds verifyUserAccess checks to prevent users from accessing
+ * other users' data.
+ */
+const recipientHandler = async function handler(
   req: NextApiRequest,
   res: NextApiResponse<RecipientResponse>
 ) {
   return withErrorHandling(req, res, async (req, res, logger) => {
     validateMethod(req, ['POST', 'GET', 'DELETE'], logger);
-    
+
+    // Get authenticated user from request (set by withAuth)
+    const authenticatedReq = req as AuthenticatedRequest;
+    const authenticatedUserId = authenticatedReq.user?.uid;
+
     logger.info('Paystack transfer recipient request', {
       component: 'paystack',
       operation: 'recipient',
       method: req.method,
+      authenticatedUserId,
     });
-    
+
     switch (req.method) {
       case 'POST':
-        return await handleCreate(req, res, logger);
+        return await handleCreate(req, res, logger, authenticatedUserId);
       case 'GET':
-        return await handleList(req, res, logger);
+        return await handleList(req, res, logger, authenticatedUserId);
       case 'DELETE':
-        return await handleDelete(req, res, logger);
+        return await handleDelete(req, res, logger, authenticatedUserId);
       default:
         // This should never happen due to validateMethod, but TypeScript needs it
         const response = createErrorResponse(
@@ -109,7 +131,13 @@ export default async function handler(
         });
     }
   });
-}
+};
+
+// Export with authentication wrapper - requires valid Firebase Auth token
+export default withAuth(
+  recipientHandler as unknown as AuthApiHandler,
+  { required: true, allowAnonymous: false }
+);
 
 // ============================================================================
 // CREATE RECIPIENT
@@ -118,8 +146,11 @@ export default async function handler(
 async function handleCreate(
   req: NextApiRequest,
   res: NextApiResponse<RecipientResponse>,
-  logger: ApiLogger
+  logger: ApiLogger,
+  authenticatedUserId?: string
 ) {
+  // SECURITY: Validate request body using Zod schema
+  const body = validateRequestBody(req, paystackCreateRecipientSchema, logger);
   const {
     userId,
     type,
@@ -128,10 +159,22 @@ async function handleCreate(
     bankCode,
     country,
     setAsDefault,
-  } = req.body as CreateRecipientRequest;
-  
-  // Validation
-  validateBody(req, ['userId', 'type', 'name', 'accountNumber', 'country'], logger);
+  } = body;
+
+  // SECURITY: Verify the authenticated user matches the requested userId
+  // This prevents users from creating recipients for other users
+  if (!verifyUserAccess(authenticatedUserId, userId)) {
+    logger.warn('Unauthorized access attempt in handleCreate', {
+      component: 'paystack',
+      operation: 'create_recipient',
+      authenticatedUserId,
+      requestedUserId: userId,
+    });
+    return res.status(403).json({
+      ok: false,
+      error: { code: 'forbidden', message: 'You can only create recipients for your own account' },
+    });
+  }
   
   if (!country || !['NG', 'GH', 'ZA', 'KE'].includes(country)) {
     const response = createErrorResponse(
@@ -268,14 +311,15 @@ async function handleCreate(
 async function handleList(
   req: NextApiRequest,
   res: NextApiResponse<RecipientResponse>,
-  logger: ApiLogger
+  logger: ApiLogger,
+  authenticatedUserId?: string
 ) {
   const userId = req.query.userId as string;
   const listBanksFor = req.query.banks as string; // 'nigeria', 'ghana', 'south_africa', 'kenya'
   const resolve = req.query.resolve === 'true';
   const accountNumber = req.query.accountNumber as string;
   const bankCode = req.query.bankCode as string;
-  
+
   // If requesting bank list
   if (listBanksFor) {
     const countryMap: Record<string, 'nigeria' | 'ghana' | 'south_africa' | 'kenya'> = {
@@ -365,7 +409,22 @@ async function handleList(
       error: { code: 'missing_user_id', message: 'User ID is required' },
     });
   }
-  
+
+  // SECURITY: Verify the authenticated user matches the requested userId
+  // This prevents users from viewing other users' recipients
+  if (!verifyUserAccess(authenticatedUserId, userId)) {
+    logger.warn('Unauthorized access attempt in handleList', {
+      component: 'paystack',
+      operation: 'list_recipients',
+      authenticatedUserId,
+      requestedUserId: userId,
+    });
+    return res.status(403).json({
+      ok: false,
+      error: { code: 'forbidden', message: 'You can only view recipients for your own account' },
+    });
+  }
+
   logger.info('Fetching user recipients', {
     component: 'paystack',
     operation: 'list_recipients',
@@ -422,15 +481,28 @@ async function handleList(
 async function handleDelete(
   req: NextApiRequest,
   res: NextApiResponse<RecipientResponse>,
-  logger: ApiLogger
+  logger: ApiLogger,
+  authenticatedUserId?: string
 ) {
-  validateBody(req, ['userId', 'recipientCode'], logger);
-  
-  const { userId, recipientCode } = req.body as {
-    userId: string;
-    recipientCode: string;
-  };
-  
+  // SECURITY: Validate request body using Zod schema
+  const body = validateRequestBody(req, paystackDeleteRecipientSchema, logger);
+  const { userId, recipientCode } = body;
+
+  // SECURITY: Verify the authenticated user matches the requested userId
+  // This prevents users from deleting other users' recipients
+  if (!verifyUserAccess(authenticatedUserId, userId)) {
+    logger.warn('Unauthorized access attempt in handleDelete', {
+      component: 'paystack',
+      operation: 'delete_recipient',
+      authenticatedUserId,
+      requestedUserId: userId,
+    });
+    return res.status(403).json({
+      ok: false,
+      error: { code: 'forbidden', message: 'You can only delete recipients for your own account' },
+    });
+  }
+
   logger.info('Deleting transfer recipient', {
     component: 'paystack',
     operation: 'delete_recipient',

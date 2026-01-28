@@ -9,6 +9,7 @@
  */
 
 import { db } from './firebase';
+import { createScopedLogger } from './clientLogger';
 import { 
   collection, 
   doc, 
@@ -19,10 +20,14 @@ import {
   where, 
   writeBatch,
   serverTimestamp,
+  limit,
+  startAfter,
+  orderBy,
   type DocumentData,
   type Timestamp,
   type Query,
   type CollectionReference,
+  type QueryDocumentSnapshot,
 } from 'firebase/firestore';
 import { 
   checkVIPReservation, 
@@ -34,6 +39,8 @@ import {
   type VIPReservationFilters,
 } from './usernameValidation';
 import { UserRegistrationService, type GetUserProfileResult } from './userRegistration';
+
+const logger = createScopedLogger('[VIPAccountManager]');
 
 // ============================================================================
 // TYPES
@@ -283,9 +290,9 @@ export class VIPAccountManager {
       const matches: VIPMatch[] = [];
       const usersRef = collection(db, 'users');
       
-      // Search by email if provided
+      // Search by email if provided (limit to 10 - email should be unique)
       if (searchCriteria.email) {
-        const emailQuery = query(usersRef, where('email', '==', searchCriteria.email.toLowerCase()));
+        const emailQuery = query(usersRef, where('email', '==', searchCriteria.email.toLowerCase()), limit(10));
         const emailResults = await getDocs(emailQuery);
         emailResults.forEach(doc => {
           matches.push({
@@ -297,41 +304,85 @@ export class VIPAccountManager {
       }
       
       // Search by partial username match
+      // NOTE: This performs a client-side filter. For production scale, consider
+      // using Firestore full-text search extensions or Algolia
       if (searchCriteria.usernameContains) {
-        const allUsers = await getDocs(usersRef);
         const searchTerm = searchCriteria.usernameContains.toUpperCase();
+        const MAX_USERS_TO_SCAN = 1000; // Limit to prevent runaway queries
         
-        allUsers.forEach(doc => {
-          const userData = doc.data();
-          if (userData.username && 
-              userData.username.includes(searchTerm) &&
-              !matches.find(m => m.uid === userData.uid)) {
-            matches.push({
-              ...userData,
-              matchReason: 'username_partial_match',
-              matchConfidence: 'medium'
-            } as VIPMatch);
+        // Paginate through users in batches
+        let lastDoc: QueryDocumentSnapshot<DocumentData> | null = null;
+        let scannedCount = 0;
+        
+        while (scannedCount < MAX_USERS_TO_SCAN) {
+          const batchSize = Math.min(500, MAX_USERS_TO_SCAN - scannedCount);
+          let batchQuery = query(usersRef, orderBy('uid'), limit(batchSize));
+          if (lastDoc) {
+            batchQuery = query(usersRef, orderBy('uid'), startAfter(lastDoc), limit(batchSize));
           }
-        });
+          
+          const batch = await getDocs(batchQuery);
+          if (batch.empty) break;
+          
+          batch.forEach(doc => {
+            const userData = doc.data();
+            if (userData.username && 
+                userData.username.includes(searchTerm) &&
+                !matches.find(m => m.uid === userData.uid)) {
+              matches.push({
+                ...userData,
+                matchReason: 'username_partial_match',
+                matchConfidence: 'medium'
+              } as VIPMatch);
+            }
+          });
+          
+          lastDoc = batch.docs[batch.docs.length - 1];
+          scannedCount += batch.size;
+          
+          if (batch.size < batchSize) break; // No more documents
+        }
       }
       
       // Search by display name
+      // NOTE: This performs a client-side filter. For production scale, consider
+      // using Firestore full-text search extensions or Algolia
       if (searchCriteria.displayNameContains) {
-        const allUsers = await getDocs(usersRef);
         const searchTerm = searchCriteria.displayNameContains.toLowerCase();
+        const MAX_USERS_TO_SCAN = 1000; // Limit to prevent runaway queries
         
-        allUsers.forEach(doc => {
-          const userData = doc.data();
-          if (userData.displayName && 
-              userData.displayName.toLowerCase().includes(searchTerm) &&
-              !matches.find(m => m.uid === userData.uid)) {
-            matches.push({
-              ...userData,
-              matchReason: 'display_name_match',
-              matchConfidence: 'medium'
-            } as VIPMatch);
+        // Paginate through users in batches
+        let lastDoc: QueryDocumentSnapshot<DocumentData> | null = null;
+        let scannedCount = 0;
+        
+        while (scannedCount < MAX_USERS_TO_SCAN) {
+          const batchSize = Math.min(500, MAX_USERS_TO_SCAN - scannedCount);
+          let batchQuery = query(usersRef, orderBy('uid'), limit(batchSize));
+          if (lastDoc) {
+            batchQuery = query(usersRef, orderBy('uid'), startAfter(lastDoc), limit(batchSize));
           }
-        });
+          
+          const batch = await getDocs(batchQuery);
+          if (batch.empty) break;
+          
+          batch.forEach(doc => {
+            const userData = doc.data();
+            if (userData.displayName && 
+                userData.displayName.toLowerCase().includes(searchTerm) &&
+                !matches.find(m => m.uid === userData.uid)) {
+              matches.push({
+                ...userData,
+                matchReason: 'display_name_match',
+                matchConfidence: 'medium'
+              } as VIPMatch);
+            }
+          });
+          
+          lastDoc = batch.docs[batch.docs.length - 1];
+          scannedCount += batch.size;
+          
+          if (batch.size < batchSize) break; // No more documents
+        }
       }
       
       return {
@@ -343,7 +394,7 @@ export class VIPAccountManager {
       
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Error finding VIP matches:', error);
+      logger.error('Error finding VIP matches', error instanceof Error ? error : new Error(errorMessage));
       return {
         success: false,
         error: errorMessage,
@@ -402,7 +453,7 @@ export class VIPAccountManager {
       
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Error getting unclaimed VIPs with matches:', error);
+      logger.error('Error getting unclaimed VIPs with matches', error instanceof Error ? error : new Error(errorMessage));
       return {
         success: false,
         error: errorMessage,
@@ -490,16 +541,16 @@ export class VIPAccountManager {
         requestedAt: serverTimestamp(),
       });
       
-      console.log(`Merge request created: ${mergeRequestId}`);
-      
+      logger.info('Merge request created', { mergeRequestId });
+
       return {
         success: true,
         mergeRequest
       };
-      
+
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Error creating merge request:', error);
+      logger.error('Error creating merge request', error instanceof Error ? error : new Error(errorMessage));
       return {
         success: false,
         error: errorMessage
@@ -537,7 +588,7 @@ export class VIPAccountManager {
       if (statusFilter) {
         q = query(mergeRequestsRef, where('uid', '==', uid), where('status', 'in', statusFilter));
       } else {
-        q = query(mergeRequestsRef, where('uid', '==', uid));
+        q = query(mergeRequestsRef, where('uid', '==', uid), limit(100));
       }
       
       const snapshot = await getDocs(q);
@@ -548,7 +599,8 @@ export class VIPAccountManager {
       
       return snapshot.docs[0].data() as MergeRequest;
     } catch (error) {
-      console.error('Error getting merge request:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      logger.error('Error getting merge request', error instanceof Error ? error : new Error(errorMessage));
       return null;
     }
   }
@@ -568,7 +620,9 @@ export class VIPAccountManager {
       let q: Query | CollectionReference = mergeRequestsRef;
       
       if (filters.status) {
-        q = query(mergeRequestsRef, where('status', '==', filters.status));
+        q = query(mergeRequestsRef, where('status', '==', filters.status), limit(500));
+      } else {
+        q = query(mergeRequestsRef, limit(500));
       }
       
       const snapshot = await getDocs(q);
@@ -581,7 +635,7 @@ export class VIPAccountManager {
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Error getting merge requests:', error);
+      logger.error('Error getting merge requests', error instanceof Error ? error : new Error(errorMessage));
       return {
         success: false,
         error: errorMessage,
@@ -590,7 +644,7 @@ export class VIPAccountManager {
       };
     }
   }
-  
+
   /**
    * Approve a merge request (if different admin than requester)
    */
@@ -626,11 +680,11 @@ export class VIPAccountManager {
       return { success: true };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Error approving merge request:', error);
+      logger.error('Error approving merge request', error instanceof Error ? error : new Error(errorMessage));
       return { success: false, error: errorMessage };
     }
   }
-  
+
   /**
    * Reject a merge request
    */
@@ -668,11 +722,11 @@ export class VIPAccountManager {
       return { success: true };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Error rejecting merge request:', error);
+      logger.error('Error rejecting merge request', error instanceof Error ? error : new Error(errorMessage));
       return { success: false, error: errorMessage };
     }
   }
-  
+
   // ==========================================================================
   // EXECUTE MERGE
   // ==========================================================================
@@ -780,9 +834,9 @@ export class VIPAccountManager {
       // IMPORTANT: This must happen AFTER batch.commit() succeeds to ensure
       // consistency between the database and in-memory state
       claimVIPUsername(reservedUsername, uid);
-      
-      console.log(`VIP merge completed: ${currentUsername} -> ${reservedUsername} for UID ${uid}`);
-      
+
+      logger.info('VIP merge completed', { oldUsername: currentUsername, newUsername: reservedUsername, uid });
+
       return {
         success: true,
         audit: {
@@ -795,14 +849,14 @@ export class VIPAccountManager {
       
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Error executing merge:', error);
+      logger.error('Error executing merge', error instanceof Error ? error : new Error(errorMessage));
       return {
         success: false,
         error: errorMessage
       };
     }
   }
-  
+
   /**
    * Quick merge - create and immediately execute a merge (for admin convenience)
    * Use with caution - bypasses approval workflow
@@ -873,11 +927,11 @@ export class VIPAccountManager {
       return { success: true };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Error accepting merge:', error);
+      logger.error('Error accepting merge', error instanceof Error ? error : new Error(errorMessage));
       return { success: false, error: errorMessage };
     }
   }
-  
+
   /**
    * User declines the username change
    */
@@ -915,11 +969,11 @@ export class VIPAccountManager {
       return { success: true };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Error declining merge:', error);
+      logger.error('Error declining merge', error instanceof Error ? error : new Error(errorMessage));
       return { success: false, error: errorMessage };
     }
   }
-  
+
   // ==========================================================================
   // NOTIFICATIONS
   // ==========================================================================
@@ -947,11 +1001,11 @@ export class VIPAccountManager {
       return { success: true };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Error marking user notified:', error);
+      logger.error('Error marking user notified', error instanceof Error ? error : new Error(errorMessage));
       return { success: false, error: errorMessage };
     }
   }
-  
+
   /**
    * Get pending merge request for a user (for showing in their UI)
    */
@@ -967,7 +1021,8 @@ export class VIPAccountManager {
         where('uid', '==', uid),
         where('status', 'in', ['pending', 'approved']),
         where('requireUserAcceptance', '==', true),
-        where('userAccepted', '==', false)
+        where('userAccepted', '==', false),
+        limit(10) // Should only have one pending at a time
       );
       
       const snapshot = await getDocs(q);
@@ -982,11 +1037,11 @@ export class VIPAccountManager {
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Error getting pending merge for user:', error);
+      logger.error('Error getting pending merge for user', error instanceof Error ? error : new Error(errorMessage));
       return { hasPending: false, error: errorMessage };
     }
   }
-  
+
   // ==========================================================================
   // AUDIT & HISTORY
   // ==========================================================================
@@ -1001,7 +1056,7 @@ export class VIPAccountManager {
       }
 
       const auditRef = collection(db, 'username_change_audit');
-      const q = query(auditRef, where('uid', '==', uid));
+      const q = query(auditRef, where('uid', '==', uid), limit(100));
       const snapshot = await getDocs(q);
       
       const history = snapshot.docs.map(doc => doc.data() as UsernameChangeAudit);
@@ -1018,7 +1073,7 @@ export class VIPAccountManager {
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Error getting username change history:', error);
+      logger.error('Error getting username change history', error instanceof Error ? error : new Error(errorMessage));
       return {
         success: false,
         error: errorMessage,
@@ -1027,7 +1082,7 @@ export class VIPAccountManager {
       };
     }
   }
-  
+
   /**
    * Get all username changes (for admin audit)
    */
@@ -1043,7 +1098,9 @@ export class VIPAccountManager {
       let q: Query | CollectionReference = auditRef;
       
       if (filters.changeType) {
-        q = query(auditRef, where('changeType', '==', filters.changeType));
+        q = query(auditRef, where('changeType', '==', filters.changeType), limit(500));
+      } else {
+        q = query(auditRef, limit(500));
       }
       
       const snapshot = await getDocs(q);
@@ -1061,7 +1118,7 @@ export class VIPAccountManager {
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Error getting all username changes:', error);
+      logger.error('Error getting all username changes', error instanceof Error ? error : new Error(errorMessage));
       return {
         success: false,
         error: errorMessage,
@@ -1070,7 +1127,7 @@ export class VIPAccountManager {
       };
     }
   }
-  
+
   // ==========================================================================
   // STATISTICS
   // ==========================================================================
@@ -1085,7 +1142,8 @@ export class VIPAccountManager {
       }
 
       const mergeRequestsRef = collection(db, 'merge_requests');
-      const snapshot = await getDocs(mergeRequestsRef);
+      // Limit statistics query - for exact counts, use Firestore aggregation queries
+      const snapshot = await getDocs(query(mergeRequestsRef, limit(500)));
       
       const requests = snapshot.docs.map(doc => doc.data() as MergeRequest);
       
@@ -1108,7 +1166,7 @@ export class VIPAccountManager {
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('Error getting merge statistics:', error);
+      logger.error('Error getting merge statistics', error instanceof Error ? error : new Error(errorMessage));
       return {
         success: false,
         error: errorMessage,

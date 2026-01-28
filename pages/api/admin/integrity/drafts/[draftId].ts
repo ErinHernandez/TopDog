@@ -22,11 +22,30 @@ export default async function handler(
     // Verify admin access
     const admin = await verifyAdminAccess(req.headers.authorization);
     if (!admin.isAdmin) {
+      // Generic error - don't leak that this is an admin endpoint
+      const requestId = res.getHeader('X-Request-ID') as string;
+      if (!requestId) {
+        logger.warn('Missing request ID in admin route');
+      }
+      
       const errorResponse = createErrorResponse(
         ErrorType.UNAUTHORIZED,
-        'Unauthorized - Admin access required',
+        'Unauthorized', // Generic message
+        {}, // Empty details - don't leak endpoint info
+        requestId || 'unknown'
+      );
+      return res.status(errorResponse.statusCode).json(errorResponse.body);
+    }
+
+    // Add explicit type check for admin object
+    if (typeof admin.uid !== 'string' || !admin.uid) {
+      logger.warn('Invalid admin object', { admin });
+      const requestId = res.getHeader('X-Request-ID') as string || 'unknown';
+      const errorResponse = createErrorResponse(
+        ErrorType.UNAUTHORIZED,
+        'Unauthorized',
         {},
-        res.getHeader('X-Request-ID') as string | undefined
+        requestId
       );
       return res.status(errorResponse.statusCode).json(errorResponse.body);
     }
@@ -76,12 +95,19 @@ export default async function handler(
     const detail = await adminService.getDraftDetail(draftId);
 
     if (!detail.riskScores && !detail.integrityFlags) {
+      // Generic error - don't leak draftId or analysis status
+      const requestId = res.getHeader('X-Request-ID') as string || 'unknown';
       const errorResponse = createErrorResponse(
         ErrorType.NOT_FOUND,
-        'Draft not found or not analyzed',
-        { draftId },
-        res.getHeader('X-Request-ID') as string | undefined
+        'Resource not found', // Generic message
+        {}, // Don't include draftId
+        requestId
       );
+      // Log details server-side only
+      logger.warn('Draft not found or not analyzed', {
+        draftId,
+        adminId: admin.uid,
+      });
       return res.status(errorResponse.statusCode).json(errorResponse.body);
     }
 

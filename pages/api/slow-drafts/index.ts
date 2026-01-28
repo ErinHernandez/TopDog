@@ -22,6 +22,11 @@ import {
   validateMethod,
   createSuccessResponse,
 } from '../../../lib/apiErrorHandler';
+import { withAuth, type AuthenticatedRequest } from '../../../lib/apiAuth';
+import {
+  TOURNAMENT_FILTERS,
+  matchesTournamentFilter,
+} from '../../../lib/config/tournamentFilters';
 
 // ============================================================================
 // TYPES
@@ -177,22 +182,26 @@ function calculateTimeLeftSeconds(
 // HANDLER
 // ============================================================================
 
-export default async function handler(
-  req: NextApiRequest,
+async function slowDraftsHandler(
+  req: AuthenticatedRequest,
   res: NextApiResponse
-) {
-  return withErrorHandling(req, res, async (req, res, logger) => {
+): Promise<void> {
+  await withErrorHandling(req, res, async (_req, res, logger) => {
     validateMethod(req, ['GET'], logger);
 
-    // Get userId from query (in production, get from auth session)
-    const { userId } = req.query;
+    // SECURITY: Get authenticated user from token (using outer req which has user)
+    const authenticatedUserId = req.user?.uid;
 
-    if (!userId || typeof userId !== 'string') {
-      return res.status(400).json({
+    if (!authenticatedUserId) {
+      return res.status(401).json({
         ok: false,
-        error: { code: 'MISSING_USER_ID', message: 'userId is required' },
+        error: { code: 'UNAUTHORIZED', message: 'Authentication required' },
       });
     }
+
+    // SECURITY: Always use authenticated user ID - never trust query params
+    // Remove userId query parameter entirely to prevent IDOR vulnerabilities
+    const userId = authenticatedUserId;
 
     logger.info('Fetching slow drafts', {
       component: 'slow-drafts',
@@ -221,7 +230,37 @@ export default async function handler(
         limit(50)
       );
 
-      const snapshot = await getDocs(q);
+      // SECURITY: Add specific error handling for Firestore errors
+      let snapshot;
+      try {
+        snapshot = await getDocs(q);
+      } catch (firestoreError) {
+        const error = firestoreError as { code?: string; message?: string };
+        
+        // Handle permission errors gracefully
+        if (error.code === 'permission-denied' || 
+            (error.message && error.message.includes('Missing or insufficient permissions'))) {
+          logger.warn('Firestore permission error in slow drafts query', {
+            component: 'slow-drafts',
+            userId,
+            error: firestoreError instanceof Error ? {
+              name: firestoreError.name,
+              message: firestoreError.message,
+              stack: firestoreError.stack,
+            } : String(firestoreError),
+          });
+          return res.status(403).json({
+            ok: false,
+            error: {
+              code: 'FORBIDDEN',
+              message: 'Access denied',
+            },
+          });
+        }
+        
+        // Re-throw other errors to be caught by outer try-catch
+        throw firestoreError;
+      }
       const slowDrafts: SlowDraftResponse[] = [];
 
       for (const docSnap of snapshot.docs) {
@@ -234,8 +273,8 @@ export default async function handler(
         // Find if user is a participant
         const participants = data.participants || [];
         const userParticipant = participants.find(
-          (p: { userId?: string; id?: string }) =>
-            p.userId === userId || p.id === userId
+          (p: { userId?: string; id?: string; participantId?: string }) =>
+            p.userId === userId || p.id === userId || p.participantId === userId
         );
 
         if (!userParticipant) continue;
@@ -319,39 +358,20 @@ export default async function handler(
           myPicks,
           positionCounts,
           positionNeeds,
-          notableEvents: [], // TODO: Implement notable events detection
+          notableEvents: [],
           lastActivityAt: data.updatedAt?.toMillis?.() || Date.now(),
         });
       }
 
-      // Filter to only TopDog International tournaments - STRICT FILTER
-      const filteredDrafts = slowDrafts.filter((draft) => {
-        const name = draft.tournamentName.toLowerCase().trim();
-        
-        // STRICT: Only allow exact "TopDog International" variants
-        // Must start with "topdog international" (case insensitive)
-        const isTopDogInternational = /^topdog\s+international/.test(name) ||
-                                      name === 'topdog international i' ||
-                                      name === 'topdog international ii' ||
-                                      name === 'topdog international iii' ||
-                                      name.startsWith('topdog international');
-        
-        // Explicitly exclude all other tournaments
-        const isExcluded = name.includes('best ball') ||
-                          name.includes('summer') ||
-                          name.includes('ultimate') ||
-                          name.includes('draft masters') ||
-                          name.includes('gridiron') ||
-                          name.includes('championship') ||
-                          name.includes('showdown') ||
-                          name.includes('bowl') ||
-                          name.includes('league') ||
-                          name.includes('premier') ||
-                          name.includes('elite') ||
-                          name.includes('regional');
-        
-        return isTopDogInternational && !isExcluded;
-      });
+      // Filter tournaments using configurable filter
+      // Configuration can be overridden via environment variables:
+      // - TOURNAMENT_FILTER_SLOW_DRAFTS_INCLUDE
+      // - TOURNAMENT_FILTER_SLOW_DRAFTS_EXCLUDE
+      // - TOURNAMENT_FILTER_SLOW_DRAFTS_STRICT
+      const filterConfig = TOURNAMENT_FILTERS.slowDrafts;
+      const filteredDrafts = slowDrafts.filter((draft) =>
+        matchesTournamentFilter(draft.tournamentName, filterConfig)
+      );
 
       // Sort by your-turn first, then by picksAway
       filteredDrafts.sort((a, b) => {
@@ -388,3 +408,6 @@ export default async function handler(
     }
   });
 }
+
+// Export with authentication middleware - requires valid Firebase token
+export default withAuth(slowDraftsHandler);

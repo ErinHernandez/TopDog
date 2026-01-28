@@ -16,6 +16,7 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../../core/constants/colors';
 import { SPACING, Z_INDEX } from '../../core/constants/sizes';
 import { useAuth } from '../hooks/useAuth';
+import { useTemporaryState } from '../../hooks/ui/useTemporaryState';
 import {
   isPlatformAuthenticatorAvailable,
   getLastBiometricUserId,
@@ -81,7 +82,8 @@ function BiometricButton({
       disabled={disabled}
       className="w-full flex items-center justify-center gap-3 py-4 rounded-xl font-semibold transition-all"
       style={{
-        backgroundColor: STATE_COLORS.active,
+        background: 'url(/wr_blue.png) no-repeat center center',
+        backgroundSize: 'cover',
         color: '#000',
         border: 'none',
         fontSize: 17,
@@ -265,8 +267,8 @@ export function LoginScreenVX2({
   // Loading/error state
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [shakeError, setShakeError] = useState(false);
-  
+  const [shakeError, setShakeError] = useTemporaryState(false, 500);
+
   // Biometric state
   const [biometricsAvailable, setBiometricsAvailable] = useState(false);
   const [biometricUserId, setBiometricUserId] = useState<string | null>(null);
@@ -304,8 +306,7 @@ export function LoginScreenVX2({
   // Trigger shake animation on error
   const triggerShake = useCallback(() => {
     setShakeError(true);
-    setTimeout(() => setShakeError(false), 500);
-  }, []);
+  }, [setShakeError]);
   
   // Handle biometric sign-in
   const handleBiometricSignIn = useCallback(async () => {
@@ -554,8 +555,8 @@ export function LoginScreenVX2({
           <div 
             className="mb-4 p-5 rounded-xl text-center"
             style={{ 
-              backgroundColor: 'rgba(96, 165, 250, 0.1)', 
-              border: '1px solid rgba(96, 165, 250, 0.3)',
+              background: 'url(/wr_blue.png) no-repeat center center',
+              backgroundSize: 'cover',
             }}
           >
             <p style={{ color: TEXT_COLORS.primary, fontSize: 16, marginBottom: 12 }}>
@@ -719,7 +720,15 @@ export function LoginScreenVX2({
                 setError(null);
               }}
               className="mt-6 font-medium"
-              style={{ color: STATE_COLORS.active, fontSize: 15 }}
+              style={{
+                background: 'url(/wr_blue.png) no-repeat center center',
+                backgroundSize: 'cover',
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                color: 'transparent',
+                fontSize: 15,
+              }}
             >
               Use a different number
             </button>

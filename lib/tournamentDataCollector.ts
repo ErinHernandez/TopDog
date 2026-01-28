@@ -4,8 +4,9 @@
  * Based on Underdog's 24-field data model but optimized for TopDog
  */
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const { TournamentDatabase } = require('./tournamentDatabase');
+import { serverLogger } from './logger/serverLogger';
 
 // ============================================================================
 // TYPES
@@ -203,7 +204,7 @@ class TournamentDataCollector {
     };
 
     TournamentDatabase.addTournament(tournament);
-    console.log(`✅ Tournament initialized: ${tournament.name} (${tournament.id})`);
+    serverLogger.info('Tournament initialized', { name: tournament.name, id: tournament.id });
     return tournament;
   }
 
@@ -246,8 +247,8 @@ class TournamentDataCollector {
 
     this.activeDrafts.set(draft.id, draft);
     TournamentDatabase.addDraft(draft);
-    
-    console.log(`🏈 Draft room initialized: ${draft.id} with ${draft.participants.length} players`);
+
+    serverLogger.info('Draft room initialized', { draftId: draft.id, participants: draft.participants.length });
     return draft;
   }
 
@@ -319,7 +320,7 @@ class TournamentDataCollector {
       this.flushPickBuffer();
     }
 
-    console.log(`📝 Pick recorded: ${pickData.playerName} (${pickData.position}) - Round ${pickData.round}, Pick ${pickData.pick}`);
+    serverLogger.debug('Pick recorded', { playerName: pickData.playerName, position: pickData.position, round: pickData.round, pick: pickData.pick });
     return pick;
   }
 
@@ -329,7 +330,7 @@ class TournamentDataCollector {
   completeDraft(draftId: string): Draft | undefined {
     const draft = this.activeDrafts.get(draftId);
     if (!draft) {
-      console.error(`❌ Draft not found: ${draftId}`);
+      serverLogger.error('Draft not found', new Error(`Draft not found: ${draftId}`));
       return;
     }
 
@@ -359,7 +360,7 @@ class TournamentDataCollector {
     // Flush any remaining picks
     this.flushPickBuffer();
 
-    console.log(`✅ Draft completed: ${draftId} - ${draft.analytics.totalTime}s total, ${draft.analytics.averagePickTime?.toFixed(1)}s avg pick`);
+    serverLogger.info('Draft completed', { draftId, totalTime: draft.analytics.totalTime, avgPickTime: draft.analytics.averagePickTime?.toFixed(1) });
     return draft;
   }
 
@@ -376,7 +377,7 @@ class TournamentDataCollector {
       // Could store weekly breakdown if needed
     });
 
-    console.log(`📊 Updated performance for ${playerId}: ${seasonTotal} points across ${picks.length} picks`);
+    serverLogger.debug('Updated performance', { playerId, seasonTotal, picksCount: picks.length });
   }
 
   /**
@@ -404,7 +405,7 @@ class TournamentDataCollector {
       analytics.ownership = Math.round(ownership * 10) / 10; // Round to 1 decimal
     });
 
-    console.log(`📊 Calculated ownership rates for ${Object.keys(playerCounts).length} players across ${totalDrafts} drafts`);
+    serverLogger.debug('Calculated ownership rates', { playersCount: Object.keys(playerCounts).length, draftsCount: totalDrafts });
   }
 
   /**
@@ -432,7 +433,7 @@ class TournamentDataCollector {
       TournamentDatabase.addPick(pick);
     });
 
-    console.log(`💾 Flushed ${this.pickBuffer.length} picks to database`);
+    serverLogger.debug('Flushed picks to database', { count: this.pickBuffer.length });
     this.pickBuffer = [];
   }
 
@@ -487,7 +488,7 @@ class TournamentDataCollector {
    * Export functions for historical analysis
    */
   exportTournamentData(tournamentId: string, format: string = 'json'): string {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+     
     const tournament = TournamentDatabase.TOURNAMENT_DATABASE?.tournaments?.[tournamentId];
     const picks = this.getAllPicksForTournament(tournamentId);
     

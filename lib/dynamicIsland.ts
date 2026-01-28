@@ -1,19 +1,23 @@
 /**
  * Dynamic Island / Live Activity Integration for Draft Timer
- * 
+ *
  * This module provides integration with iOS Dynamic Island and Live Activities
  * to show draft timer when the user navigates away from the app.
- * 
+ *
  * Requirements:
  * - iOS 16.1+ with iPhone 14 Pro or later (for Dynamic Island)
  * - iOS 16.1+ for Live Activities on other devices
  * - User must grant notification permissions
  * - App must be installed as PWA or accessed through native wrapper
- * 
+ *
  * Note: Full Dynamic Island support requires a native iOS app wrapper.
  * This implementation provides the web-side infrastructure and can communicate
  * with a native app via postMessage or a native bridge.
  */
+
+import { createScopedLogger } from './clientLogger';
+
+const logger = createScopedLogger('[DynamicIsland]');
 
 // ============================================================================
 // TYPES
@@ -136,7 +140,7 @@ function sendToNative(action: string, payload: Record<string, unknown>): void {
       timestamp: Date.now(),
     });
   } catch (error: unknown) {
-    console.warn('[DynamicIsland] Failed to send to native:', error);
+    logger.warn('Failed to send to native');
   }
 }
 
@@ -169,7 +173,7 @@ export async function startDraftTimerActivity(
   state: Omit<DraftTimerActivityState, 'activityId'>
 ): Promise<string | null> {
   if (!isLiveActivitySupported()) {
-    console.log('[DynamicIsland] Live Activities not supported on this device');
+    logger.debug('Live Activities not supported on this device');
     return null;
   }
   
@@ -215,7 +219,7 @@ export async function startDraftTimerActivity(
         return activityId;
       }
     } catch (error: unknown) {
-      console.warn('[DynamicIsland] Failed to create notification:', error);
+      logger.warn('Failed to create notification');
     }
   }
   
@@ -250,19 +254,32 @@ export async function updateDraftTimerActivity(
       if (registration) {
         // Get stored state and merge
         const storedRaw = localStorage.getItem('topdog_draft_activity');
-        const stored = storedRaw ? JSON.parse(storedRaw) : {};
-        const merged = { ...stored, ...state };
+        let stored: Partial<DraftTimerActivityState> = {};
+        if (storedRaw) {
+          try {
+            stored = JSON.parse(storedRaw) as Partial<DraftTimerActivityState>;
+          } catch {
+            // Clear corrupted data
+            try {
+              localStorage.removeItem('topdog_draft_activity');
+            } catch {
+              // Ignore errors when clearing
+            }
+          }
+        }
+        const merged: Partial<DraftTimerActivityState> = { ...stored, ...state };
         
         // Format notification body based on status
         let notificationBody: string;
+        const secondsRemaining = merged.secondsRemaining ?? 0;
         if (merged.status === 'pre_draft') {
-          const minutes = Math.floor(merged.secondsRemaining / 60);
-          const seconds = merged.secondsRemaining % 60;
+          const minutes = Math.floor(secondsRemaining / 60);
+          const seconds = secondsRemaining % 60;
           notificationBody = `Draft starts in ${minutes}:${seconds.toString().padStart(2, '0')}`;
         } else if (merged.isMyTurn) {
-          notificationBody = `Your pick! ${merged.secondsRemaining}s remaining`;
+          notificationBody = `Your pick! ${secondsRemaining}s remaining`;
         } else {
-          notificationBody = `${merged.currentDrafter} is picking...`;
+          notificationBody = `${merged.currentDrafter ?? 'Someone'} is picking...`;
         }
         
         await registration.showNotification('Draft Timer', {
@@ -277,7 +294,7 @@ export async function updateDraftTimerActivity(
         return true;
       }
     } catch (error: unknown) {
-      console.warn('[DynamicIsland] Failed to update notification:', error);
+      logger.warn('Failed to update notification');
     }
   }
   

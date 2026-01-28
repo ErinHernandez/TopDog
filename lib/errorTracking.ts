@@ -1,25 +1,25 @@
 /**
  * Error Tracking Service
- * 
+ *
  * Centralized error tracking with Sentry integration.
  * Currently stubbed - enable by setting NEXT_PUBLIC_SENTRY_DSN environment variable.
- * 
+ *
  * @example
  * ```ts
  * import { captureError, captureMessage, setUser } from '@/lib/errorTracking';
- * 
+ *
  * // Capture an error with context
- * captureError(error, { 
+ * captureError(error, {
  *   tags: { component: 'DraftRoom' },
  *   extra: { draftId: '123' }
  * });
- * 
+ *
  * // Set user context for all future errors
  * setUser({ id: userId, username });
  * ```
- * 
+ *
  * ## Setup Instructions
- * 
+ *
  * 1. Create a Sentry project at https://sentry.io
  * 2. Get your DSN from Project Settings > Client Keys
  * 3. Add to .env.local:
@@ -27,9 +27,13 @@
  *    NEXT_PUBLIC_SENTRY_DSN=https://xxxxx@xxxxx.ingest.sentry.io/xxxxx
  *    ```
  * 4. Restart the dev server
- * 
+ *
  * The integration will automatically enable when the DSN is present.
  */
+
+import { createScopedLogger } from './clientLogger';
+
+const logger = createScopedLogger('[ErrorTracking]');
 
 // ============================================================================
 // TYPES
@@ -60,17 +64,46 @@ const SENTRY_DSN = process.env.NEXT_PUBLIC_SENTRY_DSN;
 const IS_ENABLED = !!SENTRY_DSN;
 const IS_DEV = process.env.NODE_ENV === 'development';
 
+// ============================================================================
+// SENTRY TYPES
+// ============================================================================
+
+/**
+ * Minimal Sentry interface for type safety
+ * Matches @sentry/nextjs API surface we use
+ */
+interface SentryScope {
+  setTag: (key: string, value: string) => void;
+  setExtra: (key: string, value: unknown) => void;
+  setLevel: (level: ErrorContext['level']) => void;
+  setFingerprint: (fingerprint: string[]) => void;
+}
+
+interface SentryInstance {
+  captureException: (error: Error, context?: ErrorContext) => string;
+  captureMessage: (message: string, level?: ErrorContext['level']) => string;
+  setUser: (user: UserContext | null) => void;
+  setTag: (key: string, value: string) => void;
+  setContext: (name: string, context: Record<string, unknown>) => void;
+  withScope: (callback: (scope: SentryScope) => void) => void;
+  addBreadcrumb: (breadcrumb: {
+    message: string;
+    category: string;
+    data?: Record<string, unknown>;
+    level: string;
+  }) => void;
+  init: (config: Record<string, unknown>) => void;
+}
+
 // Lazy-loaded Sentry instance
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let SentryInstance: any = null;
+let SentryInstance: SentryInstance | null = null;
 let SentryLoadAttempted = false;
 
 /**
  * Initialize Sentry (called automatically on first use)
  * Returns null if Sentry is not installed or not configured
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function initSentry(): Promise<any> {
+async function initSentry(): Promise<SentryInstance | null> {
   if (!IS_ENABLED) return null;
   if (SentryInstance) return SentryInstance;
   if (SentryLoadAttempted) return null;
@@ -109,20 +142,54 @@ async function initSentry(): Promise<any> {
       beforeSend(event: unknown) {
         // Don't send in development unless explicitly enabled
         if (IS_DEV && typeof localStorage !== 'undefined' && !localStorage.getItem('sentry_debug')) {
-          console.log('[Sentry] Would send:', event);
+          logger.debug('Sentry would send event', { event });
           return null;
         }
         return event;
       },
     });
-    
-    SentryInstance = Sentry;
-    console.log('[ErrorTracking] Sentry initialized');
-    return Sentry;
+
+    // Create a typed wrapper around Sentry
+    SentryInstance = {
+      captureException: (error: Error, context?: ErrorContext) => {
+        return Sentry.captureException(error, {
+          tags: context?.tags,
+          extra: context?.extra,
+          level: context?.level,
+          fingerprint: context?.fingerprint,
+        });
+      },
+      captureMessage: (message: string, level?: ErrorContext['level']) => {
+        return Sentry.captureMessage(message, level);
+      },
+      setUser: (user: UserContext | null) => {
+        Sentry.setUser(user ? { id: user.id, username: user.username, email: user.email } : null);
+      },
+      setTag: (key: string, value: string) => {
+        Sentry.setTag(key, value);
+      },
+      setContext: (name: string, context: Record<string, unknown>) => {
+        Sentry.setContext(name, context);
+      },
+      withScope: (callback: (scope: SentryScope) => void) => {
+        Sentry.withScope(callback);
+      },
+      addBreadcrumb: (breadcrumb: {
+        message: string;
+        category: string;
+        data?: Record<string, unknown>;
+        level: string;
+      }) => {
+        Sentry.addBreadcrumb(breadcrumb);
+      },
+      init: Sentry.init,
+    };
+    logger.info('Sentry initialized');
+    return SentryInstance;
   } catch (err) {
     // Sentry not installed or failed to load - this is fine
     if (IS_DEV) {
-      console.log('[ErrorTracking] Sentry not available (install @sentry/nextjs to enable)');
+      logger.debug('Sentry not available (install @sentry/nextjs to enable)');
     }
     return null;
   }
@@ -147,41 +214,40 @@ export async function captureError(
   context?: ErrorContext
 ): Promise<string | null> {
   // Always log locally
-  console.error('[ErrorTracking]', error.message, context?.extra);
-  
+  logger.error(error.message, error, context?.extra);
+
   if (!IS_ENABLED) return null;
   
   const Sentry = await initSentry();
   if (!Sentry) return null;
   
-  return Sentry.withScope((scope: {
-    setTag: (key: string, value: string) => void;
-    setExtra: (key: string, value: unknown) => void;
-    setLevel: (level: string) => void;
-    setFingerprint: (fingerprint: string[]) => void;
-  }) => {
+  let eventId: string | null = null;
+
+  Sentry.withScope((scope: SentryScope) => {
     if (context?.tags) {
       Object.entries(context.tags).forEach(([key, value]: [string, string]) => {
         scope.setTag(key, value);
       });
     }
-    
+
     if (context?.extra) {
       Object.entries(context.extra).forEach(([key, value]: [string, unknown]) => {
         scope.setExtra(key, value);
       });
     }
-    
+
     if (context?.level) {
       scope.setLevel(context.level);
     }
-    
+
     if (context?.fingerprint) {
       scope.setFingerprint(context.fingerprint);
     }
-    
-    return Sentry.captureException(error);
+
+    eventId = Sentry.captureException(error);
   });
+
+  return eventId;
 }
 
 /**
@@ -192,30 +258,30 @@ export async function captureMessage(
   context?: ErrorContext
 ): Promise<string | null> {
   if (!IS_ENABLED) {
-    console.log('[ErrorTracking] Message:', message, context?.extra);
+    logger.info(message, context?.extra);
     return null;
   }
   
   const Sentry = await initSentry();
   if (!Sentry) return null;
   
-  return Sentry.withScope((scope: {
-    setTag: (key: string, value: string) => void;
-    setExtra: (key: string, value: unknown) => void;
-    captureMessage: (message: string, level?: string) => string | null;
-  }) => {
+  let eventId: string | null = null;
+
+  Sentry.withScope((scope: SentryScope) => {
     if (context?.tags) {
       Object.entries(context.tags).forEach(([key, value]: [string, string]) => {
         scope.setTag(key, value);
       });
     }
-    
+
     if (context?.extra) {
       scope.setExtra('context', context.extra);
     }
-    
-    return Sentry.captureMessage(message, context?.level || 'info');
+
+    eventId = Sentry.captureMessage(message, context?.level || 'info');
   });
+
+  return eventId;
 }
 
 /**

@@ -13,6 +13,7 @@
  */
 
 import { NextApiRequest } from 'next';
+import { serverLogger } from './logger/serverLogger';
 
 // ============================================================================
 // TYPES
@@ -207,7 +208,7 @@ class InMemoryRateLimitStore {
       }
 
       if (cleaned > 0) {
-        console.log(`[RateLimiter] Cleaned up ${cleaned} expired entries`);
+        serverLogger.debug(`Cleaned up ${cleaned} expired entries`);
       }
     }, 5 * 60 * 1000); // Every 5 minutes
   }
@@ -476,13 +477,7 @@ export class RateLimiterV2 {
       
       // Log for monitoring (but don't block)
       if (usagePercent >= this.config.alertThreshold) {
-        console.warn(`[RateLimiter] High activity detected:`, {
-          ip,
-          endpoint: this.config.endpoint,
-          usagePercent: (usagePercent * 100).toFixed(1) + '%',
-          userId: clientId.raw.userId,
-          deviceId: clientId.raw.deviceId,
-        });
+        serverLogger.warn(`High activity detected: ${ip} on ${this.config.endpoint} (${(usagePercent * 100).toFixed(1)}%)`);
       }
     }
     
@@ -520,13 +515,7 @@ export class RateLimiterV2 {
     // Flag if using many IPs in short time (potential VPN abuse)
     const timeWindow = 60 * 60 * 1000; // 1 hour
     if (Date.now() - pattern.firstSeen < timeWindow && pattern.ips.size > 5) {
-      console.warn(`[RateLimiter] Suspicious pattern detected:`, {
-        userId,
-        uniqueIPs: pattern.ips.size,
-        uniqueDevices: pattern.devices.size,
-        requestCount: pattern.requestCount,
-        note: 'Multiple IPs in short time - may be VPN usage or abuse',
-      });
+      serverLogger.warn(`Suspicious pattern detected: user ${userId} with ${pattern.ips.size} unique IPs in short time`);
     }
     
     this.monitoring.suspiciousPatterns.set(patternKey, pattern);

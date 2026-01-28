@@ -155,20 +155,21 @@ export class CollusionFlagService {
         // Success - exit retry loop
         return;
 
-      } catch (error: any) {
+      } catch (error: unknown) {
         attempt++;
 
         // Check if it's a transaction conflict error
+        const errorObj = error as { code?: string; message?: string };
         const isConflictError =
-          error?.code === 'failed-precondition' ||
-          error?.code === 'aborted' ||
-          error?.message?.includes('transaction') ||
-          error?.message?.includes('concurrent') ||
-          error?.message?.includes('contention');
+          errorObj?.code === 'failed-precondition' ||
+          errorObj?.code === 'aborted' ||
+          errorObj?.message?.includes('transaction') ||
+          errorObj?.message?.includes('concurrent') ||
+          errorObj?.message?.includes('contention');
 
         if (!isConflictError || attempt >= TRANSACTION_CONFIG.maxAttempts) {
           // Not a conflict error, or max attempts reached
-          logger.error('Failed to record proximity flag after retries', error as Error, {
+          logger.error('Failed to record proximity flag after retries', error instanceof Error ? error : new Error(String(error)), {
             component: 'CollusionFlagService',
             method: 'recordProximityFlag',
             draftId,

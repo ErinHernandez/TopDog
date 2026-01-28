@@ -43,7 +43,7 @@ async function handler(req: NextRequest): Promise<Response> {
   
   // Get edge region info
   // geo property exists on NextRequest in edge runtime but not in types
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const geo = (req as any).geo;
   const region = geo?.region || 'unknown';
   const city = geo?.city;

@@ -17,7 +17,7 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS } from '../../core/constants/colors';
+import { BG_COLORS, TEXT_COLORS, NAVBAR_BLUE } from '../../core/constants/colors';
 import { LoginScreenVX2 } from './LoginScreenVX2';
 import { SignUpScreenVX2 } from './SignUpScreenVX2';
 import { useIsMobileDevice } from '../../../../hooks/useIsMobileDevice';
@@ -57,11 +57,11 @@ function LoadingSpinner(): React.ReactElement {
         style={{ height: 56, marginBottom: 32 }}
       />
       
-      {/* Spinner */}
+      {/* Spinner - NAVBAR_BLUE matches wr_blue.png for solid equivalent */}
       <div 
         className="animate-spin rounded-full h-8 w-8 border-3"
         style={{ 
-          borderColor: `${STATE_COLORS.active} transparent transparent transparent`,
+          borderColor: `${NAVBAR_BLUE.solid} transparent transparent transparent`,
           borderWidth: 3,
         }}
       />

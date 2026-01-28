@@ -11,25 +11,6 @@ interface FlagGridProps {
 }
 
 export function FlagGrid({ flags, selectedCode, onSelect, isLoading }: FlagGridProps) {
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-4 gap-2">
-        {Array.from({ length: 8 }).map((_, i) => (
-          <div key={i} className="aspect-[3/2] bg-gray-200 animate-pulse rounded" />
-        ))}
-      </div>
-    );
-  }
-
-  if (flags.length === 0) {
-    return (
-      <div className="text-center py-8" style={{ color: 'rgba(156, 163, 175, 0.8)' }}>
-        <p>No flags unlocked yet.</p>
-        <p className="text-sm mt-1">Enable location tracking to unlock flags from places you visit.</p>
-      </div>
-    );
-  }
-
   // Group: countries first, then US states, then US counties, then international divisions
   const countries = flags.filter((f) => f.type === 'country');
   const states = flags.filter((f) => f.type === 'state');
@@ -48,6 +29,25 @@ export function FlagGrid({ flags, selectedCode, onSelect, isLoading }: FlagGridP
     });
     return grouped;
   }, [divisions]);
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-4 gap-2">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div key={i} className="aspect-[3/2] bg-gray-200 animate-pulse rounded" />
+        ))}
+      </div>
+    );
+  }
+
+  if (flags.length === 0) {
+    return (
+      <div className="text-center py-8" style={{ color: 'rgba(156, 163, 175, 0.8)' }}>
+        <p>No flags unlocked yet.</p>
+        <p className="text-sm mt-1">Enable location tracking to unlock flags from places you visit.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">

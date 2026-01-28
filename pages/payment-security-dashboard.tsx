@@ -4,6 +4,9 @@ import PaymentSecurityDashboard from '../components/PaymentSecurityDashboard';
 import { paymentSystem } from '../lib/paymentSystemIntegration';
 import { getAuth, onAuthStateChanged, type User } from 'firebase/auth';
 import type { GetServerSideProps } from 'next';
+import { createScopedLogger } from '@/lib/clientLogger';
+
+const logger = createScopedLogger('[PaymentSecurityDashboard]');
 
 interface AuthState {
   user: User | null;
@@ -80,19 +83,8 @@ interface VerifyAdminResponse {
 
 export default function PaymentSecurityDashboardPage() {
   const { user, isAuthenticated, mounted } = useSafeAuth();
-  
-  // Prevent execution during build/prerender phase (after hooks are called)
-  if (typeof window === 'undefined' && isBuildPhase()) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading Payment Security Dashboard...</p>
-        </div>
-      </div>
-    );
-  }
 
+  // Move all hooks to the top, before any conditional returns
   const [systemStatus, setSystemStatus] = useState<SystemStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -120,12 +112,12 @@ export default function PaymentSecurityDashboardPage() {
                   // Admin verified, continue
                 } else {
                   // In dev, still allow but warn
-                  console.warn('[PaymentSecurityDashboard] User is not admin, but allowing in dev mode');
+                  logger.warn('User is not admin, but allowing in dev mode');
                 }
               }
             }
           } catch (err) {
-            console.warn('[PaymentSecurityDashboard] Admin check error, allowing in dev mode:', err);
+            logger.warn('Admin check error, allowing in dev mode', { error: String(err) });
           }
         }
       } else {
@@ -168,7 +160,7 @@ export default function PaymentSecurityDashboardPage() {
           
           // Admin verified, continue
         } catch (err) {
-          console.error('[PaymentSecurityDashboard] Admin verification error:', err);
+          logger.error('Admin verification error', err instanceof Error ? err : new Error(String(err)));
           setError('Failed to verify admin access. Please try again.');
           setLoading(false);
           return;
@@ -188,6 +180,18 @@ export default function PaymentSecurityDashboardPage() {
     
     checkAdminAccess();
   }, [user, isAuthenticated, mounted]);
+
+  // Prevent execution during build/prerender phase (after all hooks are called)
+  if (typeof window === 'undefined' && isBuildPhase()) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading Payment Security Dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Show loading state during SSR or while checking auth
   if (!mounted || loading) {

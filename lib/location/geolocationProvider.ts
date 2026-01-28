@@ -9,6 +9,9 @@
  */
 
 import type { GeoLocation } from './types';
+import { createScopedLogger } from '@/lib/clientLogger';
+
+const logger = createScopedLogger('[GeolocationProvider]');
 
 // ============================================================================
 // BROWSER GEOLOCATION
@@ -52,13 +55,13 @@ export async function getBrowserLocation(): Promise<GeoLocation | null> {
             accuracy: 'high',
           });
         } catch (error: unknown) {
-          console.error('Reverse geocoding failed:', error);
+          logger.error('Reverse geocoding failed', error instanceof Error ? error : new Error(String(error)));
           resolve(null);
         }
       },
       (error: GeolocationPositionError) => {
         // User denied permission or other error
-        console.log('Browser geolocation failed:', error.message);
+        logger.debug('Browser geolocation failed', { message: error.message });
         resolve(null);
       },
       {
@@ -101,7 +104,7 @@ export async function getIPLocation(): Promise<GeoLocation | null> {
       }
     }
   } catch (error: unknown) {
-    console.log('ipapi.co failed, trying fallback:', error);
+    logger.debug('ipapi.co failed, trying fallback', { error: error instanceof Error ? error.message : String(error) });
   }
   
   // Fallback to BigDataCloud
@@ -128,7 +131,7 @@ export async function getIPLocation(): Promise<GeoLocation | null> {
       accuracy: 'low',
     };
   } catch (error: unknown) {
-    console.error('All IP geolocation methods failed:', error);
+    logger.error('All IP geolocation methods failed', error instanceof Error ? error : new Error(String(error)));
     return null;
   }
 }

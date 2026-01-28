@@ -6,9 +6,10 @@
  */
 
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { serverLogger } from './logger/serverLogger';
 
 // Use require for firebase-admin to ensure Turbopack compatibility
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+ 
 const admin = require('firebase-admin') as typeof import('firebase-admin');
 
 // ============================================================================
@@ -85,7 +86,7 @@ if (admin.apps.length === 0) {
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.warn('Firebase Admin initialization failed for API auth:', errorMessage);
+    serverLogger.warn(`Firebase Admin initialization failed for API auth: ${errorMessage}`);
   }
 } else {
   firebaseAdminInitialized = true;
@@ -107,20 +108,12 @@ export async function verifyAuthToken(authHeader: string | undefined): Promise<A
   
   const token = authHeader.split('Bearer ')[1];
   
-  // Development fallback (only in development mode)
-  // CRITICAL: This MUST be disabled in production - never allow in production builds
-  if (process.env.NODE_ENV === 'production') {
-    // Explicitly reject dev tokens in production
-    if (token === 'dev-token') {
-      console.error('[Security] Dev token attempted in production');
-      return { uid: null, error: 'Invalid authentication token' };
-    }
-  }
-  
-  if (process.env.NODE_ENV === 'development' && token === 'dev-token') {
-    return { uid: 'dev-uid', email: 'dev@example.com' };
-  }
-  
+  // SECURITY: All dev token logic has been removed.
+  // For local development, use Firebase Auth Emulator instead:
+  // 1. Start Firebase emulators: `firebase emulators:start`
+  // 2. Set FIREBASE_AUTH_EMULATOR_HOST=localhost:9099 in .env.local
+  // 3. Use real Firebase tokens from emulator for API testing
+
   // Check if Firebase Admin was initialized successfully
   if (!firebaseAdminInitialized) {
     return { 
@@ -138,8 +131,7 @@ export async function verifyAuthToken(authHeader: string | undefined): Promise<A
       email: decodedToken.email || undefined
     };
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Token verification error:', errorMessage);
+    serverLogger.error('Token verification error', error instanceof Error ? error : new Error(String(error)));
     return { uid: null, error: 'Invalid or expired token' };
   }
 }

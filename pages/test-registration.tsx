@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import RegistrationModal from '../components/RegistrationModal';
 import { validateUsername, getUsernameRequirements } from '../lib/usernameValidation';
 import { getAllowedCharacters, getLocaleDescription } from '../lib/localeCharacters';
+import type { UserProfile } from '../lib/userRegistration';
 
 interface Country {
   code: string;
@@ -17,12 +18,6 @@ interface UsernameRequirements {
   description: string;
   rules: string[];
   allowedCharacters: string;
-}
-
-interface UserProfile {
-  uid: string;
-  email: string;
-  [key: string]: unknown;
 }
 
 export default function TestRegistration() {
@@ -92,14 +87,14 @@ export default function TestRegistration() {
     setValidationResult(null);
   };
 
-  const mockUser: UserProfile = {
+  const mockUser = {
     uid: 'test_user_' + Date.now(),
     email: 'test@example.com'
   };
 
-  const handleRegistrationSuccess = (userProfile: UserProfile) => {
-    console.log('Registration successful:', userProfile);
-    alert('Registration successful! Check console for details.');
+  const handleRegistrationSuccess = (_userProfile: UserProfile) => {
+    // Note: User profile data is intentionally not logged to prevent PII leakage
+    alert('Registration successful!');
   };
 
   return (

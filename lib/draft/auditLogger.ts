@@ -14,6 +14,7 @@
  */
 
 import { logger } from '../structuredLogger';
+import { createHash } from 'crypto';
 
 // ============================================================================
 // TYPES
@@ -612,9 +613,14 @@ export class DraftAuditLogger {
   }
 
   /**
-   * Compute hash for tamper evidence
+   * Compute cryptographic hash for tamper evidence
+   *
+   * SECURITY: Uses SHA-256 to create a cryptographically secure hash chain.
+   * This ensures that any modification to audit events can be detected.
+   * The hash includes the previous event's hash to form an immutable chain.
    */
   private computeEventHash(event: AuditEvent): string {
+    // Create deterministic JSON by sorting keys
     const data = JSON.stringify({
       id: event.id,
       timestamp: event.timestamp,
@@ -622,17 +628,19 @@ export class DraftAuditLogger {
       roomId: event.roomId,
       userId: event.userId,
       details: event.details,
-      previousHash: event.previousHash,
-    });
+      previousHash: event.previousHash || null,
+    }, Object.keys({
+      id: '',
+      timestamp: '',
+      action: '',
+      roomId: '',
+      userId: '',
+      details: {},
+      previousHash: '',
+    }).sort());
 
-    // Simple hash - in production, use crypto.subtle.digest
-    let hash = 0;
-    for (let i = 0; i < data.length; i++) {
-      const char = data.charCodeAt(i);
-      hash = (hash << 5) - hash + char;
-      hash = hash & hash;
-    }
-    return Math.abs(hash).toString(16).padStart(8, '0');
+    // Use SHA-256 for cryptographic security
+    return createHash('sha256').update(data, 'utf8').digest('hex');
   }
 
   /**

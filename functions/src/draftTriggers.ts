@@ -8,9 +8,35 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 
+const logger = functions.logger;
+
 // Initialize admin if not already initialized
 if (!admin.apps.length) {
   admin.initializeApp();
+}
+
+/**
+ * Participant data structure from draft document
+ */
+interface DraftParticipant {
+  userId?: string;
+  id?: string;
+}
+
+/**
+ * Draft document data structure
+ */
+interface DraftData {
+  name?: string;
+  status?: string;
+  currentPicker?: string | DraftParticipant;
+  currentPickNumber?: number;
+  draftOrder?: (string | DraftParticipant)[];
+  participants?: (string | DraftParticipant)[];
+  settings?: {
+    maxParticipants?: number;
+  };
+  maxParticipants?: number;
 }
 
 /**
@@ -26,7 +52,7 @@ export const onDraftUpdate = functions.firestore
     const previousData = change.before.data();
     const draftId = context.params.draftId;
 
-    console.log(`[DraftTrigger] Draft ${draftId} updated`);
+    logger.info(`[DraftTrigger] Draft ${draftId} updated`);
 
     // 1. Check for "On The Clock" Change
     // Detect when currentPicker changes (user's turn starts)
@@ -34,7 +60,7 @@ export const onDraftUpdate = functions.firestore
     const oldCurrentPicker = getCurrentPicker(previousData);
 
     if (newCurrentPicker && newCurrentPicker !== oldCurrentPicker) {
-      console.log(`[DraftTrigger] New picker: ${newCurrentPicker}`);
+      logger.info(`[DraftTrigger] New picker: ${newCurrentPicker}`);
       await sendPushToUser(newCurrentPicker, {
         title: 'You are on the clock!',
         body: `It's your turn in ${newData.name || 'the draft'}`,
@@ -46,13 +72,13 @@ export const onDraftUpdate = functions.firestore
 
     // 2. Check for "Draft Started"
     if (newData.status === 'active' && previousData.status === 'waiting') {
-      console.log(`[DraftTrigger] Draft ${draftId} started`);
+      logger.info(`[DraftTrigger] Draft ${draftId} started`);
       
       // Send to all participants
-      const participants = newData.participants || [];
-      const userIds = participants.map((p: any) => 
+      const participants = (newData as DraftData).participants || [];
+      const userIds = participants.map((p: string | DraftParticipant) =>
         typeof p === 'string' ? p : p.userId || p.id
-      ).filter(Boolean);
+      ).filter(Boolean) as string[];
 
       await Promise.all(
         userIds.map((userId: string) =>
@@ -68,21 +94,22 @@ export const onDraftUpdate = functions.firestore
     }
 
     // 3. Check for "Room Filled"
-    const maxParticipants = newData.settings?.maxParticipants || newData.maxParticipants || 12;
-    const newParticipantCount = (newData.participants || []).length;
-    const oldParticipantCount = (previousData.participants || []).length;
+    const draftDataTyped = newData as DraftData;
+    const maxParticipants = draftDataTyped.settings?.maxParticipants || draftDataTyped.maxParticipants || 12;
+    const newParticipantCount = (draftDataTyped.participants || []).length;
+    const oldParticipantCount = ((previousData as DraftData).participants || []).length;
 
     if (
       newParticipantCount === maxParticipants &&
       oldParticipantCount < maxParticipants
     ) {
-      console.log(`[DraftTrigger] Room ${draftId} filled`);
-      
+      logger.info(`[DraftTrigger] Room ${draftId} filled`);
+
       // Send to all participants
-      const participants = newData.participants || [];
-      const userIds = participants.map((p: any) => 
+      const participants = draftDataTyped.participants || [];
+      const userIds = participants.map((p: string | DraftParticipant) =>
         typeof p === 'string' ? p : p.userId || p.id
-      ).filter(Boolean);
+      ).filter(Boolean) as string[];
 
       await Promise.all(
         userIds.map((userId: string) =>
@@ -113,7 +140,7 @@ export const onDraftUpdate = functions.firestore
  * 
  * Adapt this to match your actual draft document structure
  */
-function getCurrentPicker(draftData: any): string | null {
+function getCurrentPicker(draftData: DraftData): string | null {
   // Option 1: If you store currentPicker directly
   if (draftData.currentPicker) {
     return typeof draftData.currentPicker === 'string'
@@ -158,7 +185,7 @@ async function sendPushToUser(
     const userDoc = await admin.firestore().doc(`users/${userId}`).get();
     
     if (!userDoc.exists) {
-      console.warn(`[DraftTrigger] User ${userId} not found`);
+      logger.warn(`[DraftTrigger] User ${userId} not found`);
       return;
     }
 
@@ -169,14 +196,14 @@ async function sendPushToUser(
 
     // Check if FCM is enabled
     if (!fcmEnabled || !fcmToken) {
-      console.log(`[DraftTrigger] FCM disabled or no token for user ${userId}`);
+      logger.info(`[DraftTrigger] FCM disabled or no token for user ${userId}`);
       return;
     }
 
     // Check user preferences for this alert type
     const alertPreferenceKey = getAlertPreferenceKey(payload.type);
     if (preferences[alertPreferenceKey] === false) {
-      console.log(`[DraftTrigger] Alert ${payload.type} disabled for user ${userId}`);
+      logger.info(`[DraftTrigger] Alert ${payload.type} disabled for user ${userId}`);
       return;
     }
 
@@ -227,16 +254,17 @@ async function sendPushToUser(
 
     // Send push notification
     const response = await admin.messaging().send(fcmMessage);
-    console.log(`[DraftTrigger] ✅ Push sent to ${userId}: ${response}`);
-  } catch (error: any) {
-    console.error(`[DraftTrigger] ❌ Failed to send to ${userId}:`, error);
+    logger.info(`[DraftTrigger] ✅ Push sent to ${userId}: ${response}`);
+  } catch (error: unknown) {
+    logger.error(`[DraftTrigger] ❌ Failed to send to ${userId}:`, error);
 
     // Handle invalid token cleanup
+    const fcmError = error as { code?: string };
     if (
-      error.code === 'messaging/invalid-registration-token' ||
-      error.code === 'messaging/registration-token-not-registered'
+      fcmError.code === 'messaging/invalid-registration-token' ||
+      fcmError.code === 'messaging/registration-token-not-registered'
     ) {
-      console.log(`[DraftTrigger] Removing invalid token for user ${userId}`);
+      logger.info(`[DraftTrigger] Removing invalid token for user ${userId}`);
       await admin.firestore().doc(`users/${userId}`).update({
         fcmToken: admin.firestore.FieldValue.delete(),
         fcmEnabled: false,

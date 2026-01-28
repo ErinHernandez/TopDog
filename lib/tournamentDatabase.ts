@@ -4,6 +4,8 @@
  * Designed to match/exceed Underdog's data granularity
  */
 
+import { serverLogger } from './logger/serverLogger';
+
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -697,7 +699,7 @@ class TournamentDatabase {
       Object.assign(TOURNAMENT_DATABASE, data);
       return true;
     } catch (error) {
-      console.error('Error importing tournament database:', error);
+      serverLogger.error('Error importing tournament database', error instanceof Error ? error : new Error(String(error)));
       return false;
     }
   }

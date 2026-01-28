@@ -25,12 +25,49 @@ import {
   deleteDoc,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { createScopedLogger } from '@/lib/clientLogger';
+
+const logger = createScopedLogger('[LocationIntegrity]');
 import type {
   LocationData,
   PickLocationData,
   PickLocationRecord,
   ProximityFlags,
 } from './types';
+
+// === LOCAL TYPES ===
+
+/**
+ * Admin level from BigDataCloud reverse geocode response
+ */
+interface AdminLevel {
+  adminLevel: number;
+  name?: string;
+  description?: string;
+}
+
+/**
+ * Badge entry stored in userBadges collection
+ */
+interface BadgeEntry {
+  code: string;
+  name?: string;
+  firstEarned: ReturnType<typeof Timestamp.now>;
+  lastUpdated: ReturnType<typeof Timestamp.now>;
+  count: number;
+  lastSeen?: ReturnType<typeof Timestamp.now>;
+  pickCount?: number;
+}
+
+/**
+ * User badges document structure
+ */
+interface UserBadges {
+  countries: BadgeEntry[];
+  states: BadgeEntry[];
+  counties: BadgeEntry[];
+  divisions: BadgeEntry[];
+}
 
 // === CONSTANTS ===
 
@@ -110,12 +147,14 @@ export class LocationIntegrityService {
       }).catch((error) => {
         // Log but don't fail the pick location recording
         // Drafts always proceed normally regardless of flagging errors
-        console.error('Failed to record collusion flag:', error);
+        logger.error('Failed to record collusion flag', error instanceof Error ? error : new Error(String(error)));
       });
     }
 
     // 6. Queue badge update (async, non-blocking)
-    this.queueBadgeUpdate(userId, geoData).catch(console.error);
+    this.queueBadgeUpdate(userId, geoData).catch((error) => {
+      logger.error('Failed to queue badge update', error instanceof Error ? error : new Error(String(error)));
+    });
 
     return record;
   }
@@ -198,8 +237,8 @@ export class LocationIntegrityService {
 
       // Extract county for US
       if (countryCode === 'US' && stateCode) {
-        const adminLevels = data.localityInfo?.administrative || [];
-        const countyLevel = adminLevels.find((level: any) =>
+        const adminLevels: AdminLevel[] = data.localityInfo?.administrative || [];
+        const countyLevel = adminLevels.find((level) =>
           level.adminLevel === 2 ||
           level.description?.toLowerCase().includes('county')
         );
@@ -233,10 +272,10 @@ export class LocationIntegrityService {
         divisionType,
       };
     } catch (error) {
-      console.error('Reverse geocode error:', error);
-      return { 
-        countyCode: null, 
-        countryCode: 'UNKNOWN', 
+      logger.error('Reverse geocode error', error instanceof Error ? error : new Error(String(error)));
+      return {
+        countyCode: null,
+        countryCode: 'UNKNOWN',
         stateCode: null,
         divisionCode: null,
         divisionName: null,
@@ -416,12 +455,7 @@ export class LocationIntegrityService {
       const badgeSnap = await transaction.get(badgeRef);
       const now = Timestamp.now();
 
-      let badges: {
-        countries: any[];
-        states: any[];
-        counties: any[];
-        divisions: any[];
-      };
+      let badges: UserBadges;
 
       if (!badgeSnap.exists()) {
         badges = { countries: [], states: [], counties: [], divisions: [] };
@@ -439,13 +473,15 @@ export class LocationIntegrityService {
       if (geoData.countryCode && geoData.countryCode !== 'UNKNOWN') {
         const countryIdx = badges.countries.findIndex(b => b.code === geoData.countryCode);
         if (countryIdx >= 0) {
-          badges.countries[countryIdx].lastSeen = now;
-          badges.countries[countryIdx].pickCount++;
+          badges.countries[countryIdx]!.lastSeen = now;
+          badges.countries[countryIdx]!.pickCount = (badges.countries[countryIdx]!.pickCount || 0) + 1;
         } else {
           badges.countries.push({
             code: geoData.countryCode,
             name: await this.getCountryName(geoData.countryCode),
             firstEarned: now,
+            lastUpdated: now,
+            count: 1,
             lastSeen: now,
             pickCount: 1,
           });
@@ -457,13 +493,15 @@ export class LocationIntegrityService {
         const stateCode = `US-${geoData.stateCode}`;
         const stateIdx = badges.states.findIndex(b => b.code === stateCode);
         if (stateIdx >= 0) {
-          badges.states[stateIdx].lastSeen = now;
-          badges.states[stateIdx].pickCount++;
+          badges.states[stateIdx]!.lastSeen = now;
+          badges.states[stateIdx]!.pickCount = (badges.states[stateIdx]!.pickCount || 0) + 1;
         } else {
           badges.states.push({
             code: stateCode,
             name: await this.getStateName(geoData.stateCode),
             firstEarned: now,
+            lastUpdated: now,
+            count: 1,
             lastSeen: now,
             pickCount: 1,
           });
@@ -477,13 +515,15 @@ export class LocationIntegrityService {
       if (COUNTY_BADGES_ENABLED && geoData.countyCode) {
         const countyIdx = badges.counties.findIndex(b => b.code === geoData.countyCode);
         if (countyIdx >= 0) {
-          badges.counties[countyIdx].lastSeen = now;
-          badges.counties[countyIdx].pickCount++;
+          badges.counties[countyIdx]!.lastSeen = now;
+          badges.counties[countyIdx]!.pickCount = (badges.counties[countyIdx]!.pickCount || 0) + 1;
         } else {
           badges.counties.push({
             code: geoData.countyCode,
             name: await this.getCountyName(geoData.countyCode),
             firstEarned: now,
+            lastUpdated: now,
+            count: 1,
             lastSeen: now,
             pickCount: 1,
           });
@@ -499,16 +539,17 @@ export class LocationIntegrityService {
       if (DIVISION_BADGES_ENABLED && geoData.divisionCode && geoData.countryCode !== 'US') {
         const divIdx = badges.divisions.findIndex(d => d.code === geoData.divisionCode);
         if (divIdx >= 0) {
-          badges.divisions[divIdx].lastSeen = now;
-          badges.divisions[divIdx].pickCount++;
+          badges.divisions[divIdx]!.lastSeen = now;
+          badges.divisions[divIdx]!.pickCount = (badges.divisions[divIdx]!.pickCount || 0) + 1;
         } else {
           badges.divisions.push({
             code: geoData.divisionCode,
             name: geoData.divisionName || await this.getDivisionName(geoData.divisionCode),
             firstEarned: now,
+            lastUpdated: now,
+            count: 1,
             lastSeen: now,
             pickCount: 1,
-            divisionType: geoData.divisionType || undefined,
           });
         }
       }

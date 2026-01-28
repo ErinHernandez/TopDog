@@ -1,22 +1,26 @@
 /**
  * Auth Components Test Page
- * 
- * Test page for the VX2 authentication system.
- * Access at: /testing-grounds/vx2-auth-test
+ *
+ * - Auth components and dev controls run outside the phone in the browser.
+ * - A phone is shown for visual consistency; auth modals live in the web area.
+ * - Not available on real mobile devices (web-only for that route).
+ * Access: /testing-grounds/vx2-auth-test
  */
 
 import React, { useState, useEffect } from 'react';
 import type { JSX } from 'react';
+import Link from 'next/link';
 import { 
   AuthProvider,
-  SignUpModal, 
-  SignInModal, 
-  ForgotPasswordModal, 
+  SignUpModal,
+  SignInModal,
+  ForgotPasswordModal,
   ProfileSettingsModal,
   useAuth 
 } from '../../components/vx2/auth';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS } from '../../components/vx2/core/constants/colors';
+import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../../components/vx2/core/constants/colors';
 import MobilePhoneFrame from '../../components/vx2/shell/MobilePhoneFrame';
+import { useIsMobileDevice } from '../../hooks/useIsMobileDevice';
 
 type ModalType = 'signup' | 'signin' | 'forgot' | 'profile' | null;
 
@@ -102,81 +106,84 @@ function AuthTestContent(): JSX.Element {
   const closeModal = (): void => setActiveModal(null);
   
   return (
-    <div 
-      className="min-h-screen flex items-center justify-center gap-8 p-8"
-      style={{ backgroundColor: '#1a1a2e' }}
-    >
-      {/* Phone Frame - Left Side */}
-      <MobilePhoneFrame>
-        {/* Phone content container - relative positioned for absolute modals */}
-        <div 
+    <div className="flex items-center justify-center gap-8 p-4 min-h-screen">
+      {/* Phone: placeholder + modals under test render inside; modals go over safe area */}
+      <MobilePhoneFrame contentOverSafeArea>
+        <div
           className="relative w-full h-full overflow-hidden"
           style={{ backgroundColor: BG_COLORS.primary }}
         >
-          {/* Default state message when no modal is open */}
           {!activeModal && (
-            <div 
-              className="absolute inset-0 flex flex-col items-center justify-center p-6"
+            <div
+              className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center"
               style={{ paddingTop: '60px' }}
             >
-              <div 
+              <div
                 className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
-                style={{ backgroundColor: 'rgba(96, 165, 250, 0.15)' }}
+                style={{ 
+                  background: 'url(/wr_blue.png) no-repeat center center',
+                  backgroundSize: 'cover',
+                }}
               >
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.active} strokeWidth="2">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2">
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
-              <h2 
+              <h2
                 className="text-lg font-bold mb-2 text-center"
                 style={{ color: TEXT_COLORS.primary }}
               >
                 Auth Components
               </h2>
-              <p 
-                className="text-sm text-center"
+              <p
+                className="text-sm text-center px-2"
                 style={{ color: TEXT_COLORS.secondary }}
               >
                 Select a modal from the controls panel to preview it here
               </p>
             </div>
           )}
-          
-          {/* Modals - render inside phone frame */}
+
           <SignUpModal
             isOpen={activeModal === 'signup'}
             onClose={closeModal}
             onSwitchToSignIn={() => openModal('signin')}
-            onSuccess={() => console.log('Sign up successful!')}
+            onSuccess={() => {
+              closeModal();
+            }}
+            contentTopInset={0}
           />
-          
+
           <SignInModal
             isOpen={activeModal === 'signin'}
             onClose={closeModal}
             onSwitchToSignUp={() => openModal('signup')}
             onForgotPassword={() => openModal('forgot')}
-            onSuccess={() => console.log('Sign in successful!')}
+            onSuccess={() => {
+              closeModal();
+            }}
+            contentTopInset={0}
           />
-          
+
           <ForgotPasswordModal
             isOpen={activeModal === 'forgot'}
             onClose={closeModal}
             onBackToSignIn={() => openModal('signin')}
           />
-          
-          
+
           <ProfileSettingsModal
             isOpen={activeModal === 'profile'}
             onClose={closeModal}
-            onAccountDeleted={() => console.log('Account deleted!')}
+            onAccountDeleted={() => {}}
+            contentTopInset={0}
           />
         </div>
       </MobilePhoneFrame>
-      
-      {/* Dev Controls Panel - Right Side */}
-      <div 
-        className="w-80 space-y-4"
-        style={{ color: TEXT_COLORS.primary }}
+
+      {/* Components test panel — outside phone */}
+      <div
+        className="w-80 space-y-4 flex-shrink-0 p-8 rounded-2xl"
+        style={{ backgroundColor: '#1a1a2e', color: TEXT_COLORS.primary }}
       >
         {/* Header */}
         <div>
@@ -215,8 +222,11 @@ function AuthTestContent(): JSX.Element {
               onClick={() => openModal('signup')}
               className="w-full py-2.5 rounded-lg font-semibold text-sm transition-all"
               style={{ 
-                backgroundColor: activeModal === 'signup' ? STATE_COLORS.active : 'rgba(96, 165, 250, 0.2)',
-                color: activeModal === 'signup' ? '#000' : STATE_COLORS.active,
+                background: activeModal === 'signup' 
+                  ? 'url(/wr_blue.png) no-repeat center center'
+                  : 'rgba(255,255,255,0.08)',
+                backgroundSize: 'cover',
+                color: activeModal === 'signup' ? '#000' : TEXT_COLORS.primary,
               }}
             >
               Sign Up Modal
@@ -226,7 +236,10 @@ function AuthTestContent(): JSX.Element {
               onClick={() => openModal('signin')}
               className="w-full py-2.5 rounded-lg font-semibold text-sm transition-all"
               style={{ 
-                backgroundColor: activeModal === 'signin' ? STATE_COLORS.active : 'rgba(255,255,255,0.08)',
+                background: activeModal === 'signin' 
+                  ? 'url(/wr_blue.png) no-repeat center center'
+                  : 'rgba(255,255,255,0.08)',
+                backgroundSize: 'cover',
                 color: activeModal === 'signin' ? '#000' : TEXT_COLORS.primary,
               }}
             >
@@ -237,7 +250,10 @@ function AuthTestContent(): JSX.Element {
               onClick={() => openModal('forgot')}
               className="w-full py-2.5 rounded-lg font-semibold text-sm transition-all"
               style={{ 
-                backgroundColor: activeModal === 'forgot' ? STATE_COLORS.active : 'rgba(255,255,255,0.08)',
+                background: activeModal === 'forgot' 
+                  ? 'url(/wr_blue.png) no-repeat center center'
+                  : 'rgba(255,255,255,0.08)',
+                backgroundSize: 'cover',
                 color: activeModal === 'forgot' ? '#000' : TEXT_COLORS.primary,
               }}
             >
@@ -248,7 +264,10 @@ function AuthTestContent(): JSX.Element {
               onClick={() => openModal('profile')}
               className="w-full py-2.5 rounded-lg font-semibold text-sm transition-all"
               style={{ 
-                backgroundColor: activeModal === 'profile' ? STATE_COLORS.active : 'rgba(255,255,255,0.08)',
+                background: activeModal === 'profile' 
+                  ? 'url(/wr_blue.png) no-repeat center center'
+                  : 'rgba(255,255,255,0.08)',
+                backgroundSize: 'cover',
                 color: activeModal === 'profile' ? '#000' : TEXT_COLORS.primary,
               }}
             >
@@ -295,17 +314,16 @@ function AuthTestPage(): JSX.Element {
   );
 }
 
-// Disable SSR for this page to prevent hydration issues
-// This page has complex components (MobilePhoneFrame, modals) that can cause mismatches
-// Also prevents Firebase Auth from being accessed during SSR
+// Disable SSR for this page to prevent hydration issues with modals and Firebase Auth
 export default function Page(): JSX.Element {
   const [isClient, setIsClient] = useState<boolean>(false);
+  const isMobile = useIsMobileDevice();
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  if (!isClient) {
+  if (!isClient || isMobile === null) {
     return (
       <div style={{ 
         minHeight: '100vh', 
@@ -316,6 +334,46 @@ export default function Page(): JSX.Element {
         color: '#fff'
       }}>
         Loading...
+      </div>
+    );
+  }
+
+  // Auth Components Test is web-only — block access on real mobile devices
+  if (isMobile) {
+    return (
+      <div 
+        style={{ 
+          minHeight: '100vh', 
+          display: 'flex', 
+          flexDirection: 'column',
+          alignItems: 'center', 
+          justifyContent: 'center',
+          gap: 16,
+          backgroundColor: '#1a1a2e',
+          color: '#fff',
+          padding: 24,
+          textAlign: 'center'
+        }}
+      >
+        <p style={{ fontSize: 18, fontWeight: 600 }}>Auth Components Test is web-only</p>
+        <p style={{ color: TEXT_COLORS.muted, maxWidth: 320 }}>
+          Open this link on desktop to test auth modals and flows. They run outside the phone in the browser.
+        </p>
+        <Link 
+          href="/testing-grounds" 
+          style={{ 
+            background: 'url(/wr_blue.png) no-repeat center center',
+            backgroundSize: 'cover',
+            WebkitBackgroundClip: 'text',
+            backgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            color: 'transparent',
+            textDecoration: 'underline', 
+            marginTop: 8 
+          }}
+        >
+          Back to testing grounds
+        </Link>
       </div>
     );
   }

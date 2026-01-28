@@ -1,12 +1,15 @@
 /**
  * Mobile Share Modal Component
- * 
+ *
  * Comprehensive sharing modal with multiple platform options
  * and native mobile sharing integration
  */
 
 import React, { useState, useEffect } from 'react';
 import { generateShareData, getPlatformShareUrl, trackShare } from '../../lib/shareConfig';
+import { createScopedLogger } from '../../lib/clientLogger';
+
+const logger = createScopedLogger('[ShareModal]');
 
 const ShareModal = ({ 
   isOpen, 
@@ -38,7 +41,7 @@ const ShareModal = ({
         await handleCopyLink();
       }
     } catch (error) {
-      console.error('Native share failed:', error);
+      logger.error('Native share failed', error);
       trackShare(shareType, 'native', false);
       await handleCopyLink();
     }
@@ -62,7 +65,7 @@ const ShareModal = ({
       trackShare(shareType, 'clipboard', true);
       setTimeout(() => setCopiedFeedback(''), 3000);
     } catch (error) {
-      console.error('Copy failed:', error);
+      logger.error('Copy failed', error);
       setCopiedFeedback('Failed to copy link');
       trackShare(shareType, 'clipboard', false);
       setTimeout(() => setCopiedFeedback(''), 3000);

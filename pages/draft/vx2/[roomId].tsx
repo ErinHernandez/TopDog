@@ -59,22 +59,12 @@ export default function DraftRoomVX2Route() {
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="theme-color" content="#1E3A5F" />
       </Head>
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          backgroundColor: '#101927',
-          overflow: 'hidden',
-        }}
-      >
-        <DraftRoomVX2
-          roomId={roomId}
-          useAbsolutePosition
-          initialPickNumber={initialPickNumber}
-          teamCount={teamCount}
-          fastMode={fastMode}
-        />
-      </div>
+      <DraftRoomVX2
+        roomId={roomId}
+        initialPickNumber={initialPickNumber}
+        teamCount={teamCount}
+        fastMode={fastMode}
+      />
     </>
   );
 }

@@ -8,6 +8,9 @@
 
 import React, { useState } from 'react';
 import Head from 'next/head';
+import { createScopedLogger } from '@/lib/clientLogger';
+
+const logger = createScopedLogger('[TestEdgeHealth]');
 
 interface TestResult {
   endpoint: string;
@@ -86,7 +89,7 @@ const TestEdgeHealthPage: React.FC = () => {
         standard: standardResult,
       });
     } catch (error) {
-      console.error('Comparison test failed:', error);
+      logger.error('Comparison test failed', error instanceof Error ? error : new Error(String(error)));
       alert('Comparison test failed. Check console for details.');
     } finally {
       setIsTesting(false);
@@ -122,7 +125,7 @@ const TestEdgeHealthPage: React.FC = () => {
         `Min: ${minResponseTime}ms\n` +
         `Max: ${maxResponseTime}ms`);
     } catch (error) {
-      console.error('Multiple tests failed:', error);
+      logger.error('Multiple tests failed', error instanceof Error ? error : new Error(String(error)));
       alert('Multiple tests failed. Check console for details.');
     } finally {
       setIsTesting(false);

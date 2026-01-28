@@ -1,5 +1,7 @@
 // File: pages/api/user/update-contact.ts
+import type { NextApiRequest, NextApiResponse } from 'next';
 import { withErrorHandling } from '@/lib/apiErrorHandler';
+import type { ApiLogger } from '@/lib/apiErrorHandler';
 import { getDb } from '@/lib/firebase-utils';
 import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { verifyAuthToken, verifyUserAccess } from '@/lib/apiAuth';
@@ -10,8 +12,8 @@ interface UpdateContactBody {
   phone?: string;
 }
 
-export default async function handler(req: any, res: any) {
-  return withErrorHandling(req, res, async (req: any, res: any, logger: any) => {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  return withErrorHandling(req, res, async (req, res, logger: ApiLogger) => {
     // Only allow POST
     if (req.method !== 'POST') {
       return res.status(405).json({
@@ -125,8 +127,8 @@ export default async function handler(req: any, res: any) {
           ...(phone && { phone }),
         },
       });
-    } catch (error: any) {
-      logger.error('Failed to update user contact information', error, { userId });
+    } catch (error: unknown) {
+      logger.error('Failed to update user contact information', error instanceof Error ? error : new Error(String(error)), { userId });
       
       return res.status(500).json({
         ok: false,

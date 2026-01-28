@@ -1,9 +1,13 @@
 /**
  * WebAuthn Utilities for Biometric Authentication
- * 
+ *
  * Supports Face ID, Touch ID, and other platform authenticators
  * Uses the Web Authentication API (WebAuthn)
  */
+
+import { createScopedLogger } from './clientLogger';
+
+const logger = createScopedLogger('[WebAuthn]');
 
 // Check if WebAuthn is supported
 export function isWebAuthnSupported(): boolean {
@@ -202,8 +206,8 @@ export async function registerBiometric(
 
     return { success: true, credential: storedCredential };
   } catch (error: unknown) {
-    console.error('Biometric registration error:', error);
-    
+    logger.error('Biometric registration error', error instanceof Error ? error : new Error(String(error)));
+
     if (error instanceof DOMException) {
       if (error.name === 'NotAllowedError') {
         return { success: false, error: 'Biometric authentication was cancelled' };
@@ -279,8 +283,8 @@ export async function authenticateWithBiometric(
       credentialId: assertion.id,
     };
   } catch (error: unknown) {
-    console.error('Biometric authentication error:', error);
-    
+    logger.error('Biometric authentication error', error instanceof Error ? error : new Error(String(error)));
+
     if (error instanceof DOMException) {
       if (error.name === 'NotAllowedError') {
         return { success: false, error: 'Biometric authentication was cancelled' };

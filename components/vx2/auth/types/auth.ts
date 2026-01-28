@@ -99,6 +99,8 @@ export interface UserPreferences {
   dynamicIslandEnabled?: boolean;
   /** Enable FCM push notifications (works when app is closed) */
   fcmEnabled?: boolean;
+  /** Pause account: disable new deposits and tournament entries (reversible) */
+  accountPaused?: boolean;
   /** Individual alert preferences */
   draftAlerts?: {
     roomFilled: boolean;
@@ -361,7 +363,7 @@ export interface AuthContextValue {
   // Profile actions
   updateProfile: (data: ProfileUpdateData) => Promise<AuthResult>;
   changeUsername: (data: UsernameChangeData) => Promise<AuthResult>;
-  deleteAccount: () => Promise<AuthResult>;
+  deleteAccount: (password?: string) => Promise<AuthResult>;
   
   // Email actions
   sendVerificationEmail: () => Promise<AuthResult>;

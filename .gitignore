@@ -85,10 +85,4 @@ temp/
 # Backup files
 *.bak
 .env*.local
-.lint-metrics.json
-
-# Serwist generated service worker files
-public/sw.js
-public/sw.js.map
-public/workbox-*.js
-public/workbox-*.js.map
+service-account-key.json

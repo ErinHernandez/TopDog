@@ -48,6 +48,7 @@ export default function SlowDraftSandbox(): React.ReactElement {
       <div
         style={{
           padding: '16px',
+          paddingTop: '44px', // Account for Dynamic Island (8px top + 20px height + 16px spacing)
           borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
           backgroundColor: BG_COLORS.secondary,
         }}

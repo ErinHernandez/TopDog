@@ -176,8 +176,6 @@ function PlayerCardTest(): JSX.Element {
 
   // Function to start a live draft simulation
   const startDraftSimulation = (): void => {
-    console.log('Starting draft simulation');
-    
     // Initialize available players
     const allPlayers: Player[] = [
       // Round 1 picks (1-12)
@@ -220,40 +218,22 @@ function PlayerCardTest(): JSX.Element {
     }
     
     const totalPlayers = [...allPlayers, ...additionalPlayers];
-    console.log('Setting available players:', totalPlayers.length);
     setAvailablePlayers(totalPlayers);
-    
-    console.log('Resetting picks made');
     setPicksMade([]);
-    
-    console.log('Setting overall pick to 1');
     setOverallPick(1);
-    
-    console.log('Setting current drafting team to 1');
     setCurrentDraftingTeam(1);
-    
-    console.log('Setting draft timer to 30');
     setDraftTimer(30);
-    
-    console.log('Setting isDraftActive to true');
     setIsDraftActive(true);
-    
-    console.log('Draft simulation started with', totalPlayers.length, 'players');
-    console.log('isDraftActive should be true, draftTimer should be 30');
   };
   
   // Function to pause the draft simulation
   const pauseDraft = (): void => {
-    console.log('Pausing draft simulation - current state:', { isDraftActive, isDraftPaused, draftTimer });
     setIsDraftPaused(true);
-    console.log('Pause state set to true');
   };
-  
+
   // Function to resume the draft simulation
   const resumeDraft = (): void => {
-    console.log('Resuming draft simulation - current state:', { isDraftActive, isDraftPaused, draftTimer });
     setIsDraftPaused(false);
-    console.log('Pause state set to false');
   };
   
   // Function to make a pick (called when timer expires or manually)
@@ -316,22 +296,16 @@ function PlayerCardTest(): JSX.Element {
     // Check if draft is complete (216 picks)
     if (overallPick >= 216) {
       setIsDraftActive(false);
-      console.log('Draft simulation complete!');
     }
   };
   
   // Timer effect for draft simulation
   useEffect(() => {
-    console.log('Timer effect running - isDraftActive:', isDraftActive, 'draftTimer:', draftTimer, 'isDraftPaused:', isDraftPaused);
-    
     let interval: NodeJS.Timeout | undefined;
     if (isDraftActive && draftTimer > 0 && !isDraftPaused) {
-      console.log('Starting timer interval');
       interval = setInterval(() => {
-        console.log('Timer tick - current draftTimer:', draftTimer);
         setDraftTimer(prev => {
           if (prev <= 1) {
-            console.log('Timer expired, making pick');
             // Time's up, make a pick
             makePick();
             return 30; // Reset timer for next pick
@@ -339,13 +313,10 @@ function PlayerCardTest(): JSX.Element {
           return prev - 1;
         });
       }, 1000);
-    } else if (isDraftPaused) {
-      console.log('Draft is paused - not starting timer');
     }
-    
+
     return () => {
       if (interval) {
-        console.log('Clearing timer interval');
         clearInterval(interval);
       }
     };
@@ -354,7 +325,6 @@ function PlayerCardTest(): JSX.Element {
   
   // Function to simulate picks for testing (old function - keeping for reference)
   const simulatePicks = (): void => {
-    console.log('simulatePicks function called');
     
     // Generate 206 picks to simulate picks 1-206 being made
     const testPicks: DraftPick[] = [];
@@ -594,10 +564,8 @@ function PlayerCardTest(): JSX.Element {
       });
     }
     
-    console.log('Setting picks:', testPicks.length, 'picks');
     setPicksMade(testPicks);
     setOverallPick(207); // Set to pick 207 (on the clock)
-    console.log('Picks set, overallPick set to 207');
   };
 
   // Hover functions

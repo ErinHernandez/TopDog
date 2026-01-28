@@ -31,32 +31,21 @@ export async function getProjections(
   // Try configured source first
   try {
     if (source === 'espn') {
-      console.log('[DataSources] Using ESPN Fantasy API for projections');
       const data = await espnFantasy.getPlayerProjections(season, options);
       return data;
     } else {
-      console.log('[DataSources] Using SportsDataIO for projections');
-      try {
-        const data = await sportsdataio.getPlayerProjections(season, options);
-        return data;
-      } catch (sdiError) {
-        // Log the error for debugging
-        console.error('[DataSources] SportsDataIO error:', sdiError);
-        throw sdiError;
-      }
+      const data = await sportsdataio.getPlayerProjections(season, options);
+      return data;
     }
   } catch (error) {
     lastError = error as Error;
-    console.warn(`[DataSources] ${source} failed, attempting fallback:`, error);
 
     // Fallback to SportsDataIO if ESPN failed
     if (source === 'espn') {
       try {
-        console.log('[DataSources] Falling back to SportsDataIO for projections');
         const data = await sportsdataio.getPlayerProjections(season, options);
         return data;
       } catch (fallbackError) {
-        console.error('[DataSources] Fallback also failed:', fallbackError);
         throw new Error(
           `Both ESPN and SportsDataIO failed. ESPN error: ${lastError.message}, SportsDataIO error: ${(fallbackError as Error).message}`
         );

@@ -1,9 +1,11 @@
 /**
  * Environment Variable Validation
- * 
+ *
  * Validates all required environment variables at application startup.
  * Fails fast if critical secrets are missing.
  */
+
+import { serverLogger } from './logger/serverLogger';
 
 // ============================================================================
 // TYPES
@@ -98,9 +100,8 @@ export function validateEnvironmentVariables(
   
   // Log warnings for recommended variables
   if (warnings.length > 0 && isProduction) {
-    console.warn('⚠️  WARNING: Missing recommended environment variables:');
-    warnings.forEach(v => console.warn(`  - ${v}`));
-    console.warn('These variables are recommended for production but not required.');
+    serverLogger.warn('Missing recommended environment variables');
+    warnings.forEach(v => serverLogger.warn(`Missing: ${v}`));
   }
   
   // Validate specific variable formats
@@ -159,20 +160,18 @@ export function getEnvVar(varName: string, defaultValue: string | null = null): 
 export function initializeEnvValidation(): boolean {
   try {
     validateEnvironmentVariables();
-    console.log('✅ Environment variables validated successfully');
+    serverLogger.info('Environment variables validated successfully');
     return true;
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('❌ Environment validation failed:');
-    console.error(errorMessage);
-    
+    serverLogger.error('Environment validation failed', error instanceof Error ? error : new Error(String(error)));
+
     // In production, fail hard
     if (process.env.NODE_ENV === 'production') {
       process.exit(1);
     }
-    
+
     // In development, warn but continue
-    console.warn('⚠️  Continuing in development mode, but some features may not work');
+    serverLogger.warn('Continuing in development mode, but some features may not work');
     return false;
   }
 }

@@ -7,6 +7,9 @@
 import { db } from './firebase';
 import { collection, doc, setDoc, getDoc, query, where, getDocs } from 'firebase/firestore';
 import { validateUsername, checkUsernameAvailability, sanitizeUsername } from './usernameValidation';
+import { createScopedLogger } from './clientLogger';
+
+const logger = createScopedLogger('[UserRegistration]');
 
 // ============================================================================
 // TYPES
@@ -144,9 +147,9 @@ export class UserRegistrationService {
       // Save to Firestore
       const userRef = doc(db, 'users', uid);
       await setDoc(userRef, userProfile);
-      
-      console.log('User profile created successfully:', sanitizedUsername);
-      
+
+      logger.info('User profile created successfully', { username: sanitizedUsername });
+
       return {
         success: true,
         userProfile: userProfile,
@@ -154,16 +157,15 @@ export class UserRegistrationService {
       };
       
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error('Error creating user profile:', errorMessage);
+      logger.error('Error creating user profile', error instanceof Error ? error : new Error(String(error)));
       return {
         success: false,
-        error: errorMessage,
+        error: error instanceof Error ? error.message : String(error),
         message: 'Failed to create user profile'
       };
     }
   }
-  
+
   /**
    * Get user profile by UID
    */
@@ -191,15 +193,14 @@ export class UserRegistrationService {
         };
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error('Error getting user profile:', errorMessage);
+      logger.error('Error getting user profile', error instanceof Error ? error : new Error(String(error)));
       return {
         success: false,
-        error: errorMessage
+        error: error instanceof Error ? error.message : String(error)
       };
     }
   }
-  
+
   /**
    * Update user profile
    */
@@ -248,17 +249,16 @@ export class UserRegistrationService {
         success: true,
         message: 'User profile updated successfully'
       };
-      
+
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error('Error updating user profile:', errorMessage);
+      logger.error('Error updating user profile', error instanceof Error ? error : new Error(String(error)));
       return {
         success: false,
-        error: errorMessage
+        error: error instanceof Error ? error.message : String(error)
       };
     }
   }
-  
+
   /**
    * Check if user has completed profile setup
    */
@@ -270,12 +270,11 @@ export class UserRegistrationService {
       }
       return false;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error('Error checking profile completion:', errorMessage);
+      logger.error('Error checking profile completion', error instanceof Error ? error : new Error(String(error)));
       return false;
     }
   }
-  
+
   /**
    * Get user by username
    */
@@ -305,15 +304,14 @@ export class UserRegistrationService {
         };
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error('Error getting user by username:', errorMessage);
+      logger.error('Error getting user by username', error instanceof Error ? error : new Error(String(error)));
       return {
         success: false,
-        error: errorMessage
+        error: error instanceof Error ? error.message : String(error)
       };
     }
   }
-  
+
   /**
    * Delete user profile (for admin use)
    */
@@ -334,11 +332,10 @@ export class UserRegistrationService {
         message: 'User profile deactivated successfully'
       };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error('Error deleting user profile:', errorMessage);
+      logger.error('Error deleting user profile', error instanceof Error ? error : new Error(String(error)));
       return {
         success: false,
-        error: errorMessage
+        error: error instanceof Error ? error.message : String(error)
       };
     }
   }

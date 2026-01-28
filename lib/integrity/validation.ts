@@ -80,9 +80,20 @@ export interface ValidatedAdminActionRequest {
 }
 
 /**
+ * Raw request body structure for admin actions
+ */
+interface AdminActionRequestBody {
+  targetType?: string;
+  targetId?: string;
+  action?: string;
+  reason?: string;
+  notes?: string;
+}
+
+/**
  * Validate admin action request body
  */
-export function validateAdminActionRequest(body: any): ValidationResult<ValidatedAdminActionRequest> {
+export function validateAdminActionRequest(body: AdminActionRequestBody): ValidationResult<ValidatedAdminActionRequest> {
   const errors: string[] = [];
 
   // Validate targetType
@@ -129,14 +140,17 @@ export function validateAdminActionRequest(body: any): ValidationResult<Validate
     return { valid: false, errors };
   }
 
+  // At this point, we've validated that body.targetId exists and is a non-empty string
+  const targetId = body.targetId!;
+
   return {
     valid: true,
     errors: [],
     data: {
       targetType: body.targetType as TargetType,
-      targetId: body.targetId.trim(),
+      targetId: targetId.trim(),
       action: body.action as AdminActionType,
-      reason: sanitizeString(body.reason, 1000),
+      reason: sanitizeString(body.reason!, 1000),
       notes: body.notes ? sanitizeString(body.notes, 5000) : undefined,
     },
   };

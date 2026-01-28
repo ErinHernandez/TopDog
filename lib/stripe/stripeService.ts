@@ -1,15 +1,17 @@
 /**
  * Stripe Service Layer
- * 
+ *
  * Centralized Stripe operations with idempotency, error handling, and logging.
  * This service wraps all Stripe API calls and integrates with our logging/error tracking.
  */
 
 import Stripe from 'stripe';
+import { serverLogger } from '../logger/serverLogger';
 import { getDb } from '../firebase-utils';
-import { doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, getDocs, serverTimestamp, runTransaction } from 'firebase/firestore';
 import { captureError } from '../errorTracking';
 import { requireAppUrl } from '../envHelpers';
+import { getStripeExchangeRate } from './exchangeRates';
 import type {
   CreateCustomerRequest,
   CustomerWithPaymentMethods,
@@ -37,7 +39,7 @@ const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
 const STRIPE_CONNECT_CLIENT_ID = process.env.STRIPE_CONNECT_CLIENT_ID;
 
 if (!STRIPE_SECRET_KEY) {
-  console.warn('[StripeService] STRIPE_SECRET_KEY not configured');
+  serverLogger.warn('STRIPE_SECRET_KEY not configured');
 }
 
 /**
@@ -93,7 +95,7 @@ export async function getOrCreateCustomer(
           }
         } catch (err: unknown) {
           // Customer might have been deleted, create a new one
-          console.warn('[StripeService] Stored customer ID invalid, creating new customer');
+          serverLogger.warn('Stored customer ID invalid, creating new customer');
         }
       }
     }
@@ -553,23 +555,61 @@ export async function createPayout(
     // Convert withdrawal amount to display amount in its currency
     const withdrawalDisplayAmount = toDisplayAmount(amountCents, currencyUpper);
     
-    // TODO: Implement proper exchange rate conversion for non-USD withdrawals
-    // For now, this only works correctly for USD withdrawals.
-    // For other currencies, we need to:
-    // 1. Get current exchange rate (e.g., from Stripe or external API)
-    // 2. Convert withdrawalDisplayAmount * exchangeRate to get USD equivalent
-    // 3. Compare USD equivalent to currentBalance
-    if (currencyUpper !== 'USD') {
-      throw new Error(
-        `Currency conversion not yet implemented. ` +
-        `Withdrawals in ${currencyUpper} require exchange rate conversion to USD. ` +
-        `Please use USD for withdrawals until this feature is implemented.`
-      );
+    // Convert withdrawal amount to USD equivalent for balance comparison
+    let withdrawalAmountUSD: number;
+    let exchangeRate: number | null = null;
+    
+    if (currencyUpper === 'USD') {
+      // For USD, no conversion needed
+      withdrawalAmountUSD = withdrawalDisplayAmount;
+    } else {
+      // Get current exchange rate for the currency
+      // Rate format: 1 USD = X local currency (e.g., 1 USD = 1.55 AUD)
+      // To convert local currency to USD: localAmount / rate
+      try {
+        const rateData = await getStripeExchangeRate(currencyUpper);
+        exchangeRate = rateData.rate;
+        
+        // Convert withdrawal amount to USD
+        // withdrawalDisplayAmount is in local currency
+        // USD equivalent = localAmount / rate (since rate = local/USD)
+        withdrawalAmountUSD = withdrawalDisplayAmount / exchangeRate;
+        
+        // Log conversion for debugging
+        serverLogger.debug('Exchange rate conversion for withdrawal', {
+          currency: currencyUpper,
+          localAmount: withdrawalDisplayAmount,
+          exchangeRate,
+          usdEquivalent: withdrawalAmountUSD,
+          rateDisplay: rateData.rateDisplay,
+        });
+      } catch (error) {
+        const err = error as Error;
+        serverLogger.error('Failed to fetch exchange rate for withdrawal', err, {
+          currency: currencyUpper,
+          withdrawalAmount: withdrawalDisplayAmount,
+        });
+        
+        throw new Error(
+          `Failed to fetch exchange rate for ${currencyUpper}. ` +
+          `Please try again or use USD for withdrawals. ` +
+          `Error: ${err.message}`
+        );
+      }
     }
     
-    // For USD, compare directly (balance is already in USD)
-    if (currentBalance < withdrawalDisplayAmount) {
-      throw new Error('Insufficient balance');
+    // Compare USD equivalent to current balance
+    if (withdrawalAmountUSD > currentBalance) {
+      const errorMessage = exchangeRate
+        ? `Insufficient balance. ` +
+          `Requested: ${withdrawalDisplayAmount.toFixed(2)} ${currencyUpper} ` +
+          `(${withdrawalAmountUSD.toFixed(2)} USD), ` +
+          `Available: ${currentBalance.toFixed(2)} USD`
+        : `Insufficient balance. ` +
+          `Requested: ${withdrawalDisplayAmount.toFixed(2)} ${currencyUpper}, ` +
+          `Available: ${currentBalance.toFixed(2)} USD`;
+      
+      throw new Error(errorMessage);
     }
     
     // Create a transfer to the Connect account
@@ -967,44 +1007,157 @@ export async function createOrUpdateWebhookEvent(
 // ============================================================================
 
 /**
- * Update user's balance in Firebase (called by webhook handlers)
+ * Balance update result with transaction details
+ */
+export interface BalanceUpdateResult {
+  previousBalance: number;
+  newBalance: number;
+  amountDollars: number;
+  operation: 'add' | 'subtract';
+  timestamp: string;
+}
+
+/**
+ * Update user's balance in Firebase using atomic transaction
+ *
+ * SECURITY: Uses Firestore transaction to prevent race conditions where
+ * concurrent updates could result in incorrect balances.
+ *
+ * SECURITY FIX (Bug #6): Added currency parameter to handle zero-decimal currencies.
+ * For currencies like JPY, KRW, VND, the amount is already in the smallest unit
+ * and should NOT be divided by 100.
+ *
+ * @param userId - Firebase user ID
+ * @param amountSmallestUnit - Amount in smallest unit (cents for USD, yen for JPY, etc.)
+ * @param operation - 'add' for deposits, 'subtract' for withdrawals
+ * @param idempotencyKey - Optional key to prevent duplicate operations
+ * @param currency - ISO 4217 currency code (defaults to 'USD')
+ * @returns Promise resolving to balance update result
  */
 export async function updateUserBalance(
   userId: string,
-  amountCents: number,
-  operation: 'add' | 'subtract'
+  amountSmallestUnit: number,
+  operation: 'add' | 'subtract',
+  idempotencyKey?: string,
+  currency: string = 'USD'
 ): Promise<number> {
   try {
     const db = getDb();
     const userRef = doc(db, 'users', userId);
-    const userDoc = await getDoc(userRef);
-    
-    if (!userDoc.exists()) {
-      throw new Error('User not found');
+
+    // SECURITY FIX (Bug #6): Use currency-aware conversion to handle zero-decimal currencies
+    // For USD: 2500 cents -> 25.00 dollars
+    // For JPY: 2500 yen -> 2500 yen (zero-decimal, no conversion)
+    // For BHD: 2500 fils -> 2.500 dinars (three-decimal)
+    const amountDisplayUnits = toDisplayAmount(amountSmallestUnit, currency);
+
+    // SECURITY: Check for duplicate operations if idempotency key provided
+    if (idempotencyKey) {
+      const balanceOpsRef = collection(db, 'balanceOperations');
+      const duplicateQuery = query(
+        balanceOpsRef,
+        where('idempotencyKey', '==', idempotencyKey)
+      );
+      const duplicateSnapshot = await getDocs(duplicateQuery);
+
+      if (!duplicateSnapshot.empty) {
+        serverLogger.warn('Duplicate balance operation detected', null, {
+          userId,
+          idempotencyKey,
+          operation,
+          currency,
+        });
+        // Return the existing balance instead of processing duplicate
+        const userDoc = await getDoc(userRef);
+        return (userDoc.data()?.balance || 0) as number;
+      }
     }
-    
-    const currentBalance = (userDoc.data().balance || 0) as number;
-    const amountDollars = amountCents / 100;
-    
-    const newBalance = operation === 'add'
-      ? currentBalance + amountDollars
-      : currentBalance - amountDollars;
-    
-    if (newBalance < 0) {
-      throw new Error('Insufficient balance');
-    }
-    
-    // Use setDoc with merge for safety
-    await setDoc(userRef, {
-      balance: newBalance,
-      lastBalanceUpdate: serverTimestamp(),
-    }, { merge: true });
-    
-    return newBalance;
+
+    // SECURITY: Use atomic transaction to prevent race conditions
+    const result = await runTransaction(db, async (transaction) => {
+      const userDoc = await transaction.get(userRef);
+
+      if (!userDoc.exists()) {
+        throw new Error('User not found');
+      }
+
+      const currentBalance = (userDoc.data().balance || 0) as number;
+
+      const newBalance = operation === 'add'
+        ? currentBalance + amountDisplayUnits
+        : currentBalance - amountDisplayUnits;
+
+      // SECURITY: Prevent negative balances
+      if (newBalance < 0) {
+        throw new Error(`Insufficient balance. Current: ${currentBalance.toFixed(2)}, Requested: ${amountDisplayUnits.toFixed(2)}`);
+      }
+
+      // Update balance atomically within transaction
+      transaction.update(userRef, {
+        balance: newBalance,
+        lastBalanceUpdate: serverTimestamp(),
+      });
+
+      // If idempotency key provided, record this operation
+      if (idempotencyKey) {
+        const balanceOpRef = doc(collection(db, 'balanceOperations'));
+        transaction.set(balanceOpRef, {
+          userId,
+          idempotencyKey,
+          operation,
+          amountSmallestUnit,
+          amountDisplayUnits,
+          currency,
+          previousBalance: currentBalance,
+          newBalance,
+          createdAt: serverTimestamp(),
+        });
+      }
+
+      return {
+        previousBalance: currentBalance,
+        newBalance,
+      };
+    });
+
+    serverLogger.info('Balance updated successfully', {
+      userId,
+      operation,
+      amountDisplayUnits,
+      currency,
+      previousBalance: result.previousBalance,
+      newBalance: result.newBalance,
+      idempotencyKey,
+    });
+
+    return result.newBalance;
   } catch (error: unknown) {
     await captureError(error as Error, {
       tags: { component: 'stripe', operation: 'updateUserBalance' },
-      extra: { userId, amountCents, operation },
+      extra: { userId, amountSmallestUnit, operation, currency },
+    });
+    throw error;
+  }
+}
+
+/**
+ * Get user's current balance (read-only, does not modify)
+ */
+export async function getUserBalance(userId: string): Promise<number> {
+  try {
+    const db = getDb();
+    const userRef = doc(db, 'users', userId);
+    const userDoc = await getDoc(userRef);
+
+    if (!userDoc.exists()) {
+      return 0;
+    }
+
+    return (userDoc.data().balance || 0) as number;
+  } catch (error: unknown) {
+    await captureError(error as Error, {
+      tags: { component: 'stripe', operation: 'getUserBalance' },
+      extra: { userId },
     });
     throw error;
   }
@@ -1087,7 +1240,7 @@ export async function assessPaymentRisk(
     };
   } catch (error: unknown) {
     // Don't fail the payment if risk assessment fails, just log
-    console.error('[StripeService] Risk assessment failed:', error);
+    serverLogger.error('Risk assessment failed', error instanceof Error ? error : new Error(String(error)));
     return {
       score: 0,
       factors: ['assessment_failed'],

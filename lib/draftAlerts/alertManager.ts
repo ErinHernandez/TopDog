@@ -63,16 +63,21 @@ class AlertManager {
     try {
       const { timestamp } = JSON.parse(stored);
       const now = Date.now();
-      
+
       // Check if expired (older than 24 hours)
       if (now - timestamp > ALERT_STORAGE_EXPIRY_MS) {
         localStorage.removeItem(key);
         return false;
       }
-      
+
       return true;
     } catch {
-      // Invalid storage, treat as not fired
+      // Invalid storage, clear corrupted data and treat as not fired
+      try {
+        localStorage.removeItem(key);
+      } catch {
+        // Ignore errors when clearing
+      }
       return false;
     }
   }

@@ -1,12 +1,15 @@
 /**
  * useDraftAlerts Hook
- * 
+ *
  * Monitors draft state and triggers alerts based on conditions
  * CORRECTED: Fixed timer threshold, added error handling, round context
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
+import { createScopedLogger } from '@/lib/clientLogger';
 import { DraftAlertType, AlertTriggerContext } from '../../../../lib/draftAlerts/types';
+
+const logger = createScopedLogger('[useDraftAlerts]');
 import { alertManager } from '../../../../lib/draftAlerts/alertManager';
 import { isLiveActivitySupported, isDynamicIslandSupported } from '../../../../lib/dynamicIsland';
 import { DEFAULT_ALERT_PREFERENCES } from '../../../../lib/draftAlerts/constants';
@@ -62,7 +65,7 @@ export function useDraftAlerts({
   }, [profile]);
 
   // CORRECTED: Safe alert triggering with error handling
-  const safelyTriggerAlert = async (
+  const safelyTriggerAlert = useCallback(async (
     alertType: DraftAlertType,
     context: AlertTriggerContext
   ) => {
@@ -70,9 +73,9 @@ export function useDraftAlerts({
       await alertManager.triggerAlert(alertType, context);
     } catch (error) {
       // Log but don't crash the draft experience
-      console.error(`[DraftAlerts] Failed to trigger ${alertType}:`, error);
+      logger.error(`Failed to trigger ${alertType}:`, error instanceof Error ? error : new Error(String(error)));
     }
-  };
+  }, []);
 
   // Alert 1: Room Filled
   useEffect(() => {
@@ -97,7 +100,7 @@ export function useDraftAlerts({
     }
     
     prevValues.current.participantsLength = participants.length;
-  }, [participants.length, maxParticipants, roomId, roomStatus, preDraftCountdown, picksUntilMyTurn, isMyTurn, timer, currentRound, currentPick]);
+  }, [participants, maxParticipants, roomId, roomStatus, preDraftCountdown, picksUntilMyTurn, isMyTurn, timer, currentRound, currentPick, safelyTriggerAlert]);
 
   // Alert 2: Draft Starting
   useEffect(() => {
@@ -122,7 +125,7 @@ export function useDraftAlerts({
     }
     
     prevValues.current.preDraftCountdown = preDraftCountdown;
-  }, [preDraftCountdown, roomStatus, roomId, participants, maxParticipants, picksUntilMyTurn, isMyTurn, timer, currentRound, currentPick]);
+  }, [preDraftCountdown, roomStatus, roomId, participants, maxParticipants, picksUntilMyTurn, isMyTurn, timer, currentRound, currentPick, safelyTriggerAlert]);
 
   // Alert 3: Two Picks Away
   useEffect(() => {
@@ -147,7 +150,7 @@ export function useDraftAlerts({
     }
     
     prevValues.current.picksUntilMyTurn = picksUntilMyTurn;
-  }, [picksUntilMyTurn, roomStatus, roomId, participants, maxParticipants, preDraftCountdown, isMyTurn, timer, currentRound, currentPick]);
+  }, [picksUntilMyTurn, roomStatus, roomId, participants, maxParticipants, preDraftCountdown, isMyTurn, timer, currentRound, currentPick, safelyTriggerAlert]);
 
   // Alert 4: On The Clock
   useEffect(() => {
@@ -172,7 +175,7 @@ export function useDraftAlerts({
     }
     
     prevValues.current.isMyTurn = isMyTurn;
-  }, [isMyTurn, timer, roomStatus, roomId, participants, maxParticipants, preDraftCountdown, picksUntilMyTurn, currentRound, currentPick]);
+  }, [isMyTurn, timer, roomStatus, roomId, participants, maxParticipants, preDraftCountdown, picksUntilMyTurn, currentRound, currentPick, safelyTriggerAlert]);
 
   // Alert 5: 10 Seconds Remaining
   // CORRECTED: Changed from === 10 to <= 10 threshold detection
@@ -200,5 +203,5 @@ export function useDraftAlerts({
     }
     
     prevValues.current.timer = timer;
-  }, [timer, isMyTurn, roomStatus, roomId, participants, maxParticipants, preDraftCountdown, picksUntilMyTurn, currentRound, currentPick]);
+  }, [timer, isMyTurn, roomStatus, roomId, participants, maxParticipants, preDraftCountdown, picksUntilMyTurn, currentRound, currentPick, safelyTriggerAlert]);
 }

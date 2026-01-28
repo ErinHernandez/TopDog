@@ -19,6 +19,9 @@
  */
 
 import { useEffect, useRef } from 'react';
+import { createScopedLogger } from '@/lib/clientLogger';
+
+const logger = createScopedLogger('[useStableViewportHeight]');
 
 // Minimum height change (in pixels) to trigger an update
 // This prevents updates from address bar (typically 50-70px)
@@ -37,13 +40,16 @@ export function useStableViewportHeight(): void {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
+    // Capture the timeout ref at effect start to avoid stale closure issues
+    const currentTimeout = timeoutRef.current;
+
     const setVhProperty = (height: number) => {
       const vh = height * 0.01;
       document.documentElement.style.setProperty('--stable-vh', `${vh}px`);
       lastHeightRef.current = height;
       // Debug logging in development
       if (process.env.NODE_ENV === 'development') {
-        console.log('[useStableViewportHeight] Set --stable-vh to', `${vh}px`, 'from height', height);
+        logger.debug(`Set --stable-vh to ${vh}px from height ${height}`);
       }
     };
 
@@ -92,8 +98,9 @@ export function useStableViewportHeight(): void {
     window.addEventListener('orientationchange', handleOrientationChange);
 
     return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
+      // Use captured timeout value in cleanup
+      if (currentTimeout) {
+        clearTimeout(currentTimeout);
       }
       if (window.visualViewport) {
         window.visualViewport.removeEventListener('resize', handleResize);

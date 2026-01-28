@@ -6,6 +6,9 @@
  */
 
 import type { SWRConfiguration } from 'swr';
+import { createScopedLogger } from '@/lib/clientLogger';
+
+const logger = createScopedLogger('[SWRConfig]');
 
 // ============================================================================
 // CUSTOM ERROR TYPE
@@ -37,7 +40,7 @@ export async function fetcher<T = unknown>(url: string): Promise<T> {
         const errorData = await res.json().catch(() => ({}));
         // Log in development but don't throw
         if (process.env.NODE_ENV === 'development') {
-          console.warn(`[SWR Fetcher] ${res.status} error for ${url}:`, errorData);
+          logger.warn(`Fetcher ${res.status} error for ${url}`);
         }
         // Return empty array for list endpoints, empty object for others
         const isListEndpoint = url.match(/\/api\/.*\/list|\/api\/.*s$/) || url.includes('slow-drafts');
@@ -68,7 +71,7 @@ export async function fetcher<T = unknown>(url: string): Promise<T> {
     
     // For all other errors (network, 4xx, etc.), return empty data
     if (process.env.NODE_ENV === 'development') {
-      console.warn(`[SWR Fetcher] Error for ${url}, returning empty data:`, error);
+      logger.warn(`Fetcher error for ${url}, returning empty data`);
     }
     // Return empty array for list endpoints, empty object for others
     const isListEndpoint = url.match(/\/api\/.*\/list|\/api\/.*s$/) || url.includes('slow-drafts');
@@ -177,7 +180,7 @@ export const swrConfig: SWRConfiguration = {
     const fetchError = error as FetchError;
     // Only log non-400/404 errors in development
     if (process.env.NODE_ENV === 'development' && fetchError.status !== 400 && fetchError.status !== 404) {
-      console.error(`SWR Error [${key}]:`, error);
+      logger.error(`SWR Error [${key}]`, error);
     }
   },
   

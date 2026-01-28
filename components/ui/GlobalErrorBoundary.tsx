@@ -8,12 +8,15 @@
  * Note: Error boundaries must be class components (React limitation).
  * The wrapper pattern provides router access for the "Go Home" action.
  * 
- * @module components/shared/GlobalErrorBoundary
+ * @module components/ui/GlobalErrorBoundary
  */
 
 import React, { Component, ReactNode, ErrorInfo } from 'react';
 import type { JSX } from 'react';
 import { useRouter, NextRouter } from 'next/router';
+import { createScopedLogger } from '@/lib/clientLogger';
+
+const logger = createScopedLogger('[GlobalErrorBoundary]');
 
 // ============================================================================
 // TYPES
@@ -90,8 +93,7 @@ class GlobalErrorBoundaryClass extends Component<ErrorBoundaryProps, ErrorBounda
       componentStack: errorInfo.componentStack,
     };
 
-    console.error('[GlobalErrorBoundary] Caught error:', {
-      message: error.message,
+    logger.error('Caught error', error, {
       ...errorContext,
     });
 
@@ -116,7 +118,7 @@ class GlobalErrorBoundaryClass extends Component<ErrorBoundaryProps, ErrorBounda
         level: 'error',
       });
     } catch (trackingError) {
-      console.error('[GlobalErrorBoundary] Failed to report to Sentry:', trackingError);
+      logger.error('Failed to report to Sentry', trackingError instanceof Error ? trackingError : new Error(String(trackingError)));
     }
 
     // Google Analytics exception tracking (production only)
@@ -162,7 +164,7 @@ class GlobalErrorBoundaryClass extends Component<ErrorBoundaryProps, ErrorBounda
 
     if (retryCount >= maxRetries) {
       // Too many retries, suggest reload instead
-      console.warn('[GlobalErrorBoundary] Max retries reached, suggesting reload');
+      logger.warn('Max retries reached, suggesting reload');
       return;
     }
 
@@ -174,7 +176,7 @@ class GlobalErrorBoundaryClass extends Component<ErrorBoundaryProps, ErrorBounda
         retryCount: prevState.retryCount + 1,
       }),
       () => {
-        console.log(`[GlobalErrorBoundary] Retry attempt ${this.state.retryCount}`);
+        logger.info(`Retry attempt ${this.state.retryCount}`);
       }
     );
   };
@@ -279,19 +281,19 @@ class GlobalErrorBoundaryClass extends Component<ErrorBoundaryProps, ErrorBounda
       </header>
     );
 
-    // Error content
+    // Error content — flex column so Error ID can sit at very bottom via mt-auto
     const errorContent = (
       <div 
-        className="text-center w-full px-2 flex flex-col items-center justify-center"
+        className="text-center w-full px-2 flex flex-col min-h-full"
         style={showPhoneFrame ? {
           width: '100%',
-          height: 'calc(100% - 80px)', // Account for navbar height
+          height: '100%',
         } : {
           paddingTop: '2rem',
         }}
       >
           {/* Error Icon - Smaller on mobile */}
-          <div className="mb-4 sm:mb-6">
+          <div className="mb-4 sm:mb-6 flex-shrink-0">
             <svg
               className="w-12 h-12 sm:w-16 sm:h-16 mx-auto text-red-500"
               fill="none"
@@ -308,21 +310,17 @@ class GlobalErrorBoundaryClass extends Component<ErrorBoundaryProps, ErrorBounda
             </svg>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 px-2">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 px-2 flex-shrink-0">
             Something went wrong
           </h1>
 
-          <p className="text-base sm:text-lg text-gray-300 mb-2 px-2">
+          <p className="text-base sm:text-lg text-gray-300 mb-2 px-2 flex-shrink-0">
             We hit an unexpected error.
-          </p>
-
-          <p className="text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6 px-2 break-words">
-            Error ID: <code className="bg-gray-800 px-2 py-1 rounded text-xs sm:text-sm">{errorId}</code>
           </p>
 
           {/* Development-only error details */}
           {process.env.NODE_ENV === 'development' && error && (
-            <details className="mb-4 sm:mb-6 text-left bg-gray-800 rounded-lg overflow-hidden mx-2">
+            <details className="mb-4 sm:mb-6 text-left bg-gray-800 rounded-lg overflow-hidden mx-2 flex-shrink-0">
               <summary className="cursor-pointer px-3 py-2.5 sm:px-4 sm:py-3 text-red-300 hover:bg-gray-700 active:bg-gray-700 transition-colors text-sm sm:text-base touch-manipulation">
                 Error Details (Dev Only)
               </summary>
@@ -351,13 +349,13 @@ class GlobalErrorBoundaryClass extends Component<ErrorBoundaryProps, ErrorBounda
 
           {/* Retry limit warning */}
           {!canRetry && (
-            <p className="text-yellow-400 text-xs sm:text-sm mb-3 sm:mb-4 px-2">
+            <p className="text-yellow-400 text-xs sm:text-sm mb-3 sm:mb-4 px-2 flex-shrink-0">
               Multiple retry attempts failed. Please reload the page or return home.
             </p>
           )}
 
           {/* Action Buttons - Full width on mobile, stacked */}
-          <div className="flex flex-col gap-3 sm:gap-3 sm:flex-row sm:justify-center px-2">
+          <div className="flex flex-col gap-3 sm:gap-3 sm:flex-row sm:justify-center px-2 flex-shrink-0">
             {canRetry && (
               <button
                 onClick={this.handleRetry}
@@ -392,9 +390,16 @@ class GlobalErrorBoundaryClass extends Component<ErrorBoundaryProps, ErrorBounda
           </div>
 
           {/* Support hint - Smaller on mobile */}
-          <p className="mt-6 sm:mt-8 text-xs sm:text-sm text-gray-500 px-2">
-            If this keeps happening, please contact support with the Error ID above.
+          <p className="mt-6 sm:mt-8 text-xs sm:text-sm text-gray-500 px-2 flex-shrink-0">
+            If this keeps happening, please contact support with the Error ID below.
           </p>
+
+          {/* Error ID always at very bottom of screen */}
+          <div className="mt-auto pt-4 pb-2 flex-shrink-0">
+            <p className="text-xs sm:text-sm text-gray-500 px-2 break-words">
+              Error ID: <code className="bg-gray-800 px-2 py-1 rounded text-xs sm:text-sm">{errorId}</code>
+            </p>
+          </div>
       </div>
     );
 
@@ -423,8 +428,12 @@ class GlobalErrorBoundaryClass extends Component<ErrorBoundaryProps, ErrorBounda
               <div style={{ flexShrink: 0 }}>
                 {errorNavbar}
               </div>
-              <div style={{ flex: 1, overflow: 'auto' }}>
-                {errorContent}
+              <div 
+                style={{ flex: 1, minHeight: 0, overflow: 'auto', display: 'flex', flexDirection: 'column' }}
+              >
+                <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+                  {errorContent}
+                </div>
               </div>
             </div>
           </div>
@@ -450,12 +459,12 @@ class GlobalErrorBoundaryClass extends Component<ErrorBoundaryProps, ErrorBounda
           {errorNavbar}
         </div>
         
-        {/* Error content below navbar */}
+        {/* Error content below navbar — flex column so Error ID stays at very bottom */}
         <div 
-          className={`flex-1 flex items-center justify-center ${isActualMobileDevice ? 'p-2' : 'p-4 sm:p-6'}`}
+          className={`flex-1 flex flex-col min-h-0 ${isActualMobileDevice ? 'p-2' : 'p-4 sm:p-6'}`}
         >
           <div 
-            className={`text-center w-full px-2 ${isActualMobileDevice ? 'max-w-[375px]' : 'max-w-lg'}`}
+            className={`flex-1 flex flex-col min-h-0 text-center w-full px-2 ${isActualMobileDevice ? 'max-w-[375px]' : 'max-w-lg'}`}
             style={isActualMobileDevice ? {
               maxWidth: '375px',
               margin: '0 auto',
@@ -474,14 +483,11 @@ class GlobalErrorBoundaryClass extends Component<ErrorBoundaryProps, ErrorBounda
 // ============================================================================
 
 // Wrapper to inject Next.js router (class components can't use hooks directly)
+// Note: useRouter must be called unconditionally. Tests should mock the router context.
 function GlobalErrorBoundary(props: Omit<ErrorBoundaryProps, 'router'>): JSX.Element {
-  let router: NextRouter | null = null;
-  try {
-    // useRouter can throw if called outside Next.js context (e.g., tests)
-    router = useRouter();
-  } catch {
-    // Router not available, continue without it
-  }
+  // Always call useRouter unconditionally - Next.js handles missing context gracefully
+  // In test environments, mock RouterContext or use next-router-mock
+  const router = useRouter();
   return <GlobalErrorBoundaryClass {...props} router={router} />;
 }
 

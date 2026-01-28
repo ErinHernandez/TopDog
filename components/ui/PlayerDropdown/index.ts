@@ -30,5 +30,5 @@ export type { PlayerDropdownContentProps } from './PlayerDropdownContent';
 // } from '../../../hooks/usePlayerDropdown';
 
 // Re-export data service
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 export const playerDataService = require('../../../lib/playerData/PlayerDataService').playerDataService;

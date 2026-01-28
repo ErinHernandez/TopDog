@@ -29,6 +29,19 @@ if [ -n "$QUERY_WITHOUT_LIMIT" ]; then
   echo ""
 fi
 
+# Check for getDocs with variable refs (e.g., getDocs(someRef)) - warning only
+# Exclude patterns that are known to be safe (paginated or intentional full scans)
+VAR_REF_QUERIES=$(grep -rn "getDocs([a-zA-Z]*Ref)" --include="*.ts" --include="*.tsx" pages/ lib/ components/ 2>/dev/null | grep -v "limit(" | grep -v ".test.ts" | grep -v "node_modules" | grep -v "// MIGRATION" | grep -v "// INTENTIONAL_FULL_SCAN" || true)
+
+if [ -n "$VAR_REF_QUERIES" ]; then
+  echo ""
+  echo "WARNING: Potential unbounded getDocs(ref) found - manual review required:"
+  echo "$VAR_REF_QUERIES"
+  echo ""
+  echo "If this is intentional, add '// MIGRATION' or '// INTENTIONAL_FULL_SCAN' comment."
+  echo ""
+fi
+
 echo "Firestore query check passed"
 
 # Check for new handoff docs (warning only, non-blocking)

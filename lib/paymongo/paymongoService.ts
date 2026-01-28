@@ -9,8 +9,9 @@
 
 import crypto from 'crypto';
 import { getDb } from '../firebase-utils';
-import { doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, getDocs, serverTimestamp, runTransaction } from 'firebase/firestore';
 import { captureError } from '../errorTracking';
+import { serverLogger } from '../logger/serverLogger';
 import type {
   PayMongoSource,
   PayMongoPayment,
@@ -41,7 +42,12 @@ const PAYMONGO_WEBHOOK_SECRET = process.env.PAYMONGO_WEBHOOK_SECRET;
 const PAYMONGO_BASE_URL = 'https://api.paymongo.com/v1';
 
 if (!PAYMONGO_SECRET_KEY) {
-  console.warn('[PayMongoService] PAYMONGO_SECRET_KEY not configured');
+  serverLogger.warn('PAYMONGO_SECRET_KEY not configured');
+}
+
+// SECURITY: Enforce live webhook secret in production
+if (process.env.NODE_ENV === 'production' && !PAYMONGO_WEBHOOK_SECRET) {
+  throw new Error('CRITICAL: PAYMONGO_WEBHOOK_SECRET is required in production environment');
 }
 
 // ============================================================================
@@ -396,7 +402,7 @@ export function verifyWebhookSignature(
   signature: string
 ): boolean {
   if (!PAYMONGO_WEBHOOK_SECRET) {
-    console.error('[PayMongoService] PAYMONGO_WEBHOOK_SECRET not configured');
+    serverLogger.error('PAYMONGO_WEBHOOK_SECRET not configured', new Error('Missing webhook secret'));
     return false;
   }
   
@@ -419,9 +425,23 @@ export function verifyWebhookSignature(
     return false;
   }
   
-  // Use live signature in production, test signature in development
-  const expectedSignature = process.env.NODE_ENV === 'production' ? liveSignature : (liveSignature || testSignature);
-  
+  // SECURITY: In production, ONLY accept live signatures (never test signatures)
+  // This prevents test webhooks from being replayed in production
+  if (process.env.NODE_ENV === 'production') {
+    if (!liveSignature) {
+      serverLogger.error('PayMongo webhook missing live signature in production', new Error('Missing li= signature'), {
+        hasTestSignature: !!testSignature,
+        timestamp,
+      });
+      return false;
+    }
+  }
+
+  // Use live signature in production, allow test signature only in development
+  const expectedSignature = process.env.NODE_ENV === 'production'
+    ? liveSignature
+    : (liveSignature || testSignature);
+
   if (!expectedSignature) {
     return false;
   }
@@ -818,37 +838,103 @@ export async function findTransactionByPayoutId(
 // ============================================================================
 
 /**
- * Update user balance
+ * Update user balance atomically using Firestore transaction
+ *
+ * SECURITY: Uses runTransaction to prevent race conditions where concurrent
+ * updates could result in incorrect balances (e.g., double crediting).
+ *
+ * @param userId - Firebase user ID
+ * @param amount - Amount in PHP (not centavos)
+ * @param operation - 'add' for deposits, 'subtract' for withdrawals
+ * @param idempotencyKey - Optional key to prevent duplicate operations
+ * @returns Promise resolving to new balance
  */
 async function updateUserBalance(
   userId: string,
   amount: number,
-  operation: 'add' | 'subtract'
+  operation: 'add' | 'subtract',
+  idempotencyKey?: string
 ): Promise<number> {
   const db = getDb();
   const userRef = doc(db, 'users', userId);
-  const userDoc = await getDoc(userRef);
-  
-  if (!userDoc.exists()) {
-    throw new Error('User not found');
+
+  // SECURITY: Check for duplicate operations if idempotency key provided
+  if (idempotencyKey) {
+    const balanceOpsRef = collection(db, 'balanceOperations');
+    const duplicateQuery = query(
+      balanceOpsRef,
+      where('idempotencyKey', '==', idempotencyKey)
+    );
+    const duplicateSnapshot = await getDocs(duplicateQuery);
+
+    if (!duplicateSnapshot.empty) {
+      serverLogger.warn('PayMongo: Duplicate balance operation detected', null, {
+        userId,
+        idempotencyKey,
+        operation,
+      });
+      // Return the existing balance instead of processing duplicate
+      const userDoc = await getDoc(userRef);
+      return (userDoc.data()?.balance || 0) as number;
+    }
   }
-  
-  const currentBalance = (userDoc.data().balance || 0) as number;
-  
-  const newBalance = operation === 'add'
-    ? currentBalance + amount
-    : currentBalance - amount;
-  
-  if (newBalance < 0) {
-    throw new Error('Insufficient balance');
-  }
-  
-  await setDoc(userRef, {
-    balance: newBalance,
-    lastBalanceUpdate: serverTimestamp(),
-  }, { merge: true });
-  
-  return newBalance;
+
+  // SECURITY: Use atomic transaction to prevent race conditions
+  const result = await runTransaction(db, async (transaction) => {
+    const userDoc = await transaction.get(userRef);
+
+    if (!userDoc.exists()) {
+      throw new Error('User not found');
+    }
+
+    const currentBalance = (userDoc.data().balance || 0) as number;
+
+    const newBalance = operation === 'add'
+      ? currentBalance + amount
+      : currentBalance - amount;
+
+    // SECURITY: Prevent negative balances
+    if (newBalance < 0) {
+      throw new Error(`Insufficient balance. Current: ${currentBalance.toFixed(2)}, Requested: ${amount.toFixed(2)}`);
+    }
+
+    // Update balance atomically within transaction
+    transaction.update(userRef, {
+      balance: newBalance,
+      lastBalanceUpdate: serverTimestamp(),
+    });
+
+    // If idempotency key provided, record this operation
+    if (idempotencyKey) {
+      const balanceOpRef = doc(collection(db, 'balanceOperations'));
+      transaction.set(balanceOpRef, {
+        userId,
+        idempotencyKey,
+        provider: 'paymongo',
+        operation,
+        amount,
+        previousBalance: currentBalance,
+        newBalance,
+        createdAt: serverTimestamp(),
+      });
+    }
+
+    return {
+      previousBalance: currentBalance,
+      newBalance,
+    };
+  });
+
+  serverLogger.info('PayMongo: Balance updated successfully', {
+    userId,
+    operation,
+    amount,
+    previousBalance: result.previousBalance,
+    newBalance: result.newBalance,
+    idempotencyKey,
+  });
+
+  return result.newBalance;
 }
 
 // ============================================================================

@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { getAutodraftLimits, setAutodraftLimits, clearAutodraftLimits, DEFAULT_AUTODRAFT_LIMITS, type AutodraftLimits } from '../lib/autodraftLimits';
+import { createScopedLogger } from '@/lib/clientLogger';
+
+const logger = createScopedLogger('[AutodraftLimits]');
 
 export default function AutodraftLimits() {
   const router = useRouter();
@@ -29,7 +32,7 @@ export default function AutodraftLimits() {
           setOriginalLimits(savedLimits); // Track original values
         }
       } catch (error) {
-        console.error('Error loading autodraft limits:', error);
+        logger.error('Error loading autodraft limits', error instanceof Error ? error : new Error(String(error)));
         setLimits(DEFAULT_AUTODRAFT_LIMITS);
         setOriginalLimits(DEFAULT_AUTODRAFT_LIMITS);
       } finally {
@@ -64,9 +67,9 @@ export default function AutodraftLimits() {
       setSaving(true);
       await setAutodraftLimits(limits);
       setOriginalLimits(limits); // Update original limits after successful save
-      console.log('✅ Autodraft limits saved successfully:', limits);
+      logger.info('Autodraft limits saved successfully', { limits });
     } catch (error) {
-      console.error('Error saving autodraft limits:', error);
+      logger.error('Error saving autodraft limits', error instanceof Error ? error : new Error(String(error)));
       alert('Error saving limits. Please try again.');
     } finally {
       setSaving(false);

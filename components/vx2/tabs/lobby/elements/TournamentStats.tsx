@@ -42,9 +42,6 @@ function StatItem({ label, value }: StatItemProps): React.ReactElement {
           fontSize: `${CARD_SPACING_V3.statsValueFontSize}px`,
           fontWeight: 'bold',
           color: '#FFFFFF',
-          backgroundColor: 'rgba(0, 0, 0, 0.6)',
-          padding: '3px 8px',
-          borderRadius: '5px',
           lineHeight: 1,
         }}
       >
@@ -57,9 +54,6 @@ function StatItem({ label, value }: StatItemProps): React.ReactElement {
         style={{
           fontSize: `${CARD_SPACING_V3.statsLabelFontSize}px`,
           color: 'rgba(255, 255, 255, 0.7)',
-          backgroundColor: 'rgba(0, 0, 0, 0.6)',
-          padding: '2px 6px',
-          borderRadius: '4px',
           lineHeight: 1,
           textTransform: 'uppercase',
           letterSpacing: '0.5px',

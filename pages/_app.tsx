@@ -16,8 +16,18 @@ import { GlobalErrorBoundary } from '../components/ui';
 import { MobilePhoneFrame } from '../components/vx2/shell/MobilePhoneFrame';
 import { InPhoneFrameProvider } from '../lib/inPhoneFrameContext';
 import { useIsMobileDevice } from '../hooks/useIsMobileDevice';
+import { createScopedLogger } from '@/lib/clientLogger';
+
+const logger = createScopedLogger('[App]');
 
 const DEV_NAV_ROUTES = ['/testing-grounds', '/dev'];
+
+/** Sandbox routes that render outside the phone (own layout or web-only). Skip app-level phone so dev UI / auth stay outside. */
+const SANDBOX_ROUTES_OUTSIDE_PHONE = [
+  '/testing-grounds/navbar-sandbox',
+  '/testing-grounds/lobby-tab-sandbox',
+  '/testing-grounds/vx2-auth-test', // Page shows phone + auth outside it; mobile access blocked
+];
 
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -32,7 +42,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     if (process.env.NODE_ENV === 'production') {
       import('../lib/envValidation')
         .then(({ initializeEnvValidation }) => initializeEnvValidation())
-        .catch((e) => console.error('Env validation failed:', e));
+        .catch((e) => logger.error('Env validation failed', e instanceof Error ? e : new Error(String(e))));
     }
   }, []);
 
@@ -42,7 +52,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         const { initializeAuth } = await import('../lib/firebase');
         await initializeAuth();
       } catch {
-        console.log('Firebase init failed - app may use mock data');
+        logger.debug('Firebase init failed - app may use mock data');
       }
     };
     initFirebase();
@@ -58,36 +68,17 @@ function MyApp({ Component, pageProps }: AppProps) {
         }
         exposurePreloader.init();
       } catch (e) {
-        console.warn('User tracking failed:', e);
+        logger.warn('User tracking failed', { error: String(e) });
       }
     };
     setTimeout(init, 500);
   }, []);
 
-  function renderContent() {
-    if (isMobile === null) {
-      return <Component {...pageProps} />;
-    }
-    if (isMobile) {
-      return <Component {...pageProps} />;
-    }
-    return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-        {showDevNav && (
-          <div className="fixed top-4 left-4 z-50">
-            <DevNav />
-          </div>
-        )}
-        <InPhoneFrameProvider value={true}>
-          <MobilePhoneFrame>
-            <Component {...pageProps} />
-          </MobilePhoneFrame>
-        </InPhoneFrameProvider>
-      </div>
-    );
-  }
+  // Render the page content
+  const pageContent = <Component {...pageProps} />;
 
-  return (
+  // Wrap with providers
+  const withProviders = (content: React.ReactNode) => (
     <SWRConfig value={swrConfig}>
       <Head>
         <meta
@@ -97,10 +88,50 @@ function MyApp({ Component, pageProps }: AppProps) {
       </Head>
       <UserProvider>
         <PlayerDataProvider>
-          <GlobalErrorBoundary>{renderContent()}</GlobalErrorBoundary>
+          <GlobalErrorBoundary>{content}</GlobalErrorBoundary>
         </PlayerDataProvider>
       </UserProvider>
     </SWRConfig>
+  );
+
+  // SSR/Hydration: Render without frame to avoid mismatch
+  // Frame appears after client-side hydration
+  if (isMobile === null) {
+    return withProviders(pageContent);
+  }
+
+  // Mobile: Fullscreen, no frame
+  if (isMobile) {
+    return withProviders(pageContent);
+  }
+
+  // Sandbox pages with their own phone + dev controls: render raw so DevNav and in-page dev UI stay outside the phone
+  const sandboxDevOutsidePhone = SANDBOX_ROUTES_OUTSIDE_PHONE.some((r) => router.pathname === r);
+
+  // Desktop: Centered phone frame (or raw content for sandboxes that provide their own phone)
+  return withProviders(
+    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
+      {/* DevNav for testing routes - always outside phone. Wrapper has explicit size and high z-index so it receives clicks (avoids 0x0 collapse from absolute child). */}
+      {showDevNav && (
+        <div
+          className="fixed top-4 left-4"
+          style={{ zIndex: 99999, width: 220, minHeight: 500, pointerEvents: 'auto' }}
+        >
+          <DevNav />
+        </div>
+      )}
+
+      {/* Phone frame with page content; skip frame for sandbox routes so dev controls always render outside phone */}
+      {sandboxDevOutsidePhone ? (
+        pageContent
+      ) : (
+        <InPhoneFrameProvider value={true}>
+          <MobilePhoneFrame>
+            {pageContent}
+          </MobilePhoneFrame>
+        </InPhoneFrameProvider>
+      )}
+    </div>
   );
 }
 

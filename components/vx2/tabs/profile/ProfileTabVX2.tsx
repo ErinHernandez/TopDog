@@ -229,7 +229,6 @@ function MenuItemButton({ item, onClick }: MenuItemButtonProps): React.ReactElem
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log('[ProfileTab] MenuItemButton clicked:', item.id, item.label);
     onClick();
   };
   
@@ -337,9 +336,7 @@ export default function ProfileTabVX2({
         break;
       case 'navigate':
         if (item.path) {
-          console.log('[ProfileTab] Navigating to:', item.path);
-          router.push(item.path).catch((error) => {
-            console.error('[ProfileTab] Navigation error, using fallback:', error);
+          router.push(item.path).catch(() => {
             // Fallback to window.location on error
             if (item.path) {
               window.location.href = item.path;

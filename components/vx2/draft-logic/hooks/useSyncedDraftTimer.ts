@@ -106,6 +106,14 @@ export function useSyncedDraftTimer({
     onTickRef.current = onTick;
   }, [onExpire, onGracePeriodStart, onTick]);
 
+  // Cleanup refs on unmount
+  useEffect(() => {
+    return () => {
+      hasExpiredRef.current = false;
+      gracePeriodTriggeredRef.current = false;
+    };
+  }, []);
+
   // Derived state
   const isInGracePeriod = state === 'grace_period';
   const isRunning = isActive && state === 'running';
@@ -188,7 +196,7 @@ export function useSyncedDraftTimer({
     );
 
     return () => unsubscribe();
-  }, [db, roomId, isActive]);
+  }, [roomId, isActive]);
 
   // -------------------------------------------------------------------------
   // LOCAL COUNTDOWN (synced to server time)
@@ -290,7 +298,7 @@ export function useSyncedDraftTimer({
       logger.error('Failed to reset timer', error as Error, { roomId });
       throw error;
     }
-  }, [db, roomId, pickTimeSeconds]);
+  }, [roomId, pickTimeSeconds]);
 
   // -------------------------------------------------------------------------
   // BUILD RESULT

@@ -12,6 +12,7 @@
 import { getDb } from '../firebase-utils';
 import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { COUNTRY_TO_CURRENCY, CURRENCY_CONFIG, getCurrencyConfig } from './currencyConfig';
+import { serverLogger } from '../logger/serverLogger';
 
 // ============================================================================
 // TYPES
@@ -128,7 +129,7 @@ export async function getDisplayCurrency(
     };
   } catch (error: unknown) {
     // Fallback on error - use local detection
-    console.error('[displayCurrency] Error fetching user data:', error);
+    serverLogger.error('Error fetching user data', error instanceof Error ? error : new Error(String(error)));
     const localCurrency = COUNTRY_TO_CURRENCY[countryUpper] || 'USD';
     const config = getCurrencyConfig(localCurrency);
     return {
@@ -247,7 +248,7 @@ export async function updateLastDepositCurrency(
   const currencyUpper = currency.toUpperCase();
   
   if (!CURRENCY_CONFIG[currencyUpper]) {
-    console.warn(`[displayCurrency] Unknown currency on deposit: ${currency}`);
+    serverLogger.warn(`Unknown currency on deposit: ${currency}`);
     return;
   }
   

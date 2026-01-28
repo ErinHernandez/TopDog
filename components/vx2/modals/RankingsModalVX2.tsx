@@ -12,7 +12,10 @@
  */
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { createScopedLogger } from '@/lib/clientLogger';
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS, POSITION_COLORS } from '../core/constants/colors';
+
+const logger = createScopedLogger('[RankingsModalVX2]');
 import { SPACING, RADIUS, TYPOGRAPHY, Z_INDEX } from '../core/constants/sizes';
 import { Close, Plus, Minus, Search } from '../components/icons';
 import { PositionBadge, type Position, POSITIONS } from '../../ui';
@@ -465,11 +468,11 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
           savedRankings = JSON.parse(saved);
         } catch (error) {
           // If JSON is corrupted, clear it and use empty array
-          console.error('Error parsing vx2Rankings from localStorage:', error);
+          logger.error('Error parsing vx2Rankings from localStorage:', error instanceof Error ? error : new Error(String(error)));
           try {
             localStorage.removeItem('vx2Rankings');
           } catch (clearError) {
-            console.warn('Could not clear corrupted vx2Rankings from localStorage:', clearError);
+            logger.warn('Could not clear corrupted vx2Rankings from localStorage:', clearError);
           }
           savedRankings = [];
         }
@@ -481,11 +484,11 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
           savedExcludedList = JSON.parse(savedExcluded);
         } catch (error) {
           // If JSON is corrupted, clear it and use empty array
-          console.error('Error parsing vx2Excluded from localStorage:', error);
+          logger.error('Error parsing vx2Excluded from localStorage:', error instanceof Error ? error : new Error(String(error)));
           try {
             localStorage.removeItem('vx2Excluded');
           } catch (clearError) {
-            console.warn('Could not clear corrupted vx2Excluded from localStorage:', clearError);
+            logger.warn('Could not clear corrupted vx2Excluded from localStorage:', clearError);
           }
           savedExcludedList = [];
         }

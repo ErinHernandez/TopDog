@@ -1,9 +1,9 @@
 /**
  * Device Tracking Analytics
- * 
+ *
  * Collects anonymized device information for understanding user device distribution
  * and optimizing for legacy device support.
- * 
+ *
  * Data collected:
  * - iOS version
  * - Safari version
@@ -12,14 +12,18 @@
  * - Feature support (WebP, flexbox gap, etc.)
  * - Support tier classification
  * - Performance metrics (optional)
- * 
+ *
  * Privacy notes:
  * - No personally identifiable information collected
  * - Device model is estimated, not exact
  * - Data is aggregated for analysis
- * 
+ *
  * Created: December 30, 2024
  */
+
+import { createScopedLogger } from '@/lib/clientLogger';
+
+const logger = createScopedLogger('[DeviceTracking]');
 
 // ============================================================================
 // TYPES
@@ -145,6 +149,114 @@ function getSessionId(): string {
   }
   
   return sessionId;
+}
+
+// ============================================================================
+// ANALYTICS BACKEND
+// ============================================================================
+
+/** Analytics endpoint - can be configured via environment variable */
+const ANALYTICS_ENDPOINT = process.env.NEXT_PUBLIC_ANALYTICS_ENDPOINT || '/api/analytics';
+
+/** Queue for batching analytics events */
+let analyticsQueue: DeviceTrackingEvent[] = [];
+let flushTimeout: NodeJS.Timeout | null = null;
+const FLUSH_INTERVAL_MS = 5000; // Flush every 5 seconds
+const MAX_QUEUE_SIZE = 10; // Flush when queue reaches this size
+
+/**
+ * Send analytics event to backend
+ * Uses batching and retry logic for reliability
+ */
+async function sendToAnalytics(event: DeviceTrackingEvent): Promise<void> {
+  // Add to queue
+  analyticsQueue.push(event);
+
+  // Flush if queue is full
+  if (analyticsQueue.length >= MAX_QUEUE_SIZE) {
+    await flushAnalyticsQueue();
+    return;
+  }
+
+  // Schedule flush if not already scheduled
+  if (!flushTimeout) {
+    flushTimeout = setTimeout(() => {
+      flushAnalyticsQueue().catch(error => {
+        logger.warn(`Failed to flush analytics queue: ${error instanceof Error ? error.message : String(error)}`);
+      });
+    }, FLUSH_INTERVAL_MS);
+  }
+}
+
+/**
+ * Flush queued analytics events to backend
+ */
+async function flushAnalyticsQueue(): Promise<void> {
+  // Clear timeout
+  if (flushTimeout) {
+    clearTimeout(flushTimeout);
+    flushTimeout = null;
+  }
+
+  // Get events to send
+  const events = [...analyticsQueue];
+  analyticsQueue = [];
+
+  if (events.length === 0) return;
+
+  try {
+    // Use sendBeacon for reliability on page unload, fetch otherwise
+    const payload = JSON.stringify({ events, timestamp: new Date().toISOString() });
+
+    if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
+      // Use sendBeacon for fire-and-forget
+      const success = navigator.sendBeacon(ANALYTICS_ENDPOINT, payload);
+      if (!success) {
+        // Fallback to fetch if sendBeacon fails
+        await fetchAnalytics(payload);
+      }
+    } else {
+      await fetchAnalytics(payload);
+    }
+
+    logger.debug(`Sent ${events.length} analytics events`);
+  } catch (error) {
+    // Re-queue events on failure (with limit to prevent infinite growth)
+    if (analyticsQueue.length < MAX_QUEUE_SIZE * 2) {
+      analyticsQueue = [...events, ...analyticsQueue];
+    }
+    logger.warn(`Failed to send analytics: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
+/**
+ * Fetch-based analytics send (used when sendBeacon unavailable or fails)
+ */
+async function fetchAnalytics(payload: string): Promise<void> {
+  const response = await fetch(ANALYTICS_ENDPOINT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: payload,
+    // Don't wait for response - fire and forget
+    keepalive: true,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Analytics API returned ${response.status}`);
+  }
+}
+
+/**
+ * Flush analytics on page unload
+ */
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeunload', () => {
+    if (analyticsQueue.length > 0) {
+      // Use sendBeacon for page unload
+      const payload = JSON.stringify({ events: analyticsQueue, timestamp: new Date().toISOString() });
+      navigator.sendBeacon?.(ANALYTICS_ENDPOINT, payload);
+    }
+  });
 }
 
 // ============================================================================
@@ -358,14 +470,16 @@ export function trackDeviceInfo(): DeviceTrackingEvent {
     sessionId: getSessionId(),
   };
   
-  // Log to console in development
+  // Log in development
   if (process.env.NODE_ENV === 'development') {
-    console.log('[DeviceTracking] Device Info:', event);
+    logger.debug('Device Info', { event });
   }
-  
-  // TODO: Send to analytics backend
-  // sendToAnalytics(event);
-  
+
+  // Send to analytics backend (non-blocking)
+  sendToAnalytics(event).catch(error => {
+    logger.warn(`Failed to send device info analytics: ${error instanceof Error ? error.message : String(error)}`);
+  });
+
   return event;
 }
 
@@ -381,9 +495,9 @@ export function trackPerformance(): DeviceTrackingEvent {
   };
   
   if (process.env.NODE_ENV === 'development') {
-    console.log('[DeviceTracking] Performance:', event);
+    logger.debug('Performance', { event });
   }
-  
+
   return event;
 }
 
@@ -399,9 +513,9 @@ export function trackDraftPerformance(metrics: DraftPerformanceMetrics): DeviceT
   };
   
   if (process.env.NODE_ENV === 'development') {
-    console.log('[DeviceTracking] Draft Performance:', event);
+    logger.debug('Draft Performance', { event });
   }
-  
+
   return event;
 }
 
@@ -421,9 +535,9 @@ export function trackError(error: Error, componentStack?: string): DeviceTrackin
   };
   
   if (process.env.NODE_ENV === 'development') {
-    console.error('[DeviceTracking] Error:', event);
+    logger.error('Error', error, { event });
   }
-  
+
   return event;
 }
 

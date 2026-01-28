@@ -21,10 +21,12 @@ import {
   withErrorHandling, 
   validateMethod, 
   validateBody,
+  validateRequestBody,
   createSuccessResponse,
   createErrorResponse,
   ErrorType 
 } from '../../../lib/apiErrorHandler';
+import { stripeCancelPaymentRequestSchema } from '../../../lib/validation/schemas';
 
 const logger = createScopedLogger('[API:CancelPayment]');
 
@@ -109,10 +111,9 @@ const handler = async function(
       });
     }
     
-    // Validate required body fields
-    validateBody(req, ['paymentIntentId', 'userId'], logger);
-    
-    const { paymentIntentId, userId } = req.body as CancelPaymentRequest;
+    // SECURITY: Validate request body using Zod schema
+    const body = validateRequestBody(req, stripeCancelPaymentRequestSchema, logger);
+    const { paymentIntentId, userId } = body;
     
     // Sanitize and validate input
     const sanitizedPaymentIntentId = sanitizeID(paymentIntentId);

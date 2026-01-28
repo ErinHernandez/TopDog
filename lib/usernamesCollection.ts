@@ -26,10 +26,10 @@
  * ```
  */
 
-import { 
-  collection, 
-  doc, 
-  getDoc, 
+import {
+  collection,
+  doc,
+  getDoc,
   setDoc,
   deleteDoc,
   runTransaction,
@@ -43,6 +43,9 @@ import {
   type Transaction,
 } from 'firebase/firestore';
 import { db } from './firebase';
+import { createScopedLogger } from './clientLogger';
+
+const logger = createScopedLogger('[UsernamesCollection]');
 
 // ============================================================================
 // CONSTANTS
@@ -174,7 +177,8 @@ export async function isUsernameAvailable(
     const vipQuery = query(
       vipRef,
       where('usernameLower', '==', normalized),
-      where('claimed', '==', false)
+      where('claimed', '==', false),
+      limit(1) // Username should be unique
     );
     const vipSnapshot = await getDocs(vipQuery);
     
@@ -198,8 +202,7 @@ export async function isUsernameAvailable(
     
     return { isAvailable: true };
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Error checking username availability:', errorMessage);
+    logger.error('Error checking username availability', error instanceof Error ? error : new Error(String(error)));
     return { isAvailable: false, reason: 'Error checking availability' };
   }
 }
@@ -288,12 +291,12 @@ export async function reserveUsername(
     return { success: true };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Error reserving username:', errorMessage);
-    return { 
-      success: false, 
+    logger.error('Error reserving username', error instanceof Error ? error : new Error(String(error)));
+    return {
+      success: false,
       error: errorMessage === 'USERNAME_TAKEN' ? 'Username is already taken' :
              errorMessage === 'USERNAME_IN_COOLDOWN' ? 'Username is in recycling cooldown' :
-             errorMessage 
+             errorMessage
     };
   }
 }
@@ -339,12 +342,12 @@ export async function releaseUsername(
     return { success: true };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Error releasing username:', errorMessage);
-    return { 
-      success: false, 
+    logger.error('Error releasing username', error instanceof Error ? error : new Error(String(error)));
+    return {
+      success: false,
       error: errorMessage === 'USERNAME_NOT_FOUND' ? 'Username not found' :
              errorMessage === 'NOT_OWNER' ? 'Not authorized to release this username' :
-             errorMessage 
+             errorMessage
     };
   }
 }
@@ -414,13 +417,13 @@ export async function transferUsername(
     return { success: true };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Error transferring username:', errorMessage);
-    return { 
-      success: false, 
+    logger.error('Error transferring username', error instanceof Error ? error : new Error(String(error)));
+    return {
+      success: false,
       error: errorMessage === 'NOT_OWNER' ? 'Not authorized to change this username' :
              errorMessage === 'NEW_USERNAME_TAKEN' ? 'New username is already taken' :
              errorMessage === 'NEW_USERNAME_IN_COOLDOWN' ? 'New username is in recycling cooldown' :
-             errorMessage 
+             errorMessage
     };
   }
 }
@@ -475,8 +478,7 @@ export async function getUsernameOwner(
       isRecycled: !!data.recycledAt 
     };
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Error getting username owner:', errorMessage);
+    logger.error('Error getting username owner', error instanceof Error ? error : new Error(String(error)));
     return { uid: null, exists: false };
   }
 }
@@ -516,8 +518,7 @@ export async function cleanupRecycledUsernames(): Promise<CleanupResult> {
     
     return { cleaned: snapshot.docs.length };
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Error cleaning up recycled usernames:', errorMessage);
+    logger.error('Error cleaning up recycled usernames', error instanceof Error ? error : new Error(String(error)));
     return { cleaned: 0 };
   }
 }
@@ -525,14 +526,24 @@ export async function cleanupRecycledUsernames(): Promise<CleanupResult> {
 /**
  * Migrate existing users to usernames collection
  * One-time migration script
+ * 
+ * WARNING: This function performs a full collection scan.
+ * Only run during planned maintenance windows.
  */
 export async function migrateExistingUsernames(): Promise<MigrationResult> {
+  // Guard to prevent accidental production execution
+  if (process.env.NODE_ENV === 'production' && !process.env.ALLOW_MIGRATION) {
+    logger.error('Migration cannot run in production without ALLOW_MIGRATION flag');
+    return { migrated: 0, errors: 1 };
+  }
+  
   if (!db) {
     return { migrated: 0, errors: 1 };
   }
 
   try {
     const usersRef = collection(db, USERS_COLLECTION);
+    // MIGRATION ONLY: Intentional full collection scan - not for request path
     const usersSnapshot = await getDocs(usersRef);
     
     let migrated = 0;
@@ -569,8 +580,7 @@ export async function migrateExistingUsernames(): Promise<MigrationResult> {
           batchCount = 0;
         }
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        console.error(`Error migrating username ${username}:`, errorMessage);
+        logger.error('Error migrating username', error instanceof Error ? error : new Error(String(error)), { username });
         errors++;
       }
     }
@@ -582,8 +592,7 @@ export async function migrateExistingUsernames(): Promise<MigrationResult> {
     
     return { migrated, errors };
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Error migrating usernames:', errorMessage);
+    logger.error('Error migrating usernames', error instanceof Error ? error : new Error(String(error)));
     return { migrated: 0, errors: 1 };
   }
 }

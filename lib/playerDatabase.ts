@@ -4,6 +4,7 @@
  */
 
 import { POSITIONS } from './constants/positions';
+import { serverLogger } from './logger/serverLogger';
 
 // ============================================================================
 // TYPES
@@ -316,7 +317,7 @@ class PlayerDatabase {
       return true;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error('Error importing player database:', errorMessage);
+      serverLogger.error('Error importing player database', error instanceof Error ? error : new Error(errorMessage));
       return false;
     }
   }

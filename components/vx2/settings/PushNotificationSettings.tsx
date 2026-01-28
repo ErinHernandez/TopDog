@@ -5,7 +5,10 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { createScopedLogger } from '@/lib/clientLogger';
 import { fcmService } from '../../../lib/pushNotifications/fcmService';
+
+const logger = createScopedLogger('[PushNotificationSettings]');
 
 export function PushNotificationSettings(): React.ReactElement {
   const [isSupported, setIsSupported] = useState(false);
@@ -42,7 +45,7 @@ export function PushNotificationSettings(): React.ReactElement {
       setToken(newToken);
       setPermissionStatus(Notification.permission);
     } catch (error) {
-      console.error('Failed to request permission:', error);
+      logger.error('Failed to request permission:', error instanceof Error ? error : new Error(String(error)));
     } finally {
       setIsRequesting(false);
     }

@@ -12,10 +12,12 @@ import type { AuthenticatedRequest } from '../../../lib/apiTypes';
 import { 
   withErrorHandling, 
   validateMethod, 
+  validateRequestBody,
   createSuccessResponse,
   createErrorResponse,
   ErrorType,
 } from '../../../lib/apiErrorHandler';
+import { stripeSetupIntentRequestSchema } from '../../../lib/validation/schemas';
 import {
   getOrCreateCustomer,
   createSetupIntent,
@@ -75,22 +77,15 @@ const handler = async function(
       });
     }
     
-    const body = req.body as SetupIntentRequestBody;
-    const { userId, email } = body;
+    // SECURITY: Validate request body using Zod schema
+    const body = validateRequestBody(req, stripeSetupIntentRequestSchema, logger);
+    const { userId, email, name, paymentMethodTypes, idempotencyKey } = body;
     
     // Verify user access
-    if (req.user && !verifyUserAccess(req.user.uid, userId || '')) {
+    if (req.user && !verifyUserAccess(req.user.uid, userId)) {
       const error = createErrorResponse(
         ErrorType.FORBIDDEN,
         'Access denied'
-      );
-      return res.status(error.statusCode).json(error.body);
-    }
-    
-    if (!userId || !email) {
-      const error = createErrorResponse(
-        ErrorType.VALIDATION,
-        'userId and email are required'
       );
       return res.status(error.statusCode).json(error.body);
     }
@@ -102,25 +97,22 @@ const handler = async function(
       const customer = await getOrCreateCustomer({
         userId,
         email,
-        name: body.name,
+        name: name,
       });
       
-      // Generate idempotency key
-      const idempotencyKey = body.idempotencyKey || 
+      // Generate idempotency key if not provided
+      const finalIdempotencyKey = idempotencyKey || 
         `si_${userId}_${Date.now()}_${uuidv4().slice(0, 8)}`;
       
-      // Validate payment method types
-      const allowedTypes = ['card'] as const;
-      const paymentMethodTypes = body.paymentMethodTypes?.filter(
-        (type): type is 'card' => allowedTypes.includes(type as 'card')
-      ) || ['card'];
+      // Use validated payment method types (already filtered by Zod)
+      const finalPaymentMethodTypes = paymentMethodTypes || ['card'];
       
       // Create setup intent
       const setupIntentResponse = await createSetupIntent({
         userId,
         customerId: customer.id,
-        paymentMethodTypes,
-        idempotencyKey,
+        paymentMethodTypes: finalPaymentMethodTypes,
+        idempotencyKey: finalIdempotencyKey,
       });
       
       // Log the action

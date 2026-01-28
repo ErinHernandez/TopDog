@@ -7,6 +7,7 @@
 
 import { parsePlayerData, processMultipleRealClayPdfPages } from './realPdfProcessor';
 import * as fs from 'fs/promises';
+import { serverLogger } from './logger/serverLogger';
 
 // ============================================================================
 // TYPES
@@ -129,7 +130,7 @@ export async function integrateClayProjections(
   endPage: number = 5
 ): Promise<IntegrationResult> {
   try {
-    console.log('🏈 Starting Clay projections integration...');
+    serverLogger.info('Starting Clay projections integration');
     
     // Process multiple pages of the real Clay PDF
     const results = await processMultipleRealClayPdfPages(pdfUrl, startPage, endPage, 'read');
@@ -140,10 +141,10 @@ export async function integrateClayProjections(
     // Parse player data from each page
     for (const pageResult of results) {
       if (pageResult.success && pageResult.result && 'text' in pageResult.result) {
-        console.log(`📊 Parsing player data from page ${pageResult.page}...`);
-        
+        serverLogger.debug('Parsing player data from page', { page: pageResult.page });
+
         const players = parsePlayerData(pageResult.result.text);
-        console.log(`✅ Found ${players.length} players on page ${pageResult.page}`);
+        serverLogger.debug('Found players on page', { count: players.length, page: pageResult.page });
         
         allPlayers.push(...players);
         processedPages.push({
@@ -153,14 +154,14 @@ export async function integrateClayProjections(
         });
       } else {
         const errorMessage = pageResult.error || 'Unknown error';
-        console.warn(`⚠️ Page ${pageResult.page} failed: ${errorMessage}`);
+        serverLogger.warn(`Page ${pageResult.page} failed: ${errorMessage}`);
       }
     }
     
     // Remove duplicates and sort by rank
     const uniquePlayers = removeDuplicatePlayers(allPlayers);
-    
-    console.log(`🎉 Integration complete! Found ${uniquePlayers.length} unique players across ${processedPages.length} pages`);
+
+    serverLogger.info('Integration complete', { uniquePlayers: uniquePlayers.length, processedPages: processedPages.length });
     
     return {
       totalPlayers: uniquePlayers.length,
@@ -168,9 +169,9 @@ export async function integrateClayProjections(
       players: uniquePlayers,
       summary: generatePlayerSummary(uniquePlayers)
     };
-    
+
   } catch (error) {
-    console.error('Error integrating Clay projections:', error);
+    serverLogger.error('Error integrating Clay projections', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -277,11 +278,11 @@ export async function exportPlayersToJson(
     };
     
     await fs.writeFile(filename, JSON.stringify(exportData, null, 2));
-    console.log(`💾 Exported ${players.length} players to ${filename}`);
-    
+    serverLogger.info('Exported players', { count: players.length, filename });
+
     return filename;
   } catch (error) {
-    console.error('Error exporting players:', error);
+    serverLogger.error('Error exporting players', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }

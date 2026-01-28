@@ -5,15 +5,18 @@
  * Implements consent state machine with prompt rate limiting.
  */
 
-import { 
-  doc, 
-  getDoc, 
-  setDoc, 
-  updateDoc, 
+import {
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
   serverTimestamp,
-  Timestamp 
+  Timestamp
 } from 'firebase/firestore';
 import { getDb } from '@/lib/firebase-utils';
+import { createScopedLogger } from '@/lib/clientLogger';
+
+const logger = createScopedLogger('[ConsentManager]');
 import type { 
   LocationConsent, 
   ConsentStatus, 
@@ -66,7 +69,7 @@ export async function getConsent(userId: string): Promise<LocationConsent> {
       dontAskAgain: consent.dontAskAgain || false,
     };
   } catch (error: unknown) {
-    console.error('Error getting consent:', error);
+    logger.error('Error getting consent', error instanceof Error ? error : new Error(String(error)));
     return {
       status: 'pending',
       promptCount: 0,

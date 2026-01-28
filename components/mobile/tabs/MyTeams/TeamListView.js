@@ -1,6 +1,6 @@
 /**
  * TeamListView - Shows list of user's teams with search/filter
- * 
+ *
  * Extracted from MyTeamsTab for maintainability.
  */
 
@@ -8,6 +8,9 @@ import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { FixedSizeList as List } from 'react-window';
 import { NFL_TEAMS, BYE_WEEKS } from '../../../../lib/nflConstants';
 import { getTotalPlayers } from './mockTeamData';
+import { createScopedLogger } from '../../../../lib/clientLogger';
+
+const logger = createScopedLogger('[TeamList]');
 
 // Helper function to calculate total projected points for a team
 function getTotalProjectedPoints(team) {
@@ -20,7 +23,7 @@ function getTotalProjectedPoints(team) {
       }, 0);
     }, 0);
   } catch (error) {
-    console.error('Error calculating projected points:', error);
+    logger.error('Error calculating projected points', error);
     return 0;
   }
 }
@@ -43,7 +46,7 @@ function getTeamByeWeeks(team) {
     });
     return Array.from(byeWeeks).sort((a, b) => a - b);
   } catch (error) {
-    console.error('Error calculating bye weeks:', error);
+    logger.error('Error calculating bye weeks', error);
     return [];
   }
 }
@@ -147,11 +150,11 @@ export default function TeamListView({
 }) {
   // Handle missing props gracefully
   if (!Array.isArray(teams)) {
-    console.warn('TeamListView: teams prop is not an array');
+    logger.warn('teams prop is not an array');
     teams = [];
   }
   if (!Array.isArray(allPlayers)) {
-    console.warn('TeamListView: allPlayers prop is not an array');
+    logger.warn('allPlayers prop is not an array');
     allPlayers = [];
   }
   const [searchQuery, setSearchQuery] = useState('');
@@ -202,33 +205,33 @@ export default function TeamListView({
     return () => window.removeEventListener('resize', updateHeight);
   }, []);
 
-  // Get unique NFL teams from player pool with enhanced search data
-  const getNFLTeams = () => {
-    const teamCodes = [...new Set(allPlayers.map(player => player.team))].sort();
-    return teamCodes.map(code => ({
-      name: code,
-      displayName: NFL_TEAMS[code]?.fullName || code,
-      city: NFL_TEAMS[code]?.city || '',
-      teamName: NFL_TEAMS[code]?.name || '',
-      fullName: NFL_TEAMS[code]?.fullName || code,
-      type: 'nflTeam'
-    }));
-  };
-
   // Get filtered players and teams for dropdown
   const getFilteredResults = useMemo(() => {
     if (!debouncedSearchQuery.trim()) return [];
     const query = debouncedSearchQuery.toLowerCase();
-    
+
+    // Get unique NFL teams from player pool with enhanced search data
+    const getNFLTeams = () => {
+      const teamCodes = [...new Set(allPlayers.map(player => player.team))].sort();
+      return teamCodes.map(code => ({
+        name: code,
+        displayName: NFL_TEAMS[code]?.fullName || code,
+        city: NFL_TEAMS[code]?.city || '',
+        teamName: NFL_TEAMS[code]?.name || '',
+        fullName: NFL_TEAMS[code]?.fullName || code,
+        type: 'nflTeam'
+      }));
+    };
+
     // Get matching players
     const players = allPlayers
-      .filter(player => 
-        player.name.toLowerCase().includes(query) && 
+      .filter(player =>
+        player.name.toLowerCase().includes(query) &&
         !selectedPlayers.some(selected => selected.name === player.name)
       )
       .map(player => ({ ...player, type: 'player' }))
       .slice(0, 8);
-    
+
     // Get matching NFL teams
     const nflTeams = getNFLTeams()
       .filter(team => {
@@ -236,12 +239,12 @@ export default function TeamListView({
         const matchesCity = team.city.toLowerCase().includes(query);
         const matchesTeamName = team.teamName.toLowerCase().includes(query);
         const matchesFullName = team.fullName.toLowerCase().includes(query);
-        
+
         return (matchesCode || matchesCity || matchesTeamName || matchesFullName) &&
                !selectedNFLTeams.some(selected => selected.name === team.name);
       })
       .slice(0, 4);
-    
+
     return [...nflTeams, ...players];
   }, [debouncedSearchQuery, allPlayers, selectedPlayers, selectedNFLTeams]);
 
@@ -289,7 +292,7 @@ export default function TeamListView({
       if (selectedTournament && team.tournament !== selectedTournament) {
         return false;
       }
-      
+
       // Status filter
       if (selectedStatus) {
         const teamStatus = team.status || 'active';
@@ -297,7 +300,7 @@ export default function TeamListView({
           return false;
         }
       }
-      
+
       // Player filter
       if (selectedPlayers.length > 0) {
         const matchesPlayerFilter = selectedPlayers.every(selectedPlayer => {
@@ -307,7 +310,7 @@ export default function TeamListView({
         });
         if (!matchesPlayerFilter) return false;
       }
-      
+
       // NFL Team filter
       if (selectedNFLTeams.length > 0) {
         const matchesNFLTeamFilter = selectedNFLTeams.some(selectedNFLTeam => {
@@ -317,7 +320,7 @@ export default function TeamListView({
         });
         if (!matchesNFLTeamFilter) return false;
       }
-      
+
       return true;
     });
 
@@ -349,7 +352,7 @@ export default function TeamListView({
     });
 
     return sorted;
-  }, [teams, selectedPlayers, selectedNFLTeams, sortBy]);
+  }, [teams, selectedPlayers, selectedNFLTeams, sortBy, selectedStatus, selectedTournament]);
 
   // Handle sort change
   const handleSortChange = (newSort) => {

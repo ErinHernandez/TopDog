@@ -236,10 +236,10 @@ export interface RecentActivityProps {
 
 export interface FilterSortBarProps {
   sortBy: import('./constants').SortOption;
-  filterBy: import('./constants').FilterOption;
+  filterBy?: import('./constants').FilterOption;
   onSortChange: (sort: import('./constants').SortOption) => void;
-  onFilterChange: (filter: import('./constants').FilterOption) => void;
-  counts: {
+  onFilterChange?: (filter: import('./constants').FilterOption) => void;
+  counts?: {
     total: number;
     myTurn: number;
     needsAttention: number;

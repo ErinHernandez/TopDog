@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { createScopedLogger } from '@/lib/clientLogger';
 import { 
   collection, 
   query, 
@@ -20,6 +21,8 @@ import { FirestoreTeam } from '../../../../types/firestore';
 import { MyTeam, UseMyTeamsResult } from './useMyTeams';
 import { transformFirestoreTeam } from './useMyTeams.transform';
 import { shouldUseRealTimeForTeams } from '../../../../lib/tournament/tournamentUtils';
+
+const logger = createScopedLogger('[useMyTeamsFirebase]');
 
 /**
  * Create teams query with proper ordering
@@ -47,13 +50,13 @@ export async function fetchTeamsOnce(userId: string): Promise<MyTeam[]> {
         const transformed = transformFirestoreTeam(data);
         teams.push(transformed);
       } catch (error) {
-        console.error(`[fetchTeamsOnce] Error transforming team ${doc.id}:`, error);
+        logger.error(`Error transforming team ${doc.id}:`, error instanceof Error ? error : new Error(String(error)));
       }
     });
 
     return teams;
   } catch (error) {
-    console.error('[fetchTeamsOnce] Error:', error);
+    logger.error('Fetch error:', error instanceof Error ? error : new Error(String(error)));
     throw error;
   }
 }
@@ -79,14 +82,14 @@ export function subscribeToTeams(
           const transformed = transformFirestoreTeam(data);
           teams.push(transformed);
         } catch (error) {
-          console.error(`[subscribeToTeams] Error transforming team ${doc.id}:`, error);
+          logger.error(`Error transforming team ${doc.id}:`, error instanceof Error ? error : new Error(String(error)));
         }
       });
 
       onUpdate(teams);
     },
     (error) => {
-      console.error('[subscribeToTeams] Snapshot error:', error);
+      logger.error('Snapshot error:', error instanceof Error ? error : new Error(String(error)));
       onError(new Error(error.message));
     }
   );
@@ -142,7 +145,7 @@ export function useMyTeamsWithFirebase(): UseMyTeamsResult {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred';
       setError(errorMessage);
-      console.error('[useMyTeamsWithFirebase] Fetch error:', err);
+      logger.error('Fetch error:', err instanceof Error ? err : new Error(String(err)));
     } finally {
       setIsLoading(false);
       setIsRefetching(false);

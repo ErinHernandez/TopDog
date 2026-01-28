@@ -1,11 +1,14 @@
 /**
  * PlayerDropdownContent - Expanded Dropdown Content
- * 
+ *
  * This component ONLY handles the expanded dropdown area (purple/gold gradient).
  * It's positioned absolutely below the existing player row without modifying it.
  */
 
 import React from 'react';
+import { createScopedLogger } from '@/lib/clientLogger';
+
+const logger = createScopedLogger('[PlayerDropdownContent]');
 import { createTeamGradient } from '../../../lib/gradientUtils';
 import { DROPDOWN_STYLES, DROPDOWN_DIMENSIONS, type ContextOverride } from './PlayerDropdownStyles';
 import type { PlayerPoolEntry } from '../../../lib/playerPool';
@@ -171,7 +174,7 @@ export default function PlayerDropdownContent({
             display: 'block'
           }}
           onError={(e) => {
-            console.log(`Failed to load logo for team: ${player.team}`);
+            logger.debug(`Failed to load logo for team: ${player.team}`);
             (e.target as HTMLImageElement).style.display = 'none';
           }}
         />

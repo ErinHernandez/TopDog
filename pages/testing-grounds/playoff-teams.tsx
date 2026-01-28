@@ -412,12 +412,12 @@ export default function PlayoffTeamsSandbox() {
 
   const pod = useMemo(() => {
     return generatePlayoffPod(selectedScenario, selectedWeek);
-  }, [selectedScenario, selectedWeek, refreshKey]);
+  }, [selectedScenario, selectedWeek]);
 
   // Generate multiple pods for list view
   const pods = useMemo(() => {
     return generateMultiplePods(podCount, selectedScenario, selectedWeek);
-  }, [podCount, selectedScenario, selectedWeek, refreshKey]);
+  }, [podCount, selectedScenario, selectedWeek]);
 
   const handleRefresh = useCallback(() => {
     setRefreshKey(prev => prev + 1);
@@ -430,8 +430,8 @@ export default function PlayoffTeamsSandbox() {
     setViewMode('podDetail');
   }, []);
 
-  const handleSelectTeam = useCallback((team: PlayoffTeam, pod: PlayoffPod) => {
-    console.log('Selected team:', team.name, 'from pod:', pod.name);
+  const handleSelectTeam = useCallback((_team: PlayoffTeam, _pod: PlayoffPod) => {
+    // Team selection handler - no-op for sandbox testing
   }, []);
 
   const handleSelectOpponent = useCallback((opponent: PlayoffTeam) => {

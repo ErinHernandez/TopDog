@@ -28,6 +28,7 @@ import {
   PAYMONGO_COUNTRIES,
   XENDIT_COUNTRIES,
 } from './types';
+import { serverLogger } from '../logger/serverLogger';
 
 // ============================================================================
 // PROVIDER REGISTRY
@@ -76,7 +77,7 @@ export function getProviderForUser(country: string): PaymentProvider | undefined
   
   // If the preferred provider isn't available, fall back to Stripe
   if (!provider && providerName !== 'stripe') {
-    console.warn(`[PaymentRouter] ${providerName} not available for ${country}, falling back to Stripe`);
+    serverLogger.warn(`${providerName} not available for ${country}, falling back to Stripe`);
     return getProvider('stripe');
   }
   

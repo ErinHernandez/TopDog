@@ -1,6 +1,6 @@
 /**
  * TournamentModalMobile - Mobile Tournament Entry Modal
- * 
+ *
  * Based on the provided screenshots, this modal includes:
  * - Tournament header with title and basic info
  * - Entry fee, entrants, and prize information
@@ -16,6 +16,9 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import TournamentRulesModal from './modals/TournamentRulesModal';
+import { createScopedLogger } from '../../lib/clientLogger';
+
+const logger = createScopedLogger('[TournamentModal]');
 
 export default function TournamentModalMobile({ open, onClose, tournamentType = 'topdog' }) {
   const router = useRouter();
@@ -106,7 +109,7 @@ export default function TournamentModalMobile({ open, onClose, tournamentType = 
       // Navigate to draft room - for now just navigate to the demo
       router.push('/testing-grounds/mobile-apple-demo');
     } catch (error) {
-      console.error('Error entering tournament:', error);
+      logger.error('Error entering tournament', error);
     } finally {
       setIsJoining(false);
     }

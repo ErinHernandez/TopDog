@@ -5,9 +5,12 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { createScopedLogger } from '@/lib/clientLogger';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/components/vx2/auth/hooks/useAuth';
+
+const logger = createScopedLogger('[useLocationConsent]');
 import { 
   getConsent,
   updateConsent as updateConsentFn,
@@ -94,7 +97,7 @@ export function useLocationConsent(): UseLocationConsentReturn {
         setIsLoading(false);
       },
       (err) => {
-        console.error('Consent subscription error:', err);
+        logger.error('Consent subscription error:', err instanceof Error ? err : new Error(String(err)));
         setError(err);
         setIsLoading(false);
       }

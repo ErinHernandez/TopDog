@@ -18,8 +18,11 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { createScopedLogger } from '@/lib/clientLogger';
 import { useAuth } from '../../auth';
 import { getFirestore, doc, onSnapshot } from 'firebase/firestore';
+
+const logger = createScopedLogger('[useUser]');
 
 // ============================================================================
 // TYPES
@@ -68,6 +71,14 @@ export interface UseUserResult {
   /** Log out user */
   logout: () => void;
 }
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+/** Dev login uid from AuthContext; this user gets a synthetic $10,000 balance */
+const DEV_USER_UID = 'dev-user-t';
+const DEV_BALANCE_CENTS = 1_000_000; // $10,000
 
 // ============================================================================
 // HELPERS
@@ -134,6 +145,14 @@ export function useUser(): UseUserResult {
       return;
     }
     
+    // Dev user gets synthetic $10,000 balance (no Firestore doc)
+    if (authUser.uid === DEV_USER_UID) {
+      setBalanceCents(DEV_BALANCE_CENTS);
+      setBalanceLoading(false);
+      setBalanceError(null);
+      return;
+    }
+    
     const db = getFirestoreInstance();
     if (!db) {
       // Firebase not available - use 0 balance
@@ -167,7 +186,7 @@ export function useUser(): UseUserResult {
         setBalanceLoading(false);
       },
       (error) => {
-        console.warn('[useUser] Balance fetch error:', error.message);
+        logger.warn(`Balance fetch error: ${error.message}`);
         setBalanceError('Failed to load balance');
         setBalanceCents(0);
         setBalanceLoading(false);

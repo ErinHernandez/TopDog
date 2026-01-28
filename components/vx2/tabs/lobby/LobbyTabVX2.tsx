@@ -25,6 +25,7 @@ import { useTournaments, type Tournament } from '../../hooks/data';
 
 // UI hooks
 import { useCardHeight } from '../../hooks/ui/useCardHeight';
+import { useInPhoneFrame } from '../../../../lib/inPhoneFrameContext';
 
 // Atomic components
 import {
@@ -34,12 +35,15 @@ import {
   TournamentJoinButton,
   TournamentStats,
 } from './elements';
+import LobbyTabSandboxContent from './LobbyTabSandboxContent';
 
 // Shared components
 import { EmptyState, ErrorState } from '../../../ui';
 
 // Constants
-import { CARD_SPACING_V3, CARD_GRID_V3 } from './constants/cardSpacingV3';
+import { CARD_SPACING_V3 } from './constants/cardSpacingV3';
+import { LOBBY_TAB_SANDBOX_SPEC, LOBBY_TAB_CURRENT_ITERATION } from './constants/lobbyTabSandboxSpec';
+import { useWorkingLobbyConfig } from './workingLobbyConfig';
 import { BG_COLORS } from '../../core/constants/colors';
 
 // Modal
@@ -53,6 +57,11 @@ const logger = createScopedLogger('[LobbyTab]');
 // ============================================================================
 // CONSTANTS
 // ============================================================================
+
+/** Globe image (no background); used in lobby layout */
+const GLOBE_IMAGE = '/!!_GLOBE_NOBACKGROUND.webp';
+/** When in phone frame: use LOBBY_TAB_SANDBOX_SPEC for px-per-px match with sandbox. */
+const SPEC = LOBBY_TAB_SANDBOX_SPEC;
 
 /**
  * Card visual constants
@@ -130,8 +139,10 @@ export default function LobbyTabVX2({
   }, []);
 
   // ----------------------------------------
-  // Card dimensions (fixed pixel margins)
+  // Card dimensions (fixed pixel margins); skipped when in phone frame (use sandbox layout)
   // ----------------------------------------
+  const inPhoneFrame = useInPhoneFrame();
+  const workingConfig = useWorkingLobbyConfig();
   const {
     height: cardHeight,
     width: cardWidth,
@@ -144,6 +155,7 @@ export default function LobbyTabVX2({
     minHeight: 400,
     maxWidth: 420,
   });
+  const isCardReady = isCardHeightReady;
 
   // ----------------------------------------
   // Get featured tournament (or first one)
@@ -204,9 +216,11 @@ export default function LobbyTabVX2({
     position: 'relative',
     width: '100%',
     height: '100%',
-    minHeight: '400px', // Ensure container has minimum height for loading state
-    flex: 1, // Take available space in flex parent
+    minHeight: inPhoneFrame ? 0 : '400px', // In phone frame: shrink so border + bottom strip layout correctly
+    flex: 1,
     backgroundColor: BG_COLORS.primary,
+    // In phone frame: flex column so border wrapper is height-constrained and bottom strip (progress, join, stats) stays visible
+    ...(inPhoneFrame ? { display: 'flex', flexDirection: 'column' as const } : {}),
   };
 
   // ----------------------------------------
@@ -219,10 +233,8 @@ export default function LobbyTabVX2({
   // This ensures perfect HTML matching during hydration
   const shouldShowLoading = !isMounted || 
     (isLoading && tournaments.length === 0) ||
-    !featuredTournament || 
-    !isCardHeightReady || 
-    !cardHeight || 
-    !cardWidth;
+    !featuredTournament ||
+    (!inPhoneFrame && (!isCardReady || !cardHeight || !cardWidth));
   
   if (shouldShowLoading) {
     return (
@@ -291,7 +303,89 @@ export default function LobbyTabVX2({
   const finalWidth = cardWidth ?? 390; // Fallback to iPhone 13 width
   const finalHeight = cardHeight ?? 600; // Fallback height
 
-  // Render content (only reached after mount)
+  // Shared bottom strip (used in phone-frame layout; uses spec for px-per-px match)
+  const bottomStrip = (
+    <div
+      className="vx2-lobby-bottom"
+      style={{
+        flexShrink: 0,
+        padding: `0 ${SPEC.lobby.outer_padding_px}px ${SPEC.lobby.outer_padding_px}px`,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: SPEC.lobby.bottom_row_gap_px,
+      }}
+    >
+      <div style={{ transform: 'translateY(-14px)' }}>
+        <TournamentProgressBar
+          currentEntries={featuredTournament.currentEntries}
+          maxEntries={featuredTournament.maxEntries}
+        />
+      </div>
+      <div style={{ transform: 'translateY(-4px)' }}>
+        <TournamentJoinButton
+          onClick={() => handleJoinClick(featuredTournament.id)}
+          label="Join Tournament"
+        />
+      </div>
+      <TournamentStats
+        entryFee={featuredTournament.entryFee}
+        entries={featuredTournament.totalEntries}
+        prize={featuredTournament.firstPlacePrize}
+      />
+    </div>
+  );
+
+  const joinModal = selectedTournament && (
+    <JoinTournamentModal
+      tournament={selectedTournament}
+      onClose={handleCloseModal}
+      onConfirm={handleConfirmJoin}
+      isJoining={isJoining}
+    />
+  );
+
+  // In phone frame: use working lobby config if saved from sandbox, else current iteration.
+  if (inPhoneFrame) {
+    const base = { ...LOBBY_TAB_CURRENT_ITERATION };
+    const w = workingConfig;
+    const props = w
+      ? {
+          ...base,
+          ...(w.outlineOn !== undefined || w.outlineThickness !== undefined || w.outlineInset !== undefined || w.outlineRadius !== undefined
+            ? {
+                outlineOverrides: {
+                  on: w.outlineOn ?? base.outlineOverrides?.on,
+                  thickness: w.outlineThickness ?? base.outlineOverrides?.thickness,
+                  inset: w.outlineInset ?? base.outlineOverrides?.inset,
+                  radius: w.outlineRadius ?? base.outlineOverrides?.radius,
+                },
+              }
+            : {}),
+          ...(w.globeSizePx != null && { globeSizePx: w.globeSizePx }),
+          ...(w.objectsInPhone != null && { objectsInPhone: w.objectsInPhone }),
+          ...(w.positionYOffsets != null && Object.keys(w.positionYOffsets).length > 0
+            ? { positionOverrides: Object.fromEntries(Object.entries(w.positionYOffsets).map(([k, v]) => [k, { y: v }])) }
+            : {}),
+        }
+      : base;
+    return (
+      <div
+        className="vx2-lobby-container"
+        style={containerStyle}
+        role="main"
+        aria-label="Tournament lobby"
+      >
+        <LobbyTabSandboxContent
+          tournament={featuredTournament}
+          onJoinClick={handleJoinClick}
+          {...props}
+        />
+        {joinModal}
+      </div>
+    );
+  }
+
+  // Default: centered card layout
   return (
     <div
       className="vx2-lobby-container"
@@ -299,7 +393,6 @@ export default function LobbyTabVX2({
       role="main"
       aria-label="Tournament lobby"
     >
-      {/* Absolutely positioned card container with 16px margins */}
       <div
         className="vx2-lobby-card"
         style={{
@@ -321,76 +414,67 @@ export default function LobbyTabVX2({
           isolation: 'isolate',
         }}
       >
-        {/* Content Grid - The Layout Engine */}
         <div
           className="vx2-lobby-content"
           style={{
             flex: 1,
-            display: 'grid',
-            gridTemplateRows: CARD_GRID_V3.template,
-            padding: `${CARD_SPACING_V3.outerPadding}px`,
+            minHeight: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
             zIndex: 1,
             position: 'relative',
-            contain: 'layout',
-            overflow: 'hidden',
           }}
         >
-          {/* Row 1: Logo + Title (auto height) */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <TournamentCardLogo src={CARD_VISUALS.logoImage} alt="Tournament logo" maxHeight={72} />
-            <TournamentTitle title={featuredTournament.title} />
-          </div>
-
-          {/* Row 2: Spacer (Takes 1fr - flexible space) */}
           <div
-            className="vx2-lobby-spacer"
             style={{
-              minHeight: `${CARD_SPACING_V3.spacerMinHeight}px`,
-            }}
-            aria-hidden="true"
-          />
-
-          {/* Row 3: Bottom Anchor (auto height) */}
-          <div
-            className="vx2-lobby-bottom"
-            style={{
+              flex: 1,
+              minHeight: 0,
+              overflow: 'auto',
               display: 'flex',
               flexDirection: 'column',
-              justifyContent: 'flex-end',
-              gap: `${CARD_SPACING_V3.bottomRowGap}px`,
             }}
           >
-            {/* Progress Bar (only if tournament has max entries) */}
-            <TournamentProgressBar
-              currentEntries={featuredTournament.currentEntries}
-              maxEntries={featuredTournament.maxEntries}
-            />
-
-            {/* Join Button */}
-            <TournamentJoinButton
-              onClick={() => handleJoinClick(featuredTournament.id)}
-              label="Join Tournament"
-            />
-
-            {/* Stats Grid */}
-            <TournamentStats
-              entryFee={featuredTournament.entryFee}
-              entries={featuredTournament.totalEntries}
-              prize={featuredTournament.firstPlacePrize}
-            />
+            <div
+              style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                padding: `${CARD_SPACING_V3.outerPadding}px`,
+                gap: CARD_SPACING_V3.bottomRowGap,
+                minHeight: 0,
+              }}
+            >
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <TournamentCardLogo src={CARD_VISUALS.logoImage} alt="Tournament logo" maxHeight={60} />
+                <div style={{ marginTop: 14, transform: 'translateY(-24px)' }}>
+                  <TournamentTitle title={featuredTournament.title} fontSize={38} />
+                </div>
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  minHeight: SPEC.lobby.globe_size_px,
+                  marginTop: 24,
+                  transform: 'translateY(-24px)',
+                }}
+              >
+                <img
+                  src={GLOBE_IMAGE}
+                  alt=""
+                  width={SPEC.lobby.globe_size_px}
+                  height={SPEC.lobby.globe_size_px}
+                  style={{ width: SPEC.lobby.globe_size_px, height: SPEC.lobby.globe_size_px, objectFit: 'contain', display: 'block' }}
+                />
+              </div>
+            </div>
           </div>
+          {bottomStrip}
         </div>
       </div>
-
-      {/* Join Modal */}
-      {selectedTournament && (
-        <JoinTournamentModal
-          tournament={selectedTournament}
-          onClose={handleCloseModal}
-          onConfirm={handleConfirmJoin}
-          isJoining={isJoining}
-        />
-      )}
+      {joinModal}
     </div>
   );
 }

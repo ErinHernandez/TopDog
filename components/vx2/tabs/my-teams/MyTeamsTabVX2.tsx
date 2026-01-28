@@ -17,6 +17,7 @@ import { useAuth } from '../../auth/hooks/useAuth';
 import { BG_COLORS, TEXT_COLORS, POSITION_COLORS } from '../../core/constants/colors';
 import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
 import { useHeader, useTabNavigation } from '../../core';
+import { useTemporaryState } from '../../hooks/ui/useTemporaryState';
 import { 
   PositionBadge,
   Skeleton, 
@@ -498,7 +499,7 @@ function TeamListView({ teams, isLoading, onSelect, sortState, onSortChange }: T
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [hasOrderChanged, setHasOrderChanged] = useState(false);
   const [showUnsavedModal, setShowUnsavedModal] = useState(false);
-  const [justSaved, setJustSaved] = useState(false);
+  const [justSaved, setJustSaved, setJustSavedPermanent] = useTemporaryState(false, 2000);
   
   // Undo history - stores previous team ID orders
   const [orderHistory, setOrderHistory] = useState<string[][]>([]);
@@ -539,7 +540,7 @@ function TeamListView({ teams, isLoading, onSelect, sortState, onSortChange }: T
     setJustSaved(true);
     setShowUnsavedModal(false);
     confirmPendingNavigation();
-  }, [confirmPendingNavigation]);
+  }, [confirmPendingNavigation, setJustSaved]);
   
   // Handle discard from modal
   const handleModalDiscard = useCallback(() => {
@@ -573,9 +574,9 @@ function TeamListView({ teams, isLoading, onSelect, sortState, onSortChange }: T
       onSortChange({ ...sortState, primary: 'custom' });
       // Mark as changed - undo creates an unsaved state that needs confirmation
       setHasOrderChanged(true);
-      setJustSaved(false);
+      setJustSavedPermanent(false);
     }
-  }, [orderHistory, userId, onSortChange, sortState]);
+  }, [orderHistory, userId, onSortChange, sortState, setJustSavedPermanent]);
   
   // Save current order to history before making a change
   const saveToHistory = useCallback((currentTeamIds: string[]) => {
@@ -877,8 +878,8 @@ function TeamListView({ teams, isLoading, onSelect, sortState, onSortChange }: T
     setDraggedTeamId(null);
     setDragOverIndex(null);
     setHasOrderChanged(true);
-    setJustSaved(false);
-  }, [draggedTeamId, filteredTeams, sortState, onSortChange, userId, saveToHistory]);
+    setJustSavedPermanent(false);
+  }, [draggedTeamId, filteredTeams, sortState, onSortChange, userId, saveToHistory, setJustSavedPermanent]);
   
   // Move team up/down handlers
   const handleMoveUp = useCallback((teamId: string, currentIndex: number) => {
@@ -894,9 +895,9 @@ function TeamListView({ teams, isLoading, onSelect, sortState, onSortChange }: T
     updateCustomOrder(teamIds, userId);
     onSortChange({ ...sortState, primary: 'custom' });
     setHasOrderChanged(true);
-    setJustSaved(false);
-  }, [filteredTeams, sortState, onSortChange, userId, saveToHistory]);
-  
+    setJustSavedPermanent(false);
+  }, [filteredTeams, sortState, onSortChange, userId, saveToHistory, setJustSavedPermanent]);
+
   const handleMoveDown = useCallback((teamId: string, currentIndex: number) => {
     if (currentIndex >= filteredTeams.length - 1) return;
     
@@ -910,9 +911,9 @@ function TeamListView({ teams, isLoading, onSelect, sortState, onSortChange }: T
     updateCustomOrder(teamIds, userId);
     onSortChange({ ...sortState, primary: 'custom' });
     setHasOrderChanged(true);
-    setJustSaved(false);
-  }, [filteredTeams, sortState, onSortChange, userId, saveToHistory]);
-  
+    setJustSavedPermanent(false);
+  }, [filteredTeams, sortState, onSortChange, userId, saveToHistory, setJustSavedPermanent]);
+
   return (
     <div 
       className="flex-1 flex flex-col min-h-0"
@@ -1060,8 +1061,6 @@ function TeamListView({ teams, isLoading, onSelect, sortState, onSortChange }: T
                     // Custom order is auto-saved to localStorage, this confirms the save
                     setHasOrderChanged(false);
                     setJustSaved(true);
-                    // Reset "Saved" state after 2 seconds
-                    setTimeout(() => setJustSaved(false), 2000);
                   }
                 }}
                 disabled={!hasOrderChanged && !justSaved}

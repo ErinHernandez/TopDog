@@ -15,11 +15,12 @@ import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../../core/
 import { SPACING, TYPOGRAPHY, Z_INDEX } from '../../core/constants/sizes';
 import { Close, ChevronLeft, Edit } from '../../components/icons';
 import { UsernameInput } from './UsernameInput';
+import { DeleteAccountModal } from './DeleteAccountModal';
 import { useAuth } from '../hooks/useAuth';
 import { useUsernameValidation } from '../hooks/useUsernameValidation';
+import { useTemporaryState } from '../../hooks/ui/useTemporaryState';
 import { RATE_LIMITS } from '../constants';
 import { createScopedLogger } from '../../../../lib/clientLogger';
-import { fcmService } from '../../../../lib/pushNotifications/fcmService';
 import { getAuth } from 'firebase/auth';
 
 const logger = createScopedLogger('[ProfileSettingsModal]');
@@ -32,9 +33,11 @@ export interface ProfileSettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAccountDeleted?: () => void;
+  /** Top offset in px. Use 0 to align to safe-area edge (e.g. inside phone frame). Default 60. */
+  contentTopInset?: number;
 }
 
-type ProfileTab = 'profile' | 'preferences' | 'security' | 'delete';
+type ProfileTab = 'profile' | 'preferences' | 'security';
 
 // ============================================================================
 // PROFILE TAB
@@ -44,18 +47,18 @@ interface ProfileTabContentProps {
   onEditName: () => void;
   onAddEmail: () => void;
   onAddPhone: () => void;
+  onOpenDeleteModal: () => void;
 }
 
-function ProfileTabContent({ onEditName, onAddEmail, onAddPhone }: ProfileTabContentProps): React.ReactElement {
+function ProfileTabContent({ onEditName, onAddEmail, onAddPhone, onOpenDeleteModal }: ProfileTabContentProps): React.ReactElement {
   const { user, profile, sendVerificationEmail } = useAuth();
   const router = useRouter();
-  const [emailSent, setEmailSent] = useState(false);
-  
+  const [emailSent, setEmailSent] = useTemporaryState(false, 30000);
+
   const handleResendVerification = async () => {
     const result = await sendVerificationEmail();
     if (result.success) {
       setEmailSent(true);
-      setTimeout(() => setEmailSent(false), 30000);
     }
   };
 
@@ -74,107 +77,78 @@ function ProfileTabContent({ onEditName, onAddEmail, onAddPhone }: ProfileTabCon
     <div className="space-y-6">
       {/* Customization Section */}
       <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <div>
-            <span 
-              className="font-medium block"
-              style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}
+        {/* Example Player Box */}
+        <div className="flex justify-center">
+          <div 
+            className="flex-shrink-0 flex flex-col"
+            style={{ 
+              width: '96px',
+              height: '105px',
+              border: '4px solid',
+              borderColor: fixedBorderColor, // Fixed border color - matches unpicked card border (#6B7280)
+              backgroundColor: '#374151', // Matches PICKS_BAR_PX.cardBg
+              borderRadius: '6px', 
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
+              position: 'relative',
+            }}
+          >
+            {/* Header - matches draft room card header structure */}
+            <div 
+              style={{ 
+                height: '28px', // 20px visible + 8px overlap
+                marginTop: '-8px', // Overlaps top border
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '0 4px',
+                backgroundColor: fixedBorderColor, // Border color used as header background
+                borderTopLeftRadius: '6px',
+                borderTopRightRadius: '6px',
+                fontSize: '11px',
+                fontWeight: 500,
+                color: '#FFFFFF',
+                textTransform: 'uppercase',
+                textAlign: 'center',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
             >
-              Profile Customization
-            </span>
-            <span 
-              className="block mt-1"
-              style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
+              {profile?.username || 'Username'}
+            </div>
+            
+            {/* Content area - matches draft room card content */}
+            <div 
+              style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                minHeight: '78px',
+                position: 'relative',
+                backgroundColor: innerCellColor, // Customizable inner area
+              }}
             >
-              Customize player cell backgrounds
-            </span>
+            </div>
           </div>
+        </div>
+        
+        <div className="flex items-center justify-center">
           <button
             onClick={() => router.push('/profile-customization')}
             className="px-3 py-1.5 rounded-lg font-medium text-sm"
             style={{ 
-              backgroundColor: STATE_COLORS.active, 
+              background: 'url(/wr_blue.png) no-repeat center center',
+              backgroundSize: 'cover',
               color: '#000',
             }}
           >
             Customize
           </button>
         </div>
-        
-        {/* Example Player Box */}
-        <div className="flex justify-center">
-          <div 
-            className="flex-shrink-0 text-sm font-medium flex flex-col"
-            style={{ 
-              width: '120px',
-              height: '140px',
-              borderWidth: '6px',
-              borderStyle: 'solid',
-              borderColor: fixedBorderColor, // Fixed border color - matches unpicked card border
-              borderTopWidth: '32px', 
-              backgroundColor: innerCellColor, // Customizable inner area
-              borderRadius: '11px', 
-              overflow: 'visible'
-            }}
-          >
-            {/* Username in border area */}
-            <div 
-              className="absolute left-0 right-0 font-bold text-center truncate whitespace-nowrap overflow-hidden"
-              style={{ 
-                fontSize: '12px', 
-                color: '#000',
-                backgroundColor: 'transparent',
-                zIndex: 10,
-                padding: '2px',
-                top: '-16px', 
-                transform: 'translateY(-50%)',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                maxWidth: '100%',
-                width: '100%',
-                textTransform: 'uppercase'
-              }}
-            >
-              {profile?.username || 'Username'}
-            </div>
-            
-            {/* Customizable inner area (where player name would go) */}
-            <div className="flex-1 flex items-center justify-center">
-              <div 
-                className="text-center"
-                style={{
-                  fontSize: '12px',
-                  color: TEXT_COLORS.muted,
-                }}
-              >
-                Player Name
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
-      {/* Avatar & Username */}
-      <div className="flex items-center gap-4">
-        <div 
-          className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold"
-          style={{ backgroundColor: STATE_COLORS.active, color: '#000' }}
-        >
-          {profile?.username?.[0]?.toUpperCase() || '?'}
-        </div>
-        <div className="flex-1">
-          <span 
-            className="font-bold"
-            style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}
-          >
-            {profile?.username || 'No username'}
-          </span>
-          <p style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
-            Member since {profile?.createdAt ? new Date(profile.createdAt).toLocaleDateString() : 'Unknown'}
-          </p>
-        </div>
-      </div>
 
       {/* Name */}
       <div 
@@ -185,16 +159,6 @@ function ProfileTabContent({ onEditName, onAddEmail, onAddPhone }: ProfileTabCon
           <span style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
             Name
           </span>
-          <button
-            onClick={onEditName}
-            className="px-2 py-0.5 rounded-full text-xs"
-            style={{ 
-              backgroundColor: 'rgba(96, 165, 250, 0.15)', 
-              color: STATE_COLORS.active,
-            }}
-          >
-            {displayName ? 'Edit' : 'Add'}
-          </button>
         </div>
         <p style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}>
           {displayName || 'Not added yet'}
@@ -232,18 +196,7 @@ function ProfileTabContent({ onEditName, onAddEmail, onAddPhone }: ProfileTabCon
               {emailSent ? 'Email sent' : 'Verify'}
               </button>
             )
-          ) : (
-            <button
-              onClick={onAddEmail}
-              className="px-2 py-0.5 rounded-full text-xs"
-              style={{ 
-                backgroundColor: 'rgba(96, 165, 250, 0.15)', 
-                color: STATE_COLORS.active,
-              }}
-            >
-              Add
-            </button>
-          )}
+          ) : null}
         </div>
         <p style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}>
           {user?.email || 'Not added yet'}
@@ -259,18 +212,6 @@ function ProfileTabContent({ onEditName, onAddEmail, onAddPhone }: ProfileTabCon
           <span style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
             Phone
           </span>
-          {!user?.phoneNumber && (
-            <button
-              onClick={onAddPhone}
-              className="px-2 py-0.5 rounded-full text-xs"
-              style={{ 
-                backgroundColor: 'rgba(96, 165, 250, 0.15)', 
-                color: STATE_COLORS.active,
-              }}
-            >
-              Add
-            </button>
-          )}
         </div>
           <p style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}>
           {user?.phoneNumber || 'Not added yet'}
@@ -324,6 +265,35 @@ function ProfileTabContent({ onEditName, onAddEmail, onAddPhone }: ProfileTabCon
           </span>
         </div>
       </div>
+
+      {/* Delete account — opens modal (eligibility, maze, password) */}
+      <div
+        className="flex items-center justify-between p-4 rounded-xl"
+        style={{ backgroundColor: 'rgba(255,255,255,0.03)' }}
+      >
+        <div>
+          <span className="block font-medium" style={{ color: TEXT_COLORS.primary }}>
+            Delete account
+          </span>
+          <span style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+            Permanently delete your account and data
+          </span>
+        </div>
+        <button
+          onClick={onOpenDeleteModal}
+          style={{
+            padding: '8px 16px',
+            borderRadius: 10,
+            border: `1px solid ${STATE_COLORS.error}`,
+            background: 'transparent',
+            color: STATE_COLORS.error,
+            fontWeight: 600,
+            fontSize: TYPOGRAPHY.fontSize.sm,
+          }}
+        >
+          Delete account
+        </button>
+      </div>
     </div>
   );
 }
@@ -337,36 +307,25 @@ function PreferencesTabContent(): React.ReactElement {
   const [preferences, setPreferences] = useState({
     notifications: profile?.preferences?.notifications ?? true,
     emailUpdates: profile?.preferences?.emailUpdates ?? true,
-    publicProfile: profile?.preferences?.publicProfile ?? true,
     dynamicIslandEnabled: profile?.preferences?.dynamicIslandEnabled ?? false,
   });
   const [isSaving, setIsSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const [saved, setSaved] = useTemporaryState(false, 2000);
   const [dynamicIslandSupported, setDynamicIslandSupported] = useState(false);
   
   // Alert preferences state
   const [alertPreferences, setAlertPreferences] = useState({
-    roomFilled: profile?.preferences?.draftAlerts?.roomFilled ?? true,
-    draftStarting: profile?.preferences?.draftAlerts?.draftStarting ?? true,
-    twoPicksAway: profile?.preferences?.draftAlerts?.twoPicksAway ?? true,
-    onTheClock: profile?.preferences?.draftAlerts?.onTheClock ?? true,
-    tenSecondsRemaining: profile?.preferences?.draftAlerts?.tenSecondsRemaining ?? true,
+    roomFilled: profile?.preferences?.draftAlerts?.roomFilled ?? false,
+    draftStarting: profile?.preferences?.draftAlerts?.draftStarting ?? false,
+    twoPicksAway: profile?.preferences?.draftAlerts?.twoPicksAway ?? false,
+    onTheClock: profile?.preferences?.draftAlerts?.onTheClock ?? false,
+    tenSecondsRemaining: profile?.preferences?.draftAlerts?.tenSecondsRemaining ?? false,
   });
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
   const [savingKey, setSavingKey] = useState<string | null>(null);
-  const [fcmEnabled, setFcmEnabled] = useState(profile?.preferences?.fcmEnabled ?? false);
-  const [fcmInitializing, setFcmInitializing] = useState(false);
-  const [isIOS, setIsIOS] = useState(false);
-  const [isStandalone, setIsStandalone] = useState(false);
   
   // Check Dynamic Island support on mount
   useEffect(() => {
-    // Check iOS and standalone mode
-    if (typeof window !== 'undefined') {
-      const userAgent = navigator.userAgent;
-      setIsIOS(/iPad|iPhone|iPod/.test(userAgent));
-      setIsStandalone((window.navigator as any).standalone === true);
-    }
     // Check if iOS 16.1+ (Live Activities support)
     const checkSupport = () => {
       if (typeof window === 'undefined') return false;
@@ -412,9 +371,8 @@ function PreferencesTabContent(): React.ReactElement {
         },
       });
       setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
     } catch (error) {
-      console.error('Failed to update alert preferences:', error);
+      logger.error('Failed to update alert preferences:', error instanceof Error ? error : new Error(String(error)));
       // Revert on error
       setAlertPreferences(prev => ({ ...prev, [key]: !newValue }));
     } finally {
@@ -439,7 +397,6 @@ function PreferencesTabContent(): React.ReactElement {
         preferences: { ...profile?.preferences, [key]: newValue } 
       });
       setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
     } catch (err) {
       // Revert on error
       setPreferences(prev => ({ ...prev, [key]: !newValue }));
@@ -457,7 +414,8 @@ function PreferencesTabContent(): React.ReactElement {
       disabled={disabled}
       className="relative w-11 h-6 rounded-full transition-colors"
       style={{ 
-        backgroundColor: checked ? STATE_COLORS.active : 'rgba(255,255,255,0.1)',
+        background: checked ? 'url(/wr_blue.png) no-repeat center center' : 'rgba(255,255,255,0.1)',
+        backgroundSize: checked ? 'cover' : undefined,
         opacity: disabled ? 0.5 : 1,
         cursor: disabled ? 'not-allowed' : 'pointer',
       }}
@@ -485,97 +443,6 @@ function PreferencesTabContent(): React.ReactElement {
         </div>
       )}
       
-      <div 
-        className="flex items-center justify-between p-4 rounded-xl"
-        style={{ backgroundColor: 'rgba(255,255,255,0.03)' }}
-      >
-        <div>
-          <span 
-            className="block font-medium"
-            style={{ color: TEXT_COLORS.primary }}
-          >
-            Push Notifications
-          </span>
-          <span style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
-            Draft reminders and updates
-          </span>
-        </div>
-        <ToggleSwitch 
-          checked={preferences.notifications} 
-          onChange={() => handleToggle('notifications')} 
-        />
-      </div>
-      
-      {/* FCM Push Notifications - Receive alerts when app is closed */}
-      <div 
-        className="flex items-center justify-between p-4 rounded-xl"
-        style={{ backgroundColor: 'rgba(255,255,255,0.03)' }}
-      >
-        <div className="flex-1">
-          <span 
-            className="block font-medium"
-            style={{ color: TEXT_COLORS.primary }}
-          >
-            Background Push Notifications
-          </span>
-          <span style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
-            Receive alerts even when app is closed
-          </span>
-          {isIOS && !isStandalone && (
-            <span style={{ color: '#FBBF25', fontSize: `${TYPOGRAPHY.fontSize.xs}px` }} className="block mt-1">
-              ⚠️ Add to Home Screen to enable on iOS
-            </span>
-          )}
-        </div>
-        <button
-          onClick={async () => {
-            if (fcmEnabled) {
-              // Disable
-              await fcmService.deleteToken();
-              setFcmEnabled(false);
-              await updateProfile({
-                preferences: {
-                  ...profile?.preferences,
-                  fcmEnabled: false,
-                },
-              });
-            } else {
-              // Enable (user interaction required)
-              setFcmInitializing(true);
-              try {
-                const token = await fcmService.requestPermissionAndGetToken();
-                if (token) {
-                  setFcmEnabled(true);
-                  await updateProfile({
-                    preferences: {
-                      ...profile?.preferences,
-                      fcmEnabled: true,
-                    },
-                  });
-                } else {
-                  alert('Failed to enable push notifications. Please check browser permissions.');
-                }
-              } catch (error) {
-                console.error('[FCM] Enable failed:', error);
-                alert('Failed to enable push notifications.');
-              } finally {
-                setFcmInitializing(false);
-              }
-            }
-          }}
-          disabled={fcmInitializing}
-          className="px-4 py-2 rounded-lg font-medium text-sm transition-opacity"
-          style={{ 
-            backgroundColor: fcmEnabled ? STATE_COLORS.active : 'rgba(255,255,255,0.1)',
-            color: fcmEnabled ? '#000' : TEXT_COLORS.primary,
-            opacity: fcmInitializing ? 0.5 : 1,
-            cursor: fcmInitializing ? 'not-allowed' : 'pointer',
-          }}
-        >
-          {fcmInitializing ? 'Enabling...' : fcmEnabled ? 'Disable' : 'Enable'}
-        </button>
-      </div>
-      
       {/* Dynamic Island / Live Activity toggle - only show on supported iOS devices */}
       {dynamicIslandSupported && (
         <div 
@@ -601,7 +468,7 @@ function PreferencesTabContent(): React.ReactElement {
       )}
       
       {/* Draft Alerts - Show for ALL users */}
-      <div className="space-y-3 mt-6">
+      <div className="space-y-3 mt-4">
         <h3 className="text-lg font-semibold" style={{ color: TEXT_COLORS.primary }}>
           Draft Alerts
         </h3>
@@ -673,36 +540,15 @@ function PreferencesTabContent(): React.ReactElement {
             className="block font-medium"
             style={{ color: TEXT_COLORS.primary }}
           >
-            Email Updates
+            Slow draft email updates
           </span>
           <span style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
-            Tournament news and promotions
+            Updates about your slow drafts
           </span>
         </div>
         <ToggleSwitch 
           checked={preferences.emailUpdates} 
           onChange={() => handleToggle('emailUpdates')} 
-        />
-      </div>
-      
-      <div 
-        className="flex items-center justify-between p-4 rounded-xl"
-        style={{ backgroundColor: 'rgba(255,255,255,0.03)' }}
-      >
-        <div>
-          <span 
-            className="block font-medium"
-            style={{ color: TEXT_COLORS.primary }}
-          >
-            Public Profile
-          </span>
-          <span style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
-            Let others see your stats
-          </span>
-        </div>
-        <ToggleSwitch 
-          checked={preferences.publicProfile} 
-          onChange={() => handleToggle('publicProfile')} 
         />
       </div>
     </div>
@@ -775,100 +621,6 @@ function SecurityTabContent(): React.ReactElement {
           Last login: {user?.lastLoginAt ? new Date(user.lastLoginAt).toLocaleString() : 'Unknown'}
         </span>
       </div>
-    </div>
-  );
-}
-
-// ============================================================================
-// DELETE ACCOUNT TAB
-// ============================================================================
-
-interface DeleteTabContentProps {
-  onDelete: () => void;
-  isDeleting: boolean;
-}
-
-function DeleteTabContent({ onDelete, isDeleting }: DeleteTabContentProps): React.ReactElement {
-  const [confirmText, setConfirmText] = useState('');
-  const canDelete = confirmText.toLowerCase() === 'delete';
-  
-  return (
-    <div className="space-y-6">
-      <div 
-        className="p-4 rounded-xl"
-        style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)' }}
-      >
-        <div className="flex items-start gap-3">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.error} strokeWidth="2" className="flex-shrink-0">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-          </svg>
-          <div>
-            <span 
-              className="block font-semibold mb-1"
-              style={{ color: STATE_COLORS.error }}
-            >
-              Warning: This action is irreversible
-            </span>
-            <p style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
-              Deleting your account will permanently remove all your data, including:
-            </p>
-            <ul 
-              className="list-disc list-inside mt-2 space-y-1"
-              style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
-            >
-              <li>Your profile and username</li>
-              <li>Tournament history and stats</li>
-              <li>All teams and draft data</li>
-              <li>Transaction history</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-      
-      <div>
-        <label 
-          className="block font-medium mb-2"
-          style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
-        >
-          Type &quot;delete&quot; to confirm
-        </label>
-        <input
-          type="text"
-          value={confirmText}
-          onChange={(e) => setConfirmText(e.target.value)}
-          placeholder="delete"
-          className="w-full px-4 py-3 rounded-xl outline-none"
-          style={{
-            backgroundColor: 'rgba(255,255,255,0.05)',
-            color: TEXT_COLORS.primary,
-            border: `2px solid ${confirmText && !canDelete ? STATE_COLORS.error : BORDER_COLORS.default}`,
-            fontSize: `${TYPOGRAPHY.fontSize.base}px`,
-          }}
-        />
-      </div>
-      
-      <button
-        onClick={onDelete}
-        disabled={!canDelete || isDeleting}
-        className="w-full py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2"
-        style={{
-          backgroundColor: canDelete ? STATE_COLORS.error : BG_COLORS.tertiary,
-          color: canDelete ? '#fff' : TEXT_COLORS.disabled,
-          opacity: canDelete ? 1 : 0.5,
-        }}
-      >
-        {isDeleting ? (
-          <>
-            <div 
-              className="animate-spin rounded-full h-5 w-5 border-2"
-              style={{ borderColor: '#fff transparent transparent transparent' }}
-            />
-            Deleting...
-          </>
-        ) : (
-          'Delete My Account'
-        )}
-      </button>
     </div>
   );
 }
@@ -1021,7 +773,8 @@ function ChangeUsernameModal({ isOpen, onClose, currentUsername }: ChangeUsernam
                 disabled={!canChange || isChanging}
                 className="w-full py-3 rounded-xl font-bold"
                 style={{
-                  backgroundColor: canChange ? STATE_COLORS.active : BG_COLORS.tertiary,
+                  background: canChange ? 'url(/wr_blue.png) no-repeat center center' : BG_COLORS.tertiary,
+                  backgroundSize: canChange ? 'cover' : undefined,
                   color: canChange ? '#000' : TEXT_COLORS.disabled,
                   opacity: canChange ? 1 : 0.5,
                 }}
@@ -1182,9 +935,19 @@ function AddContactModal({ isOpen, onClose, type }: AddContactModalProps): React
             <>
               <div 
                 className="p-3 rounded-lg"
-                style={{ backgroundColor: 'rgba(96, 165, 250, 0.1)' }}
+                style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}
               >
-                <p style={{ color: STATE_COLORS.active, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+                <p
+                  style={{
+                    background: 'url(/wr_blue.png) no-repeat center center',
+                    backgroundSize: 'cover',
+                    WebkitBackgroundClip: 'text',
+                    backgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    color: 'transparent',
+                    fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
+                  }}
+                >
                   Adding {isEmail ? 'an email' : 'a phone number'} gives you another way to sign in to your account.
                 </p>
               </div>
@@ -1234,7 +997,8 @@ function AddContactModal({ isOpen, onClose, type }: AddContactModalProps): React
                 disabled={!isValid || isAdding}
                 className="w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2"
                 style={{
-                  backgroundColor: isValid ? STATE_COLORS.active : BG_COLORS.tertiary,
+                  background: isValid ? 'url(/wr_blue.png) no-repeat center center' : BG_COLORS.tertiary,
+                  backgroundSize: isValid ? 'cover' : undefined,
                   color: isValid ? '#000' : TEXT_COLORS.disabled,
                   opacity: isValid ? 1 : 0.5,
                 }}
@@ -1417,7 +1181,8 @@ function EditNameModal({ isOpen, onClose, currentFirstName, currentLastName }: E
                 disabled={!isValid || !hasChanges || isSaving}
                 className="w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2"
                 style={{
-                  backgroundColor: isValid && hasChanges ? STATE_COLORS.active : BG_COLORS.tertiary,
+                  background: isValid && hasChanges ? 'url(/wr_blue.png) no-repeat center center' : BG_COLORS.tertiary,
+                  backgroundSize: isValid && hasChanges ? 'cover' : undefined,
                   color: isValid && hasChanges ? '#000' : TEXT_COLORS.disabled,
                   opacity: isValid && hasChanges ? 1 : 0.5,
                 }}
@@ -1450,43 +1215,28 @@ export function ProfileSettingsModal({
   isOpen,
   onClose,
   onAccountDeleted,
+  contentTopInset = 60,
 }: ProfileSettingsModalProps): React.ReactElement | null {
   const [activeTab, setActiveTab] = useState<ProfileTab>('profile');
   const [showNameModal, setShowNameModal] = useState(false);
   const [showAddContactModal, setShowAddContactModal] = useState<'email' | 'phone' | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
-  
-  const { profile, deleteAccount, signOut } = useAuth();
-  
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const { profile, signOut } = useAuth();
+
   // Reset state when modal closes
   useEffect(() => {
     if (!isOpen) {
       setActiveTab('profile');
       setShowAddContactModal(null);
-      setIsDeleting(false);
+      setShowDeleteModal(false);
     }
   }, [isOpen]);
   
-  const handleDelete = async () => {
-    setIsDeleting(true);
-    try {
-      const result = await deleteAccount();
-      if (result.success) {
-        onAccountDeleted?.();
-        onClose();
-      }
-    } catch (err) {
-      logger.error('Delete account failed', err instanceof Error ? err : new Error(String(err)));
-    } finally {
-      setIsDeleting(false);
-    }
-  };
-  
   const tabs: { id: ProfileTab; label: string }[] = [
     { id: 'profile', label: 'Profile' },
-    { id: 'preferences', label: 'Preferences' },
+    { id: 'preferences', label: 'Draft Alerts' },
     { id: 'security', label: 'Security' },
-    { id: 'delete', label: 'Delete' },
   ];
   
   if (!isOpen) return null;
@@ -1495,17 +1245,17 @@ export function ProfileSettingsModal({
     <div 
       className="absolute left-0 right-0 bottom-0 flex flex-col"
       style={{ 
-        top: '60px', 
+        top: `${contentTopInset}px`, 
         backgroundColor: BG_COLORS.secondary, 
         zIndex: Z_INDEX.modal 
       }}
     >
-      {/* Header */}
+      {/* Header — same top padding as Sign In/Sign Up/Forgot Password so X height is consistent */}
       <div 
         className="flex items-center justify-between flex-shrink-0"
         style={{ 
-          padding: `${SPACING.md}px ${SPACING.lg}px`, 
-          borderBottom: `1px solid ${BORDER_COLORS.default}` 
+          padding: `${SPACING.md + 8}px ${SPACING.lg}px ${SPACING.md}px`,
+          borderBottom: `1px solid ${BORDER_COLORS.default}`,
         }}
       >
         <h2 
@@ -1532,14 +1282,25 @@ export function ProfileSettingsModal({
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className="flex-1 py-3 font-medium transition-colors"
+            className="flex-1 py-3 transition-colors relative"
             style={{
-              color: activeTab === tab.id ? STATE_COLORS.active : TEXT_COLORS.muted,
-              borderBottom: activeTab === tab.id ? `2px solid ${STATE_COLORS.active}` : '2px solid transparent',
+              color: TEXT_COLORS.muted,
+              borderBottom: '2px solid transparent',
               fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
+              fontWeight: activeTab === tab.id ? 600 : 500,
             }}
           >
-            {tab.label}
+            <span style={{ position: 'relative', zIndex: 1 }}>{tab.label}</span>
+            {activeTab === tab.id && (
+              <div
+                className="absolute left-0 right-0 bottom-0"
+                style={{
+                  height: 2,
+                  background: 'url(/wr_blue.png) no-repeat center center',
+                  backgroundSize: 'cover',
+                }}
+              />
+            )}
           </button>
         ))}
       </div>
@@ -1554,23 +1315,21 @@ export function ProfileSettingsModal({
             onEditName={() => setShowNameModal(true)}
             onAddEmail={() => setShowAddContactModal('email')}
             onAddPhone={() => setShowAddContactModal('phone')}
+            onOpenDeleteModal={() => setShowDeleteModal(true)}
           />
         )}
         {activeTab === 'preferences' && <PreferencesTabContent />}
         {activeTab === 'security' && <SecurityTabContent />}
-        {activeTab === 'delete' && (
-          <DeleteTabContent onDelete={handleDelete} isDeleting={isDeleting} />
-        )}
       </div>
       
       {/* Footer */}
       <div 
-        className="flex-shrink-0 text-center py-6"
+        className="flex-shrink-0 text-center py-3"
         style={{ borderTop: `1px solid ${BORDER_COLORS.default}` }}
       >
         <button
           onClick={async () => { await signOut(); onClose(); }}
-          className="py-3 px-8 rounded-xl"
+          className="py-2 px-8 rounded-xl"
           style={{ color: STATE_COLORS.error, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}
         >
           Sign Out
@@ -1590,6 +1349,16 @@ export function ProfileSettingsModal({
         onClose={() => setShowNameModal(false)}
         currentFirstName={profile?.firstName || ''}
         currentLastName={profile?.lastName || ''}
+      />
+
+      {/* Delete Account Modal – eligibility, maze, password */}
+      <DeleteAccountModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onDeleted={() => {
+          onAccountDeleted?.();
+          onClose();
+        }}
       />
     </div>
   );

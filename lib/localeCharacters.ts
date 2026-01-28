@@ -1,3 +1,5 @@
+import { serverLogger } from './logger/serverLogger';
+
 // ============================================================================
 // LOCALE CHARACTER CONFIGURATION
 // ============================================================================
@@ -335,21 +337,18 @@ export function validateConfiguration(): boolean {
   
   // Report results
   if (errors.length === 0 && warnings.length === 0) {
-    console.log('Configuration is valid. All countries are properly configured.');
-    console.log(`Total approved countries: ${approvedCountries.length}`);
+    serverLogger.info('Configuration is valid. All countries are properly configured', { totalCountries: approvedCountries.length });
     return true;
   }
-  
+
   if (errors.length > 0) {
-    console.error('ERRORS FOUND:');
-    errors.forEach(e => console.error(`  - ${e}`));
+    serverLogger.error('Configuration errors found', new Error('Locale configuration errors'), { errors });
   }
-  
+
   if (warnings.length > 0) {
-    console.warn('WARNINGS:');
-    warnings.forEach(w => console.warn(`  - ${w}`));
+    serverLogger.warn('Configuration warnings found');
   }
-  
+
   return errors.length === 0;
 }
 

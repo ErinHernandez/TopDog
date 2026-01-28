@@ -3,6 +3,8 @@
  * Checks user compliance status for deposits and transactions
  */
 
+import { serverLogger } from './logger/serverLogger';
+
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -28,7 +30,7 @@ export interface ComplianceResult {
  */
 export const canMakeDeposits = async (userData: UserData | null | undefined, country: string): Promise<ComplianceResult> => {
   // Mock implementation - in real app this would check compliance status
-  console.log(`Checking compliance for user ${userData?.id} in ${country}`);
+  serverLogger.info(`Checking compliance for user ${userData?.id} in ${country}`);
   
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 500));

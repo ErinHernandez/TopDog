@@ -56,7 +56,7 @@ import {
 } from '../../../../lib/apiErrorHandler';
 
 // Use require for firebase-admin to ensure Turbopack compatibility
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+ 
 const admin = require('firebase-admin') as typeof import('firebase-admin');
 
 // ============================================================================

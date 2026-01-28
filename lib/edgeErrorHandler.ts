@@ -54,7 +54,7 @@ export function withEdgeErrorHandling(
     const startTime = Date.now();
     
     // Get edge region info (available in Edge Runtime)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const geo = (request as any).geo;
     const region = geo?.region || 'unknown';
     const city = geo?.city;

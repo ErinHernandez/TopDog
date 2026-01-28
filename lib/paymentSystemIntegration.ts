@@ -6,6 +6,9 @@ import { getPaymentMethodsByLocation, getOrderedPaymentMethods, type PaymentMeth
 import { paymentHealthMonitor } from './paymentHealthMonitor';
 import { fraudDetectionEngine, FraudResult } from './fraudDetection';
 import { WebhookSecurity, RiskScoring, SecurityLogger, RATE_LIMITS } from './paymentSecurity';
+import { createScopedLogger } from './clientLogger';
+
+const logger = createScopedLogger('[PaymentSystem]');
 
 // ============================================================================
 // TYPES
@@ -121,36 +124,36 @@ class PaymentSystemOrchestrator {
   
   async initialize(): Promise<void> {
     try {
-      console.log('🚀 Initializing Payment System...');
-      
+      logger.debug('Initializing Payment System');
+
       // Initialize rate limiters for all processors
       this.initializeRateLimiters();
-      
+
       // Start health monitoring
       paymentHealthMonitor.startMonitoring();
-      
+
       // Initialize fraud detection
-      console.log('🛡️ Fraud detection engine ready');
-      
+      logger.debug('Fraud detection engine ready');
+
       // Set up webhook security
-      console.log('🔐 Webhook security configured');
-      
+      logger.debug('Webhook security configured');
+
       this.isInitialized = true;
-      
+
       SecurityLogger.logSecurityEvent(
         'payment_system_initialized',
         'medium',
-        { 
+        {
           processors: Object.keys(RATE_LIMITS).length,
           features: ['health_monitoring', 'fraud_detection', 'rate_limiting', 'webhook_security']
         }
       );
-      
-      console.log('✅ Payment System fully initialized with 31 processors');
-      
+
+      logger.debug('Payment System fully initialized', { processorCount: 31 });
+
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.error('❌ Payment System initialization failed:', error);
+      logger.error('Payment System initialization failed', error instanceof Error ? error : new Error(errorMessage));
       SecurityLogger.logSecurityEvent(
         'payment_system_init_failed',
         'critical',
@@ -530,23 +533,23 @@ class PaymentSystemOrchestrator {
         await this.handlePaymentRefunded(processor, eventData);
         break;
       default:
-        console.log(`Unhandled webhook event: ${eventData.type}`);
+        logger.debug('Unhandled webhook event', { type: eventData.type });
     }
   }
-  
+
   private async handlePaymentSucceeded(processor: string, eventData: WebhookEvent): Promise<void> {
     // Update transaction status, notify user, etc.
-    console.log(`Payment succeeded on ${processor}:`, eventData.id);
+    logger.debug('Payment succeeded', { processor, eventId: eventData.id });
   }
-  
+
   private async handlePaymentFailed(processor: string, eventData: WebhookEvent): Promise<void> {
     // Handle failed payment, possibly retry with different processor
-    console.log(`Payment failed on ${processor}:`, eventData.id);
+    logger.debug('Payment failed', { processor, eventId: eventData.id });
   }
-  
+
   private async handlePaymentRefunded(processor: string, eventData: WebhookEvent): Promise<void> {
     // Handle refund processing
-    console.log(`Payment refunded on ${processor}:`, eventData.id);
+    logger.debug('Payment refunded', { processor, eventId: eventData.id });
   }
   
   // Public API methods
@@ -573,17 +576,17 @@ class PaymentSystemOrchestrator {
   }
   
   async shutdown(): Promise<void> {
-    console.log('🛑 Shutting down Payment System...');
-    
+    logger.debug('Shutting down Payment System');
+
     paymentHealthMonitor.stopMonitoring();
-    
+
     SecurityLogger.logSecurityEvent(
       'payment_system_shutdown',
       'medium',
       { activeTransactions: this.activeTransactions.size }
     );
-    
-    console.log('✅ Payment System shutdown complete');
+
+    logger.debug('Payment System shutdown complete');
   }
 }
 

@@ -1,11 +1,14 @@
 /**
  * Mobile Share Button Component
- * 
+ *
  * Reusable share button for mobile interface that handles different content types
  * and provides native mobile sharing when available, with clipboard fallback
  */
 
 import React, { useState } from 'react';
+import { createScopedLogger } from '../../lib/clientLogger';
+
+const logger = createScopedLogger('[ShareButton]');
 
 const ShareButton = ({ 
   shareData,
@@ -74,16 +77,16 @@ const ShareButton = ({
         onShareSuccess?.('clipboard');
       }
     } catch (error) {
-      console.error('Share failed:', error);
+      logger.error('Share failed', error);
       onShareError?.(error);
-      
+
       // Last resort: try to copy URL only
       try {
         await navigator.clipboard.writeText(shareData.url || window.location.href);
         setShowCopiedFeedback(true);
         setTimeout(() => setShowCopiedFeedback(false), 2000);
       } catch (clipboardError) {
-        console.error('Clipboard fallback failed:', clipboardError);
+        logger.error('Clipboard fallback failed', clipboardError);
       }
     } finally {
       setIsSharing(false);

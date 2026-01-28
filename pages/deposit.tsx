@@ -6,6 +6,9 @@ import { PAYMENT_METHODS_BY_COUNTRY, PAYMENT_METHOD_DETAILS, type PaymentMethodI
 import { getAvailablePaymentMethods, calculateFees } from '../lib/paymentProcessor';
 import { createDeposit } from '../lib/bankingSystem';
 import { canMakeDeposits, type ComplianceResult } from '../lib/complianceSystem';
+import { createScopedLogger } from '@/lib/clientLogger';
+
+const logger = createScopedLogger('[Deposit]');
 
 interface UserLocation {
   latitude?: number;
@@ -345,7 +348,7 @@ export default function DepositPage() {
 
     // Development bypass - ONLY check NODE_ENV, never hostname
     if (process.env.NODE_ENV === 'development') {
-      console.log('🏠 Development mode: Bypassing location verification');
+      logger.debug('Development mode: Bypassing location verification');
       setUserLocation({
         latitude: 40.7128, // NYC coordinates as default
         longitude: -74.0060,
@@ -391,7 +394,7 @@ export default function DepositPage() {
         await checkCompliance();
       }
     } catch (error) {
-      console.error('Error getting location:', error);
+      logger.error('Error getting location', error instanceof Error ? error : new Error(String(error)));
       setUserLocation({ country: 'United States', state: null });
       const methods = getAvailablePaymentMethods('United States');
       setAvailableMethods(methods.map(m => m.toString()));
@@ -415,7 +418,7 @@ export default function DepositPage() {
         state: data.principalSubdivision || null
       };
     } catch (error) {
-      console.error('Reverse geocoding error:', error);
+      logger.error('Reverse geocoding error', error instanceof Error ? error : new Error(String(error)));
       return { country: 'United States', state: null };
     }
   };
@@ -429,7 +432,7 @@ export default function DepositPage() {
       const compliance = await canMakeDeposits(userData, country);
       setComplianceStatus(compliance.status);
     } catch (error) {
-      console.error('Error checking compliance:', error);
+      logger.error('Error checking compliance', error instanceof Error ? error : new Error(String(error)));
     }
   };
 
@@ -490,7 +493,7 @@ export default function DepositPage() {
       setSelectedMethod(availableMethods[0] || '');
       
     } catch (error) {
-      console.error('Deposit error:', error);
+      logger.error('Deposit error', error instanceof Error ? error : new Error(String(error)));
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       setError(`Deposit failed: ${errorMessage}`);
     } finally {

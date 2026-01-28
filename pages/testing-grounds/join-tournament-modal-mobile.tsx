@@ -59,7 +59,6 @@ function JoinTournamentModalMobilePage(): JSX.Element {
 
   const handleConfirm = useCallback((options: { entries: number; autopilot: boolean }): void => {
     setIsJoining(true);
-    console.log('Joining with options:', options);
     setTimeout(() => {
       setIsJoining(false);
       alert(`Joined with ${options.entries} entries, autopilot: ${options.autopilot}`);

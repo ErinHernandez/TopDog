@@ -9,10 +9,11 @@
  */
 
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { 
+import {
   createDisbursement,
   createXenditTransaction,
   getSavedDisbursementAccounts,
+  saveDisbursementAccount,
   generateReference,
 } from '../../../lib/xendit';
 import { validateWithdrawalAmount } from '../../../lib/xendit/currencyConfig';
@@ -20,12 +21,16 @@ import {
   withErrorHandling,
   validateMethod,
   validateBody,
+  validateRequestBody,
   createSuccessResponse,
   createErrorResponse,
   ErrorType,
 } from '../../../lib/apiErrorHandler';
+import { xenditCreateDisbursementSchema } from '../../../lib/validation/schemas';
 import { db } from '../../../lib/firebase';
 import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { withAuth } from '../../../lib/apiAuth';
+import { withRateLimit, createPaymentRateLimiter } from '../../../lib/rateLimitConfig';
 
 // ============================================================================
 // TYPES
@@ -59,7 +64,10 @@ interface CreateDisbursementResponse {
 // HANDLER
 // ============================================================================
 
-export default async function handler(
+// Create rate limiter for Xendit disbursements (10 per hour)
+const xenditDisbursementLimiter = createPaymentRateLimiter('xenditDisbursement');
+
+async function handler(
   req: NextApiRequest,
   res: NextApiResponse<CreateDisbursementResponse>
 ): Promise<void> {
@@ -71,38 +79,8 @@ export default async function handler(
       operation: 'createDisbursement',
     });
     
-    const body = req.body as CreateDisbursementBody;
-    
-    // Validate required fields
-    validateBody(req, ['amount', 'userId', 'accountId'], logger);
-    
-    // Validate amount type and value
-    if (typeof body.amount !== 'number' || body.amount <= 0) {
-      const response = createErrorResponse(
-        ErrorType.VALIDATION,
-        'Invalid amount. Must be a positive number',
-        { amount: body.amount },
-        null
-      );
-      return res.status(response.statusCode).json({ 
-        success: false, 
-        error: 'Invalid amount' 
-      });
-    }
-    
-    // Validate userId type
-    if (typeof body.userId !== 'string') {
-      const response = createErrorResponse(
-        ErrorType.VALIDATION,
-        'User ID must be a string',
-        {},
-        null
-      );
-      return res.status(response.statusCode).json({ 
-        success: false, 
-        error: 'User ID is required' 
-      });
-    }
+    // SECURITY: Validate request body using Zod schema
+    const body = validateRequestBody(req, xenditCreateDisbursementSchema, logger);
     
     logger.info('Validating disbursement request', {
       component: 'xendit',
@@ -205,10 +183,64 @@ export default async function handler(
         userId: body.userId,
         saveForFuture: body.newAccount.saveForFuture,
       });
-      
-      // TODO: Save for future if requested
-      // Note: This TODO should be addressed in a future update
-      // Implementation would involve saving the account to user's saved accounts
+
+      // Save account for future use if requested
+      if (body.newAccount.saveForFuture) {
+        try {
+          // Create masked account number for display (show last 4 digits)
+          const accountNumberMasked = accountNumber.length > 4
+            ? '*'.repeat(accountNumber.length - 4) + accountNumber.slice(-4)
+            : accountNumber;
+
+          // Determine account type and channel name
+          const isEwallet = ['GCASH', 'GRABPAY', 'PAYMAYA', 'SHOPEEPAY'].includes(bankCode.toUpperCase());
+          const type = isEwallet ? 'ewallet' : 'bank' as const;
+
+          // Map channel code to channel name
+          const channelNames: Record<string, string> = {
+            // Banks
+            'BCA': 'Bank Central Asia',
+            'BNI': 'Bank Negara Indonesia',
+            'BRI': 'Bank Rakyat Indonesia',
+            'MANDIRI': 'Bank Mandiri',
+            'CIMB': 'CIMB Niaga',
+            'PERMATA': 'PermataBank',
+            'BSI': 'Bank Syariah Indonesia',
+            // E-wallets
+            'GCASH': 'GCash',
+            'GRABPAY': 'GrabPay',
+            'PAYMAYA': 'PayMaya',
+            'SHOPEEPAY': 'ShopeePay',
+            'OVO': 'OVO',
+            'DANA': 'DANA',
+          };
+          const channelName = channelNames[bankCode.toUpperCase()] || bankCode;
+
+          const savedAccount = await saveDisbursementAccount(body.userId, {
+            type,
+            channelCode: bankCode,
+            channelName,
+            accountNumber,
+            accountNumberMasked,
+            accountHolderName,
+            isDefault: false, // Don't automatically make it default
+          });
+          logger.info('Disbursement account saved for future use', {
+            component: 'xendit',
+            operation: 'saveDisbursementAccount',
+            userId: body.userId,
+            accountId: savedAccount.id,
+          });
+        } catch (saveError) {
+          // Log but don't fail the disbursement - saving is optional
+          logger.warn('Failed to save disbursement account for future use', {
+            component: 'xendit',
+            operation: 'saveDisbursementAccount',
+            userId: body.userId,
+            error: saveError instanceof Error ? saveError.message : String(saveError),
+          });
+        }
+      }
     } else {
       logger.info('Fetching saved disbursement account', {
         component: 'xendit',
@@ -326,14 +358,12 @@ export default async function handler(
         status: result.status,
       });
       
-      const response = createSuccessResponse({
+      return res.status(200).json({
         success: true,
         disbursementId: result.disbursementId,
         transactionId: transaction.id,
         status: result.status,
-      }, 200, logger);
-      
-      return res.status(response.statusCode).json(response.body);
+      });
       
     } catch (disbursementError) {
       // Restore balance if disbursement fails
@@ -406,5 +436,12 @@ export default async function handler(
     }
   });
 }
+
+// Export with authentication and rate limiting
+// Cast to any to resolve type mismatch between NextApiRequest and AuthenticatedRequest
+export default withAuth(
+  withRateLimit(handler, xenditDisbursementLimiter) as any,
+  { required: true, allowAnonymous: false }
+);
 
 

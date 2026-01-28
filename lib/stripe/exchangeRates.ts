@@ -1,15 +1,17 @@
 /**
  * Exchange Rate Service
- * 
+ *
  * Fetches real-time exchange rates for currency conversion.
  * Uses the Frankfurter API (European Central Bank rates) as primary source.
  * Results are cached for 15 minutes to minimize API calls.
- * 
+ *
  * Note: Stripe's actual exchange rate is only available after payment capture.
  * For display purposes, we use ECB rates which are updated daily and closely
  * match what payment processors use. The actual conversion at deposit time
  * may vary slightly (typically <1%).
  */
+
+import { serverLogger } from '../logger/serverLogger';
 
 // ============================================================================
 // TYPES
@@ -241,7 +243,7 @@ async function fetchExchangeRate(currency: string): Promise<StripeExchangeRate> 
       throw new Error(`Invalid rate returned for ${upperCurrency}: ${rate}`);
     }
     
-    console.log(`[ExchangeRates] Fetched ${upperCurrency} rate from ECB: ${rate}`);
+    serverLogger.info(`Fetched ${upperCurrency} rate from ECB: ${rate}`);
     
     return {
       currency: upperCurrency,
@@ -252,7 +254,7 @@ async function fetchExchangeRate(currency: string): Promise<StripeExchangeRate> 
     };
     
   } catch (error: unknown) {
-    console.warn('[ExchangeRates] API fetch failed, using fallback rate:', error);
+    serverLogger.warn('API fetch failed, using fallback rate');
     
     // Use fallback rate
     const fallbackRate = FALLBACK_RATES[upperCurrency];
@@ -268,7 +270,7 @@ async function fetchExchangeRate(currency: string): Promise<StripeExchangeRate> 
     }
     
     // Unknown currency - return 1:1 with short TTL
-    console.error(`[ExchangeRates] Unknown currency ${upperCurrency}, no fallback available`);
+    serverLogger.error(`Unknown currency ${upperCurrency}, no fallback available`, new Error('Unknown currency'));
     return {
       currency: upperCurrency,
       rate: 1,

@@ -13,6 +13,10 @@
  * DELETE /api/user/display-currency
  *   Resets to auto mode (follows last deposit currency)
  *   Body: { userId, country }
+ * 
+ * @deprecated This endpoint is deprecated. Use /api/v1/user/display-currency instead.
+ * Deprecation date: 2026-04-01
+ * Removal date: 2026-10-01
  */
 
 import type { NextApiResponse } from 'next';
@@ -20,11 +24,13 @@ import type { AuthenticatedRequest } from '../../../lib/apiTypes';
 import { 
   withErrorHandling, 
   validateMethod, 
+  validateRequestBody,
   createSuccessResponse,
   createErrorResponse,
   ErrorType,
   type ApiLogger,
 } from '../../../lib/apiErrorHandler';
+import { setDisplayCurrencySchema, resetDisplayCurrencySchema } from '../../../lib/validation/schemas';
 import {
   getDisplayCurrency,
   setDisplayCurrencyPreference,
@@ -71,6 +77,12 @@ const handler = async function(
 ) {
   return withErrorHandling(req, res, async (req, res, logger) => {
     validateMethod(req, ['GET', 'PUT', 'DELETE'], logger);
+    
+    // DEPRECATION: Set deprecation headers for non-v1 route
+    // Migrate to /api/v1/user/display-currency before 2026-10-01
+    res.setHeader('Deprecation', 'true');
+    res.setHeader('Sunset', 'Thu, 01 Oct 2026 00:00:00 GMT');
+    res.setHeader('Link', '</api/v1/user/display-currency>; rel="successor-version"');
     
     // Check rate limit
     const rateLimitResult = await displayCurrencyLimiter.check(req);
@@ -174,21 +186,15 @@ async function handlePut(
   res: NextApiResponse,
   logger: ApiLogger
 ) {
-  const { userId, country, currency } = req.body as Partial<SetDisplayCurrencyBody>;
+  // SECURITY: Validate request body using Zod schema
+  const body = validateRequestBody(req, setDisplayCurrencySchema, logger);
+  const { userId, country, currency } = body;
   
   // Verify user access
-  if (req.user && !verifyUserAccess(req.user.uid, userId || '')) {
+  if (req.user && !verifyUserAccess(req.user.uid, userId)) {
     const error = createErrorResponse(
       ErrorType.FORBIDDEN,
       'Access denied'
-    );
-    return res.status(error.statusCode).json(error.body);
-  }
-  
-  if (!userId || !country || !currency) {
-    const error = createErrorResponse(
-      ErrorType.VALIDATION,
-      'userId, country, and currency are required'
     );
     return res.status(error.statusCode).json(error.body);
   }
@@ -245,10 +251,12 @@ async function handleDelete(
   res: NextApiResponse,
   logger: ApiLogger
 ) {
-  const { userId, country } = req.body as Partial<ResetDisplayCurrencyBody>;
+  // SECURITY: Validate request body using Zod schema
+  const body = validateRequestBody(req, resetDisplayCurrencySchema, logger);
+  const { userId, country } = body;
   
   // Verify user access
-  if (req.user && !verifyUserAccess(req.user.uid, userId || '')) {
+  if (req.user && !verifyUserAccess(req.user.uid, userId)) {
     const error = createErrorResponse(
       ErrorType.FORBIDDEN,
       'Access denied'

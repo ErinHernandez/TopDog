@@ -5,6 +5,9 @@
 
 import { getNflLogoUrl } from './nflLogos';
 import { POSITION_COLORS } from './constants/positions';
+import { createScopedLogger } from './clientLogger';
+
+const logger = createScopedLogger('[PlayerPhotos]');
 
 // ============================================================================
 // TYPES
@@ -110,7 +113,7 @@ export const getTeamLogoUrl = (teamCode: NFLTeamCode | string | null | undefined
   try {
     return getNflLogoUrl(teamCode as NFLTeamCode);
   } catch (error) {
-    console.warn(`Failed to get team logo for ${teamCode}:`, error);
+    logger.warn(`Failed to get team logo for ${teamCode}`);
     return null;
   }
 };

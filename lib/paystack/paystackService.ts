@@ -9,8 +9,9 @@
 
 import crypto from 'crypto';
 import { getDb } from '../firebase-utils';
-import { doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, getDocs, serverTimestamp, runTransaction } from 'firebase/firestore';
 import { captureError } from '../errorTracking';
+import { serverLogger } from '../logger/serverLogger';
 import type {
   PaystackApiResponse,
   InitializeTransactionRequest,
@@ -50,7 +51,7 @@ const PAYSTACK_WEBHOOK_SECRET = process.env.PAYSTACK_WEBHOOK_SECRET;
 const PAYSTACK_BASE_URL = 'https://api.paystack.co';
 
 if (!PAYSTACK_SECRET_KEY) {
-  console.warn('[PaystackService] PAYSTACK_SECRET_KEY not configured');
+  serverLogger.warn('PAYSTACK_SECRET_KEY not configured');
 }
 
 // ============================================================================
@@ -116,12 +117,10 @@ async function paystackRequest<T>(
   return withPaystackRetry(makeRequest, {
     logger: {
       warn: (message: string, context?: Record<string, unknown>) => {
-        // Log retry warnings (structured logging will be added by caller if needed)
-        console.warn(`[PaystackService] ${message}`, context);
+        serverLogger.warn(message);
       },
       error: (message: string, error: unknown, context?: Record<string, unknown>) => {
-        // Log retry errors
-        console.error(`[PaystackService] ${message}`, error, context);
+        serverLogger.error(message, error instanceof Error ? error : new Error(String(error)), context);
       },
     },
   });
@@ -345,13 +344,37 @@ export async function initiateTransfer(
   }
   
   const userData = userDoc.data();
-  const currentBalance = (userData.balance || 0) as number;
+  const currentBalance = (userData.balance || 0) as number; // Balance stored in USD cents
   const currency = transferRequest.currency || 'NGN';
-  const amountDisplay = transferRequest.amount / 100; // Assuming smallest unit
-  
-  // TODO: Convert to USD equivalent for balance check
-  // For now, assume balance is in user's local currency
-  if (currentBalance < amountDisplay) {
+  const amountInLocalCurrency = transferRequest.amount / 100; // Convert from smallest unit to display amount
+
+  // Convert local currency amount to USD equivalent for balance check
+  // User balance is stored in USD cents, so we need to convert the withdrawal amount to USD
+  let amountInUSD: number;
+
+  if (currency === 'USD') {
+    amountInUSD = amountInLocalCurrency;
+  } else {
+    try {
+      const exchangeRate = await getStripeExchangeRate(currency);
+      amountInUSD = convertToUSD(amountInLocalCurrency, exchangeRate.rate);
+      serverLogger.debug(`Converted ${amountInLocalCurrency} ${currency} to ${amountInUSD.toFixed(2)} USD (rate: ${exchangeRate.rate})`);
+    } catch (error) {
+      serverLogger.error('Failed to get exchange rate for balance check', error instanceof Error ? error : new Error(String(error)));
+      throw new Error('Unable to verify balance - exchange rate unavailable');
+    }
+  }
+
+  // Convert USD amount to cents for comparison with balance (stored in cents)
+  const amountInUSDCents = Math.ceil(amountInUSD * 100);
+
+  if (currentBalance < amountInUSDCents) {
+    serverLogger.warn('Insufficient balance for transfer', null, {
+      currentBalance,
+      amountInUSDCents,
+      amountInLocalCurrency,
+      currency,
+    });
     throw new Error('Insufficient balance');
   }
   
@@ -446,7 +469,7 @@ export async function getOrCreateCustomer(
         return response.data;
       } catch (error: unknown) {
         // Customer might not exist, create new
-        console.warn('[PaystackService] Stored customer code invalid, creating new');
+        serverLogger.warn('Stored customer code invalid, creating new');
       }
     }
   }
@@ -480,39 +503,80 @@ export async function getOrCreateCustomer(
  * SECURITY: Uses crypto.timingSafeEqual to prevent timing attacks.
  * A timing attack could allow an attacker to guess the signature byte-by-byte
  * by measuring response times when comparing signatures.
+ *
+ * This implementation is constant-time regardless of input validity:
+ * - Always computes the hash
+ * - Always performs the timing-safe comparison
+ * - Early return conditions are masked with dummy operations
  */
 export function verifyWebhookSignature(
   payload: string | Buffer,
   signature: string
 ): boolean {
+  // Track validation failures but don't return early
+  let isValid = true;
+
   if (!PAYSTACK_WEBHOOK_SECRET) {
-    console.error('[PaystackService] PAYSTACK_WEBHOOK_SECRET not configured');
-    return false;
+    serverLogger.error('PAYSTACK_WEBHOOK_SECRET not configured');
+    isValid = false;
   }
 
-  // Validate signature format (should be hex string)
-  if (!signature || typeof signature !== 'string') {
-    return false;
-  }
-
+  // SECURITY: Always compute the hash to prevent timing leak
+  // Use a dummy secret if the real one isn't configured
+  const secretToUse = PAYSTACK_WEBHOOK_SECRET || 'dummy_secret_for_constant_time';
   const hash = crypto
-    .createHmac('sha512', PAYSTACK_WEBHOOK_SECRET)
+    .createHmac('sha512', secretToUse)
     .update(typeof payload === 'string' ? payload : payload.toString())
     .digest('hex');
 
-  // Use timing-safe comparison to prevent timing attacks
-  // Both buffers must be the same length for timingSafeEqual
-  const hashBuffer = Buffer.from(hash, 'hex');
-  const signatureBuffer = Buffer.from(signature, 'hex');
+  // SECURITY: Validate signature format without early return
+  // Missing or non-string signature fails validation
+  const signatureToUse = (signature && typeof signature === 'string')
+    ? signature
+    : hash; // Use computed hash as dummy to ensure valid hex
 
-  // If lengths differ, signature is invalid (but still do constant-time check)
-  if (hashBuffer.length !== signatureBuffer.length) {
-    // Perform a dummy comparison to maintain constant time
-    crypto.timingSafeEqual(hashBuffer, hashBuffer);
-    return false;
+  if (!signature || typeof signature !== 'string') {
+    isValid = false;
   }
 
-  return crypto.timingSafeEqual(hashBuffer, signatureBuffer);
+  // SECURITY: Validate hex format - signature should only contain hex chars
+  // Invalid hex will cause Buffer.from to produce unexpected results
+  const hexRegex = /^[0-9a-fA-F]+$/;
+  if (!hexRegex.test(signatureToUse)) {
+    isValid = false;
+  }
+
+  // SECURITY: Use timing-safe comparison to prevent timing attacks
+  // Both buffers must be the same length for timingSafeEqual
+  const hashBuffer = Buffer.from(hash, 'hex');
+
+  // Safely create signature buffer - if invalid hex, use hash length buffer
+  let signatureBuffer: Buffer;
+  try {
+    signatureBuffer = Buffer.from(signatureToUse, 'hex');
+  } catch {
+    // If hex parsing fails, use a same-length dummy buffer
+    signatureBuffer = Buffer.alloc(hashBuffer.length);
+    isValid = false;
+  }
+
+  // SECURITY: Length mismatch means invalid signature
+  // Still perform constant-time comparison with padded/truncated buffer
+  if (hashBuffer.length !== signatureBuffer.length) {
+    // Create a buffer of matching length for constant-time comparison
+    const paddedBuffer = Buffer.alloc(hashBuffer.length);
+    signatureBuffer.copy(paddedBuffer, 0, 0, Math.min(signatureBuffer.length, hashBuffer.length));
+    crypto.timingSafeEqual(hashBuffer, paddedBuffer);
+    isValid = false;
+  } else {
+    // Perform the actual comparison
+    const comparisonResult = crypto.timingSafeEqual(hashBuffer, signatureBuffer);
+    if (!comparisonResult) {
+      isValid = false;
+    }
+  }
+
+  return isValid;
 }
 
 /**
@@ -561,10 +625,10 @@ export async function handleChargeSuccess(
     exchangeRate = rateData.rate;
     usdAmount = convertToUSD(localAmountDisplay, exchangeRate);
     
-    console.log(`[Paystack] Converting ${localAmountDisplay} ${currency} to USD: rate=${exchangeRate}, usdAmount=${usdAmount.toFixed(2)}`);
+    serverLogger.debug('Converting to USD', { localAmount: localAmountDisplay, currency, exchangeRate, usdAmount: usdAmount.toFixed(2) });
     actions.push(`converted_${currency}_to_usd`);
   } catch (error: unknown) {
-    console.error('[Paystack] Failed to get exchange rate, cannot process deposit:', error);
+    serverLogger.error('Failed to get exchange rate, cannot process deposit', error instanceof Error ? error : new Error(String(error)));
     return { success: false, actions: ['exchange_rate_failed'] };
   }
   
@@ -646,7 +710,7 @@ export async function handleChargeFailed(
   if (!existingTx) {
     // No transaction record found - this is unusual but not an error
     // The user may have never started the payment flow
-    console.warn(`[Paystack] charge.failed: No transaction found for reference ${data.reference}`);
+    serverLogger.warn('charge.failed: No transaction found for reference');
     return { success: true, actions: ['no_transaction_found'] };
   }
   
@@ -661,8 +725,8 @@ export async function handleChargeFailed(
   actions.push('transaction_failed');
   
   // Log the failure reason for debugging
-  console.log(`[Paystack] Charge failed for reference ${data.reference}: ${errorMessage}`);
-  
+  serverLogger.debug('Charge failed', { reference: data.reference, errorMessage });
+
   return { success: true, actions };
 }
 
@@ -737,7 +801,7 @@ export async function handleTransferFailed(
     } else {
       // Fallback: Convert local currency to USD if usdAmountDebited not stored
       // This shouldn't happen for new transactions but handles legacy data
-      console.warn(`[Paystack] No usdAmountDebited found for transfer ${data.transfer_code}, falling back to conversion`);
+      serverLogger.warn('No usdAmountDebited found for transfer, falling back to conversion');
       
       const currency = existingTx.currency || data.currency.toUpperCase();
       const localAmountDisplay = data.amount / 100;
@@ -748,7 +812,7 @@ export async function handleTransferFailed(
         await updateUserBalance(userId, usdAmount * 100, 'add');
         actions.push('balance_restored_converted');
       } catch (error: unknown) {
-        console.error('[Paystack] Failed to get exchange rate for balance restoration:', error);
+        serverLogger.error('Failed to get exchange rate for balance restoration', error instanceof Error ? error : new Error(String(error)));
         actions.push('balance_restoration_failed');
         return { success: false, actions };
       }
@@ -1071,37 +1135,103 @@ export async function createOrUpdateWebhookEvent(
 // ============================================================================
 
 /**
- * Update user balance
+ * Update user balance atomically using Firestore transaction
+ *
+ * SECURITY: Uses runTransaction to prevent race conditions where concurrent
+ * updates could result in incorrect balances (e.g., double crediting).
+ *
+ * @param userId - Firebase user ID
+ * @param amount - Amount in dollars (not cents)
+ * @param operation - 'add' for deposits, 'subtract' for withdrawals
+ * @param idempotencyKey - Optional key to prevent duplicate operations
+ * @returns Promise resolving to new balance
  */
 async function updateUserBalance(
   userId: string,
   amount: number,
-  operation: 'add' | 'subtract'
+  operation: 'add' | 'subtract',
+  idempotencyKey?: string
 ): Promise<number> {
   const db = getDb();
   const userRef = doc(db, 'users', userId);
-  const userDoc = await getDoc(userRef);
-  
-  if (!userDoc.exists()) {
-    throw new Error('User not found');
+
+  // SECURITY: Check for duplicate operations if idempotency key provided
+  if (idempotencyKey) {
+    const balanceOpsRef = collection(db, 'balanceOperations');
+    const duplicateQuery = query(
+      balanceOpsRef,
+      where('idempotencyKey', '==', idempotencyKey)
+    );
+    const duplicateSnapshot = await getDocs(duplicateQuery);
+
+    if (!duplicateSnapshot.empty) {
+      serverLogger.warn('Paystack: Duplicate balance operation detected', null, {
+        userId,
+        idempotencyKey,
+        operation,
+      });
+      // Return the existing balance instead of processing duplicate
+      const userDoc = await getDoc(userRef);
+      return (userDoc.data()?.balance || 0) as number;
+    }
   }
-  
-  const currentBalance = (userDoc.data().balance || 0) as number;
-  
-  const newBalance = operation === 'add'
-    ? currentBalance + amount
-    : currentBalance - amount;
-  
-  if (newBalance < 0) {
-    throw new Error('Insufficient balance');
-  }
-  
-  await setDoc(userRef, {
-    balance: newBalance,
-    lastBalanceUpdate: serverTimestamp(),
-  }, { merge: true });
-  
-  return newBalance;
+
+  // SECURITY: Use atomic transaction to prevent race conditions
+  const result = await runTransaction(db, async (transaction) => {
+    const userDoc = await transaction.get(userRef);
+
+    if (!userDoc.exists()) {
+      throw new Error('User not found');
+    }
+
+    const currentBalance = (userDoc.data().balance || 0) as number;
+
+    const newBalance = operation === 'add'
+      ? currentBalance + amount
+      : currentBalance - amount;
+
+    // SECURITY: Prevent negative balances
+    if (newBalance < 0) {
+      throw new Error(`Insufficient balance. Current: ${currentBalance.toFixed(2)}, Requested: ${amount.toFixed(2)}`);
+    }
+
+    // Update balance atomically within transaction
+    transaction.update(userRef, {
+      balance: newBalance,
+      lastBalanceUpdate: serverTimestamp(),
+    });
+
+    // If idempotency key provided, record this operation
+    if (idempotencyKey) {
+      const balanceOpRef = doc(collection(db, 'balanceOperations'));
+      transaction.set(balanceOpRef, {
+        userId,
+        idempotencyKey,
+        provider: 'paystack',
+        operation,
+        amount,
+        previousBalance: currentBalance,
+        newBalance,
+        createdAt: serverTimestamp(),
+      });
+    }
+
+    return {
+      previousBalance: currentBalance,
+      newBalance,
+    };
+  });
+
+  serverLogger.info('Paystack: Balance updated successfully', {
+    userId,
+    operation,
+    amount,
+    previousBalance: result.previousBalance,
+    newBalance: result.newBalance,
+    idempotencyKey,
+  });
+
+  return result.newBalance;
 }
 
 // ============================================================================

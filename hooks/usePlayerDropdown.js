@@ -1,11 +1,14 @@
 /**
  * usePlayerDropdown - Custom Hook for Player Dropdown Logic
- * 
+ *
  * Provides consistent dropdown behavior across different contexts
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { playerDataService } from '../lib/playerData/PlayerDataService';
+import { createScopedLogger } from '../lib/clientLogger';
+
+const logger = createScopedLogger('[PlayerDropdown]');
 
 export function usePlayerDropdown({
   initialPlayers = null,
@@ -37,7 +40,7 @@ export function usePlayerDropdown({
       setLastUpdate(Date.now());
     } catch (err) {
       setError(err.message);
-      console.error('Failed to load players:', err);
+      logger.error('Failed to load players', err);
     } finally {
       setLoading(false);
     }

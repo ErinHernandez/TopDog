@@ -12,6 +12,9 @@
  */
 
 import React from 'react';
+import { createScopedLogger } from '../clientLogger';
+
+const logger = createScopedLogger('[DraftVersionTracking]');
 
 /**
  * Track draft version access
@@ -57,7 +60,7 @@ export async function trackDraftVersion(
     // Silent failure - analytics shouldn't break the app
     // Only log in development
     if (process.env.NODE_ENV === 'development') {
-      console.warn('[DraftVersionTracking] Failed to track version:', error);
+      logger.warn('Failed to track version');
     }
   }
 }
@@ -75,13 +78,14 @@ export function useDraftVersionTracking(
   roomId?: string | null,
   userId?: string | null
 ): void {
-  // Only run in browser
-  if (typeof window === 'undefined') {
-    return;
-  }
-
   // Use useEffect to track on mount
+  // Hook must be called unconditionally at the top level
   React.useEffect(() => {
+    // Only run in browser
+    if (typeof window === 'undefined') {
+      return;
+    }
+
     if (roomId) {
       trackDraftVersion(version, roomId, userId);
     }

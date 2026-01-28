@@ -1,11 +1,14 @@
 /**
  * Sort Utilities for Teams Tab
- * 
+ *
  * Provides sorting functions for team lists and player lists.
  * Philosophy: Data only, no analysis - just raw data sorting.
  */
 
+import { createScopedLogger } from '@/lib/clientLogger';
 import type { MyTeam, TeamPlayer, Position } from '../../hooks/data/useMyTeams';
+
+const logger = createScopedLogger('[sortUtils]');
 
 // ============================================================================
 // TYPES
@@ -355,7 +358,7 @@ export function loadSortPreferences(): SortState | null {
       playerList: parsed.playerList || {},
     };
   } catch (e) {
-    console.error('Failed to load sort preferences:', e);
+    logger.error('Failed to load sort preferences:', e instanceof Error ? e : new Error(String(e)));
     return null;
   }
 }
@@ -378,7 +381,7 @@ export function saveSortPreferences(state: SortState): void {
     
     localStorage.setItem(STORAGE_KEY, JSON.stringify(toStore));
   } catch (e) {
-    console.error('Failed to save sort preferences:', e);
+    logger.error('Failed to save sort preferences:', e instanceof Error ? e : new Error(String(e)));
   }
 }
 
@@ -454,7 +457,7 @@ export function loadCustomOrder(userId: string | null = null): Map<string, numbe
     const parsed = JSON.parse(stored);
     return new Map(Object.entries(parsed).map(([id, order]) => [id, order as number]));
   } catch (e) {
-    console.error('Failed to load custom order:', e);
+    logger.error('Failed to load custom order:', e instanceof Error ? e : new Error(String(e)));
     return new Map();
   }
 }
@@ -473,7 +476,7 @@ export function saveCustomOrder(order: Map<string, number>, userId: string | nul
     const toStore = Object.fromEntries(order);
     localStorage.setItem(key, JSON.stringify(toStore));
   } catch (e) {
-    console.error('Failed to save custom order:', e);
+    logger.error('Failed to save custom order:', e instanceof Error ? e : new Error(String(e)));
   }
 }
 
@@ -501,7 +504,7 @@ export function clearCustomOrder(userId: string | null = null): void {
     const key = getCustomOrderKey(userId);
     localStorage.removeItem(key);
   } catch (e) {
-    console.error('Failed to clear custom order:', e);
+    logger.error('Failed to clear custom order:', e instanceof Error ? e : new Error(String(e)));
   }
 }
 

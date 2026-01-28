@@ -8,6 +8,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { SeasonStats, HistoricalPlayer } from '@/lib/historicalStats/types';
 import * as historicalService from '@/lib/historicalStats/service';
+import { createScopedLogger } from '@/lib/clientLogger';
+
+const logger = createScopedLogger('[useHistoricalStats]');
 
 // =============================================================================
 // TYPES
@@ -206,7 +209,7 @@ export function usePreloadHistoricalData() {
       await historicalService.preloadHistoricalData();
       setPreloaded(true);
     } catch (error) {
-      console.error('[usePreloadHistoricalData] Failed:', error);
+      logger.error('Preload failed', error instanceof Error ? error : new Error(String(error)));
     } finally {
       setLoading(false);
     }

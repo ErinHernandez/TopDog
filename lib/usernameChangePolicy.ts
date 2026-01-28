@@ -13,12 +13,15 @@
  * ```
  */
 
-import { 
-  doc, 
-  getDoc, 
-  Timestamp 
+import {
+  doc,
+  getDoc,
+  Timestamp
 } from 'firebase/firestore';
 import { db } from './firebase';
+import { createScopedLogger } from './clientLogger';
+
+const logger = createScopedLogger('[UsernameChangePolicy]');
 
 // ============================================================================
 // CONSTANTS
@@ -114,8 +117,7 @@ export class UsernameChangePolicy {
       
       return { allowed: true };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error('Error checking username change policy:', errorMessage);
+      logger.error('Error checking username change policy', error instanceof Error ? error : new Error(String(error)));
       // Fail closed for security
       return { allowed: false, reason: 'Error checking change policy' };
     }
@@ -164,8 +166,7 @@ export class UsernameChangePolicy {
         isWhale,
       };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error('Error getting cooldown info:', errorMessage);
+      logger.error('Error getting cooldown info', error instanceof Error ? error : new Error(String(error)));
       return { cooldownDays: COOLDOWN_PERIODS.DEFAULT, isWhale: false };
     }
   }

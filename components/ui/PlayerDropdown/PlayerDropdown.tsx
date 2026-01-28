@@ -1,13 +1,16 @@
 /**
  * PlayerDropdown - Reusable Player Dropdown Component
- * 
+ *
  * Identical styling to draft room dropdown, configurable for different contexts.
  * Supports daily data updates and cross-application usage.
  */
 
 import React, { useState, useEffect, useRef } from 'react';
 import type { JSX } from 'react';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+import { createScopedLogger } from '@/lib/clientLogger';
+
+const logger = createScopedLogger('[PlayerDropdown]');
+ 
 const { playerDataService } = require('../../../lib/playerData/PlayerDataService');
 import { DROPDOWN_STYLES, DROPDOWN_DIMENSIONS, CONTEXT_OVERRIDES, type ContextOverride } from './PlayerDropdownStyles';
 import PlayerDropdownRow from './PlayerDropdownRow';
@@ -155,7 +158,7 @@ export default function PlayerDropdown({
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       setDataError(errorMessage);
-      console.error('Failed to load players:', err);
+      logger.error('Failed to load players:', err instanceof Error ? err : new Error(String(err)));
     } finally {
       setIsLoading(false);
     }

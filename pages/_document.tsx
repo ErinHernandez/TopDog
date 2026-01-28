@@ -8,6 +8,9 @@ export default function Document() {
         {/* Fonts */}
         <link href="https://fonts.googleapis.com/css2?family=Anton+SC&display=swap" rel="stylesheet" />
         
+        {/* Viewport */}
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+        
         {/* PWA Primary Meta Tags */}
         <meta name="application-name" content="TopDog" />
         <meta name="apple-mobile-web-app-capable" content="yes" />

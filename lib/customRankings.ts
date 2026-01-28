@@ -3,6 +3,10 @@
  * Manages user-defined player rankings stored in localStorage
  */
 
+import { createScopedLogger } from './clientLogger';
+
+const logger = createScopedLogger('[CustomRankings]');
+
 // ============================================================================
 // TYPES
 // ============================================================================
@@ -40,14 +44,13 @@ export const loadCustomRankings = (): CustomRankings => {
     const stored = localStorage.getItem('customRankings');
     return stored ? JSON.parse(stored) : [];
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Error loading custom rankings:', errorMessage);
+    logger.error('Error loading custom rankings', error instanceof Error ? error : new Error(String(error)));
     // Clear corrupted data from localStorage to prevent future errors
     try {
       localStorage.removeItem('customRankings');
     } catch (clearError) {
       // Ignore errors when clearing (e.g., in private browsing mode)
-      console.warn('Could not clear corrupted customRankings from localStorage:', clearError);
+      logger.warn('Could not clear corrupted customRankings from localStorage');
     }
     return [];
   }
@@ -64,8 +67,7 @@ export const saveCustomRankings = (rankings: CustomRankings): void => {
     }
     localStorage.setItem('customRankings', JSON.stringify(rankings));
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Error saving custom rankings:', errorMessage);
+    logger.error('Error saving custom rankings', error instanceof Error ? error : new Error(String(error)));
   }
 };
 
@@ -79,8 +81,7 @@ export const clearCustomRankings = (): void => {
     }
     localStorage.removeItem('customRankings');
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Error clearing custom rankings:', errorMessage);
+    logger.error('Error clearing custom rankings', error instanceof Error ? error : new Error(String(error)));
   }
 };
 

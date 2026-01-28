@@ -4,6 +4,9 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { createScopedLogger } from '../lib/clientLogger';
+
+const logger = createScopedLogger('[ExportModal]');
 
 export default function ExportModal({ 
   isOpen, 
@@ -40,7 +43,7 @@ export default function ExportModal({
         setRestrictionInfo(null);
       }
     } catch (error) {
-      console.error('Error checking data access:', error);
+      logger.error('Error checking data access', error);
     }
   };
 
@@ -81,7 +84,7 @@ export default function ExportModal({
       }, 2000);
 
     } catch (error) {
-      console.error('Export failed:', error);
+      logger.error('Export failed', error);
       alert('Export failed. Please try again.');
     } finally {
       setIsExporting(false);

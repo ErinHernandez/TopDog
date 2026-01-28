@@ -682,27 +682,21 @@ function DepositModalContent({
     const localAmount = toLocal(amountUSD);
     return toSmallestUnit(localAmount, displayCurrency);
   }, [amountUSD, toLocal, displayCurrency]);
-  
-  // Load saved payment methods
-  useEffect(() => {
-    if (isOpen && userId) {
-      loadSavedMethods();
-    }
-  }, [isOpen, userId]);
-  
-  const loadSavedMethods = async () => {
+
+  // Load saved payment methods - wrapped in useCallback for proper dependency management
+  const loadSavedMethods = useCallback(async () => {
     try {
       const response = await fetch(`/api/stripe/payment-methods?userId=${userId}`);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
-      
+
       if (data.ok && data.data?.paymentMethods) {
         setSavedMethods(data.data.paymentMethods);
-        
+
         // Auto-select default method if exists
         const defaultMethod = data.data.paymentMethods.find((m: SavedPaymentMethod) => m.isDefault);
         if (defaultMethod) {
@@ -712,7 +706,14 @@ function DepositModalContent({
     } catch (err) {
       logger.error('Failed to load payment methods', err);
     }
-  };
+  }, [userId]);
+
+  // Load saved payment methods
+  useEffect(() => {
+    if (isOpen && userId) {
+      loadSavedMethods();
+    }
+  }, [isOpen, userId, loadSavedMethods]);
   
   // Handle USD amount change from stepper
   const handleAmountChange = useCallback((usdAmount: number) => {
@@ -789,11 +790,13 @@ function DepositModalContent({
     }
     return null;
   }, [displayCurrency, userCountry, selectedPaymentType]);
-  
+
   // Check if payment requires async flow (voucher/QR code)
   const isAsyncPayment = useMemo(() => {
-    return getAsyncPaymentType() !== null;
-  }, [getAsyncPaymentType]);
+    if (displayCurrency === 'MXN' && userCountry === 'MX') return true;
+    if (displayCurrency === 'BRL' && userCountry === 'BR') return true;
+    return false;
+  }, [displayCurrency, userCountry]);
   
   // Process payment
   const processPayment = async () => {
@@ -1102,14 +1105,12 @@ export function DepositModalVX2(props: DepositModalVX2Props): React.ReactElement
   
   // Handle currency change - recreate payment intent with new currency
   const handleCurrencyChange = useCallback((newCurrency: string) => {
-    if (newCurrency !== selectedCurrency) {
-      logger.debug('Currency changed', { from: selectedCurrency, to: newCurrency });
-      setSelectedCurrency(newCurrency);
-      // Reset payment intent to create new one with new currency
-      setClientSecret(null);
-      hasAttemptedRef.current = false;
-      setError(null);
-    }
+    logger.debug('Currency changed', { from: selectedCurrency, to: newCurrency });
+    setSelectedCurrency(newCurrency);
+    // Reset payment intent to create new one with new currency
+    setClientSecret(null);
+    hasAttemptedRef.current = false;
+    setError(null);
   }, [selectedCurrency]);
   
   // Reset when modal opens/closes
@@ -1132,15 +1133,15 @@ export function DepositModalVX2(props: DepositModalVX2Props): React.ReactElement
     if (!isOpen || !userId || clientSecret || hasAttemptedRef.current) {
       return;
     }
-    
+
     hasAttemptedRef.current = true;
     setIsCreatingIntent(true);
     setError(null);
-    
+
     const createPaymentIntent = async () => {
       try {
         logger.debug('Creating payment intent', { userId, userEmail, selectedCurrency });
-        
+
         const response = await fetch('/api/stripe/payment-intent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -1156,14 +1157,14 @@ export function DepositModalVX2(props: DepositModalVX2Props): React.ReactElement
             paymentMethodTypes: ['card', 'link'],
           }),
         });
-        
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         const data = await response.json();
         logger.debug('Payment intent response', { ok: data.ok, hasSecret: !!data.data?.clientSecret });
-        
+
         if (data.ok && data.data?.clientSecret) {
           setClientSecret(data.data.clientSecret);
         } else {
@@ -1177,9 +1178,9 @@ export function DepositModalVX2(props: DepositModalVX2Props): React.ReactElement
         setIsCreatingIntent(false);
       }
     };
-    
+
     createPaymentIntent();
-  }, [isOpen, userId, userEmail, userName, userCountry, selectedCurrency, currencyConfig, clientSecret]);
+  }, [isOpen, userId, userEmail, userName, userCountry, selectedCurrency, currencyConfig, clientSecret, localCurrency]);
   
   const handleRetry = useCallback(() => {
     hasAttemptedRef.current = false;

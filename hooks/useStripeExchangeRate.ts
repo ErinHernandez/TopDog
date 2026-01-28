@@ -21,6 +21,9 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { createScopedLogger } from '@/lib/clientLogger';
+
+const logger = createScopedLogger('[useStripeExchangeRate]');
 
 // ============================================================================
 // TYPES
@@ -129,7 +132,7 @@ export function useStripeExchangeRate(
         // Keep using old rate if available
       }
     } catch (err) {
-      console.error('[useStripeExchangeRate] Error fetching rate:', err);
+      logger.error('Error fetching rate', err instanceof Error ? err : new Error(String(err)));
       setError('Network error fetching exchange rate');
       // Keep using old rate if available
     } finally {

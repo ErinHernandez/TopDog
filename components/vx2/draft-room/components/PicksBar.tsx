@@ -46,13 +46,13 @@ interface ScrollingUsernameProps {
  * Username that scrolls horizontally when tapped if truncated.
  * Shows full username with smooth scroll animation, then resets.
  */
-const ScrollingUsername: React.FC<ScrollingUsernameProps> = ({
+const ScrollingUsername = React.memo<ScrollingUsernameProps>(function ScrollingUsername({
   name,
   maxChars,
   color,
   fontSize,
   fontWeight,
-}) => {
+}) {
   const [isScrolling, setIsScrolling] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
@@ -113,7 +113,7 @@ const ScrollingUsername: React.FC<ScrollingUsernameProps> = ({
       </span>
     </div>
   );
-};
+});
 
 // ============================================================================
 // PIXEL-PERFECT CONSTANTS (matched from VX PicksBarVX.tsx)
@@ -535,7 +535,7 @@ interface BlankCardProps {
 // ============================================================================
 
 /** Position tracker bar showing draft composition by position */
-function PositionTrackerBar({ picks }: { picks: DraftPlayer[] }) {
+const PositionTrackerBar = React.memo(function PositionTrackerBar({ picks }: { picks: DraftPlayer[] }) {
   if (picks.length === 0) {
     return (
       <div
@@ -576,43 +576,24 @@ function PositionTrackerBar({ picks }: { picks: DraftPlayer[] }) {
         })}
     </div>
   );
-}
+});
 
 /** Status text shown in center of blank card */
-function BlankCardStatus({ 
+const BlankCardStatus = React.memo(function BlankCardStatus({ 
   isCurrent, 
   isUserPick, 
   picksAway,
-  timer
+  timer,
+  isDraftActive
 }: { 
   isCurrent: boolean; 
   isUserPick: boolean; 
   picksAway?: number;
   timer?: number;
+  isDraftActive: boolean;
 }) {
-  if (isCurrent) {
-    // Show timer instead of "On The Clock" text
-    if (timer !== undefined && timer !== null) {
-      return (
-        <div
-          style={{
-            fontWeight: 700,
-            color: '#FFFFFF',
-            fontSize: 24,
-            lineHeight: 1.2,
-            textAlign: 'center',
-            marginTop: 6,
-            fontVariantNumeric: 'tabular-nums',
-          }}
-          aria-label={`${timer} seconds remaining${isUserPick ? ', your turn' : ''}`}
-          aria-live="polite"
-        >
-          {timer}
-        </div>
-      );
-    }
-    
-    // Fallback to "On The Clock" if timer not available
+  if (isCurrent && isDraftActive) {
+    // Only show "On The Clock" text when draft is active
     return (
       <div
         style={{
@@ -646,10 +627,10 @@ function BlankCardStatus({
   }
   
   return null;
-}
+});
 
 /** Shared content area for blank cards (pick number, status, tracker) */
-function BlankCardContent({
+const BlankCardContent = React.memo(function BlankCardContent({
   pickNumber,
   teamCount,
   isCurrent,
@@ -657,6 +638,7 @@ function BlankCardContent({
   picksAway,
   participantPicks,
   timer,
+  isDraftActive,
 }: {
   pickNumber: number;
   teamCount: number;
@@ -665,6 +647,7 @@ function BlankCardContent({
   picksAway?: number;
   participantPicks: DraftPlayer[];
   timer?: number;
+  isDraftActive: boolean;
 }) {
   return (
     <div
@@ -709,6 +692,7 @@ function BlankCardContent({
           isUserPick={isUserPick} 
           picksAway={picksAway}
           timer={timer}
+          isDraftActive={isDraftActive}
         />
       </div>
       
@@ -725,7 +709,7 @@ function BlankCardContent({
       </div>
     </div>
   );
-}
+});
 
 /** Derive card styling based on draft state */
 function getBlankCardStyle(
@@ -852,6 +836,7 @@ const BlankCard = React.forwardRef<HTMLDivElement, BlankCardProps>(
               picksAway={picksAway}
               participantPicks={participantPicks}
               timer={timer}
+              isDraftActive={isDraftActive}
             />
           </div>
         </div>
@@ -892,6 +877,7 @@ const BlankCard = React.forwardRef<HTMLDivElement, BlankCardProps>(
           picksAway={picksAway}
           participantPicks={participantPicks}
           timer={timer}
+          isDraftActive={isDraftActive}
         />
       </div>
     );
@@ -902,7 +888,7 @@ const BlankCard = React.forwardRef<HTMLDivElement, BlankCardProps>(
 // MAIN COMPONENT
 // ============================================================================
 
-export default function PicksBar({
+const PicksBar = React.memo(function PicksBar({
   picks,
   currentPickNumber,
   participants,
@@ -1021,14 +1007,16 @@ export default function PicksBar({
     <div
       style={{
         width: '100%',
-        height: PICKS_BAR_PX.containerHeight,
+        height: '100%',
         backgroundColor: PICKS_BAR_PX.containerBg,
         paddingTop: PICKS_BAR_PX.containerPaddingTop,
-        paddingBottom: PICKS_BAR_PX.containerPaddingBottom,
+        paddingBottom: 0,
         paddingLeft: 0,
         paddingRight: 0,
+        marginBottom: 0,
         position: 'relative',
-        marginTop: 8,
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
       {/* Scrollable Container */}
@@ -1046,6 +1034,8 @@ export default function PicksBar({
           WebkitOverflowScrolling: 'touch',
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
+          marginBottom: 0,
+          paddingBottom: 0,
         }}
       >
         {/* Hidden scrollbar CSS */}
@@ -1072,6 +1062,8 @@ export default function PicksBar({
             paddingLeft: `calc(50% - ${PICKS_BAR_PX.cardWidth / 2}px)`,
             paddingRight: `calc(50% - ${PICKS_BAR_PX.cardWidth / 2}px)`,
             backgroundColor: PICKS_BAR_PX.containerBg,
+            marginBottom: 0,
+            paddingBottom: 0,
           }}
         >
           {pickSlots.map(({ pickNumber, pick, participantIndex }) => {
@@ -1176,5 +1168,7 @@ export default function PicksBar({
       )}
     </div>
   );
-}
+});
+
+export default PicksBar;
 

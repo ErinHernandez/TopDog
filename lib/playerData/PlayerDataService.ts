@@ -6,6 +6,9 @@
  */
 
 import type { PlayerPoolEntry } from '../playerPool';
+import { createScopedLogger } from '../clientLogger';
+
+const logger = createScopedLogger('[PlayerDataService]');
 
 // ============================================================================
 // TYPES
@@ -132,7 +135,7 @@ class PlayerDataService {
       
       return players;
     } catch (error) {
-      console.error('Failed to fetch players:', error);
+      logger.error('Failed to fetch players', error instanceof Error ? error : new Error(String(error)));
       // Return cached data as fallback
       const cacheKey = this.generateCacheKey(options);
       return this.cache.get(cacheKey) || [];

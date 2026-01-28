@@ -2,6 +2,9 @@ import { doc, runTransaction, Timestamp, getDoc, setDoc } from 'firebase/firesto
 import type { Firestore } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { UserLocations } from './types';
+import { createScopedLogger } from '@/lib/clientLogger';
+
+const logger = createScopedLogger('[Geolocation]');
 
 export interface GeolocationResult {
   country: { code: string; name: string } | null;
@@ -43,7 +46,7 @@ export async function detectLocation(): Promise<GeolocationResult> {
     }
   } catch (e: unknown) {
     // Log but continue to fallback
-    console.log('ipapi.co failed, trying fallback:', e instanceof Error ? e.message : 'Unknown error');
+    logger.debug('ipapi.co failed, trying fallback', { error: e instanceof Error ? e.message : 'Unknown error' });
   }
 
   // Fallback to BigDataCloud
@@ -99,7 +102,7 @@ export async function detectLocation(): Promise<GeolocationResult> {
       }
     }
   } catch (e: unknown) {
-    console.log('BigDataCloud fallback failed:', e instanceof Error ? e.message : 'Unknown error');
+    logger.debug('BigDataCloud fallback failed', { error: e instanceof Error ? e.message : 'Unknown error' });
   }
 
   // Final fallback: try ipinfo.io
@@ -135,11 +138,11 @@ export async function detectLocation(): Promise<GeolocationResult> {
       }
     }
   } catch (e: unknown) {
-    console.log('ipinfo.io fallback failed:', e instanceof Error ? e.message : 'Unknown error');
+    logger.debug('ipinfo.io fallback failed', { error: e instanceof Error ? e.message : 'Unknown error' });
   }
 
   // All methods failed
-  console.error('All location detection methods failed');
+  logger.error('All location detection methods failed', new Error('All detection methods failed'));
   return { country: null, state: null, error: 'All detection methods failed' };
 }
 

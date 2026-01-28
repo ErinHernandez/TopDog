@@ -30,6 +30,7 @@ const TUTORIAL_SHOWN_PREFIX = 'topdog_tutorial_shown_';
 
 // Hooks
 import { useDraftRoom } from '../hooks/useDraftRoom';
+import { getParticipantForPick } from '../utils';
 
 // Components
 import DraftStatusBar, { HEADER_HEIGHT } from './DraftStatusBar';
@@ -41,6 +42,7 @@ import DraftBoard from './DraftBoard';
 import DraftInfo from './DraftInfo';
 import DraftFooter from './DraftFooter';
 import LeaveConfirmModal from './LeaveConfirmModal';
+import NavigateAwayAlertsPromptModal, { DRAFT_ALERTS_PROMPT_SEEN_KEY } from './NavigateAwayAlertsPromptModal';
 import DraftInfoModal from './DraftInfoModal';
 import DraftTutorialModal from './DraftTutorialModal';
 
@@ -69,8 +71,6 @@ export interface DraftRoomVX2Props {
   userId?: string;
   /** Callback when leaving draft */
   onLeave?: () => void;
-  /** Use absolute positioning (for phone frame container) */
-  useAbsolutePosition?: boolean;
   /** Enable fast timer mode (3 seconds per pick) */
   fastMode?: boolean;
   /** Initial pick number to start at (default: 1) */
@@ -219,31 +219,35 @@ interface TabContentProps {
     rosterSize: number;
     pickTimeSeconds: number;
   };
+  selectedRosterParticipantIndex?: number;
+  onRosterParticipantSelect?: (index: number) => void;
 }
 
-function TabContent({ activeTab, draftRoom, onTutorial, onLeave, onLeaveFromLink, draftSettings }: TabContentProps): React.ReactElement {
+function TabContent({ activeTab, draftRoom, onTutorial, onLeave, onLeaveFromLink, draftSettings, selectedRosterParticipantIndex, onRosterParticipantSelect }: TabContentProps): React.ReactElement {
   switch (activeTab) {
     case 'players':
       return (
-        <PlayerList
-          players={draftRoom.availablePlayers.filteredPlayers}
-          totalCount={draftRoom.availablePlayers.totalCount}
-          isLoading={draftRoom.availablePlayers.isLoading}
-          isMyTurn={draftRoom.isMyTurn}
-          draftedCounts={draftRoom.picks.userPositionCounts}
-          positionFilters={draftRoom.availablePlayers.positionFilters}
-          onToggleFilter={draftRoom.availablePlayers.togglePositionFilter}
-          searchQuery={draftRoom.availablePlayers.searchQuery}
-          onSearchChange={draftRoom.availablePlayers.setSearchQuery}
-          onClearAll={draftRoom.availablePlayers.clearAll}
-          sortOption={draftRoom.availablePlayers.sortOption}
-          onSortChange={draftRoom.availablePlayers.setSortOption}
-          onDraft={draftRoom.draftPlayer}
-          onToggleQueue={draftRoom.queue.toggleQueue}
-          isQueued={draftRoom.queue.isQueued}
-          initialScrollPosition={draftRoom.getScrollPosition('players')}
-          onScrollPositionChange={(pos) => draftRoom.saveScrollPosition('players', pos)}
-        />
+        <div style={{ height: '100%', minHeight: 0, display: 'flex', flexDirection: 'column', position: 'relative' }}>
+          <PlayerList
+            players={draftRoom.availablePlayers.filteredPlayers}
+            totalCount={draftRoom.availablePlayers.totalCount}
+            isLoading={draftRoom.availablePlayers.isLoading}
+            isMyTurn={draftRoom.isMyTurn}
+            draftedCounts={draftRoom.picks.userPositionCounts}
+            positionFilters={draftRoom.availablePlayers.positionFilters}
+            onToggleFilter={draftRoom.availablePlayers.togglePositionFilter}
+            searchQuery={draftRoom.availablePlayers.searchQuery}
+            onSearchChange={draftRoom.availablePlayers.setSearchQuery}
+            onClearAll={draftRoom.availablePlayers.clearAll}
+            sortOption={draftRoom.availablePlayers.sortOption}
+            onSortChange={draftRoom.availablePlayers.setSortOption}
+            onDraft={draftRoom.draftPlayer}
+            onToggleQueue={draftRoom.queue.toggleQueue}
+            isQueued={draftRoom.queue.isQueued}
+            initialScrollPosition={draftRoom.getScrollPosition('players')}
+            onScrollPositionChange={(pos) => draftRoom.saveScrollPosition('players', pos)}
+          />
+        </div>
       );
     
     case 'queue':
@@ -268,6 +272,8 @@ function TabContent({ activeTab, draftRoom, onTutorial, onLeave, onLeaveFromLink
           getPicksForParticipant={(idx) => draftRoom.picks.picksByParticipant(idx)}
           initialScrollPosition={draftRoom.getScrollPosition('rosters')}
           onScrollPositionChange={(pos) => draftRoom.saveScrollPosition('rosters', pos)}
+          selectedParticipantIndex={selectedRosterParticipantIndex}
+          onParticipantSelect={onRosterParticipantSelect}
         />
       );
     
@@ -308,7 +314,6 @@ export default function DraftRoomVX2({
   roomId,
   userId,
   onLeave,
-  useAbsolutePosition = false,
   fastMode = false,
   initialPickNumber = 1,
   teamCount = 12,
@@ -325,6 +330,13 @@ export default function DraftRoomVX2({
   
   // Expose dev tools to parent - use ref to track previous values and prevent infinite loops
   const prevDevToolsRef = useRef<{ status: string; isPaused: boolean } | null>(null);
+
+  // SECURITY FIX: Store latest onLeave callback in ref to prevent stale closure issues
+  // when setTimeout captures an outdated reference to the callback
+  const onLeaveRef = useRef(onLeave);
+  useEffect(() => {
+    onLeaveRef.current = onLeave;
+  }, [onLeave]);
   
   React.useEffect(() => {
     if (!onDevToolsReady || draftRoom.isLoading) return;
@@ -347,11 +359,22 @@ export default function DraftRoomVX2({
   
   // Leave confirmation modal state
   const [showLeaveModal, setShowLeaveModal] = useState(false);
+  const [showAlertsPrompt, setShowAlertsPrompt] = useState(false);
   const [showTopBarHint, setShowTopBarHint] = useState(false);
   
   // Info and tutorial modal state
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [showTutorialModal, setShowTutorialModal] = useState(false);
+  
+  // Selected participant index in rosters tab (for external control from PicksBar)
+  const [selectedRosterParticipantIndex, setSelectedRosterParticipantIndex] = useState<number | undefined>(undefined);
+  
+  // Reset selected participant index when switching away from rosters tab
+  useEffect(() => {
+    if (draftRoom.activeTab !== 'rosters') {
+      setSelectedRosterParticipantIndex(undefined);
+    }
+  }, [draftRoom.activeTab]);
   
   // Track if we've already auto-shown tutorial for this draft session
   const hasAutoShownTutorial = useRef(false);
@@ -397,17 +420,33 @@ export default function DraftRoomVX2({
     localStorage.setItem(TUTORIAL_DISABLED_KEY, checked ? 'true' : 'false');
   }, []);
   
-  // Show leave confirmation modal (from top bar)
+  // Show leave confirmation modal (from top bar). On first leave from any draft room, show alerts prompt first.
   const handleLeaveClick = useCallback(() => {
     logger.debug('Leave button clicked - opening modal');
     setShowTopBarHint(false);
-    setShowLeaveModal(true);
+    const seen = typeof window !== 'undefined' && window.localStorage.getItem(DRAFT_ALERTS_PROMPT_SEEN_KEY) === 'true';
+    if (seen) {
+      setShowLeaveModal(true);
+    } else {
+      setShowAlertsPrompt(true);
+    }
   }, []);
 
   // Show leave confirmation modal (from Exit Draft link)
   const handleLeaveFromLink = useCallback(() => {
     logger.debug('Leave from Exit Draft link - opening modal with hint');
     setShowTopBarHint(true);
+    const seen = typeof window !== 'undefined' && window.localStorage.getItem(DRAFT_ALERTS_PROMPT_SEEN_KEY) === 'true';
+    if (seen) {
+      setShowLeaveModal(true);
+    } else {
+      setShowAlertsPrompt(true);
+    }
+  }, []);
+
+  // After alerts prompt (Enable or No thanks) -> show leave confirm
+  const handleAlertsPromptContinue = useCallback(() => {
+    setShowAlertsPrompt(false);
     setShowLeaveModal(true);
   }, []);
   
@@ -429,13 +468,14 @@ export default function DraftRoomVX2({
 
   // Confirm leaving (during active draft)
   const handleLeaveConfirm = useCallback(() => {
-    logger.debug('Leave confirmed, cleaning up', { hasOnLeave: !!onLeave });
+    logger.debug('Leave confirmed, cleaning up', { hasOnLeave: !!onLeaveRef.current });
     // Call leave draft cleanup
     draftRoom.leaveDraft();
     // Close modal first
     setShowLeaveModal(false);
     // Trigger navigation - use setTimeout to ensure it happens after state update
-    if (onLeave) {
+    // SECURITY FIX: Use ref to get latest onLeave callback, avoiding stale closure
+    if (onLeaveRef.current) {
       logger.debug('Scheduling onLeave callback');
       // Clear any existing timeout
       if (leaveTimeoutRef.current) {
@@ -444,10 +484,10 @@ export default function DraftRoomVX2({
       // Use setTimeout to ensure navigation happens after modal closes
       leaveTimeoutRef.current = setTimeout(() => {
         // Only call onLeave if component is still mounted
-        if (isMountedRef.current) {
+        if (isMountedRef.current && onLeaveRef.current) {
           try {
             logger.debug('Calling onLeave callback');
-            onLeave();
+            onLeaveRef.current();
           } catch (error) {
             logger.error('Error in onLeave callback', error as Error);
           }
@@ -457,18 +497,54 @@ export default function DraftRoomVX2({
     } else {
       logger.warn('onLeave callback not provided');
     }
-  }, [draftRoom, onLeave]);
+  }, [draftRoom]);
 
   // Handle withdrawal (before draft starts)
-  const handleWithdraw = useCallback(() => {
-    logger.debug('Withdraw confirmed, cleaning up', { hasOnLeave: !!onLeave });
-    // Call leave draft cleanup (same as leaving, but this is withdrawal)
+  const handleWithdraw = useCallback(async () => {
+    logger.debug('Withdraw confirmed, cleaning up', { hasOnLeave: !!onLeaveRef.current, roomId, userId });
+
+    // Withdrawal-specific logic (runs before draft starts)
+    // 1. Remove user from participants list via API
+    // 2. Process entry fee refund if applicable
+    try {
+      if (userId && roomId) {
+        logger.info('Processing withdrawal request', { userId, roomId });
+
+        const response = await fetch(`/api/drafts/${roomId}/withdraw`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          logger.warn('Withdrawal API returned non-OK status', {
+            status: response.status,
+            error: errorData
+          });
+          // Continue with cleanup even if API fails - user still leaves UI
+        } else {
+          const result = await response.json();
+          logger.info('Withdrawal processed successfully', {
+            refundAmount: result.refundAmount,
+            refundStatus: result.refundStatus,
+            removedFromParticipants: result.removedFromParticipants
+          });
+        }
+      }
+    } catch (error) {
+      // Log but don't block - user should still be able to leave
+      logger.error('Error processing withdrawal', error instanceof Error ? error : new Error(String(error)));
+    }
+
+    // Call leave draft cleanup
     draftRoom.leaveDraft();
-    // TODO: Add withdrawal-specific logic here (e.g., remove from participants, refund entry fee)
+
     // Close modal first
     setShowLeaveModal(false);
     // Trigger navigation - use setTimeout to ensure it happens after state update
-    if (onLeave) {
+    // SECURITY FIX: Use ref to get latest onLeave callback, avoiding stale closure
+    if (onLeaveRef.current) {
       logger.debug('Scheduling onLeave callback after withdrawal');
       // Clear any existing timeout
       if (leaveTimeoutRef.current) {
@@ -477,10 +553,10 @@ export default function DraftRoomVX2({
       // Use setTimeout to ensure navigation happens after modal closes
       leaveTimeoutRef.current = setTimeout(() => {
         // Only call onLeave if component is still mounted
-        if (isMountedRef.current) {
+        if (isMountedRef.current && onLeaveRef.current) {
           try {
             logger.debug('Calling onLeave callback after withdrawal');
-            onLeave();
+            onLeaveRef.current();
           } catch (error) {
             logger.error('Error in onLeave callback after withdrawal', error as Error);
           }
@@ -490,7 +566,7 @@ export default function DraftRoomVX2({
     } else {
       logger.warn('onLeave callback not provided for withdrawal');
     }
-  }, [draftRoom, onLeave]);
+  }, [draftRoom, roomId, userId]);
   
   // Cancel leaving
   const handleLeaveCancel = useCallback(() => {
@@ -529,58 +605,43 @@ export default function DraftRoomVX2({
     );
   }
   
-  const positionStyle = useAbsolutePosition ? 'absolute' : 'fixed';
-  
   return (
     <div
       style={{
-        position: positionStyle,
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: BG_COLORS.primary,
         display: 'flex',
         flexDirection: 'column',
+        height: '100%',
+        width: '100%',
+        backgroundColor: BG_COLORS.primary,
         overflow: 'hidden',
       }}
     >
-      {/* Unified Header - Status bar with centered timer */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 50,
-        }}
-      >
+      {/* Header - Fixed 54px */}
+      <div style={{ flexShrink: 0, height: HEADER_HEIGHT, zIndex: 50 }}>
         <DraftStatusBar
           timerSeconds={draftRoom.timer.seconds}
           isUserTurn={draftRoom.isMyTurn && draftRoom.status === 'active'}
           onGracePeriodEnd={handleGracePeriodEnd}
           onLeave={handleLeaveClick}
-          hideTimer={draftRoom.status === 'active'} // Hide timer in status bar when draft is active (timer shown in pick card)
+          hideTimer={false} // Always show timer in status bar
+          preDraftCountdown={draftRoom.preDraftCountdown}
+          draftStatus={draftRoom.status}
         />
       </div>
-      
-      {/* Content wrapper - accounts for combined header + safe area */}
+
+      {/* Content Area - Flexible */}
       <div
         style={{
-          position: 'absolute',
-          // Account for combined header + safe area inset
-          top: `calc(${HEADER_HEIGHT}px + env(safe-area-inset-top, 0px))`,
-          left: 0,
-          right: 0,
-          bottom: LAYOUT_PX.footerHeight,
+          flex: 1,
+          minHeight: 0,  // CRITICAL: Allow shrinking
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
         }}
       >
-        {/* Picks Bar - hidden on Board tab (matches VX) */}
+        {/* Picks Bar - 200px when visible (not on board tab) */}
         {draftRoom.activeTab !== 'board' && (
-          <div style={{ flexShrink: 0 }}>
+          <div style={{ flexShrink: 0, height: LAYOUT_PX.picksBarHeight, marginBottom: 0, paddingBottom: 0 }}>
             <PicksBar
               picks={draftRoom.picks.picks}
               currentPickNumber={draftRoom.currentPickNumber}
@@ -588,15 +649,27 @@ export default function DraftRoomVX2({
               userParticipantIndex={draftRoom.userParticipantIndex}
               timer={draftRoom.timer.seconds}
               status={draftRoom.status}
+              onBlankClick={(pickNumber) => {
+                // When in rosters tab, clicking a blank card should navigate to that user
+                if (draftRoom.activeTab === 'rosters') {
+                  const teamCount = draftRoom.participants.length;
+                  const participantIndex = getParticipantForPick(pickNumber, teamCount);
+                  setSelectedRosterParticipantIndex(participantIndex);
+                }
+              }}
             />
           </div>
         )}
-        
-        {/* Main Content Area */}
+
+        {/* Main Content - Fill available space, let child components handle scrolling */}
         <main
           style={{
             flex: 1,
-            overflow: 'hidden',
+            minHeight: 0,  // CRITICAL: Allow shrinking
+            overflow: 'hidden',  // Changed from 'auto' - let child components handle scrolling
+            display: 'flex',
+            flexDirection: 'column',
+            paddingTop: 0,
           }}
         >
           <TabContent 
@@ -606,18 +679,27 @@ export default function DraftRoomVX2({
             onLeave={handleLeaveClick}
             onLeaveFromLink={handleLeaveFromLink}
             draftSettings={draftSettings}
+            selectedRosterParticipantIndex={selectedRosterParticipantIndex}
+            onRosterParticipantSelect={setSelectedRosterParticipantIndex}
           />
         </main>
       </div>
+
+      {/* Footer - Fixed 56px */}
+      <div style={{ flexShrink: 0, height: LAYOUT_PX.footerHeight, zIndex: 50 }}>
+        <DraftFooter
+          activeTab={draftRoom.activeTab}
+          onTabChange={draftRoom.setActiveTab}
+          queueCount={draftRoom.queue.queueCount}
+        />
+      </div>
       
-      {/* Footer */}
-      <DraftFooter
-        activeTab={draftRoom.activeTab}
-        onTabChange={draftRoom.setActiveTab}
-        queueCount={draftRoom.queue.queueCount}
-        useAbsolutePosition={useAbsolutePosition}
+      {/* First-time leave: ask about alerts when navigating away (in-app vs outside app) */}
+      <NavigateAwayAlertsPromptModal
+        isOpen={showAlertsPrompt}
+        onContinue={handleAlertsPromptContinue}
       />
-      
+
       {/* Leave Confirmation Modal */}
       <LeaveConfirmModal
         isOpen={showLeaveModal}

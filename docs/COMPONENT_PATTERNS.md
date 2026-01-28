@@ -49,6 +49,17 @@ components/ui/                    # NEW: Shared UI components
 
 ---
 
+## Form validation (inline errors)
+
+When a form shows **inline** validation messages under a field (e.g. “Please enter a valid email”):
+
+- Show the message **only after the user leaves the field (blur)**.
+- Hide the message **while the field is focused**.
+
+**Reference:** [FORM_VALIDATION_PATTERN.md](./FORM_VALIDATION_PATTERN.md) — use this logic everywhere similar inline validation appears.
+
+---
+
 ## Component Template
 
 ```typescript

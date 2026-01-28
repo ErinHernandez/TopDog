@@ -7,6 +7,9 @@
 
 import * as https from 'https';
 import type { IncomingMessage } from 'http';
+import { createScopedLogger } from './clientLogger';
+
+const logger = createScopedLogger('[MultiApiStats]');
 
 // ============================================================================
 // TYPES
@@ -287,7 +290,7 @@ class MultiApiStatsService {
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.warn(`ESPN API failed for ${playerName}:`, errorMessage);
+      logger.warn(`ESPN API failed for ${playerName}: ${errorMessage}`);
       return null;
     }
   }
@@ -318,7 +321,7 @@ class MultiApiStatsService {
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.warn(`Sports Reference failed for ${playerName}:`, errorMessage);
+      logger.warn(`Sports Reference failed for ${playerName}: ${errorMessage}`);
       return null;
     }
   }
@@ -342,7 +345,7 @@ class MultiApiStatsService {
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.warn(`Rolling Insights failed for ${playerName}:`, errorMessage);
+      logger.warn(`Rolling Insights failed for ${playerName}: ${errorMessage}`);
       return null;
     }
   }
@@ -365,7 +368,7 @@ class MultiApiStatsService {
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.warn(`Free API failed for ${playerName}:`, errorMessage);
+      logger.warn(`Free API failed for ${playerName}: ${errorMessage}`);
       return null;
     }
   }
@@ -374,8 +377,8 @@ class MultiApiStatsService {
    * Aggregate data from all available sources
    */
   async fetchPlayerDataFromAllSources(playerName: string): Promise<MergedData> {
-    console.log(`🔍 Fetching ${playerName} from multiple sources...`);
-    
+    logger.debug('Fetching player from multiple sources', { playerName });
+
     const sources = await Promise.allSettled([
       this.fetchFromESPN(playerName),
       this.fetchFromSportsReference(playerName),
@@ -384,7 +387,7 @@ class MultiApiStatsService {
     ]);
 
     const validSources = sources
-      .filter((result): result is PromiseFulfilledResult<ApiSourceData> => 
+      .filter((result): result is PromiseFulfilledResult<ApiSourceData> =>
         result.status === 'fulfilled' && result.value !== null
       )
       .map(result => result.value)
@@ -394,7 +397,7 @@ class MultiApiStatsService {
       throw new Error(`No data sources available for ${playerName}`);
     }
 
-    console.log(`✅ Found data from ${validSources.length} sources: ${validSources.map(s => s.source).join(', ')}`);
+    logger.debug('Found data from sources', { playerName, sourceCount: validSources.length, sources: validSources.map(s => s.source).join(', ') });
     
     return this.mergeDataSources(playerName, validSources);
   }
@@ -505,10 +508,10 @@ class MultiApiStatsService {
     });
 
     const result = totalWeight > 0 ? Math.round(weightedSum / totalWeight) : 0;
-    
+
     // Log conflicts for review
     if (new Set(values).size > 1) {
-      console.warn(`📊 Conflict in ${statPath}: ${values.join(', ')} → using ${result}`);
+      logger.warn(`Conflict in ${statPath}: ${values.join(', ')} → using ${result}`);
     }
 
     return result;

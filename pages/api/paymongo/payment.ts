@@ -25,24 +25,19 @@ import { logPaymentTransaction, getClientIP } from '../../../lib/securityLogger'
 import { 
   withErrorHandling, 
   validateMethod, 
-  validateBody,
+  validateRequestBody,
   createErrorResponse,
   createSuccessResponse,
   ErrorType 
 } from '../../../lib/apiErrorHandler';
+import { paymongoCreatePaymentSchema } from '../../../lib/validation/schemas';
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-interface CreatePaymentBody {
-  /** Source ID from the initial source creation */
-  sourceId: string;
-  /** Firebase user ID */
-  userId: string;
-  /** Description (optional) */
-  description?: string;
-}
+// Types are now inferred from Zod schemas in lib/validation/schemas.ts
+// import type { PayMongoCreatePaymentRequest } from '../../../lib/validation/schemas';
 
 interface CreatePaymentResponse {
   success: boolean;
@@ -88,10 +83,8 @@ const handler = async function(
       });
     }
     
-    // Validate required body fields
-    validateBody(req, ['sourceId', 'userId'], logger);
-    
-    const body = req.body as CreatePaymentBody;
+    // Validate request body with Zod schema
+    const body = validateRequestBody(req, paymongoCreatePaymentSchema, logger);
     
     logger.info('Creating payment from source', {
       component: 'paymongo',
@@ -179,13 +172,14 @@ const handler = async function(
 };
 
 // Export with authentication, CSRF protection, and rate limiting
+// Type assertions needed for middleware chain compatibility
 import type { ApiHandler as AuthApiHandler } from '../../../lib/apiAuth';
 type CSRFHandler = (req: NextApiRequest, res: NextApiResponse) => Promise<void> | void;
 export default withCSRFProtection(
   withAuth(
-    withRateLimit(handler, paymentCreateLimiter) as unknown as AuthApiHandler,
+    withRateLimit(handler, paymentCreateLimiter) as AuthApiHandler,
     { required: true, allowAnonymous: false }
-  ) as unknown as CSRFHandler
+  ) as CSRFHandler
 );
 
 

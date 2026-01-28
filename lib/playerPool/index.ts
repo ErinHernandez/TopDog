@@ -1,18 +1,21 @@
 /**
  * Player Pool Module
- * 
+ *
  * Provides access to the static, immutable player pool.
  * The pool is loaded once and cached for the entire session.
- * 
+ *
  * Usage:
  *   import { getPlayerPool, getPlayerById, getAvailablePlayers } from '@/lib/playerPool';
- *   
+ *
  *   const pool = await getPlayerPool();
  *   const player = getPlayerById('chase_jamarr');
  *   const available = getAvailablePlayers(pool.players, pickedIds);
  */
 
 import type { PlayerPool, PoolPlayer, Position } from './types';
+import { createScopedLogger } from '../clientLogger';
+
+const logger = createScopedLogger('[PlayerPool]');
 
 // ============================================================================
 // CONSTANTS
@@ -87,13 +90,15 @@ export function getPlayerPoolSync(): PlayerPool | null {
 
 /**
  * Preload the player pool (call early in app lifecycle).
- * 
+ *
  * @example
  * // In _app.js or layout
  * useEffect(() => { preloadPlayerPool(); }, []);
  */
 export function preloadPlayerPool(): void {
-  getPlayerPool().catch(console.error);
+  getPlayerPool().catch((error: unknown) => {
+    logger.error('Failed to preload player pool', error instanceof Error ? error : new Error(String(error)));
+  });
 }
 
 // ============================================================================
@@ -292,7 +297,7 @@ export async function verifyPoolIntegrity(): Promise<boolean> {
     
     return actualChecksum === expectedChecksum;
   } catch (error: unknown) {
-    console.error('Integrity verification failed:', error);
+    logger.error('Integrity verification failed', error instanceof Error ? error : new Error(String(error)));
     return false;
   }
 }

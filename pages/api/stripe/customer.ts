@@ -5,6 +5,10 @@
  * 
  * POST /api/stripe/customer - Create or retrieve customer
  * GET /api/stripe/customer?userId={userId} - Get customer with payment methods
+ * 
+ * @deprecated This endpoint is deprecated. Use /api/v1/stripe/customer instead.
+ * Deprecation date: 2026-04-01
+ * Removal date: 2026-10-01
  */
 
 import type { NextApiResponse } from 'next';
@@ -35,6 +39,12 @@ const handler = async function(
 ) {
   return withErrorHandling(req, res, async (req, res, logger) => {
     validateMethod(req, ['GET', 'POST'], logger);
+    
+    // DEPRECATION: Set deprecation headers for non-v1 route
+    // Migrate to /api/v1/stripe/customer before 2026-10-01
+    res.setHeader('Deprecation', 'true');
+    res.setHeader('Sunset', 'Thu, 01 Oct 2026 00:00:00 GMT');
+    res.setHeader('Link', '</api/v1/stripe/customer>; rel="successor-version"');
     
     // Check rate limit
     const rateLimitResult = await customerLimiter.check(req);

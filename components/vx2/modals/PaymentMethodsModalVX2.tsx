@@ -122,20 +122,13 @@ function ModalContent({
   const [showAddForm, setShowAddForm] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  
-  // Load payment methods
-  useEffect(() => {
-    if (isOpen && userId) {
-      loadPaymentMethods();
-    }
-  }, [isOpen, userId]);
-  
-  const loadPaymentMethods = async () => {
+
+  const loadPaymentMethods = useCallback(async () => {
     setIsLoading(true);
     try {
       const response = await fetch(`/api/stripe/payment-methods?userId=${userId}`);
       const data = await response.json();
-      
+
       if (data.success && data.data?.paymentMethods) {
         setPaymentMethods(data.data.paymentMethods);
       }
@@ -144,7 +137,14 @@ function ModalContent({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [userId]);
+
+  // Load payment methods
+  useEffect(() => {
+    if (isOpen && userId) {
+      loadPaymentMethods();
+    }
+  }, [isOpen, userId, loadPaymentMethods]);
   
   const handleAddCard = async () => {
     if (!stripe || !elements || !clientSecret) {
@@ -433,39 +433,39 @@ function ModalContent({
 
 export function PaymentMethodsModalVX2(props: PaymentMethodsModalVX2Props): React.ReactElement | null {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
-  
+
   const { isOpen, userId, userEmail } = props;
-  
-  // Create setup intent when modal opens and user wants to add a card
-  useEffect(() => {
-    if (isOpen && userId && userEmail) {
-      createSetupIntent();
-    }
-  }, [isOpen, userId, userEmail]);
-  
-  useEffect(() => {
-    if (!isOpen) {
-      setClientSecret(null);
-    }
-  }, [isOpen]);
-  
-  const createSetupIntent = async () => {
+
+  const createSetupIntent = useCallback(async () => {
     try {
       const response = await fetch('/api/stripe/setup-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, email: userEmail }),
       });
-      
+
       const data = await response.json();
-      
+
       if (data.success && data.data?.clientSecret) {
         setClientSecret(data.data.clientSecret);
       }
     } catch (err) {
       logger.error('Failed to create setup intent', err);
     }
-  };
+  }, [userId, userEmail]);
+
+  // Create setup intent when modal opens and user wants to add a card
+  useEffect(() => {
+    if (isOpen && userId && userEmail) {
+      createSetupIntent();
+    }
+  }, [isOpen, userId, userEmail, createSetupIntent]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setClientSecret(null);
+    }
+  }, [isOpen]);
   
   if (!isOpen) return null;
   

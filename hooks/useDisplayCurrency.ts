@@ -19,6 +19,9 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { createScopedLogger } from '@/lib/clientLogger';
+
+const logger = createScopedLogger('[useDisplayCurrency]');
 
 // ============================================================================
 // TYPES
@@ -134,7 +137,7 @@ export function useDisplayCurrency(
         }));
       }
     } catch (err) {
-      console.error('[useDisplayCurrency] Error fetching:', err);
+      logger.error('Error fetching', err instanceof Error ? err : new Error(String(err)));
       setState(prev => ({
         ...prev,
         isLoading: false,
@@ -187,7 +190,7 @@ export function useDisplayCurrency(
         }));
       }
     } catch (err) {
-      console.error('[useDisplayCurrency] Error setting currency:', err);
+      logger.error('Error setting currency', err instanceof Error ? err : new Error(String(err)));
       setState(prev => ({
         ...prev,
         error: 'Network error',
@@ -235,7 +238,7 @@ export function useDisplayCurrency(
         }));
       }
     } catch (err) {
-      console.error('[useDisplayCurrency] Error resetting currency:', err);
+      logger.error('Error resetting currency', err instanceof Error ? err : new Error(String(err)));
       setState(prev => ({
         ...prev,
         error: 'Network error',

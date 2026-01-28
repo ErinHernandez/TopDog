@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { useUser } from '../lib/userContext';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
+import { createScopedLogger } from '../lib/clientLogger';
+
+const logger = createScopedLogger('[UserPreferences]');
 
 /**
  * Custom hook for managing user preferences including border color customization
@@ -38,7 +41,7 @@ export function useUserPreferences() {
           }
         }
       } catch (error) {
-        console.error('Error loading user preferences:', error);
+        logger.error('Error loading user preferences', error);
       } finally {
         setLoading(false);
       }
@@ -63,7 +66,7 @@ export function useUserPreferences() {
 
       return { success: true };
     } catch (error) {
-      console.error('Error updating preference:', error);
+      logger.error('Error updating preference', error, { key });
       // Revert local state on error
       setPreferences(preferences);
       return { success: false, error: error.message };

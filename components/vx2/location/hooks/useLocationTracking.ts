@@ -5,10 +5,13 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { createScopedLogger } from '@/lib/clientLogger';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/components/vx2/auth/hooks/useAuth';
 import { useLocationConsent } from './useLocationConsent';
+
+const logger = createScopedLogger('[useLocationTracking]');
 import {
   trackLocation,
   getUserLocations,
@@ -102,7 +105,7 @@ export function useLocationTracking(): UseLocationTrackingReturn {
         setIsLoading(false);
       },
       (err) => {
-        console.error('Location tracking subscription error:', err);
+        logger.error('Location tracking subscription error:', err instanceof Error ? err : new Error(String(err)));
         setError(err);
         setIsLoading(false);
       }
@@ -122,7 +125,7 @@ export function useLocationTracking(): UseLocationTrackingReturn {
           setCurrentLocation(location);
         }
       } catch (err) {
-        console.error('Auto-track failed:', err);
+        logger.error('Auto-track failed:', err instanceof Error ? err : new Error(String(err)));
       }
     };
     

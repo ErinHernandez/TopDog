@@ -48,7 +48,7 @@ export default function XenditCallback(): React.ReactElement {
       setStatus('error');
       setMessage('Invalid callback. Please contact support if you believe this is an error.');
     }
-  }, [router.isReady, router.query]);
+  }, [router.isReady, router.query, router]);
   
   const handleRetry = () => {
     router.push('/deposit');

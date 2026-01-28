@@ -15,6 +15,7 @@ import {
   requireEnvVar,
   createSuccessResponse,
 } from '../../../../lib/apiErrorHandler';
+import { fantasyPlayersResponseSchema } from '../../../../lib/validation/schemas';
 
 // ============================================================================
 // TYPES
@@ -32,6 +33,40 @@ export interface FantasyPlayer {
   byeWeek?: number;
   overallRank?: number;
   [key: string]: unknown;
+}
+
+// ============================================================================
+// VALIDATION
+// ============================================================================
+
+/**
+ * SECURITY: Validate external API response structure using Zod
+ * Prevents malformed or malicious data from propagating through the system
+ */
+function validateExternalApiResponse(data: unknown, logger: { error: (message: string, error: Error, context?: Record<string, unknown>) => void }): FantasyPlayer[] {
+  // Validate using Zod schema
+  const validationResult = fantasyPlayersResponseSchema.safeParse(data);
+  
+  if (!validationResult.success) {
+    logger.error('External API response validation failed', new Error('Invalid response structure'), {
+      errors: validationResult.error.issues,
+    });
+    throw new Error('Invalid response from external data provider');
+  }
+  
+  // Transform validated data to FantasyPlayer format
+  return validationResult.data.map((item) => ({
+    position: item.Position || item.position,
+    name: item.Name || item.name,
+    team: item.Team || item.team,
+    adpPPR: item.AverageDraftPositionPPR || item.adpPPR,
+    adp: item.AverageDraftPosition || item.adp,
+    projectedPointsPPR: item.ProjectedFantasyPointsPPR || item.projectedPointsPPR,
+    projectedPoints: item.ProjectedFantasyPoints || item.projectedPoints,
+    positionRank: item.PositionRank || item.positionRank,
+    byeWeek: item.ByeWeek || item.byeWeek,
+    overallRank: item.AverageDraftPositionRank || item.overallRank,
+  }));
 }
 
 export interface TopPlayer {
@@ -76,8 +111,20 @@ export default async function handler(
 
     logger.info('Fetching fantasy overview');
 
-    const allPlayers = await getFantasyPlayers(apiKey, { limit: 500 }) as unknown as FantasyPlayer[];
-    logger.debug('Fantasy players fetched', { count: allPlayers.length });
+    // Fetch from external API
+    const rawData = await getFantasyPlayers(apiKey, { limit: 500 });
+
+    // SECURITY: Validate external API response before processing using Zod
+    // This prevents malformed or malicious data from propagating
+    let allPlayers: FantasyPlayer[];
+    try {
+      allPlayers = validateExternalApiResponse(rawData, logger);
+    } catch (validationError) {
+      logger.error('External API response validation failed', validationError as Error);
+      throw new Error('Invalid response from external data provider');
+    }
+
+    logger.debug('Fantasy players fetched and validated', { count: allPlayers.length });
     
     // Group by position and get top 10 each
     const byPosition: Record<string, TopPlayer[]> = {};

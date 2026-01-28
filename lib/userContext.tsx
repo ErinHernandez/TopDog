@@ -65,19 +65,15 @@ export function UserProvider({ children }: { children: ReactNode }): React.React
   const unsubscribeBalanceRef = useRef<Unsubscribe | null>(null);
 
   useEffect(() => {
-    console.log('🔄 UserContext: Starting authentication check');
-    
     // Guard: If Firebase auth is not initialized, skip auth listener
     if (!auth) {
-      console.warn('🔄 UserContext: Firebase Auth not initialized - running in offline mode');
       setUser(null);
       setUserBalance({ balance: 0 });
       setLoading(false);
       return () => {}; // Return empty cleanup function
     }
-    
+
     const unsubscribe = auth.onAuthStateChanged(async (user: FirebaseUser | null) => {
-      console.log('🔄 UserContext: Auth state changed', user ? 'User found' : 'No user');
       setUser(user);
       
       // Clean up previous balance listener if it exists
@@ -102,26 +98,22 @@ export function UserProvider({ children }: { children: ReactNode }): React.React
                 setUserBalance({ balance: 0 });
               }
             },
-            (error) => {
-              console.log('🔄 UserContext: Firestore error, using default balance', error);
+            () => {
               setUserBalance({ balance: 0 });
             }
           );
-        } catch (error) {
-          console.log('🔄 UserContext: Error accessing user data, using default balance', error);
+        } catch {
           setUserBalance({ balance: 0 });
         }
       } else {
         setUserBalance({ balance: 0 });
       }
-      
-      console.log('🔄 UserContext: Setting loading to false');
+
       setLoading(false);
     });
 
     // Add a timeout to prevent infinite loading
     const timeoutId = setTimeout(() => {
-      console.log('🔄 UserContext: Auth timeout - setting loading to false');
       setLoading(false);
     }, 2000); // 2 second timeout - reasonable for user experience
 

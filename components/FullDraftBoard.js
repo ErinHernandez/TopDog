@@ -379,13 +379,9 @@ export default function FullDraftBoard({ room, picks, participants, draftOrder, 
                                     display: 'block'
                                   }}
                                   onError={(e) => {
-                                    console.log('Logo failed to load:', `/logos/nfl/${playerData.team.toLowerCase()}.png`);
                                     // Fallback to text if logo fails to load
                                     e.target.style.display = 'none';
                                     e.target.nextSibling.style.display = 'inline-block';
-                                  }}
-                                  onLoad={() => {
-                                    console.log('Logo loaded successfully:', `/logos/nfl/${playerData.team.toLowerCase()}.png`);
                                   }}
                                 />
                                 <span 

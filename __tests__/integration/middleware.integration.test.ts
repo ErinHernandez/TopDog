@@ -7,7 +7,7 @@
  */
 
 import { NextRequest } from 'next/server';
-import { middleware } from '../../middleware';
+import { proxy } from '../../proxy';
 
 // Mock the middlewareErrorHandler to test core logic
 // Note: The actual handler returns NextResponse, but the wrapper makes it async
@@ -17,7 +17,7 @@ jest.mock('../../lib/middlewareErrorHandler', () => ({
   },
 }));
 
-describe('Middleware Integration Tests', () => {
+describe('Proxy integration (redirects & query params)', () => {
   const createMockRequest = (
     pathname: string,
     searchParams?: Record<string, string>
@@ -38,7 +38,7 @@ describe('Middleware Integration Tests', () => {
 
     it('should complete full redirect flow for v2 route', async () => {
       const request = createMockRequest('/draft/v2/test-room-123');
-      const response = await middleware(request);
+      const response = await proxy(request);
       
       // Verify redirect
       expect(response.status).toBe(307);
@@ -52,7 +52,7 @@ describe('Middleware Integration Tests', () => {
 
     it('should complete full redirect flow for v3 route', async () => {
       const request = createMockRequest('/draft/v3/test-room-456');
-      const response = await middleware(request);
+      const response = await proxy(request);
       
       expect(response.status).toBe(307);
       const location = response.headers.get('location');
@@ -61,7 +61,7 @@ describe('Middleware Integration Tests', () => {
 
     it('should complete full redirect flow for topdog route', async () => {
       const request = createMockRequest('/draft/topdog/test-room-789');
-      const response = await middleware(request);
+      const response = await proxy(request);
       
       expect(response.status).toBe(307);
       const location = response.headers.get('location');
@@ -76,7 +76,7 @@ describe('Middleware Integration Tests', () => {
 
     it('should preserve single query parameter', async () => {
       const request = createMockRequest('/draft/v2/test-room', { pickNumber: '50' });
-      const response = await middleware(request);
+      const response = await proxy(request);
       
       const location = response.headers.get('location');
       expect(location).toContain('pickNumber=50');
@@ -88,7 +88,7 @@ describe('Middleware Integration Tests', () => {
         teamCount: '12',
         fastMode: 'true',
       });
-      const response = await middleware(request);
+      const response = await proxy(request);
       
       const location = response.headers.get('location');
       expect(location).toContain('pickNumber=50');
@@ -101,7 +101,7 @@ describe('Middleware Integration Tests', () => {
         roomName: 'Test Room & More',
         userId: 'user-123',
       });
-      const response = await middleware(request);
+      const response = await proxy(request);
       
       const location = response.headers.get('location');
       expect(location).toContain('roomName=');
@@ -110,7 +110,7 @@ describe('Middleware Integration Tests', () => {
 
     it('should preserve empty query string', async () => {
       const request = createMockRequest('/draft/v2/test-room');
-      const response = await middleware(request);
+      const response = await proxy(request);
       
       const location = response.headers.get('location');
       // Should not have query string
@@ -134,7 +134,7 @@ describe('Middleware Integration Tests', () => {
 
       for (const path of removedPages) {
         const request = createMockRequest(path);
-        const response = await middleware(request);
+        const response = await proxy(request);
         
         expect(response.status).toBe(307);
         expect(response.headers.get('location')).toBe('https://example.com/');
@@ -143,7 +143,7 @@ describe('Middleware Integration Tests', () => {
 
     it('should preserve query parameters when redirecting removed pages', async () => {
       const request = createMockRequest('/rankings', { sort: 'points' });
-      const response = await middleware(request);
+      const response = await proxy(request);
       
       // Removed pages redirect to home, query params may or may not be preserved
       // This is acceptable behavior
@@ -177,8 +177,8 @@ describe('Middleware Integration Tests', () => {
         writable: true,
       });
       
-      const response1 = await middleware(request1);
-      const response2 = await middleware(request2);
+      const response1 = await proxy(request1);
+      const response2 = await proxy(request2);
       
       // Same user should get same assignment
       expect(response1.headers.get('X-VX2-Migration')).toBe(
@@ -196,8 +196,8 @@ describe('Middleware Integration Tests', () => {
       request1.headers.set('cf-connecting-ip', '1.2.3.4');
       request2.headers.set('cf-connecting-ip', '5.6.7.8');
       
-      const response1 = await middleware(request1);
-      const response2 = await middleware(request2);
+      const response1 = await proxy(request1);
+      const response2 = await proxy(request2);
       
       // Should have migration headers (may be same or different)
       expect(response1.headers.get('X-VX2-Migration')).toBeDefined();
@@ -209,7 +209,7 @@ describe('Middleware Integration Tests', () => {
     it('should handle malformed URLs gracefully', async () => {
       // Create request with potentially problematic path
       const request = createMockRequest('/draft/v2/test%20room');
-      const response = await middleware(request);
+      const response = await proxy(request);
       
       // Should not throw, should handle gracefully
       expect(response).toBeDefined();
@@ -219,7 +219,7 @@ describe('Middleware Integration Tests', () => {
     it('should handle very long room IDs', async () => {
       const longRoomId = 'a'.repeat(1000);
       const request = createMockRequest(`/draft/v2/${longRoomId}`);
-      const response = await middleware(request);
+      const response = await proxy(request);
       
       // Should handle without error
       expect(response).toBeDefined();

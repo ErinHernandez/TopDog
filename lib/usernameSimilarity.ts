@@ -11,14 +11,15 @@
  * ```
  */
 
-import { 
-  collection, 
-  query, 
-  where, 
-  getDocs, 
-  limit 
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  limit
 } from 'firebase/firestore';
 import { db } from './firebase';
+import { serverLogger } from './logger/serverLogger';
 
 // ============================================================================
 // CONSTANTS
@@ -189,8 +190,7 @@ export async function findSimilarUsernames(
     
     return similar;
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Error finding similar usernames:', errorMessage);
+    serverLogger.error('Error finding similar usernames', error instanceof Error ? error : new Error(String(error)));
     return [];
   }
 }

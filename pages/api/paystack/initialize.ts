@@ -35,10 +35,12 @@ import {
   withErrorHandling, 
   validateMethod, 
   validateBody,
+  validateRequestBody,
   createErrorResponse,
   createSuccessResponse,
   ErrorType 
 } from '../../../lib/apiErrorHandler';
+import { paystackInitializeSchema } from '../../../lib/validation/schemas';
 
 // ============================================================================
 // TYPES
@@ -133,9 +135,8 @@ const handler = async function(
       });
     }
     
-    // Validate required body fields
-    validateBody(req, ['amountSmallestUnit', 'userId', 'email'], logger);
-    
+    // SECURITY: Validate request body using Zod schema
+    const body = validateRequestBody(req, paystackInitializeSchema, logger);
     const {
       amountSmallestUnit,
       currency: requestCurrency,
@@ -148,7 +149,7 @@ const handler = async function(
       mobileMoneyProvider,
       callbackUrl,
       metadata,
-    } = req.body as InitializeRequest;
+    } = body;
     
     // Additional validation
     if (!amountSmallestUnit || amountSmallestUnit <= 0) {
@@ -313,7 +314,7 @@ const handler = async function(
             ...Object.entries(metadata || {}).map(([key, value]) => ({
               display_name: key,
               variable_name: key,
-              value,
+              value: typeof value === 'string' || typeof value === 'number' ? value : String(value),
             })),
           ],
         },

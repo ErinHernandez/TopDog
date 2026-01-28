@@ -37,15 +37,16 @@ import {
 import { captureError } from '../../../lib/errorTracking';
 import { logger } from '../../../lib/structuredLogger';
 import { getDb } from '../../../lib/firebase-utils';
-import { doc, updateDoc, getDoc, serverTimestamp } from 'firebase/firestore';
-import { 
-  withErrorHandling, 
+import { doc, updateDoc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import {
+  withErrorHandling,
   validateMethod,
   createSuccessResponse,
   createErrorResponse,
   ErrorType,
   type ApiLogger,
 } from '../../../lib/apiErrorHandler';
+import { acquireWebhookLock } from '../../../lib/webhooks/atomicLock';
 
 // ============================================================================
 // CONFIG
@@ -183,84 +184,145 @@ export default async function handler(
       return res.status(200).json({ received: false, error: errorResponse.body.error.message });
     }
     
-    // Check for duplicate event (idempotency)
-    const existingEvent = await findEventByStripeId(event.id);
-    if (existingEvent?.status === 'processed') {
-      logger.info('Duplicate webhook event - already processed', { 
-        component: 'stripe',
-        operation: 'webhook',
-        eventType: event.type, 
-        eventId: event.id,
-        processedAt: existingEvent.processedAt,
-      });
-      
-      const successResponse = createSuccessResponse({
-        received: true,
-        eventId: event.id,
-        eventType: event.type,
-        success: true,
-        actions: ['already_processed'],
-      }, 200, logger);
-      
-      return res.status(successResponse.statusCode).json(successResponse.body);
-    }
-    
-    // Create or update event record for tracking
-    await createOrUpdateWebhookEvent(event.id, event.type, {
+    // ATOMIC LOCK: Acquire exclusive processing lock to prevent race conditions
+    // This replaces the previous non-atomic duplicate check
+    const lock = await acquireWebhookLock(event.id, event.type, 'stripe', {
       livemode: event.livemode,
       apiVersion: event.api_version,
     });
-    
-    // Log webhook event
-    logger.info('Webhook received', { 
+
+    if (!lock.acquired) {
+      if (lock.reason === 'already_processed') {
+        logger.info('Duplicate webhook event - already processed', {
+          component: 'stripe',
+          operation: 'webhook',
+          eventType: event.type,
+          eventId: event.id,
+        });
+
+        return res.status(200).json({
+          received: true,
+          eventId: event.id,
+          eventType: event.type,
+          success: true,
+          duplicate: true,
+          actions: ['already_processed'],
+        });
+      }
+
+      if (lock.reason === 'already_processing') {
+        logger.info('Webhook being processed by another handler', {
+          component: 'stripe',
+          operation: 'webhook',
+          eventType: event.type,
+          eventId: event.id,
+        });
+
+        // Return 200 to prevent Stripe retry (other handler will complete)
+        return res.status(200).json({
+          received: true,
+          eventId: event.id,
+          eventType: event.type,
+          processing: true,
+          actions: ['deferred_to_existing_handler'],
+        });
+      }
+
+      if (lock.reason === 'max_attempts_exceeded') {
+        logger.error('Webhook max processing attempts exceeded', null, {
+          component: 'stripe',
+          operation: 'webhook',
+          eventType: event.type,
+          eventId: event.id,
+        });
+
+        return res.status(200).json({
+          received: true,
+          eventId: event.id,
+          eventType: event.type,
+          success: false,
+          error: 'Max processing attempts exceeded',
+          actions: ['abandoned'],
+        });
+      }
+    }
+
+    // At this point, lock.acquired is guaranteed to be true
+    // TypeScript needs explicit narrowing
+    if (!lock.acquired) {
+      // This should never happen due to early returns above
+      return res.status(500).json({ error: 'Internal error: lock state inconsistent' });
+    }
+
+    // Log webhook event - lock acquired
+    logger.info('Webhook received, processing started', {
       component: 'stripe',
       operation: 'webhook',
-      eventType: event.type, 
+      eventType: event.type,
       eventId: event.id,
-      isRetry: existingEvent?.status === 'failed',
-      retryCount: existingEvent?.retryCount || 0,
     });
-    
+
     try {
       // Process event
       const result = await processEvent(event, logger);
-      
+
       if (!result.success) {
-        // Log webhook processing failure
+        // Mark as failed to allow retry
+        await lock.markFailed(result.error || 'Unknown processing error');
+
         logger.error('Webhook processing failed', new Error(result.error || 'Unknown error'), {
           component: 'stripe',
           operation: 'webhook',
           eventType: event.type,
           eventId: event.id,
         });
-        // Still return 200 to prevent retries for handled errors
+
+        // Return 500 to trigger Stripe retry
+        return res.status(500).json({
+          received: true,
+          eventId: event.id,
+          eventType: event.type,
+          ...result,
+        });
       }
-      
+
+      // Success - release lock and mark as processed
+      await lock.releaseLock();
+
       const successResponse = createSuccessResponse({
         received: true,
         eventId: event.id,
         eventType: event.type,
         ...result,
       }, 200, logger);
-      
+
       return res.status(successResponse.statusCode).json(successResponse.body);
     } catch (error) {
-      // For webhooks, we must always return 200 to prevent retries
-      // Log the error for investigation but don't let it propagate
       const err = error as Error;
-      logger.error('Webhook processing error', err, { 
-        component: 'stripe', 
-        operation: 'webhook' 
+
+      // Mark webhook as failed to allow retry (if lock was acquired)
+      if (lock.acquired) {
+        await lock.markFailed(err.message || 'Unknown processing error');
+      }
+
+      logger.error('Webhook processing error', err, {
+        component: 'stripe',
+        operation: 'webhook',
+        eventType: event.type,
+        eventId: event.id,
       });
+
       await captureError(err, {
         tags: { component: 'stripe', operation: 'webhook' },
+        extra: { eventId: event.id, eventType: event.type },
       });
-      
-      // Always return 200 to prevent Stripe from retrying
-      // This is a webhook-specific requirement
-      return res.status(200).json({
+
+      // Return 500 to trigger Stripe retry for unexpected errors
+      return res.status(500).json({
         received: true,
-        error: err.message || 'Processing error - logged for investigation',
+        eventId: event.id,
+        eventType: event.type,
+        error: err.message || 'Processing error - will retry',
       });
     }
   });
@@ -497,8 +559,8 @@ async function handlePaymentIntentSucceeded(
     actions.push('transaction_created');
   }
   
-  // Credit user balance
-  await updateUserBalance(userId, paymentIntent.amount, 'add');
+  // Credit user balance (pass currency for zero-decimal currency handling)
+  await updateUserBalance(userId, paymentIntent.amount, 'add', undefined, currency);
   actions.push('balance_credited');
   
   // Update user's last deposit currency for display currency auto-tracking
@@ -700,9 +762,9 @@ async function handleTransferCreated(
     return { success: true, actions: ['already_processed'] };
   }
   
-  // Debit user balance
-  await updateUserBalance(userId, transfer.amount, 'subtract');
-  
+  // Debit user balance (pass currency for zero-decimal currency handling)
+  await updateUserBalance(userId, transfer.amount, 'subtract', undefined, currency);
+
   // Create transaction record with currency
   await createTransaction({
     userId,
@@ -735,10 +797,10 @@ async function handleTransferFailed(
   }
   
   const currency = transfer.currency.toUpperCase();
-  
-  // Restore user balance
-  await updateUserBalance(userId, transfer.amount, 'add');
-  
+
+  // Restore user balance (pass currency for zero-decimal currency handling)
+  await updateUserBalance(userId, transfer.amount, 'add', undefined, currency);
+
   // Update transaction
   const existingTx = await findTransactionByTransfer(transfer.id);
   if (existingTx) {
@@ -847,6 +909,10 @@ async function handleDisputeCreated(
 
 /**
  * Handle refund
+ *
+ * SECURITY: Track individual refund events by refund ID to prevent double-deduction.
+ * The charge.amount_refunded is cumulative, so we must process each refund individually
+ * by looking at the latest refund in the refunds list.
  */
 async function handleChargeRefunded(
   charge: Stripe.Charge
@@ -855,39 +921,100 @@ async function handleChargeRefunded(
   if (!paymentIntent) {
     return { success: true, actions: ['no_payment_intent'] };
   }
-  
+
   const currency = charge.currency.toUpperCase();
-  
+
   // Find original transaction
   const transaction = await findTransactionByPaymentIntent(paymentIntent);
   if (!transaction) {
     return { success: false, error: 'Original transaction not found' };
   }
-  
+
   const userId = transaction.userId;
-  const refundAmount = charge.amount_refunded;
-  
-  // Debit refunded amount from balance
-  await updateUserBalance(userId, refundAmount, 'subtract');
-  
-  // Create refund transaction record with currency
-  await createTransaction({
-    userId,
-    type: 'refund',
-    amountCents: -refundAmount,
-    currency,
-    stripePaymentIntentId: paymentIntent,
-    description: 'Refund',
-    referenceId: transaction.id,
-  });
-  
-  // Log audit event
-  await logPaymentEvent(userId, 'refund_processed', {
-    transactionId: transaction.id,
-    amountCents: refundAmount,
-    severity: 'medium',
-    metadata: { currency },
-  });
-  
-  return { success: true, actions: ['refund_processed', 'balance_adjusted'] };
+
+  // SECURITY FIX (Bug #3): Process each refund individually by its ID
+  // The charge.refunds contains all refunds - we need to find and process only new ones
+  const refunds = charge.refunds?.data || [];
+
+  if (refunds.length === 0) {
+    return { success: true, actions: ['no_refunds_found'] };
+  }
+
+  const actions: string[] = [];
+  const db = getDb();
+
+  // Process each refund that hasn't been processed yet
+  for (const refund of refunds) {
+    const refundId = refund.id;
+    const refundAmount = refund.amount;
+
+    // Check if this specific refund has already been processed
+    const refundDocRef = doc(db, 'stripe_refunds', refundId);
+    const refundDoc = await getDoc(refundDocRef);
+
+    if (refundDoc.exists()) {
+      // This refund was already processed - skip to prevent double-deduction
+      actions.push(`refund_${refundId}_already_processed`);
+      continue;
+    }
+
+    // Mark this refund as being processed BEFORE deducting balance
+    // to prevent race conditions with concurrent webhook deliveries
+    await setDoc(refundDocRef, {
+      refundId,
+      chargeId: charge.id,
+      paymentIntentId: paymentIntent,
+      userId,
+      amountCents: refundAmount,
+      currency,
+      status: 'processing',
+      createdAt: serverTimestamp(),
+    });
+
+    try {
+      // Debit refunded amount from balance (pass currency for zero-decimal currency handling)
+      await updateUserBalance(userId, refundAmount, 'subtract', undefined, currency);
+
+      // Create refund transaction record with currency
+      await createTransaction({
+        userId,
+        type: 'refund',
+        amountCents: -refundAmount,
+        currency,
+        stripePaymentIntentId: paymentIntent,
+        stripeRefundId: refundId,
+        description: 'Refund',
+        referenceId: transaction.id,
+      });
+
+      // Mark refund as completed
+      await updateDoc(refundDocRef, {
+        status: 'completed',
+        completedAt: serverTimestamp(),
+      });
+
+      // Log audit event
+      await logPaymentEvent(userId, 'refund_processed', {
+        transactionId: transaction.id,
+        amountCents: refundAmount,
+        severity: 'medium',
+        metadata: { currency, refundId },
+      });
+
+      actions.push(`refund_${refundId}_processed`);
+    } catch (error) {
+      // Mark refund as failed for retry
+      await updateDoc(refundDocRef, {
+        status: 'failed',
+        error: (error as Error).message,
+        failedAt: serverTimestamp(),
+      });
+      throw error;
+    }
+  }
+
+  return {
+    success: true,
+    actions: actions.length > 0 ? actions : ['no_new_refunds']
+  };
 }

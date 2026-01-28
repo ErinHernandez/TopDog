@@ -1,6 +1,6 @@
 /**
  * PaymentPageContent - Mobile Payment Methods Content
- * 
+ *
  * Extracted from pages/mobile-payment.js for maintainability.
  * Contains all the UI and logic for the payment methods page.
  */
@@ -10,6 +10,9 @@ import { useRouter } from 'next/router';
 import { getOrderedPaymentMethods, PAYMENT_METHOD_DETAILS } from '../../../lib/paymentMethodConfig';
 import MobilePhoneFrame, { MobilePhoneContent } from '../shared/MobilePhoneFrame';
 import PaymentMethodIcon, { CardBrandIcon } from '../shared/PaymentMethodIcon';
+import { createScopedLogger } from '../../../lib/clientLogger';
+
+const logger = createScopedLogger('[PaymentPage]');
 
 export default function PaymentPageContent() {
   const router = useRouter();
@@ -40,7 +43,7 @@ export default function PaymentPageContent() {
         
         setLoading(false);
       } catch (error) {
-        console.error('Error loading payment methods:', error);
+        logger.error('Error loading payment methods', error);
         setLoading(false);
       }
     };

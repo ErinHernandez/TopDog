@@ -101,7 +101,7 @@ const DEV_AUTH_OVERRIDE_KEY = 'devnav-auth-override'; // 'logged-in' | 'logged-o
 // VX2 components are the current/active development - put them first
 const DEFAULT_LINKS = [
   { id: 'vx2-shell', href: '/testing-grounds/vx2-mobile-app-demo', label: 'Mobile App (VX2)', bgColor: '#14532D', bgColorActive: '#1F4D3A', textColor: '#86EFAC' },
-  { id: 'vx2-lobby', href: '/testing-grounds/vx2-mobile-app-demo?tab=lobby', label: 'Lobby Tab (VX2)', bgColor: '#14532D', bgColorActive: '#1F4D3A', textColor: '#86EFAC' },
+  { id: 'vx2-lobby', href: '/testing-grounds/lobby-tab-sandbox', label: 'Lobby Tab Sandbox', bgColor: '#14532D', bgColorActive: '#1F4D3A', textColor: '#86EFAC' },
   { id: 'vx2-draft', href: '/testing-grounds/vx2-draft-room', label: 'Draft Room (VX2)', bgColor: '#14532D', bgColorActive: '#1F4D3A', textColor: '#86EFAC' },
   { id: 'slow-draft-sandbox', href: '/testing-grounds/slow-draft-sandbox', label: 'Slow Draft Sandbox', bgColor: '#14532D', bgColorActive: '#1F4D3A', textColor: '#86EFAC' },
   { id: 'dynamic-island-sandbox', href: '/testing-grounds/dynamic-island-sandbox', label: 'Dynamic Island Sandbox', bgColor: '#D97706', bgColorActive: '#B45309', textColor: '#FDE68A' },
@@ -109,15 +109,186 @@ const DEFAULT_LINKS = [
   { id: 'device-compare', href: '/testing-grounds/device-comparison', label: 'Device Comparison', bgColor: '#14B8A6', bgColorActive: '#0F766E', textColor: '#CCFBF1' },
   { id: 'join-modal-mobile', href: '/testing-grounds/join-tournament-modal-mobile', label: 'Join Modal (Mobile)', bgColor: '#14532D', bgColorActive: '#1F4D3A', textColor: '#86EFAC' },
   { id: 'auth-test', href: '/testing-grounds/vx2-auth-test', label: 'Auth Components Test', bgColor: '#065F46', bgColorActive: '#064E3B', textColor: '#A7F3D0' },
-  // Legacy/deprecated - kept for reference only
-  { id: 'mobile-demo', href: '/testing-grounds/mobile-apple-demo', label: '[Legacy] Mobile Demo', bgColor: '#78350F', bgColorActive: '#4B3621', textColor: '#FCD34D' },
-  { id: 'vx-draft', href: '/testing-grounds/vx-mobile-demo', label: '[Legacy] VX Draft Room', bgColor: '#78350F', bgColorActive: '#4B3621', textColor: '#FCD34D' },
 ];
 
 const MIN_WIDTH = 180;
 const MIN_HEIGHT = 200;
 const MAX_WIDTH = 500;
 const MAX_HEIGHT = 800;
+
+const DRAFT_CONTROLS_STORAGE_KEY = 'devnav-draft-controls';
+
+// ============================================================================
+// DRAFT CONTROLS SECTION
+// ============================================================================
+
+function DraftControlsSection() {
+  const [draftState, setDraftState] = useState({
+    status: 'waiting',
+    isPaused: false,
+    fastMode: false,
+  });
+
+  useEffect(() => {
+    // Listen for draft state updates from the draft room page
+    const handleStorageChange = () => {
+      try {
+        const stored = localStorage.getItem(DRAFT_CONTROLS_STORAGE_KEY);
+        if (stored) {
+          setDraftState(JSON.parse(stored));
+        }
+      } catch (e) {
+        // Ignore errors
+      }
+    };
+
+    // Check initial state
+    handleStorageChange();
+
+    // Listen for storage events (from other tabs/windows)
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Poll for changes (since same-tab updates don't trigger storage event)
+    const interval = setInterval(handleStorageChange, 200);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
+  }, []);
+
+  const handleAction = (action) => {
+    // Dispatch custom event that the draft room page listens to
+    window.dispatchEvent(new CustomEvent('devnav-draft-action', { detail: action }));
+  };
+
+  const statusColor = 
+    draftState.status === 'active' && !draftState.isPaused ? '#22C55E' :
+    draftState.status === 'active' && draftState.isPaused ? '#F59E0B' :
+    '#6B7280';
+
+  const statusText = 
+    draftState.status === 'active' && !draftState.isPaused ? 'Running' :
+    draftState.status === 'active' && draftState.isPaused ? 'Paused' :
+    draftState.status === 'waiting' ? 'Ready' :
+    'Loading...';
+
+  return (
+    <div 
+      style={{ 
+        marginBottom: 12,
+        paddingTop: 8,
+        borderTop: '1px solid #374151',
+        flexShrink: 0,
+      }}
+    >
+      <div style={{ 
+        fontSize: 10, 
+        color: '#6B7280', 
+        marginBottom: 6,
+        fontWeight: 600,
+      }}>
+        DRAFT CONTROLS
+      </div>
+
+      {/* Status */}
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: '6px',
+        padding: '6px 8px',
+        backgroundColor: 'rgba(0,0,0,0.2)',
+        borderRadius: 6,
+        marginBottom: 8,
+      }}>
+        <div style={{
+          width: '8px',
+          height: '8px',
+          borderRadius: '50%',
+          backgroundColor: statusColor,
+        }} />
+        <span style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 500 }}>
+          {statusText}
+        </span>
+      </div>
+
+      {/* Buttons */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+        <button
+          onClick={() => handleAction(draftState.status !== 'active' ? 'start' : draftState.isPaused ? 'resume' : 'pause')}
+          disabled={draftState.status === 'loading'}
+          style={{
+            width: '100%',
+            padding: '8px 10px',
+            backgroundColor: draftState.status !== 'active' ? '#10B981' : draftState.isPaused ? '#10B981' : '#4B5563',
+            color: '#FFFFFF',
+            fontSize: 11,
+            fontWeight: 600,
+            border: 'none',
+            borderRadius: 6,
+            cursor: draftState.status === 'loading' ? 'not-allowed' : 'pointer',
+            opacity: draftState.status === 'loading' ? 0.5 : 1,
+          }}
+        >
+          {draftState.status !== 'active' ? '▶ Start' : draftState.isPaused ? '▶ Resume' : '⏸ Pause'}
+        </button>
+
+        <button
+          onClick={() => handleAction('forcePick')}
+          disabled={draftState.status !== 'active'}
+          style={{
+            width: '100%',
+            padding: '8px 10px',
+            backgroundColor: draftState.status === 'active' ? '#F97316' : '#374151',
+            color: '#FFFFFF',
+            fontSize: 11,
+            fontWeight: 600,
+            border: 'none',
+            borderRadius: 6,
+            cursor: draftState.status === 'active' ? 'pointer' : 'not-allowed',
+            opacity: draftState.status === 'active' ? 1 : 0.4,
+          }}
+        >
+          ⚡ Force Pick
+        </button>
+
+        <button
+          onClick={() => handleAction('toggleSpeed')}
+          style={{
+            width: '100%',
+            padding: '8px 10px',
+            backgroundColor: draftState.fastMode ? '#8B5CF6' : '#1F2937',
+            color: '#FFFFFF',
+            fontSize: 11,
+            fontWeight: 600,
+            border: draftState.fastMode ? 'none' : '1px solid #374151',
+            borderRadius: 6,
+            cursor: 'pointer',
+          }}
+        >
+          {draftState.fastMode ? '⚡ Fast' : '🐢 Normal'}
+        </button>
+
+        <button
+          onClick={() => handleAction('restart')}
+          style={{
+            width: '100%',
+            padding: '8px 10px',
+            backgroundColor: 'transparent',
+            color: '#EF4444',
+            fontSize: 11,
+            fontWeight: 600,
+            border: '1px solid #EF4444',
+            borderRadius: 6,
+            cursor: 'pointer',
+          }}
+        >
+          🔄 Restart
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export default function DevNav() {
   const router = useRouter();
@@ -686,6 +857,14 @@ export default function DevNav() {
       {/* Content - only show when not minimized */}
       {!isMinimized && (
         <>
+          {/* Hide scrollbar styles */}
+          <style>{`
+            .devnav-links-scroll::-webkit-scrollbar {
+              width: 0px !important;
+              height: 0px !important;
+              display: none !important;
+            }
+          `}</style>
           {/* Edit mode instructions */}
           {isEditMode && (
             <div style={{
@@ -722,7 +901,10 @@ export default function DevNav() {
               flex: 1,
               overflowY: 'auto',
               minHeight: 0,
+              scrollbarWidth: 'none', /* Firefox */
+              msOverflowStyle: 'none', /* IE/Edge */
             }}
+            className="devnav-links-scroll"
           >
             {orderedLinks.map((link) => (
               <div
@@ -742,47 +924,55 @@ export default function DevNav() {
                   transition: 'transform 0.1s ease',
                 }}
               >
-                <Link 
-                  href={link.href}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    padding: '6px 10px',
-                    backgroundColor: router.pathname === link.href ? link.bgColorActive : link.bgColor,
-                    color: link.textColor,
-                    borderRadius: 6,
-                    fontSize: 12,
-                    textDecoration: 'none',
-                    cursor: isEditMode ? 'grab' : 'pointer',
-                    border: dragOverLinkId === link.id ? '2px dashed #3B82F6' : '2px solid transparent',
-                  }}
-                  onClick={(e) => {
-                    if (isEditMode) {
-                      e.preventDefault();
-                    }
-                  }}
-                >
-                  {isEditMode && (
-                    <svg 
-                      width="10" 
-                      height="10" 
-                      viewBox="0 0 10 10" 
-                      fill="currentColor"
-                      style={{ marginRight: 6, flexShrink: 0, opacity: 0.5 }}
-                    >
-                      <circle cx="2" cy="2" r="1" />
-                      <circle cx="8" cy="2" r="1" />
-                      <circle cx="2" cy="5" r="1" />
-                      <circle cx="8" cy="5" r="1" />
-                      <circle cx="2" cy="8" r="1" />
-                      <circle cx="8" cy="8" r="1" />
+                {isEditMode ? (
+                  <Link
+                    href={link.href}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '6px 10px',
+                      backgroundColor: link.bgColor,
+                      color: link.textColor,
+                      borderRadius: 6,
+                      fontSize: 12,
+                      textDecoration: 'none',
+                      cursor: 'grab',
+                      border: dragOverLinkId === link.id ? '2px dashed #3B82F6' : '2px solid transparent',
+                    }}
+                    onClick={(e) => e.preventDefault()}
+                  >
+                    <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" style={{ marginRight: 6, flexShrink: 0, opacity: 0.5 }}>
+                      <circle cx="2" cy="2" r="1" /><circle cx="8" cy="2" r="1" /><circle cx="2" cy="5" r="1" /><circle cx="8" cy="5" r="1" /><circle cx="2" cy="8" r="1" /><circle cx="8" cy="8" r="1" />
                     </svg>
-                  )}
-                  {link.label}
-                </Link>
+                    {link.label}
+                  </Link>
+                ) : (
+                  <a
+                    href={link.href}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '6px 10px',
+                      backgroundColor: router.asPath === link.href ? link.bgColorActive : link.bgColor,
+                      color: link.textColor,
+                      borderRadius: 6,
+                      fontSize: 12,
+                      textDecoration: 'none',
+                      cursor: 'pointer',
+                      border: '2px solid transparent',
+                    }}
+                  >
+                    {link.label}
+                  </a>
+                )}
               </div>
             ))}
           </div>
+          
+          {/* Draft Controls - Only show on draft room page */}
+          {router.pathname === '/testing-grounds/vx2-draft-room' && (
+            <DraftControlsSection />
+          )}
           
           {/* Dev Auth Controls */}
           <div 

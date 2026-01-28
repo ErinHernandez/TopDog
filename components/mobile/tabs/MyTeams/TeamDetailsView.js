@@ -1,6 +1,6 @@
 /**
  * TeamDetailsView - Shows detailed roster for a selected team
- * 
+ *
  * Extracted from MyTeamsTab for maintainability.
  */
 
@@ -12,6 +12,9 @@ import { SHARE_TYPES, generateShareData } from '../../../../lib/shareConfig';
 import { BYE_WEEKS } from '../../../../lib/nflConstants';
 import { POSITIONS } from '../../../draft/v3/constants/positions';
 import { getTotalPlayers } from './mockTeamData';
+import { createScopedLogger } from '../../../../lib/clientLogger';
+
+const logger = createScopedLogger('[TeamDetails]');
 
 export default function TeamDetailsView({
   team,
@@ -44,7 +47,7 @@ export default function TeamDetailsView({
       rosterText += `\nTotal: ${getTotalPlayers(team)} players in the ${team.tournament || 'TopDog International'} tournament.`;
       return rosterText;
     } catch (error) {
-      console.error('Error generating roster share text:', error);
+      logger.error('Error generating roster share text', error, { teamId: team?.id });
       return `Check out my "${team.name || 'team'}" roster!`;
     }
   };
@@ -70,7 +73,7 @@ export default function TeamDetailsView({
         setEditingTeamName(null);
         setTeamNameInput('');
       } catch (error) {
-        console.error('Error saving team name:', error);
+        logger.error('Error saving team name', error);
       }
     }
   };
@@ -333,7 +336,7 @@ export default function TeamDetailsView({
                       </div>
                     );
                   }}
-                  onPlayerSelect={(player) => console.log('Player selected:', player.name)}
+                  onPlayerSelect={(player) => logger.debug('Player selected', { player: player.name })}
                 />
                 
                 {!isLastPosition && (

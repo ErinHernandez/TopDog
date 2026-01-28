@@ -14,7 +14,7 @@
 /**
  * Supported payment providers
  */
-export type PaymentProviderName = 'stripe' | 'paystack' | 'paymongo' | 'xendit';
+export type PaymentProviderName = 'stripe' | 'paystack' | 'paymongo' | 'xendit' | 'paypal';
 
 /**
  * Countries supported by Paystack
