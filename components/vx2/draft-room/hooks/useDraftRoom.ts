@@ -288,7 +288,7 @@ export function useDraftRoom({
   const { players: poolPlayers, loading: poolLoading } = usePlayerPool();
   
   // Derived values - memoized to stabilize hook dependencies
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   const participants = useMemo(() => room?.participants ?? [], [room?.participants]);
   // Use room's teamCount if available, otherwise use the parameter or default
   const effectiveTeamCount = room?.settings.teamCount ?? teamCount;

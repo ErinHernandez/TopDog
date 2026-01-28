@@ -10,7 +10,7 @@ import type { JSX } from 'react';
 import { createScopedLogger } from '@/lib/clientLogger';
 
 const logger = createScopedLogger('[PlayerDropdown]');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const { playerDataService } = require('../../../lib/playerData/PlayerDataService');
 import { DROPDOWN_STYLES, DROPDOWN_DIMENSIONS, CONTEXT_OVERRIDES, type ContextOverride } from './PlayerDropdownStyles';
 import PlayerDropdownRow from './PlayerDropdownRow';

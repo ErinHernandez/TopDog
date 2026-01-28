@@ -28,12 +28,31 @@ export default function PayMongoCallback(): React.ReactElement {
   const router = useRouter();
   const [status, setStatus] = useState<CallbackStatus>('loading');
   const [message, setMessage] = useState('Verifying your payment...');
-  
+
+  const handleSuccessfulPayment = useCallback(async (sourceId: string) => {
+    try {
+      // The webhook should have already processed this
+      // We just need to verify and redirect
+      setStatus('success');
+      setMessage('Payment successful! Redirecting...');
+
+      // Redirect to wallet after a short delay
+      setTimeout(() => {
+        router.push('/wallet?deposit=success');
+      }, 2000);
+
+    } catch (error) {
+      logger.error('Error processing callback', error instanceof Error ? error : new Error(String(error)));
+      setStatus('error');
+      setMessage('An error occurred. Your payment may still be processing.');
+    }
+  }, [router]);
+
   useEffect(() => {
     const { status: urlStatus, source_id } = router.query;
-    
+
     if (!router.isReady) return;
-    
+
     // Handle based on URL status
     if (urlStatus === 'success' && source_id) {
       handleSuccessfulPayment(source_id as string);
@@ -44,26 +63,7 @@ export default function PayMongoCallback(): React.ReactElement {
       setStatus('error');
       setMessage('Invalid callback. Please contact support.');
     }
-  }, [router.isReady, router.query]);
-  
-  const handleSuccessfulPayment = async (sourceId: string) => {
-    try {
-      // The webhook should have already processed this
-      // We just need to verify and redirect
-      setStatus('success');
-      setMessage('Payment successful! Redirecting...');
-      
-      // Redirect to wallet after a short delay
-      setTimeout(() => {
-        router.push('/wallet?deposit=success');
-      }, 2000);
-      
-    } catch (error) {
-      logger.error('Error processing callback', error instanceof Error ? error : new Error(String(error)));
-      setStatus('error');
-      setMessage('An error occurred. Your payment may still be processing.');
-    }
-  };
+  }, [router.isReady, router.query, handleSuccessfulPayment, router]);
   
   const handleRetry = () => {
     router.push('/deposit');

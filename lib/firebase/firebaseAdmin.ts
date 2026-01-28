@@ -12,7 +12,7 @@ import { serverLogger } from '../logger/serverLogger';
 
 // Only import firebase-admin on the server
 // @ts-ignore - firebase-admin types may not be available during build
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+ 
 const admin = require('firebase-admin');
 
 // Initialize Firebase Admin if not already initialized

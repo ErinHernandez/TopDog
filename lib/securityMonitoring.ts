@@ -209,7 +209,7 @@ async function checkAlerts(eventType: string, ipAddress: string, count: number):
       
       // Also send to Sentry for tracking
       try {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
+         
         const Sentry = require('@sentry/nextjs');
         Sentry.captureMessage('Security Alert: Rate Limit Exceeded', {
           level: 'warning',

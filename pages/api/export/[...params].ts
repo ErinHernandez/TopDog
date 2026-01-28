@@ -6,9 +6,9 @@
 
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { AuthenticatedRequest, ApiHandler as AuthApiHandler } from '../../../lib/apiAuth';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const { exportSystem } = require('../../../lib/exportSystem');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const { dataAccessControl } = require('../../../lib/dataAccessControl');
 import { 
   withErrorHandling, 

@@ -58,7 +58,7 @@ export default function DevTournaments() {
 
   useEffect(() => {
     fetchDevTournaments();
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- Only run on mount
+   
   }, []);
 
   const fetchDevTournaments = async () => {

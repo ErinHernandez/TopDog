@@ -5,9 +5,9 @@
  * and image tagging using Azure Computer Vision API.
  */
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const ComputerVisionClient = require('@azure/cognitiveservices-computervision').ComputerVisionClient;
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const ApiKeyCredentials = require('@azure/ms-rest-js').ApiKeyCredentials;
 import * as fs from 'fs/promises';
 import { serverLogger } from './logger/serverLogger';

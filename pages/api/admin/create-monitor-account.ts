@@ -14,7 +14,7 @@
  */
 
 import type { NextApiRequest, NextApiResponse } from 'next';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const admin = require('firebase-admin');
 import { 
   getFirestore, 

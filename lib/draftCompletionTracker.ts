@@ -3,7 +3,7 @@
  * Tracks when users complete drafts with comprehensive analytics
  */
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const userMetrics = require('./userMetrics').default || require('./userMetrics').userMetrics;
 import { createScopedLogger } from './clientLogger';
 

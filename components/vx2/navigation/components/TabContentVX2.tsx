@@ -117,7 +117,7 @@ export default function TabContentVX2({
   // Track mount state for SSR
   useEffect(() => {
     setIsMounted(true);
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- Only run on mount
+   
   }, []);
   
   // Restore scroll position when tab becomes active

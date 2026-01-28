@@ -417,7 +417,7 @@ export default function PlayoffTeamsSandbox() {
   // Generate multiple pods for list view
   const pods = useMemo(() => {
     return generateMultiplePods(podCount, selectedScenario, selectedWeek);
-  }, [podCount, selectedScenario, selectedWeek, refreshKey]);
+  }, [podCount, selectedScenario, selectedWeek]);
 
   const handleRefresh = useCallback(() => {
     setRefreshKey(prev => prev + 1);

@@ -60,7 +60,7 @@ export interface GroupedPicks {
 
 // Note: The actual PLAYER_POOL data array is very large (6700+ lines)
 // Import from JSON file in public/data directory
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const playerPoolData = require('../public/data/player-pool-2025.json');
 
 // Handle both array format and {players: []} format

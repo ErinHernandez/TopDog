@@ -17,6 +17,7 @@ import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../../core/
 import { SPACING, TYPOGRAPHY, Z_INDEX } from '../../core/constants/sizes';
 import { Close, ChevronLeft } from '../../components/icons';
 import { useAuth } from '../hooks/useAuth';
+import { useCountdown } from '../../hooks/ui/useCountdown';
 import { createScopedLogger } from '../../../../lib/clientLogger';
 
 const logger = createScopedLogger('[ForgotPasswordModal]');
@@ -349,25 +350,17 @@ function CodeStep({
   error,
 }: CodeStepProps): React.ReactElement {
   const [code, setCode] = useState('');
-  const [cooldown, setCooldown] = useState(60);
-  
+  const { seconds: cooldown, isActive: cooldownActive, start: startCooldown } = useCountdown(60, { autoStart: true });
+
   const maskedContact = method === 'phone'
     ? contact.slice(0, -4).replace(/\d/g, '*') + contact.slice(-4)
     : contact.replace(/(.{2})(.*)(@.*)/, '$1****$3');
-  
+
   const canSubmit = code.length === 6 && !isLoading;
-  
-  useEffect(() => {
-    if (cooldown > 0) {
-      const timer = setTimeout(() => setCooldown((c: number) => c - 1), 1000);
-      return () => clearTimeout(timer);
-    }
-    return undefined;
-  }, [cooldown]);
-  
+
   const handleResend = () => {
     onResend();
-    setCooldown(60);
+    startCooldown();
   };
   
   return (
@@ -460,7 +453,7 @@ function CodeStep({
         >
           Didn't receive it?{' '}
           {method === 'email' && <span>Check your spam folder or </span>}
-          {cooldown > 0 ? (
+          {cooldownActive ? (
             <span>resend in {cooldown}s</span>
           ) : (
             <button

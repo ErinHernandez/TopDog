@@ -3,9 +3,9 @@
  * Provides data export capabilities for all users - whales, casuals, streamers
  */
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const { tournamentCollector } = require('./tournamentDataCollector');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const { DataManager } = require('./dataManager');
 
 // ============================================================================

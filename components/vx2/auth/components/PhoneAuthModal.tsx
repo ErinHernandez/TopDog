@@ -19,6 +19,7 @@ import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS, NAVBAR_BLUE } from
 import { SPACING, TYPOGRAPHY, Z_INDEX } from '../../core/constants/sizes';
 import { Close, ChevronLeft } from '../../components/icons';
 import { useAuth } from '../hooks/useAuth';
+import { useCountdown } from '../../hooks/ui/useCountdown';
 import { PHONE_CONSTRAINTS } from '../constants';
 import { getApprovedCountriesSorted } from '../../../../lib/localeCharacters';
 
@@ -394,17 +395,11 @@ function VerifyStep({
   error,
 }: VerifyStepProps): React.ReactElement {
   const [code, setCode] = useState(['', '', '', '', '', '']);
-  const [resendCooldown, setResendCooldown] = useState<number>(PHONE_CONSTRAINTS.RESEND_COOLDOWN_SECONDS);
+  const { seconds: resendCooldown, isActive: cooldownActive, start: startCooldown } = useCountdown(
+    PHONE_CONSTRAINTS.RESEND_COOLDOWN_SECONDS,
+    { autoStart: true }
+  );
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  
-  // Cooldown timer
-  useEffect(() => {
-    if (resendCooldown > 0) {
-      const timer = setTimeout(() => setResendCooldown(c => c - 1), 1000);
-      return () => clearTimeout(timer);
-    }
-    return undefined;
-  }, [resendCooldown]);
   
   // Auto-submit when code is complete
   useEffect(() => {
@@ -448,7 +443,7 @@ function VerifyStep({
   };
   
   const handleResend = () => {
-    setResendCooldown(PHONE_CONSTRAINTS.RESEND_COOLDOWN_SECONDS);
+    startCooldown();
     setCode(['', '', '', '', '', '']);
     onResend();
     inputRefs.current[0]?.focus();
@@ -562,7 +557,7 @@ function VerifyStep({
           <p style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
             Didn&apos;t receive it?
           </p>
-          {resendCooldown > 0 ? (
+          {cooldownActive ? (
             <p style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
               Resend in {resendCooldown}s
             </p>

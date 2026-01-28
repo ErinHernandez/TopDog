@@ -4,7 +4,7 @@
  * Based on Underdog's 24-field data model but optimized for TopDog
  */
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const { TournamentDatabase } = require('./tournamentDatabase');
 import { serverLogger } from './logger/serverLogger';
 
@@ -488,7 +488,7 @@ class TournamentDataCollector {
    * Export functions for historical analysis
    */
   exportTournamentData(tournamentId: string, format: string = 'json'): string {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+     
     const tournament = TournamentDatabase.TOURNAMENT_DATABASE?.tournaments?.[tournamentId];
     const picks = this.getAllPicksForTournament(tournamentId);
     

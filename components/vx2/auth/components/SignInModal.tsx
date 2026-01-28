@@ -20,6 +20,7 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../../core/constants/colors';
 import { SPACING, TYPOGRAPHY, Z_INDEX } from '../../core/constants/sizes';
 import { useAuth } from '../hooks/useAuth';
+import { useTemporaryState } from '../../hooks/ui/useTemporaryState';
 import {
   isPlatformAuthenticatorAvailable,
   getLastBiometricUserId,
@@ -221,8 +222,8 @@ export function SignInModal({
   // Loading/error state
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [shakeError, setShakeError] = useState(false);
-  
+  const [shakeError, setShakeError, setShakeErrorPermanent] = useTemporaryState(false, 500);
+
   // Biometric state
   const [biometricsAvailable, setBiometricsAvailable] = useState(false);
   const [biometricUserId, setBiometricUserId] = useState<string | null>(null);
@@ -289,15 +290,14 @@ export function SignInModal({
       setPasswordTouched(false);
       setIdentifierFocused(false);
       setPasswordFocused(false);
-      setShakeError(false);
+      setShakeErrorPermanent(false);
     }
-  }, [isOpen]);
+  }, [isOpen, setShakeErrorPermanent]);
   
   // Trigger shake animation on error
   const triggerShake = useCallback(() => {
     setShakeError(true);
-    setTimeout(() => setShakeError(false), 500);
-  }, []);
+  }, [setShakeError]);
   
   // Handle biometric sign-in
   const handleBiometricSignIn = useCallback(async () => {

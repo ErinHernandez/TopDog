@@ -187,7 +187,7 @@ class FCMService {
 
     try {
       // deleteToken is available but not in the type definitions
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       await (this.messaging as any).deleteToken();
       this.token = null;
       

@@ -3,7 +3,7 @@
  * Preloads and caches exposure data in the background for faster page loads
  */
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const userMetrics = require('./userMetrics').default || require('./userMetrics').userMetrics;
 import { createScopedLogger } from './clientLogger';
 

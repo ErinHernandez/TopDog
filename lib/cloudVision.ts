@@ -7,7 +7,7 @@
 
 import { serverLogger } from './logger/serverLogger';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const vision = require('@google-cloud/vision');
 
 // ============================================================================

@@ -22,6 +22,7 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../core/constants/colors';
 import { SPACING, TYPOGRAPHY, Z_INDEX } from '../core/constants/sizes';
 import { Close, ChevronLeft, Plus } from '../components/icons';
+import { useCountdown } from '../hooks/ui/useCountdown';
 import {
   formatPaystackAmount,
   toSmallestUnit,
@@ -804,16 +805,8 @@ function CodeStep({
   attemptsRemaining 
 }: CodeStepProps): React.ReactElement {
   const [code, setCode] = useState(['', '', '', '', '', '']);
-  const [resendCooldown, setResendCooldown] = useState(60);
+  const { seconds: resendCooldown, isActive: cooldownActive, start: startCooldown } = useCountdown(60, { autoStart: true });
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-
-  useEffect(() => {
-    if (resendCooldown > 0) {
-      const timer = setTimeout(() => setResendCooldown(r => r - 1), 1000);
-      return () => clearTimeout(timer);
-    }
-    return undefined;
-  }, [resendCooldown]);
 
   useEffect(() => {
     const fullCode = code.join('');
@@ -842,11 +835,11 @@ function CodeStep({
     if (pastedData.length === 6) inputRefs.current[5]?.focus();
   };
 
-  const handleResend = () => { 
-    setResendCooldown(60); 
-    setCode(['', '', '', '', '', '']); 
-    onResend(); 
-    inputRefs.current[0]?.focus(); 
+  const handleResend = () => {
+    startCooldown();
+    setCode(['', '', '', '', '', '']);
+    onResend();
+    inputRefs.current[0]?.focus();
   };
 
   return (
@@ -941,7 +934,7 @@ function CodeStep({
           <p style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
             Didn't receive it?
           </p>
-          {resendCooldown > 0 ? (
+          {cooldownActive ? (
             <p style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
               Resend in {resendCooldown}s
             </p>

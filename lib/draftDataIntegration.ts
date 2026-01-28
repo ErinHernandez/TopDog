@@ -3,7 +3,7 @@
  * Integrates tournament data collection with existing draft rooms
  */
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const { tournamentCollector } = require('./tournamentDataCollector.js');
 import { createScopedLogger } from './clientLogger';
 

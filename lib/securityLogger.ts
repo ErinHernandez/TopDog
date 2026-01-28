@@ -91,7 +91,7 @@ export async function logSecurityEvent(
     if (process.env.NODE_ENV === 'production') {
       // Send to Sentry if available
       try {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
+         
         const Sentry = require('@sentry/nextjs');
         Sentry.captureMessage('Security Event', {
           level: 'warning',

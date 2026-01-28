@@ -18,6 +18,7 @@ import { UsernameInput } from './UsernameInput';
 import { DeleteAccountModal } from './DeleteAccountModal';
 import { useAuth } from '../hooks/useAuth';
 import { useUsernameValidation } from '../hooks/useUsernameValidation';
+import { useTemporaryState } from '../../hooks/ui/useTemporaryState';
 import { RATE_LIMITS } from '../constants';
 import { createScopedLogger } from '../../../../lib/clientLogger';
 import { getAuth } from 'firebase/auth';
@@ -52,13 +53,12 @@ interface ProfileTabContentProps {
 function ProfileTabContent({ onEditName, onAddEmail, onAddPhone, onOpenDeleteModal }: ProfileTabContentProps): React.ReactElement {
   const { user, profile, sendVerificationEmail } = useAuth();
   const router = useRouter();
-  const [emailSent, setEmailSent] = useState(false);
-  
+  const [emailSent, setEmailSent] = useTemporaryState(false, 30000);
+
   const handleResendVerification = async () => {
     const result = await sendVerificationEmail();
     if (result.success) {
       setEmailSent(true);
-      setTimeout(() => setEmailSent(false), 30000);
     }
   };
 
@@ -310,7 +310,7 @@ function PreferencesTabContent(): React.ReactElement {
     dynamicIslandEnabled: profile?.preferences?.dynamicIslandEnabled ?? false,
   });
   const [isSaving, setIsSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const [saved, setSaved] = useTemporaryState(false, 2000);
   const [dynamicIslandSupported, setDynamicIslandSupported] = useState(false);
   
   // Alert preferences state
@@ -371,7 +371,6 @@ function PreferencesTabContent(): React.ReactElement {
         },
       });
       setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
     } catch (error) {
       logger.error('Failed to update alert preferences:', error instanceof Error ? error : new Error(String(error)));
       // Revert on error
@@ -398,7 +397,6 @@ function PreferencesTabContent(): React.ReactElement {
         preferences: { ...profile?.preferences, [key]: newValue } 
       });
       setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
     } catch (err) {
       // Revert on error
       setPreferences(prev => ({ ...prev, [key]: !newValue }));

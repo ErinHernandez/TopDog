@@ -41,7 +41,7 @@ export interface ExposureData {
 
 // Note: This is a large auto-generated data file
 // The actual data is imported from the backup file
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const exposureDataModule = require('./exposureData.js.bak');
 
 export const exposureData: ExposureData = exposureDataModule.exposureData || {

@@ -9,7 +9,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as https from 'https';
 import type { IncomingMessage } from 'http';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const { createCanvas } = require('canvas');
 import { extractTextFromImage, readTextFromImage, type OCRResult, type ReadResult } from './azureVision';
 import { serverLogger } from './logger/serverLogger';

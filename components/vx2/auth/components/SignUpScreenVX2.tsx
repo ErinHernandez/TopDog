@@ -17,6 +17,7 @@ import { SPACING, Z_INDEX } from '../../core/constants/sizes';
 import { ChevronLeft } from '../../components/icons';
 import { UsernameInput } from './UsernameInput';
 import { useAuth } from '../hooks/useAuth';
+import { useCountdown } from '../../hooks/ui/useCountdown';
 import { PASSWORD_CONSTRAINTS } from '../constants';
 
 // ============================================================================
@@ -691,24 +692,16 @@ function EmailVerifyStep({
   error,
 }: EmailVerifyStepProps): React.ReactElement {
   const [code, setCode] = useState('');
-  const [cooldown, setCooldown] = useState(60);
+  const { seconds: cooldown, isActive: cooldownActive, start: startCooldown } = useCountdown(60, { autoStart: true });
   const [isVerifying, setIsVerifying] = useState(false);
   const [verifyError, setVerifyError] = useState<string | null>(null);
-  
+
   const maskedEmail = email.replace(/(.{2})(.*)(@.*)/, '$1****$3');
   const canSubmit = code.length === 6 && !isVerifying;
-  
-  useEffect(() => {
-    if (cooldown > 0) {
-      const timer = setTimeout(() => setCooldown(c => c - 1), 1000);
-      return () => clearTimeout(timer);
-    }
-    return undefined;
-  }, [cooldown]);
-  
+
   const handleResend = () => {
     onResend();
-    setCooldown(60);
+    startCooldown();
   };
   
   const handleVerify = useCallback(async () => {
@@ -846,7 +839,7 @@ function EmailVerifyStep({
           style={{ color: TEXT_COLORS.muted, fontSize: 14 }}
         >
           Didn't receive it? Check your spam folder or{' '}
-          {cooldown > 0 ? (
+          {cooldownActive ? (
             <span>resend in {cooldown}s</span>
           ) : (
             <button
