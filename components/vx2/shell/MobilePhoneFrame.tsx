@@ -62,8 +62,23 @@ export function MobilePhoneFrame({ children, contentOverSafeArea = false }: Mobi
         />
         <div 
           className="w-full h-full rounded-[2.125rem] overflow-hidden relative"
-          style={{ backgroundColor: '#0f172a' }}
+          style={{ backgroundColor: '#101927' }}
         >
+          {/* Safe area - matches background color */}
+          {!contentOverSafeArea && (
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: `${contentTop}px`,
+                backgroundColor: '#101927',
+                zIndex: 1,
+              }}
+              aria-hidden="true"
+            />
+          )}
           {/* Content: contentOverSafeArea=0 lets modals go over safe area */}
           <div
           style={{

@@ -114,6 +114,7 @@ export function useConnectionStatus({
   const onDisconnectedRef = useRef(onDisconnected);
   const onReconnectFailedRef = useRef(onReconnectFailed);
   const scheduleReconnectRef = useRef<(() => void) | null>(null);
+  const attemptReconnectRef = useRef<(() => Promise<void>) | null>(null);
 
   // Update callback refs
   useEffect(() => {
@@ -266,11 +267,11 @@ export function useConnectionStatus({
       }
     }, 100);
 
-    // Schedule reconnection
+    // Schedule reconnection (use ref to avoid circular dependency with attemptReconnect)
     reconnectTimeoutRef.current = setTimeout(() => {
-      attemptReconnect();
+      attemptReconnectRef.current?.();
     }, delay);
-  }, [reconnectAttempts, maxReconnectAttempts, calculateReconnectDelay, attemptReconnect]);
+  }, [reconnectAttempts, maxReconnectAttempts, calculateReconnectDelay]);
 
   const attemptReconnect = useCallback(async () => {
     if (!db) return;
@@ -298,6 +299,11 @@ export function useConnectionStatus({
       }
     }
   }, [reconnectAttempts, maxReconnectAttempts]);
+
+  // Keep attemptReconnect ref updated
+  useEffect(() => {
+    attemptReconnectRef.current = attemptReconnect;
+  }, [attemptReconnect]);
 
   // -------------------------------------------------------------------------
   // CLEANUP

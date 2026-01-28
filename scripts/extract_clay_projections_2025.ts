@@ -5,7 +5,7 @@
  */
 
 import * as fs from 'fs';
-import * as pdf from 'pdf-parse';
+import pdf from 'pdf-parse';
 
 interface PassingStats {
   attempts?: number;

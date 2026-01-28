@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+export {}; // Force ES module scope to prevent variable redeclaration errors
+
 // Test Bijan Robinson's data
 const testLine: string = "RB Bijan Robinson 17 0 0 0 0 0 0 303 1422 12 79 62 490 2 336 1";
 

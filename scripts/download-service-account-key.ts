@@ -55,8 +55,9 @@ async function downloadServiceAccountKey(): Promise<void> {
     for (const selector of buttonSelectors) {
       try {
         if (selector.startsWith('//')) {
-          // XPath selector
-          const buttons = await page.$x(selector);
+          // XPath selector (page.$x exists at runtime; type assertion for Puppeteer type defs)
+          type PageWithX = { $x(expression: string): Promise<{ click(): Promise<void> }[]> };
+          const buttons = await (page as unknown as PageWithX).$x(selector);
           if (buttons.length > 0) {
             await buttons[0].click();
             clicked = true;

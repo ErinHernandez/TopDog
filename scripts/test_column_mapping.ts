@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+export {}; // Force ES module scope to prevent variable redeclaration errors
+
 // Test column mapping for Falcons data
 const testLine: string = "TE Feleipe Franks 17 0 0 0 0 0 0 0 0 0 3 2 18 0 4 93";
 
