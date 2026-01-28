@@ -5,7 +5,11 @@
     "lib": [
       "dom",
       "dom.iterable",
-      "ES2020"
+      "ES2020",
+      "webworker"
+    ],
+    "types": [
+      "@serwist/next/typings"
     ],
     "module": "esnext",
     "moduleResolution": "bundler",
@@ -79,6 +83,9 @@
     ".next",
     "out",
     "components/vx",
-    "functions"
+    "functions",
+    "cypress",
+    "__tests__",
+    "scripts"
   ]
 }
