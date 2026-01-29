@@ -1,0 +1,156 @@
+/**
+ * PlayerDropdownContent - CSS Module
+ *
+ * Styles for the player dropdown expanded content area.
+ * Uses CSS custom properties for dynamic team gradient values.
+ */
+
+/* ============================================================================
+   DROPDOWN CONTAINER
+   ============================================================================ */
+
+.dropdownContent {
+  position: relative;
+  width: 100%;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  z-index: 9998;
+  background: var(--dropdown-gradient);
+  border: 2px solid var(--dropdown-border-color);
+  margin-top: 4px;
+  margin-bottom: 14px;
+  min-height: 200px;
+  height: var(--dropdown-height);
+}
+
+/* ============================================================================
+   HEADER SECTION
+   ============================================================================ */
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: var(--spacing-3);
+  padding-right: var(--spacing-3);
+  padding-top: 6px;
+  padding-bottom: 4px;
+}
+
+.teamLogo {
+  width: 55px;
+  height: 55px;
+  flex-shrink: 0;
+  display: block;
+}
+
+/* ============================================================================
+   BADGES SECTION
+   ============================================================================ */
+
+.badgesContainer {
+  flex: 1;
+  padding-left: var(--spacing-3);
+  padding-right: var(--spacing-3);
+}
+
+.badgesRow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-4);
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-400);
+}
+
+.badge {
+  text-align: center;
+}
+
+.badge[data-type="bye"] {
+  min-width: 35px;
+}
+
+.badge[data-type="adp"] {
+  min-width: 45px;
+}
+
+.badge[data-type="proj"] {
+  min-width: 40px;
+}
+
+.badgeLabel {
+  font-size: 12px;
+}
+
+.badgeValue {
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
+}
+
+/* ============================================================================
+   ACTION BUTTONS
+   ============================================================================ */
+
+.actionsContainer {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+.draftButton {
+  padding: var(--spacing-2) 17px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  background-color: #6B7280;
+  color: #000000;
+  opacity: 0.7;
+  z-index: 10;
+  border: none;
+  cursor: pointer;
+}
+
+.draftButton[data-active="true"] {
+  background-color: #ef4444;
+  opacity: 1;
+}
+
+.queueButton {
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  background-color: #2DE2C5;
+  color: #000F55;
+  z-index: 10;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.queueButton:hover {
+  background-color: #26c9af;
+}
+
+/* ============================================================================
+   STATS SECTION
+   ============================================================================ */
+
+.statsSection {
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-top: 0;
+}
+
+/* Hide scrollbars in stats area */
+.statsSection ::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.statsSection {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}

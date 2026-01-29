@@ -10,7 +10,14 @@
  */
 
 /* ============================================================================
-   CSS CUSTOM PROPERTIES (Variables)
+   MASTER TOKEN FILE (Single Source of Truth)
+   ============================================================================ */
+
+@import './tokens/_tokens.css';
+
+/* ============================================================================
+   CSS CUSTOM PROPERTIES (Variables) - Component-Specific Overrides
+   These files extend the master tokens with component-specific variables
    ============================================================================ */
 
 @import './variables/colors.css';
@@ -20,9 +27,17 @@
 @import './variables/animations.css';
 
 /* ============================================================================
-   UTILITY CLASSES
+   UTILITY CLASSES - Layout & Display
    ============================================================================ */
 
 @import './utilities/layout.css';
 @import './utilities/spacing.css';
 @import './utilities/display.css';
+
+/* ============================================================================
+   UTILITY CLASSES - Static Classes (Replaces inline styles)
+   ============================================================================ */
+
+@import './utilities/positions.css';
+@import './utilities/teams.css';
+@import './utilities/dynamic.css';

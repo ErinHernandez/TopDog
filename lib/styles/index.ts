@@ -5,6 +5,7 @@
  *
  * @example
  * import { cn, cssVar, spacing, color } from '@/lib/styles';
+ * import { positionTextClass, teamDataAttr } from '@/lib/styles';
  */
 
 // Class name utilities
@@ -53,3 +54,97 @@ export {
   duration,
   ease,
 } from './cssVariables';
+
+// Token utilities (new - for static CSS class patterns)
+export {
+  // Position class helpers
+  positionTextClass,
+  positionBgClass,
+  positionBadgeClass,
+  positionGradientClass,
+  positionBorderClass,
+  positionBorderLeftClass,
+  // Team class helpers
+  teamDataAttr,
+  teamBgClass,
+  teamTextClass,
+  // Pixel value getters (for calculations)
+  spacingPx,
+  fontSizePx,
+  touchTargetPx,
+  zIndexValue,
+  // Backward compatibility exports
+  POSITION_COLORS,
+  BRAND_COLORS,
+  BG_COLORS,
+  TEXT_COLORS,
+  NFL_TEAM_COLORS,
+  getPositionColor,
+  getTeamColors,
+  // Types
+  type Position,
+  type ColoredPosition,
+  type NFLTeam,
+  type TouchTargetToken,
+  type DurationToken,
+  type EasingToken,
+  type TransitionToken,
+  type ShadowToken,
+} from './tokens';
+
+// Lazy loading utilities (for performance optimization)
+export {
+  lazyComponent,
+  preloadRouteStyles,
+  loadStylesOnDemand,
+  loadStylesOnVisible,
+  getCriticalCSSPath,
+} from './lazyStyles';
+
+// Comprehensive type definitions
+export type {
+  // Spacing
+  SpacingScale,
+  SpacingToken,
+  TouchTargetToken,
+  // Colors
+  Position,
+  ColoredPosition,
+  NFLTeam,
+  BrandColor,
+  GrayToken,
+  BgToken,
+  TextToken,
+  BorderToken,
+  StateColor,
+  // Typography
+  FontSizeToken,
+  FontWeightToken,
+  LineHeightToken,
+  // Layout
+  RadiusToken,
+  ZIndexToken,
+  ShadowToken,
+  // Animation
+  DurationToken,
+  EasingToken,
+  TransitionToken,
+  // CSS utilities
+  CSSVariable,
+  CSSVariableStyle,
+  ClampValue,
+  // Component-specific
+  DeviceSizeToken,
+  StatsTablePosition,
+  // Utility types
+  WithCSSVariables,
+  TokenName,
+  CSSValue,
+} from './types';
+
+// Type guards
+export {
+  isPosition,
+  isColoredPosition,
+  isNFLTeam,
+} from './types';

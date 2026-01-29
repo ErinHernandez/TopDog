@@ -13,6 +13,8 @@
     "lint:errors": "npx eslint . --quiet",
     "lint:report": "npx eslint . --format=json --output-file=eslint-report.json || true",
     "lint:stats": "node scripts/lint-stats.js",
+    "lint:css": "npx stylelint 'styles/**/*.css' 'components/**/*.module.css'",
+    "lint:css:fix": "npx stylelint 'styles/**/*.css' 'components/**/*.module.css' --fix",
     "type-check": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",

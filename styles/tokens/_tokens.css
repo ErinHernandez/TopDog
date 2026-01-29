@@ -1,0 +1,426 @@
+/**
+ * MASTER DESIGN TOKENS
+ *
+ * SINGLE SOURCE OF TRUTH for all design tokens.
+ * This file is the canonical definition - all other token systems derive from here.
+ *
+ * DO NOT duplicate these values elsewhere. Use CSS variables or the TypeScript
+ * token utilities in /lib/styles/tokens.ts
+ *
+ * @see /lib/styles/tokens.ts - TypeScript types and utilities
+ * @see /STYLING_ARCHITECTURE_PLAN.md - Architecture documentation
+ */
+
+:root {
+  /* ============================================================================
+     POSITION COLORS (LOCKED - DO NOT CHANGE without user approval)
+     Memory #4753963 - These colors are locked per user request
+     ============================================================================ */
+  --color-position-qb: #F472B6;
+  --color-position-rb: #0fba80;
+  --color-position-wr: #FBBF25;
+  --color-position-te: #7C3AED;
+  --color-position-flex: transparent;
+  --color-position-bn: #6B7280;
+
+  /* Position gradient end colors */
+  --color-position-qb-end: #EC4899;
+  --color-position-rb-end: #10B981;
+  --color-position-wr-end: #F59E0B;
+  --color-position-te-end: #8B5CF6;
+
+  /* Position backgrounds (30% opacity) */
+  --color-position-qb-bg: rgba(244, 114, 182, 0.3);
+  --color-position-rb-bg: rgba(15, 186, 128, 0.3);
+  --color-position-wr-bg: rgba(251, 191, 37, 0.3);
+  --color-position-te-bg: rgba(124, 58, 237, 0.3);
+
+  /* ============================================================================
+     BRAND COLORS
+     ============================================================================ */
+  --color-brand-primary: #2DE2C5;
+  --color-brand-secondary: #59c5bf;
+  --color-brand-accent: #04FBB9;
+
+  /* ============================================================================
+     NAVBAR COLORS (matches /wr_blue.png gradient)
+     ============================================================================ */
+  --color-navbar-solid: #1DA1F2;
+  --color-navbar-light: #4DB5F5;
+  --color-navbar-dark: #1A91DA;
+
+  /* ============================================================================
+     BACKGROUND COLORS
+     ============================================================================ */
+  --bg-primary: #101927;
+  --bg-secondary: #1f2937;
+  --bg-tertiary: #111827;
+  --bg-elevated: rgba(255, 255, 255, 0.1);
+  --bg-card: #1f2833;
+  --bg-black: #000000;
+
+  /* ============================================================================
+     TEXT COLORS
+     ============================================================================ */
+  --text-primary: #ffffff;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+  --text-disabled: #4b5563;
+
+  /* ============================================================================
+     BORDER COLORS
+     ============================================================================ */
+  --border-default: rgba(255, 255, 255, 0.1);
+  --border-light: rgba(255, 255, 255, 0.05);
+  --border-subtle: rgba(255, 255, 255, 0.15);
+  --border-focus: #59c5bf;
+  --border-error: #ef4444;
+  --border-success: #10b981;
+
+  /* ============================================================================
+     UI STATE COLORS
+     ============================================================================ */
+  --color-on-the-clock: #EF4444;
+  --color-my-turn: #EF4444;
+  --color-active: #60A5FA;
+  --color-active-light: #3B82F6;
+  --color-user-highlight: #3B82F6;
+  --color-selected: #2DE2C5;
+  --color-hover: rgba(255, 255, 255, 0.1);
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  --color-info: #3B82F6;
+
+  /* ============================================================================
+     TAB BAR
+     ============================================================================ */
+  --tab-bar-bg: #000000;
+  --tab-bar-border: #374151;
+  --tab-bar-icon-active: var(--color-navbar-solid);
+  --tab-bar-icon-inactive: #9CA3AF;
+  --tab-bar-label-active: var(--color-navbar-solid);
+  --tab-bar-label-inactive: #9CA3AF;
+  --tab-bar-badge-bg: var(--color-navbar-solid);
+  --tab-bar-badge-text: #FFFFFF;
+  --tab-bar-home-indicator: rgba(255, 255, 255, 0.3);
+
+  /* ============================================================================
+     HEADER
+     ============================================================================ */
+  --header-bg: #2563EB;
+  --header-text: #ffffff;
+  --header-icon-default: #ffffff;
+  --header-icon-hover: rgba(255, 255, 255, 0.8);
+  --header-deposit-btn: rgba(255, 255, 255, 0.15);
+
+  /* ============================================================================
+     GRAY SCALE (Tailwind-compatible)
+     ============================================================================ */
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+  --gray-950: #030712;
+
+  /* ============================================================================
+     BLUE SCALE
+     ============================================================================ */
+  --blue-400: #60a5fa;
+  --blue-500: #3b82f6;
+  --blue-600: #2563eb;
+  --blue-700: #1d4ed8;
+
+  /* ============================================================================
+     OVERLAYS
+     ============================================================================ */
+  --overlay: rgba(0, 0, 0, 0.5);
+  --overlay-dark: rgba(0, 0, 0, 0.75);
+  --overlay-light: rgba(0, 0, 0, 0.25);
+
+  /* ============================================================================
+     SPACING SCALE
+     ============================================================================ */
+  --spacing-0: 0px;
+  --spacing-px: 1px;
+  --spacing-2xs: 2px;
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 24px;
+  --spacing-2xl: 32px;
+  --spacing-3xl: 48px;
+  --spacing-4xl: 64px;
+
+  /* ============================================================================
+     CONTENT DIMENSIONS
+     ============================================================================ */
+  --content-padding-x: 16px;
+  --content-padding-y: 16px;
+  --content-gap: 12px;
+  --content-gap-sm: 8px;
+  --content-gap-lg: 16px;
+
+  /* ============================================================================
+     TOUCH TARGETS (Apple HIG Compliant)
+     ============================================================================ */
+  --touch-target-min: 44px;
+  --touch-target-comfort: 48px;
+  --touch-target-large: 56px;
+
+  /* ============================================================================
+     HEADER DIMENSIONS
+     ============================================================================ */
+  --header-height: 26px;
+  --header-padding-x: 16px;
+  --header-logo-height: 22px;
+  --header-logo-max-width: 120px;
+  --header-button-size: 44px;
+  --header-icon-size: 24px;
+  --header-deposit-button-size: 32px;
+  --header-deposit-icon-size: 20px;
+
+  /* ============================================================================
+     TAB BAR DIMENSIONS
+     ============================================================================ */
+  --tab-bar-min-height: 44px;
+  --tab-bar-padding-top: 10px;
+  --tab-bar-padding-bottom: 10px;
+  --tab-bar-tab-padding-x: 2px;
+  --tab-bar-icon-size: 24px;
+  --tab-bar-label-margin-top: 4px;
+  --tab-bar-badge-min-width: 18px;
+  --tab-bar-badge-height: 18px;
+  --tab-bar-badge-offset-top: 1px;
+  --tab-bar-badge-offset-right: -12px;
+  --tab-bar-home-indicator-width: 134px;
+  --tab-bar-home-indicator-height: 5px;
+  --tab-bar-home-indicator-margin-top: 8px;
+  --tab-bar-home-indicator-margin-bottom: 4px;
+
+  /* ============================================================================
+     SAFE AREAS (iOS)
+     ============================================================================ */
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+
+  /* ============================================================================
+     TYPOGRAPHY - FONT SIZES
+     ============================================================================ */
+  --font-size-2xs: 10px;
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 26px;
+  --font-size-3xl: 32px;
+  --font-size-4xl: 40px;
+  --font-size-5xl: 52px;
+
+  /* Component-specific font sizes */
+  --tab-bar-label-font-size: 10px;
+  --tab-bar-label-line-height: 12px;
+  --tab-bar-badge-font-size: 10.5px;
+  --header-title-font-size: 18px;
+
+  /* ============================================================================
+     TYPOGRAPHY - LINE HEIGHTS
+     ============================================================================ */
+  --line-height-none: 1;
+  --line-height-tight: 1.1;
+  --line-height-snug: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  --line-height-loose: 2;
+
+  /* ============================================================================
+     TYPOGRAPHY - FONT WEIGHTS
+     ============================================================================ */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* ============================================================================
+     TYPOGRAPHY - FONT FAMILIES
+     ============================================================================ */
+  --font-family-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-family-mono: 'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', monospace;
+
+  /* ============================================================================
+     BORDER RADIUS
+     ============================================================================ */
+  --radius-none: 0px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+
+  /* ============================================================================
+     BOX SHADOWS
+     ============================================================================ */
+  --shadow-none: none;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --shadow-elevated: 0 4px 12px rgba(0, 0, 0, 0.3);
+
+  /* ============================================================================
+     Z-INDEX SCALE
+     ============================================================================ */
+  --z-base: 0;
+  --z-elevated: 10;
+  --z-sticky-content: 20;
+  --z-dropdown: 100;
+  --z-header: 150;
+  --z-tab-bar: 150;
+  --z-sticky: 200;
+  --z-fixed: 300;
+  --z-modal-backdrop: 400;
+  --z-modal: 500;
+  --z-popover: 600;
+  --z-tooltip: 700;
+  --z-toast: 800;
+  --z-max: 9999;
+
+  /* ============================================================================
+     BREAKPOINTS (for reference - use @media queries)
+     ============================================================================ */
+  --breakpoint-xs: 320px;
+  --breakpoint-sm: 375px;
+  --breakpoint-md: 414px;
+  --breakpoint-lg: 768px;
+  --breakpoint-xl: 1024px;
+
+  /* ============================================================================
+     PHONE FRAME (Desktop Preview)
+     ============================================================================ */
+  --phone-frame-width: 280px;
+  --phone-frame-height: 580px;
+  --phone-frame-border-radius: 36px;
+  --phone-frame-padding: 8px;
+  --phone-frame-bezel-color: #000000;
+
+  /* ============================================================================
+     ICON SIZES
+     ============================================================================ */
+  --icon-size-xs: 12px;
+  --icon-size-sm: 16px;
+  --icon-size-md: 20px;
+  --icon-size-lg: 24px;
+  --icon-size-xl: 32px;
+  --icon-stroke-width: 2px;
+  --icon-stroke-width-bold: 2.5px;
+
+  /* ============================================================================
+     ANIMATION DURATIONS
+     ============================================================================ */
+  --duration-instant: 0ms;
+  --duration-fast: 75ms;
+  --duration-normal: 150ms;
+  --duration-slow: 300ms;
+  --duration-page: 200ms;
+
+  /* ============================================================================
+     EASING FUNCTIONS
+     ============================================================================ */
+  --ease-default: ease;
+  --ease-in: ease-in;
+  --ease-out: ease-out;
+  --ease-in-out: ease-in-out;
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ============================================================================
+     TRANSITION PRESETS
+     ============================================================================ */
+  --transition-fast: 75ms ease;
+  --transition-normal: 150ms ease;
+  --transition-slow: 300ms ease-in-out;
+  --transition-colors: 150ms ease;
+  --transition-transform: 150ms ease;
+  --transition-opacity: 150ms ease;
+  --transition-all: all 150ms ease;
+
+  /* ============================================================================
+     NFL TEAM COLORS
+     For dynamic team styling, use data-team attribute with these classes
+     ============================================================================ */
+  --team-ari-primary: #97233F;
+  --team-ari-secondary: #000000;
+  --team-atl-primary: #A71930;
+  --team-atl-secondary: #000000;
+  --team-bal-primary: #241773;
+  --team-bal-secondary: #000000;
+  --team-buf-primary: #00338D;
+  --team-buf-secondary: #C60C30;
+  --team-car-primary: #0085CA;
+  --team-car-secondary: #101820;
+  --team-chi-primary: #0B162A;
+  --team-chi-secondary: #C83803;
+  --team-cin-primary: #FB4F14;
+  --team-cin-secondary: #000000;
+  --team-cle-primary: #311D00;
+  --team-cle-secondary: #FF3C00;
+  --team-dal-primary: #003594;
+  --team-dal-secondary: #869397;
+  --team-den-primary: #FB4F14;
+  --team-den-secondary: #002244;
+  --team-det-primary: #0076B6;
+  --team-det-secondary: #B0B7BC;
+  --team-gb-primary: #203731;
+  --team-gb-secondary: #FFB612;
+  --team-hou-primary: #03202F;
+  --team-hou-secondary: #A71930;
+  --team-ind-primary: #002C5F;
+  --team-ind-secondary: #A2AAAD;
+  --team-jax-primary: #101820;
+  --team-jax-secondary: #D7A22A;
+  --team-kc-primary: #E31837;
+  --team-kc-secondary: #FFB81C;
+  --team-lv-primary: #000000;
+  --team-lv-secondary: #A5ACAF;
+  --team-lac-primary: #0080C6;
+  --team-lac-secondary: #FFC20E;
+  --team-lar-primary: #003594;
+  --team-lar-secondary: #FFA300;
+  --team-mia-primary: #008E97;
+  --team-mia-secondary: #FC4C02;
+  --team-min-primary: #4F2683;
+  --team-min-secondary: #FFC62F;
+  --team-ne-primary: #002244;
+  --team-ne-secondary: #C60C30;
+  --team-no-primary: #101820;
+  --team-no-secondary: #D3BC8D;
+  --team-nyg-primary: #0B2265;
+  --team-nyg-secondary: #C60C30;
+  --team-nyj-primary: #125740;
+  --team-nyj-secondary: #000000;
+  --team-phi-primary: #004C54;
+  --team-phi-secondary: #A5ACAF;
+  --team-pit-primary: #101820;
+  --team-pit-secondary: #FFB612;
+  --team-sf-primary: #AA0000;
+  --team-sf-secondary: #B3995D;
+  --team-sea-primary: #002244;
+  --team-sea-secondary: #69BE28;
+  --team-tb-primary: #D50A0A;
+  --team-tb-secondary: #FF7900;
+  --team-ten-primary: #0C2340;
+  --team-ten-secondary: #4B92DB;
+  --team-was-primary: #5A1414;
+  --team-was-secondary: #FFB612;
+}
