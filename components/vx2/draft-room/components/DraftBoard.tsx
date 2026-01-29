@@ -26,6 +26,8 @@ import ShareOptionsModal from './ShareOptionsModal';
 import { createScopedLogger } from '../../../../lib/clientLogger';
 import { useCustomizationPreferences } from '../../customization/hooks/useCustomizationPreferences';
 import { generateBackgroundStyle, generateOverlayStyle } from '@/lib/customization/patterns';
+import { cn } from '@/lib/styles';
+import styles from './DraftBoard.module.css';
 
 const logger = createScopedLogger('[DraftBoard]');
 
@@ -168,111 +170,53 @@ const TeamHeader = React.memo(function TeamHeader({
   const displayName = participant.name?.length > BOARD_PX.headerMaxChars
     ? participant.name.substring(0, BOARD_PX.headerMaxChars)
     : participant.name || `Team ${index + 1}`;
-  
+
   return (
     <div
+      className={styles.teamHeader}
       style={{
-        flexShrink: 0,
-        display: 'flex',
-        flexDirection: 'column',
-        backgroundColor: BOARD_COLORS.headerBgGray,
-        margin: BOARD_PX.cellMargin,
-        minWidth: BOARD_PX.cellWidth,
-        width: BOARD_PX.cellWidth,
-        borderRadius: BOARD_PX.cellBorderRadius,
-        border: `${BOARD_PX.cellBorderWidth}px solid ${borderColor}`,
-        overflow: 'hidden',
+        borderColor: borderColor,
       }}
     >
       {/* Username Header */}
       <div
+        className={styles.teamHeaderUsername}
         style={{
-          height: BOARD_PX.headerHeight,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '0 4px',
           backgroundColor: borderColor,
-          fontSize: BOARD_PX.headerFontSize,
-          fontWeight: 500,
-          color: '#FFFFFF',
-          textTransform: 'uppercase',
-          textAlign: 'center',
         }}
       >
         {displayName}
       </div>
-      
+
       {/* Content Area with Tracker */}
-      <div
-        style={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-          paddingBottom: BOARD_PX.contentPaddingBottom,
-          minHeight: BOARD_PX.contentMinHeight,
-        }}
-      >
+      <div className={styles.teamHeaderContent}>
         {/* On The Clock text */}
         {isOnTheClock && (
-          <div
-            style={{
-              fontWeight: 600,
-              color: '#FFFFFF',
-              fontSize: 11,
-              lineHeight: 1.2,
-              textAlign: 'center',
-              marginBottom: 8,
-            }}
-          >
+          <div className={styles.onTheClock}>
             On The<br />Clock
           </div>
         )}
-        
+
         {/* Position Tracker Bar */}
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            width: '100%',
-            marginTop: BOARD_PX.trackerMarginTop,
-          }}
-        >
+        <div className={styles.trackerContainer}>
           {totalPicks === 0 ? (
-            <div
-              style={{
-                height: BOARD_PX.trackerHeight,
-                width: BOARD_PX.trackerEmptyWidth,
-                backgroundColor: BOARD_COLORS.trackerEmpty,
-                borderRadius: BOARD_PX.trackerBorderRadius,
-              }}
-            />
+            <div className={styles.trackerEmpty} />
           ) : (
-            <div
-              style={{
-                display: 'flex',
-                height: BOARD_PX.trackerHeight,
-                width: BOARD_PX.trackerWidth,
-                borderRadius: BOARD_PX.trackerBorderRadius,
-                overflow: 'hidden',
-              }}
-            >
+            <div className={styles.trackerFilled}>
               {POSITION_ORDER
                 .filter(pos => positionCounts[pos] > 0)
                 .map((position, idx, arr) => (
                   <div
                     key={position}
+                    className={cn(
+                      styles.trackerSegment,
+                      idx === 0 && styles.trackerSegmentFirst,
+                      idx === arr.length - 1 && styles.trackerSegmentLast,
+                      idx > 0 && idx < arr.length - 1 && styles.trackerSegmentMiddle,
+                    )}
                     style={{
                       width: `${(positionCounts[position] / totalPicks) * 100}%`,
-                      height: '100%',
                       backgroundColor: getPositionColor(position),
-                      borderRadius: idx === 0 
-                        ? '1px 0 0 1px' 
-                        : idx === arr.length - 1 
-                          ? '0 1px 1px 0' 
-                          : '0',
                     }}
                   />
                 ))}
@@ -305,35 +249,23 @@ const PickCell = React.memo(function PickCell({
 }: PickCellProps): React.ReactElement {
   const { pick, isUserPick, isCurrentPick, pickNumber, round } = pickData;
   const { preferences } = useCustomizationPreferences();
-  
+
   // Determine cell styling
   const getCellStyle = (): React.CSSProperties => {
-    const base: React.CSSProperties = {
-      minWidth: BOARD_PX.cellWidth,
-      width: BOARD_PX.cellWidth,
-      margin: BOARD_PX.cellMargin,
-      marginTop: round === 1 ? BOARD_PX.firstRowMarginTop : BOARD_PX.cellMargin,
-      borderRadius: BOARD_PX.cellBorderRadius,
-      position: 'relative', // Required for absolute positioned overlay
-    };
-    
     if (pick) {
       const posColor = getPositionColor(pick.player.position);
       // All picked cells use position color border
       return {
-        ...base,
-        border: `${BOARD_PX.cellBorderWidth}px solid ${posColor}`,
+        borderColor: posColor,
         backgroundColor: `${posColor}20`,
       };
     }
-    
+
     if (isUserPick) {
       // Apply customization for user's unpicked cells
       const borderColor = preferences?.borderColor || userBorderColor;
-      const baseStyle = {
-        ...base,
-        border: `${BOARD_PX.cellBorderWidth}px solid ${borderColor}`,
-        backgroundColor: 'transparent',
+      const baseStyle: React.CSSProperties = {
+        borderColor: borderColor,
       };
 
       // Apply background customization (flag or solid color)
@@ -348,20 +280,22 @@ const PickCell = React.memo(function PickCell({
 
       return baseStyle;
     }
-    
-    return {
-      ...base,
-      border: `${BOARD_PX.cellBorderWidth}px solid ${BOARD_COLORS.cellBorderDefault}`,
-      backgroundColor: 'transparent',
-    };
+
+    return {};
   };
-  
+
+  const cellClassName = cn(
+    styles.pickCell,
+    round === 1 && styles.pickCellFirstRow,
+    pick ? styles.pickCellPicked : (isUserPick ? styles.pickCellUser : styles.pickCellDefault),
+  );
+
   return (
-    <div style={getCellStyle()}>
+    <div className={cellClassName} style={getCellStyle()}>
       {/* Overlay layer for user's unpicked cells */}
       {isUserPick && !pick && preferences?.overlayEnabled && (
         <div
-          className="absolute inset-0 pointer-events-none z-10"
+          className={styles.pickCellOverlay}
           style={generateOverlayStyle(
             `/customization/images/${preferences.overlayImageId}.svg`,
             preferences.overlayPattern,
@@ -372,110 +306,35 @@ const PickCell = React.memo(function PickCell({
           )}
         />
       )}
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          height: BOARD_PX.cellHeight,
-          padding: '2px 3px',
-          position: 'relative',
-          zIndex: 1,
-        }}
-      >
+      <div className={styles.pickCellContent}>
         {/* Pick number - top left */}
-        <div
-          style={{
-            fontSize: BOARD_PX.pickNumberFontSize,
-            fontWeight: 500,
-            color: '#FFFFFF',
-            lineHeight: 1,
-            marginTop: BOARD_PX.pickNumberMarginTop,
-            marginLeft: BOARD_PX.pickNumberMarginLeft,
-            flexShrink: 0,
-          }}
-        >
+        <div className={styles.pickNumber}>
           {formatPickNumber(pickNumber, teamCount)}
         </div>
-        
+
         {/* Content area */}
-        <div
-          style={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
+        <div className={styles.pickContentArea}>
           {pick ? (
             // Drafted player - First name / Last name / POS-TEAM
             <>
-              <div
-                style={{
-                  fontWeight: 700,
-                  color: '#FFFFFF',
-                  textAlign: 'center',
-                  width: '100%',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  fontSize: BOARD_PX.playerFirstNameFontSize,
-                  lineHeight: 1.2,
-                  marginTop: -1,
-                }}
-              >
+              <div className={cn(styles.playerName, styles.playerFirstName)}>
                 {pick.player.name.split(' ')[0]}
               </div>
-              <div
-                style={{
-                  fontWeight: 700,
-                  color: '#FFFFFF',
-                  textAlign: 'center',
-                  width: '100%',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  fontSize: BOARD_PX.playerLastNameFontSize,
-                  lineHeight: 1.2,
-                }}
-              >
+              <div className={cn(styles.playerName, styles.playerLastName)}>
                 {pick.player.name.split(' ').slice(1).join(' ') || pick.player.name}
               </div>
-              <div
-                style={{
-                  color: '#FFFFFF',
-                  textAlign: 'center',
-                  fontSize: BOARD_PX.playerPosTeamFontSize,
-                  lineHeight: 1.2,
-                  marginTop: BOARD_PX.playerPosTeamMarginTop,
-                }}
-              >
+              <div className={styles.playerPosTeam}>
                 {pick.player.position}-{pick.player.team}
               </div>
             </>
           ) : isCurrentPick && isDraftActive ? (
             // Current pick - show "On The Clock" only when draft is active
-            <div
-              style={{
-                fontWeight: 600,
-                color: '#FFFFFF',
-                fontSize: 11,
-                lineHeight: 1.2,
-                textAlign: 'center',
-                marginTop: -2,
-              }}
-            >
+            <div className={styles.onTheClockCell}>
               On The<br />Clock
             </div>
           ) : isNextUserPick ? (
             // Next user pick - show "X away"
-            <div
-              style={{
-                color: '#9CA3AF',
-                fontSize: BOARD_PX.awayFontSize,
-                marginTop: BOARD_PX.awayMarginTop,
-              }}
-            >
+            <div className={styles.picksAway}>
               {picksAway} away
             </div>
           ) : null}
@@ -644,51 +503,21 @@ const DraftBoard = React.memo(function DraftBoard({
   const gridMinWidth = teamCount * (BOARD_PX.cellWidth + BOARD_PX.cellMargin * 2);
   
   return (
-    <div
-      style={{
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        backgroundColor: BOARD_COLORS.background,
-        position: 'relative',
-      }}
-    >
+    <div className={styles.container}>
       {/* Scrollable Grid */}
       <div
         ref={scrollRef}
         onScroll={handleScroll}
-        style={{
-          flex: 1,
-          overflow: 'auto',
-          WebkitOverflowScrolling: 'touch',
-          overscrollBehavior: 'contain',
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-        }}
+        className={styles.scrollContainer}
       >
-        <style>{`
-          .draft-board-scroll::-webkit-scrollbar {
-            display: none !important;
-          }
-        `}</style>
-        
         {/* Capturable Board Content */}
-        <div ref={boardContentRef}>
+        <div ref={boardContentRef} className={styles.boardContent}>
           {/* Team Headers - Sticky */}
-          <div
-            style={{
-              position: 'sticky',
-              top: 0,
-              zIndex: 100,
-              backgroundColor: BOARD_COLORS.background,
-              paddingTop: 16,
-            }}
-          >
+          <div className={styles.headersContainer}>
             <div
+              className={styles.headersRow}
               style={{
-                display: 'flex',
                 minWidth: gridMinWidth,
-                width: 'max-content',
               }}
             >
               {participants.map((participant, index) => (
@@ -706,15 +535,14 @@ const DraftBoard = React.memo(function DraftBoard({
           </div>
           
           {/* Draft Grid Rows */}
-          <div style={{ paddingBottom: 24 }}>
+          <div className={styles.gridContainer}>
             {draftGrid.map((roundData) => (
               <div
                 key={roundData.round}
                 data-round={roundData.round}
+                className={styles.gridRow}
                 style={{
-                  display: 'flex',
                   minWidth: gridMinWidth,
-                  width: 'max-content',
                 }}
               >
                 {roundData.picks.map((pickData) => (
@@ -740,47 +568,14 @@ const DraftBoard = React.memo(function DraftBoard({
         onClick={handleShare}
         disabled={isCapturing}
         aria-label="Share draft board as image"
-        style={{
-          position: 'absolute',
-          bottom: 16,
-          right: 16,
-          width: 48,
-          height: 48,
-          borderRadius: 24,
-          backgroundColor: '#3B82F6',
-          border: 'none',
-          cursor: isCapturing ? 'wait' : 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
-          opacity: isCapturing ? 0.7 : 1,
-          transition: 'opacity 0.2s, transform 0.2s',
-          zIndex: 20,
-        }}
+        className={styles.shareButton}
       >
         {isCapturing ? (
-          <div
-            style={{
-              width: 20,
-              height: 20,
-              border: '2px solid #FFFFFF',
-              borderTopColor: 'transparent',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite',
-            }}
-          />
+          <div className={styles.spinner} />
         ) : (
           <Share size={24} color="#FFFFFF" strokeWidth={2} aria-hidden />
         )}
       </button>
-      
-      {/* Spinner animation */}
-      <style>{`
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
       
       {/* Share Options Modal */}
       <ShareOptionsModal

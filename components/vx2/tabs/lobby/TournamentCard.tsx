@@ -11,6 +11,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { createScopedLogger } from '@/lib/clientLogger';
+import { cn } from '@/lib/styles';
+import styles from './TournamentCard.module.css';
 import { BG_COLORS, TEXT_COLORS, BRAND_COLORS, STATE_COLORS } from '../../core/constants/colors';
 
 const logger = createScopedLogger('[TournamentCard]');
@@ -215,111 +217,56 @@ export function TournamentCard({
   const borderColor = featured ? colors.accent : colors.border;
   
   return (
-    <div 
-      className={`vx2-tournament-card relative w-full h-full ${className}`}
+    <div
+      className={cn(styles.card, { [styles.featured]: featured }, className)}
       style={{
-        backgroundColor: colors.backgroundFallback,
-        borderRadius: `${sizes.borderRadius}px`,
-        border: `${colors.borderWidth}px solid ${borderColor}`,
-        padding: `${sizes.padding}px`,
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-        position: 'relative',
-        minHeight: '400px', // Ensure minimum height on mobile
-        isolation: 'isolate', // Create new stacking context for z-index
-      }}
+        '--card-bg-fallback': colors.backgroundFallback,
+        '--card-border-color': borderColor,
+        '--card-border-width': `${colors.borderWidth}px`,
+        '--card-padding': `${sizes.padding}px`,
+        '--card-border-radius': `${sizes.borderRadius}px`,
+        '--card-background': useFallback && bgUrl && (bgUrl.endsWith('.webp') || bgUrl.includes('.webp'))
+          ? CARD_COLORS.backgroundFallbackPng
+          : colors.background,
+        '--blur-border-radius': `${sizes.borderRadius - 1}px`,
+        '--progress-bg': colors.progressBg,
+      } as React.CSSProperties}
       role="article"
       aria-label={`${tournament.title} tournament`}
     >
       {/* Blur placeholder layer - shows instantly */}
       <div
+        className={styles.blurPlaceholder}
         aria-hidden="true"
-        style={{
-          position: 'absolute',
-          inset: 0,
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          width: '100%',
-          height: '100%',
-          backgroundImage: `url(${BLUR_PLACEHOLDER})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          borderRadius: `${sizes.borderRadius - 1}px`,
-          zIndex: 0,
-        }}
       />
-      
+
       {/* Full image layer - fades in when loaded */}
       <div
+        className={cn(styles.fullImage, { [styles.loaded]: imageLoaded })}
         aria-hidden="true"
-        style={{
-          position: 'absolute',
-          inset: 0,
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          width: '100%',
-          height: '100%',
-          backgroundImage: useFallback && bgUrl && (bgUrl.endsWith('.webp') || bgUrl.includes('.webp'))
-            ? CARD_COLORS.backgroundFallbackPng 
-            : colors.background,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          borderRadius: `${sizes.borderRadius - 1}px`,
-          zIndex: 1,
-          opacity: imageLoaded ? 1 : 0,
-          transition: 'opacity 0.3s ease-out',
-          willChange: 'opacity', // Optimize for mobile
-          WebkitTransform: 'translateZ(0)', // Force hardware acceleration on mobile
-          transform: 'translateZ(0)',
-        }}
       />
-      
-      {/* Content layer */}
-      <div style={{ 
-        position: 'relative', 
-        zIndex: 2, 
-        display: 'flex', 
-        flexDirection: 'column', 
-        flex: 1,
-        minHeight: 0, // Important for flexbox on mobile
-        justifyContent: 'space-between', // Distribute space evenly
-      }}>
-      {/* Tournament Title */}
-      <div style={{ marginTop: '12px' }}>
-        <h2 
-          className="vx2-tournament-title text-center font-bold leading-tight"
-          style={{ 
-            fontSize: '46px',
-            fontFamily: "'Anton SC', sans-serif",
-            textTransform: 'uppercase',
-            letterSpacing: '2px',
-            color: CARD_COLORS.text,
-            textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
-          }}
-        >
-          The TopDog<br />
-          International
-        </h2>
-      </div>
 
-      {/* Bottom Section - Progress, Button, Stats */}
-      <TournamentCardBottomSection
-        tournament={tournament}
-        onJoinClick={onJoinClick}
-        styleOverrides={{
-          buttonBackground: styleOverrides.buttonBackground,
-          buttonBackgroundColor: styleOverrides.buttonBackgroundColor,
-          progressBg: colors.progressBg,
-        }}
-      />
-      </div>{/* End content layer */}
+      {/* Content layer */}
+      <div className={styles.contentLayer}>
+        {/* Tournament Title */}
+        <div className={styles.titleContainer}>
+          <h2 className={styles.title}>
+            The TopDog<br />
+            International
+          </h2>
+        </div>
+
+        {/* Bottom Section - Progress, Button, Stats */}
+        <TournamentCardBottomSection
+          tournament={tournament}
+          onJoinClick={onJoinClick}
+          styleOverrides={{
+            buttonBackground: styleOverrides.buttonBackground,
+            buttonBackgroundColor: styleOverrides.buttonBackgroundColor,
+            progressBg: colors.progressBg,
+          }}
+        />
+      </div>
     </div>
   );
 }
@@ -330,71 +277,39 @@ export function TournamentCard({
 
 export function TournamentCardSkeleton(): React.ReactElement {
   return (
-    <div 
-      className="animate-pulse"
+    <div
+      className={styles.skeleton}
       style={{
-        backgroundColor: CARD_COLORS.background,
-        borderRadius: `${CARD_PX.borderRadius}px`,
-        border: `1px solid ${CARD_COLORS.border}`,
-        padding: `${CARD_PX.padding}px`,
-      }}
+        '--card-bg-fallback': CARD_COLORS.backgroundFallback,
+        '--card-border-color': CARD_COLORS.border,
+        '--card-border-width': '1px',
+        '--card-padding': `${CARD_PX.padding}px`,
+        '--card-border-radius': `${CARD_PX.borderRadius}px`,
+        '--title-margin-bottom': `${CARD_PX.titleMarginBottom}px`,
+      } as React.CSSProperties}
       aria-hidden="true"
     >
       {/* Title skeleton */}
-      <div 
-        className="mx-auto rounded"
-        style={{ 
-          width: '70%', 
-          height: `${CARD_PX.titleFontSize}px`,
-          backgroundColor: 'rgba(255,255,255,0.1)',
-          marginBottom: `${CARD_PX.titleMarginBottom}px`,
-        }} 
-      />
-      
+      <div className={styles.skeletonTitle} />
+
       {/* Progress skeleton */}
-      <div style={{ marginBottom: `${CARD_PX.progressMarginBottom}px` }}>
-        <div 
-          className="flex justify-between"
-          style={{ marginBottom: `${CARD_PX.progressLabelMarginBottom}px` }}
-        >
-          <div 
-            className="rounded"
-            style={{ width: '80px', height: '14px', backgroundColor: 'rgba(255,255,255,0.1)' }} 
-          />
-          <div 
-            className="rounded"
-            style={{ width: '60px', height: '14px', backgroundColor: 'rgba(255,255,255,0.1)' }} 
-          />
+      <div className={styles.skeletonProgress}>
+        <div className={styles.skeletonProgressLabels}>
+          <div className={styles.skeletonProgressLabel} />
+          <div className={styles.skeletonProgressLabel} style={{ width: '60px' }} />
         </div>
-        <div 
-          className="rounded"
-          style={{ width: '100%', height: '8px', backgroundColor: 'rgba(255,255,255,0.1)' }} 
-        />
+        <div className={styles.skeletonProgressBar} />
       </div>
-      
+
       {/* Button skeleton */}
-      <div 
-        className="rounded"
-        style={{ 
-          width: '100%', 
-          height: `${CARD_PX.buttonHeight}px`,
-          backgroundColor: 'rgba(255,255,255,0.1)',
-          marginBottom: `${CARD_PX.buttonMarginBottom}px`,
-        }} 
-      />
-      
+      <div className={styles.skeletonButton} />
+
       {/* Stats skeleton */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: `${CARD_PX.statsGap}px` }}>
+      <div className={styles.skeletonStats}>
         {[1, 2, 3].map((i) => (
-          <div key={i} className="flex flex-col items-center">
-            <div 
-              className="rounded"
-              style={{ width: '50px', height: '24px', backgroundColor: 'rgba(255,255,255,0.1)', marginBottom: '4px' }} 
-            />
-            <div 
-              className="rounded"
-              style={{ width: '40px', height: '14px', backgroundColor: 'rgba(255,255,255,0.1)' }} 
-            />
+          <div key={i} className={styles.skeletonStatItem}>
+            <div className={styles.skeletonStatValue} />
+            <div className={styles.skeletonStatLabel} />
           </div>
         ))}
       </div>

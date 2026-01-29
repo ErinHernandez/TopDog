@@ -1,0 +1,73 @@
+/**
+ * CSS Custom Properties - Layout
+ *
+ * Border radius, shadows, z-index, breakpoints
+ * Mapped from components/vx2/core/constants/sizes.ts
+ */
+
+:root {
+  /* ============================================================================
+     BORDER RADIUS
+     ============================================================================ */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+
+  /* ============================================================================
+     BOX SHADOWS
+     ============================================================================ */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+
+  /* ============================================================================
+     Z-INDEX SCALE
+     ============================================================================ */
+  --z-base: 0;
+  --z-elevated: 10;
+  --z-sticky-content: 20;
+  --z-dropdown: 100;
+  --z-header: 150;
+  --z-tab-bar: 150;
+  --z-sticky: 200;
+  --z-fixed: 300;
+  --z-modal-backdrop: 400;
+  --z-modal: 500;
+  --z-popover: 600;
+  --z-tooltip: 700;
+  --z-toast: 800;
+  --z-max: 9999;
+
+  /* ============================================================================
+     BREAKPOINTS (for reference - use media queries)
+     ============================================================================ */
+  --breakpoint-xs: 320px;
+  --breakpoint-sm: 375px;
+  --breakpoint-md: 414px;
+  --breakpoint-lg: 768px;
+  --breakpoint-xl: 1024px;
+
+  /* ============================================================================
+     PHONE FRAME (Desktop Preview)
+     ============================================================================ */
+  --phone-frame-width: 280px;
+  --phone-frame-height: 580px;
+  --phone-frame-border-radius: 36px;
+  --phone-frame-padding: 8px;
+  --phone-frame-bezel-color: #000000;
+
+  /* ============================================================================
+     ICON SIZES
+     ============================================================================ */
+  --icon-size-xs: 12px;
+  --icon-size-sm: 16px;
+  --icon-size-md: 20px;
+  --icon-size-lg: 24px;
+  --icon-size-xl: 32px;
+  --icon-stroke-width: 2px;
+  --icon-stroke-width-bold: 2.5px;
+}

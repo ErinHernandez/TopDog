@@ -17,6 +17,8 @@ import { DRAFT_LAYOUT, DRAFT_DEFAULTS } from '../constants';
 import { BG_COLORS, TEXT_COLORS } from '../../core/constants/colors';
 import { SPACING, TYPOGRAPHY, RADIUS } from '../../core/constants/sizes';
 import { createScopedLogger } from '../../../../lib/clientLogger';
+import { cn } from '@/lib/styles';
+import styles from './DraftRoomVX2.module.css';
 
 // Create scoped logger for this component
 const logger = createScopedLogger('[DraftRoomVX2]');
@@ -95,41 +97,11 @@ interface LoadingStateProps {}
 
 function LoadingState({}: LoadingStateProps): React.ReactElement {
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100vh',
-        backgroundColor: BG_COLORS.primary,
-      }}
-    >
-      <div
-        style={{
-          width: 48,
-          height: 48,
-          borderRadius: 24,
-          border: `3px solid ${BG_COLORS.elevated}`,
-          borderTopColor: '#3B82F6',
-          animation: 'spin 1s linear infinite',
-        }}
-      />
-      <p
-        style={{
-          marginTop: SPACING.lg,
-          fontSize: TYPOGRAPHY.fontSize.sm,
-          color: TEXT_COLORS.secondary,
-        }}
-      >
+    <div className={styles.loadingContainer}>
+      <div className={styles.spinner} />
+      <p className={styles.loadingText}>
         Joining draft room...
       </p>
-      
-      <style>{`
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   );
 }
@@ -141,66 +113,22 @@ interface ErrorStateProps {
 
 function ErrorState({ message, onRetry }: ErrorStateProps): React.ReactElement {
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100vh',
-        backgroundColor: BG_COLORS.primary,
-        padding: SPACING.xl,
-        textAlign: 'center',
-      }}
-    >
-      <div
-        style={{
-          width: 64,
-          height: 64,
-          borderRadius: 32,
-          backgroundColor: '#EF444420',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginBottom: SPACING.lg,
-        }}
-      >
-        <span style={{ fontSize: 28, color: '#EF4444' }}>!</span>
+    <div className={styles.errorContainer}>
+      <div className={styles.errorIcon}>
+        <span className={styles.errorIconText}>!</span>
       </div>
-      
-      <h2
-        style={{
-          fontSize: TYPOGRAPHY.fontSize.lg,
-          fontWeight: TYPOGRAPHY.fontWeight.semibold,
-          color: TEXT_COLORS.primary,
-          marginBottom: SPACING.sm,
-        }}
-      >
+
+      <h2 className={styles.errorTitle}>
         Unable to Join Draft
       </h2>
-      
-      <p
-        style={{
-          fontSize: TYPOGRAPHY.fontSize.sm,
-          color: TEXT_COLORS.secondary,
-          marginBottom: SPACING.lg,
-        }}
-      >
+
+      <p className={styles.errorMessage}>
         {message}
       </p>
-      
+
       <button
         onClick={onRetry}
-        style={{
-          padding: `${SPACING.sm}px ${SPACING.lg}px`,
-          backgroundColor: '#3B82F6',
-          color: '#FFFFFF',
-          fontSize: TYPOGRAPHY.fontSize.sm,
-          fontWeight: TYPOGRAPHY.fontWeight.medium,
-          border: 'none',
-          borderRadius: 8,
-          cursor: 'pointer',
-        }}
+        className={styles.errorButton}
       >
         Try Again
       </button>
@@ -227,7 +155,7 @@ function TabContent({ activeTab, draftRoom, onTutorial, onLeave, onLeaveFromLink
   switch (activeTab) {
     case 'players':
       return (
-        <div style={{ height: '100%', minHeight: 0, display: 'flex', flexDirection: 'column', position: 'relative' }}>
+        <div className={styles.tabContent}>
           <PlayerList
             players={draftRoom.availablePlayers.filteredPlayers}
             totalCount={draftRoom.availablePlayers.totalCount}
@@ -606,42 +534,25 @@ export default function DraftRoomVX2({
   }
   
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        width: '100%',
-        backgroundColor: BG_COLORS.primary,
-        overflow: 'hidden',
-      }}
-    >
+    <div className={styles.container}>
       {/* Header - Fixed 54px */}
-      <div style={{ flexShrink: 0, height: HEADER_HEIGHT, zIndex: 50 }}>
+      <div className={styles.header}>
         <DraftStatusBar
           timerSeconds={draftRoom.timer.seconds}
           isUserTurn={draftRoom.isMyTurn && draftRoom.status === 'active'}
           onGracePeriodEnd={handleGracePeriodEnd}
           onLeave={handleLeaveClick}
-          hideTimer={false} // Always show timer in status bar
+          hideTimer={false}
           preDraftCountdown={draftRoom.preDraftCountdown}
           draftStatus={draftRoom.status}
         />
       </div>
 
       {/* Content Area - Flexible */}
-      <div
-        style={{
-          flex: 1,
-          minHeight: 0,  // CRITICAL: Allow shrinking
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden',
-        }}
-      >
+      <div className={styles.contentArea}>
         {/* Picks Bar - 200px when visible (not on board tab) */}
         {draftRoom.activeTab !== 'board' && (
-          <div style={{ flexShrink: 0, height: LAYOUT_PX.picksBarHeight, marginBottom: 0, paddingBottom: 0 }}>
+          <div className={styles.picksBarContainer}>
             <PicksBar
               picks={draftRoom.picks.picks}
               currentPickNumber={draftRoom.currentPickNumber}
@@ -650,7 +561,6 @@ export default function DraftRoomVX2({
               timer={draftRoom.timer.seconds}
               status={draftRoom.status}
               onBlankClick={(pickNumber) => {
-                // When in rosters tab, clicking a blank card should navigate to that user
                 if (draftRoom.activeTab === 'rosters') {
                   const teamCount = draftRoom.participants.length;
                   const participantIndex = getParticipantForPick(pickNumber, teamCount);
@@ -662,19 +572,10 @@ export default function DraftRoomVX2({
         )}
 
         {/* Main Content - Fill available space, let child components handle scrolling */}
-        <main
-          style={{
-            flex: 1,
-            minHeight: 0,  // CRITICAL: Allow shrinking
-            overflow: 'hidden',  // Changed from 'auto' - let child components handle scrolling
-            display: 'flex',
-            flexDirection: 'column',
-            paddingTop: 0,
-          }}
-        >
-          <TabContent 
-            activeTab={draftRoom.activeTab} 
-            draftRoom={draftRoom} 
+        <main className={styles.mainContent}>
+          <TabContent
+            activeTab={draftRoom.activeTab}
+            draftRoom={draftRoom}
             onTutorial={() => setShowTutorialModal(true)}
             onLeave={handleLeaveClick}
             onLeaveFromLink={handleLeaveFromLink}
@@ -686,7 +587,7 @@ export default function DraftRoomVX2({
       </div>
 
       {/* Footer - Fixed 56px */}
-      <div style={{ flexShrink: 0, height: LAYOUT_PX.footerHeight, zIndex: 50 }}>
+      <div className={styles.footer}>
         <DraftFooter
           activeTab={draftRoom.activeTab}
           onTabChange={draftRoom.setActiveTab}

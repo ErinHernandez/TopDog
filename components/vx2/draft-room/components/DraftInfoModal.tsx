@@ -11,26 +11,11 @@
  */
 
 import React, { useEffect, useRef } from 'react';
+import { cn } from '@/lib/styles';
 import { SPACING } from '../../core/constants/sizes';
 import { POSITION_COLORS } from '../../core/constants/colors';
 import { DRAFT_DEFAULTS } from '../constants';
-
-// ============================================================================
-// CONSTANTS
-// ============================================================================
-
-const MODAL_COLORS = {
-  backdrop: 'rgba(0, 0, 0, 0.7)',
-  background: '#1E293B',
-  title: '#FFFFFF',
-  sectionTitle: '#FFFFFF',
-  text: '#94A3B8',
-  textLight: '#64748B',
-  closeButton: '#475569',
-  closeButtonText: '#FFFFFF',
-  divider: '#334155',
-  keyDot: '#FFFFFF',
-} as const;
+import styles from './DraftInfoModal.module.css';
 
 // ============================================================================
 // TYPES
@@ -57,74 +42,41 @@ export interface DraftInfoModalProps {
 // SUB-COMPONENTS
 // ============================================================================
 
-function KeyItem({ 
-  color, 
-  label 
-}: { 
-  color: string; 
-  label: string; 
+function KeyItem({
+  color,
+  label
+}: {
+  color: string;
+  label: string;
 }): React.ReactElement {
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 10,
-      }}
-    >
+    <div className={styles.keyItem}>
       <div
+        className={styles.keyDot}
         style={{
-          width: 16,
-          height: 16,
-          borderRadius: 4,
           backgroundColor: color,
-          flexShrink: 0,
         }}
       />
-      <span
-        style={{
-          fontSize: 14,
-          color: MODAL_COLORS.text,
-        }}
-      >
+      <span className={styles.keyLabel}>
         {label}
       </span>
     </div>
   );
 }
 
-function InfoRow({ 
-  label, 
-  value 
-}: { 
-  label: string; 
-  value: string | number; 
+function InfoRow({
+  label,
+  value
+}: {
+  label: string;
+  value: string | number;
 }): React.ReactElement {
   return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingTop: 8,
-        paddingBottom: 8,
-      }}
-    >
-      <span
-        style={{
-          fontSize: 14,
-          color: MODAL_COLORS.textLight,
-        }}
-      >
+    <div className={styles.infoRow}>
+      <span className={styles.infoLabel}>
         {label}
       </span>
-      <span
-        style={{
-          fontSize: 14,
-          fontWeight: 600,
-          color: MODAL_COLORS.title,
-        }}
-      >
+      <span className={styles.infoValue}>
         {value}
       </span>
     </div>
@@ -133,32 +85,14 @@ function InfoRow({
 
 function SectionTitle({ children }: { children: React.ReactNode }): React.ReactElement {
   return (
-    <h3
-      style={{
-        fontSize: 13,
-        fontWeight: 600,
-        color: MODAL_COLORS.textLight,
-        textTransform: 'uppercase',
-        letterSpacing: '0.05em',
-        marginBottom: 12,
-      }}
-    >
+    <h3 className={styles.sectionTitle}>
       {children}
     </h3>
   );
 }
 
 function Divider(): React.ReactElement {
-  return (
-    <div
-      style={{
-        height: 1,
-        backgroundColor: MODAL_COLORS.divider,
-        marginTop: 16,
-        marginBottom: 16,
-      }}
-    />
-  );
+  return <div className={styles.divider} />;
 }
 
 // ============================================================================
@@ -209,53 +143,20 @@ export default function DraftInfoModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="info-modal-title"
+      className={styles.backdrop}
       style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: MODAL_COLORS.backdrop,
-        zIndex: 1000,
-        padding: SPACING.md,
-      }}
+        '--spacing-md': `${SPACING.md}px`,
+      } as React.CSSProperties}
       onClick={onClose}
     >
       {/* Modal Content */}
       <div
         onClick={(e) => e.stopPropagation()}
-        style={{
-          width: '100%',
-          maxWidth: 340,
-          maxHeight: '80%',
-          backgroundColor: MODAL_COLORS.background,
-          borderRadius: 20,
-          overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
+        className={styles.modalContent}
       >
         {/* Header */}
-        <div
-          style={{
-            padding: '20px 20px 0 20px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <h2
-            id="info-modal-title"
-            style={{
-              fontSize: 20,
-              fontWeight: 700,
-              color: MODAL_COLORS.title,
-              margin: 0,
-            }}
-          >
+        <div className={styles.header}>
+          <h2 id="info-modal-title" className={styles.title}>
             {format} Draft
           </h2>
           {onTutorial && (
@@ -264,15 +165,7 @@ export default function DraftInfoModal({
                 e.stopPropagation();
                 onTutorial();
               }}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#3B82F6',
-                fontSize: 16,
-                fontWeight: 500,
-                cursor: 'pointer',
-                padding: 0,
-              }}
+              className={styles.tutorialButtonHeader}
             >
               Tutorial
             </button>
@@ -280,33 +173,13 @@ export default function DraftInfoModal({
         </div>
         
         {/* Header Divider */}
-        <div
-          style={{
-            height: 1,
-            backgroundColor: MODAL_COLORS.divider,
-            marginLeft: 20,
-            marginRight: 20,
-            marginTop: 16,
-          }}
-        />
+        <div className={styles.headerDivider} />
         
         {/* Scrollable Content */}
-        <div
-          style={{
-            flex: 1,
-            overflowY: 'auto',
-            padding: 20,
-          }}
-        >
+        <div className={styles.scrollContent}>
           {/* Position Key */}
           <SectionTitle>Position Key</SectionTitle>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: 10,
-            }}
-          >
+          <div className={styles.keyGrid}>
             <KeyItem color={POSITION_COLORS.QB} label="Quarterback (QB)" />
             <KeyItem color={POSITION_COLORS.RB} label="Running Back (RB)" />
             <KeyItem color={POSITION_COLORS.WR} label="Wide Receiver (WR)" />
@@ -322,18 +195,7 @@ export default function DraftInfoModal({
                 e.stopPropagation();
                 onTutorial();
               }}
-              style={{
-                width: '100%',
-                height: 44,
-                backgroundColor: '#3B82F6',
-                border: 'none',
-                borderRadius: 10,
-                color: '#FFFFFF',
-                fontSize: 15,
-                fontWeight: 600,
-                cursor: 'pointer',
-                marginBottom: 16,
-              }}
+              className={styles.tutorialButton}
             >
               View Tutorial
             </button>
@@ -341,7 +203,7 @@ export default function DraftInfoModal({
           
           {/* Draft Settings */}
           <SectionTitle>Draft Settings</SectionTitle>
-          <div>
+          <div className={styles.draftSettings}>
             <InfoRow label="Format" value={format} />
             <InfoRow label="Teams" value={teams} />
             <InfoRow label="Rounds" value={rounds} />
@@ -353,14 +215,7 @@ export default function DraftInfoModal({
           
           {/* How It Works */}
           <SectionTitle>How It Works</SectionTitle>
-          <p
-            style={{
-              fontSize: 14,
-              color: MODAL_COLORS.text,
-              lineHeight: 1.6,
-              margin: 0,
-            }}
-          >
+          <p className={styles.description}>
             In a snake draft, pick order reverses each round. Your roster is automatically
             optimized each week to maximize points. No need to set lineups - just draft
             your best team.
@@ -368,26 +223,11 @@ export default function DraftInfoModal({
         </div>
         
         {/* Close Button */}
-        <div
-          style={{
-            padding: 20,
-            paddingTop: 0,
-          }}
-        >
+        <div className={styles.closeButtonContainer}>
           <button
             ref={closeButtonRef}
             onClick={onClose}
-            style={{
-              width: '100%',
-              height: 52,
-              backgroundColor: MODAL_COLORS.closeButton,
-              border: 'none',
-              borderRadius: 12,
-              color: MODAL_COLORS.closeButtonText,
-              fontSize: 16,
-              fontWeight: 600,
-              cursor: 'pointer',
-            }}
+            className={styles.closeButton}
           >
             Close
           </button>

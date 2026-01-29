@@ -1,0 +1,48 @@
+/**
+ * TabLoadingState CSS Module
+ *
+ * Migrated from inline styles for CSP compliance.
+ */
+
+/* ============================================================================
+   SKELETON BASE
+   ============================================================================ */
+
+.skeleton {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================================================
+   TAB SKELETON CONTAINERS
+   ============================================================================ */
+
+.skeletonCard {
+  background-color: var(--skeleton-card-bg, #1c1c1c);
+}
+
+.playerRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm, 0.75rem);
+  padding: var(--spacing-sm, 0.75rem);
+  background-color: var(--skeleton-card-bg, #1c1c1c);
+  border-radius: var(--radius-md, 8px);
+}
+
+/* ============================================================================
+   MAIN CONTAINER
+   ============================================================================ */
+
+.container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--loading-bg, #0a0a0a);
+}
+
+.message {
+  text-align: center;
+  padding-top: var(--spacing-md, 1rem);
+  padding-bottom: var(--spacing-md, 1rem);
+  color: var(--message-color, rgba(255, 255, 255, 0.6));
+}

@@ -8,6 +8,8 @@
  */
 
 import React from 'react';
+import { cn } from '@/lib/styles';
+import styles from './TournamentCardLogo.module.css';
 
 export interface TournamentCardLogoProps {
   /** Logo image path (e.g. /tournament_card_background.png) */
@@ -29,7 +31,16 @@ export function TournamentCardLogo({
   maxHeight = DEFAULT_MAX_HEIGHT,
   className = '',
 }: TournamentCardLogoProps): React.ReactElement {
-  return <></>;
+  return (
+    <div
+      className={cn(styles.container, className)}
+      style={{
+        '--max-height': `${maxHeight}px`,
+      } as React.CSSProperties}
+    >
+      <img src={src} alt={alt} />
+    </div>
+  );
 }
 
 export default TournamentCardLogo;

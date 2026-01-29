@@ -27,6 +27,8 @@ import { UsernameInput } from './UsernameInput';
 import { useAuth } from '../hooks/useAuth';
 import { useCountdown } from '../../hooks/ui/useCountdown';
 import { PASSWORD_CONSTRAINTS } from '../constants';
+import { cn } from '@/lib/styles';
+import styles from './SignUpModal.module.css';
 
 // ============================================================================
 // TYPES
@@ -50,10 +52,10 @@ type SignUpStep = 'credentials' | 'username' | 'emailVerify' | 'success';
 function TopDogLogo(): React.ReactElement {
   return (
     <div className="flex items-center justify-center">
-      <img 
-        src="/logo.png" 
-        alt="TopDog" 
-        style={{ height: 56 }}
+      <img
+        src="/logo.png"
+        alt="TopDog"
+        className={styles.logo}
       />
     </div>
   );
@@ -77,36 +79,36 @@ function PasswordStrength({ password }: PasswordStrengthProps): React.ReactEleme
     number: /\d/.test(password),
     special: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/.test(password),
   };
-  
+
   const score = Object.values(checks).filter(Boolean).length;
-  
+
   let strength: number;
   if (score <= 2) strength = 1;
   else if (score <= 3) strength = 2;
   else if (score <= 5) strength = 3;
   else strength = 4;
-  
+
   const strengthLabel = ['', 'Weak', 'Fair', 'Good', 'Strong'][strength];
   const strengthColor = ['', STATE_COLORS.error, STATE_COLORS.warning, '#84cc16', STATE_COLORS.success][strength];
-  
+
   return (
-    <div className="mt-3" style={{ opacity: password ? 1 : 0, transition: 'opacity 0.2s' }}>
+    <div className={styles.strengthContainer} style={{ opacity: password ? 1 : 0 }}>
       <div className="flex gap-1.5 mb-2">
         {[1, 2, 3, 4].map((level) => (
           <div
             key={level}
-            className="flex-1 h-1.5 rounded-full transition-colors"
+            className={styles.strengthBar}
             style={{
-              backgroundColor: strength >= level ? strengthColor : 'rgba(255,255,255,0.1)',
-            }}
+              '--bar-color': strength >= level ? strengthColor : 'rgba(255,255,255,0.1)',
+            } as React.CSSProperties}
           />
         ))}
       </div>
       <div className="flex justify-between items-center">
-        <span style={{ color: strengthColor, fontSize: 13 }}>
+        <span className={styles.strengthLabel} style={{ color: strengthColor }}>
           {strengthLabel || '\u00A0'}
         </span>
-        <span style={{ color: TEXT_COLORS.muted, fontSize: 13 }}>
+        <span className={cn(styles.textMuted, styles.strengthLabel)}>
           {password.length}/{PASSWORD_CONSTRAINTS.MIN_LENGTH}+ chars
         </span>
       </div>
@@ -150,18 +152,21 @@ function Input({
   label,
 }: InputProps): React.ReactElement {
   const hasError = touched && error;
-  
+
+  const inputStyle: React.CSSProperties = {
+    '--text-primary': TEXT_COLORS.primary,
+    '--input-border': hasError ? STATE_COLORS.error : BORDER_COLORS.default,
+    '--error-color': STATE_COLORS.error,
+  } as React.CSSProperties;
+
   return (
-    <div>
+    <div style={inputStyle}>
       {label && (
-        <label 
-          className="block font-medium mb-2"
-          style={{ color: TEXT_COLORS.primary, fontSize: 15 }}
-        >
+        <label className={styles.label}>
           {label}
         </label>
       )}
-      <div className="relative">
+      <div className={styles.inputWrapper}>
         <input
           ref={inputRef}
           type={type}
@@ -172,28 +177,20 @@ function Input({
           placeholder={placeholder}
           autoComplete={autoComplete}
           disabled={disabled}
-          className="w-full px-5 py-4 rounded-xl outline-none transition-all"
-          style={{
-            backgroundColor: 'rgba(255,255,255,0.05)',
-            color: TEXT_COLORS.primary,
-            border: `2px solid ${hasError ? STATE_COLORS.error : BORDER_COLORS.default}`,
-            fontSize: 17,
-            height: 56,
-            opacity: disabled ? 0.5 : 1,
-            paddingRight: rightElement ? 52 : 20,
-          }}
+          className={cn(
+            styles.input,
+            hasError && styles.inputError,
+            rightElement && styles.inputWithRight
+          )}
         />
         {rightElement && (
-          <div className="absolute right-4 top-1/2 -translate-y-1/2">
+          <div className={styles.inputRightElement}>
             {rightElement}
           </div>
         )}
       </div>
       {hasError && (
-        <div 
-          className="flex items-center gap-1.5 mt-2 px-1"
-          style={{ color: STATE_COLORS.error, fontSize: 13 }}
-        >
+        <div className={styles.fieldError}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="12" cy="12" r="10" />
             <line x1="12" y1="8" x2="12" y2="12" />
@@ -266,47 +263,38 @@ function CredentialsStep({
     }
   }, [canContinue, onContinue]);
   
+  const credentialsStyle: React.CSSProperties = {
+    '--text-secondary': TEXT_COLORS.secondary,
+    '--text-muted': TEXT_COLORS.muted,
+    '--error-color': STATE_COLORS.error,
+    '--bg-tertiary': BG_COLORS.tertiary,
+    '--text-disabled': TEXT_COLORS.disabled,
+  } as React.CSSProperties;
+
   return (
-    <div className="flex flex-col h-full" onKeyDown={handleKeyDown}>
+    <div className="flex flex-col h-full" onKeyDown={handleKeyDown} style={credentialsStyle}>
       {/* Content — centered vertically within phone frame */}
-      <div 
-        className="flex-1 overflow-y-auto" 
-        style={{ 
-          padding: `0 ${SPACING.xl}px`, 
-          scrollbarWidth: 'none',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-        }}
+      <div
+        className={styles.contentArea}
+        style={{ padding: `0 ${SPACING.xl}px` }}
       >
         {/* Logo & Welcome */}
         <div className="text-center mb-8">
           <TopDogLogo />
-          <p 
-            className="mt-6"
-            style={{ color: TEXT_COLORS.secondary, fontSize: 17 }}
-          >
+          <p className={cn(styles.textSecondary, "mt-6")} style={{ fontSize: 17 }}>
             Create your account
           </p>
         </div>
-        
+
         {/* Error Message */}
         {error && (
-          <div 
-            className="mb-4 p-4 rounded-xl flex items-center gap-3"
-            style={{ 
-              backgroundColor: 'rgba(239, 68, 68, 0.1)', 
-              border: `1px solid ${STATE_COLORS.error}20`,
-            }}
-          >
+          <div className={styles.errorBanner}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.error} strokeWidth="2">
               <circle cx="12" cy="12" r="10" />
               <line x1="12" y1="8" x2="12" y2="12" />
               <line x1="12" y1="16" x2="12.01" y2="16" />
             </svg>
-            <span style={{ color: STATE_COLORS.error, fontSize: 15 }}>
-              {error}
-            </span>
+            <span className={styles.errorBannerText}>{error}</span>
           </div>
         )}
         
@@ -338,8 +326,7 @@ function CredentialsStep({
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="p-1 rounded transition-colors hover:bg-white/10"
-                  style={{ color: TEXT_COLORS.muted }}
+                  className={styles.togglePasswordButton}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                   tabIndex={-1}
                 >
@@ -359,7 +346,7 @@ function CredentialsStep({
             />
             <PasswordStrength password={password} />
           </div>
-          
+
           {/* Confirm Password Input */}
           <Input
             value={confirmPassword}
@@ -373,8 +360,7 @@ function CredentialsStep({
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="p-1 rounded transition-colors hover:bg-white/10"
-                style={{ color: TEXT_COLORS.muted }}
+                className={styles.togglePasswordButton}
                 aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
                 tabIndex={-1}
               >
@@ -399,29 +385,18 @@ function CredentialsStep({
           <button
             onClick={onContinue}
             disabled={!canContinue}
-            className="w-full rounded-xl font-bold transition-all"
-            style={{
-              fontSize: 17,
-              height: 56,
-              background: canContinue ? 'url(/wr_blue.png) no-repeat center center' : BG_COLORS.tertiary,
-              backgroundSize: canContinue ? 'cover' : undefined,
-              color: canContinue ? '#000' : TEXT_COLORS.disabled,
-              opacity: canContinue ? 1 : 0.6,
-            }}
+            className={cn(
+              styles.primaryButton,
+              canContinue ? styles.primaryButtonEnabled : styles.primaryButtonDisabled
+            )}
           >
             Continue
           </button>
         </div>
-        
+
         {/* Password Requirements */}
-        <div 
-          className="p-4 rounded-xl mt-6"
-          style={{ backgroundColor: 'rgba(255,255,255,0.03)' }}
-        >
-          <div 
-            className="font-medium mb-3"
-            style={{ color: TEXT_COLORS.secondary, fontSize: 15 }}
-          >
+        <div className={styles.requirementsBox}>
+          <div className={styles.requirementsTitle}>
             Password requirements:
           </div>
           <div className="grid grid-cols-2 gap-2">
@@ -431,13 +406,10 @@ function CredentialsStep({
               { check: /[a-z]/.test(password), label: 'Lowercase' },
               { check: /\d/.test(password), label: 'Number' },
             ].map((req, i) => (
-              <div 
+              <div
                 key={i}
-                className="flex items-center gap-2"
-                style={{ 
-                  color: req.check ? STATE_COLORS.success : TEXT_COLORS.muted,
-                  fontSize: 14,
-                }}
+                className={styles.requirementItem}
+                style={{ color: req.check ? STATE_COLORS.success : TEXT_COLORS.muted }}
               >
                 {req.check ? (
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -456,31 +428,13 @@ function CredentialsStep({
       </div>
       
       {/* Footer */}
-      <div 
-        className="flex-shrink-0"
-        style={{ 
-          padding: `${SPACING.sm}px ${SPACING.xl}px`,
-          paddingBottom: 'max(env(safe-area-inset-bottom), 16px)',
-        }}
-      >
+      <div className={styles.footer}>
         {onSwitchToSignIn && (
-          <p 
-            className="text-center"
-            style={{ color: TEXT_COLORS.muted, fontSize: 15 }}
-          >
+          <p className={styles.footerText}>
             Already have an account?{' '}
-            <button 
+            <button
               onClick={onSwitchToSignIn}
-              className="font-semibold bg-transparent border-0 p-0 cursor-pointer"
-              style={{
-                background: 'url(/wr_blue.png) no-repeat center center',
-                backgroundSize: 'cover',
-                WebkitBackgroundClip: 'text',
-                backgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                color: 'transparent',
-                fontSize: 15,
-              }}
+              className={styles.footerLink}
             >
               Sign In
             </button>
@@ -520,43 +474,43 @@ function UsernameStep({
     }
   }, [canContinue, onContinue]);
   
+  const usernameStyle: React.CSSProperties = {
+    '--text-primary': TEXT_COLORS.primary,
+    '--text-secondary': TEXT_COLORS.secondary,
+    '--text-muted': TEXT_COLORS.muted,
+    '--border-default': BORDER_COLORS.default,
+    '--bg-tertiary': BG_COLORS.tertiary,
+    '--text-disabled': TEXT_COLORS.disabled,
+  } as React.CSSProperties;
+
   return (
-    <div className="flex flex-col h-full" onKeyDown={handleKeyDown}>
+    <div className="flex flex-col h-full" onKeyDown={handleKeyDown} style={usernameStyle}>
       {/* Header — same padding as Sign In/Sign Up credentials so height consistent */}
-      <div 
-        className="flex items-center gap-4 flex-shrink-0"
-        style={{ padding: `${SPACING.md + 8}px ${SPACING.lg}px ${SPACING.md}px` }}
-      >
-        <button 
-          onClick={onBack} 
-          className="p-2 rounded-full transition-colors hover:bg-white/10" 
+      <div className={styles.stepHeader}>
+        <button
+          onClick={onBack}
+          className={styles.backButton}
           aria-label="Back"
         >
           <ChevronLeft size={24} color={TEXT_COLORS.muted} />
         </button>
       </div>
-      
+
       {/* Content */}
-      <div 
+      <div
         className="flex-1 flex flex-col justify-center"
         style={{ padding: `0 ${SPACING.xl}px` }}
       >
         <div className="text-center mb-8">
-          <div 
-            className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4"
-            style={{ background: 'url(/wr_blue.png) no-repeat center center', backgroundSize: 'cover' }}
-          >
+          <div className={styles.iconCircle}>
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
           </div>
-          <h3 
-            className="font-bold mb-2"
-            style={{ color: TEXT_COLORS.primary, fontSize: 24 }}
-          >
+          <h3 className={cn(styles.textPrimary, "font-bold mb-2")} style={{ fontSize: 24 }}>
             Pick your username
           </h3>
-          <p style={{ color: TEXT_COLORS.secondary, fontSize: 15 }}>
+          <p className={styles.textSecondary} style={{ fontSize: 15 }}>
             This is how other players will see you
           </p>
         </div>
@@ -572,14 +526,8 @@ function UsernameStep({
         />
         
         {/* Username Requirements */}
-        <div
-          className="p-4 rounded-xl mt-6"
-          style={{ backgroundColor: 'rgba(255,255,255,0.03)' }}
-        >
-          <div
-            className="font-medium mb-3"
-            style={{ color: TEXT_COLORS.secondary, fontSize: 15 }}
-          >
+        <div className={styles.requirementsBox}>
+          <div className={styles.requirementsTitle}>
             Username requirements:
           </div>
           <div className="space-y-2">
@@ -590,11 +538,8 @@ function UsernameStep({
             ].map((req, i) => (
               <div
                 key={i}
-                className="flex items-center gap-2"
-                style={{
-                  color: req.check ? STATE_COLORS.success : TEXT_COLORS.muted,
-                  fontSize: 14,
-                }}
+                className={styles.requirementItem}
+                style={{ color: req.check ? STATE_COLORS.success : TEXT_COLORS.muted }}
               >
                 {req.check ? (
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -611,28 +556,16 @@ function UsernameStep({
           </div>
         </div>
       </div>
-      
+
       {/* Footer */}
-      <div 
-        className="flex-shrink-0"
-        style={{ 
-          padding: `${SPACING.sm}px ${SPACING.xl}px`,
-          paddingBottom: 'max(env(safe-area-inset-bottom), 16px)',
-          borderTop: `1px solid ${BORDER_COLORS.default}`,
-        }}
-      >
+      <div className={cn(styles.footer, styles.footerWithBorder)}>
         <button
           onClick={onContinue}
           disabled={!canContinue}
-          className="w-full rounded-xl font-bold transition-all"
-          style={{
-            fontSize: 17,
-            height: 56,
-            background: canContinue ? 'url(/wr_blue.png) no-repeat center center' : BG_COLORS.tertiary,
-            backgroundSize: canContinue ? 'cover' : undefined,
-            color: canContinue ? '#000' : TEXT_COLORS.disabled,
-            opacity: canContinue ? 1 : 0.6,
-          }}
+          className={cn(
+            styles.primaryButton,
+            canContinue ? styles.primaryButtonEnabled : styles.primaryButtonDisabled
+          )}
         >
           Continue
         </button>
@@ -700,72 +633,62 @@ function EmailVerifyStep({
     }
   }, [canSubmit, handleVerify]);
   
+  const verifyStyle: React.CSSProperties = {
+    '--text-primary': TEXT_COLORS.primary,
+    '--text-secondary': TEXT_COLORS.secondary,
+    '--text-muted': TEXT_COLORS.muted,
+    '--border-default': BORDER_COLORS.default,
+    '--bg-tertiary': BG_COLORS.tertiary,
+    '--text-disabled': TEXT_COLORS.disabled,
+    '--error-color': STATE_COLORS.error,
+  } as React.CSSProperties;
+
   return (
-    <div className="flex flex-col h-full" onKeyDown={handleKeyDown}>
+    <div className="flex flex-col h-full" onKeyDown={handleKeyDown} style={verifyStyle}>
       {/* Header — same padding as Sign In/Sign Up credentials so height consistent */}
-      <div 
-        className="flex items-center gap-4 flex-shrink-0"
-        style={{ padding: `${SPACING.md + 8}px ${SPACING.lg}px ${SPACING.md}px` }}
-      >
-        <button 
-          onClick={onBack} 
-          className="p-2 rounded-full transition-colors hover:bg-white/10" 
+      <div className={styles.stepHeader}>
+        <button
+          onClick={onBack}
+          className={styles.backButton}
           aria-label="Back"
         >
           <ChevronLeft size={24} color={TEXT_COLORS.muted} />
         </button>
       </div>
-      
+
       {/* Content */}
-      <div 
+      <div
         className="flex-1 flex flex-col justify-center"
         style={{ padding: `0 ${SPACING.xl}px` }}
       >
         <div className="text-center mb-8">
-          <div 
-            className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4"
-            style={{ 
-              background: 'url(/wr_blue.png) no-repeat center center',
-              backgroundSize: 'cover',
-            }}
-          >
+          <div className={styles.iconCircle}>
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
           </div>
-          <h3 
-            className="font-bold mb-2"
-            style={{ color: TEXT_COLORS.primary, fontSize: 24 }}
-          >
+          <h3 className={cn(styles.textPrimary, "font-bold mb-2")} style={{ fontSize: 24 }}>
             Check your email
           </h3>
-          <p style={{ color: TEXT_COLORS.secondary, fontSize: 15 }}>
+          <p className={styles.textSecondary} style={{ fontSize: 15 }}>
             We sent a 6-digit code to
             <br />
-            <span className="font-medium" style={{ color: TEXT_COLORS.primary }}>{maskedEmail}</span>
+            <span className={cn(styles.textPrimary, "font-medium")}>{maskedEmail}</span>
           </p>
         </div>
-        
+
         {/* Error Message */}
         {(error || verifyError) && (
-          <div 
-            className="mb-4 p-4 rounded-xl flex items-center gap-3"
-            style={{ 
-              backgroundColor: 'rgba(239, 68, 68, 0.1)', 
-              border: `1px solid ${STATE_COLORS.error}20`,
-            }}
-          >
+          <div className={styles.errorBanner}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.error} strokeWidth="2">
               <circle cx="12" cy="12" r="10" />
               <line x1="12" y1="8" x2="12" y2="12" />
               <line x1="12" y1="16" x2="12.01" y2="16" />
             </svg>
-            <span style={{ color: STATE_COLORS.error, fontSize: 15 }}>
-              {error || verifyError}
-            </span>
+            <span className={styles.errorBannerText}>{error || verifyError}</span>
           </div>
         )}
-        
+
         {/* Code Input */}
         <input
           type="text"
@@ -775,21 +698,10 @@ function EmailVerifyStep({
           maxLength={6}
           autoFocus
           disabled={isVerifying}
-          className="w-full px-5 py-4 rounded-xl outline-none text-center tracking-[0.5em] font-mono transition-all"
-          style={{
-            backgroundColor: 'rgba(255,255,255,0.05)',
-            color: TEXT_COLORS.primary,
-            border: `2px solid ${BORDER_COLORS.default}`,
-            fontSize: 24,
-            height: 64,
-            opacity: isVerifying ? 0.5 : 1,
-          }}
+          className={styles.codeInput}
         />
-        
-        <p 
-          className="text-center mt-6"
-          style={{ color: TEXT_COLORS.muted, fontSize: 14 }}
-        >
+
+        <p className={cn(styles.textMuted, "text-center mt-6")} style={{ fontSize: 14 }}>
           Didn't receive it? Check your spam folder or{' '}
           {cooldownActive ? (
             <span>resend in {cooldown}s</span>
@@ -797,50 +709,27 @@ function EmailVerifyStep({
             <button
               onClick={handleResend}
               disabled={isLoading}
-              className="font-semibold"
-              style={{
-                background: 'url(/wr_blue.png) no-repeat center center',
-                backgroundSize: 'cover',
-                WebkitBackgroundClip: 'text',
-                backgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                color: 'transparent',
-              }}
+              className={cn(styles.gradientText, "font-semibold")}
             >
               resend code
             </button>
           )}
         </p>
       </div>
-      
+
       {/* Footer */}
-      <div 
-        className="flex-shrink-0"
-        style={{ 
-          padding: `${SPACING.sm}px ${SPACING.xl}px`,
-          paddingBottom: 'max(env(safe-area-inset-bottom), 16px)',
-          borderTop: `1px solid ${BORDER_COLORS.default}`,
-        }}
-      >
+      <div className={cn(styles.footer, styles.footerWithBorder)}>
         <button
           onClick={handleVerify}
           disabled={!canSubmit}
-          className="w-full rounded-xl font-bold transition-all flex items-center justify-center gap-2"
-          style={{
-            fontSize: 17,
-            height: 56,
-            background: canSubmit ? 'url(/wr_blue.png) no-repeat center center' : BG_COLORS.tertiary,
-            backgroundSize: canSubmit ? 'cover' : undefined,
-            color: canSubmit ? '#000' : TEXT_COLORS.disabled,
-            opacity: canSubmit ? 1 : 0.6,
-          }}
+          className={cn(
+            styles.primaryButton,
+            canSubmit ? styles.primaryButtonEnabled : styles.primaryButtonDisabled
+          )}
         >
           {isVerifying ? (
             <>
-              <div 
-                className="animate-spin rounded-full h-5 w-5 border-2"
-                style={{ borderColor: '#000 transparent transparent transparent' }}
-              />
+              <div className={styles.spinner} />
               Verifying...
             </>
           ) : (
@@ -863,72 +752,51 @@ interface SuccessStepProps {
 }
 
 function SuccessStep({ email, username, onClose }: SuccessStepProps): React.ReactElement {
+  const successStyle: React.CSSProperties = {
+    '--text-primary': TEXT_COLORS.primary,
+    '--text-secondary': TEXT_COLORS.secondary,
+    '--text-muted': TEXT_COLORS.muted,
+  } as React.CSSProperties;
+
   return (
-    <div 
+    <div
       className="flex flex-col h-full items-center justify-center"
-      style={{ padding: `0 ${SPACING.xl}px` }}
+      style={{ ...successStyle, padding: `0 ${SPACING.xl}px` }}
     >
-      <div 
-        className="w-24 h-24 rounded-full flex items-center justify-center mb-6"
-        style={{ backgroundColor: 'rgba(16, 185, 129, 0.15)' }}
-      >
+      <div className={styles.iconCircleSuccess}>
         <svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke={STATE_COLORS.success} strokeWidth="2.5">
           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
         </svg>
       </div>
-      
-      <h2 
-        className="font-bold mb-3"
-        style={{ color: TEXT_COLORS.primary, fontSize: 28 }}
-      >
+
+      <h2 className={cn(styles.textPrimary, "font-bold mb-3")} style={{ fontSize: 28 }}>
         Welcome, {username}!
       </h2>
-      
-      <p 
-        className="text-center mb-6"
-        style={{ color: TEXT_COLORS.secondary, fontSize: 17 }}
-      >
+
+      <p className={cn(styles.textSecondary, "text-center mb-6")} style={{ fontSize: 17 }}>
         Your account has been created
       </p>
-      
-      <div 
-        className="text-center mb-6 px-5 py-4 rounded-xl w-full"
-        style={{ 
-          backgroundColor: 'rgba(255,255,255,0.03)', 
-        }}
-      >
-        <p style={{ color: TEXT_COLORS.muted, fontSize: 14 }} className="mb-2">
+
+      <div className={styles.successBox}>
+        <p className={cn(styles.textMuted, "mb-2")} style={{ fontSize: 14 }}>
           We sent a verification email to:
         </p>
-        <p style={{ color: TEXT_COLORS.primary, fontWeight: 500, fontSize: 15 }}>{email}</p>
-        <p style={{ color: TEXT_COLORS.muted, fontSize: 14 }} className="mt-2">
+        <p className={styles.textPrimary} style={{ fontWeight: 500, fontSize: 15 }}>{email}</p>
+        <p className={cn(styles.textMuted, "mt-2")} style={{ fontSize: 14 }}>
           Check your inbox to verify your account.
         </p>
       </div>
-      
+
       {/* Tax reminder */}
-      <div 
-        className="text-center mb-8 px-5 py-4 rounded-xl w-full"
-        style={{ 
-          backgroundColor: 'rgba(255,255,255,0.03)', 
-          borderLeft: `3px solid ${TEXT_COLORS.muted}`,
-        }}
-      >
-        <p style={{ color: TEXT_COLORS.muted, fontSize: 13 }}>
+      <div className={styles.taxReminder}>
+        <p className={styles.textMuted} style={{ fontSize: 13 }}>
           You are responsible for reporting and paying any applicable taxes on winnings in accordance with your local tax laws.
         </p>
       </div>
-      
-      <button 
+
+      <button
         onClick={onClose}
-        className="w-full rounded-xl font-bold"
-        style={{ 
-          background: 'url(/wr_blue.png) no-repeat center center',
-          backgroundSize: 'cover',
-          color: '#000', 
-          fontSize: 17,
-          height: 56,
-        }}
+        className={cn(styles.primaryButton, styles.primaryButtonEnabled)}
       >
         Get Started
       </button>
@@ -1026,42 +894,17 @@ export function SignUpModal({
   }, [step]);
   
   if (!isOpen) return null;
-  
+
+  const containerStyle: React.CSSProperties = {
+    '--content-top-inset': `${contentTopInset}px`,
+    '--modal-bg': BG_COLORS.secondary,
+    '--z-modal': Z_INDEX.modal,
+  } as React.CSSProperties;
+
   return (
-    <div
-      className="absolute left-0 right-0 bottom-0 flex flex-col"
-      style={{
-        top: `${contentTopInset}px`,
-        backgroundColor: BG_COLORS.secondary,
-        zIndex: Z_INDEX.modal,
-      }}
-    >
+    <div className={styles.modalContainer} style={containerStyle}>
       {/* Blue outline wrapper - auth modal branding */}
-      <div
-        style={{
-          position: 'absolute',
-          top: -8,
-          left: -8,
-          right: -8,
-          bottom: -8,
-          background: 'url(/wr_blue.png) no-repeat center center',
-          backgroundSize: '100% 100%',
-          borderRadius: '2.5rem',
-          zIndex: -1,
-          pointerEvents: 'none',
-          maskImage: `
-            linear-gradient(to bottom, black 0, black 8px, transparent 8px, transparent calc(100% - 8px), black calc(100% - 8px), black 100%),
-            linear-gradient(to right, black 0, black 8px, transparent 8px, transparent calc(100% - 8px), black calc(100% - 8px), black 100%)
-          `,
-          maskComposite: 'intersect',
-          WebkitMaskImage: `
-            linear-gradient(to bottom, black 0, black 8px, transparent 8px, transparent calc(100% - 8px), black calc(100% - 8px), black 100%),
-            linear-gradient(to right, black 0, black 8px, transparent 8px, transparent calc(100% - 8px), black calc(100% - 8px), black 100%)
-          `,
-          WebkitMaskComposite: 'source-in',
-        }}
-        aria-hidden="true"
-      />
+      <div className={styles.blueOutline} aria-hidden="true" />
 
       {step === 'credentials' && (
         <CredentialsStep

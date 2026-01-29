@@ -6,8 +6,9 @@
  */
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../../core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
+import { cn } from '@/lib/styles';
+import styles from './EnableBiometricsPrompt.module.css';
+import authStyles from './auth-shared.module.css';
 import {
   isPlatformAuthenticatorAvailable,
   isBiometricsEnabled,
@@ -75,26 +76,13 @@ export function EnableBiometricsPrompt({
   if (!isOpen || !shouldShow) return null;
 
   return (
-    <div
-      className="fixed inset-0 flex items-center justify-center p-4"
-      style={{ backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 9999 }}
-    >
-      <div
-        className="w-full max-w-sm rounded-2xl overflow-hidden"
-        style={{ backgroundColor: BG_COLORS.secondary }}
-      >
+    <div className={styles.backdrop}>
+      <div className={styles.modalCard}>
         {/* Icon */}
-        <div
-          className="flex justify-center pt-8 pb-4"
-          style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}
-        >
-          <div
-            className="w-20 h-20 rounded-full flex items-center justify-center"
-            style={{ background: 'url(/wr_blue.png) no-repeat center center', backgroundSize: 'cover' }}
-          >
+        <div className={styles.headerSection}>
+          <div className={styles.iconCircle}>
             <svg
-              width="40"
-              height="40"
+              className={styles.iconSvg}
               viewBox="0 0 24 24"
               fill="none"
               stroke="#000"
@@ -112,53 +100,30 @@ export function EnableBiometricsPrompt({
         </div>
 
         {/* Content */}
-        <div className="p-6 text-center">
-          <h3
-            className="font-bold mb-2"
-            style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.xl}px` }}
-          >
+        <div className={styles.contentSection}>
+          <h3 className={styles.title}>
             Enable {biometricType}?
           </h3>
-          <p
-            className="mb-6"
-            style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
-          >
+          <p className={styles.description}>
             Sign in faster and more securely with {biometricType}. Your biometric data never leaves your device.
           </p>
 
           {error && (
-            <div
-              className="mb-4 p-3 rounded-lg"
-              style={{
-                backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                color: STATE_COLORS.error,
-                fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-              }}
-            >
+            <div className={styles.errorMessage}>
               {error}
             </div>
           )}
 
           {/* Buttons */}
-          <div className="space-y-3">
+          <div className={styles.buttonsContainer}>
             <button
               onClick={handleEnable}
               disabled={isLoading}
-              className="w-full py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2"
-              style={{
-                background: 'url(/wr_blue.png) no-repeat center center',
-                backgroundSize: 'cover',
-                color: '#000',
-                fontSize: `${TYPOGRAPHY.fontSize.base}px`,
-                opacity: isLoading ? 0.5 : 1,
-              }}
+              className={styles.enableButton}
             >
               {isLoading ? (
                 <>
-                  <div
-                    className="animate-spin rounded-full h-5 w-5 border-2"
-                    style={{ borderColor: '#000 transparent transparent transparent' }}
-                  />
+                  <div className={styles.spinner} />
                   Setting up...
                 </>
               ) : (
@@ -169,12 +134,7 @@ export function EnableBiometricsPrompt({
             <button
               onClick={onClose}
               disabled={isLoading}
-              className="w-full py-3 rounded-xl font-medium transition-all"
-              style={{
-                backgroundColor: 'transparent',
-                color: TEXT_COLORS.secondary,
-                fontSize: `${TYPOGRAPHY.fontSize.base}px`,
-              }}
+              className={styles.cancelButton}
             >
               Not now
             </button>

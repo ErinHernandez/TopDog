@@ -1,49 +1,25 @@
 /**
  * Dynamic Island Sandbox - React Component
- * 
+ *
  * Visualizes the three Dynamic Island states:
  * 1. In-draft state (user actively in draft room)
  * 2. Out-of-draft state (user in app but not in draft)
  * 3. Out-of-app-during-live-draft state (user left app but draft is live)
- * 
+ *
  * This is a web-based visualization/simulation for development and demo purposes.
  * For actual Dynamic Island functionality, see the iOS Swift implementation.
  */
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import type { DraftStatus } from '../draft-room/types';
-
-// ============================================================================
-// STYLES
-// ============================================================================
-
-// Add pulsing animation for background
-if (typeof document !== 'undefined') {
-  const styleId = 'dynamic-island-pulse-animation';
-  if (!document.getElementById(styleId)) {
-    const style = document.createElement('style');
-    style.id = styleId;
-    style.textContent = `
-      @keyframes pulseBackground {
-        0%, 100% {
-          opacity: 1;
-          background-size: 200px 200px;
-        }
-        50% {
-          opacity: 0.7;
-          background-size: 220px 220px;
-        }
-      }
-    `;
-    document.head.appendChild(style);
-  }
-}
+import { cn } from '@/lib/styles';
+import styles from './DynamicIslandSandbox.module.css';
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-export type DynamicIslandState = 
+export type DynamicIslandState =
   | 'in-draft'           // User is actively in the draft room
   | 'out-of-draft'       // User is in app but not in a draft
   | 'out-of-app-live';   // User left app but draft is still live
@@ -225,18 +201,27 @@ export default function DynamicIslandSandbox({
   }, [externalState, onStateChange]);
 
   return (
-    <div className="flex flex-col items-center gap-8 p-8">
+    <div className={styles.container}>
       {/* State selector */}
-      <div className="flex gap-4">
+      <div className={styles.stateSelector}>
         {(['in-draft', 'out-of-draft', 'out-of-app-live'] as const).map((s) => (
           <button
             key={s}
             onClick={() => handleStateChange(s)}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            className={cn(
+              styles.stateButton,
               currentState === s
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
+                ? undefined // Styles will be applied via CSS variables
+                : undefined
+            )}
+            style={{
+              '--button-bg-active': '#2563eb',
+              '--button-text-active': '#fff',
+              '--button-bg-inactive': '#e5e7eb',
+              '--button-text-inactive': '#374151',
+              '--button-bg-inactive-hover': '#d1d5db',
+            } as React.CSSProperties}
+            data-active={currentState === s}
           >
             {s.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
           </button>
@@ -244,12 +229,12 @@ export default function DynamicIslandSandbox({
       </div>
 
       {/* Dynamic Island visualization */}
-      <div className="relative w-full max-w-md">
+      <div className={styles.visualizationWrapper}>
         {/* iPhone frame (optional, for visual context) */}
-        <div className="mx-auto bg-black rounded-[3rem] p-2 shadow-2xl">
-          <div className="bg-white rounded-[2.5rem] overflow-hidden">
+        <div className={styles.iphoneFrame}>
+          <div className={styles.iphoneScreen}>
             {/* Status bar / Dynamic Island area */}
-            <div className="relative h-14 bg-gradient-to-b from-gray-100 to-white">
+            <div className={styles.statusBar}>
               {/* Dynamic Island */}
               <DynamicIslandVisualization
                 state={currentState}
@@ -265,25 +250,25 @@ export default function DynamicIslandSandbox({
             </div>
 
             {/* App content area */}
-            <div className="h-96 bg-white p-4">
-              <div className="h-full bg-gray-50 rounded-lg flex items-center justify-center">
-                <div className="text-center text-gray-400">
+            <div className={styles.appContent}>
+              <div className={styles.appContentBox}>
+                <div className={styles.appContentText}>
                   {currentState === 'in-draft' && (
                     <div>
-                      <div className="text-2xl font-bold mb-2">Draft Room</div>
-                      <div className="text-sm">Pick #{currentPickNumber} / {totalPicks}</div>
+                      <div className={styles.appContentTitle}>Draft Room</div>
+                      <div className={styles.appContentSubtitle}>Pick #{currentPickNumber} / {totalPicks}</div>
                     </div>
                   )}
                   {currentState === 'out-of-draft' && (
                     <div>
-                      <div className="text-2xl font-bold mb-2">App Home</div>
-                      <div className="text-sm">No active drafts</div>
+                      <div className={styles.appContentTitle}>App Home</div>
+                      <div className={styles.appContentSubtitle}>No active drafts</div>
                     </div>
                   )}
                   {currentState === 'out-of-app-live' && (
                     <div>
-                      <div className="text-2xl font-bold mb-2">Other App</div>
-                      <div className="text-sm">Draft continuing in background</div>
+                      <div className={styles.appContentTitle}>Other App</div>
+                      <div className={styles.appContentSubtitle}>Draft continuing in background</div>
                     </div>
                   )}
                 </div>
@@ -294,28 +279,28 @@ export default function DynamicIslandSandbox({
       </div>
 
       {/* State info */}
-      <div className="w-full max-w-md bg-gray-50 rounded-lg p-6">
-        <h3 className="font-bold text-lg mb-4">Current State: {currentState.replace(/-/g, ' ')}</h3>
-        <div className="space-y-2 text-sm text-gray-700">
+      <div className={styles.stateInfo}>
+        <h3 className={styles.stateInfoTitle}>Current State: {currentState.replace(/-/g, ' ')}</h3>
+        <div className={styles.stateInfoContent}>
           {islandContent && (
-            <div>
-              <div className="font-medium mb-1">Dynamic Island Display:</div>
-              <div className="pl-4">{islandContent.description}</div>
+            <div className={styles.stateInfoItem}>
+              <div className={styles.stateInfoLabel}>Dynamic Island Display:</div>
+              <div className={styles.stateInfoValue}>{islandContent.description}</div>
             </div>
           )}
           {currentState === 'in-draft' && (
             <>
-              <div>Timer: {externalTimerSeconds ?? timerSeconds}s / {totalSeconds}s</div>
-              <div>Pick: {currentPickNumber} / {totalPicks}</div>
-              <div>Your Turn: {isMyTurn ? 'Yes' : 'No'}</div>
-              <div>Status: {draftStatus}</div>
+              <div className={styles.stateInfoItem}>Timer: {externalTimerSeconds ?? timerSeconds}s / {totalSeconds}s</div>
+              <div className={styles.stateInfoItem}>Pick: {currentPickNumber} / {totalPicks}</div>
+              <div className={styles.stateInfoItem}>Your Turn: {isMyTurn ? 'Yes' : 'No'}</div>
+              <div className={styles.stateInfoItem}>Status: {draftStatus}</div>
             </>
           )}
           {currentState === 'out-of-app-live' && (
             <>
-              <div>Room ID: {roomId}</div>
-              <div>Timer: {externalTimerSeconds ?? timerSeconds}s</div>
-              <div>Pick: {currentPickNumber} / {totalPicks}</div>
+              <div className={styles.stateInfoItem}>Room ID: {roomId}</div>
+              <div className={styles.stateInfoItem}>Timer: {externalTimerSeconds ?? timerSeconds}s</div>
+              <div className={styles.stateInfoItem}>Pick: {currentPickNumber} / {totalPicks}</div>
             </>
           )}
         </div>
@@ -367,16 +352,16 @@ function getInDraftContent({
     };
   }
 
-  const urgency: 'normal' | 'warning' | 'critical' = 
-    timerSeconds <= 5 ? 'critical' : 
-    timerSeconds <= 10 ? 'warning' : 
+  const urgency: 'normal' | 'warning' | 'critical' =
+    timerSeconds <= 5 ? 'critical' :
+    timerSeconds <= 10 ? 'warning' :
     'normal';
 
   if (isMyTurn) {
     const expandedText = autopickPlayerName
       ? `Autopick would be: ${autopickPlayerName}`
       : 'Your pick!';
-    
+
     return {
       description: 'Your turn timer countdown in Dynamic Island',
       compactText: 'Your Turn',
@@ -430,16 +415,16 @@ function getOutOfAppLiveContent({
   roomId: string;
   autopickPlayerName?: string;
 }): IslandContent {
-  const urgency: 'normal' | 'warning' | 'critical' = 
-    timerSeconds <= 5 ? 'critical' : 
-    timerSeconds <= 10 ? 'warning' : 
+  const urgency: 'normal' | 'warning' | 'critical' =
+    timerSeconds <= 5 ? 'critical' :
+    timerSeconds <= 10 ? 'warning' :
     'normal';
 
   if (isMyTurn) {
     const expandedText = autopickPlayerName
       ? `Autopick would be: ${autopickPlayerName}`
       : 'Your pick!';
-    
+
     return {
       description: 'Live Activity showing your turn timer (while app is in background)',
       compactText: 'Your Turn',
@@ -470,7 +455,6 @@ function getOutOfAppLiveContent({
 // DYNAMIC ISLAND VISUALIZATION
 // ============================================================================
 
-
 interface DynamicIslandVisualizationProps {
   state: DynamicIslandState;
   content: IslandContent | null;
@@ -488,45 +472,41 @@ function DynamicIslandVisualization({
   // But if content exists (user on clock), show Dynamic Island
   if (!content || !content.compactText) {
     return (
-      <div className="absolute top-0 left-0 right-0 h-14 flex items-center justify-center">
-        <div className="text-xs text-gray-600">9:41 AM</div>
+      <div className={styles.emptyStatusBar}>
+        <div className={styles.emptyStatusBarTime}>9:41 AM</div>
       </div>
     );
   }
 
   // Determine island size based on state and urgency
   const isExpanded = state === 'out-of-app-live' || content.urgency === 'critical';
-  const islandWidth = isExpanded ? 'w-72' : 'w-32';
-  const islandHeight = isExpanded ? 'h-16' : 'h-8';
+  const islandWidth = isExpanded ? '18rem' : '8rem';
+  const islandHeight = isExpanded ? '4rem' : '2rem';
 
   // Urgency colors and background
-  const getUrgencyColor = () => {
+  const getUrgencyClass = () => {
     // In draft, user on the clock: use wr_blue.png background with red text
     if (content.isInDraft && content.isMyTurn) {
-      return ''; // No background color class, use inline style with image
+      return '';
     }
-    if (content.urgency === 'critical') return 'bg-red-500';
-    if (content.urgency === 'warning') return 'bg-orange-500';
-    return 'bg-black';
+    if (content.urgency === 'critical') return styles.islandCritical;
+    if (content.urgency === 'warning') return styles.islandWarning;
+    return styles.islandNormal;
   };
 
   const getBackgroundStyle = () => {
     // In draft, user on the clock: use wr_blue.png background with pulse animation
     if (content.isInDraft && content.isMyTurn) {
       return {
-        backgroundImage: 'url(/wr_blue.png)',
-        backgroundRepeat: 'repeat',
-        backgroundSize: '200px 200px',
-        backgroundColor: '#1E3A5F', // Fallback color
-        animation: 'pulseBackground 2s ease-in-out infinite',
-      };
+        '--island-bg-image': 'url(/wr_blue.png)',
+        '--island-bg-color': '#1E3A5F',
+      } as React.CSSProperties;
     }
-    return {};
-  };
-
-  const getTextColor = () => {
-    // Always use white text
-    return 'text-white';
+    return {
+      '--island-bg-color': content.urgency === 'critical' ? '#ef4444' :
+                          content.urgency === 'warning' ? '#f97316' :
+                          '#000',
+    } as React.CSSProperties;
   };
 
   // Handle click to navigate to draft room
@@ -536,21 +516,24 @@ function DynamicIslandVisualization({
     }
   };
 
+  const timerProgress = content.totalSeconds ? (content.timerSeconds / content.totalSeconds) * 100 : 0;
+
   return (
-    <div className="absolute top-2 left-1/2 -translate-x-1/2">
+    <div className={styles.islandContainer}>
       {/* Dynamic Island pill */}
       <div
-        className={`
-          ${islandWidth} ${islandHeight}
-          ${getUrgencyColor()}
-          rounded-full
-          flex items-center justify-center
-          ${getTextColor()} text-xs font-medium
-          shadow-lg
-          transition-all duration-300 ease-in-out
-          ${state === 'out-of-draft' && content.isMyTurn ? 'cursor-pointer hover:opacity-90' : ''}
-        `}
-        style={getBackgroundStyle()}
+        className={cn(
+          styles.islandPill,
+          getUrgencyClass(),
+          content.isInDraft && content.isMyTurn ? styles.islandPillWithBackgroundImage : '',
+          state === 'out-of-draft' && content.isMyTurn ? styles.islandClickable : ''
+        )}
+        style={{
+          ...getBackgroundStyle(),
+          '--island-width': islandWidth,
+          '--island-height': islandHeight,
+          '--timer-progress-percent': `${Math.min(100, timerProgress)}%`,
+        } as React.CSSProperties}
         onClick={handleClick}
         role={state === 'out-of-draft' && content.isMyTurn ? 'button' : undefined}
         tabIndex={state === 'out-of-draft' && content.isMyTurn ? 0 : undefined}
@@ -563,33 +546,30 @@ function DynamicIslandVisualization({
       >
         {/* Compact view */}
         {!isExpanded && (
-          <div className="flex items-center gap-2 px-3">
+          <div className={styles.compactView}>
             {content.showTimer && (
-              <span className="tabular-nums">{content.timerSeconds}</span>
+              <span className={styles.timerDisplay}>{content.timerSeconds}</span>
             )}
-            <span className="truncate max-w-[80px]">{content.compactText}</span>
+            <span className={styles.compactText}>{content.compactText}</span>
           </div>
         )}
 
         {/* Expanded view */}
         {isExpanded && (
-          <div className="flex flex-col items-center justify-center px-4 py-2 w-full">
+          <div className={styles.expandedView}>
             {content.showTimer && content.timerSeconds !== undefined && (
-              <div className="flex items-center gap-2 w-full justify-between">
-                <span className="tabular-nums font-bold text-sm">{content.timerSeconds}</span>
+              <div className={styles.timerBar}>
+                <span className={styles.timerBarSeconds}>{content.timerSeconds}</span>
                 {content.totalSeconds && (
-                  <div className="flex-1 mx-2 bg-white/20 rounded-full h-1.5">
+                  <div className={styles.timerBarContainer}>
                     <div
-                      className="bg-white h-full rounded-full transition-all duration-1000"
-                      style={{
-                        width: `${Math.min(100, (content.timerSeconds / content.totalSeconds) * 100)}%`,
-                      }}
+                      className={styles.timerBarFill}
                     />
                   </div>
                 )}
               </div>
             )}
-            <div className="text-xs mt-0.5 truncate w-full text-center">
+            <div className={styles.expandedText}>
               {content.expandedText || content.compactText}
             </div>
           </div>

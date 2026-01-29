@@ -11,12 +11,14 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { cn } from '@/lib/styles';
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS, POSITION_COLORS } from '../core/constants/colors';
 import { SPACING, RADIUS, TYPOGRAPHY, Z_INDEX } from '../core/constants/sizes';
 import { Close, Plus, Minus } from '../components/icons';
 import type { Position, PositionLimits } from '../draft-logic';
 import { POSITIONS } from '../draft-logic';
 import { createScopedLogger } from '../../../lib/clientLogger';
+import styles from './AutodraftLimitsModalVX2.module.css';
 
 const logger = createScopedLogger('[AutodraftLimitsModal]');
 
@@ -74,58 +76,39 @@ function PositionRow({ position, value, maxValue, onChange, disabled }: Position
   const atMax = value >= maxValue;
 
   return (
-    <div 
-      className="flex items-center justify-between"
+    <div
+      className={styles.positionRow}
       style={{
-        padding: `${SPACING.lg}px`,
-        backgroundColor: '#1e293b', // Slate-800
-        borderRadius: `${RADIUS.lg}px`,
-        borderLeft: `4px solid ${color}`,
-      }}
+        '--position-color': color,
+      } as React.CSSProperties}
     >
       {/* Position info */}
-      <div>
-        <div 
-          className="font-bold"
-          style={{ color, fontSize: `${TYPOGRAPHY.fontSize.xl}px` }}
+      <div className={styles.positionInfo}>
+        <div
+          className={styles.positionLabel}
+          style={{ '--position-color': color } as React.CSSProperties}
         >
           {position}
         </div>
-        <div style={{ color: '#64748b', fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>
+        <div className={styles.positionSubLabel}>
           Maximum
         </div>
       </div>
 
       {/* Controls */}
-      <div className="flex items-center gap-2">
+      <div className={styles.positionControls}>
         {/* Decrement */}
         <button
           onClick={() => !atMin && !disabled && onChange(-1)}
           disabled={disabled || atMin}
-          className="flex items-center justify-center transition-all"
-          style={{
-            width: '44px',
-            height: '44px',
-            borderRadius: `${RADIUS.lg}px`,
-            backgroundColor: '#334155', // Slate-700
-            color: atMin ? '#475569' : '#e2e8f0',
-            border: 'none',
-            cursor: atMin || disabled ? 'not-allowed' : 'pointer',
-          }}
+          className={styles.controlButton}
           aria-label={`Decrease ${position} limit`}
         >
           <Minus size={22} />
         </button>
 
         {/* Value */}
-        <div 
-          className="text-center font-bold"
-          style={{
-            width: '48px',
-            fontSize: '20px',
-            color: '#f1f5f9', // Slate-100
-          }}
-        >
+        <div className={styles.positionValue}>
           {value}
         </div>
 
@@ -133,16 +116,7 @@ function PositionRow({ position, value, maxValue, onChange, disabled }: Position
         <button
           onClick={() => !atMax && !disabled && onChange(1)}
           disabled={disabled || atMax}
-          className="flex items-center justify-center transition-all"
-          style={{
-            width: '44px',
-            height: '44px',
-            borderRadius: `${RADIUS.lg}px`,
-            backgroundColor: '#334155', // Slate-700
-            color: atMax ? '#475569' : '#e2e8f0',
-            border: 'none',
-            cursor: atMax || disabled ? 'not-allowed' : 'pointer',
-          }}
+          className={styles.controlButton}
           aria-label={`Increase ${position} limit`}
         >
           <Plus size={22} />
@@ -154,10 +128,12 @@ function PositionRow({ position, value, maxValue, onChange, disabled }: Position
 
 function LoadingSpinner(): React.ReactElement {
   return (
-    <div className="flex items-center justify-center py-12">
-      <div 
-        className="animate-spin rounded-full h-8 w-8 border-2"
-        style={{ borderColor: `${STATE_COLORS.active} transparent transparent transparent` }}
+    <div className={styles.loadingSpinner}>
+      <div
+        className={styles.spinnerCircle}
+        style={{
+          '--spinner-color': STATE_COLORS.active,
+        } as React.CSSProperties}
       />
     </div>
   );
@@ -264,35 +240,26 @@ export default function AutodraftLimitsModalVX2({
 
   return (
     <div
-      className="absolute inset-0 flex flex-col"
+      className={styles.modalContainer}
       style={{
-        backgroundColor: '#0f172a', // Slate-900
-        zIndex: Z_INDEX.modal,
-        top: '60px', // Below header
-      }}
+        '--z-modal': Z_INDEX.modal,
+        '--title-font-size': `${TYPOGRAPHY.fontSize.lg}px`,
+      } as React.CSSProperties}
       role="dialog"
       aria-modal="true"
       aria-labelledby="autodraft-modal-title"
     >
       {/* Header */}
-      <div
-        className="flex items-center justify-between flex-shrink-0"
-        style={{
-          padding: `${MODAL_PX.headerPadding}px`,
-          borderBottom: '1px solid #1e293b',
-        }}
-      >
-        <h2 
+      <div className={styles.modalHeader}>
+        <h2
           id="autodraft-modal-title"
-          className="font-semibold"
-          style={{ color: '#f1f5f9', fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}
+          className={styles.modalTitle}
         >
           Position Limits
         </h2>
         <button
           onClick={onClose}
-          className="p-2 transition-colors hover:bg-slate-800 rounded-lg"
-          style={{ color: '#94a3b8' }}
+          className={styles.closeButton}
           aria-label="Close modal"
         >
           <Close size={24} />
@@ -301,23 +268,18 @@ export default function AutodraftLimitsModalVX2({
 
       {/* Content */}
       <div
-        className="flex-1 overflow-y-auto"
+        className={styles.contentArea}
         style={{
-          padding: `${MODAL_PX.padding}px`,
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-        }}
+          '--content-padding': `${MODAL_PX.padding}px`,
+          '--description-font-size': `${TYPOGRAPHY.fontSize.sm}px`,
+          '--row-gap': `${MODAL_PX.rowGap}px`,
+          '--rows-margin-bottom': `${SPACING.xl}px`,
+          '--error-font-size': `${TYPOGRAPHY.fontSize.sm}px`,
+        } as React.CSSProperties}
       >
         {/* Description */}
-        <p 
-          className="mb-6"
-          style={{ 
-            color: '#94a3b8', // Slate-400
-            fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-            lineHeight: 1.5,
-          }}
-        >
-          Set the maximum number of players you want at each position if you are 
+        <p className={styles.description}>
+          Set the maximum number of players you want at each position if you are
           not able to make your picks or are on Autopilot.
         </p>
 
@@ -326,7 +288,7 @@ export default function AutodraftLimitsModalVX2({
         ) : (
           <>
             {/* Position rows */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: `${MODAL_PX.rowGap}px`, marginBottom: `${SPACING.xl}px` }}>
+            <div className={styles.positionRows}>
               {POSITIONS.map(position => (
                 <PositionRow
                   key={position}
@@ -341,13 +303,11 @@ export default function AutodraftLimitsModalVX2({
 
             {/* Error message */}
             {error && (
-              <div 
-                className="mb-4 p-3 rounded-lg"
-                style={{ 
-                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                  color: STATE_COLORS.error,
-                  fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-                }}
+              <div
+                className={styles.errorMessage}
+                style={{
+                  '--error-color': STATE_COLORS.error,
+                } as React.CSSProperties}
               >
                 {error}
               </div>
@@ -359,24 +319,18 @@ export default function AutodraftLimitsModalVX2({
       {/* Footer Actions */}
       {!isLoading && (
         <div
-          className="flex gap-3 flex-shrink-0"
+          className={styles.footer}
           style={{
-            padding: `${MODAL_PX.padding}px`,
-            borderTop: '1px solid #1e293b',
-          }}
+            '--footer-padding': `${MODAL_PX.padding}px`,
+            '--button-height': `${MODAL_PX.buttonHeight}px`,
+            '--button-radius': `${RADIUS.lg}px`,
+            '--save-bg': STATE_COLORS.active,
+          } as React.CSSProperties}
         >
           <button
             onClick={handleReset}
             disabled={isAtDefaults || isSaving}
-            className="flex-1 font-semibold transition-all"
-            style={{
-              height: `${MODAL_PX.buttonHeight}px`,
-              borderRadius: `${RADIUS.lg}px`,
-              backgroundColor: '#1e293b',
-              color: isAtDefaults ? '#475569' : '#e2e8f0',
-              border: 'none',
-              cursor: isAtDefaults || isSaving ? 'not-allowed' : 'pointer',
-            }}
+            className={cn(styles.actionButton, styles.resetButton)}
           >
             Reset
           </button>
@@ -384,22 +338,11 @@ export default function AutodraftLimitsModalVX2({
           <button
             onClick={handleSave}
             disabled={!hasChanges || isSaving}
-            className="flex-1 font-semibold transition-all flex items-center justify-center gap-2"
-            style={{
-              height: `${MODAL_PX.buttonHeight}px`,
-              borderRadius: `${RADIUS.lg}px`,
-              backgroundColor: (!hasChanges || isSaving) ? '#1e293b' : STATE_COLORS.active,
-              color: (!hasChanges || isSaving) ? '#475569' : '#FFFFFF',
-              border: 'none',
-              cursor: (!hasChanges || isSaving) ? 'not-allowed' : 'pointer',
-            }}
+            className={cn(styles.actionButton, styles.saveButton)}
           >
             {isSaving ? (
               <>
-                <div 
-                  className="animate-spin rounded-full h-4 w-4 border-2"
-                  style={{ borderColor: 'currentColor transparent transparent transparent' }}
-                />
+                <div className={styles.savingSpinner} />
                 Saving...
               </>
             ) : (

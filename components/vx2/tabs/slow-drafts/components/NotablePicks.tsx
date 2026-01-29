@@ -12,6 +12,8 @@ import {
   SLOW_DRAFT_LAYOUT,
   SLOW_DRAFT_THRESHOLDS,
 } from '../constants';
+import { cn } from '@/lib/styles';
+import styles from './NotablePicks.module.css';
 
 // ============================================================================
 // EVENT STYLING
@@ -88,7 +90,7 @@ function formatTimestamp(timestamp: number, isMounted: boolean): string {
   if (!isMounted) {
     return '—'; // Placeholder that matches on server and client
   }
-  
+
   const now = Date.now();
   const diffMs = now - timestamp;
   const diffMins = Math.floor(diffMs / 60000);
@@ -130,66 +132,45 @@ function EventItem({ event, onTap }: EventItemProps): React.ReactElement {
   return (
     <button
       onClick={onTap}
-      className="w-full text-left transition-all active:scale-[0.99]"
+      className={cn(styles.eventButton, 'w-full')}
       style={{
-        display: 'flex',
-        alignItems: 'flex-start',
-        gap: 10,
-        padding: '10px 12px',
-        borderRadius: 10,
-        backgroundColor: style.bgColor,
-        border: `1px solid ${style.color}30`,
-      }}
+        '--event-bg-color': style.bgColor,
+        '--event-border-color': `${style.color}30`,
+      } as React.CSSProperties}
     >
       {/* Pick number column */}
-      <div
-        style={{
-          minWidth: 36,
-          fontSize: 11,
-          fontWeight: 600,
-          color: 'rgba(255, 255, 255, 0.5)',
-          paddingTop: 2,
-        }}
-      >
+      <div className={styles.pickNumber}>
         {formatPickNumber(event.pickNumber)}
       </div>
 
       {/* Content */}
-      <div className="flex-1 min-w-0">
+      <div className={cn(styles.content, 'flex-1 min-w-0')}>
         {/* Main line: Drafter took Player (Position) */}
-        <div style={{ marginBottom: 4 }}>
+        <div className={styles.mainLine}>
           <span
-            style={{
-              ...SLOW_DRAFT_TYPOGRAPHY.eventDescription,
-              color: 'rgba(255, 255, 255, 0.7)',
-            }}
+            className={styles.drafterName}
+            style={SLOW_DRAFT_TYPOGRAPHY.eventDescription}
           >
             {event.drafter?.name || 'Someone'}
           </span>
           <span
-            style={{
-              ...SLOW_DRAFT_TYPOGRAPHY.eventDescription,
-              color: 'rgba(255, 255, 255, 0.5)',
-            }}
+            className={styles.actionText}
+            style={SLOW_DRAFT_TYPOGRAPHY.eventDescription}
           >
             {' '}took{' '}
           </span>
           <span
-            style={{
-              ...SLOW_DRAFT_TYPOGRAPHY.eventHighlight,
-              color: 'rgba(255, 255, 255, 0.95)',
-            }}
+            className={styles.playerName}
+            style={SLOW_DRAFT_TYPOGRAPHY.eventHighlight}
           >
             {event.player?.name || 'Unknown'}
           </span>
           {event.player && (
             <span
+              className={styles.playerPosition}
               style={{
-                fontSize: 11,
                 color: SLOW_DRAFT_COLORS.positions[event.player.position],
-                fontWeight: 600,
-                marginLeft: 4,
-              }}
+              } as React.CSSProperties}
             >
               ({event.player.position})
             </span>
@@ -197,20 +178,14 @@ function EventItem({ event, onTap }: EventItemProps): React.ReactElement {
         </div>
 
         {/* Event type badge and ADP info */}
-        <div className="flex items-center gap-2">
+        <div className={cn(styles.badgeRow, 'flex items-center gap-2')}>
           {/* Type badge */}
           <span
+            className={styles.typeBadge}
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 3,
-              fontSize: 10,
-              fontWeight: 700,
-              color: style.color,
-              backgroundColor: `${style.color}20`,
-              padding: '2px 6px',
-              borderRadius: 4,
-            }}
+              '--event-color': style.color,
+              '--event-badge-bg': `${style.color}20`,
+            } as React.CSSProperties}
           >
             {style.icon} {style.label}
           </span>
@@ -218,11 +193,10 @@ function EventItem({ event, onTap }: EventItemProps): React.ReactElement {
           {/* ADP delta */}
           {event.adpDelta !== undefined && Math.abs(event.adpDelta) > 0 && (
             <span
+              className={styles.adpDelta}
               style={{
-                fontSize: 11,
-                color: style.color,
-                fontWeight: 500,
-              }}
+                '--event-color': style.color,
+              } as React.CSSProperties}
             >
               {formatAdpDelta(event.adpDelta)}
             </span>
@@ -231,13 +205,7 @@ function EventItem({ event, onTap }: EventItemProps): React.ReactElement {
       </div>
 
       {/* Timestamp */}
-      <div
-        style={{
-          fontSize: 10,
-          color: 'rgba(255, 255, 255, 0.35)',
-          paddingTop: 2,
-        }}
-      >
+      <div className={styles.timestamp}>
         {formatTimestamp(event.timestamp, isMounted)}
       </div>
     </button>
@@ -260,23 +228,17 @@ export default function NotablePicks({
 
   if (events.length === 0) {
     return (
-      <div>
+      <div className={styles.emptyContainer}>
         <div
+          className={styles.sectionLabel}
           style={{
             ...SLOW_DRAFT_TYPOGRAPHY.sectionLabel,
-            marginBottom: SLOW_DRAFT_LAYOUT.sectionLabelMarginBottom,
-          }}
+            '--section-label-margin-bottom': `${SLOW_DRAFT_LAYOUT.sectionLabelMarginBottom}px`,
+          } as React.CSSProperties}
         >
           NOTABLE ACTIVITY
         </div>
-        <div
-          style={{
-            color: 'rgba(255, 255, 255, 0.4)',
-            fontSize: 13,
-            fontStyle: 'italic',
-            padding: '8px 0',
-          }}
-        >
+        <div className={styles.emptyMessage}>
           No notable picks yet
         </div>
       </div>
@@ -286,10 +248,11 @@ export default function NotablePicks({
   return (
     <div>
       <div
+        className={styles.sectionLabel}
         style={{
           ...SLOW_DRAFT_TYPOGRAPHY.sectionLabel,
-          marginBottom: SLOW_DRAFT_LAYOUT.sectionLabelMarginBottom,
-        }}
+          '--section-label-margin-bottom': `${SLOW_DRAFT_LAYOUT.sectionLabelMarginBottom}px`,
+        } as React.CSSProperties}
       >
         NOTABLE ACTIVITY
       </div>
@@ -306,14 +269,7 @@ export default function NotablePicks({
 
       {/* Show more indicator */}
       {hiddenCount > 0 && (
-        <button
-          className="w-full mt-2 py-2 text-center transition-all active:opacity-70"
-          style={{
-            fontSize: 12,
-            fontWeight: 500,
-            color: 'rgba(255, 255, 255, 0.5)',
-          }}
-        >
+        <button className={styles.showMoreButton}>
           +{hiddenCount} more event{hiddenCount !== 1 ? 's' : ''}
         </button>
       )}

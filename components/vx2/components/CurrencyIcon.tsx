@@ -1,9 +1,11 @@
 /**
  * CurrencyIcon Component
- * 
+ *
  * Displays currency icons with fallback to Unicode symbols.
  * Follows VX2 IconProps pattern for consistency.
- * 
+ *
+ * Migrated to CSS Modules for CSP compliance.
+ *
  * @example
  * ```tsx
  * <CurrencyIcon currency="USD" size={24} />
@@ -14,11 +16,13 @@
 import React, { useState, useMemo } from 'react';
 import type { IconProps } from './icons/types';
 import { DEFAULT_ICON_PROPS } from './icons/types';
-import { 
-  getCurrencyIconPath, 
+import {
+  getCurrencyIconPath,
   getCurrencyUnicode,
-  hasCurrencyIcon 
+  hasCurrencyIcon
 } from '../../../lib/stripe/currencyIcons';
+import { cn } from '@/lib/styles';
+import styles from './CurrencyIcon.module.css';
 
 // ============================================================================
 // TYPES
@@ -52,59 +56,57 @@ export function CurrencyIcon({
 }: CurrencyIconProps): React.ReactElement {
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
-  
+
   // Get icon path and fallback symbol
   const iconPath = useMemo(() => getCurrencyIconPath(currency), [currency]);
-  const unicodeFallback = useMemo(() => 
-    fallbackSymbol || getCurrencyUnicode(currency), 
+  const unicodeFallback = useMemo(() =>
+    fallbackSymbol || getCurrencyUnicode(currency),
     [currency, fallbackSymbol]
   );
   const hasIcon = useMemo(() => hasCurrencyIcon(currency), [currency]);
-  
+
   // Determine if we should show icon or fallback
   const shouldShowIcon = hasIcon && iconPath && !imageError;
   const shouldShowFallback = !shouldShowIcon && showFallback;
-  
+
   // Generate aria-label if not provided
-  const defaultAriaLabel = useMemo(() => 
+  const defaultAriaLabel = useMemo(() =>
     ariaLabel || `${currency} currency icon`,
     [currency, ariaLabel]
   );
-  
+
   // Handle image load
   const handleImageLoad = () => {
     setImageLoading(false);
   };
-  
+
   // Handle image error - fallback to Unicode
   const handleImageError = () => {
     setImageError(true);
     setImageLoading(false);
   };
-  
+
+  // CSS custom properties for dynamic values
+  const iconStyle: React.CSSProperties = {
+    '--icon-size': `${size}px`,
+    '--icon-color': color,
+    '--fallback-font-size': `${Math.max(size * 0.6, 12)}px`,
+    '--code-font-size': `${Math.max(size * 0.4, 10)}px`,
+  } as React.CSSProperties;
+
   // Render icon image
   if (shouldShowIcon) {
     return (
       <span
-        className={`inline-flex items-center justify-center ${className}`}
-        style={{
-          width: `${size}px`,
-          height: `${size}px`,
-          color,
-        }}
+        className={cn(styles.iconContainer, className)}
+        style={iconStyle}
         aria-label={defaultAriaLabel}
         aria-hidden={ariaHidden}
         role={ariaLabel ? 'img' : undefined}
       >
         {imageLoading && showPlaceholder && (
           <span
-            className="absolute animate-pulse"
-            style={{
-              width: `${size}px`,
-              height: `${size}px`,
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
-              borderRadius: '4px',
-            }}
+            className={styles.placeholder}
             aria-hidden="true"
           />
         )}
@@ -113,12 +115,10 @@ export function CurrencyIcon({
           alt={defaultAriaLabel}
           width={size}
           height={size}
-          className={`${imageLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-200`}
-          style={{
-            width: `${size}px`,
-            height: `${size}px`,
-            objectFit: 'contain',
-          }}
+          className={cn(
+            styles.iconImage,
+            imageLoading ? styles.iconImageLoading : styles.iconImageLoaded
+          )}
           onLoad={handleImageLoad}
           onError={handleImageError}
           loading="lazy"
@@ -126,18 +126,13 @@ export function CurrencyIcon({
       </span>
     );
   }
-  
+
   // Render Unicode fallback
   if (shouldShowFallback) {
     return (
       <span
-        className={`inline-flex items-center justify-center font-semibold ${className}`}
-        style={{
-          width: `${size}px`,
-          height: `${size}px`,
-          fontSize: `${Math.max(size * 0.6, 12)}px`,
-          color,
-        }}
+        className={cn(styles.unicodeFallback, className)}
+        style={iconStyle}
         aria-label={defaultAriaLabel}
         aria-hidden={ariaHidden}
         role={ariaLabel ? 'img' : undefined}
@@ -146,17 +141,12 @@ export function CurrencyIcon({
       </span>
     );
   }
-  
+
   // Fallback: show currency code if no symbol available
   return (
     <span
-      className={`inline-flex items-center justify-center text-xs font-medium ${className}`}
-      style={{
-        width: `${size}px`,
-        height: `${size}px`,
-        fontSize: `${Math.max(size * 0.4, 10)}px`,
-        color,
-      }}
+      className={cn(styles.codeFallback, className)}
+      style={iconStyle}
       aria-label={defaultAriaLabel}
       aria-hidden={ariaHidden}
       role={ariaLabel ? 'img' : undefined}
@@ -167,4 +157,3 @@ export function CurrencyIcon({
 }
 
 export default CurrencyIcon;
-

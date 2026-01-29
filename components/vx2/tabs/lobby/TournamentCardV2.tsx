@@ -17,6 +17,8 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { cn, cssVars } from '@/lib/styles';
+import styles from './TournamentCardV2.module.css';
 
 // ============================================================================
 // IMPORTS - Verify these paths match your project structure
@@ -188,7 +190,7 @@ function BackgroundLayers({
   originalUrl,
 }: BackgroundLayersProps): React.ReactElement {
   // Determine which image to show based on fallback status
-  const displayImageUrl = useFallback && originalUrl && 
+  const displayImageUrl = useFallback && originalUrl &&
     (originalUrl.endsWith('.webp') || originalUrl.includes('.webp'))
     ? CARD_COLORS.backgroundImagePng
     : fullImageUrl;
@@ -198,44 +200,19 @@ function BackgroundLayers({
       {/* Layer 1: Blur placeholder - shows instantly */}
       <div
         aria-hidden="true"
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundImage: `url(${blurPlaceholder})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          borderRadius: `${borderRadius - 1}px`,
-          zIndex: 0,
-        }}
+        className={styles.blurLayer}
+        style={cssVars({
+          'blur-placeholder': `url(${blurPlaceholder})`,
+        })}
       />
-      
+
       {/* Layer 2: Full image - fades in when loaded */}
       <div
         aria-hidden="true"
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundImage: displayImageUrl,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          borderRadius: `${borderRadius - 1}px`,
-          zIndex: 1,
-          // Opacity transition for smooth fade-in
-          opacity: imageLoaded ? 1 : 0,
-          transition: 'opacity 0.3s ease-out',
-          // GPU acceleration for smooth animation
-          willChange: 'opacity',
-          transform: 'translateZ(0)',
-          WebkitTransform: 'translateZ(0)',
-        }}
+        className={cn(styles.imageLayer, imageLoaded && styles.loaded)}
+        style={cssVars({
+          'card-bg-image-display': displayImageUrl,
+        })}
       />
     </>
   );
@@ -253,36 +230,14 @@ function BackgroundLayers({
  */
 function TitleSection({ titleFontSize }: { titleFontSize?: number }): React.ReactElement {
   const fontSize = titleFontSize ?? CARD_DIMENSIONS.titleFontSize;
-  
+
   return (
-    <div
-      style={{
-        // Center the title horizontally
-        display: 'flex',
-        alignItems: 'flex-start',
-        justifyContent: 'center',
-        // No margin - padding on card container handles spacing uniformly
-        // Isolate layout calculations
-        contain: 'layout style',
-      }}
-    >
+    <div className={styles.titleSectionWrapper}>
       <h2
-        className="vx2-tournament-title"
-        style={{
-          // Typography
-          fontSize: `${fontSize}px`,
-          fontFamily: "'Anton SC', sans-serif",
-          fontWeight: 'bold',
-          textTransform: 'uppercase',
-          letterSpacing: '2px',
-          lineHeight: CARD_DIMENSIONS.titleLineHeight,
-          textAlign: 'center',
-          // Colors
-          color: CARD_COLORS.textPrimary,
-          textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
-          // Reset margin
-          margin: 0,
-        }}
+        className={cn('vx2-tournament-title', styles.title)}
+        style={cssVars({
+          'title-font-size': `${fontSize}px`,
+        })}
       >
         The TopDog<br />
         International
@@ -401,46 +356,16 @@ export function TournamentCardV2({
   // ----------------------------------------
   return (
     <div
-      className={`vx2-tournament-card-v2 ${className}`}
-      style={{
-        // ========================================
-        // CSS GRID LAYOUT - This is the key change
-        // ========================================
-        display: 'grid',
-        gridTemplateRows: `${GRID_TEMPLATE.titleRow} ${GRID_TEMPLATE.spacerRow} ${GRID_TEMPLATE.bottomRow}`,
-        gap: 0, // No gap - spacing is handled by the spacer row
-        
-        // ========================================
-        // Dimensions
-        // ========================================
-        width: '100%',
-        height: `${finalSizes.minHeight}px`, // Use explicit height instead of 100%
-        minHeight: `${finalSizes.minHeight}px`,
-        maxHeight: `${finalSizes.minHeight}px`, // Constrain height to prevent overflow
-        padding: `${finalSizes.padding}px`,
-        boxSizing: 'border-box', // Ensure padding is included in height calculation
-        flexShrink: 0, // Prevent card from shrinking in flex container
-        marginTop: 'auto', // Push card down to create equal spacing at top and bottom
-        
-        // ========================================
-        // Appearance
-        // ========================================
-        backgroundColor: finalColors.backgroundFallback,
-        borderRadius: `${finalSizes.borderRadius}px`,
-        border: `${finalColors.borderWidth}px solid ${borderColor}`,
-        
-        // ========================================
-        // Positioning
-        // ========================================
-        position: 'relative',
-        overflow: 'hidden',
-        
-        // ========================================
-        // CSS CONTAINMENT - Prevents layout shift propagation
-        // ========================================
-        contain: 'layout style paint',
-        isolation: 'isolate',
-      }}
+      className={cn(styles.cardContainer, featured && styles.featured, className)}
+      style={cssVars({
+        'card-padding': `${finalSizes.padding}px`,
+        'card-border-radius': `${finalSizes.borderRadius}px`,
+        'card-min-height': `${finalSizes.minHeight}px`,
+        'card-border-width': `${finalColors.borderWidth}px`,
+        'card-bg-fallback': finalColors.backgroundFallback,
+        'card-border-color': borderColor,
+        'card-bg-image': resolvedBackground,
+      })}
       role="article"
       aria-label={`${tournament.title} tournament`}
     >
@@ -455,46 +380,18 @@ export function TournamentCardV2({
       />
 
       {/* Content Container - Positioned above backgrounds */}
-      <div
-        style={{
-          position: 'relative',
-          zIndex: 2,
-          display: 'grid',
-          gridTemplateRows: `${GRID_TEMPLATE.titleRow} ${GRID_TEMPLATE.spacerRow} ${GRID_TEMPLATE.bottomRow}`,
-          gap: 0,
-          height: '100%',
-          width: '100%',
-          contain: 'layout',
-          overflow: 'hidden', // Prevent any content from overflowing
-        }}
-      >
+      <div className={styles.contentContainer}>
         {/* Grid Row 1: Title Section */}
         <TitleSection titleFontSize={styleOverrides.titleFontSize} />
 
         {/* Grid Row 2: Flexible Spacer - expands to fill space */}
         <div
+          className={styles.spacer}
           aria-hidden="true"
         />
 
         {/* Grid Row 3: Bottom Section - Uses flexbox to push content to bottom */}
-        <div
-          style={{
-            // Fill the entire grid cell
-            alignSelf: 'stretch',
-            
-            // Use flexbox to push content to bottom edge
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'flex-end',
-            
-            // NO bottom padding - content reaches the edge
-            paddingBottom: 0,
-            marginBottom: 0,
-            
-            // Ensure minimum height doesn't constrain
-            minHeight: 0,
-          }}
-        >
+        <div className={styles.bottomSectionWrapper}>
           <BottomSectionV2
             tournament={tournament}
             onJoinClick={onJoinClick}
@@ -523,108 +420,39 @@ export function TournamentCardV2({
 export function TournamentCardSkeleton(): React.ReactElement {
   return (
     <div
-      className="vx2-tournament-card-skeleton animate-pulse"
-      style={{
-        display: 'grid',
-        gridTemplateRows: `${GRID_TEMPLATE.titleRow} ${GRID_TEMPLATE.spacerRow} ${GRID_TEMPLATE.bottomRow}`,
-        gap: 0,
-        width: '100%',
-        minHeight: `${CARD_DIMENSIONS.minHeight}px`,
-        padding: `${CARD_DIMENSIONS.padding}px`,
-        backgroundColor: CARD_COLORS.backgroundFallback,
-        borderRadius: `${CARD_DIMENSIONS.borderRadius}px`,
-        border: `1px solid ${CARD_COLORS.borderDefault}`,
-      }}
+      className={cn(styles.skeletonContainer, styles.pulse)}
+      style={cssVars({
+        'card-padding': `${CARD_DIMENSIONS.padding}px`,
+        'card-border-radius': `${CARD_DIMENSIONS.borderRadius}px`,
+        'card-min-height': `${CARD_DIMENSIONS.minHeight}px`,
+        'card-bg-fallback': CARD_COLORS.backgroundFallback,
+        'card-border-color': CARD_COLORS.borderDefault,
+      })}
       aria-hidden="true"
       aria-label="Loading tournament card"
     >
       {/* Title skeleton */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'center',
-          // No margin - padding on card container handles spacing uniformly
-        }}
-      >
-        <div
-          style={{
-            width: '70%',
-            height: `${CARD_DIMENSIONS.titleFontSize}px`,
-            backgroundColor: 'rgba(255,255,255,0.1)',
-            borderRadius: '4px',
-          }}
-        />
+      <div className={styles.skeletonTitleWrapper}>
+        <div className={styles.skeletonTitleBar} />
       </div>
 
       {/* Spacer - flexes to fill space */}
-      <div style={{ minHeight: 0 }} />
+      <div className={styles.spacer} />
 
       {/* Bottom section skeleton */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateRows: '8px 57px 48px',
-          gap: '16px',
-          alignSelf: 'end',
-        }}
-      >
+      <div className={styles.skeletonBottomSection}>
         {/* Progress bar skeleton */}
-        <div
-          style={{
-            width: '100%',
-            height: '8px',
-            backgroundColor: 'rgba(255,255,255,0.1)',
-            borderRadius: '4px',
-          }}
-        />
+        <div className={styles.skeletonProgressBar} />
 
         {/* Button skeleton */}
-        <div
-          style={{
-            width: '100%',
-            height: '57px',
-            backgroundColor: 'rgba(255,255,255,0.1)',
-            borderRadius: '8px',
-          }}
-        />
+        <div className={styles.skeletonButton} />
 
         {/* Stats skeleton */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '24px',
-            height: '48px',
-          }}
-        >
+        <div className={styles.skeletonStatsGrid}>
           {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <div
-                style={{
-                  width: '50px',
-                  height: '24px',
-                  backgroundColor: 'rgba(255,255,255,0.1)',
-                  borderRadius: '4px',
-                  marginBottom: '4px',
-                }}
-              />
-              <div
-                style={{
-                  width: '40px',
-                  height: '14px',
-                  backgroundColor: 'rgba(255,255,255,0.1)',
-                  borderRadius: '4px',
-                }}
-              />
+            <div key={i} className={styles.skeletonStatItem}>
+              <div className={styles.skeletonStatLabel} />
+              <div className={styles.skeletonStatValue} />
             </div>
           ))}
         </div>

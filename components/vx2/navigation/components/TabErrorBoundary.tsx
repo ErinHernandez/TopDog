@@ -1,8 +1,10 @@
 /**
  * TabErrorBoundary - Error Boundary for Tab Content
- * 
+ *
  * Catches errors in tab components and displays a fallback UI.
  * Prevents one broken tab from crashing the entire app.
+ *
+ * Migrated to CSS Modules for CSP compliance.
  */
 
 import React, { Component, ErrorInfo } from 'react';
@@ -11,6 +13,7 @@ import { TEXT_COLORS, BG_COLORS, STATE_COLORS } from '../../core/constants/color
 import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
 import { createScopedLogger } from '../../../../lib/clientLogger';
 import { captureReactError } from '../../../../lib/errorTracking';
+import styles from './TabErrorBoundary.module.css';
 
 const logger = createScopedLogger('[TabErrorBoundary]');
 
@@ -46,25 +49,55 @@ interface ErrorFallbackProps {
 }
 
 function ErrorFallback({ tabId, error, onRetry }: ErrorFallbackProps): React.ReactElement {
+  const containerStyle: React.CSSProperties = {
+    '--fallback-bg': BG_COLORS.primary,
+  } as React.CSSProperties;
+
+  const titleStyle: React.CSSProperties = {
+    '--title-color': TEXT_COLORS.primary,
+    '--title-font-size': `${TYPOGRAPHY.fontSize.lg}px`,
+  } as React.CSSProperties;
+
+  const descriptionStyle: React.CSSProperties = {
+    '--description-color': TEXT_COLORS.secondary,
+    '--description-font-size': `${TYPOGRAPHY.fontSize.base}px`,
+  } as React.CSSProperties;
+
+  const detailsStyle: React.CSSProperties = {
+    '--details-bg': BG_COLORS.secondary,
+    '--radius-md': `${RADIUS.md}px`,
+    '--spacing-md': `${SPACING.md}px`,
+  } as React.CSSProperties;
+
+  const summaryStyle: React.CSSProperties = {
+    '--summary-color': TEXT_COLORS.secondary,
+    '--summary-font-size': `${TYPOGRAPHY.fontSize.sm}px`,
+  } as React.CSSProperties;
+
+  const errorStyle: React.CSSProperties = {
+    '--error-color': STATE_COLORS.error,
+    '--error-font-size': `${TYPOGRAPHY.fontSize.xs}px`,
+    '--spacing-xs': `${SPACING.xs}px`,
+  } as React.CSSProperties;
+
+  const buttonStyle: React.CSSProperties = {
+    '--button-bg': STATE_COLORS.active,
+    '--button-color': TEXT_COLORS.primary,
+    '--spacing-md': `${SPACING.md}px`,
+    '--spacing-xl': `${SPACING.xl}px`,
+    '--radius-md': `${RADIUS.md}px`,
+    '--button-font-size': `${TYPOGRAPHY.fontSize.base}px`,
+  } as React.CSSProperties;
+
   return (
-    <div 
-      className="flex-1 flex flex-col items-center justify-center p-6"
-      style={{ backgroundColor: BG_COLORS.primary }}
-    >
+    <div className={styles.container} style={containerStyle}>
       {/* Error Icon */}
-      <div 
-        className="flex items-center justify-center rounded-full mb-4"
-        style={{
-          width: '64px',
-          height: '64px',
-          backgroundColor: 'rgba(239, 68, 68, 0.1)',
-        }}
-      >
-        <svg 
-          width="32" 
-          height="32" 
-          viewBox="0 0 24 24" 
-          fill="none" 
+      <div className={styles.iconWrapper}>
+        <svg
+          width="32"
+          height="32"
+          viewBox="0 0 24 24"
+          fill="none"
           stroke={STATE_COLORS.error}
           strokeWidth="2"
         >
@@ -73,79 +106,36 @@ function ErrorFallback({ tabId, error, onRetry }: ErrorFallbackProps): React.Rea
           <line x1="12" y1="16" x2="12.01" y2="16" />
         </svg>
       </div>
-      
+
       {/* Error Message */}
-      <h2 
-        className="font-semibold text-center mb-2"
-        style={{ 
-          color: TEXT_COLORS.primary,
-          fontSize: `${TYPOGRAPHY.fontSize.lg}px`,
-        }}
-      >
+      <h2 className={styles.title} style={titleStyle}>
         Something went wrong
       </h2>
-      
-      <p 
-        className="text-center mb-6"
-        style={{ 
-          color: TEXT_COLORS.secondary,
-          fontSize: `${TYPOGRAPHY.fontSize.base}px`,
-          maxWidth: '280px',
-        }}
-      >
+
+      <p className={styles.description} style={descriptionStyle}>
         We had trouble loading this section. Please try again.
       </p>
-      
+
       {/* Error Details (collapsed by default in production) */}
       {typeof window !== 'undefined' && process.env.NODE_ENV === 'development' && error && (
-        <details 
-          className="w-full max-w-sm mb-6 text-left"
-          style={{
-            backgroundColor: BG_COLORS.secondary,
-            borderRadius: `${RADIUS.md}px`,
-            padding: `${SPACING.md}px`,
-          }}
-        >
-          <summary 
-            className="cursor-pointer"
-            style={{ 
-              color: TEXT_COLORS.secondary,
-              fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-            }}
-          >
+        <details className={styles.details} style={detailsStyle}>
+          <summary className={styles.detailsSummary} style={summaryStyle}>
             Technical Details
           </summary>
-          <pre 
-            className="mt-2 overflow-x-auto"
-            style={{ 
-              color: STATE_COLORS.error,
-              fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-              whiteSpace: 'pre-wrap',
-              wordBreak: 'break-word',
-            }}
-          >
+          <pre className={styles.detailsContent} style={errorStyle}>
             {error.message}
             {'\n\n'}
             Tab: {tabId}
           </pre>
         </details>
       )}
-      
+
       {/* Retry Button */}
       {onRetry && (
         <button
           onClick={onRetry}
-          className="font-medium transition-colors"
-          style={{
-            backgroundColor: STATE_COLORS.active,
-            color: TEXT_COLORS.primary,
-            paddingLeft: `${SPACING.xl}px`,
-            paddingRight: `${SPACING.xl}px`,
-            paddingTop: `${SPACING.md}px`,
-            paddingBottom: `${SPACING.md}px`,
-            borderRadius: `${RADIUS.md}px`,
-            fontSize: `${TYPOGRAPHY.fontSize.base}px`,
-          }}
+          className={styles.retryButton}
+          style={buttonStyle}
         >
           Try Again
         </button>
@@ -170,24 +160,24 @@ export default class TabErrorBoundary extends Component<
       errorInfo: null,
     };
   }
-  
+
   static getDerivedStateFromError(error: Error): Partial<TabErrorBoundaryState> {
     return {
       hasError: true,
       error,
     };
   }
-  
+
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     // Log the error with context using centralized logger
     logger.error(`Error in tab "${this.props.tabId}"`, error, {
       tabId: this.props.tabId,
       componentStack: errorInfo.componentStack?.substring(0, 200),
     });
-    
+
     // Update state with error info
     this.setState({ errorInfo });
-    
+
     // Send to error tracking service (Sentry when configured)
     captureReactError(
       error,
@@ -195,7 +185,7 @@ export default class TabErrorBoundary extends Component<
       `TabErrorBoundary:${this.props.tabId}`
     );
   }
-  
+
   componentDidUpdate(prevProps: TabErrorBoundaryProps): void {
     // Reset error state when tab changes
     if (prevProps.tabId !== this.props.tabId && this.state.hasError) {
@@ -206,7 +196,7 @@ export default class TabErrorBoundary extends Component<
       });
     }
   }
-  
+
   handleRetry = (): void => {
     // Reset error state
     this.setState({
@@ -214,18 +204,18 @@ export default class TabErrorBoundary extends Component<
       error: null,
       errorInfo: null,
     });
-    
+
     // Call parent retry handler
     this.props.onRetry?.();
   };
-  
+
   render(): React.ReactNode {
     if (this.state.hasError) {
       // Custom fallback
       if (this.props.fallback) {
         return this.props.fallback;
       }
-      
+
       // Default fallback
       return (
         <ErrorFallback
@@ -235,8 +225,7 @@ export default class TabErrorBoundary extends Component<
         />
       );
     }
-    
+
     return this.props.children;
   }
 }
-

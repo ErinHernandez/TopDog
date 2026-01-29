@@ -19,6 +19,8 @@ import type { DraftPlayer, Position, PlayerSortOption } from '../types';
 import { POSITION_COLORS } from '../constants';
 import { BG_COLORS, TEXT_COLORS } from '../../core/constants/colors';
 import { TOUCH_TARGETS, SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
+import { cn } from '@/lib/utils';
+import styles from './PlayerList.module.css';
 import PlayerExpandedCard from './PlayerExpandedCard';
 
 // ============================================================================
@@ -138,25 +140,23 @@ interface FilterButtonProps {
 
 const FilterButton = React.memo(function FilterButton({ position, count, isActive, onToggle }: FilterButtonProps): React.ReactElement {
   const color = POSITION_COLORS[position];
-  
+
   return (
     <button
       onClick={onToggle}
       aria-label={`Filter by ${position}, ${count} drafted`}
       aria-pressed={isActive}
-      className="flex-1 py-2.5 px-3 font-bold transition-all"
+      className={cn(
+        styles.filterButton,
+        isActive ? styles.filterButtonActive : styles.filterButtonInactive
+      )}
       style={{
-        fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-        backgroundColor: isActive ? 'rgba(255,255,255,0.1)' : 'transparent',
-        color: isActive ? color : TEXT_COLORS.muted,
-        borderBottom: `2px solid ${color}`,
-        opacity: isActive ? 1 : 0.4,
-        cursor: 'pointer',
-        minWidth: 0,
-        flex: 1,
+        color: isActive ? color : undefined,
+        borderBottomColor: color,
       }}
     >
-      {position} {count}
+      <span>{position}</span>
+      <span className={styles.filterCount}>{count}</span>
     </button>
   );
 });
@@ -170,74 +170,36 @@ interface SearchBarProps {
 
 const SearchBar = React.memo(function SearchBar({ value, onChange, onClear }: SearchBarProps): React.ReactElement {
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 8,
-        marginTop: PLAYER_LIST_PX.searchMarginTop,
-        marginLeft: PLAYER_LIST_PX.searchMarginX,
-        marginRight: PLAYER_LIST_PX.searchMarginX,
-      }}
-    >
+    <div className={styles.searchContainer}>
       {/* Search Input */}
-      <div
-        style={{
-          flex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          height: PLAYER_LIST_PX.searchHeight,
-          backgroundColor: PLAYER_LIST_COLORS.searchBg,
-          borderRadius: 8,
-          paddingLeft: 12,
-          paddingRight: 12,
-        }}
-      >
+      <div className={styles.searchInputWrapper}>
         {/* Search Icon */}
         <svg
-          width="18"
-          height="18"
+          className={styles.searchIcon}
           viewBox="0 0 24 24"
           fill="none"
-          stroke={PLAYER_LIST_COLORS.searchPlaceholder}
+          stroke="currentColor"
           strokeWidth="2"
-          style={{ marginRight: 8, flexShrink: 0 }}
+          style={{ color: PLAYER_LIST_COLORS.searchPlaceholder }}
         >
           <circle cx="11" cy="11" r="8" />
           <path d="M21 21l-4.35-4.35" />
         </svg>
-        
+
         <input
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder="Search..."
           aria-label="Search players"
-          style={{
-            flex: 1,
-            border: 'none',
-            background: 'transparent',
-            color: TEXT_COLORS.primary,
-            fontSize: PLAYER_LIST_PX.searchFontSize,
-            outline: 'none',
-          }}
+          className={styles.searchInput}
         />
       </div>
-      
+
       {/* Clear Button */}
       <button
         onClick={onClear}
-        style={{
-          width: PLAYER_LIST_PX.clearButtonWidth,
-          height: PLAYER_LIST_PX.searchHeight,
-          backgroundColor: PLAYER_LIST_COLORS.searchBg,
-          border: 'none',
-          borderRadius: 8,
-          color: TEXT_COLORS.primary,
-          fontSize: 14,
-          fontWeight: 500,
-          cursor: 'pointer',
-        }}
+        className={styles.clearButton}
       >
         Clear
       </button>
@@ -342,7 +304,7 @@ const VirtualizedPlayerList = React.memo(function VirtualizedPlayerList({
           onRowClick={() => onRowClick(player.id)}
         />
         {isExpanded && (
-          <div style={{ padding: '8px 4px' }}>
+          <div className={styles.expandedCardContainer}>
             <PlayerExpandedCard
               player={{
                 id: player.id,
@@ -368,61 +330,42 @@ const VirtualizedPlayerList = React.memo(function VirtualizedPlayerList({
   return (
     <div ref={containerRef} style={{ flex: 1, minHeight: 0 }}>
       {/* Sticky Header */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          height: 40,
-          borderBottom: `1px solid ${PLAYER_LIST_COLORS.rowBorder}`,
-          backgroundColor: BG_COLORS.primary,
-          paddingLeft: 4,
-          paddingRight: 4,
-        }}
-      >
+      <div className={styles.headerRow}>
         <div
           onClick={onSortAdp}
-          style={{
-            width: PLAYER_LIST_PX.adpColumnWidth,
-            textAlign: 'center',
-            fontSize: 14,
-            fontWeight: 500,
-            color: sortMode === 'adp' ? TEXT_COLORS.primary : TEXT_COLORS.secondary,
-            cursor: 'pointer',
-          }}
+          className={cn(
+            styles.headerColumn,
+            styles.adpColumn,
+            sortMode === 'adp' && styles.headerColumnActive
+          )}
         >
-          <span style={{ borderBottom: sortMode === 'adp' ? '2px solid #6B7280' : 'none', paddingBottom: 2 }}>
+          <span className={sortMode === 'adp' ? styles.headerColumnSortIndicator : undefined}>
             ADP
           </span>
         </div>
-        <div style={{ flex: 1 }} />
-        <div style={{ width: PLAYER_LIST_PX.queueButtonContainerWidth }} />
+        <div className={styles.playerInfoColumn} />
+        <div className={styles.queueButtonColumn} />
         <div
           onClick={onSortProj}
-          style={{
-            width: PLAYER_LIST_PX.projColumnWidth,
-            textAlign: 'center',
-            fontSize: 13,
-            fontWeight: 500,
-            color: sortMode === 'proj' ? TEXT_COLORS.primary : TEXT_COLORS.secondary,
-            cursor: 'pointer',
-          }}
+          className={cn(
+            styles.headerColumn,
+            styles.projColumn,
+            sortMode === 'proj' && styles.headerColumnActive
+          )}
         >
-          <span style={{ borderBottom: sortMode === 'proj' ? '2px solid #6B7280' : 'none', paddingBottom: 2 }}>
+          <span className={sortMode === 'proj' ? styles.headerColumnSortIndicator : undefined}>
             PROJ
           </span>
         </div>
         <div
           onClick={onSortRank}
-          style={{
-            width: PLAYER_LIST_PX.rankColumnWidth,
-            textAlign: 'center',
-            fontSize: 13,
-            fontWeight: 500,
-            color: sortMode === 'rank' ? TEXT_COLORS.primary : TEXT_COLORS.secondary,
-            cursor: 'pointer',
-          }}
+          className={cn(
+            styles.headerColumn,
+            styles.rankColumn,
+            sortMode === 'rank' && styles.headerColumnActive
+          )}
         >
-          <span style={{ borderBottom: sortMode === 'rank' ? '2px solid #6B7280' : 'none', paddingBottom: 2 }}>
+          <span className={sortMode === 'rank' ? styles.headerColumnSortIndicator : undefined}>
             RANK
           </span>
         </div>
@@ -467,211 +410,52 @@ const PlayerRowDiv = React.memo(function PlayerRowDiv({
   return (
     <div
       onClick={onRowClick}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        height: PLAYER_LIST_PX.rowHeight,
-        backgroundColor: PLAYER_LIST_COLORS.rowBg,
-        cursor: 'pointer',
-        borderBottom: `1px solid ${PLAYER_LIST_COLORS.rowBorder}`,
-        paddingLeft: 4,
-        paddingRight: 4,
-      }}
+      className={styles.playerRow}
     >
       {/* ADP Column */}
-      <div style={{ width: PLAYER_LIST_PX.adpColumnWidth, textAlign: 'center', fontSize: PLAYER_LIST_PX.statFontSize, color: '#9CA3AF', fontVariantNumeric: 'tabular-nums' }}>
+      <div className={cn(styles.playerAdpValue, styles.adpColumn)}>
         {player.adp?.toFixed(1) || '-'}
       </div>
 
       {/* Player Info */}
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8, paddingLeft: 6, minWidth: 0 }}>
-        <div style={{ minWidth: 0, flex: 1 }}>
-          <div style={{ fontSize: PLAYER_LIST_PX.playerNameFontSize, fontWeight: 500, color: TEXT_COLORS.primary, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+      <div className={styles.playerInfoContainer}>
+        <div className={styles.playerNameContainer}>
+          <div className={styles.playerName}>
             {player.name}
           </div>
-          <div style={{ fontSize: PLAYER_LIST_PX.playerTeamFontSize, color: TEXT_COLORS.secondary, display: 'flex', alignItems: 'center', gap: 4 }}>
-            <span style={{ color: positionColor, fontWeight: 600 }}>{player.position}</span>
+          <div className={styles.playerPositionTeam}>
+            <span className={styles.playerPosition} style={{ color: positionColor }}>
+              {player.position}
+            </span>
             <span>{player.team}</span>
           </div>
         </div>
       </div>
 
       {/* Queue Button */}
-      <div
-        style={{
-          width: PLAYER_LIST_PX.queueButtonContainerWidth,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
+      <div className={styles.queueButtonContainer}>
         <button
           onClick={(e) => { e.stopPropagation(); onToggleQueue(); }}
           aria-label={isQueued ? 'Remove from queue' : 'Add to queue'}
-          style={{
-            width: PLAYER_LIST_PX.queueButtonSize,
-            height: PLAYER_LIST_PX.queueButtonSize,
-            borderRadius: '50%',
-            border: `2px solid ${isQueued ? PLAYER_LIST_COLORS.queueButtonActiveBorder : PLAYER_LIST_COLORS.queueButtonBorder}`,
-            backgroundColor: isQueued ? PLAYER_LIST_COLORS.queueButtonActiveBg : 'transparent',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
+          className={cn(
+            styles.queueButton,
+            isQueued ? styles.queueButtonActive : styles.queueButtonInactive
+          )}
         >
-          <span style={{ color: isQueued ? PLAYER_LIST_COLORS.queueButtonActiveBorder : PLAYER_LIST_COLORS.queueButtonBorder, fontSize: 16 }}>
-            {isQueued ? '✓' : '+'}
-          </span>
+          {isQueued ? '✓' : '+'}
         </button>
       </div>
 
       {/* PROJ Column */}
-      <div style={{ width: PLAYER_LIST_PX.projColumnWidth, textAlign: 'center', fontSize: PLAYER_LIST_PX.statFontSize, color: '#9CA3AF', fontVariantNumeric: 'tabular-nums' }}>
+      <div className={cn(styles.playerProjValue, styles.projColumn)}>
         {player.projectedPoints?.toFixed(1) || '-'}
       </div>
 
       {/* RANK Column */}
-      <div style={{ width: PLAYER_LIST_PX.rankColumnWidth, textAlign: 'center', fontSize: PLAYER_LIST_PX.playerRankFontSize, fontWeight: 600, color: TEXT_COLORS.primary, fontVariantNumeric: 'tabular-nums' }}>
+      <div className={cn(styles.playerRankValue, styles.rankColumn)}>
         {rank || '-'}
       </div>
     </div>
-  );
-});
-
-// --- Player Row (Table-based - kept for compatibility) ---
-interface PlayerRowProps {
-  player: DraftPlayer;
-  rank: number | null;
-  isQueued: boolean;
-  onToggleQueue: () => void;
-  onRowClick: () => void;
-}
-
-const PlayerRow = React.memo(function PlayerRow({
-  player,
-  rank,
-  isQueued,
-  onToggleQueue,
-  onRowClick,
-}: PlayerRowProps): React.ReactElement {
-  const positionColor = POSITION_COLORS[player.position];
-  
-  const cellStyle: React.CSSProperties = {
-    padding: '0 4px',
-    verticalAlign: 'middle',
-  };
-  
-  return (
-    <tr
-      onClick={onRowClick}
-      style={{
-        height: PLAYER_LIST_PX.rowHeight,
-        backgroundColor: PLAYER_LIST_COLORS.rowBg,
-        cursor: 'pointer',
-        borderBottom: `1px solid ${PLAYER_LIST_COLORS.rowBorder}`,
-      }}
-    >
-      {/* ADP Column */}
-      <td style={{ ...cellStyle, textAlign: 'center', padding: '0 4px', fontSize: PLAYER_LIST_PX.statFontSize, color: '#9CA3AF', fontVariantNumeric: 'tabular-nums' }}>
-        {player.adp?.toFixed(1) || '-'}
-      </td>
-      
-      {/* Player Info */}
-      <td style={{ ...cellStyle, paddingLeft: 10, paddingRight: 8 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ minWidth: 0, flex: 1 }}>
-            <div
-              style={{
-                fontSize: PLAYER_LIST_PX.playerNameFontSize,
-                fontWeight: 500,
-                color: TEXT_COLORS.primary,
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
-            >
-              {player.name}
-            </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
-          <span
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '1px 5px',
-              borderRadius: 3,
-              backgroundColor: positionColor,
-              color: '#000000',
-              fontSize: 10,
-              fontWeight: 700,
-            }}
-          >
-            {player.position}
-          </span>
-          <span style={{ fontSize: PLAYER_LIST_PX.playerTeamFontSize, color: TEXT_COLORS.secondary }}>
-            {player.team} ({player.byeWeek || 'TBD'})
-          </span>
-        </div>
-          </div>
-        </div>
-      </td>
-      
-      {/* Queue Action */}
-      <td>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100%',
-          }}
-        >
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggleQueue();
-            }}
-            aria-label={isQueued ? `Remove ${player.name} from queue` : `Add ${player.name} to queue`}
-            style={{
-              width: 28,
-              height: 28,
-              borderRadius: '50%',
-              border: `2px solid ${isQueued ? '#60A5FA' : '#6B7280'}`,
-              backgroundColor: isQueued ? 'rgba(96, 165, 250, 0.2)' : 'transparent',
-              cursor: 'pointer',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              padding: 0,
-              marginLeft: -10, // Moved right 4px (was -14)
-              marginRight: 14,
-            }}
-          >
-            <svg width="12" height="12" viewBox="0 0 12 12">
-              {isQueued ? (
-                <rect x="1" y="5" width="10" height="2" rx="1" fill="#FFFFFF" />
-              ) : (
-                <>
-                  <rect x="5" y="1" width="2" height="10" rx="1" fill="#FFFFFF" />
-                  <rect x="1" y="5" width="10" height="2" rx="1" fill="#FFFFFF" />
-                </>
-              )}
-            </svg>
-          </button>
-        </div>
-      </td>
-      
-      {/* PROJ Column */}
-      <td style={{ ...cellStyle, textAlign: 'right', paddingRight: 12, fontSize: PLAYER_LIST_PX.statFontSize, color: TEXT_COLORS.secondary, fontVariantNumeric: 'tabular-nums' }}>
-        {player.projectedPoints ? Math.round(player.projectedPoints) : '-'}
-      </td>
-      
-      {/* RANK Column */}
-      <td style={{ ...cellStyle, textAlign: 'center', padding: '0 4px', fontSize: PLAYER_LIST_PX.playerRankFontSize, color: TEXT_COLORS.secondary, fontVariantNumeric: 'tabular-nums' }}>
-        {rank || '-'}
-      </td>
-    </tr>
   );
 });
 
@@ -743,32 +527,9 @@ const PlayerList = React.memo(function PlayerList({
   }, []);
   
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        minHeight: 0,
-        backgroundColor: BG_COLORS.primary,
-        paddingTop: 0,
-        paddingLeft: `${SPACING.xs}px`,
-        paddingRight: `${SPACING.xs}px`,
-      }}
-    >
+    <div className={styles.mainContainer}>
       {/* Position Filter Buttons */}
-      <div 
-        className="flex rounded-lg overflow-hidden"
-        style={{ 
-          backgroundColor: 'rgba(255,255,255,0.05)',
-          position: 'relative',
-          top: '0px',
-          marginTop: 0,
-          marginBottom: `${SPACING.xs}px`,
-          width: '100%',
-          overflow: 'hidden',
-          flexShrink: 0,
-        }}
-      >
+      <div className={styles.filterContainer}>
         {POSITIONS.map(position => (
           <FilterButton
             key={position}
@@ -779,7 +540,7 @@ const PlayerList = React.memo(function PlayerList({
           />
         ))}
       </div>
-      
+
       {/* Search Bar */}
       <div style={{ flexShrink: 0 }}>
         <SearchBar
@@ -788,33 +549,19 @@ const PlayerList = React.memo(function PlayerList({
           onClear={onClearAll}
         />
       </div>
-      
+
       {/* Player Table with integrated headers */}
       <div
         ref={scrollContainerRef}
         onScroll={handleScroll}
-        style={{
-          flex: '1 1 0',
-          minHeight: 0,
-          overflowY: 'auto',
-          WebkitOverflowScrolling: 'touch',
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-          paddingBottom: 24,
-        }}
+        className={styles.listContainer}
       >
-        <style>{`
-          .player-table-container::-webkit-scrollbar {
-            display: none !important;
-          }
-        `}</style>
-        
         {isLoading ? (
-          <div style={{ padding: 24, textAlign: 'center', color: TEXT_COLORS.secondary }}>
+          <div className={styles.emptyState}>
             Loading players...
           </div>
         ) : players.length === 0 ? (
-          <div style={{ padding: 24, textAlign: 'center', color: TEXT_COLORS.secondary }}>
+          <div className={styles.emptyState}>
             No players found
           </div>
         ) : (

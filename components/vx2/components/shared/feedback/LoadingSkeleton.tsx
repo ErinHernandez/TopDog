@@ -1,23 +1,25 @@
 /**
  * LoadingSkeleton - Animated placeholder while content loads
- * 
+ *
  * Provides building blocks for creating loading skeletons.
- * 
+ * Migrated to CSS Modules for CSP compliance.
+ *
  * @example
  * ```tsx
  * // Basic usage
  * <Skeleton width={200} height={20} />
- * 
+ *
  * // Card skeleton
  * <SkeletonCard />
- * 
+ *
  * // List item skeleton
  * <SkeletonListItem />
  * ```
  */
 
 import React from 'react';
-import { RADIUS } from '../../../core/constants/sizes';
+import { cn } from '@/lib/styles';
+import styles from './LoadingSkeleton.module.css';
 
 // ============================================================================
 // TYPES
@@ -45,23 +47,22 @@ export interface SkeletonProps {
 export function Skeleton({
   width = '100%',
   height = 16,
-  borderRadius = RADIUS.md,
+  borderRadius = 8,
   circle = false,
   className = '',
   animation = 'pulse',
 }: SkeletonProps): React.ReactElement {
-  const animationClass = animation === 'pulse' ? 'animate-pulse' : '';
-  const actualRadius = circle ? '50%' : `${borderRadius}px`;
-  
+  const animationClass =
+    animation === 'pulse' ? styles.pulse : animation === 'shimmer' ? styles.shimmer : '';
+
   return (
     <div
-      className={`${animationClass} ${className}`}
+      className={cn(styles.skeleton, circle && styles.circle, animationClass, className)}
       style={{
-        width: typeof width === 'number' ? `${width}px` : width,
-        height: typeof height === 'number' ? `${height}px` : height,
-        backgroundColor: 'rgba(255, 255, 255, 0.1)',
-        borderRadius: actualRadius,
-      }}
+        '--skeleton-width': typeof width === 'number' ? `${width}px` : width,
+        '--skeleton-height': typeof height === 'number' ? `${height}px` : height,
+        '--skeleton-radius': circle ? '50%' : `${borderRadius}px`,
+      } as React.CSSProperties}
       aria-hidden="true"
     />
   );
@@ -92,15 +93,11 @@ export function SkeletonText({
 }: SkeletonTextProps): React.ReactElement {
   return (
     <div
-      className={className}
-      style={{ display: 'flex', flexDirection: 'column', gap: `${gap}px` }}
+      className={cn(styles.textContainer, className)}
+      style={{ '--skeleton-gap': `${gap}px` } as React.CSSProperties}
     >
       {Array.from({ length: lines }).map((_, i) => (
-        <Skeleton
-          key={i}
-          width={i === lines - 1 ? lastLineWidth : '100%'}
-          height={14}
-        />
+        <Skeleton key={i} width={i === lines - 1 ? lastLineWidth : '100%'} height={14} />
       ))}
     </div>
   );
@@ -127,31 +124,24 @@ export function SkeletonCard({
 }: SkeletonCardProps): React.ReactElement {
   return (
     <div
-      className={className}
-      style={{
-        backgroundColor: 'rgba(31, 41, 55, 0.5)',
-        borderRadius: `${RADIUS.lg}px`,
-        padding: '16px',
-        height: `${height}px`,
-        display: 'flex',
-        flexDirection: 'column',
-      }}
+      className={cn(styles.card, className)}
+      style={{ '--card-height': `${height}px` } as React.CSSProperties}
     >
       {showHeader && (
-        <div style={{ marginBottom: '12px' }}>
+        <div className={styles.cardHeader}>
           <Skeleton width={180} height={20} />
-          <Skeleton width={120} height={14} className="mt-2" />
+          <Skeleton width={120} height={14} className={styles.mt2} />
         </div>
       )}
-      
-      <div style={{ flex: 1 }}>
+
+      <div className={styles.cardBody}>
         <Skeleton width="100%" height={60} />
       </div>
-      
+
       {showAction && (
-        <div className="flex justify-between items-center mt-3">
+        <div className={styles.cardFooter}>
           <Skeleton width={80} height={14} />
-          <Skeleton width={100} height={36} borderRadius={RADIUS.md} />
+          <Skeleton width={100} height={36} borderRadius={8} />
         </div>
       )}
     </div>
@@ -181,29 +171,22 @@ export function SkeletonListItem({
   className = '',
 }: SkeletonListItemProps): React.ReactElement {
   return (
-    <div
-      className={`flex items-center ${className}`}
-      style={{ padding: '12px 0' }}
-    >
+    <div className={cn(styles.listItem, className)}>
       {showAvatar && (
         <Skeleton
           width={avatarSize}
           height={avatarSize}
           circle
-          className="flex-shrink-0 mr-3"
+          className={styles.listItemAvatar}
         />
       )}
-      
-      <div style={{ flex: 1, minWidth: 0 }}>
+
+      <div className={styles.listItemContent}>
         <Skeleton width="70%" height={14} />
-        {textLines > 1 && (
-          <Skeleton width="50%" height={12} className="mt-2" />
-        )}
+        {textLines > 1 && <Skeleton width="50%" height={12} className={styles.mt2} />}
       </div>
-      
-      {showRight && (
-        <Skeleton width={50} height={16} className="ml-3 flex-shrink-0" />
-      )}
+
+      {showRight && <Skeleton width={50} height={16} className={styles.listItemRight} />}
     </div>
   );
 }
@@ -213,4 +196,3 @@ export function SkeletonListItem({
 // ============================================================================
 
 export default Skeleton;
-

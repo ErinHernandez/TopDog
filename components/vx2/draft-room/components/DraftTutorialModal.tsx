@@ -10,6 +10,8 @@
  */
 
 import React, { useState, useCallback } from 'react';
+import { cn } from '@/lib/styles';
+import styles from './DraftTutorialModal.module.css';
 import { POSITION_COLORS } from '../../core/constants/colors';
 
 // ============================================================================
@@ -62,47 +64,23 @@ interface TutorialPage {
 
 function DraftCardsIllustration(): React.ReactElement {
   return (
-    <div style={{ display: 'flex', gap: 6, justifyContent: 'center', padding: '0 20px' }}>
+    <div className={styles.cardsIllustration}>
       {/* User card - highlighted with blue */}
-      <div
-        style={{
-          width: 72,
-          height: 88,
-          backgroundColor: COLORS.cardBg,
-          borderRadius: 6,
-          border: `3px solid ${COLORS.userBlue}`,
-          overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        <div style={{ 
-          backgroundColor: COLORS.userBlue, 
-          padding: '4px 6px',
-          textAlign: 'center',
-        }}>
-          <span style={{ color: '#FFF', fontSize: 8, fontWeight: 600 }}>YOUR TURN</span>
+      <div className={styles.userCard}>
+        <div className={styles.userCardHeader}>
+          <span className={styles.userCardLabel}>YOUR TURN</span>
         </div>
-        <div style={{ 
-          flex: 1, 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center',
-          color: COLORS.text,
-          fontSize: 20,
-          fontWeight: 700,
-          fontVariantNumeric: 'tabular-nums',
-        }}>
+        <div className={styles.userCardContent}>
           28
         </div>
-        <div style={{ display: 'flex', height: 4, gap: 1, margin: 4 }}>
-          <div style={{ flex: 1, backgroundColor: POSITION_COLORS.QB, borderRadius: 1 }} />
-          <div style={{ flex: 1, backgroundColor: POSITION_COLORS.RB, borderRadius: 1 }} />
-          <div style={{ flex: 1, backgroundColor: POSITION_COLORS.WR, borderRadius: 1 }} />
-          <div style={{ flex: 1, backgroundColor: POSITION_COLORS.TE, borderRadius: 1 }} />
-          </div>
+        <div className={styles.userCardPositions}>
+          <div className={cn(styles.positionBar)} style={{ backgroundColor: POSITION_COLORS.QB }} />
+          <div className={cn(styles.positionBar)} style={{ backgroundColor: POSITION_COLORS.RB }} />
+          <div className={cn(styles.positionBar)} style={{ backgroundColor: POSITION_COLORS.WR }} />
+          <div className={cn(styles.positionBar)} style={{ backgroundColor: POSITION_COLORS.TE }} />
         </div>
-      
+      </div>
+
       {/* Picked cards with players */}
       {[
         { pos: 'WR', name: 'Chase', color: POSITION_COLORS.WR },
@@ -111,39 +89,15 @@ function DraftCardsIllustration(): React.ReactElement {
       ].map((player, i) => (
         <div
           key={i}
-          style={{
-            width: 64,
-            height: 80,
-            backgroundColor: COLORS.cardBg,
-            borderRadius: 6,
-            border: `2px solid ${player.color}`,
-            overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column',
-          }}
+          className={styles.playerCard}
+          style={{ borderColor: player.color }}
         >
-          <div style={{ 
-            backgroundColor: player.color, 
-            padding: '2px 4px',
-          }}>
-            <span style={{ color: '#000', fontSize: 7, fontWeight: 600 }}>{player.pos}</span>
+          <div className={styles.playerCardHeader} style={{ backgroundColor: player.color }}>
+            <span className={styles.playerCardHeaderLabel}>{player.pos}</span>
           </div>
-          <div style={{ 
-            flex: 1, 
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 4,
-          }}>
-            <div style={{ 
-              width: 24, 
-              height: 24, 
-              borderRadius: 12, 
-              backgroundColor: '#475569',
-              marginBottom: 2,
-            }} />
-            <span style={{ color: COLORS.text, fontSize: 8, fontWeight: 500 }}>{player.name}</span>
+          <div className={styles.playerCardContent}>
+            <div className={styles.playerAvatar} />
+            <span className={styles.playerCardName}>{player.name}</span>
           </div>
         </div>
       ))}
@@ -158,10 +112,7 @@ function SnakeOrderIllustration(): React.ReactElement {
     { name: 'TEAM 3', isUser: false, tracker: [POSITION_COLORS.WR, POSITION_COLORS.RB, POSITION_COLORS.QB] },
     { name: 'TEAM 4', isUser: false, tracker: [POSITION_COLORS.RB, POSITION_COLORS.WR, POSITION_COLORS.WR] },
   ];
-  
-  const cellWidth = 76;
-  const cellGap = 2;
-  
+
   // Pick data matching actual board style
   const picks = [
     // Round 1
@@ -179,52 +130,32 @@ function SnakeOrderIllustration(): React.ReactElement {
       { pick: '2.01', first: 'Breece', last: 'Hall', pos: 'RB', team: 'NYJ', color: POSITION_COLORS.RB },
     ],
   ];
-  
+
   return (
-    <div style={{ padding: '0 12px', overflowX: 'auto' }}>
-      <div style={{ 
-        display: 'inline-flex',
-        flexDirection: 'column',
-        backgroundColor: '#101927',
-        borderRadius: 6,
-        padding: 4,
-      }}>
+    <div className={styles.snakeIllustration}>
+      <div className={styles.snakeBoardContainer}>
         {/* Team Headers */}
-        <div style={{ display: 'flex', gap: cellGap, marginBottom: cellGap }}>
+        <div className={styles.snakeTeamHeaders}>
           {teams.map((team, i) => (
             <div
               key={i}
-        style={{
-                width: cellWidth,
-                backgroundColor: '#374151',
-                borderRadius: 4,
-                border: `2px solid ${team.isUser ? COLORS.accent : '#6B7280'}`,
-                overflow: 'hidden',
-              }}
+              className={cn(
+                styles.snakeTeamCell,
+                team.isUser ? styles.snakeTeamUserBorder : styles.snakeTeamOtherBorder
+              )}
             >
               {/* Name header */}
-              <div style={{
-                height: 18,
-                backgroundColor: team.isUser ? COLORS.accent : '#6B7280',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}>
-                <span style={{ 
-                  color: team.isUser ? '#000' : '#FFF', 
-                  fontSize: 8, 
-                  fontWeight: 600,
-                }}>
+              <div className={cn(
+                styles.snakeTeamName,
+                team.isUser ? styles.snakeTeamUserName : styles.snakeTeamOtherName
+              )}>
+                <span className={styles.snakeTeamNameText}>
                   {team.name}
                 </span>
               </div>
               {/* Position tracker */}
-              <div style={{ 
-                display: 'flex', 
-                justifyContent: 'center',
-                padding: '6px 4px',
-              }}>
-                <div style={{ display: 'flex', height: 6, width: 54, borderRadius: 2, overflow: 'hidden' }}>
+              <div className={styles.snakePositionTracker}>
+                <div className={styles.snakePositionBar}>
                   {team.tracker.map((color, j) => (
                     <div key={j} style={{ flex: 1, backgroundColor: color }} />
                   ))}
@@ -233,68 +164,46 @@ function SnakeOrderIllustration(): React.ReactElement {
             </div>
           ))}
         </div>
-        
+
         {/* Pick Rows */}
         {picks.map((row, rowIndex) => (
-          <div key={rowIndex} style={{ display: 'flex', gap: cellGap, marginBottom: cellGap }}>
-            {row.map((cell, colIndex) => {
-              const isUserCol = colIndex === 0;
-              return (
-                <div
-                  key={colIndex}
-          style={{
-                    width: cellWidth,
-                    height: 56,
-                    backgroundColor: `${cell.color}20`,
-                    borderRadius: 4,
-                    border: `2px solid ${cell.color}`,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    padding: '2px 3px',
-                  }}
-                >
-                  {/* Pick number */}
-                  <span style={{ 
-                    color: '#FFF', 
-                    fontSize: 7,
-                    fontWeight: 500,
-                  }}>
-                    {cell.pick}
-                  </span>
-                  {/* Player name */}
-                  <div style={{ 
-                    flex: 1, 
-                    display: 'flex', 
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}>
-                    <span style={{ color: '#FFF', fontSize: 8, fontWeight: 500 }}>{cell.first}</span>
-                    <span style={{ color: '#FFF', fontSize: 9, fontWeight: 700 }}>{cell.last}</span>
-                  </div>
-                  {/* Position-Team */}
-                  <div style={{ textAlign: 'center' }}>
-                    <span style={{ color: '#9CA3AF', fontSize: 7 }}>{cell.pos}-{cell.team}</span>
-                  </div>
+          <div key={rowIndex} className={styles.snakePickRow}>
+            {row.map((cell, colIndex) => (
+              <div
+                key={colIndex}
+                className={styles.snakePickCell}
+                style={{
+                  backgroundColor: `${cell.color}20`,
+                  borderColor: cell.color,
+                }}
+              >
+                {/* Pick number */}
+                <span className={styles.snakePickNumber}>
+                  {cell.pick}
+                </span>
+                {/* Player name */}
+                <div className={styles.snakePlayerName}>
+                  <span className={styles.snakePlayerFirst}>{cell.first}</span>
+                  <span className={styles.snakePlayerLast}>{cell.last}</span>
                 </div>
-              );
-            })}
+                {/* Position-Team */}
+                <div className={styles.snakePlayerTeam}>
+                  {cell.pos}-{cell.team}
+                </div>
+              </div>
+            ))}
           </div>
         ))}
-        
+
         {/* Snake direction indicators */}
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between',
-          padding: '4px 8px',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <span style={{ color: COLORS.textMuted, fontSize: 9 }}>R1</span>
-            <span style={{ color: COLORS.success, fontSize: 12 }}>→</span>
+        <div className={styles.snakeDirectionIndicators}>
+          <div className={styles.snakeRoundIndicator}>
+            <span className={styles.snakeRoundLabel}>R1</span>
+            <span className={styles.snakeArrow}>→</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <span style={{ color: COLORS.success, fontSize: 12 }}>←</span>
-            <span style={{ color: COLORS.textMuted, fontSize: 9 }}>R2</span>
+          <div className={styles.snakeRoundIndicator}>
+            <span className={styles.snakeArrow}>←</span>
+            <span className={styles.snakeRoundLabel}>R2</span>
           </div>
         </div>
       </div>
@@ -308,74 +217,45 @@ function QueueIllustration(): React.ReactElement {
     { name: 'Bijan Robinson', pos: 'RB', team: 'ATL', color: POSITION_COLORS.RB },
     { name: 'Sam LaPorta', pos: 'TE', team: 'DET', color: POSITION_COLORS.TE },
   ];
-  
+
   return (
-    <div style={{ padding: '0 20px' }}>
-      <div style={{ 
-        backgroundColor: COLORS.cardBg, 
-        borderRadius: 12, 
-        overflow: 'hidden',
-        border: `1px solid ${COLORS.border}`,
-      }}>
+    <div className={styles.queueIllustration}>
+      <div className={styles.queueContainer}>
         {/* Header */}
-        <div style={{ 
-          padding: '8px 12px', 
-          borderBottom: `1px solid ${COLORS.border}`,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}>
-          <span style={{ color: COLORS.text, fontSize: 12, fontWeight: 600 }}>MY QUEUE</span>
-          <span style={{ color: COLORS.accent, fontSize: 11 }}>3 players</span>
+        <div className={styles.queueHeader}>
+          <span className={styles.queueTitle}>MY QUEUE</span>
+          <span className={styles.queueCount}>3 players</span>
         </div>
-        
+
         {/* Queue items */}
         {players.map((player, i) => (
-        <div
-          key={i}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-              gap: 10,
-              padding: '10px 12px',
-              borderBottom: i < players.length - 1 ? `1px solid ${COLORS.border}` : 'none',
-          }}
-        >
+          <div
+            key={i}
+            className={cn(styles.queueItem, i === players.length - 1 && styles.queueItemLast)}
+          >
             {/* Drag handle */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 2, opacity: 0.4 }}>
-              <div style={{ width: 12, height: 2, backgroundColor: COLORS.textMuted, borderRadius: 1 }} />
-              <div style={{ width: 12, height: 2, backgroundColor: COLORS.textMuted, borderRadius: 1 }} />
+            <div className={styles.dragHandle}>
+              <div className={styles.dragHandleBar} />
+              <div className={styles.dragHandleBar} />
             </div>
-            
+
             {/* Position badge */}
-            <div style={{
-              padding: '3px 6px',
-              backgroundColor: player.color,
-              borderRadius: 4,
-            }}>
-              <span style={{ color: '#000', fontSize: 10, fontWeight: 700 }}>{player.pos}</span>
+            <div className={styles.positionBadge} style={{ backgroundColor: player.color }}>
+              {player.pos}
             </div>
-            
+
             {/* Player info */}
-          <div style={{ flex: 1 }}>
-              <div style={{ color: COLORS.text, fontSize: 13, fontWeight: 500 }}>{player.name}</div>
-              <div style={{ color: COLORS.textMuted, fontSize: 10 }}>{player.team}</div>
+            <div className={styles.queuePlayerInfo}>
+              <div className={styles.queuePlayerName}>{player.name}</div>
+              <div className={styles.queuePlayerTeam}>{player.team}</div>
             </div>
-            
+
             {/* Remove button */}
-            <div style={{ 
-              width: 20, 
-              height: 20, 
-              borderRadius: 10, 
-              backgroundColor: '#374151',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-              <span style={{ color: COLORS.textMuted, fontSize: 12, lineHeight: 1 }}>×</span>
+            <div className={styles.removeButton}>
+              ×
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
       </div>
     </div>
   );
@@ -388,80 +268,48 @@ function BestBallIllustration(): React.ReactElement {
     { pos: 'WR', pts: 31.2, color: POSITION_COLORS.WR },
     { pos: 'TE', pts: 18.6, color: POSITION_COLORS.TE },
   ];
-  
+
   return (
-    <div style={{ padding: '0 20px' }}>
-      <div style={{ 
-        backgroundColor: COLORS.cardBg, 
-        borderRadius: 12, 
-        padding: 16,
-        border: `1px solid ${COLORS.border}`,
-      }}>
+    <div className={styles.bestBallIllustration}>
+      <div className={styles.bestBallContainer}>
         {/* Week label */}
-        <div style={{ 
-          display: 'flex',
-          justifyContent: 'space-between', 
-          alignItems: 'center',
-          marginBottom: 12,
-        }}>
-          <span style={{ color: COLORS.textMuted, fontSize: 11, fontWeight: 600 }}>WEEK 1 LINEUP</span>
-          <span style={{ color: COLORS.success, fontSize: 11, fontWeight: 600 }}>✓ Auto-set</span>
+        <div className={styles.bestBallWeekLabel}>
+          <span className={styles.weekLabelText}>WEEK 1 LINEUP</span>
+          <span className={styles.autoSetBadge}>✓ Auto-set</span>
         </div>
-        
+
         {/* Starters grid */}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+        <div className={styles.startersGrid}>
           {starters.map((s, i) => (
-            <div key={i} style={{ 
-              flex: 1, 
-              backgroundColor: `${s.color}15`,
-              borderRadius: 6,
-              padding: 8,
-              textAlign: 'center',
-              border: `1px solid ${s.color}40`,
-            }}>
-              <div style={{ 
-                fontSize: 9, 
-                fontWeight: 700, 
-                color: s.color,
-                marginBottom: 4,
-              }}>{s.pos}</div>
-              <div style={{ 
-                fontSize: 14, 
-                fontWeight: 700, 
-                color: COLORS.text,
-              }}>{s.pts}</div>
-        </div>
+            <div
+              key={i}
+              className={styles.starterCard}
+              style={{
+                backgroundColor: `${s.color}15`,
+                borderColor: `${s.color}40`,
+              }}
+            >
+              <div className={styles.starterPosition} style={{ color: s.color }}>
+                {s.pos}
+              </div>
+              <div className={styles.starterPoints}>
+                {s.pts}
+              </div>
+            </div>
           ))}
-      </div>
-      
+        </div>
+
         {/* Total */}
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '8px 0',
-          borderTop: `1px solid ${COLORS.border}`,
-        }}>
-          <span style={{ color: COLORS.textMuted, fontSize: 12 }}>Week Total</span>
-          <span style={{ color: COLORS.success, fontSize: 18, fontWeight: 700 }}>100.3 pts</span>
+        <div className={styles.bestBallTotal}>
+          <span className={styles.totalLabel}>Week Total</span>
+          <span className={styles.totalScore}>100.3 pts</span>
         </div>
       </div>
-      
+
       {/* No work badge */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        marginTop: 12,
-      }}>
-        <div style={{ 
-          backgroundColor: '#22C55E20',
-          borderRadius: 20,
-          padding: '6px 16px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 6,
-        }}>
-          <span style={{ color: COLORS.success, fontSize: 12, fontWeight: 500 }}>No lineup changes needed!</span>
+      <div className={styles.noBadgeContainer}>
+        <div className={styles.noBadge}>
+          <span className={styles.noBadgeText}>No lineup changes needed!</span>
         </div>
       </div>
     </div>
@@ -519,32 +367,26 @@ const TUTORIAL_PAGES: TutorialPage[] = [
 // SUB-COMPONENTS
 // ============================================================================
 
-function PageIndicator({ 
-  total, 
+function PageIndicator({
+  total,
   current,
   onSelect,
-}: { 
-  total: number; 
-  current: number; 
+}: {
+  total: number;
+  current: number;
   onSelect: (index: number) => void;
 }): React.ReactElement {
   return (
-    <div style={{ display: 'flex', gap: 8, justifyContent: 'center', alignItems: 'center' }}>
+    <div className={styles.pageIndicator}>
       {Array.from({ length: total }).map((_, i) => (
         <button
           key={i}
           onClick={() => onSelect(i)}
           aria-label={`Go to step ${i + 1}`}
-          style={{
-            width: i === current ? 20 : 6,
-            height: 6,
-            borderRadius: 3,
-            backgroundColor: i === current ? COLORS.accent : COLORS.dotInactive,
-            border: 'none',
-            cursor: 'pointer',
-            transition: 'width 0.2s ease, background-color 0.2s ease',
-            padding: 0,
-          }}
+          className={cn(
+            styles.progressDot,
+            i === current ? styles.progressDotActive : styles.progressDotInactive
+          )}
         />
       ))}
     </div>
@@ -589,151 +431,67 @@ export default function DraftTutorialModal({
   }, [isOpen]);
   
   if (!isOpen) return null;
-  
+
   const page = TUTORIAL_PAGES[currentPage];
-  
+
   return (
     <div
       role="dialog"
       aria-modal="true"
       aria-labelledby="tutorial-modal-title"
-      style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: COLORS.background,
-        zIndex: 1100,
-        display: 'flex',
-        flexDirection: 'column',
-      }}
+      className={styles.modalDialog}
     >
       {/* Header */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '12px 16px',
-          flexShrink: 0,
-        }}
-      >
-        <div style={{ width: 60 }} />
-          <h1
-            id="tutorial-modal-title"
-            style={{
-              margin: 0,
-            fontSize: 15,
-              fontWeight: 600,
-            color: COLORS.textMuted,
-            }}
-          >
+      <div className={styles.header}>
+        <div className={styles.headerSpacer} />
+        <h1 id="tutorial-modal-title" className={styles.headerTitle}>
           {currentPage + 1} of {TUTORIAL_PAGES.length}
-          </h1>
-        <button
-          onClick={onClose}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: COLORS.accent,
-            fontSize: 14,
-            fontWeight: 500,
-            cursor: 'pointer',
-            padding: '8px 0',
-            width: 60,
-            textAlign: 'right',
-          }}
-        >
+        </h1>
+        <button onClick={onClose} className={styles.skipButton}>
           Skip
         </button>
       </div>
-      
+
       {/* Content */}
-      <div
-        style={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          padding: '16px 0 24px',
-          overflowY: 'auto',
-        }}
-      >
+      <div className={styles.contentArea}>
         {/* Title */}
-        <h2
-          style={{
-            margin: '0 24px 6px',
-            fontSize: 24,
-            fontWeight: 700,
-            color: COLORS.text,
-            textAlign: 'center',
-          }}
-        >
+        <h2 className={styles.contentTitle}>
           {page.title}
         </h2>
-        
+
         {/* Description */}
-        <p
-          style={{
-            margin: '0 24px 24px',
-            fontSize: 14,
-            color: COLORS.textMuted,
-            textAlign: 'center',
-            lineHeight: 1.5,
-          }}
-        >
+        <p className={styles.description}>
           {page.description}
         </p>
-        
+
         {/* Illustration */}
-        <div
-          style={{
-            marginBottom: 24,
-            minHeight: 160,
-          }}
-        >
+        <div className={styles.illustrationContainer}>
           {page.illustration}
         </div>
-        
+
         {/* Tips */}
-        <div style={{ 
-          margin: '0 20px',
-        }}>
+        <div className={styles.tipsSection}>
           {page.tips.map((tip, i) => (
-            <div 
-              key={i} 
-              style={{ 
-                display: 'flex', 
-                gap: 12, 
-                alignItems: 'center',
-                padding: '10px 14px',
-                backgroundColor: i === 0 ? `${COLORS.accent}10` : 'transparent',
-                borderRadius: 8,
-                marginBottom: 4,
-              }}
+            <div
+              key={i}
+              className={cn(
+                styles.tipItem,
+                i === 0 && styles.tipItemHighlight
+              )}
             >
-              <div style={{
-                width: 22,
-                height: 22,
-                borderRadius: 11,
-                backgroundColor: i === 0 ? COLORS.accent : COLORS.border,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-              }}>
-                <span style={{ color: i === 0 ? '#FFF' : COLORS.textMuted, fontSize: 11, fontWeight: 600 }}>
-                  {i + 1}
-                </span>
+              <div
+                className={cn(
+                  styles.tipNumber,
+                  i === 0 ? styles.tipNumberHighlight : styles.tipNumberNormal
+                )}
+              >
+                {i + 1}
               </div>
               <p
-                style={{
-                  margin: 0,
-                  fontSize: 13,
-                  lineHeight: 1.4,
-                  color: i === 0 ? COLORS.text : COLORS.textMuted,
-                  fontWeight: i === 0 ? 500 : 400,
-                }}
+                className={cn(
+                  styles.tipText,
+                  i === 0 ? styles.tipTextHighlight : styles.tipTextNormal
+                )}
               >
                 {tip}
               </p>
@@ -741,70 +499,43 @@ export default function DraftTutorialModal({
           ))}
         </div>
       </div>
-      
+
       {/* Footer */}
-      <div
-        style={{
-          padding: '12px 20px 28px',
-          flexShrink: 0,
-        }}
-      >
+      <div className={styles.footer}>
         {/* Page Indicator */}
-        <div style={{ marginBottom: 16 }}>
-          <PageIndicator 
-            total={TUTORIAL_PAGES.length} 
-            current={currentPage} 
+        <div className={styles.pageIndicatorContainer}>
+          <PageIndicator
+            total={TUTORIAL_PAGES.length}
+            current={currentPage}
             onSelect={setCurrentPage}
           />
         </div>
-        
+
         {/* Don't show again checkbox - only on last page when enabled */}
         {showDontShowAgain && isLastPage && (
-          <label
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 10,
-              marginBottom: 16,
-              cursor: 'pointer',
-            }}
-          >
+          <label className={styles.dontShowAgainLabel}>
             <input
               type="checkbox"
               checked={dontShowAgain}
               onChange={(e) => handleDontShowAgainChange(e.target.checked)}
-              style={{
-                width: 20,
-                height: 20,
-                accentColor: COLORS.accent,
-                cursor: 'pointer',
-              }}
+              className={styles.dontShowAgainCheckbox}
             />
-            <span style={{ color: COLORS.textMuted, fontSize: 14 }}>
+            <span className={styles.dontShowAgainText}>
               Don't show this tutorial again
             </span>
           </label>
         )}
-        
+
         {/* Next Button */}
-          <button
-            onClick={handleNext}
-            style={{
-            width: '100%',
-            height: 50,
-            backgroundColor: isLastPage ? COLORS.success : COLORS.accent,
-              border: 'none',
-            borderRadius: 25,
-            color: '#FFFFFF',
-              fontSize: 16,
-              fontWeight: 600,
-              cursor: 'pointer',
-            transition: 'background-color 0.2s ease',
-            }}
-          >
-          {isLastPage ? 'Let\&apos;s Draft!' : 'Continue'}
-          </button>
+        <button
+          onClick={handleNext}
+          className={cn(
+            styles.nextButton,
+            isLastPage ? styles.nextButtonFinish : styles.nextButtonContinue
+          )}
+        >
+          {isLastPage ? 'Let\'s Draft!' : 'Continue'}
+        </button>
       </div>
     </div>
   );

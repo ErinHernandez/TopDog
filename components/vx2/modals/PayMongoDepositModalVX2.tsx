@@ -11,6 +11,7 @@
  */
 
 import React, { useState, useCallback, useMemo } from 'react';
+import { cn } from '@/lib/styles';
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../core/constants/colors';
 import { SPACING, RADIUS, TYPOGRAPHY } from '../core/constants/sizes';
 import { Close, ChevronLeft } from '../components/icons';
@@ -22,6 +23,7 @@ import {
   PHP_CONFIG,
 } from '../../../lib/paymongo/currencyConfig';
 import { createScopedLogger } from '../../../lib/clientLogger';
+import styles from './PayMongoDepositModalVX2.module.css';
 
 const logger = createScopedLogger('[PayMongoDeposit]');
 
@@ -245,25 +247,25 @@ export function PayMongoDepositModalVX2({
   }, [handleReset, onClose]);
   
   if (!isOpen) return null;
-  
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div 
-        className="w-full max-w-md bg-[#101927] rounded-2xl overflow-hidden shadow-2xl"
+    <div className={styles.modalOverlay}>
+      <div
+        className={styles.modalContainer}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
-          <div className="flex items-center gap-3">
+        <div className={styles.header}>
+          <div className={styles.headerLeft}>
             {step === 'method' && (
               <button
                 onClick={handleBack}
-                className="p-1 -ml-1 hover:bg-white/10 rounded-lg transition-colors"
+                className={styles.backButton}
               >
                 <ChevronLeft className="w-5 h-5 text-gray-400" />
               </button>
             )}
-            <h2 className="text-lg font-semibold text-white">
+            <h2 className={styles.headerTitle}>
               {step === 'amount' && 'Deposit'}
               {step === 'method' && 'Select Payment Method'}
               {step === 'processing' && 'Processing...'}
@@ -273,46 +275,46 @@ export function PayMongoDepositModalVX2({
           </div>
           <button
             onClick={handleClose}
-            className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+            className={styles.closeButton}
           >
             <Close className="w-5 h-5 text-gray-400" />
           </button>
         </div>
-        
+
         {/* Content */}
-        <div className="p-6">
+        <div className={styles.modalContent}>
           {/* Amount Selection Step */}
           {step === 'amount' && (
-            <div className="space-y-6">
+            <div className={styles.amountSelectionStep}>
               {/* Quick amounts */}
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-3">
+                <label className={styles.amountLabel}>
                   Select Amount
                 </label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className={styles.quickAmountGrid}>
                   {quickAmounts.map(({ display }) => (
                     <button
                       key={display}
                       onClick={() => handleQuickAmount(display)}
-                      className={`py-3 px-4 rounded-lg font-medium transition-all ${
-                        amount === display
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-[#1a2537] text-gray-300 hover:bg-[#243044]'
-                      }`}
+                      className={cn(
+                        styles.quickAmountButton,
+                        amount === display ? styles.quickAmountButtonActive : styles.quickAmountButtonInactive
+                      )}
                     >
                       {PHP_CONFIG.symbol}{display.toLocaleString()}
                     </button>
                   ))}
                 </div>
               </div>
-              
+
+
               {/* Custom amount */}
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">
+              <div className={styles.customAmountSection}>
+                <label className={styles.amountLabel}>
                   Or Enter Custom Amount
                 </label>
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">
+                <div className={styles.customAmountInputWrapper}>
+                  <span className={styles.customAmountPrefix}>
                     {PHP_CONFIG.symbol}
                   </span>
                   <input
@@ -321,79 +323,78 @@ export function PayMongoDepositModalVX2({
                     value={customAmount}
                     onChange={(e) => handleCustomAmountChange(e.target.value)}
                     placeholder="0.00"
-                    className="w-full pl-10 pr-4 py-3 bg-[#1a2537] border border-white/10 rounded-lg text-white text-lg focus:outline-none focus:border-blue-500 transition-colors"
+                    className={styles.customAmountInput}
                   />
                 </div>
-                <p className="mt-2 text-xs text-gray-500">
-                  Min: {formatPhpAmount(PHP_CONFIG.minimumDepositCentavos)} | 
+                <p className={styles.amountHint}>
+                  Min: {formatPhpAmount(PHP_CONFIG.minimumDepositCentavos)} |
                   Max: {formatPhpAmount(PHP_CONFIG.maximumDepositCentavos)}
                 </p>
               </div>
-              
+
+
               {/* Error */}
               {error && (
-                <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                  <p className="text-sm text-red-400">{error}</p>
+                <div className={styles.errorAlert}>
+                  <p className={styles.errorText}>{error}</p>
                 </div>
               )}
-              
+
               {/* Continue button */}
               <button
                 onClick={handleContinueToMethod}
                 disabled={!amountValidation.isValid}
-                className={`w-full py-3 rounded-lg font-semibold transition-all ${
-                  amountValidation.isValid
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                    : 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                }`}
+                className={cn(
+                  styles.continueButton,
+                  amountValidation.isValid ? styles.continueButtonActive : styles.continueButtonDisabled
+                )}
               >
                 Continue with {amount > 0 ? formatPhpAmount(toSmallestUnit(amount)) : 'amount'}
               </button>
             </div>
           )}
-          
+
+
           {/* Payment Method Step */}
           {step === 'method' && (
-            <div className="space-y-4">
+            <div className={styles.methodSelectionStep}>
               {/* Amount display */}
-              <div className="text-center py-4 bg-[#1a2537] rounded-lg">
-                <p className="text-sm text-gray-400 mb-1">Deposit Amount</p>
-                <p className="text-2xl font-bold text-white">
+              <div className={styles.amountDisplayBox}>
+                <p className={styles.amountDisplayLabel}>Deposit Amount</p>
+                <p className={styles.amountDisplayValue}>
                   {formatPhpAmount(toSmallestUnit(amount))}
                 </p>
               </div>
-              
+
               {/* Payment methods */}
-              <div className="space-y-2">
+              <div className={styles.methodsContainer}>
                 {PAYMENT_METHODS.map((method) => (
                   <button
                     key={method.id}
                     onClick={() => handleSelectMethod(method.id)}
-                    className={`w-full flex items-center gap-4 p-4 rounded-lg border transition-all ${
-                      selectedMethod === method.id
-                        ? 'bg-blue-600/10 border-blue-500'
-                        : 'bg-[#1a2537] border-white/10 hover:border-white/20'
-                    }`}
+                    className={cn(
+                      styles.methodButton,
+                      selectedMethod === method.id && styles.methodButtonActive
+                    )}
                   >
                     {method.icon}
-                    <div className="flex-1 text-left">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-white">{method.name}</span>
+                    <div className={styles.methodContent}>
+                      <div className={styles.methodHeader}>
+                        <span className={styles.methodName}>{method.name}</span>
                         {method.popular && (
-                          <span className="px-2 py-0.5 text-xs bg-green-500/20 text-green-400 rounded-full">
+                          <span className={styles.methodPopularBadge}>
                             Popular
                           </span>
                         )}
                       </div>
-                      <p className="text-sm text-gray-400">{method.description}</p>
+                      <p className={styles.methodDescription}>{method.description}</p>
                     </div>
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                      selectedMethod === method.id
-                        ? 'border-blue-500 bg-blue-500'
-                        : 'border-gray-600'
-                    }`}>
+                    <div className={cn(
+                      styles.methodRadio,
+                      selectedMethod === method.id && styles.methodRadioActive
+                    )}>
                       {selectedMethod === method.id && (
-                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <svg className={styles.methodRadioCheckmark} fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
                       )}
@@ -401,61 +402,63 @@ export function PayMongoDepositModalVX2({
                   </button>
                 ))}
               </div>
-              
+
+
               {/* Error */}
               {error && (
-                <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                  <p className="text-sm text-red-400">{error}</p>
+                <div className={styles.errorAlert}>
+                  <p className={styles.errorText}>{error}</p>
                 </div>
               )}
-              
+
               {/* Pay button */}
               <button
                 onClick={handleSubmit}
                 disabled={!selectedMethod || isLoading}
-                className={`w-full py-3 rounded-lg font-semibold transition-all ${
-                  selectedMethod && !isLoading
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                    : 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                }`}
+                className={cn(
+                  styles.payButton,
+                  selectedMethod && !isLoading ? styles.payButtonActive : styles.payButtonDisabled
+                )}
               >
                 {isLoading ? 'Processing...' : `Pay ${formatPhpAmount(toSmallestUnit(amount))}`}
               </button>
-              
+
               {/* Security note */}
-              <p className="text-xs text-gray-500 text-center">
+              <p className={styles.securityNote}>
                 You will be redirected to complete payment securely
               </p>
             </div>
           )}
-          
+
+
           {/* Processing Step */}
           {step === 'processing' && (
-            <div className="text-center py-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-blue-600/20">
-                <svg className="animate-spin w-8 h-8 text-blue-500" fill="none" viewBox="0 0 24 24">
+            <div className={styles.processingStep}>
+              <div className={styles.spinnerContainer}>
+                <svg className={styles.spinner} fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">Redirecting...</h3>
-              <p className="text-gray-400">Please wait while we redirect you to complete your payment.</p>
+              <h3 className={styles.processingTitle}>Redirecting...</h3>
+              <p className={styles.processingText}>Please wait while we redirect you to complete your payment.</p>
             </div>
           )}
-          
+
+
           {/* Error Step */}
           {step === 'error' && (
-            <div className="text-center py-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-red-600/20">
-                <svg className="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className={styles.errorStep}>
+              <div className={styles.errorIconContainer}>
+                <svg className={styles.errorIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">Payment Failed</h3>
-              <p className="text-gray-400 mb-6">{error || 'An error occurred. Please try again.'}</p>
+              <h3 className={styles.errorTitle}>Payment Failed</h3>
+              <p className={styles.errorMessage}>{error || 'An error occurred. Please try again.'}</p>
               <button
                 onClick={handleReset}
-                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+                className={styles.tryAgainButton}
               >
                 Try Again
               </button>

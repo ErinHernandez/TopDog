@@ -13,6 +13,8 @@ import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../core/con
 import { SPACING, RADIUS, TYPOGRAPHY, Z_INDEX } from '../core/constants/sizes';
 import { Close } from '../components/icons';
 import { createScopedLogger } from '../../../lib/clientLogger';
+import { cn } from '@/lib/styles';
+import styles from './ConnectOnboardingModalVX2.module.css';
 
 const logger = createScopedLogger('[ConnectOnboarding]');
 
@@ -93,88 +95,98 @@ function LockIcon(): React.ReactElement {
 
 function IntroStep({ onContinue }: { onContinue: () => void }): React.ReactElement {
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <div className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center"
-          style={{ backgroundColor: `${STATE_COLORS.active}20` }}
+    <div className={styles.introContainer}>
+      <div className={styles.centerSection}>
+        <div
+          className={styles.iconCircle}
+          style={{ '--icon-bg-color': `${STATE_COLORS.active}20` } as React.CSSProperties}
         >
           <BankIcon />
         </div>
-        <h3 
-          className="font-semibold mb-2"
-          style={{ fontSize: `${TYPOGRAPHY.fontSize.xl}px`, color: TEXT_COLORS.primary }}
+        <h3
+          className={cn(styles.introTitle)}
+          style={{ '--intro-title-font-size': `${TYPOGRAPHY.fontSize.xl}px`, '--text-primary-color': TEXT_COLORS.primary } as React.CSSProperties}
         >
           Set Up Withdrawals
         </h3>
-        <p style={{ color: TEXT_COLORS.secondary }}>
+        <p className={styles.textSecondary}>
           Connect your bank account to receive payouts securely
         </p>
       </div>
-      
-      <div className="space-y-3">
-        <div 
-          className="flex items-start gap-3 p-3 rounded-lg"
-          style={{ backgroundColor: BG_COLORS.tertiary }}
+
+      <div className={styles.featuresList}>
+        <div
+          className={styles.featureItem}
+          style={{ '--feature-item-bg': BG_COLORS.tertiary } as React.CSSProperties}
         >
-          <div style={{ color: STATE_COLORS.success }}>
+          <div className={styles.featureIcon} style={{ '--feature-icon-color': STATE_COLORS.success } as React.CSSProperties}>
             <ShieldIcon />
           </div>
-          <div>
-            <p className="font-medium" style={{ color: TEXT_COLORS.primary }}>
+          <div className={styles.featureContent}>
+            <p className={cn(styles.featureTitle)} style={{ '--text-primary-color': TEXT_COLORS.primary } as React.CSSProperties}>
               Secure & Private
             </p>
-            <p style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px`, color: TEXT_COLORS.muted }}>
+            <p
+              className={cn(styles.featureDescription)}
+              style={{ '--small-font-size': `${TYPOGRAPHY.fontSize.sm}px`, '--text-muted-color': TEXT_COLORS.muted } as React.CSSProperties}
+            >
               Bank details are encrypted and stored by Stripe
             </p>
           </div>
         </div>
-        
-        <div 
-          className="flex items-start gap-3 p-3 rounded-lg"
-          style={{ backgroundColor: BG_COLORS.tertiary }}
+
+        <div
+          className={styles.featureItem}
+          style={{ '--feature-item-bg': BG_COLORS.tertiary } as React.CSSProperties}
         >
-          <div style={{ color: STATE_COLORS.active }}>
+          <div className={styles.featureIcon} style={{ '--feature-icon-color': STATE_COLORS.active } as React.CSSProperties}>
             <ClockIcon />
           </div>
-          <div>
-            <p className="font-medium" style={{ color: TEXT_COLORS.primary }}>
+          <div className={styles.featureContent}>
+            <p className={cn(styles.featureTitle)} style={{ '--text-primary-color': TEXT_COLORS.primary } as React.CSSProperties}>
               Fast Payouts
             </p>
-            <p style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px`, color: TEXT_COLORS.muted }}>
+            <p
+              className={cn(styles.featureDescription)}
+              style={{ '--small-font-size': `${TYPOGRAPHY.fontSize.sm}px`, '--text-muted-color': TEXT_COLORS.muted } as React.CSSProperties}
+            >
               Receive funds within 1-2 business days
             </p>
           </div>
         </div>
-        
-        <div 
-          className="flex items-start gap-3 p-3 rounded-lg"
-          style={{ backgroundColor: BG_COLORS.tertiary }}
+
+        <div
+          className={styles.featureItem}
+          style={{ '--feature-item-bg': BG_COLORS.tertiary } as React.CSSProperties}
         >
-          <div style={{ color: STATE_COLORS.warning }}>
+          <div className={styles.featureIcon} style={{ '--feature-icon-color': STATE_COLORS.warning } as React.CSSProperties}>
             <LockIcon />
           </div>
-          <div>
-            <p className="font-medium" style={{ color: TEXT_COLORS.primary }}>
+          <div className={styles.featureContent}>
+            <p className={cn(styles.featureTitle)} style={{ '--text-primary-color': TEXT_COLORS.primary } as React.CSSProperties}>
               One-Time Setup
             </p>
-            <p style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px`, color: TEXT_COLORS.muted }}>
+            <p
+              className={cn(styles.featureDescription)}
+              style={{ '--small-font-size': `${TYPOGRAPHY.fontSize.sm}px`, '--text-muted-color': TEXT_COLORS.muted } as React.CSSProperties}
+            >
               Complete verification once, withdraw anytime
             </p>
           </div>
         </div>
       </div>
-      
+
       <button
         onClick={onContinue}
-        className="w-full py-3 rounded-lg font-semibold"
-        style={{ backgroundColor: STATE_COLORS.active, color: '#000' }}
+        className={styles.primaryButton}
+        style={{ '--button-bg-color': STATE_COLORS.active, '--button-text-color': '#000' } as React.CSSProperties}
       >
         Get Started
       </button>
-      
-      <p 
-        className="text-center"
-        style={{ fontSize: `${TYPOGRAPHY.fontSize.xs}px`, color: TEXT_COLORS.muted }}
+
+      <p
+        className={cn(styles.footer)}
+        style={{ '--footer-font-size': `${TYPOGRAPHY.fontSize.xs}px`, '--text-muted-color': TEXT_COLORS.muted } as React.CSSProperties}
       >
         Powered by Stripe Connect. Takes about 5 minutes.
       </p>
@@ -184,12 +196,11 @@ function IntroStep({ onContinue }: { onContinue: () => void }): React.ReactEleme
 
 function LoadingStep({ message }: { message: string }): React.ReactElement {
   return (
-    <div className="text-center py-12 space-y-4">
-      <div className="w-12 h-12 mx-auto">
-        <span className="animate-spin block w-12 h-12 border-3 border-white/30 border-t-white rounded-full" 
-          style={{ borderWidth: '3px' }} />
-      </div>
-      <p style={{ color: TEXT_COLORS.primary }}>{message}</p>
+    <div className={styles.loadingContainer}>
+      <span className={styles.spinner} />
+      <p className={styles.loadingMessage} style={{ '--text-primary-color': TEXT_COLORS.primary } as React.CSSProperties}>
+        {message}
+      </p>
     </div>
   );
 }
@@ -198,48 +209,55 @@ function OnboardingStep({ onboardingUrl }: { onboardingUrl: string }): React.Rea
   const handleOpenOnboarding = () => {
     window.open(onboardingUrl, '_blank', 'noopener,noreferrer');
   };
-  
+
   return (
-    <div className="text-center space-y-6 py-4">
-      <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center"
-        style={{ backgroundColor: `${STATE_COLORS.active}20` }}
+    <div className={styles.onboardingContainer}>
+      <div
+        className={styles.onboardingIconCircle}
+        style={{ '--onboarding-icon-bg': `${STATE_COLORS.active}20` } as React.CSSProperties}
       >
         <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke={STATE_COLORS.active}>
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+          />
         </svg>
       </div>
-      
+
       <div>
-        <h3 
-          className="font-semibold mb-2"
-          style={{ fontSize: `${TYPOGRAPHY.fontSize.lg}px`, color: TEXT_COLORS.primary }}
+        <h3
+          className={cn(styles.onboardingTitle)}
+          style={{ '--onboarding-title-font-size': `${TYPOGRAPHY.fontSize.lg}px`, '--text-primary-color': TEXT_COLORS.primary } as React.CSSProperties}
         >
           Complete Verification
         </h3>
-        <p style={{ color: TEXT_COLORS.secondary }}>
+        <p className={styles.textSecondary}>
           Click below to open Stripe's secure verification portal
         </p>
       </div>
-      
+
       <button
         onClick={handleOpenOnboarding}
-        className="w-full py-3 rounded-lg font-semibold flex items-center justify-center gap-2"
-        style={{ backgroundColor: STATE_COLORS.active, color: '#000' }}
+        className={styles.openPortalButton}
+        style={{ '--button-bg-color': STATE_COLORS.active, '--button-text-color': '#000' } as React.CSSProperties}
       >
         Open Verification Portal
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
         </svg>
       </button>
-      
-      <div 
-        className="p-4 rounded-lg"
-        style={{ backgroundColor: BG_COLORS.tertiary }}
+
+      <div
+        className={styles.infoBox}
+        style={{ '--info-box-bg': BG_COLORS.tertiary } as React.CSSProperties}
       >
-        <p style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px`, color: TEXT_COLORS.muted }}>
-          After completing verification in the new tab, return here. 
-          We'll automatically detect when you're done.
+        <p
+          className={cn(styles.infoBoxText)}
+          style={{ '--small-font-size': `${TYPOGRAPHY.fontSize.sm}px`, '--text-muted-color': TEXT_COLORS.muted } as React.CSSProperties}
+        >
+          After completing verification in the new tab, return here. We'll automatically detect when you're done.
         </p>
       </div>
     </div>
@@ -248,31 +266,32 @@ function OnboardingStep({ onboardingUrl }: { onboardingUrl: string }): React.Rea
 
 function CompleteStep({ onClose }: { onClose: () => void }): React.ReactElement {
   return (
-    <div className="text-center space-y-6 py-8">
-      <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center"
-        style={{ backgroundColor: `${STATE_COLORS.success}20` }}
+    <div className={styles.completeContainer}>
+      <div
+        className={styles.successIconCircle}
+        style={{ '--success-icon-bg': `${STATE_COLORS.success}20` } as React.CSSProperties}
       >
         <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke={STATE_COLORS.success}>
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
         </svg>
       </div>
-      
+
       <div>
-        <h3 
-          className="font-semibold mb-2"
-          style={{ fontSize: `${TYPOGRAPHY.fontSize.xl}px`, color: STATE_COLORS.success }}
+        <h3
+          className={cn(styles.successTitle)}
+          style={{ '--success-title-font-size': `${TYPOGRAPHY.fontSize.xl}px`, '--success-color': STATE_COLORS.success } as React.CSSProperties}
         >
           All Set!
         </h3>
-        <p style={{ color: TEXT_COLORS.secondary }}>
+        <p className={styles.textSecondary}>
           Your payout account is ready. You can now withdraw your winnings.
         </p>
       </div>
-      
+
       <button
         onClick={onClose}
-        className="w-full py-3 rounded-lg font-semibold"
-        style={{ backgroundColor: STATE_COLORS.active, color: '#000' }}
+        className={styles.continueButton}
+        style={{ '--button-bg-color': STATE_COLORS.active, '--button-text-color': '#000' } as React.CSSProperties}
       >
         Continue to Withdraw
       </button>
@@ -280,37 +299,38 @@ function CompleteStep({ onClose }: { onClose: () => void }): React.ReactElement 
   );
 }
 
-function ErrorStep({ 
-  message, 
-  onRetry 
-}: { 
-  message: string; 
+function ErrorStep({
+  message,
+  onRetry
+}: {
+  message: string;
   onRetry: () => void;
 }): React.ReactElement {
   return (
-    <div className="text-center space-y-6 py-8">
-      <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center"
-        style={{ backgroundColor: `${STATE_COLORS.error}20` }}
+    <div className={styles.errorContainer}>
+      <div
+        className={styles.errorIconCircle}
+        style={{ '--error-icon-bg': `${STATE_COLORS.error}20` } as React.CSSProperties}
       >
         <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke={STATE_COLORS.error}>
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
         </svg>
       </div>
-      
+
       <div>
-        <h3 
-          className="font-semibold mb-2"
-          style={{ fontSize: `${TYPOGRAPHY.fontSize.lg}px`, color: STATE_COLORS.error }}
+        <h3
+          className={cn(styles.errorTitle)}
+          style={{ '--error-title-font-size': `${TYPOGRAPHY.fontSize.lg}px`, '--error-color': STATE_COLORS.error } as React.CSSProperties}
         >
           Something went wrong
         </h3>
-        <p style={{ color: TEXT_COLORS.secondary }}>{message}</p>
+        <p className={styles.errorMessage}>{message}</p>
       </div>
-      
+
       <button
         onClick={onRetry}
-        className="w-full py-3 rounded-lg font-semibold"
-        style={{ backgroundColor: STATE_COLORS.active, color: '#000' }}
+        className={styles.retryButton}
+        style={{ '--button-bg-color': STATE_COLORS.active, '--button-text-color': '#000' } as React.CSSProperties}
       >
         Try Again
       </button>
@@ -444,71 +464,60 @@ export function ConnectOnboardingModalVX2({
   };
   
   if (!isOpen) return null;
-  
+
   return (
-    <div 
-      className="fixed inset-0 flex items-center justify-center p-4"
-      style={{ zIndex: Z_INDEX.modal }}
+    <div
+      className={styles.modalOverlay}
+      style={{ '--z-index': Z_INDEX.modal } as React.CSSProperties}
     >
       {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/60"
+      <div
+        className={styles.backdrop}
         onClick={handleClose}
       />
-      
+
       {/* Modal */}
-      <div 
-        className="relative w-full max-w-md rounded-xl overflow-hidden"
-        style={{ backgroundColor: BG_COLORS.secondary }}
+      <div
+        className={styles.modal}
+        style={{ '--bg-color': BG_COLORS.secondary } as React.CSSProperties}
       >
         {/* Header */}
-        <div 
-          className="flex items-center justify-between p-4 border-b"
-          style={{ borderColor: BORDER_COLORS.default }}
+        <div
+          className={styles.header}
+          style={{ '--border-color': BORDER_COLORS.default } as React.CSSProperties}
         >
-          <h2 
-            className="font-semibold"
-            style={{ fontSize: `${TYPOGRAPHY.fontSize.lg}px`, color: TEXT_COLORS.primary }}
+          <h2
+            className={cn(styles.headerTitle)}
+            style={{ '--title-font-size': `${TYPOGRAPHY.fontSize.lg}px`, '--text-primary-color': TEXT_COLORS.primary } as React.CSSProperties}
           >
             Payout Setup
           </h2>
           <button
             onClick={handleClose}
-            className="p-2 rounded-full hover:bg-white/10"
+            className={styles.closeButton}
           >
-            <span style={{ color: TEXT_COLORS.muted, display: 'inline-block' }}>
+            <span className={styles.closeIcon} style={{ color: TEXT_COLORS.muted }}>
               <Close className="w-5 h-5" />
             </span>
           </button>
         </div>
-        
+
         {/* Content */}
-        <div className="p-6">
-          {step === 'intro' && (
-            <IntroStep onContinue={createAccount} />
-          )}
-          
-          {step === 'creating' && (
-            <LoadingStep message="Setting up your payout account..." />
-          )}
-          
+        <div className={styles.content}>
+          {step === 'intro' && <IntroStep onContinue={createAccount} />}
+
+          {step === 'creating' && <LoadingStep message="Setting up your payout account..." />}
+
           {step === 'onboarding' && accountStatus?.onboardingUrl && (
             <OnboardingStep onboardingUrl={accountStatus.onboardingUrl} />
           )}
-          
-          {step === 'polling' && (
-            <LoadingStep message="Checking verification status..." />
-          )}
-          
-          {step === 'complete' && (
-            <CompleteStep onClose={handleClose} />
-          )}
-          
+
+          {step === 'polling' && <LoadingStep message="Checking verification status..." />}
+
+          {step === 'complete' && <CompleteStep onClose={handleClose} />}
+
           {step === 'error' && (
-            <ErrorStep 
-              message={error || 'An unexpected error occurred'} 
-              onRetry={handleRetry} 
-            />
+            <ErrorStep message={error || 'An unexpected error occurred'} onRetry={handleRetry} />
           )}
         </div>
       </div>

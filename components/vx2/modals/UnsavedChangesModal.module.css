@@ -1,0 +1,101 @@
+/**
+ * UnsavedChangesModal.module.css
+ *
+ * CSS Module for enterprise-grade confirmation modal for unsaved changes.
+ * Uses CSS custom properties for dynamic values from constants.
+ */
+
+/* Overlay backdrop */
+.overlay {
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: var(--z-index-modal, 1000);
+}
+
+/* Modal card container */
+.modalCard {
+  background-color: var(--bg-color-card, #1a1f2e);
+  border-radius: var(--radius-lg, 12px);
+  padding: var(--spacing-lg, 16px);
+  margin: var(--spacing-md, 12px);
+  max-width: 320px;
+  width: 100%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Modal title */
+.title {
+  color: var(--text-color-primary, #fff);
+  font-size: var(--font-size-lg, 18px);
+  font-weight: var(--font-weight-semibold, 600);
+  margin-bottom: var(--spacing-sm, 8px);
+}
+
+/* Modal message */
+.message {
+  color: var(--text-color-secondary, #a0a0a0);
+  font-size: var(--font-size-sm, 14px);
+  line-height: 1.5;
+  margin-bottom: var(--spacing-lg, 16px);
+}
+
+/* Actions container */
+.actions {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Base button styles */
+.buttonBase {
+  width: 100%;
+  height: 48px;
+  border-radius: var(--radius-md, 8px);
+  font-size: var(--font-size-base, 16px);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Save button (blue gradient background) */
+.saveButton {
+  composes: buttonBase;
+  background: url(/wr_blue.png) no-repeat center center;
+  background-size: cover;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+}
+
+.saveButton:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* Discard button (red) */
+.discardButton {
+  composes: buttonBase;
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #EF4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  font-weight: 600;
+}
+
+.discardButton:hover {
+  background-color: rgba(239, 68, 68, 0.25);
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+/* Cancel button (transparent) */
+.cancelButton {
+  composes: buttonBase;
+  background-color: transparent;
+  color: var(--text-color-secondary, #a0a0a0);
+  border: none;
+  font-weight: 500;
+}
+
+.cancelButton:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}

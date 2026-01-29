@@ -7,7 +7,9 @@
  */
 
 import React from 'react';
+import { cn } from '@/lib/styles';
 import { CARD_SPACING_V3 } from '../constants/cardSpacingV3';
+import styles from './TournamentProgressBar.module.css';
 
 export interface TournamentProgressBarProps {
   /** Current number of entries */
@@ -29,17 +31,16 @@ export function TournamentProgressBar({
   }
 
   const percentage = Math.min(Math.round((currentEntries / maxEntries) * 100), 100);
+  const hasFillStyle = fillStyle && fillStyle.trim().length > 0;
 
   return (
     <div
-      className="tournament-progress-bar"
+      className={cn(styles.container)}
       style={{
-        height: `${CARD_SPACING_V3.progressHeight}px`,
-        width: '100%',
-        backgroundColor: CARD_SPACING_V3.progressBackgroundColor,
-        borderRadius: `${CARD_SPACING_V3.progressBorderRadius}px`,
-        overflow: 'hidden',
-      }}
+        '--height': `${CARD_SPACING_V3.progressHeight}px`,
+        '--background-color': CARD_SPACING_V3.progressBackgroundColor,
+        '--border-radius': `${CARD_SPACING_V3.progressBorderRadius}px`,
+      } as React.CSSProperties}
       role="progressbar"
       aria-valuenow={percentage}
       aria-valuemin={0}
@@ -47,21 +48,15 @@ export function TournamentProgressBar({
       aria-label={`${currentEntries} of ${maxEntries} entries`}
     >
       <div
-        className="tournament-progress-bar__fill"
+        className={cn(styles.fill)}
         style={{
-          height: '100%',
-          width: `${percentage}%`,
-          ...(fillStyle
-            ? { background: fillStyle }
-            : {
-                backgroundImage: 'url(/wr_blue.png)',
-                backgroundSize: '200px',
-                backgroundRepeat: 'repeat',
-                backgroundColor: '#1E40AF',
-              }),
-          borderRadius: `${CARD_SPACING_V3.progressBorderRadius}px`,
-          transition: 'width 0.3s ease-out',
-        }}
+          '--percentage': `${percentage}%`,
+          '--background-image': hasFillStyle ? fillStyle : 'url(/wr_blue.png)',
+          '--background-color': hasFillStyle ? 'transparent' : '#1e40af',
+          '--background-size': '200px',
+          '--background-repeat': 'repeat',
+          '--border-radius': `${CARD_SPACING_V3.progressBorderRadius}px`,
+        } as React.CSSProperties}
       />
     </div>
   );

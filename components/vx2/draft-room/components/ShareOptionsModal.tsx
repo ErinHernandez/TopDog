@@ -14,6 +14,8 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { createScopedLogger } from '../../../../lib/clientLogger';
+import { cn } from '@/lib/styles';
+import styles from './ShareOptionsModal.module.css';
 
 const logger = createScopedLogger('[ShareOptionsModal]');
 
@@ -163,49 +165,41 @@ interface AppIconButtonProps {
 }
 
 function AppIconButton({ label, bgColor, icon, onClick, showCheck, disabled }: AppIconButtonProps): React.ReactElement {
+  const getIconColorClass = (color: string): string => {
+    switch (color) {
+      case IOS_COLORS.appIconBg.messages:
+        return styles.messagesIcon;
+      case IOS_COLORS.appIconBg.mail:
+        return styles.mailIcon;
+      case IOS_COLORS.appIconBg.copy:
+        return styles.copyIcon;
+      case IOS_COLORS.appIconBg.image:
+        return styles.imageIcon;
+      case IOS_COLORS.appIconBg.more:
+        return styles.moreIcon;
+      default:
+        return '';
+    }
+  };
+
   return (
     <button
       type="button"
       onClick={onClick}
       disabled={disabled}
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: 6,
-        background: 'none',
-        border: 'none',
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        opacity: disabled ? 0.5 : 1,
-        padding: 0,
-        minWidth: 60,
-      }}
+      className={styles.appIconButton}
     >
       {/* Circular icon */}
       <div
-        style={{
-          width: 50,
-          height: 50,
-          borderRadius: 12,
-          backgroundColor: showCheck ? IOS_COLORS.successCheck : bgColor,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          transition: 'background-color 0.2s, transform 0.1s',
-        }}
+        className={cn(
+          styles.iconCircle,
+          showCheck ? styles.successIcon : getIconColorClass(bgColor)
+        )}
       >
         {showCheck ? <CheckmarkIcon /> : icon}
       </div>
       {/* Label */}
-      <span
-        style={{
-          fontSize: 11,
-          color: IOS_COLORS.title,
-          textAlign: 'center',
-          lineHeight: 1.2,
-          maxWidth: 60,
-        }}
-      >
+      <span className={styles.iconLabel}>
         {label}
       </span>
     </button>
@@ -226,7 +220,7 @@ interface ActionRowProps {
 
 function ActionRow({ label, onClick, isFirst, isLast, showCheck }: ActionRowProps): React.ReactElement {
   const [isPressed, setIsPressed] = useState(false);
-  
+
   return (
     <button
       type="button"
@@ -234,24 +228,14 @@ function ActionRow({ label, onClick, isFirst, isLast, showCheck }: ActionRowProp
       onMouseDown={() => setIsPressed(true)}
       onMouseUp={() => setIsPressed(false)}
       onMouseLeave={() => setIsPressed(false)}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        width: '100%',
-        padding: '14px 16px',
-        backgroundColor: isPressed ? IOS_COLORS.actionBackgroundActive : IOS_COLORS.actionBackground,
-        border: 'none',
-        borderTopLeftRadius: isFirst ? 12 : 0,
-        borderTopRightRadius: isFirst ? 12 : 0,
-        borderBottomLeftRadius: isLast ? 12 : 0,
-        borderBottomRightRadius: isLast ? 12 : 0,
-        borderBottom: isLast ? 'none' : `0.5px solid ${IOS_COLORS.actionBorder}`,
-        cursor: 'pointer',
-        transition: 'background-color 0.1s',
-      }}
+      className={cn(
+        styles.actionRow,
+        isFirst && styles.firstRow,
+        isLast && styles.lastRow,
+        isPressed && styles.actionRowActive
+      )}
     >
-      <span style={{ fontSize: 17, color: IOS_COLORS.actionText }}>
+      <span className={styles.actionRowText}>
         {label}
       </span>
       {showCheck && (
@@ -384,25 +368,13 @@ export default function ShareOptionsModal({
   }, [onShareImage, onClose]);
   
   if (!isOpen) return null;
-  
+
   return (
     <div
       role="dialog"
       aria-modal="true"
       aria-labelledby="share-modal-title"
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        display: 'flex',
-        alignItems: 'flex-end',
-        justifyContent: 'center',
-        backgroundColor: IOS_COLORS.backdrop,
-        zIndex: 9999,
-        pointerEvents: 'auto',
-      }}
+      className={styles.backdrop}
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           onClose();
@@ -413,59 +385,29 @@ export default function ShareOptionsModal({
       <div
         ref={sheetRef}
         onClick={(e) => e.stopPropagation()}
-        style={{
-          width: '100%',
-          maxWidth: 428, // iPhone Pro Max width
-          backgroundColor: IOS_COLORS.sheetBackground,
-          borderTopLeftRadius: 14,
-          borderTopRightRadius: 14,
-          paddingBottom: 'max(env(safe-area-inset-bottom), 20px)',
-          transform: isAnimating ? 'translateY(0)' : 'translateY(100%)',
-          transition: 'transform 0.3s cubic-bezier(0.32, 0.72, 0, 1)',
-          pointerEvents: 'auto',
-        }}
+        className={cn(
+          styles.sheet,
+          isAnimating && styles.animating,
+          !isAnimating && styles.hidden
+        )}
       >
         {/* Drag Handle */}
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center', 
-          paddingTop: 8,
-          paddingBottom: 8,
-        }}>
-          <div style={{
-            width: 36,
-            height: 5,
-            backgroundColor: IOS_COLORS.handleBar,
-            borderRadius: 2.5,
-          }} />
+        <div className={styles.handleContainer}>
+          <div className={styles.handle} />
         </div>
-        
+
         {/* Content Name Header */}
-        <div style={{
-          padding: '8px 16px 16px',
-          borderBottom: `0.5px solid ${IOS_COLORS.headerBorder}`,
-        }}>
+        <div className={styles.header}>
           <p
             id="share-modal-title"
-            style={{
-              fontSize: 13,
-              color: IOS_COLORS.subtitle,
-              textAlign: 'center',
-              margin: 0,
-            }}
+            className={styles.headerTitle}
           >
             {contentName || 'Share'}
           </p>
         </div>
-        
+
         {/* App Icons Row */}
-        <div style={{
-          display: 'flex',
-          gap: 16,
-          padding: '20px 20px 24px',
-          justifyContent: 'center',
-          borderBottom: `0.5px solid ${IOS_COLORS.headerBorder}`,
-        }}>
+        <div className={styles.appIconsRow}>
           <AppIconButton
             label="Messages"
             bgColor={IOS_COLORS.appIconBg.messages}
@@ -497,7 +439,7 @@ export default function ShareOptionsModal({
         </div>
         
         {/* Actions List */}
-        <div style={{ padding: '12px 12px 8px' }}>
+        <div className={styles.actionsList}>
           <ActionRow
             label="Copy Link"
             onClick={handleCopyLink}
@@ -519,26 +461,15 @@ export default function ShareOptionsModal({
             />
           )}
         </div>
-        
+
         {/* Cancel Button */}
-        <div style={{ padding: '4px 12px 0' }}>
+        <div className={styles.cancelContainer}>
           <button
             type="button"
             onClick={onClose}
-            style={{
-              width: '100%',
-              padding: '14px 16px',
-              backgroundColor: IOS_COLORS.actionBackground,
-              border: 'none',
-              borderRadius: 12,
-              cursor: 'pointer',
-            }}
+            className={styles.cancelButton}
           >
-            <span style={{ 
-              fontSize: 17, 
-              fontWeight: 600,
-              color: IOS_COLORS.cancelText,
-            }}>
+            <span className={styles.cancelButtonText}>
               Cancel
             </span>
           </button>

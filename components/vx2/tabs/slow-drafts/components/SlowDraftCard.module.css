@@ -1,0 +1,278 @@
+/**
+ * SlowDraftCard Styles - CSS Module for CSP compliance
+ *
+ * All styles extracted from inline style={{}} attributes
+ * Dynamic values use CSS custom properties
+ */
+
+/* ===================================================================== */
+/* CARD CONTAINER */
+/* ===================================================================== */
+
+.card {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  border-radius: var(--border-radius, 12px);
+  padding: var(--padding-x, 16px);
+  background-color: var(--bg-color);
+  border: var(--border);
+  box-shadow: var(--shadow);
+}
+
+.contentWrapper {
+  position: relative;
+  z-index: 10;
+}
+
+/* ===================================================================== */
+/* HEADER SECTION */
+/* ===================================================================== */
+
+.headerButton {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.headerContent {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.nameSection {
+  flex: 1;
+  min-width: 0;
+}
+
+.tournamentName {
+  color: #ffffff;
+  margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--tournament-name-size, 16px);
+  font-weight: var(--tournament-name-weight, 600);
+  line-height: var(--tournament-name-line-height, 1.2);
+  letter-spacing: var(--tournament-name-letter-spacing, 0px);
+}
+
+.pickInfo {
+  font-size: var(--pick-info-size, 12px);
+  font-weight: var(--pick-info-weight, 500);
+  line-height: var(--pick-info-line-height, 1.4);
+  letter-spacing: var(--pick-info-letter-spacing, 0px);
+  color: var(--pick-info-color);
+}
+
+.rightSection {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.yourTurnSection {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.timerDisplay {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--timer-color);
+  font-family: var(--timer-font-family);
+  letter-spacing: var(--timer-letter-spacing, 0px);
+}
+
+.statusSection {
+  text-align: right;
+}
+
+.picksAwayText {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  display: block;
+}
+
+.statusTimer {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--timer-color);
+  margin-top: 2px;
+  line-height: 1;
+}
+
+/* ===================================================================== */
+/* COLLAPSED VIEW */
+/* ===================================================================== */
+
+.collapsedButton {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  margin-top: var(--section-gap, 12px);
+}
+
+.rosterSection {
+  margin-bottom: 10px;
+}
+
+.sectionLabel {
+  font-size: var(--section-label-size, 11px);
+  font-weight: var(--section-label-weight, 700);
+  letter-spacing: var(--section-label-letter-spacing, 0.5px);
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 6px;
+}
+
+/* ===================================================================== */
+/* EXPANDED VIEW */
+/* ===================================================================== */
+
+.expandedView {
+  margin-top: var(--section-gap, 12px);
+  animation: slideDown var(--expand-duration, 300ms) var(--expand-easing, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.expandedRosterSection {
+  margin-bottom: var(--section-gap, 12px);
+}
+
+.expandedNeedsSection {
+  margin-bottom: var(--section-gap, 12px);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===================================================================== */
+/* EXPAND/COLLAPSE INDICATOR */
+/* ===================================================================== */
+
+.expandIndicator {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.expandIcon {
+  color: rgba(255, 255, 255, 0.3);
+  transition: transform 0.2s ease;
+  width: 20px;
+  height: 20px;
+}
+
+.expandIcon.expanded {
+  transform: rotate(180deg);
+}
+
+/* ===================================================================== */
+/* PROGRESS BAR */
+/* ===================================================================== */
+
+.progressBar {
+  margin-top: 12px;
+  position: relative;
+}
+
+.progressTrack {
+  height: 4px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background-color: var(--progress-color);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+  width: var(--progress-width, 0%);
+}
+
+.progressLabel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 6px;
+}
+
+.progressText {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+}
+
+/* ===================================================================== */
+/* ON THE CLOCK BADGE */
+/* ===================================================================== */
+
+.badge {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 10px;
+  line-height: 1.2;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  background-image: var(--badge-bg-image);
+  background-size: var(--badge-bg-size);
+  background-position: var(--badge-bg-position);
+}
+
+/* ===================================================================== */
+/* QUICK ACTIONS BUTTONS */
+/* ===================================================================== */
+
+.quickActionsContainer {
+  display: flex;
+  gap: 12px;
+  margin-top: var(--section-gap, 12px);
+}
+
+.actionButton {
+  flex: 1;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  border-radius: var(--button-radius, 12px);
+  height: 44px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.actionButton:active {
+  transform: scale(0.98);
+}
+
+.enterDraftButton {
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text-color);
+}
+
+.quickPickButton {
+  background-color: var(--quick-pick-bg);
+  color: #ffffff;
+}

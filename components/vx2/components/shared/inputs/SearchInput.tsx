@@ -1,6 +1,8 @@
 /**
  * SearchInput - Search input field with icon
- * 
+ *
+ * Migrated to CSS Modules for CSP compliance.
+ *
  * @example
  * ```tsx
  * <SearchInput
@@ -12,9 +14,11 @@
  */
 
 import React, { useRef, useCallback } from 'react';
-import { BG_COLORS, TEXT_COLORS, BORDER_COLORS } from '../../../core/constants/colors';
+import { BG_COLORS, TEXT_COLORS, BORDER_COLORS, STATE_COLORS } from '../../../core/constants/colors';
 import { SPACING, RADIUS, TYPOGRAPHY } from '../../../core/constants/sizes';
 import { Search, Close } from '../../icons';
+import { cn } from '@/lib/styles';
+import styles from './SearchInput.module.css';
 
 // ============================================================================
 // TYPES
@@ -89,12 +93,12 @@ export function SearchInput({
 }: SearchInputProps): React.ReactElement {
   const inputRef = useRef<HTMLInputElement>(null);
   const config = SIZE_CONFIG[size];
-  
+
   const handleClear = useCallback(() => {
     onChange('');
     inputRef.current?.focus();
   }, [onChange]);
-  
+
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && onSubmit) {
       onSubmit();
@@ -106,28 +110,30 @@ export function SearchInput({
       }
     }
   }, [value, onSubmit, onCancel, handleClear]);
-  
+
+  // CSS custom properties for dynamic values
+  const containerStyle: React.CSSProperties = {
+    '--input-height': `${config.height}px`,
+    '--input-bg': BG_COLORS.secondary,
+    '--text-primary': TEXT_COLORS.primary,
+    '--text-muted': TEXT_COLORS.muted,
+    '--border-default': BORDER_COLORS.default,
+    '--border-radius': `${RADIUS.md}px`,
+    '--font-size': `${config.fontSize}px`,
+    '--input-padding-right': showClear && value ? `${config.height}px` : `${config.paddingX}px`,
+    '--focus-border': `${STATE_COLORS.active}80`,
+  } as React.CSSProperties;
+
   return (
-    <div
-      className={`relative flex items-center ${className}`}
-      style={{
-        height: `${config.height}px`,
-      }}
-    >
+    <div className={cn(styles.container, className)} style={containerStyle}>
       {/* Search icon */}
-      <div
-        className="absolute left-0 flex items-center justify-center pointer-events-none"
-        style={{
-          width: `${config.height}px`,
-          height: `${config.height}px`,
-        }}
-      >
+      <div className={styles.searchIcon}>
         <Search
           size={config.iconSize}
           color={TEXT_COLORS.muted}
         />
       </div>
-      
+
       {/* Input */}
       <input
         ref={inputRef}
@@ -138,32 +144,16 @@ export function SearchInput({
         placeholder={placeholder}
         disabled={disabled}
         autoFocus={autoFocus}
-        className="w-full h-full outline-none transition-colors"
-        style={{
-          backgroundColor: BG_COLORS.secondary,
-          color: TEXT_COLORS.primary,
-          border: `1px solid ${BORDER_COLORS.default}`,
-          borderRadius: `${RADIUS.md}px`,
-          paddingLeft: `${config.height}px`,
-          paddingRight: showClear && value ? `${config.height}px` : `${config.paddingX}px`,
-          fontSize: `${config.fontSize}px`,
-        }}
+        className={styles.input}
         aria-label={ariaLabel}
       />
-      
+
       {/* Clear button */}
       {showClear && value && (
         <button
           type="button"
           onClick={handleClear}
-          className="absolute right-0 flex items-center justify-center transition-colors hover:opacity-80"
-          style={{
-            width: `${config.height}px`,
-            height: `${config.height}px`,
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-          }}
+          className={styles.clearButton}
           aria-label="Clear search"
         >
           <Close
@@ -177,4 +167,3 @@ export function SearchInput({
 }
 
 export default SearchInput;
-

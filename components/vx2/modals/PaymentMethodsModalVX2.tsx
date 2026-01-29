@@ -15,6 +15,8 @@ import { SPACING, RADIUS, TYPOGRAPHY, Z_INDEX } from '../core/constants/sizes';
 import { Close, Plus } from '../components/icons';
 import { StripeProvider } from '../providers/StripeProvider';
 import { createScopedLogger } from '../../../lib/clientLogger';
+import { cn } from '@/lib/styles';
+import styles from './PaymentMethodsModalVX2.module.css';
 
 const logger = createScopedLogger('[PaymentMethodsModal]');
 
@@ -76,13 +78,13 @@ function CardBrandIcon({ brand }: { brand: string }): React.ReactElement {
     amex: '#006FCF',
     discover: '#FF6000',
   };
-  
+
   const color = brandColors[brand.toLowerCase()] || TEXT_COLORS.muted;
-  
+
   return (
-    <div 
-      className="w-10 h-6 rounded flex items-center justify-center text-xs font-bold"
-      style={{ backgroundColor: color, color: '#fff' }}
+    <div
+      className={styles.cardBrandIcon}
+      style={{ '--brand-color': color } as React.CSSProperties}
     >
       {brand.slice(0, 4).toUpperCase()}
     </div>
@@ -237,109 +239,120 @@ function ModalContent({
   };
   
   if (!isOpen) return null;
-  
+
   return (
-    <div 
-      className="fixed inset-0 flex items-center justify-center p-4"
-      style={{ zIndex: Z_INDEX.modal }}
+    <div
+      className={styles.modalContainer}
+      style={{ '--z-index': Z_INDEX.modal } as React.CSSProperties}
     >
       {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/60"
+      <div
+        className={styles.backdrop}
         onClick={onClose}
       />
-      
+
       {/* Modal */}
-      <div 
-        className="relative w-full max-w-md rounded-xl overflow-hidden"
-        style={{ backgroundColor: BG_COLORS.secondary }}
+      <div
+        className={styles.modal}
+        style={{ '--bg-color': BG_COLORS.secondary } as React.CSSProperties}
       >
         {/* Header */}
-        <div 
-          className="flex items-center justify-between p-4 border-b"
-          style={{ borderColor: BORDER_COLORS.default }}
+        <div
+          className={styles.header}
+          style={{ '--border-color': BORDER_COLORS.default } as React.CSSProperties}
         >
-          <h2 
-            className="font-semibold"
-            style={{ fontSize: `${TYPOGRAPHY.fontSize.lg}px`, color: TEXT_COLORS.primary }}
+          <h2
+            className={styles.headerTitle}
+            style={{
+              '--font-size': `${TYPOGRAPHY.fontSize.lg}px`,
+              '--text-color': TEXT_COLORS.primary,
+            } as React.CSSProperties}
           >
             Payment Methods
           </h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-full hover:bg-white/10"
+            className={styles.closeButton}
           >
-            <span style={{ color: TEXT_COLORS.muted, display: 'inline-block' }}>
+            <span className={styles.closeIcon} style={{ '--text-muted-color': TEXT_COLORS.muted } as React.CSSProperties}>
               <Close className="w-5 h-5" />
             </span>
           </button>
         </div>
         
         {/* Content */}
-        <div className="p-6 max-h-[60vh] overflow-y-auto">
+        <div className={styles.content}>
           {isLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <span className="animate-spin w-6 h-6 border-2 border-white/30 border-t-white rounded-full" />
+            <div className={styles.loadingContainer}>
+              <span className={styles.spinner} />
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className={styles.methodsList}>
               {/* Payment methods list */}
               {paymentMethods.length === 0 && !showAddForm && (
-                <div className="text-center py-8">
-                  <p style={{ color: TEXT_COLORS.muted }}>No saved payment methods</p>
+                <div className={styles.emptyState}>
+                  <p style={{ '--text-muted-color': TEXT_COLORS.muted } as React.CSSProperties}>No saved payment methods</p>
                 </div>
               )}
               
               {paymentMethods.map(method => (
-                <div 
+                <div
                   key={method.id}
-                  className="flex items-center gap-3 p-3 rounded-lg"
-                  style={{ 
-                    backgroundColor: BG_COLORS.tertiary,
-                    border: `1px solid ${method.isDefault ? STATE_COLORS.active : BORDER_COLORS.default}`,
-                  }}
+                  className={styles.methodCard}
+                  style={{
+                    '--bg-tertiary-color': BG_COLORS.tertiary,
+                    '--border-method-color': method.isDefault ? STATE_COLORS.active : BORDER_COLORS.default,
+                  } as React.CSSProperties}
                 >
                   <CardBrandIcon brand={method.card.brand} />
-                  
-                  <div className="flex-1">
-                    <p style={{ color: TEXT_COLORS.primary }}>
+
+                  <div className={styles.methodCardInfo}>
+                    <p
+                      className={styles.methodCardBrand}
+                      style={{ '--text-color': TEXT_COLORS.primary } as React.CSSProperties}
+                    >
                       {method.card.brand.charAt(0).toUpperCase() + method.card.brand.slice(1)} ****{method.card.last4}
                     </p>
-                    <p style={{ fontSize: `${TYPOGRAPHY.fontSize.xs}px`, color: TEXT_COLORS.muted }}>
+                    <p
+                      className={styles.methodCardExpiry}
+                      style={{
+                        '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
+                        '--text-muted-color': TEXT_COLORS.muted,
+                      } as React.CSSProperties}
+                    >
                       Expires {method.card.expMonth}/{method.card.expYear}
                     </p>
                   </div>
-                  
-                  <div className="flex items-center gap-2">
+
+                  <div className={styles.methodCardActions}>
                     {method.isDefault ? (
-                      <span 
-                        className="px-2 py-1 rounded text-xs font-medium"
-                        style={{ backgroundColor: STATE_COLORS.active, color: '#000' }}
+                      <span
+                        className={styles.defaultBadge}
+                        style={{ '--state-active-color': STATE_COLORS.active } as React.CSSProperties}
                       >
                         Default
                       </span>
                     ) : (
                       <button
                         onClick={() => handleSetDefault(method.id)}
-                        className="px-2 py-1 rounded text-xs"
-                        style={{ 
-                          backgroundColor: 'transparent',
-                          border: `1px solid ${BORDER_COLORS.default}`,
-                          color: TEXT_COLORS.secondary,
-                        }}
+                        className={styles.setDefaultButton}
+                        style={{
+                          '--border-color': BORDER_COLORS.default,
+                          '--text-secondary-color': TEXT_COLORS.secondary,
+                        } as React.CSSProperties}
                       >
                         Set Default
                       </button>
                     )}
-                    
+
                     <button
                       onClick={() => handleDelete(method.id)}
                       disabled={deletingId === method.id}
-                      className="p-2 rounded hover:bg-white/10"
-                      style={{ color: STATE_COLORS.error }}
+                      className={styles.deleteButton}
+                      style={{ '--state-error-color': STATE_COLORS.error } as React.CSSProperties}
                     >
                       {deletingId === method.id ? (
-                        <span className="animate-spin w-4 h-4 border-2 border-red-500/30 border-t-red-500 rounded-full block" />
+                        <span className={styles.deleteSpinner} />
                       ) : (
                         <TrashIcon />
                       )}
@@ -350,53 +363,55 @@ function ModalContent({
               
               {/* Add new card form */}
               {showAddForm ? (
-                <div 
-                  className="p-4 rounded-lg space-y-4"
-                  style={{ backgroundColor: BG_COLORS.tertiary }}
+                <div
+                  className={styles.addCardForm}
+                  style={{ '--bg-tertiary-color': BG_COLORS.tertiary } as React.CSSProperties}
                 >
-                  <div 
-                    className="p-3 rounded-lg"
-                    style={{ 
-                      backgroundColor: BG_COLORS.primary,
-                      border: `1px solid ${BORDER_COLORS.default}`,
-                    }}
+                  <div
+                    className={styles.cardInputContainer}
+                    style={{
+                      '--bg-primary-color': BG_COLORS.primary,
+                      '--border-color': BORDER_COLORS.default,
+                    } as React.CSSProperties}
                   >
                     <CardElement options={CARD_ELEMENT_OPTIONS} />
                   </div>
-                  
+
                   {error && (
-                    <p style={{ color: STATE_COLORS.error, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+                    <p
+                      className={styles.errorMessage}
+                      style={{
+                        '--state-error-color': STATE_COLORS.error,
+                        '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
+                      } as React.CSSProperties}
+                    >
                       {error}
                     </p>
                   )}
-                  
-                  <div className="flex gap-3">
+
+                  <div className={styles.formActions}>
                     <button
                       onClick={() => {
                         setShowAddForm(false);
                         setError(null);
                       }}
-                      className="flex-1 py-2 rounded-lg"
-                      style={{
-                        backgroundColor: 'transparent',
-                        border: `1px solid ${BORDER_COLORS.default}`,
-                        color: TEXT_COLORS.primary,
-                      }}
+                      className={styles.cancelButton}
+                      style={{ '--border-color': BORDER_COLORS.default, '--text-color': TEXT_COLORS.primary } as React.CSSProperties}
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleAddCard}
                       disabled={isAdding}
-                      className="flex-1 py-2 rounded-lg font-medium flex items-center justify-center gap-2"
+                      className={styles.addButton}
                       style={{
-                        backgroundColor: isAdding ? BG_COLORS.tertiary : STATE_COLORS.active,
-                        color: isAdding ? TEXT_COLORS.muted : '#000',
-                      }}
+                        '--add-button-bg': isAdding ? BG_COLORS.tertiary : STATE_COLORS.active,
+                        '--add-button-text': isAdding ? TEXT_COLORS.muted : '#000',
+                      } as React.CSSProperties}
                     >
                       {isAdding ? (
                         <>
-                          <span className="animate-spin w-4 h-4 border-2 border-black/30 border-t-black rounded-full" />
+                          <span className={styles.addButtonSpinner} />
                           Adding...
                         </>
                       ) : (
@@ -408,14 +423,14 @@ function ModalContent({
               ) : (
                 <button
                   onClick={() => setShowAddForm(true)}
-                  className="w-full flex items-center justify-center gap-2 p-3 rounded-lg"
+                  className={styles.addNewCardButton}
                   style={{
-                    backgroundColor: BG_COLORS.tertiary,
-                    border: `1px dashed ${BORDER_COLORS.default}`,
-                    color: TEXT_COLORS.secondary,
-                  }}
+                    '--bg-tertiary-color': BG_COLORS.tertiary,
+                    '--border-color': BORDER_COLORS.default,
+                    '--text-secondary-color': TEXT_COLORS.secondary,
+                  } as React.CSSProperties}
                 >
-                  <Plus className="w-4 h-4" />
+                  <Plus className={styles.addIcon} />
                   Add New Card
                 </button>
               )}

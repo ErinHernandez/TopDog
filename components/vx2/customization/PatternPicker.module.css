@@ -1,0 +1,36 @@
+.button {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border: 2px solid;
+  text-align: left;
+  transition: all 0.3s ease;
+  min-height: 64px;
+  background-color: var(--bg-color);
+  border-color: var(--border-color);
+  cursor: pointer;
+  font-size: inherit;
+  color: inherit;
+}
+
+.button:hover {
+  border-color: var(--border-color-hover, var(--border-color));
+}
+
+.label {
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: inherit;
+}
+
+.description {
+  font-size: 0.75rem;
+  margin-top: 0.125rem;
+  color: var(--description-color);
+}
+
+@media (min-width: 640px) {
+  .button {
+    padding: 0.75rem;
+    min-height: auto;
+  }
+}

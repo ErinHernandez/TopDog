@@ -10,6 +10,7 @@ import React, { useState, useCallback } from 'react';
 import { SPACING, TYPOGRAPHY, RADIUS } from '../../core/constants/sizes';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { createScopedLogger } from '../../../../lib/clientLogger';
+import styles from './NavigateAwayAlertsPromptModal.module.css';
 
 const logger = createScopedLogger('[NavigateAwayAlertsPromptModal]');
 
@@ -94,136 +95,59 @@ export function NavigateAwayAlertsPromptModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="alerts-prompt-title"
-      style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: MODAL_COLORS.backdrop,
-        zIndex: 9999,
-        padding: SPACING.lg,
-        pointerEvents: 'auto',
-      }}
+      className={styles.backdrop}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        style={{
-          width: '100%',
-          maxWidth: 340,
-          backgroundColor: MODAL_COLORS.background,
-          borderRadius: RADIUS.xl,
-          padding: 24,
-          position: 'relative',
-          zIndex: 10001,
-          pointerEvents: 'auto',
-        }}
+        className={styles.modal}
       >
         <h2
           id="alerts-prompt-title"
-          style={{
-            fontSize: 22,
-            fontWeight: 700,
-            color: MODAL_COLORS.title,
-            textAlign: 'center',
-            marginBottom: 12,
-          }}
+          className={styles.title}
         >
           Get alerts when you leave?
         </h2>
-        <p
-          style={{
-            fontSize: TYPOGRAPHY.fontSize.sm,
-            color: MODAL_COLORS.description,
-            textAlign: 'center',
-            lineHeight: 1.5,
-            marginBottom: 24,
-          }}
-        >
+        <p className={styles.description}>
           Do you want to receive draft alerts when you're not on this screen?
         </p>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
-          <label
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-              padding: 14,
-              borderRadius: RADIUS.lg,
-              border: `1px solid ${MODAL_COLORS.border}`,
-              cursor: 'pointer',
-            }}
-          >
+        <div className={styles.checkboxContainer}>
+          <label className={styles.checkboxLabel}>
             <input
               type="checkbox"
               checked={inApp}
               onChange={(e) => setInApp(e.target.checked)}
-              style={{ width: 20, height: 20 }}
+              className={styles.checkboxInput}
             />
-            <span style={{ color: MODAL_COLORS.label, fontSize: 15 }}>
+            <span className={styles.checkboxText}>
               When I'm elsewhere in the app (other tabs, My Teams, etc.)
             </span>
           </label>
-          <label
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-              padding: 14,
-              borderRadius: RADIUS.lg,
-              border: `1px solid ${MODAL_COLORS.border}`,
-              cursor: 'pointer',
-            }}
-          >
+          <label className={styles.checkboxLabel}>
             <input
               type="checkbox"
               checked={outsideApp}
               onChange={(e) => setOutsideApp(e.target.checked)}
-              style={{ width: 20, height: 20 }}
+              className={styles.checkboxInput}
             />
-            <span style={{ color: MODAL_COLORS.label, fontSize: 15 }}>
+            <span className={styles.checkboxText}>
               When I leave the app or switch browser tabs
             </span>
           </label>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div className={styles.buttonContainer}>
           <button
             onClick={handleEnable}
             disabled={saving}
-            style={{
-              width: '100%',
-              padding: '14px 20px',
-              borderRadius: RADIUS.lg,
-              border: 'none',
-              backgroundColor: MODAL_COLORS.primaryButton,
-              color: MODAL_COLORS.primaryText,
-              fontWeight: 600,
-              fontSize: 16,
-              cursor: saving ? 'not-allowed' : 'pointer',
-              opacity: saving ? 0.7 : 1,
-            }}
+            className={styles.primaryButton}
           >
             {saving ? 'Saving...' : 'Enable'}
           </button>
           <button
             onClick={handleNoThanks}
             disabled={saving}
-            style={{
-              width: '100%',
-              padding: '14px 20px',
-              borderRadius: RADIUS.lg,
-              border: 'none',
-              backgroundColor: MODAL_COLORS.secondaryButton,
-              color: MODAL_COLORS.secondaryText,
-              fontWeight: 500,
-              fontSize: 16,
-              cursor: saving ? 'not-allowed' : 'pointer',
-            }}
+            className={styles.secondaryButton}
           >
             No thanks
           </button>

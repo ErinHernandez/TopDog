@@ -8,7 +8,9 @@
  */
 
 import React from 'react';
+import { cn } from '@/lib/styles';
 import { CARD_SPACING_V3 } from '../constants/cardSpacingV3';
+import styles from './TournamentTitle.module.css';
 
 export interface TournamentTitleProps {
   /** Tournament title text */
@@ -36,22 +38,13 @@ export function TournamentTitle({
   const { line1, line2 } = titleLines(title);
   return (
     <h2
-      className="tournament-title"
+      className={cn(styles.title)}
       style={{
-        fontFamily: CARD_SPACING_V3.titleFontFamily,
-        fontSize: `${fontSize}px`,
-        lineHeight: CARD_SPACING_V3.titleLineHeight,
-        textTransform: 'uppercase',
-        color: '#FFFFFF',
-        textAlign: 'center',
-        margin: 0,
-        marginTop: `${CARD_SPACING_V3.titleMarginTop}px`,
-        textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
-        letterSpacing: '2px',
-        // Keep words whole; we control break at last space above
-        wordBreak: 'normal',
-        overflowWrap: 'normal',
-      }}
+        '--font-family': CARD_SPACING_V3.titleFontFamily,
+        '--font-size': `${fontSize}px`,
+        '--line-height': CARD_SPACING_V3.titleLineHeight,
+        '--margin-top': `${CARD_SPACING_V3.titleMarginTop}px`,
+      } as React.CSSProperties}
     >
       {line2 ? (
         <>

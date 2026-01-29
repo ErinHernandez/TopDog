@@ -13,7 +13,9 @@
  */
 
 import React from 'react';
+import { cn } from '@/lib/styles';
 import type { DraftTab } from '../types';
+import styles from './DraftFooter.module.css';
 
 // ============================================================================
 // PIXEL-PERFECT CONSTANTS (matched from VX FooterVX.tsx)
@@ -192,21 +194,7 @@ interface CountBadgeProps {
 
 function CountBadge({ count }: CountBadgeProps): React.ReactElement {
   return (
-    <span
-      style={{
-        minWidth: FOOTER_PX.badgeMinWidth,
-        height: FOOTER_PX.badgeHeight,
-        borderRadius: FOOTER_PX.badgeHeight / 2,
-        backgroundColor: FOOTER_COLORS.badgeBg,
-        color: FOOTER_COLORS.badgeText,
-        fontSize: FOOTER_PX.badgeFontSize,
-        fontWeight: 600,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '0 5px',
-      }}
-    >
+    <span className={styles.badge}>
       {count > 99 ? '99+' : count}
     </span>
   );
@@ -225,27 +213,10 @@ export default function DraftFooter({
     <nav
       role="tablist"
       aria-label="Draft room navigation"
-      style={{
-        backgroundColor: FOOTER_COLORS.background,
-        height: FOOTER_PX.containerHeight,
-        borderTop: `${FOOTER_PX.containerBorderTop}px solid ${FOOTER_COLORS.border}`,
-        width: '100%',
-        zIndex: 50,
-        display: 'flex',
-        flexDirection: 'column',
-        flexShrink: 0,
-      }}
+      className={styles.nav}
     >
       {/* Tab Bar */}
-      <div 
-        style={{ 
-          display: 'flex',
-          flex: 1,
-          paddingTop: FOOTER_PX.tabPaddingTop,
-          width: '100%',
-          overflow: 'hidden',
-        }}
-      >
+      <div className={styles.tabBar}>
         {TABS.map((tab) => {
           const isActive = activeTab === tab.id;
           const hasBadge = tab.hasBadge && queueCount > 0;
@@ -257,76 +228,31 @@ export default function DraftFooter({
               aria-selected={isActive}
               aria-label={tab.label}
               onClick={() => onTabChange(tab.id)}
-              style={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                position: 'relative',
-                minHeight: FOOTER_PX.tabMinHeight,
-                paddingLeft: 0,
-                paddingRight: 0,
-                minWidth: 0,
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                WebkitTapHighlightColor: 'transparent',
-                transition: 'all 0.25s ease',
-              }}
+              className={styles.tabButton}
             >
               {/* Icon with optional badge */}
-              <div 
-                style={{ 
-                  position: 'relative',
-                  width: FOOTER_PX.iconSize, 
-                  height: FOOTER_PX.iconSize,
-                }}
-              >
+              <div className={styles.iconContainer}>
                 {tab.icon(isActive)}
                 
                 {/* Badge - only show when count > 0 */}
                 {hasBadge && (
-                  <span 
-                    style={{
-                      position: 'absolute',
-                      top: '50%',
-                      right: FOOTER_PX.badgeOffsetRight,
-                      transform: 'translateY(-50%)',
-                    }}
-                  >
+                  <span className={styles.badgeWrapper}>
                     <CountBadge count={queueCount} />
                   </span>
                 )}
               </div>
 
               {/* Label */}
-              <span
-                style={{
-                  fontSize: FOOTER_PX.labelFontSize,
-                  lineHeight: `${FOOTER_PX.labelLineHeight}px`,
-                  marginTop: FOOTER_PX.labelMarginTop,
-                  color: isActive ? FOOTER_COLORS.active : FOOTER_COLORS.inactive,
-                  fontWeight: isActive ? 500 : 400,
-                }}
-              >
+              <span className={cn(styles.tabLabel, isActive ? styles.active : styles.inactive)}>
                 {tab.label}
               </span>
             </button>
           );
         })}
       </div>
-      
+
       {/* Home Indicator */}
-      <div 
-        style={{
-          width: FOOTER_PX.homeIndicatorWidth,
-          height: FOOTER_PX.homeIndicatorHeight,
-          backgroundColor: FOOTER_COLORS.homeIndicator,
-          borderRadius: FOOTER_PX.homeIndicatorHeight,
-          margin: `${FOOTER_PX.homeIndicatorMarginTop}px auto ${FOOTER_PX.homeIndicatorMarginBottom}px`,
-        }}
-      />
+      <div className={styles.homeIndicator} />
     </nav>
   );
 }

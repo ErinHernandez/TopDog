@@ -1,19 +1,22 @@
 /**
  * TournamentCardBottomSectionV3 - Bottom section with new spacing
- * 
+ *
  * Architecture:
  * - CSS Grid with fixed row heights (prevents layout shifts)
  * - Uses V3 spacing constants throughout
  * - No alignSelf - parent handles positioning with flexbox
- * 
+ * Migrated to CSS Modules for CSP compliance
+ *
  * @module TournamentCardBottomSectionV3
  */
 
 import React from 'react';
+import { cn } from '@/lib/styles';
 import { ProgressBar } from '../../../ui';
 import { TILED_BG_STYLE } from '../../draft-room/constants';
 import type { Tournament } from '../../hooks/data';
 import { CARD_SPACING_V3, BOTTOM_GRID_V3 } from './constants/cardSpacingV3';
+import styles from './TournamentCardBottomSectionV3.module.css';
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -43,45 +46,28 @@ interface StatItemProps {
 
 /**
  * StatItem - Single statistic display (value + label)
- * 
+ *
  * Uses V3 spacing values for fonts and padding
  */
 function StatItem({ value, label }: StatItemProps): React.ReactElement {
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
+    <div className={styles.statItem}>
       {/* Value */}
       <span
-        className="vx2-tournament-stat-value-v3"
+        className={cn(styles.statValue, 'vx2-tournament-stat-value-v3')}
         style={{
-          fontSize: `${CARD_SPACING_V3.statsValueFontSize}px`,
-          fontWeight: 'bold',
-          color: '#FFFFFF',
-          backgroundColor: '#000000',
-          padding: '3px 8px',
-          borderRadius: '5px',
-        }}
+          '--stats-value-font-size': `${CARD_SPACING_V3.statsValueFontSize}px`,
+        } as React.CSSProperties}
       >
         {value}
       </span>
-      
+
       {/* Label */}
       <span
-        className="vx2-tournament-stat-label-v3"
+        className={cn(styles.statLabel, 'vx2-tournament-stat-label-v3')}
         style={{
-          fontSize: `${CARD_SPACING_V3.statsLabelFontSize}px`,
-          color: 'rgba(255, 255, 255, 0.7)',
-          backgroundColor: '#000000',
-          padding: '2px 6px',
-          borderRadius: '4px',
-          marginTop: '3px',
-        }}
+          '--stats-label-font-size': `${CARD_SPACING_V3.statsLabelFontSize}px`,
+        } as React.CSSProperties}
       >
         {label}
       </span>
@@ -127,28 +113,19 @@ export function BottomSectionV3({
   // ----------------------------------------
   return (
     <div
-      className="vx2-tournament-bottom-section-v3"
+      className={cn(styles.bottomSectionV3, 'vx2-tournament-bottom-section-v3')}
+      data-has-progress={hasProgress}
       style={{
-        // ========================================
-        // CSS GRID with FIXED row heights
-        // Strict fixed-height rows prevent layout shifts
-        // ========================================
-        display: 'grid',
-        gridTemplateRows: hasProgress
-          ? BOTTOM_GRID_V3.withProgress
-          : BOTTOM_GRID_V3.withoutProgress,
-        gap: `${CARD_SPACING_V3.bottomRowGap}px`,
-        
-        // ========================================
-        // Positioning
-        // ========================================
-        width: '100%',
-        
-        // ========================================
-        // CSS CONTAINMENT
-        // ========================================
-        contain: 'layout paint',
-      }}
+        '--progress-height': `${CARD_SPACING_V3.progressHeight}px`,
+        '--button-height': `${CARD_SPACING_V3.buttonHeight}px`,
+        '--stats-height': `${CARD_SPACING_V3.statsHeight}px`,
+        '--button-font-size': `${CARD_SPACING_V3.buttonFontSize}px`,
+        '--stats-value-font-size': `${CARD_SPACING_V3.statsValueFontSize}px`,
+        '--stats-label-font-size': `${CARD_SPACING_V3.statsLabelFontSize}px`,
+        '--row-gap': `${CARD_SPACING_V3.bottomRowGap}px`,
+        '--stats-gap': `${CARD_SPACING_V3.bottomStatsGap}px`,
+        '--button-border-radius': `${CARD_SPACING_V3.buttonBorderRadius}px`,
+      } as React.CSSProperties}
     >
       {/* ========================================
           Row 1: Progress Bar (conditional)
@@ -156,13 +133,7 @@ export function BottomSectionV3({
           ======================================== */}
       {hasProgress && (
         <div
-          className="vx2-progress-section-v3"
-          style={{
-            height: `${CARD_SPACING_V3.progressHeight}px`,
-            display: 'flex',
-            alignItems: 'center',
-            contain: 'layout',
-          }}
+          className={cn(styles.progressSection, 'vx2-progress-section-v3')}
         >
           <ProgressBar
             value={fillPercentage}
@@ -179,57 +150,24 @@ export function BottomSectionV3({
           ======================================== */}
       <button
         onClick={onJoinClick}
-        className="vx2-tournament-button-v3"
+        className={cn(
+          styles.button,
+          !styleOverrides.buttonBackgroundColor && 'vx2-tournament-button-v3',
+          styleOverrides.buttonBackgroundColor && styles.buttonCustom
+        )}
         style={{
-          // ----------------------------------------
-          // Background (tiled or custom)
-          // ----------------------------------------
           ...(styleOverrides.buttonBackground ? {} : TILED_BG_STYLE),
           ...(styleOverrides.buttonBackground
             ? {
-                backgroundImage: styleOverrides.buttonBackground,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
+                '--button-bg-image': styleOverrides.buttonBackground,
               }
             : {}),
           ...(styleOverrides.buttonBackgroundColor
             ? {
-                backgroundColor: styleOverrides.buttonBackgroundColor,
+                '--button-bg-color': styleOverrides.buttonBackgroundColor,
               }
             : {}),
-
-          // ----------------------------------------
-          // FIXED dimensions - all three are set
-          // ----------------------------------------
-          height: `${CARD_SPACING_V3.buttonHeight}px`,
-          minHeight: `${CARD_SPACING_V3.buttonHeight}px`,
-          maxHeight: `${CARD_SPACING_V3.buttonHeight}px`,
-
-          // ----------------------------------------
-          // Typography
-          // ----------------------------------------
-          color: '#FFFFFF',
-          fontSize: `${CARD_SPACING_V3.buttonFontSize}px`,
-          fontWeight: 600,
-
-          // ----------------------------------------
-          // Appearance
-          // ----------------------------------------
-          width: '100%',
-          borderRadius: `${CARD_SPACING_V3.buttonBorderRadius}px`,
-          border: 'none',
-          cursor: 'pointer',
-
-          // ----------------------------------------
-          // Interaction
-          // ----------------------------------------
-          transition: 'background-color 0.2s ease',
-
-          // ----------------------------------------
-          // CSS containment
-          // ----------------------------------------
-          contain: 'layout style',
-        }}
+        } as React.CSSProperties}
         aria-label={`Join ${tournament.title} for ${tournament.entryFee}`}
       >
         Join Tournament
@@ -240,15 +178,7 @@ export function BottomSectionV3({
           Height: 52px fixed (V3)
           ======================================== */}
       <div
-        className="vx2-tournament-stats-v3"
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: `${CARD_SPACING_V3.bottomStatsGap}px`,
-          height: `${CARD_SPACING_V3.statsHeight}px`,
-          alignContent: 'center',
-          contain: 'layout',
-        }}
+        className={cn(styles.statsGrid, 'vx2-tournament-stats-v3')}
       >
         <StatItem value={tournament.entryFee} label="Entry" />
         <StatItem value={tournament.totalEntries} label="Entries" />

@@ -11,6 +11,8 @@
  */
 
 import React, { useState, useCallback, useMemo } from 'react';
+import { cn } from '@/lib/styles';
+import styles from './XenditDepositModalVX2.module.css';
 import { Close, ChevronLeft } from '../components/icons';
 import {
   formatIdrAmount,
@@ -19,8 +21,8 @@ import {
   IDR_CONFIG,
   parseIdrInput,
 } from '../../../lib/xendit/currencyConfig';
-import { 
-  ID_BANK_CODES, 
+import {
+  ID_BANK_CODES,
   EWALLET_NAMES,
   getBankName,
   getEWalletName,
@@ -277,24 +279,23 @@ export function XenditDepositModalVX2({
   if (!isOpen) return null;
   
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div 
-        className="w-full max-w-md bg-[#101927] rounded-2xl overflow-hidden shadow-2xl max-h-[90vh] overflow-y-auto"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+    <div className={styles.overlay}>
+      <div
+        className={styles.modal}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 border-b border-white/10 bg-[#101927]">
-          <div className="flex items-center gap-3">
+        <div className={styles.header}>
+          <div className={styles.headerLeft}>
             {(step === 'category' || step === 'method') && (
               <button
                 onClick={handleBack}
-                className="p-1 -ml-1 hover:bg-white/10 rounded-lg transition-colors"
+                className={styles.backButton}
               >
-                <ChevronLeft className="w-5 h-5 text-gray-400" />
+                <ChevronLeft className={styles.backButtonIcon} />
               </button>
             )}
-            <h2 className="text-lg font-semibold text-white">
+            <h2 className={styles.headerTitle}>
               {step === 'amount' && 'Deposit'}
               {step === 'category' && 'Select Payment Type'}
               {step === 'method' && (category === 'virtual_account' ? 'Select Bank' : 'Select E-Wallet')}
@@ -306,46 +307,47 @@ export function XenditDepositModalVX2({
           </div>
           <button
             onClick={handleClose}
-            className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+            className={styles.closeButton}
           >
-            <Close className="w-5 h-5 text-gray-400" />
+            <Close className={styles.closeButtonIcon} />
           </button>
         </div>
         
         {/* Content */}
-        <div className="p-6">
+        <div className={styles.content}>
           {/* Amount Step */}
           {step === 'amount' && (
-            <div className="space-y-6">
+            <div className={styles.amountContainer}>
               {/* Quick amounts */}
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-3">
+              <div className={styles.quickAmountsSection}>
+                <label className={styles.quickAmountsLabel}>
                   Select Amount
                 </label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className={styles.quickAmountsGrid}>
                   {quickAmounts.map(({ amount: idrAmount, display }) => (
                     <button
                       key={idrAmount}
                       onClick={() => handleQuickAmount(idrAmount)}
-                      className={`py-3 px-2 rounded-lg font-medium text-sm transition-all ${
+                      className={cn(
+                        styles.quickAmountButton,
                         amount === idrAmount
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-[#1a2537] text-gray-300 hover:bg-[#243044]'
-                      }`}
+                          ? styles.quickAmountButtonActive
+                          : styles.quickAmountButtonInactive
+                      )}
                     >
                       {display}
                     </button>
                   ))}
                 </div>
               </div>
-              
+
               {/* Custom amount */}
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">
+              <div className={styles.customAmountSection}>
+                <label className={styles.customAmountLabel}>
                   Or Enter Custom Amount
                 </label>
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">
+                <div className={styles.customAmountInputWrapper}>
+                  <span className={styles.customAmountPrefix}>
                     Rp
                   </span>
                   <input
@@ -354,31 +356,32 @@ export function XenditDepositModalVX2({
                     value={customAmount}
                     onChange={(e) => handleCustomAmountChange(e.target.value)}
                     placeholder="0"
-                    className="w-full pl-12 pr-4 py-3 bg-[#1a2537] border border-white/10 rounded-lg text-white text-lg focus:outline-none focus:border-blue-500 transition-colors"
+                    className={styles.customAmountInput}
                   />
                 </div>
-                <p className="mt-2 text-xs text-gray-500">
-                  Min: {formatIdrAmount(IDR_CONFIG.minimumDeposit)} | 
+                <p className={styles.customAmountHint}>
+                  Min: {formatIdrAmount(IDR_CONFIG.minimumDeposit)} |
                   Max: {formatIdrAmount(IDR_CONFIG.maximumDeposit)}
                 </p>
               </div>
-              
+
               {/* Error */}
               {error && (
-                <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                  <p className="text-sm text-red-400">{error}</p>
+                <div className={styles.errorBox}>
+                  <p className={styles.errorText}>{error}</p>
                 </div>
               )}
-              
+
               {/* Continue button */}
               <button
                 onClick={handleContinueToCategory}
                 disabled={!amountValidation.isValid}
-                className={`w-full py-3 rounded-lg font-semibold transition-all ${
+                className={cn(
+                  styles.continueButton,
                   amountValidation.isValid
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                    : 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                }`}
+                    ? styles.continueButtonEnabled
+                    : styles.continueButtonDisabled
+                )}
               >
                 Continue with {amount > 0 ? formatIdrAmount(amount) : 'amount'}
               </button>
@@ -387,43 +390,49 @@ export function XenditDepositModalVX2({
           
           {/* Category Selection Step */}
           {step === 'category' && (
-            <div className="space-y-4">
+            <div className={styles.categoryContainer}>
               {/* Amount display */}
-              <div className="text-center py-4 bg-[#1a2537] rounded-lg">
-                <p className="text-sm text-gray-400 mb-1">Deposit Amount</p>
-                <p className="text-2xl font-bold text-white">
+              <div className={styles.amountDisplayBox}>
+                <p className={styles.amountDisplayLabel}>Deposit Amount</p>
+                <p className={styles.amountDisplayValue}>
                   {formatIdrAmount(amount)}
                 </p>
               </div>
-              
+
               {/* Payment categories */}
-              <div className="space-y-3">
+              <div className={styles.categoryButtonsContainer}>
                 <button
                   onClick={() => handleSelectCategory('virtual_account')}
-                  className="w-full flex items-center gap-4 p-4 rounded-lg border border-white/10 bg-[#1a2537] hover:border-blue-500/50 transition-all"
+                  className={styles.categoryButton}
                 >
-                  <div className="w-12 h-12 rounded-lg bg-green-600/20 flex items-center justify-center">
+                  <div className={cn(
+                    styles.categoryIconBox,
+                    styles.categoryIconBoxVA
+                  )}>
                     <BankIcon />
                   </div>
-                  <div className="flex-1 text-left">
-                    <p className="font-semibold text-white">Virtual Account</p>
-                    <p className="text-sm text-gray-400">Transfer from any bank - Most popular</p>
+                  <div className={styles.categoryButtonContent}>
+                    <p className={styles.categoryButtonTitle}>Virtual Account</p>
+                    <p className={styles.categoryButtonDescription}>Transfer from any bank - Most popular</p>
                   </div>
-                  <span className="px-2 py-0.5 text-xs bg-green-500/20 text-green-400 rounded-full">
+                  <span className={styles.categoryBadge}>
                     60%+
                   </span>
                 </button>
-                
+
                 <button
                   onClick={() => handleSelectCategory('ewallet')}
-                  className="w-full flex items-center gap-4 p-4 rounded-lg border border-white/10 bg-[#1a2537] hover:border-blue-500/50 transition-all"
+                  className={styles.categoryButton}
                 >
-                  <div className="w-12 h-12 rounded-lg bg-purple-600/20 flex items-center justify-center">
+                  <div className={cn(
+                    styles.categoryIconBox,
+                    styles.categoryIconBoxEWallet
+                  )}>
                     <WalletIcon />
                   </div>
-                  <div className="flex-1 text-left">
-                    <p className="font-semibold text-white">E-Wallet</p>
-                    <p className="text-sm text-gray-400">OVO, GoPay, DANA, ShopeePay</p>
+                  <div className={styles.categoryButtonContent}>
+                    <p className={styles.categoryButtonTitle}>E-Wallet</p>
+                    <p className={styles.categoryButtonDescription}>OVO, GoPay, DANA, ShopeePay</p>
                   </div>
                 </button>
               </div>
@@ -432,32 +441,33 @@ export function XenditDepositModalVX2({
           
           {/* Method Selection Step */}
           {step === 'method' && category === 'virtual_account' && (
-            <div className="space-y-4">
-              <div className="text-center py-3 bg-[#1a2537] rounded-lg">
-                <p className="text-sm text-gray-400">Depositing</p>
-                <p className="text-xl font-bold text-white">{formatIdrAmount(amount)}</p>
+            <div className={styles.methodContainer}>
+              <div className={styles.methodAmountDisplay}>
+                <p className={styles.methodAmountLabel}>Depositing</p>
+                <p className={styles.methodAmountValue}>{formatIdrAmount(amount)}</p>
               </div>
-              
-              <p className="text-sm font-medium text-gray-400">Select your bank</p>
-              
-              <div className="space-y-2">
+
+              <p className={styles.methodLabel}>Select your bank</p>
+
+              <div className={styles.methodList}>
                 {VA_BANKS.map((bank) => (
                   <button
                     key={bank.code}
                     onClick={() => setSelectedBank(bank.code)}
-                    className={`w-full flex items-center gap-4 p-4 rounded-lg border transition-all ${
+                    className={cn(
+                      styles.methodButton,
                       selectedBank === bank.code
-                        ? 'bg-blue-600/10 border-blue-500'
-                        : 'bg-[#1a2537] border-white/10 hover:border-white/20'
-                    }`}
+                        ? styles.methodButtonActive
+                        : styles.methodButtonInactive
+                    )}
                   >
-                    <div className="w-10 h-10 rounded-lg bg-[#243044] flex items-center justify-center">
-                      <span className="text-white font-bold text-xs">{bank.code.slice(0, 3)}</span>
+                    <div className={styles.methodIconBox}>
+                      <span className={styles.methodIconText}>{bank.code.slice(0, 3)}</span>
                     </div>
-                    <span className="font-medium text-white">{bank.name}</span>
+                    <span className={styles.methodButtonLabelText}>{bank.name}</span>
                     {selectedBank === bank.code && (
-                      <div className="ml-auto w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
-                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <div className={styles.methodCheckmark}>
+                        <svg className={styles.methodCheckmarkIcon} fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
                       </div>
@@ -465,15 +475,16 @@ export function XenditDepositModalVX2({
                   </button>
                 ))}
               </div>
-              
+
               <button
                 onClick={handleSubmit}
                 disabled={!selectedBank || isLoading}
-                className={`w-full py-3 rounded-lg font-semibold transition-all ${
+                className={cn(
+                  styles.continueButton,
                   selectedBank && !isLoading
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                    : 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                }`}
+                    ? styles.continueButtonEnabled
+                    : styles.continueButtonDisabled
+                )}
               >
                 {isLoading ? 'Creating...' : 'Get Virtual Account Number'}
               </button>
@@ -481,37 +492,38 @@ export function XenditDepositModalVX2({
           )}
           
           {step === 'method' && category === 'ewallet' && (
-            <div className="space-y-4">
-              <div className="text-center py-3 bg-[#1a2537] rounded-lg">
-                <p className="text-sm text-gray-400">Depositing</p>
-                <p className="text-xl font-bold text-white">{formatIdrAmount(amount)}</p>
+            <div className={styles.methodContainer}>
+              <div className={styles.methodAmountDisplay}>
+                <p className={styles.methodAmountLabel}>Depositing</p>
+                <p className={styles.methodAmountValue}>{formatIdrAmount(amount)}</p>
               </div>
-              
-              <p className="text-sm font-medium text-gray-400">Select e-wallet</p>
-              
-              <div className="space-y-2">
+
+              <p className={styles.methodLabel}>Select e-wallet</p>
+
+              <div className={styles.methodList}>
                 {EWALLETS.map((wallet) => (
                   <button
                     key={wallet.code}
                     onClick={() => setSelectedEWallet(wallet.code)}
-                    className={`w-full flex items-center gap-4 p-4 rounded-lg border transition-all ${
+                    className={cn(
+                      styles.methodButton,
                       selectedEWallet === wallet.code
-                        ? 'bg-blue-600/10 border-blue-500'
-                        : 'bg-[#1a2537] border-white/10 hover:border-white/20'
-                    }`}
+                        ? styles.methodButtonActive
+                        : styles.methodButtonInactive
+                    )}
                   >
-                    <div className="w-10 h-10 rounded-lg bg-[#243044] flex items-center justify-center">
-                      <span className="text-white font-bold text-xs">{wallet.name.slice(0, 2)}</span>
+                    <div className={styles.methodIconBox}>
+                      <span className={styles.methodIconText}>{wallet.name.slice(0, 2)}</span>
                     </div>
-                    <div className="flex-1 text-left">
-                      <span className="font-medium text-white">{wallet.name}</span>
+                    <div className={styles.methodButtonLabel}>
+                      <span className={styles.methodButtonLabelText}>{wallet.name}</span>
                       {wallet.requiresPhone && (
-                        <p className="text-xs text-gray-400">Phone number required</p>
+                        <p className={styles.methodButtonSubtext}>Phone number required</p>
                       )}
                     </div>
                     {selectedEWallet === wallet.code && (
-                      <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
-                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <div className={styles.methodCheckmark}>
+                        <svg className={styles.methodCheckmarkIcon} fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
                       </div>
@@ -519,30 +531,31 @@ export function XenditDepositModalVX2({
                   </button>
                 ))}
               </div>
-              
+
               {/* Phone number for OVO */}
               {requiresPhone && (
-                <div>
-                  <label className="block text-sm text-gray-400 mb-2">Phone Number</label>
+                <div className={styles.phoneSection}>
+                  <label className={styles.phoneLabel}>Phone Number</label>
                   <input
                     type="tel"
                     value={userPhone}
                     onChange={(e) => setUserPhone(e.target.value)}
                     placeholder="08xxxxxxxxxx"
-                    className="w-full px-4 py-3 bg-[#1a2537] border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                    className={styles.phoneInput}
                   />
-                  <p className="mt-1 text-xs text-gray-500">Enter the phone number linked to your OVO account</p>
+                  <p className={styles.phoneHint}>Enter the phone number linked to your OVO account</p>
                 </div>
               )}
-              
+
               <button
                 onClick={handleSubmit}
                 disabled={!canProceed || isLoading}
-                className={`w-full py-3 rounded-lg font-semibold transition-all ${
+                className={cn(
+                  styles.continueButton,
                   canProceed && !isLoading
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                    : 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                }`}
+                    ? styles.continueButtonEnabled
+                    : styles.continueButtonDisabled
+                )}
               >
                 {isLoading ? 'Processing...' : `Pay with ${selectedEWallet ? getEWalletName(selectedEWallet) : 'E-Wallet'}`}
               </button>
@@ -551,70 +564,70 @@ export function XenditDepositModalVX2({
           
           {/* Processing Step */}
           {step === 'processing' && (
-            <div className="text-center py-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-blue-600/20">
-                <svg className="animate-spin w-8 h-8 text-blue-500" fill="none" viewBox="0 0 24 24">
+            <div className={styles.processingContainer}>
+              <div className={styles.spinnerWrapper}>
+                <svg className={styles.spinnerIcon} fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">
+              <h3 className={styles.processingTitle}>
                 {category === 'virtual_account' ? 'Creating Virtual Account...' : 'Redirecting...'}
               </h3>
-              <p className="text-gray-400">Please wait...</p>
+              <p className={styles.processingText}>Please wait...</p>
             </div>
           )}
           
           {/* VA Instructions Step */}
           {step === 'instructions' && vaAccountNumber && (
-            <div className="space-y-6">
-              <div className="text-center">
-                <p className="text-sm text-gray-400 mb-1">Transfer exactly</p>
-                <p className="text-3xl font-bold text-white">{formatIdrAmount(amount)}</p>
+            <div className={styles.instructionsContainer}>
+              <div className={styles.instructionsAmountDisplay}>
+                <p className={styles.instructionsAmountLabel}>Transfer exactly</p>
+                <p className={styles.instructionsAmountValue}>{formatIdrAmount(amount)}</p>
               </div>
-              
-              <div className="p-4 bg-[#1a2537] rounded-lg space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-400">Bank</span>
-                  <span className="font-semibold text-white">{selectedBank}</span>
+
+              <div className={styles.instructionsBox}>
+                <div className={styles.instructionRow}>
+                  <span className={styles.instructionLabel}>Bank</span>
+                  <span className={styles.instructionValue}>{selectedBank}</span>
                 </div>
-                
-                <div className="border-t border-white/10" />
-                
-                <div>
-                  <p className="text-sm text-gray-400 mb-2">Virtual Account Number</p>
-                  <div className="flex items-center gap-2">
-                    <code className="flex-1 p-3 bg-[#243044] rounded-lg text-lg font-mono text-white tracking-wider">
+
+                <div className={styles.instructionDivider} />
+
+                <div className={styles.vaNumberSection}>
+                  <p className={styles.vaNumberLabel}>Virtual Account Number</p>
+                  <div className={styles.vaNumberWrapper}>
+                    <code className={styles.vaNumberCode}>
                       {vaAccountNumber}
                     </code>
                     <button
                       onClick={handleCopyVA}
-                      className="p-3 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+                      className={styles.copyButton}
                     >
                       <CopyIcon />
                     </button>
                   </div>
                 </div>
-                
+
                 {vaExpiresAt && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-400">Expires</span>
-                    <span className="text-yellow-400">
+                  <div className={styles.vaExpiresRow}>
+                    <span className={styles.vaExpiresLabel}>Expires</span>
+                    <span className={styles.vaExpiresValue}>
                       {new Date(vaExpiresAt).toLocaleString('id-ID')}
                     </span>
                   </div>
                 )}
               </div>
-              
-              <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
-                <p className="text-sm text-yellow-400">
+
+              <div className={styles.warningBox}>
+                <p className={styles.warningText}>
                   Transfer the exact amount. Your balance will be credited automatically once payment is received.
                 </p>
               </div>
-              
+
               <button
                 onClick={handleClose}
-                className="w-full py-3 bg-[#1a2537] hover:bg-[#243044] text-white font-medium rounded-lg transition-colors"
+                className={styles.doneButton}
               >
                 Done
               </button>
@@ -623,17 +636,17 @@ export function XenditDepositModalVX2({
           
           {/* Error Step */}
           {step === 'error' && (
-            <div className="text-center py-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-red-600/20">
-                <svg className="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className={styles.errorContainer}>
+              <div className={styles.errorIconWrapper}>
+                <svg className={styles.errorIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">Payment Failed</h3>
-              <p className="text-gray-400 mb-6">{error || 'An error occurred. Please try again.'}</p>
+              <h3 className={styles.errorTitle}>Payment Failed</h3>
+              <p className={styles.errorMessage}>{error || 'An error occurred. Please try again.'}</p>
               <button
                 onClick={handleReset}
-                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+                className={styles.tryAgainButton}
               >
                 Try Again
               </button>

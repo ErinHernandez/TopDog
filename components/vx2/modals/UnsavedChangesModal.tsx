@@ -6,6 +6,8 @@
  */
 
 import React from 'react';
+import { cn } from '@/lib/styles';
+import styles from './UnsavedChangesModal.module.css';
 import { BG_COLORS, TEXT_COLORS, RADIUS, SPACING, TYPOGRAPHY, Z_INDEX } from '../core/constants';
 
 // ============================================================================
@@ -43,73 +45,61 @@ export function UnsavedChangesModal({
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center"
+      className={cn('fixed inset-0 flex items-center justify-center', styles.overlay)}
       style={{
-        backgroundColor: 'rgba(0, 0, 0, 0.7)',
-        zIndex: Z_INDEX.modal + 10,
-      }}
+        '--z-index-modal': Z_INDEX.modal + 10,
+      } as React.CSSProperties}
       onClick={onCancel}
       role="dialog"
       aria-modal="true"
       aria-labelledby="unsaved-changes-title"
     >
       <div
-        className="flex flex-col"
+        className={styles.modalCard}
         style={{
-          backgroundColor: BG_COLORS.card,
-          borderRadius: `${RADIUS.lg}px`,
-          padding: `${SPACING.lg}px`,
-          margin: `${SPACING.md}px`,
-          maxWidth: 320,
-          width: '100%',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
-        }}
+          '--bg-color-card': BG_COLORS.card,
+          '--radius-lg': `${RADIUS.lg}px`,
+          '--spacing-lg': `${SPACING.lg}px`,
+          '--spacing-md': `${SPACING.md}px`,
+        } as React.CSSProperties}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Title */}
         <h2
           id="unsaved-changes-title"
+          className={styles.title}
           style={{
-            color: TEXT_COLORS.primary,
-            fontSize: `${TYPOGRAPHY.fontSize.lg}px`,
-            fontWeight: TYPOGRAPHY.fontWeight.semibold,
-            marginBottom: `${SPACING.sm}px`,
-          }}
+            '--text-color-primary': TEXT_COLORS.primary,
+            '--font-size-lg': `${TYPOGRAPHY.fontSize.lg}px`,
+            '--font-weight-semibold': TYPOGRAPHY.fontWeight.semibold,
+            '--spacing-sm': `${SPACING.sm}px`,
+          } as React.CSSProperties}
         >
           {title}
         </h2>
 
         {/* Message */}
         <p
+          className={styles.message}
           style={{
-            color: TEXT_COLORS.secondary,
-            fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-            lineHeight: 1.5,
-            marginBottom: `${SPACING.lg}px`,
-          }}
+            '--text-color-secondary': TEXT_COLORS.secondary,
+            '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
+            '--spacing-lg': `${SPACING.lg}px`,
+          } as React.CSSProperties}
         >
           {message}
         </p>
 
         {/* Actions */}
-        <div
-          className="flex flex-col gap-2"
-          style={{ marginTop: 'auto' }}
-        >
+        <div className={styles.actions}>
           {/* Save Button */}
           <button
             onClick={onSave}
-            className="w-full font-semibold transition-all"
+            className={styles.saveButton}
             style={{
-              height: 48,
-              background: 'url(/wr_blue.png) no-repeat center center',
-              backgroundSize: 'cover',
-              color: '#fff',
-              borderRadius: `${RADIUS.md}px`,
-              border: 'none',
-              fontSize: `${TYPOGRAPHY.fontSize.base}px`,
-              cursor: 'pointer',
-            }}
+              '--radius-md': `${RADIUS.md}px`,
+              '--font-size-base': `${TYPOGRAPHY.fontSize.base}px`,
+            } as React.CSSProperties}
           >
             Save
           </button>
@@ -117,16 +107,11 @@ export function UnsavedChangesModal({
           {/* Discard Button */}
           <button
             onClick={onDiscard}
-            className="w-full font-semibold transition-all"
+            className={styles.discardButton}
             style={{
-              height: 48,
-              backgroundColor: 'rgba(239, 68, 68, 0.15)',
-              color: '#EF4444',
-              borderRadius: `${RADIUS.md}px`,
-              border: '1px solid rgba(239, 68, 68, 0.3)',
-              fontSize: `${TYPOGRAPHY.fontSize.base}px`,
-              cursor: 'pointer',
-            }}
+              '--radius-md': `${RADIUS.md}px`,
+              '--font-size-base': `${TYPOGRAPHY.fontSize.base}px`,
+            } as React.CSSProperties}
           >
             Discard
           </button>
@@ -134,16 +119,12 @@ export function UnsavedChangesModal({
           {/* Cancel Button */}
           <button
             onClick={onCancel}
-            className="w-full font-medium transition-all"
+            className={styles.cancelButton}
             style={{
-              height: 48,
-              backgroundColor: 'transparent',
-              color: TEXT_COLORS.secondary,
-              borderRadius: `${RADIUS.md}px`,
-              border: 'none',
-              fontSize: `${TYPOGRAPHY.fontSize.base}px`,
-              cursor: 'pointer',
-            }}
+              '--text-color-secondary': TEXT_COLORS.secondary,
+              '--radius-md': `${RADIUS.md}px`,
+              '--font-size-base': `${TYPOGRAPHY.fontSize.base}px`,
+            } as React.CSSProperties}
           >
             Cancel
           </button>

@@ -22,6 +22,7 @@ import {
   TournamentStats,
 } from './elements';
 import { LOBBY_TAB_SANDBOX_SPEC } from './constants/lobbyTabSandboxSpec';
+import styles from './LobbyTabSandboxContent.module.css';
 
 const SPEC = LOBBY_TAB_SANDBOX_SPEC;
 const LOGO_IMAGE = '/tournament_card_background.png';
@@ -102,80 +103,36 @@ export function LobbyTabSandboxContent({
 
   /** Outline wraps the full content area (from content top down to top of footer).
    * Inset = distance from content-area edges; at 0px the outline reaches the edge of the footer tabs. */
-  const contentAreaOutlineStyle = outlineOn
-    ? (() => {
-        const marginFromEdge = Math.max(0, outlineInset - outlineThickness);
-        const outline = SPEC.outline as { color?: string };
-        const outlineColor = outline.color ?? '#3B82F6';
-        return {
-          margin: marginFromEdge,
-          border: `${outlineThickness}px solid ${outlineColor}`,
-          borderRadius: outlineRadius,
-          boxSizing: 'border-box' as const,
-        };
-      })()
-    : {};
+  const marginFromEdge = outlineOn ? Math.max(0, outlineInset - outlineThickness) : 0;
+  const outlineColor = (SPEC.outline as { color?: string }).color ?? '#3B82F6';
 
   const innerContent = () => {
     if (stateOverride === 'loading') {
       return (
         <div
-          style={{
-            position: 'absolute',
-            inset: 16,
-            backgroundColor: 'rgba(255,255,255,0.08)',
-            borderRadius: 16,
-            animation: 'pulse 2s infinite',
-          }}
+          className={styles.loadingPlaceholder}
           aria-label="Loading"
         />
       );
     }
     if (stateOverride === 'error') {
       return (
-        <div
-          style={{
-            flex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 24,
-          }}
-        >
-          <span style={{ color: '#EF4444', fontSize: 14 }}>Error state</span>
+        <div className={styles.errorContainer}>
+          <span className={styles.errorText}>Error state</span>
         </div>
       );
     }
     if (stateOverride === 'empty') {
       return (
-        <div
-          style={{
-            flex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 24,
-          }}
-        >
-          <span style={{ color: '#9CA3AF', fontSize: 14 }}>Empty state</span>
+        <div className={styles.emptyContainer}>
+          <span className={styles.emptyText}>Empty state</span>
         </div>
       );
     }
     // stateOverride === 'default'
     if (showEmptyPrompt && !hasAnyInPhone) {
       return (
-        <div
-          style={{
-            flex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 24,
-            color: '#6B7280',
-            fontSize: 13,
-            textAlign: 'center',
-          }}
-        >
+        <div className={styles.emptyPrompt}>
           Add elements from the panel →
         </div>
       );
@@ -188,66 +145,54 @@ export function LobbyTabSandboxContent({
       objectsInPhone.stats;
     const heroBlock = (
       <div
+        className={styles.heroBlock}
         style={{
-          display: 'flex',
-          flexDirection: 'column',
-          padding: `${SPEC.lobby.outer_padding_px}px`,
-          gap: `${SPEC.lobby.bottom_row_gap_px}px`,
-        }}
+          '--outer-padding': `${SPEC.lobby.outer_padding_px}px`,
+          '--bottom-row-gap': `${SPEC.lobby.bottom_row_gap_px}px`,
+        } as React.CSSProperties}
       >
         {objectsInPhone.logoTitle && (
           <div
+            className={styles.logoTitleContainer}
             style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              transform: `translate(${positionOverrides?.logoTitle?.x ?? 0}px, ${positionOverrides?.logoTitle?.y ?? 0}px)`,
-            }}
+              '--logo-title-translate-x': `${positionOverrides?.logoTitle?.x ?? 0}px`,
+              '--logo-title-translate-y': `${positionOverrides?.logoTitle?.y ?? 0}px`,
+            } as React.CSSProperties}
           >
             <TournamentCardLogo src={LOGO_IMAGE} alt="Tournament logo" maxHeight={60} />
-            <div style={{ marginTop: 14, transform: 'translateY(-24px)' }}>
+            <div className={styles.logoTitleInner}>
               <TournamentTitle title={tournament.title} fontSize={38} />
             </div>
           </div>
         )}
         {objectsInPhone.globe && (
           <div
+            className={styles.globeSlotContainer}
             style={{
-              height: GLOBE_SLOT_HEIGHT_PX,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '100%',
-              flexShrink: 0,
-              marginTop: '24px',
-              overflow: 'hidden',
-              transform: `translateY(-24px) translate(${positionOverrides?.globe?.x ?? 0}px, ${positionOverrides?.globe?.y ?? 0}px)`,
-            }}
+              '--globe-slot-height': `${GLOBE_SLOT_HEIGHT_PX}px`,
+              '--globe-translate-x': `${positionOverrides?.globe?.x ?? 0}px`,
+              '--globe-translate-y': `${positionOverrides?.globe?.y ?? 0}px`,
+            } as React.CSSProperties}
           >
             <div
               data-globe-slot
               role="img"
               aria-label="Globe"
+              className={styles.globeSlot}
               style={{
-                width: globeSizePx,
-                height: globeSizePx,
-                minWidth: 0,
-                minHeight: 0,
-                maxWidth: '100%',
-                flexShrink: 0,
+                '--globe-size': `${globeSizePx}px`,
                 backgroundImage: `url(${globeUrl})`,
-                backgroundSize: 'contain',
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'center',
-              }}
+              } as React.CSSProperties}
             />
           </div>
         )}
         {objectsInPhone.progressBar && (
           <div
+            className={styles.progressBarContainer}
             style={{
-              transform: `translateY(-14px) translate(${positionOverrides?.progressBar?.x ?? 0}px, ${positionOverrides?.progressBar?.y ?? 0}px)`,
-            }}
+              '--progress-bar-translate-x': `${positionOverrides?.progressBar?.x ?? 0}px`,
+              '--progress-bar-translate-y': `${positionOverrides?.progressBar?.y ?? 0}px`,
+            } as React.CSSProperties}
           >
             <TournamentProgressBar
               currentEntries={tournament.currentEntries}
@@ -257,18 +202,22 @@ export function LobbyTabSandboxContent({
         )}
         {objectsInPhone.joinButton && (
           <div
+            className={styles.joinButtonContainer}
             style={{
-              transform: `translateY(-4px) translate(${positionOverrides?.joinButton?.x ?? 0}px, ${positionOverrides?.joinButton?.y ?? 0}px)`,
-            }}
+              '--join-button-translate-x': `${positionOverrides?.joinButton?.x ?? 0}px`,
+              '--join-button-translate-y': `${positionOverrides?.joinButton?.y ?? 0}px`,
+            } as React.CSSProperties}
           >
             <TournamentJoinButton onClick={() => onJoinClick(tournament.id)} label="Join Tournament" />
           </div>
         )}
         {objectsInPhone.stats && (
           <div
+            className={styles.statsContainer}
             style={{
-              transform: `translate(${positionOverrides?.stats?.x ?? 0}px, ${positionOverrides?.stats?.y ?? 0}px)`,
-            }}
+              '--stats-translate-x': `${positionOverrides?.stats?.x ?? 0}px`,
+              '--stats-translate-y': `${positionOverrides?.stats?.y ?? 0}px`,
+            } as React.CSSProperties}
           >
             <TournamentStats
               entryFee={tournament.entryFee}
@@ -280,13 +229,7 @@ export function LobbyTabSandboxContent({
       </div>
     );
     return (
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          minHeight: 'min-content',
-        }}
-      >
+      <div className={styles.contentWrapper}>
         {heroBlock}
       </div>
     );
@@ -299,45 +242,21 @@ export function LobbyTabSandboxContent({
     <>
       <div
         data-outline-debug={dataOutlineDebug}
+        className={styles.contentArea}
         style={{
-          flex: 1,
-          minHeight: 0,
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden',
-          ...contentAreaOutlineStyle,
-          ...(outlineY !== 0 ? { transform: `translateY(${outlineY}px)` } : {}),
-        }}
+          '--lobby-outline-thickness': outlineOn ? `${outlineThickness}px` : '0px',
+          '--lobby-outline-margin': `${marginFromEdge}px`,
+          '--lobby-outline-color': outlineColor,
+          '--lobby-outline-radius': `${outlineRadius}px`,
+          '--outline-translate-y': `${outlineY}px`,
+          '--content-scale': contentScale.toString(),
+          '--safe-area-top': `${SPEC.safe_area_top_px}px`,
+        } as React.CSSProperties}
       >
-        <div
-          style={{
-            flex: 1,
-            minHeight: 0,
-            paddingTop: SPEC.safe_area_top_px,
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-          }}
-        >
-          <div
-            style={{
-              flex: 1,
-              minHeight: 0,
-              display: 'flex',
-              flexDirection: 'column',
-              transform: `scale(${contentScale})`,
-              transformOrigin: 'top center',
-            }}
-          >
+        <div className={styles.safeAreaWrapper}>
+          <div className={styles.scaleWrapper}>
             <div
-              style={{
-                flex: 1,
-                minHeight: 0,
-                overflow: scrollable ? 'auto' : 'hidden',
-                position: 'relative',
-                display: 'flex',
-                flexDirection: 'column',
-              }}
+              className={`${styles.scrollContainer} ${!scrollable ? styles.noScroll : ''}`}
             >
               {innerContent()}
             </div>

@@ -1,10 +1,12 @@
 /**
  * AppHeaderVX2 - App Header Component
- * 
+ *
  * Migrated from VX AppHeaderVX with improvements:
  * - Integration with TabNavigationContext
  * - Cleaner props interface
  * - Better accessibility
+ *
+ * Migrated to CSS Modules for CSP compliance.
  */
 
 import React, { useContext } from 'react';
@@ -13,6 +15,8 @@ import { TabNavigationContext } from '../core/context/TabNavigationContext';
 import { HEADER, Z_INDEX } from '../core/constants';
 import { HEADER_COLORS, STATE_COLORS } from '../core/constants/colors';
 import { createScopedLogger } from '../../../lib/clientLogger';
+import { cn } from '@/lib/styles';
+import styles from './AppHeaderVX2.module.css';
 
 const logger = createScopedLogger('[AppHeader]');
 
@@ -110,20 +114,33 @@ export default function AppHeaderVX2({
   const tabNavigationContext = useContext(TabNavigationContext);
   const router = useRouter();
 
-  // Determine background based on variant
-  const getBackgroundStyle = (): React.CSSProperties => {
+  // Determine header class based on variant
+  const getHeaderClass = (): string => {
     switch (variant) {
       case 'urgent':
-        return { backgroundColor: STATE_COLORS.onTheClock };
+        return styles.headerUrgent;
       case 'success':
-        return { backgroundColor: STATE_COLORS.success };
+        return styles.headerSuccess;
       default:
-        return {
-          background: 'url(/wr_blue.png) no-repeat center center',
-          backgroundSize: 'cover',
-        };
+        return styles.headerDefault;
     }
   };
+
+  // CSS custom properties for dynamic values
+  const headerStyle: React.CSSProperties = {
+    '--header-z-index': Z_INDEX.header,
+    '--urgent-bg': STATE_COLORS.onTheClock,
+    '--success-bg': STATE_COLORS.success,
+  } as React.CSSProperties;
+
+  const innerStyle: React.CSSProperties = {
+    '--header-height': `${HEADER.height}px`,
+    '--header-padding-x': `${HEADER.paddingX}px`,
+  } as React.CSSProperties;
+
+  const buttonStyle: React.CSSProperties = {
+    '--button-size': `${HEADER.buttonSize}px`,
+  } as React.CSSProperties;
 
   // Handle logo click - navigate to Lobby
   // Use tab navigation if available, otherwise use router
@@ -145,51 +162,31 @@ export default function AppHeaderVX2({
 
   return (
     <header
-      className="w-full flex-shrink-0"
-      style={{
-        // Background
-        ...getBackgroundStyle(),
-        // Stacking context
-        position: 'relative',
-        zIndex: Z_INDEX.header,
-      }}
+      className={cn(styles.header, getHeaderClass())}
+      style={headerStyle}
       role="banner"
     >
       {/* Inner content container with fixed height */}
-      <div
-        className="flex items-center w-full"
-        style={{
-          height: `${HEADER.height}px`,
-          paddingLeft: `${HEADER.paddingX}px`,
-          paddingRight: `${HEADER.paddingX}px`,
-        }}
-      >
+      <div className={styles.innerContent} style={innerStyle}>
         {/* LEFT SECTION - Back button or custom content */}
-        <div 
-          className="flex items-center justify-start"
-          style={{ minWidth: `${HEADER.buttonSize}px` }}
-        >
+        <div className={styles.leftSection} style={buttonStyle}>
           {leftContent ? (
             leftContent
           ) : showBackButton ? (
             <button
               onClick={handleBackClick}
-              className="flex items-center justify-center rounded-full hover:bg-white/10 active:bg-white/20 transition-colors"
-              style={{
-                width: `${HEADER.buttonSize}px`,
-                height: `${HEADER.buttonSize}px`,
-              }}
+              className={styles.iconButton}
+              style={buttonStyle}
               aria-label="Go back"
             >
               <BackIcon />
             </button>
           ) : (
             // Empty spacer for layout balance
-            <div style={{ width: `${HEADER.buttonSize}px` }} />
+            <div className={styles.spacer} style={buttonStyle} />
           )}
         </div>
       </div>
     </header>
   );
 }
-

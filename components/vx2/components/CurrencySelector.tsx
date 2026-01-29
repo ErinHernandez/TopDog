@@ -1,8 +1,10 @@
 /**
  * CurrencySelector Component
- * 
+ *
  * Dropdown selector for deposit/withdrawal currency.
  * Shows all available currencies with the geolocated currency marked as recommended.
+ *
+ * Migrated to CSS Modules for CSP compliance.
  */
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -11,6 +13,8 @@ import { SPACING, RADIUS, TYPOGRAPHY, Z_INDEX } from '../core/constants/sizes';
 import { ChevronDown } from './icons';
 import { CurrencyIcon } from './CurrencyIcon';
 import { getCurrencyOptions } from '../../../lib/stripe/currencyConfig';
+import { cn } from '@/lib/styles';
+import styles from './CurrencySelector.module.css';
 
 // ============================================================================
 // TYPES
@@ -48,20 +52,20 @@ export function CurrencySelector({
 }: CurrencySelectorProps): React.ReactElement {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  
+
   // Get all currency options
   const currencyOptions = getCurrencyOptions();
-  
+
   // Find the selected option
   const selectedOption = currencyOptions.find(opt => opt.value === selectedCurrency);
-  
+
   // Sort options: local currency first, then alphabetically
   const sortedOptions = [...currencyOptions].sort((a, b) => {
     if (a.value === localCurrency) return -1;
     if (b.value === localCurrency) return 1;
     return a.value.localeCompare(b.value);
   });
-  
+
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -69,54 +73,59 @@ export function CurrencySelector({
         setIsOpen(false);
       }
     }
-    
+
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-  
+
   // Handle option selection
   const handleSelect = (currency: string) => {
     onSelect(currency);
     setIsOpen(false);
   };
-  
+
+  // CSS custom properties for dynamic values
+  const containerStyle: React.CSSProperties = {
+    '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
+    '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
+    '--font-size-base': `${TYPOGRAPHY.fontSize.base}px`,
+    '--text-secondary': TEXT_COLORS.secondary,
+    '--text-primary': TEXT_COLORS.primary,
+    '--text-muted': TEXT_COLORS.muted,
+    '--active-color': STATE_COLORS.active,
+    '--success-color': STATE_COLORS.success,
+    '--border-default': BORDER_COLORS.default,
+    '--border-light': BORDER_COLORS.light,
+    '--dropdown-bg': BG_COLORS.secondary,
+    '--z-dropdown': Z_INDEX.dropdown,
+  } as React.CSSProperties;
+
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className={styles.container} ref={dropdownRef} style={containerStyle}>
       {/* Label */}
       {label && (
-        <label 
-          className="block font-medium mb-2"
-          style={{ 
-            fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-            color: TEXT_COLORS.secondary,
-          }}
-        >
+        <label className={styles.label}>
           {label}
         </label>
       )}
-      
+
       {/* Trigger Button */}
       <button
         type="button"
         onClick={() => !disabled && setIsOpen(!isOpen)}
         disabled={disabled}
-        className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl transition-all"
+        className={cn(
+          styles.triggerButton,
+          isOpen && styles.triggerButtonOpen,
+          disabled && styles.triggerButtonDisabled
+        )}
         style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.05)',
-          border: `1px solid ${isOpen ? STATE_COLORS.active : BORDER_COLORS.default}`,
-          color: TEXT_COLORS.primary,
-          opacity: disabled ? 0.5 : 1,
-          cursor: disabled ? 'not-allowed' : 'pointer',
-        }}
+          '--trigger-border': isOpen ? STATE_COLORS.active : BORDER_COLORS.default,
+        } as React.CSSProperties}
       >
-        <div className="flex items-center gap-3">
+        <div className={styles.triggerContent}>
           {/* Currency Icon */}
-          <div 
-            className="w-10 h-10 rounded-lg flex items-center justify-center"
-            style={{ 
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
-            }}
-          >
+          <div className={styles.iconWrapper}>
             <CurrencyIcon
               currency={selectedCurrency}
               size={TYPOGRAPHY.fontSize.lg}
@@ -126,89 +135,55 @@ export function CurrencySelector({
               aria-hidden={false}
             />
           </div>
-          
+
           {/* Currency Info */}
-          <div className="text-left">
-            <div 
-              className="font-semibold"
-              style={{ fontSize: `${TYPOGRAPHY.fontSize.base}px` }}
-            >
+          <div className={styles.currencyInfo}>
+            <div className={styles.currencyCode}>
               {selectedOption?.value || 'USD'}
             </div>
-            <div 
-              style={{ 
-                fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-                color: TEXT_COLORS.muted,
-              }}
-            >
+            <div className={styles.currencyName}>
               {selectedOption?.label.split('(')[0].trim() || 'US Dollar'}
             </div>
           </div>
         </div>
-        
+
         {/* Chevron */}
-        <span
-          style={{
-            transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-            transition: 'transform 150ms ease',
-            display: 'inline-block',
-          }}
-        >
-          <ChevronDown 
-            size={20} 
+        <span className={cn(styles.chevron, isOpen && styles.chevronOpen)}>
+          <ChevronDown
+            size={20}
             color={TEXT_COLORS.muted}
           />
         </span>
       </button>
-      
+
       {/* Dropdown Menu */}
       {isOpen && (
-        <div
-          className="absolute left-0 right-0 mt-2 rounded-xl overflow-hidden"
-          style={{
-            backgroundColor: BG_COLORS.secondary,
-            border: `1px solid ${BORDER_COLORS.default}`,
-            zIndex: Z_INDEX.dropdown,
-            maxHeight: '300px',
-            overflowY: 'auto',
-            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.5)',
-          }}
-        >
+        <div className={styles.dropdown}>
           {sortedOptions.map((option) => {
             const isSelected = option.value === selectedCurrency;
             const isLocal = option.value === localCurrency;
-            
+
             return (
               <button
                 key={option.value}
                 type="button"
                 onClick={() => handleSelect(option.value)}
-                className="w-full flex items-center gap-3 px-4 py-3 transition-all"
-                style={{
-                  backgroundColor: isSelected 
-                    ? 'rgba(96, 165, 250, 0.15)' 
-                    : 'transparent',
-                  borderBottom: `1px solid ${BORDER_COLORS.light}`,
-                }}
-                onMouseEnter={(e) => {
-                  if (!isSelected) {
-                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isSelected) {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                  }
-                }}
+                className={cn(
+                  styles.optionButton,
+                  isSelected && styles.optionButtonSelected
+                )}
               >
                 {/* Currency Icon */}
-                <div 
-                  className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                  style={{ 
-                    backgroundColor: isSelected 
-                      ? 'rgba(96, 165, 250, 0.2)' 
+                <div
+                  className={cn(
+                    styles.optionIconWrapper,
+                    isSelected && styles.optionIconWrapperSelected
+                  )}
+                  style={{
+                    '--option-icon-bg': isSelected
+                      ? 'rgba(96, 165, 250, 0.2)'
                       : 'rgba(255, 255, 255, 0.1)',
-                  }}
+                  } as React.CSSProperties}
                 >
                   <CurrencyIcon
                     currency={option.value}
@@ -219,47 +194,36 @@ export function CurrencySelector({
                     aria-hidden={false}
                   />
                 </div>
-                
+
                 {/* Currency Info */}
-                <div className="flex-1 text-left">
-                  <div 
-                    className="font-semibold flex items-center gap-2"
-                    style={{ 
-                      fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-                      color: isSelected ? STATE_COLORS.active : TEXT_COLORS.primary,
-                    }}
+                <div className={styles.optionInfo}>
+                  <div
+                    className={cn(
+                      styles.optionCodeRow,
+                      isSelected && styles.optionCodeRowSelected
+                    )}
                   >
                     {option.value}
                     {isLocal && (
-                      <span 
-                        className="px-2 py-0.5 rounded-full text-xs"
-                        style={{ 
-                          backgroundColor: 'rgba(16, 185, 129, 0.2)',
-                          color: STATE_COLORS.success,
-                        }}
-                      >
+                      <span className={styles.recommendedBadge}>
                         Recommended
                       </span>
                     )}
                   </div>
-                  <div 
-                    style={{ 
-                      fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-                      color: TEXT_COLORS.muted,
-                    }}
-                  >
+                  <div className={styles.optionName}>
                     {option.label.split('(')[0].trim()}
                   </div>
                 </div>
-                
+
                 {/* Checkmark for selected */}
                 {isSelected && (
-                  <svg 
-                    width="20" 
-                    height="20" 
-                    viewBox="0 0 24 24" 
-                    fill="none" 
-                    stroke={STATE_COLORS.active} 
+                  <svg
+                    className={styles.checkmark}
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke={STATE_COLORS.active}
                     strokeWidth="2.5"
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -275,4 +239,3 @@ export function CurrencySelector({
 }
 
 export default CurrencySelector;
-

@@ -16,6 +16,7 @@ import {
 } from '../constants';
 import { SPACING, RADIUS } from '../../../core/constants/sizes';
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS } from '../../../core/constants/colors';
+import styles from './FilterSortBar.module.css';
 
 // ============================================================================
 // SORT DROPDOWN
@@ -44,17 +45,16 @@ function SortDropdown({ value, onChange }: SortDropdownProps): React.ReactElemen
   const selectedOption = SORT_OPTIONS.find((opt) => opt.value === value);
 
   return (
-    <div ref={dropdownRef} className="relative">
+    <div ref={dropdownRef} className={styles.dropdownContainer}>
       {/* Trigger button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 transition-all active:scale-[0.97]"
+        className={styles.sortButton}
         style={{
-          padding: '6px 12px',
-          borderRadius: RADIUS.lg,
-          backgroundColor: 'rgba(255, 255, 255, 0.06)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-        }}
+          '--radius-lg': `${RADIUS.lg}px`,
+          '--text-color-muted': TEXT_COLORS.muted,
+          '--text-color-secondary': TEXT_COLORS.secondary,
+        } as React.CSSProperties}
       >
         {/* Sort icon */}
         <svg
@@ -66,20 +66,14 @@ function SortDropdown({ value, onChange }: SortDropdownProps): React.ReactElemen
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          style={{ color: TEXT_COLORS.muted }}
+          className={styles.sortIcon}
         >
           <line x1="4" y1="6" x2="16" y2="6" />
           <line x1="4" y1="12" x2="12" y2="12" />
           <line x1="4" y1="18" x2="8" y2="18" />
         </svg>
 
-        <span
-          style={{
-            fontSize: 13,
-            fontWeight: 500,
-            color: TEXT_COLORS.secondary,
-          }}
-        >
+        <span className={styles.sortLabel}>
           {selectedOption?.label || 'Sort'}
         </span>
 
@@ -93,11 +87,10 @@ function SortDropdown({ value, onChange }: SortDropdownProps): React.ReactElemen
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
+          className={`${styles.chevron} ${isOpen ? styles.open : ''}`}
           style={{
-            color: TEXT_COLORS.muted,
-            transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-            transition: 'transform 0.15s ease',
-          }}
+            '--text-color-muted': TEXT_COLORS.muted,
+          } as React.CSSProperties}
         >
           <polyline points="6 9 12 15 18 9" />
         </svg>
@@ -106,15 +99,11 @@ function SortDropdown({ value, onChange }: SortDropdownProps): React.ReactElemen
       {/* Dropdown menu */}
       {isOpen && (
         <div
-          className="absolute right-0 mt-2 z-50"
+          className={styles.dropdownMenu}
           style={{
-            minWidth: 180,
-            backgroundColor: BG_COLORS.card,
-            borderRadius: RADIUS.lg,
-            border: '1px solid rgba(255, 255, 255, 0.12)',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
-            overflow: 'hidden',
-          }}
+            '--bg-color-card': BG_COLORS.card,
+            '--radius-lg': `${RADIUS.lg}px`,
+          } as React.CSSProperties}
         >
           {SORT_OPTIONS.map((option) => (
             <button
@@ -123,14 +112,12 @@ function SortDropdown({ value, onChange }: SortDropdownProps): React.ReactElemen
                 onChange(option.value);
                 setIsOpen(false);
               }}
-              className="w-full text-left transition-all hover:bg-white/5"
+              className={`${styles.menuItem} ${option.value === value ? styles.active : ''}`}
               style={{
-                padding: '10px 14px',
-                fontSize: 13,
-                fontWeight: option.value === value ? 600 : 400,
-                color: option.value === value ? STATE_COLORS.active : TEXT_COLORS.primary,
-                backgroundColor: option.value === value ? 'rgba(96, 165, 250, 0.1)' : 'transparent',
-              }}
+                '--text-color-primary': TEXT_COLORS.primary,
+                '--text-color-active': option.value === value ? STATE_COLORS.active : TEXT_COLORS.primary,
+                '--state-color-active': STATE_COLORS.active,
+              } as React.CSSProperties}
             >
               {option.label}
             </button>
@@ -151,14 +138,14 @@ export default function FilterSortBar({
 }: FilterSortBarProps): React.ReactElement {
   return (
     <div
-      className="flex flex-col gap-3"
+      className={styles.barContainer}
       style={{
-        padding: `${SPACING.sm}px ${SLOW_DRAFT_LAYOUT.listPaddingX}px`,
-        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-      }}
+        '--spacing-sm': `${SPACING.sm}`,
+        '--padding-x': `${SLOW_DRAFT_LAYOUT.listPaddingX}px`,
+      } as React.CSSProperties}
     >
       {/* Top row: Sort */}
-      <div className="flex items-center justify-end">
+      <div className={styles.barTopRow}>
         <SortDropdown value={sortBy} onChange={onSortChange} />
       </div>
     </div>

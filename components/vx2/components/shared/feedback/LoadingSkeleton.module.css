@@ -1,0 +1,119 @@
+/**
+ * LoadingSkeleton CSS Module
+ *
+ * Migrated from inline styles for CSP compliance.
+ */
+
+/* ============================================================================
+   BASE SKELETON
+   ============================================================================ */
+
+.skeleton {
+  background-color: rgba(255, 255, 255, 0.1);
+  /* Dynamic sizing via CSS custom properties */
+  width: var(--skeleton-width, 100%);
+  height: var(--skeleton-height, 16px);
+  border-radius: var(--skeleton-radius, var(--radius-md));
+}
+
+.skeleton.circle {
+  border-radius: 50%;
+}
+
+.skeleton.pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.skeleton.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* ============================================================================
+   SKELETON TEXT
+   ============================================================================ */
+
+.textContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--skeleton-gap, 8px);
+}
+
+/* ============================================================================
+   SKELETON CARD
+   ============================================================================ */
+
+.card {
+  background-color: rgba(31, 41, 55, 0.5);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  height: var(--card-height, 160px);
+  display: flex;
+  flex-direction: column;
+}
+
+.cardHeader {
+  margin-bottom: var(--spacing-md);
+}
+
+.cardBody {
+  flex: 1;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--spacing-md);
+}
+
+/* ============================================================================
+   SKELETON LIST ITEM
+   ============================================================================ */
+
+.listItem {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-md) 0;
+}
+
+.listItemAvatar {
+  flex-shrink: 0;
+  margin-right: var(--spacing-md);
+}
+
+.listItemContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.listItemRight {
+  margin-left: var(--spacing-md);
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+   UTILITY SPACING
+   ============================================================================ */
+
+.mt2 {
+  margin-top: var(--spacing-sm);
+}
+
+.mt3 {
+  margin-top: var(--spacing-md);
+}
+
+.mr3 {
+  margin-right: var(--spacing-md);
+}
+
+.ml3 {
+  margin-left: var(--spacing-md);
+}

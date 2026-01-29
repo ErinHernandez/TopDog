@@ -14,10 +14,12 @@
  */
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { cn } from '@/lib/styles';
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../core/constants/colors';
 import { TYPOGRAPHY, RADIUS, SPACING } from '../core/constants/sizes';
 import { formatSmallestUnit } from '../utils/formatting';
 import { createScopedLogger } from '../../../lib/clientLogger';
+import styles from './PendingPayments.module.css';
 
 const logger = createScopedLogger('[PendingPayments]');
 
@@ -110,119 +112,102 @@ interface PaymentCardProps {
   isCancelling: boolean;
 }
 
-function PaymentCard({ 
-  payment, 
-  onViewVoucher, 
+function PaymentCard({
+  payment,
+  onViewVoucher,
   onCancel,
   isCancelling,
 }: PaymentCardProps): React.ReactElement {
   const [isMounted, setIsMounted] = useState(false);
-  
+
   // Track mount state to prevent hydration mismatch with Date.now()
   useEffect(() => {
     setIsMounted(true);
   }, []);
-  
+
   // Use safe placeholder during SSR/initial render, then calculate after mount
-  const timeInfo = isMounted 
+  const timeInfo = isMounted
     ? formatTimeRemaining(payment.expiresAt)
     : { text: '—', isExpiringSoon: false, isExpired: false };
   const isDisabled = timeInfo.isExpired || payment.status !== 'pending';
-  
+
   return (
-    <div 
-      className="p-4 rounded-lg"
-      style={{ 
-        backgroundColor: BG_COLORS.tertiary,
-        border: `1px solid ${isDisabled ? BORDER_COLORS.default : BORDER_COLORS.subtle}`,
-        opacity: isDisabled ? 0.6 : 1,
-      }}
+    <div
+      className={cn(styles.card, isDisabled && styles.disabled)}
     >
-      <div className="flex items-start gap-4">
+      <div className={styles.cardContent}>
         {/* Icon */}
-        <div 
-          className="text-3xl flex-shrink-0"
+        <div
+          className={styles.paymentIcon}
           role="img"
           aria-label={getPaymentTypeLabel(payment.type)}
         >
           {getPaymentTypeIcon(payment.type)}
         </div>
-        
+
         {/* Content */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between gap-2 mb-1">
-            <h4 
-              className="font-semibold truncate"
-              style={{ color: TEXT_COLORS.primary }}
-            >
+        <div className={styles.cardBody}>
+          <div className={styles.cardHeader}>
+            <h4 className={styles.cardTitle}>
               {getPaymentTypeLabel(payment.type)}
             </h4>
-            <span 
-              className="font-bold flex-shrink-0"
-              style={{ color: STATE_COLORS.success }}
-            >
+            <span className={styles.cardAmount}>
               {formatSmallestUnit(payment.amount, { currency: payment.currency })}
             </span>
           </div>
-          
-          <p 
-            className="text-sm mb-2"
-            style={{ color: TEXT_COLORS.secondary }}
-          >
+
+          <p className={styles.cardDescription}>
             {getPaymentTypeDescription(payment.type)}
           </p>
-          
+
           {/* Expiration */}
-          <div className="flex items-center gap-2 mb-3">
-            <span 
-              className="text-xs"
-              style={{ color: TEXT_COLORS.muted }}
-            >
+          <div className={styles.expirationContainer}>
+            <span className={styles.expirationLabel}>
               {timeInfo.isExpired ? 'Expired' : 'Expires in:'}
             </span>
             {!timeInfo.isExpired && (
-              <span 
-                className="text-xs font-medium px-2 py-0.5 rounded"
-                style={{ 
-                  backgroundColor: timeInfo.isExpiringSoon 
+              <span
+                className={cn(
+                  styles.expirationBadge,
+                  timeInfo.isExpiringSoon && styles.expiringSoon
+                )}
+                style={{
+                  '--expiration-bg': timeInfo.isExpiringSoon
                     ? `${STATE_COLORS.error}20`
                     : `${STATE_COLORS.warning}20`,
-                  color: timeInfo.isExpiringSoon 
-                    ? STATE_COLORS.error 
+                  '--expiration-text': timeInfo.isExpiringSoon
+                    ? STATE_COLORS.error
                     : STATE_COLORS.warning,
-                }}
+                  '--expiration-bg-soon': `${STATE_COLORS.error}20`,
+                  '--expiration-text-soon': STATE_COLORS.error,
+                } as React.CSSProperties}
               >
                 {timeInfo.text}
               </span>
             )}
           </div>
-          
+
           {/* Actions */}
-          <div className="flex gap-2">
+          <div className={styles.actions}>
             <button
               onClick={() => onViewVoucher(payment)}
               disabled={isDisabled}
-              className="flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-all"
+              className={styles.viewButton}
               style={{
-                backgroundColor: isDisabled ? BG_COLORS.elevated : STATE_COLORS.success,
-                color: isDisabled ? TEXT_COLORS.muted : '#fff',
-                cursor: isDisabled ? 'not-allowed' : 'pointer',
-              }}
+                '--button-bg': isDisabled ? BG_COLORS.elevated : STATE_COLORS.success,
+                '--button-text': isDisabled ? TEXT_COLORS.muted : '#fff',
+              } as React.CSSProperties}
             >
               View {payment.type === 'pix' ? 'QR Code' : 'Voucher'}
             </button>
-            
+
             <button
               onClick={() => onCancel(payment.id)}
               disabled={isDisabled || isCancelling}
-              className="py-2 px-3 rounded-lg text-sm font-medium transition-all"
-              style={{
-                backgroundColor: BG_COLORS.elevated,
-                color: TEXT_COLORS.secondary,
-                border: `1px solid ${BORDER_COLORS.default}`,
-                cursor: isDisabled || isCancelling ? 'not-allowed' : 'pointer',
-                opacity: isCancelling ? 0.5 : 1,
-              }}
+              className={cn(
+                styles.cancelButton,
+                isCancelling && styles.cancelling
+              )}
             >
               {isCancelling ? '...' : 'Cancel'}
             </button>
@@ -332,74 +317,78 @@ export function PendingPayments({
   }
   
   return (
-    <div 
-      className="rounded-xl overflow-hidden"
-      style={{ backgroundColor: BG_COLORS.secondary }}
+    <div
+      className={styles.container}
+      style={{
+        '--bg-secondary': BG_COLORS.secondary,
+      } as React.CSSProperties}
     >
       {/* Header */}
-      <div 
-        className="p-4 border-b"
-        style={{ borderColor: BORDER_COLORS.default }}
-      >
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 
-              className="font-semibold"
-              style={{ 
-                fontSize: `${TYPOGRAPHY.fontSize.lg}px`, 
-                color: TEXT_COLORS.primary 
-              }}
+      <div className={styles.header}>
+        <div className={styles.headerContent}>
+          <div className={styles.headerText}>
+            <h3
+              style={{
+                '--typography-lg': `${TYPOGRAPHY.fontSize.lg}px`,
+                '--text-primary': TEXT_COLORS.primary,
+                '--border-default': BORDER_COLORS.default,
+              } as React.CSSProperties}
             >
               Pending Deposits
             </h3>
-            <p 
-              className="text-sm mt-0.5"
-              style={{ color: TEXT_COLORS.secondary }}
+            <p
+              style={{
+                '--text-secondary': TEXT_COLORS.secondary,
+              } as React.CSSProperties}
             >
               Complete these payments to add funds
             </p>
           </div>
-          
+
           <button
             onClick={fetchPayments}
             disabled={isLoading}
-            className="p-2 rounded-lg transition-all"
-            style={{ 
-              backgroundColor: BG_COLORS.tertiary,
-              color: TEXT_COLORS.secondary,
-            }}
+            className={styles.refreshButton}
+            style={{
+              '--bg-tertiary': BG_COLORS.tertiary,
+              '--text-secondary': TEXT_COLORS.secondary,
+            } as React.CSSProperties}
             aria-label="Refresh"
           >
-            <svg 
-              className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`}
-              fill="none" 
-              viewBox="0 0 24 24" 
+            <svg
+              className={cn(styles.spinIcon, isLoading && styles.spinning)}
+              fill="none"
+              viewBox="0 0 24 24"
               stroke="currentColor"
             >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" 
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
               />
             </svg>
           </button>
         </div>
       </div>
-      
+
       {/* Content */}
-      <div className="p-4 space-y-3">
+      <div className={styles.content}>
         {isLoading ? (
-          <div className="flex items-center justify-center py-8">
-            <span 
-              className="animate-spin w-6 h-6 border-2 border-current border-t-transparent rounded-full"
-              style={{ color: STATE_COLORS.active }}
+          <div className={styles.loadingContainer}>
+            <span
+              className={styles.spinner}
+              style={{
+                '--state-active': STATE_COLORS.active,
+              } as React.CSSProperties}
             />
           </div>
         ) : error ? (
-          <div 
-            className="text-center py-6"
-            style={{ color: STATE_COLORS.error }}
+          <div
+            className={styles.errorMessage}
+            style={{
+              '--state-error': STATE_COLORS.error,
+            } as React.CSSProperties}
           >
             {error}
           </div>

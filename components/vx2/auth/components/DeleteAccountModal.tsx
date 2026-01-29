@@ -7,13 +7,14 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { SPACING, TYPOGRAPHY, Z_INDEX } from '../../core/constants/sizes';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../../core/constants/colors';
+import { cn } from '@/lib/styles';
 import { Close } from '../../components/icons';
 import { useAuth } from '../hooks/useAuth';
 import { getAuth } from 'firebase/auth';
 import { DeletionTracePath } from './DeletionTracePath';
 import { createScopedLogger } from '../../../../lib/clientLogger';
+import styles from './DeleteAccountModal.module.css';
+import sharedStyles from './auth-shared.module.css';
 
 const logger = createScopedLogger('[DeleteAccountModal]');
 
@@ -159,95 +160,53 @@ export function DeleteAccountModal({
     <div
       role="dialog"
       aria-modal="true"
+      className={styles.backdrop}
       style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: Z_INDEX.modal + 10,
-        background: 'rgba(0,0,0,0.75)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: SPACING.lg,
-      }}
+        '--z-modal-backdrop': 1010,
+      } as React.CSSProperties}
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        style={{
-          width: '100%',
-          maxWidth: 400,
-          maxHeight: '90vh',
-          overflow: 'auto',
-          background: BG_COLORS.secondary,
-          borderRadius: 16,
-          padding: SPACING.lg,
-        }}
+        className={styles.modalContent}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING.lg }}>
-          <h2 style={{ color: TEXT_COLORS.primary, fontSize: TYPOGRAPHY.fontSize.lg, fontWeight: 700 }}>
+        <div className={styles.headerContainer}>
+          <h2 className={styles.headerTitle}>
             {step === 'options' && 'Account options'}
             {step === 'eligibility' && 'Request account deletion'}
             {step === 'confirm' && 'Confirm deletion'}
           </h2>
-          <button onClick={onClose} className="p-2" aria-label="Close">
-            <Close size={24} color={TEXT_COLORS.muted} />
+          <button onClick={onClose} className={styles.closeButton} aria-label="Close">
+            <Close size={24} />
           </button>
         </div>
 
         {error && (
-          <div
-            style={{
-              padding: SPACING.sm,
-              marginBottom: SPACING.md,
-              borderRadius: 8,
-              background: 'rgba(239,68,68,0.1)',
-              color: STATE_COLORS.error,
-              fontSize: TYPOGRAPHY.fontSize.sm,
-            }}
-          >
+          <div className={styles.errorMessage}>
             {error}
           </div>
         )}
 
         {step === 'options' && (
-          <div className="space-y-4">
-            <p style={{ color: TEXT_COLORS.secondary, fontSize: TYPOGRAPHY.fontSize.sm }}>
+          <div className={styles.section}>
+            <p className={styles.descriptionText}>
               Pause your account to disable new deposits and tournament entries. You can turn it back on anytime.
             </p>
             <button
               onClick={handlePause}
               disabled={pauseSaving}
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                borderRadius: 12,
-                border: `1px solid ${BORDER_COLORS.default}`,
-                background: accountPaused ? 'url(/wr_blue.png) no-repeat center center' : BG_COLORS.tertiary,
-                backgroundSize: accountPaused ? 'cover' : undefined,
-                color: accountPaused ? '#000' : TEXT_COLORS.primary,
-                fontWeight: 600,
-                fontSize: TYPOGRAPHY.fontSize.base,
-              }}
+              className={cn(styles.pauseButton, accountPaused && styles.pauseButtonPaused)}
             >
               {pauseSaving ? 'Saving...' : accountPaused ? 'Account paused – tap to resume' : 'Pause account'}
             </button>
 
-            <p style={{ color: TEXT_COLORS.muted, fontSize: TYPOGRAPHY.fontSize.sm, marginTop: 24 }}>
-              To permanently delete your account, you must have $0 balance and no active tournament entries. You’ll
+            <p className={styles.warningText}>
+              To permanently delete your account, you must have $0 balance and no active tournament entries. You'll
               need to withdraw all funds and finish or withdraw from any live drafts first.
             </p>
             <button
               onClick={handleRequestDeletion}
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                borderRadius: 12,
-                border: `1px solid ${STATE_COLORS.error}`,
-                background: 'transparent',
-                color: STATE_COLORS.error,
-                fontWeight: 600,
-                fontSize: TYPOGRAPHY.fontSize.base,
-              }}
+              className={styles.deleteButton}
             >
               Request account deletion
             </button>
@@ -255,28 +214,21 @@ export function DeleteAccountModal({
         )}
 
         {step === 'eligibility' && (
-          <div className="space-y-4">
-            {loading && <p style={{ color: TEXT_COLORS.muted }}>Checking...</p>}
+          <div className={styles.section}>
+            {loading && <p className={styles.loadingText}>Checking...</p>}
             {!loading && eligibility && (
               <>
                 {!eligibility.canDelete && (
-                  <div
-                    style={{
-                      padding: SPACING.md,
-                      borderRadius: 12,
-                      background: 'rgba(239,68,68,0.1)',
-                      border: `1px solid ${STATE_COLORS.error}40`,
-                    }}
-                  >
-                    <p style={{ color: STATE_COLORS.error, fontWeight: 600, marginBottom: 8 }}>
-                      You can’t delete yet
+                  <div className={styles.ineligibilityBox}>
+                    <p className={styles.ineligibilityTitle}>
+                      You can't delete yet
                     </p>
-                    <ul style={{ color: TEXT_COLORS.secondary, fontSize: TYPOGRAPHY.fontSize.sm, margin: 0, paddingLeft: 20 }}>
+                    <ul className={styles.ineligibilityReasons}>
                       {eligibility.reasons.map((r, i) => (
-                        <li key={i}>{r}</li>
+                        <li key={i} className={styles.ineligibilityReason}>{r}</li>
                       ))}
                     </ul>
-                    <p style={{ color: TEXT_COLORS.muted, fontSize: TYPOGRAPHY.fontSize.xs, marginTop: 12 }}>
+                    <p className={styles.ineligibilityHint}>
                       Your balance is ${balanceDollars}. Withdraw or claim all funds, and finish or withdraw from
                       active tournaments. You can also &quot;Pause account&quot; to stop new activity and delete
                       later when eligible.
@@ -284,42 +236,28 @@ export function DeleteAccountModal({
                   </div>
                 )}
                 {eligibility.canDelete && (
-                  <p style={{ color: TEXT_COLORS.secondary, fontSize: TYPOGRAPHY.fontSize.sm }}>
+                  <p className={styles.eligibilityMessage}>
                     Your balance is $0 and you have no active tournament entries. You can proceed to confirm deletion.
                   </p>
                 )}
-                <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
-                  <button
-                    onClick={() => setStep('options')}
-                    style={{
-                      flex: 1,
-                      padding: '12px 16px',
-                      borderRadius: 12,
-                      border: `1px solid ${BORDER_COLORS.default}`,
-                      background: 'transparent',
-                      color: TEXT_COLORS.primary,
-                      fontSize: TYPOGRAPHY.fontSize.base,
-                    }}
-                  >
-                    Back
-                  </button>
-                  {eligibility.canDelete && (
+                <div className={styles.buttonGroup}>
+                  <div className={styles.buttonGroupItem}>
                     <button
-                      onClick={handleConfirmDeletion}
-                      style={{
-                        flex: 1,
-                        padding: '12px 16px',
-                        borderRadius: 12,
-                        border: 'none',
-                        background: 'url(/wr_blue.png) no-repeat center center',
-                        backgroundSize: 'cover',
-                        color: '#000',
-                        fontWeight: 600,
-                        fontSize: TYPOGRAPHY.fontSize.base,
-                      }}
+                      onClick={() => setStep('options')}
+                      className={styles.backButton}
                     >
-                      Continue to confirm
+                      Back
                     </button>
+                  </div>
+                  {eligibility.canDelete && (
+                    <div className={styles.buttonGroupItem}>
+                      <button
+                        onClick={handleConfirmDeletion}
+                        className={styles.confirmButton}
+                      >
+                        Continue to confirm
+                      </button>
+                    </div>
                   )}
                 </div>
               </>
@@ -328,9 +266,9 @@ export function DeleteAccountModal({
         )}
 
         {step === 'confirm' && (
-          <div className="space-y-6">
-            <div style={{ padding: SPACING.md, background: 'rgba(239,68,68,0.1)', borderRadius: 12 }}>
-              <p style={{ color: TEXT_COLORS.primary, fontSize: TYPOGRAPHY.fontSize.sm }}>
+          <div className={styles.section}>
+            <div className={styles.confirmationBox}>
+              <p className={styles.confirmationText}>
                 This will permanently delete your account and all data. To prevent accidental deletion, trace the path
                 below and enter your password.
               </p>
@@ -339,11 +277,8 @@ export function DeleteAccountModal({
             <DeletionTracePath onComplete={() => setTraceComplete(true)} disabled={isDeleting} />
 
             {hasEmailPassword && (
-              <div>
-                <label
-                  className="block font-medium mb-1"
-                  style={{ color: TEXT_COLORS.primary, fontSize: TYPOGRAPHY.fontSize.sm }}
-                >
+              <div className={styles.passwordFieldWrapper}>
+                <label className={styles.passwordLabel}>
                   Your password
                 </label>
                 <input
@@ -352,56 +287,36 @@ export function DeleteAccountModal({
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Password"
                   autoComplete="current-password"
-                  style={{
-                    width: '100%',
-                    padding: '12px 16px',
-                    borderRadius: 12,
-                    border: `2px solid ${BORDER_COLORS.default}`,
-                    background: 'rgba(255,255,255,0.05)',
-                    color: TEXT_COLORS.primary,
-                    fontSize: TYPOGRAPHY.fontSize.base,
-                  }}
+                  className={styles.passwordInput}
                 />
               </div>
             )}
 
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button
-                onClick={() => setStep('eligibility')}
-                disabled={isDeleting}
-                style={{
-                  flex: 1,
-                  padding: '12px 16px',
-                  borderRadius: 12,
-                  border: `1px solid ${BORDER_COLORS.default}`,
-                  background: 'transparent',
-                  color: TEXT_COLORS.primary,
-                  fontSize: TYPOGRAPHY.fontSize.base,
-                }}
-              >
-                Back
-              </button>
-              <button
-                onClick={handleDelete}
-                disabled={!traceComplete || (hasEmailPassword && !password.trim()) || isDeleting}
-                style={{
-                  flex: 1,
-                  padding: '12px 16px',
-                  borderRadius: 12,
-                  border: 'none',
-                  background:
+            <div className={styles.buttonGroup}>
+              <div className={styles.buttonGroupItem}>
+                <button
+                  onClick={() => setStep('eligibility')}
+                  disabled={isDeleting}
+                  className={styles.backButton}
+                >
+                  Back
+                </button>
+              </div>
+              <div className={styles.buttonGroupItem}>
+                <button
+                  onClick={handleDelete}
+                  disabled={!traceComplete || (hasEmailPassword && !password.trim()) || isDeleting}
+                  className={cn(
+                    styles.deleteFinalButton,
                     traceComplete && (!hasEmailPassword || password.trim())
-                      ? STATE_COLORS.error
-                      : BG_COLORS.tertiary,
-                  color:
-                    traceComplete && (!hasEmailPassword || password.trim()) ? '#fff' : TEXT_COLORS.disabled,
-                  fontWeight: 600,
-                  fontSize: TYPOGRAPHY.fontSize.base,
-                  opacity: isDeleting ? 0.7 : 1,
-                }}
-              >
-                {isDeleting ? 'Deleting...' : 'Delete my account'}
-              </button>
+                      ? styles.deleteFinalButtonEnabled
+                      : styles.deleteFinalButtonDisabled,
+                    isDeleting && styles.deleting
+                  )}
+                >
+                  {isDeleting ? 'Deleting...' : 'Delete my account'}
+                </button>
+              </div>
             </div>
           </div>
         )}

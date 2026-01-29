@@ -20,11 +20,14 @@
  */
 
 import React, { useCallback, useState, useRef, useEffect } from 'react';
+import { cn } from '@/lib/styles';
 import { BG_COLORS, TEXT_COLORS, BORDER_COLORS, STATE_COLORS } from '../../core/constants/colors';
 import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
 import { useUsernameValidation } from '../hooks/useUsernameValidation';
 import type { UsernameValidationResult, UsernameAvailabilityResult } from '../types';
 import { USERNAME_CONSTRAINTS } from '../constants';
+import styles from './UsernameInput.module.css';
+import sharedStyles from './auth-shared.module.css';
 
 // ============================================================================
 // TYPES
@@ -99,15 +102,15 @@ interface StatusIconProps {
 
 function StatusIcon({ status, size }: StatusIconProps): React.ReactElement | null {
   if (status === 'idle') return null;
-  
+
   if (status === 'loading') {
     return (
       <svg
         width={size}
         height={size}
         viewBox="0 0 24 24"
-        className="animate-spin"
-        style={{ color: TEXT_COLORS.muted }}
+        className={styles.statusIconLoading}
+        style={{ '--text-muted': TEXT_COLORS.muted } as React.CSSProperties}
       >
         <circle
           cx="12"
@@ -122,7 +125,7 @@ function StatusIcon({ status, size }: StatusIconProps): React.ReactElement | nul
       </svg>
     );
   }
-  
+
   if (status === 'valid') {
     return (
       <svg
@@ -130,7 +133,7 @@ function StatusIcon({ status, size }: StatusIconProps): React.ReactElement | nul
         height={size}
         viewBox="0 0 24 24"
         fill="none"
-        style={{ color: STATE_COLORS.success }}
+        style={{ '--success-color': STATE_COLORS.success } as React.CSSProperties}
       >
         <path
           d="M20 6L9 17L4 12"
@@ -142,7 +145,7 @@ function StatusIcon({ status, size }: StatusIconProps): React.ReactElement | nul
       </svg>
     );
   }
-  
+
   // invalid
   return (
     <svg
@@ -150,7 +153,7 @@ function StatusIcon({ status, size }: StatusIconProps): React.ReactElement | nul
       height={size}
       viewBox="0 0 24 24"
       fill="none"
-      style={{ color: STATE_COLORS.error }}
+      style={{ '--error-color': STATE_COLORS.error } as React.CSSProperties}
     >
       <path
         d="M18 6L6 18M6 6L18 18"
@@ -258,12 +261,29 @@ export function UsernameInput({
     return BORDER_COLORS.default;
   };
   
+  // Determine size class
+  const sizeClass = {
+    sm: styles.inputContainerSmall,
+    md: styles.inputContainerMedium,
+    lg: styles.inputContainerLarge,
+  }[size];
+
+  // Determine input state classes
+  const inputStateClass = cn({
+    [styles.inputError]: hasError,
+    [styles.inputSuccess]: status === 'valid',
+  });
+
   return (
-    <div className={`flex flex-col ${className}`}>
+    <div className={cn(styles.container, className)}>
       {/* Input container */}
       <div
-        className="relative flex items-center"
-        style={{ height: `${config.height}px` }}
+        className={cn(styles.inputContainer, sizeClass)}
+        style={{
+          '--input-height': `${config.height}px`,
+          '--input-padding-x': `${config.paddingX}px`,
+          '--input-font-size': `${config.fontSize}px`,
+        } as React.CSSProperties}
       >
         {/* Input */}
         <input
@@ -281,78 +301,72 @@ export function UsernameInput({
           autoComplete="username"
           spellCheck={false}
           maxLength={USERNAME_CONSTRAINTS.MAX_LENGTH}
-          className="w-full h-full outline-none transition-colors"
+          className={cn(styles.input, inputStateClass)}
           style={{
-            backgroundColor: BG_COLORS.secondary,
-            color: TEXT_COLORS.primary,
-            border: `2px solid ${getBorderColor()}`,
-            borderRadius: `${RADIUS.md}px`,
-            paddingLeft: `${config.paddingX}px`,
-            paddingRight: `${config.height + config.paddingX}px`,
-            fontSize: `${config.fontSize}px`,
-          }}
+            '--bg-secondary': BG_COLORS.secondary,
+            '--text-primary': TEXT_COLORS.primary,
+            '--input-border-color': getBorderColor(),
+            '--input-radius': `${RADIUS.md}px`,
+          } as React.CSSProperties}
           aria-label={ariaLabel}
           aria-describedby={ariaDescribedBy || (hasError ? 'username-error' : undefined)}
           aria-invalid={hasError}
         />
-        
+
         {/* Status icon */}
         <div
-          className="absolute right-0 flex items-center justify-center"
+          className={cn('absolute right-0 flex items-center justify-center', styles.statusIconContainer)}
           style={{
-            width: `${config.height}px`,
-            height: `${config.height}px`,
-          }}
+            '--input-height': `${config.height}px`,
+          } as React.CSSProperties}
         >
           <StatusIcon status={status} size={config.iconSize} />
         </div>
       </div>
       
       {/* Helper row */}
-      <div
-        className="flex items-center justify-between mt-1 px-1"
-        style={{ minHeight: '20px' }}
-      >
+      <div className={styles.helperRow}>
         {/* Error message */}
         {hasError ? (
           <span
             id="username-error"
             role="alert"
+            className={styles.errorMessage}
             style={{
-              color: STATE_COLORS.error,
-              fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-            }}
+              '--error-color': STATE_COLORS.error,
+              '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
+            } as React.CSSProperties}
           >
             {errorMessage}
           </span>
         ) : showRequirements && isFocused && username.length === 0 ? (
           <span
+            className={styles.requirementsText}
             style={{
-              color: TEXT_COLORS.muted,
-              fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-            }}
+              '--text-muted': TEXT_COLORS.muted,
+              '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
+            } as React.CSSProperties}
           >
             {requirements.allowedCharactersDescription}
           </span>
         ) : (
           <span />
         )}
-        
       </div>
       
       {/* Suggestions when username is unavailable */}
       {availability && !availability.isAvailable && availability.suggestions && availability.suggestions.length > 0 && (
-        <div className="mt-2">
+        <div className={styles.suggestionsSection}>
           <div
+            className={styles.suggestionsLabel}
             style={{
-              color: TEXT_COLORS.muted,
-              fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-              marginBottom: '4px',
-            }}
+              '--text-muted': TEXT_COLORS.muted,
+              '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
+            } as React.CSSProperties}
           >
             Suggested alternatives:
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className={styles.suggestionsContainer}>
             {availability.suggestions.map((suggestion, index) => (
               <button
                 key={index}
@@ -363,20 +377,14 @@ export function UsernameInput({
                   }
                   internalSetUsername(suggestion);
                 }}
-                className="px-2 py-1 rounded transition-colors"
+                className={styles.suggestionButton}
                 style={{
-                  backgroundColor: BG_COLORS.tertiary,
-                  color: TEXT_COLORS.primary,
-                  border: `1px solid ${BORDER_COLORS.light}`,
-                  fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-                  cursor: 'pointer',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = BG_COLORS.secondary;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = BG_COLORS.tertiary;
-                }}
+                  '--bg-tertiary': BG_COLORS.tertiary,
+                  '--bg-secondary': BG_COLORS.secondary,
+                  '--text-primary': TEXT_COLORS.primary,
+                  '--border-light': BORDER_COLORS.light,
+                  '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
+                } as React.CSSProperties}
               >
                 {suggestion}
               </button>
@@ -387,30 +395,32 @@ export function UsernameInput({
       
       {/* Warnings (similarity warnings, etc.) */}
       {availability && availability.warnings && availability.warnings.length > 0 && (
-        <div className="mt-2">
+        <div className={styles.warningsSection}>
           {availability.warnings.map((warning, index) => (
             <div
               key={index}
+              className={styles.warningMessage}
               style={{
-                color: STATE_COLORS.warning || '#FBBF25',
-                fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-              }}
+                '--warning-color': STATE_COLORS.warning || '#f59e0b',
+                '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
+              } as React.CSSProperties}
             >
               {warning}
             </div>
           ))}
         </div>
       )}
-      
+
       {validation && validation.warnings && validation.warnings.length > 0 && (
-        <div className="mt-2">
+        <div className={styles.warningsSection}>
           {validation.warnings.map((warning, index) => (
             <div
               key={index}
+              className={styles.warningMessage}
               style={{
-                color: STATE_COLORS.warning || '#FBBF25',
-                fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-              }}
+                '--warning-color': STATE_COLORS.warning || '#f59e0b',
+                '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
+              } as React.CSSProperties}
             >
               {warning}
             </div>
@@ -421,11 +431,11 @@ export function UsernameInput({
       {/* Requirements panel (optional) */}
       {showRequirements && isFocused && username.length > 0 && validation && (
         <div
-          className="mt-2 p-3 rounded"
+          className={styles.requirementsPanel}
           style={{
-            backgroundColor: BG_COLORS.tertiary,
-            border: `1px solid ${BORDER_COLORS.light}`,
-          }}
+            '--bg-tertiary': BG_COLORS.tertiary,
+            '--border-light': BORDER_COLORS.light,
+          } as React.CSSProperties}
         >
           <RequirementsList
             validation={validation}
@@ -464,33 +474,39 @@ function RequirementsList({
       passed: !validation.errors.some(e => e.includes('character') || e.includes('invalid')),
     },
   ];
-  
+
   return (
-    <ul className="space-y-1">
+    <ul className={styles.requirementsList}>
       {checks.map((check, index) => (
         <li
           key={index}
-          className="flex items-center gap-2"
+          className={cn(styles.requirementItem, {
+            [styles.requirementItemPassed]: check.passed,
+            [styles.requirementItemPending]: !check.passed,
+          })}
           style={{
-            color: check.passed ? STATE_COLORS.success : TEXT_COLORS.muted,
-            fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-          }}
+            '--success-color': STATE_COLORS.success,
+            '--text-muted': TEXT_COLORS.muted,
+            '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
+          } as React.CSSProperties}
         >
-          {check.passed ? (
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M20 6L9 17L4 12"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          ) : (
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="2" />
-            </svg>
-          )}
+          <span className={styles.requirementIcon}>
+            {check.passed ? (
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M20 6L9 17L4 12"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            ) : (
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="2" />
+              </svg>
+            )}
+          </span>
           {check.label}
         </li>
       ))}

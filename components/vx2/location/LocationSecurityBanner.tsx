@@ -1,6 +1,6 @@
 /**
  * Location Security Banner
- * 
+ *
  * Displays security warnings for new/suspicious locations.
  * Shows contextual messages and actions.
  */
@@ -8,6 +8,7 @@
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS } from '@/components/vx2/core/constants/colors';
 import { SPACING, RADIUS } from '@/components/vx2/core/constants/sizes';
 import type { SecurityCheck } from '@/lib/location/types';
+import styles from './LocationSecurityBanner.module.css';
 
 interface LocationSecurityBannerProps {
   securityCheck: SecurityCheck;
@@ -30,7 +31,7 @@ export function LocationSecurityBanner({
   }
   
   // Determine banner style based on severity
-  const getStyles = () => {
+  const getBannerConfig = () => {
     if (securityCheck.action === 'block') {
       return {
         bgColor: 'rgba(239, 68, 68, 0.15)',
@@ -40,7 +41,7 @@ export function LocationSecurityBanner({
         message: 'Suspicious activity detected from this location. Please contact support.',
       };
     }
-    
+
     if (securityCheck.action === 'verify') {
       return {
         bgColor: 'rgba(245, 158, 11, 0.15)',
@@ -50,41 +51,40 @@ export function LocationSecurityBanner({
         message: 'Please verify your identity to continue from this new location.',
       };
     }
-    
+
     if (securityCheck.action === 'warn' || securityCheck.isNewLocation) {
       return {
         bgColor: 'rgba(59, 130, 246, 0.15)',
         borderColor: STATE_COLORS.info,
         iconColor: STATE_COLORS.info,
         title: 'New Location Detected',
-        message: locationName 
+        message: locationName
           ? `You're accessing from ${locationName}. Mark as trusted?`
           : 'You\'re accessing from a new location.',
       };
     }
-    
+
     return null;
   };
-  
-  const styles = getStyles();
-  if (!styles) return null;
+
+  const bannerConfig = getBannerConfig();
+  if (!bannerConfig) return null;
   
   return (
     <div
-      className="relative"
+      className={styles.container}
       style={{
-        backgroundColor: styles.bgColor,
-        borderRadius: RADIUS.lg,
-        border: `1px solid ${styles.borderColor}`,
-        padding: SPACING.lg,
-      }}
+        '--bg-color': bannerConfig.bgColor,
+        '--border-color': bannerConfig.borderColor,
+        '--border-radius': `${RADIUS.lg}px`,
+        '--padding': `${SPACING.lg}px`,
+      } as React.CSSProperties}
     >
       {/* Dismiss button */}
       {onDismiss && securityCheck.action !== 'block' && (
         <button
           onClick={onDismiss}
-          className="absolute top-2 right-2 p-1 rounded opacity-60 hover:opacity-100 transition-opacity"
-          style={{ color: TEXT_COLORS.secondary }}
+          className={styles.dismissButton}
         >
           <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
             <line x1="18" y1="6" x2="6" y2="18" />
@@ -92,12 +92,14 @@ export function LocationSecurityBanner({
           </svg>
         </button>
       )}
-      
-      <div className="flex items-start gap-3">
+
+      <div className={styles.contentWrapper}>
         {/* Icon */}
-        <div 
-          className="flex-shrink-0 mt-0.5"
-          style={{ color: styles.iconColor }}
+        <div
+          className={styles.iconContainer}
+          style={{
+            '--icon-color': bannerConfig.iconColor,
+          } as React.CSSProperties}
         >
           {securityCheck.action === 'block' ? (
             <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
@@ -118,33 +120,36 @@ export function LocationSecurityBanner({
             </svg>
           )}
         </div>
-        
+
         {/* Content */}
-        <div className="flex-1">
-          <h4 
-            className="text-sm font-semibold"
-            style={{ color: TEXT_COLORS.primary }}
+        <div className={styles.content}>
+          <h4
+            className={styles.title}
+            style={{
+              '--text-primary-color': TEXT_COLORS.primary,
+            } as React.CSSProperties}
           >
-            {styles.title}
+            {bannerConfig.title}
           </h4>
-          <p 
-            className="text-sm mt-1"
-            style={{ color: TEXT_COLORS.secondary }}
+          <p
+            className={styles.message}
+            style={{
+              '--text-secondary-color': TEXT_COLORS.secondary,
+            } as React.CSSProperties}
           >
-            {styles.message}
+            {bannerConfig.message}
           </p>
-          
+
           {/* Actions */}
           {(onTrustLocation || onVerify) && securityCheck.action !== 'block' && (
-            <div className="flex gap-2 mt-3">
+            <div className={styles.actions}>
               {onTrustLocation && securityCheck.isNewLocation && (
                 <button
                   onClick={onTrustLocation}
-                  className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors"
+                  className={styles.actionButton}
                   style={{
-                    backgroundColor: STATE_COLORS.success,
-                    color: '#FFFFFF',
-                  }}
+                    '--button-bg-color': STATE_COLORS.success,
+                  } as React.CSSProperties}
                 >
                   Trust This Location
                 </button>
@@ -152,11 +157,10 @@ export function LocationSecurityBanner({
               {onVerify && securityCheck.action === 'verify' && (
                 <button
                   onClick={onVerify}
-                  className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors"
+                  className={styles.actionButton}
                   style={{
-                    backgroundColor: STATE_COLORS.info,
-                    color: '#FFFFFF',
-                  }}
+                    '--button-bg-color': STATE_COLORS.info,
+                  } as React.CSSProperties}
                 >
                   Verify Identity
                 </button>

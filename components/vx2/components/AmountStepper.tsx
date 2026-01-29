@@ -1,6 +1,6 @@
 /**
  * AmountStepper Component
- * 
+ *
  * Stepper control for deposit amounts with $25 USD increments.
  * Features:
  * - Large +/- buttons for easy tapping
@@ -9,12 +9,16 @@
  * - Quick select chips for common amounts
  * - Exchange rate transparency notice
  * - Explanation of $25 increment recommendation
+ *
+ * Migrated to CSS Modules for CSP compliance.
  */
 
 import React, { useCallback, useMemo } from 'react';
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../core/constants/colors';
 import { SPACING, RADIUS, TYPOGRAPHY, TOUCH_TARGETS } from '../core/constants/sizes';
 import { Plus, Minus } from './icons';
+import { cn } from '@/lib/styles';
+import styles from './AmountStepper.module.css';
 
 // ============================================================================
 // TYPES
@@ -68,12 +72,12 @@ export function AmountStepper({
 }: AmountStepperProps): React.ReactElement {
   const isUSD = displayCurrency === 'USD';
   const rate = exchangeRate ?? 1;
-  
+
   // Calculate local amount
   const localAmount = useMemo(() => {
     return Math.round(amountUSD * rate * 100) / 100;
   }, [amountUSD, rate]);
-  
+
   // Format currency symbol
   const currencySymbol = useMemo(() => {
     try {
@@ -89,7 +93,7 @@ export function AmountStepper({
       return displayCurrency;
     }
   }, [displayCurrency]);
-  
+
   // Format local amount for display
   const formattedLocalAmount = useMemo(() => {
     try {
@@ -103,100 +107,91 @@ export function AmountStepper({
       return `${currencySymbol}${localAmount.toFixed(2)}`;
     }
   }, [localAmount, displayCurrency, currencySymbol]);
-  
+
   // Check if at limits
   const isAtMin = amountUSD <= minUSD;
   const isAtMax = amountUSD >= maxUSD;
-  
+
   // Handle increment
   const handleIncrement = useCallback(() => {
     if (disabled || isAtMax) return;
     const newAmount = Math.min(amountUSD + INCREMENT_USD, maxUSD);
     onChange(newAmount);
   }, [amountUSD, maxUSD, disabled, isAtMax, onChange]);
-  
+
   // Handle decrement
   const handleDecrement = useCallback(() => {
     if (disabled || isAtMin) return;
     const newAmount = Math.max(amountUSD - INCREMENT_USD, minUSD);
     onChange(newAmount);
   }, [amountUSD, minUSD, disabled, isAtMin, onChange]);
-  
+
   // Handle quick select
   const handleQuickSelect = useCallback((usdAmount: number) => {
     if (disabled) return;
     onChange(usdAmount);
   }, [disabled, onChange]);
-  
+
+  // CSS custom properties for dynamic values
+  const containerStyle: React.CSSProperties = {
+    '--info-bg': `${STATE_COLORS.info}12`,
+    '--info-border': `${STATE_COLORS.info}30`,
+    '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
+    '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
+    '--amount-font-size': `${TYPOGRAPHY.fontSize['3xl']}px`,
+    '--text-primary': TEXT_COLORS.primary,
+    '--text-secondary': TEXT_COLORS.secondary,
+    '--text-muted': TEXT_COLORS.muted,
+    '--button-size': `${TOUCH_TARGETS.comfort}px`,
+    '--active-color': STATE_COLORS.active,
+    '--border-default': BORDER_COLORS.default,
+    '--border-light': BORDER_COLORS.light,
+  } as React.CSSProperties;
+
   return (
-    <div className="space-y-5">
+    <div className={styles.container} style={containerStyle}>
       {/* Explanation Banner */}
-      <div 
-        className="p-4 rounded-xl"
-        style={{ 
-          backgroundColor: `${STATE_COLORS.info}12`,
-          border: `1px solid ${STATE_COLORS.info}30`,
-        }}
-      >
-        <p 
-          style={{ 
-            fontSize: `${TYPOGRAPHY.fontSize.sm}px`, 
-            color: TEXT_COLORS.primary,
-            lineHeight: 1.5,
-          }}
-        >
+      <div className={styles.explanationBanner}>
+        <p className={styles.explanationText}>
           Drafts cost $25 each. We recommend depositing in $25 increments so your balance always covers complete draft entries.
         </p>
       </div>
-      
+
       {/* Stepper Control */}
-      <div className="flex flex-col items-center gap-3">
-        <div className="flex items-center gap-6">
+      <div className={styles.stepperControl}>
+        <div className={styles.stepperRow}>
           {/* Decrement Button */}
           <button
             type="button"
             onClick={handleDecrement}
             disabled={disabled || isAtMin}
-            className="flex items-center justify-center rounded-full transition-all active:scale-95"
+            className={cn(
+              styles.stepperButton,
+              isAtMin && styles.stepperButtonDisabled
+            )}
             style={{
-              width: TOUCH_TARGETS.comfort,
-              height: TOUCH_TARGETS.comfort,
-              backgroundColor: isAtMin 
-                ? 'rgba(255, 255, 255, 0.05)' 
+              '--button-bg': isAtMin
+                ? 'rgba(255, 255, 255, 0.05)'
                 : 'rgba(255, 255, 255, 0.1)',
-              border: `1px solid ${isAtMin ? BORDER_COLORS.light : BORDER_COLORS.default}`,
-              opacity: isAtMin ? 0.5 : 1,
-              cursor: isAtMin ? 'not-allowed' : 'pointer',
-            }}
+              '--button-border': isAtMin ? BORDER_COLORS.light : BORDER_COLORS.default,
+            } as React.CSSProperties}
             aria-label="Decrease amount by $25"
           >
-            <Minus 
-              size={24} 
-              color={isAtMin ? TEXT_COLORS.muted : TEXT_COLORS.primary} 
+            <Minus
+              size={24}
+              color={isAtMin ? TEXT_COLORS.muted : TEXT_COLORS.primary}
             />
           </button>
-          
+
           {/* Amount Display */}
-          <div className="text-center min-w-[140px]">
-            <div 
-              className="font-bold"
-              style={{ 
-                fontSize: `${TYPOGRAPHY.fontSize['3xl']}px`,
-                color: TEXT_COLORS.primary,
-              }}
-            >
+          <div className={styles.amountDisplay}>
+            <div className={styles.amountValue}>
               ${amountUSD}
             </div>
-            
+
             {/* Local Currency Equivalent (non-USD only) */}
             {!isUSD && (
-              <div 
-                className="mt-1"
-                style={{ 
-                  fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-                  color: TEXT_COLORS.secondary,
-                }}
-              >
+              <div className={styles.localEquivalent}>
                 {rateLoading ? (
                   <span className="animate-pulse">Loading...</span>
                 ) : (
@@ -205,67 +200,51 @@ export function AmountStepper({
               </div>
             )}
           </div>
-          
+
           {/* Increment Button */}
           <button
             type="button"
             onClick={handleIncrement}
             disabled={disabled || isAtMax}
-            className="flex items-center justify-center rounded-full transition-all active:scale-95"
+            className={cn(
+              styles.stepperButton,
+              !isAtMax && styles.stepperButtonIncrement,
+              isAtMax && styles.stepperButtonDisabled
+            )}
             style={{
-              width: TOUCH_TARGETS.comfort,
-              height: TOUCH_TARGETS.comfort,
-              backgroundColor: isAtMax 
-                ? 'rgba(255, 255, 255, 0.05)' 
+              '--button-bg': isAtMax
+                ? 'rgba(255, 255, 255, 0.05)'
                 : STATE_COLORS.active,
-              border: `1px solid ${isAtMax ? BORDER_COLORS.light : STATE_COLORS.active}`,
-              opacity: isAtMax ? 0.5 : 1,
-              cursor: isAtMax ? 'not-allowed' : 'pointer',
-            }}
+              '--button-border': isAtMax ? BORDER_COLORS.light : STATE_COLORS.active,
+            } as React.CSSProperties}
             aria-label="Increase amount by $25"
           >
-            <Plus 
-              size={24} 
-              color={isAtMax ? TEXT_COLORS.muted : '#000'} 
+            <Plus
+              size={24}
+              color={isAtMax ? TEXT_COLORS.muted : '#000'}
             />
           </button>
         </div>
-        
+
         {/* Limit message */}
         {isAtMin && (
-          <p 
-            style={{ 
-              fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-              color: TEXT_COLORS.muted,
-            }}
-          >
+          <p className={styles.limitMessage}>
             Minimum deposit is $25
           </p>
         )}
         {isAtMax && (
-          <p 
-            style={{ 
-              fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-              color: TEXT_COLORS.muted,
-            }}
-          >
+          <p className={styles.limitMessage}>
             Maximum deposit reached
           </p>
         )}
       </div>
-      
+
       {/* Quick Select Chips */}
-      <div>
-        <p 
-          className="text-center mb-3"
-          style={{ 
-            fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-            color: TEXT_COLORS.muted,
-          }}
-        >
+      <div className={styles.quickSelectContainer}>
+        <p className={styles.quickSelectLabel}>
           Quick select
         </p>
-        <div className="flex justify-center flex-wrap gap-2">
+        <div className={styles.quickSelectGrid}>
           {QUICK_AMOUNTS_USD.map((usd) => {
             const isSelected = amountUSD === usd;
             return (
@@ -274,15 +253,17 @@ export function AmountStepper({
                 type="button"
                 onClick={() => handleQuickSelect(usd)}
                 disabled={disabled}
-                className="px-4 py-2 rounded-full font-medium transition-all"
+                className={cn(
+                  styles.quickSelectChip,
+                  isSelected && styles.quickSelectChipSelected
+                )}
                 style={{
-                  backgroundColor: isSelected 
-                    ? STATE_COLORS.active 
+                  '--chip-bg': isSelected
+                    ? STATE_COLORS.active
                     : 'rgba(255, 255, 255, 0.05)',
-                  color: isSelected ? '#000' : TEXT_COLORS.primary,
-                  border: `1px solid ${isSelected ? STATE_COLORS.active : BORDER_COLORS.default}`,
-                  fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-                }}
+                  '--chip-color': isSelected ? '#000' : TEXT_COLORS.primary,
+                  '--chip-border': isSelected ? STATE_COLORS.active : BORDER_COLORS.default,
+                } as React.CSSProperties}
               >
                 ${usd}
               </button>
@@ -290,33 +271,14 @@ export function AmountStepper({
           })}
         </div>
       </div>
-      
+
       {/* Exchange Rate Transparency (non-USD only) */}
       {!isUSD && rateDisplay && !rateLoading && (
-        <div 
-          className="p-3 rounded-lg"
-          style={{ 
-            backgroundColor: 'rgba(255, 255, 255, 0.03)',
-            border: `1px solid ${BORDER_COLORS.light}`,
-          }}
-        >
-          <p 
-            className="text-center"
-            style={{ 
-              fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-              color: TEXT_COLORS.muted,
-            }}
-          >
+        <div className={styles.exchangeRateBox}>
+          <p className={styles.exchangeRateText}>
             Exchange rate: {rateDisplay}
           </p>
-          <p 
-            className="text-center mt-1"
-            style={{ 
-              fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-              color: TEXT_COLORS.muted,
-              opacity: 0.7,
-            }}
-          >
+          <p className={styles.exchangeRateDisclaimer}>
             Rate from European Central Bank. Final rate at deposit may vary slightly.
           </p>
         </div>
@@ -326,4 +288,3 @@ export function AmountStepper({
 }
 
 export default AmountStepper;
-

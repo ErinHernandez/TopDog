@@ -1,0 +1,558 @@
+/**
+ * JoinTournamentModal - CSS Module for CSP Compliance
+ *
+ * Migrated from inline styles to CSS Modules for Content Security Policy compliance.
+ * Uses CSS custom properties for dynamic values from constants.
+ *
+ * @module JoinTournamentModal.module.css
+ */
+
+/* ============================================================================
+   CSS CUSTOM PROPERTIES - CONSTANTS FROM components
+   ============================================================================ */
+
+/* ============================================================================
+   MODAL OVERLAY
+   ============================================================================ */
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg-overlay);
+  z-index: var(--z-modal);
+}
+
+.overlay.hidden {
+  display: none;
+}
+
+/* ============================================================================
+   MODAL CONTAINER
+   ============================================================================ */
+
+.modalContainer {
+  width: 384px;
+  margin: 16px;
+  background-color: var(--color-bg-secondary);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================================================
+   MODAL HEADER
+   ============================================================================ */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.headerTitle {
+  font-size: var(--font-size-lg);
+  font-weight: bold;
+  color: var(--color-text-primary);
+}
+
+.closeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--color-text-muted);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.closeButton:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ============================================================================
+   SCROLLABLE CONTENT
+   ============================================================================ */
+
+.scrollableContent {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-lg);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollableContent::-webkit-scrollbar {
+  display: none;
+}
+
+/* ============================================================================
+   TOURNAMENT TITLE
+   ============================================================================ */
+
+.tournamentTitle {
+  font-size: var(--font-size-base);
+  font-weight: bold;
+  color: var(--color-text-primary);
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+/* ============================================================================
+   STATISTICS BAR
+   ============================================================================ */
+
+.statsBar {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: var(--spacing-lg);
+}
+
+.statColumn {
+  text-align: center;
+}
+
+.statValue {
+  font-size: var(--font-size-xl);
+  font-weight: bold;
+  color: var(--color-text-primary);
+}
+
+.statLabel {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+/* ============================================================================
+   ACCOUNT BALANCE SECTION
+   ============================================================================ */
+
+.balanceSection {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--color-bg-panel);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-md);
+  border: none;
+}
+
+.balanceSection.insufficientBalance {
+  background-color: var(--color-error-bg);
+  border: 1px solid var(--color-error-border);
+}
+
+.balanceRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.balanceInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.balanceLabel {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.balanceAmount {
+  font-size: var(--font-size-lg);
+  font-weight: bold;
+  color: var(--color-text-primary);
+}
+
+.balanceAmount.insufficientBalance {
+  color: var(--color-error);
+}
+
+.depositButton {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-weight: 600;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--wr-blue-bg);
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  font-size: var(--font-size-xs);
+  color: #fff;
+  transition: all 0.2s ease;
+}
+
+.depositButton:hover {
+  opacity: 0.9;
+}
+
+.insufficientBalanceMessage {
+  font-size: var(--font-size-xs);
+  color: var(--color-error);
+  margin-top: var(--spacing-xs);
+}
+
+/* ============================================================================
+   ENTRY CONTROLS
+   ============================================================================ */
+
+.entryControls {
+  padding: var(--spacing-md);
+  background-color: var(--color-bg-panel);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.entryRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-sm);
+}
+
+.entryLabel {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+.entryInputWrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.entryInput {
+  width: 60px;
+  height: 36px;
+  background-color: var(--color-input-bg);
+  border: 1px solid var(--color-border-lighter);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  text-align: center;
+  font-size: var(--font-size-sm);
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.entryInput:focus {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.entryMax {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.autopilotRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.autopilotLabel {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+/* ============================================================================
+   TOTAL COST SECTION
+   ============================================================================ */
+
+.totalCostSection {
+  text-align: center;
+  margin-bottom: var(--spacing-sm);
+}
+
+.totalCostLabel {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.totalCostAmount {
+  font-size: var(--font-size-lg);
+  font-weight: bold;
+  color: var(--color-text-primary);
+}
+
+/* ============================================================================
+   DEPOSIT FUNDS BUTTON
+   ============================================================================ */
+
+.depositFundsSection {
+  text-align: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.depositFundsButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  font-weight: 600;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--wr-blue-bg);
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  color: #fff;
+  transition: all 0.2s ease;
+  margin: 0 auto;
+}
+
+.depositFundsButton:hover {
+  opacity: 0.9;
+}
+
+/* ============================================================================
+   TOURNAMENT DETAILS SECTION
+   ============================================================================ */
+
+.detailsSection {
+  background-color: var(--color-bg-panel-lighter);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.detailsHeader {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-sm);
+  font-weight: 600;
+}
+
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.infoLabel {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.infoValue {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-primary);
+}
+
+.subsectionHeader {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin-bottom: 4px;
+}
+
+.subsectionDivider {
+  margin-top: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.scoringGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.rosterInfo {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+/* ============================================================================
+   INFO MESSAGE
+   ============================================================================ */
+
+.infoMessage {
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin-bottom: var(--spacing-lg);
+}
+
+/* ============================================================================
+   BUTTONS SECTION
+   ============================================================================ */
+
+.buttonsSection {
+  display: flex;
+  gap: 12px;
+  margin-bottom: var(--spacing-md);
+}
+
+.rulesButton {
+  flex: 1;
+  font-weight: 600;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--color-text-primary);
+  border: none;
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  transition: all 0.2s ease;
+}
+
+.rulesButton:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ============================================================================
+   BOTTOM SECTION - FIXED AT BOTTOM
+   ============================================================================ */
+
+.bottomSection {
+  display: grid;
+  padding: var(--spacing-lg);
+  border-top: 1px solid var(--color-border-light);
+  background-color: rgba(255, 255, 255, 0.02);
+  flex-shrink: 0;
+  gap: var(--bottom-row-gap);
+}
+
+.bottomSection.withProgress {
+  grid-template-rows: var(--row-height-progress) var(--row-height-button) var(--row-height-stats);
+}
+
+.bottomSection.withProgressAndTextBoxes {
+  grid-template-rows: var(--row-height-progress) var(--row-height-button) var(--row-height-stats) var(--row-height-text-boxes);
+}
+
+.bottomSection.withoutProgress {
+  grid-template-rows: var(--row-height-button) var(--row-height-stats);
+}
+
+.bottomSection.withoutProgressWithTextBoxes {
+  grid-template-rows: var(--row-height-button) var(--row-height-stats) var(--row-height-text-boxes);
+}
+
+.progressSection {
+  height: var(--row-height-progress);
+  display: flex;
+  align-items: center;
+}
+
+.joinButton {
+  height: var(--row-height-button);
+  min-height: var(--row-height-button);
+  max-height: var(--row-height-button);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  width: 100%;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  background: var(--wr-blue-bg);
+}
+
+.joinButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.joinButton:not(:disabled):hover {
+  opacity: 0.9;
+}
+
+.joinButtonSpinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  border-color: #fff transparent transparent transparent;
+  animation: spin 0.6s linear infinite;
+  margin-right: var(--spacing-sm);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--stats-gap);
+  height: var(--row-height-stats);
+  align-content: center;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.statItemValue {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--color-text-primary);
+  background-color: var(--color-stat-bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.statItemLabel {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  background-color: var(--color-stat-bg);
+  padding: 1px 4px;
+  border-radius: 3px;
+  margin-top: 2px;
+}
+
+.textBoxesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--stats-gap);
+  height: var(--row-height-text-boxes);
+  align-content: center;
+}
+
+.textBoxInput {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--color-text-primary);
+  background-color: var(--color-stat-bg);
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
+}
+
+.textBoxInput:focus {
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* ============================================================================
+   RULES MODAL WRAPPER
+   ============================================================================ */
+
+.rulesModalWrapper {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal-top);
+}

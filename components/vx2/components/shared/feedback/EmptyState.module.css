@@ -1,0 +1,153 @@
+/**
+ * EmptyState CSS Module
+ *
+ * Migrated from inline styles for CSP compliance.
+ * Uses CSS custom properties from styles/variables/*.css
+ */
+
+/* ============================================================================
+   CONTAINER
+   ============================================================================ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--spacing-2xl);
+  min-height: 200px;
+}
+
+.container.compact {
+  padding: var(--spacing-lg);
+  min-height: auto;
+}
+
+/* ============================================================================
+   ICON WRAPPER
+   ============================================================================ */
+
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  margin-bottom: var(--spacing-lg);
+  width: 64px;
+  height: 64px;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.iconWrapper.compact {
+  width: 48px;
+  height: 48px;
+}
+
+/* ============================================================================
+   TITLE
+   ============================================================================ */
+
+.title {
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  font-size: var(--font-size-lg);
+  margin: 0;
+}
+
+.title.compact {
+  font-size: var(--font-size-base);
+}
+
+.title.hasDescription {
+  margin-bottom: var(--spacing-sm);
+}
+
+/* ============================================================================
+   DESCRIPTION
+   ============================================================================ */
+
+.description {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  max-width: 280px;
+  margin: 0;
+}
+
+.description.hasAction {
+  margin-bottom: var(--spacing-lg);
+}
+
+/* ============================================================================
+   ACTIONS
+   ============================================================================ */
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+/* ============================================================================
+   PRIMARY BUTTON
+   ============================================================================ */
+
+.primaryButton {
+  font-weight: var(--font-weight-medium);
+  background-color: var(--color-active);
+  color: #000000;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-colors);
+}
+
+.primaryButton:hover {
+  opacity: 0.9;
+}
+
+.primaryButton:active {
+  opacity: 0.8;
+}
+
+/* ============================================================================
+   SECONDARY BUTTON
+   ============================================================================ */
+
+.secondaryButton {
+  font-weight: var(--font-weight-medium);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-colors);
+}
+
+.secondaryButton:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ============================================================================
+   TEXT BUTTON (for secondary action)
+   ============================================================================ */
+
+.textButton {
+  font-weight: var(--font-weight-medium);
+  background-color: transparent;
+  color: var(--text-secondary);
+  padding: var(--spacing-md);
+  font-size: var(--font-size-sm);
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: var(--transition-colors);
+}
+
+.textButton:hover {
+  color: var(--text-primary);
+}

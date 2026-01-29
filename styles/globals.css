@@ -13,7 +13,9 @@
 
 @layer base {
   html {
-    background: url('/wr_blue.png') repeat-y;
+    background-color: #101927; /* Fallback so page is never white if image fails */
+    background-image: url('/wr_blue.png');
+    background-repeat: repeat-y;
     background-size: auto 100%;
     background-position: center center;
     margin: 0;
@@ -26,7 +28,9 @@
     text-size-adjust: 100%;
   }
   body {
-    background: url('/wr_blue.png') repeat-y;
+    background-color: #101927; /* Fallback so area below app is never white */
+    background-image: url('/wr_blue.png');
+    background-repeat: repeat-y;
     background-size: auto 100%;
     background-position: center center;
     margin: 0;

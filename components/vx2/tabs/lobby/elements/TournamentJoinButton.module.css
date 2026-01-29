@@ -1,0 +1,27 @@
+.button {
+  background-image: var(--background-image, url(/wr_blue.png));
+  background-size: var(--background-size, 200px);
+  background-repeat: var(--background-repeat, repeat);
+  background-color: var(--background-color, #1e40af);
+  height: var(--height, 40px);
+  width: 100%;
+  font-size: var(--font-size, 14px);
+  font-weight: var(--font-weight, 600);
+  color: #ffffff;
+  text-align: center;
+  border-radius: var(--border-radius, 8px);
+  border: none;
+  cursor: pointer;
+  opacity: 1;
+  transition: opacity 0.2s ease, transform 0.1s ease;
+  padding: 0;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.button:active:not(:disabled) {
+  transform: scale(0.98);
+}

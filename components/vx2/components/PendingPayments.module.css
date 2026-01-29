@@ -1,0 +1,252 @@
+/* PendingPayments.module.css - CSS Module for CSP-compliant styling */
+
+/* ============================================================================
+   CONTAINER STYLES
+   ============================================================================ */
+
+.container {
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background-color: var(--bg-secondary, #f5f5f5);
+}
+
+/* ============================================================================
+   HEADER STYLES
+   ============================================================================ */
+
+.header {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-default, #e0e0e0);
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.headerText h3 {
+  font-weight: 600;
+  font-size: var(--typography-lg, 1.125rem);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.headerText p {
+  font-size: 0.875rem;
+  margin-top: 0.125rem;
+  margin-bottom: 0;
+  color: var(--text-secondary);
+}
+
+.refreshButton {
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  background-color: var(--bg-tertiary, #ffffff);
+  color: var(--text-secondary, #666666);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.refreshButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spinIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.spinIcon.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================================================
+   CONTENT AREA STYLES
+   ============================================================================ */
+
+.content {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.loadingContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+.spinner {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  color: var(--state-active, #3b82f6);
+}
+
+.errorMessage {
+  text-align: center;
+  padding: 1.5rem 0;
+  color: var(--state-error, #dc2626);
+}
+
+/* ============================================================================
+   PAYMENT CARD STYLES
+   ============================================================================ */
+
+.card {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: var(--bg-tertiary, #ffffff);
+  border: 1px solid var(--border-default, #e0e0e0);
+  transition: opacity 0.2s ease;
+}
+
+.card.disabled {
+  opacity: 0.6;
+  border-color: var(--border-default, #e0e0e0);
+}
+
+.cardContent {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.paymentIcon {
+  font-size: 1.875rem;
+  flex-shrink: 0;
+}
+
+.cardBody {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Header row: Title and Amount */
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.cardTitle {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-primary, #000000);
+  margin: 0;
+}
+
+.cardAmount {
+  font-weight: 700;
+  flex-shrink: 0;
+  color: var(--state-success, #10b981);
+}
+
+/* Description */
+.cardDescription {
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+  margin-top: 0;
+  color: var(--text-secondary, #666666);
+}
+
+/* Expiration status */
+.expirationContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.expirationLabel {
+  font-size: 0.75rem;
+  color: var(--text-muted, #999999);
+}
+
+.expirationBadge {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+  background-color: var(--expiration-bg, #fef3c720);
+  color: var(--expiration-text, #f59e0b);
+}
+
+.expirationBadge.expiringSoon {
+  background-color: var(--expiration-bg-soon, #fee2e220);
+  color: var(--expiration-text-soon, #ef4444);
+}
+
+/* Actions row */
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.viewButton {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: var(--button-bg, #10b981);
+  color: var(--button-text, #ffffff);
+}
+
+.viewButton:disabled {
+  background-color: var(--button-disabled-bg, #f3f4f6);
+  color: var(--button-disabled-text, #999999);
+  cursor: not-allowed;
+}
+
+.viewButton:not(:disabled):hover {
+  opacity: 0.9;
+}
+
+.cancelButton {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid var(--border-default, #e0e0e0);
+  background-color: var(--bg-tertiary, #ffffff);
+  color: var(--text-secondary, #666666);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancelButton:disabled {
+  cursor: not-allowed;
+}
+
+.cancelButton.cancelling {
+  opacity: 0.5;
+}
+
+.cancelButton:not(:disabled):hover {
+  opacity: 0.8;
+}

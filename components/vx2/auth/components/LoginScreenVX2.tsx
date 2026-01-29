@@ -13,6 +13,9 @@
  */
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { cn } from '@/lib/styles';
+import styles from './LoginScreenVX2.module.css';
+import authStyles from './auth-shared.module.css';
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../../core/constants/colors';
 import { SPACING, Z_INDEX } from '../../core/constants/sizes';
 import { useAuth } from '../hooks/useAuth';
@@ -49,15 +52,14 @@ type LoginStep = 'credentials' | 'phoneCode';
 
 function TopDogLogo({ loaded }: { loaded: boolean }): React.ReactElement {
   return (
-    <div className="flex items-center justify-center">
-      <img 
-        src="/logo.png" 
-        alt="TopDog" 
-        style={{ 
-          height: 56,
-          opacity: loaded ? 1 : 0,
-          transition: 'opacity 0.3s ease-out',
-        }}
+    <div className={styles.logoContainer}>
+      <img
+        src="/logo.png"
+        alt="TopDog"
+        className={styles.logo}
+        style={{
+          '--logo-opacity': loaded ? 1 : 0,
+        } as React.CSSProperties}
       />
     </div>
   );
@@ -67,29 +69,20 @@ function TopDogLogo({ loaded }: { loaded: boolean }): React.ReactElement {
 // BIOMETRIC BUTTON
 // ============================================================================
 
-function BiometricButton({ 
-  onClick, 
-  disabled, 
-  label 
-}: { 
-  onClick: () => void; 
-  disabled: boolean; 
-  label: string; 
+function BiometricButton({
+  onClick,
+  disabled,
+  label
+}: {
+  onClick: () => void;
+  disabled: boolean;
+  label: string;
 }): React.ReactElement {
   return (
     <button
       onClick={onClick}
       disabled={disabled}
-      className="w-full flex items-center justify-center gap-3 py-4 rounded-xl font-semibold transition-all"
-      style={{
-        background: 'url(/wr_blue.png) no-repeat center center',
-        backgroundSize: 'cover',
-        color: '#000',
-        border: 'none',
-        fontSize: 17,
-        opacity: disabled ? 0.5 : 1,
-        height: 56,
-      }}
+      className={cn(authStyles.biometricButton, disabled && 'opacity-50')}
     >
       {/* Face ID / Touch ID Icon */}
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -112,10 +105,10 @@ function BiometricButton({
 
 function Divider(): React.ReactElement {
   return (
-    <div className="flex items-center gap-4 my-6">
-      <div className="flex-1 h-px" style={{ backgroundColor: BORDER_COLORS.default }} />
-      <span style={{ color: TEXT_COLORS.muted, fontSize: 14 }}>or sign in with email</span>
-      <div className="flex-1 h-px" style={{ backgroundColor: BORDER_COLORS.default }} />
+    <div className={authStyles.divider}>
+      <div className={authStyles.dividerLine} />
+      <span className={authStyles.dividerText}>or sign in with email</span>
+      <div className={authStyles.dividerLine} />
     </div>
   );
 }
@@ -156,10 +149,10 @@ function Input({
   autoFocus,
 }: InputProps): React.ReactElement {
   const hasError = touched && error;
-  
+
   return (
     <div>
-      <div className="relative">
+      <div className={authStyles.inputWrapper}>
         <input
           ref={inputRef}
           type={type}
@@ -171,28 +164,23 @@ function Input({
           autoComplete={autoComplete}
           disabled={disabled}
           autoFocus={autoFocus}
-          className="w-full px-5 py-4 rounded-xl outline-none transition-all"
+          className={cn(
+            authStyles.input,
+            rightElement && authStyles.inputWithRight,
+            hasError && authStyles.inputError
+          )}
           style={{
-            backgroundColor: 'rgba(255,255,255,0.05)',
-            color: TEXT_COLORS.primary,
-            border: `2px solid ${hasError ? STATE_COLORS.error : BORDER_COLORS.default}`,
-            fontSize: 17,
-            height: 56,
-            opacity: disabled ? 0.5 : 1,
-            paddingRight: rightElement ? 52 : 20,
-          }}
+            '--error-color': STATE_COLORS.error,
+          } as React.CSSProperties}
         />
         {rightElement && (
-          <div className="absolute right-4 top-1/2 -translate-y-1/2">
+          <div className={authStyles.inputRightElement}>
             {rightElement}
           </div>
         )}
       </div>
       {hasError && (
-        <div 
-          className="flex items-center gap-1.5 mt-2 px-1"
-          style={{ color: STATE_COLORS.error, fontSize: 13 }}
-        >
+        <div className={authStyles.fieldError}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="12" cy="12" r="10" />
             <line x1="12" y1="8" x2="12" y2="12" />
@@ -445,74 +433,52 @@ export function LoginScreenVX2({
                     (inputType === 'phone' && identifier && !isLoading);
   
   return (
-    <div 
-      className="fixed inset-0 flex flex-col"
-      style={{ 
-        backgroundColor: BG_COLORS.primary, 
-        zIndex: Z_INDEX.modal 
-      }}
+    <div
+      className={styles.container}
+      style={{
+        '--bg-primary': BG_COLORS.primary,
+        '--z-modal': Z_INDEX.modal,
+      } as React.CSSProperties}
     >
-      {/* Safe area with wr_blue background - covers dynamic island */}
       {/* Blur placeholder layer - shows instantly */}
-      <div 
+      <div
         aria-hidden="true"
-        style={{ 
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 'max(env(safe-area-inset-top, 59px), 59px)',
-          backgroundImage: `url(${BLUR_PLACEHOLDER})`,
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'center center',
-          backgroundSize: 'cover',
-          zIndex: 1,
-        }} 
+        className={styles.safeAreaBackgroundPlaceholder}
+        style={{
+          '--blur-placeholder-bg': `url(${BLUR_PLACEHOLDER})`,
+          '--z-placeholder': 1,
+        } as React.CSSProperties}
       />
       {/* Full image layer - fades in when loaded */}
-      <div 
+      <div
         aria-hidden="true"
-        style={{ 
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 'max(env(safe-area-inset-top, 59px), 59px)',
-          backgroundImage: 'url(/wr_blue.png)',
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'center center',
-          backgroundSize: 'cover',
-          zIndex: 2,
+        className={styles.safeAreaBackground}
+        style={{
+          '--safe-area-bg-image': 'url(/wr_blue.png)',
           opacity: imagesLoaded ? 1 : 0,
-          transition: 'opacity 0.3s ease-out',
-        }} 
+        } as React.CSSProperties}
       />
       {/* Spacer for safe area */}
-      <div style={{ height: 'max(env(safe-area-inset-top, 59px), 59px)', flexShrink: 0 }} />
+      <div className={styles.safeAreaSpacer} />
       
       {/* Content */}
-      <div 
+      <div
         ref={formRef}
-        className={`flex-1 overflow-y-auto flex flex-col ${shakeError ? 'animate-shake' : ''}`}
-        style={{ 
-          padding: `${SPACING.xl}px`,
-          scrollbarWidth: 'none',
-          opacity: imagesLoaded ? 1 : 0,
-          transition: 'opacity 0.3s ease-out',
-        }}
+        className={cn(styles.content, shakeError && styles.shakeAnimation)}
+        style={{
+          '--content-padding': `${SPACING.xl}px`,
+          '--content-opacity': imagesLoaded ? 1 : 0,
+        } as React.CSSProperties}
         onKeyDown={handleKeyDown}
       >
         {/* Spacer to push content down */}
-        <div className="flex-1 min-h-[40px]" />
-        
+        <div className={styles.spacer} />
+
         {/* Logo */}
-        <div className="text-center mb-10">
+        <div className={styles.logoSection}>
           <TopDogLogo loaded={imagesLoaded} />
           {step === 'phoneCode' && (
-            <p 
-              className="mt-6"
-              style={{ color: TEXT_COLORS.secondary, fontSize: 17 }}
-            >
+            <p className={styles.phoneVerifyTitle}>
               Verify your phone
             </p>
           )}
@@ -532,19 +498,18 @@ export function LoginScreenVX2({
         
         {/* Error Message */}
         {error && (
-          <div 
-            className="mb-4 p-4 rounded-xl flex items-center gap-3"
-            style={{ 
-              backgroundColor: 'rgba(239, 68, 68, 0.1)', 
-              border: `1px solid ${STATE_COLORS.error}20`,
-            }}
+          <div
+            className={authStyles.errorBanner}
+            style={{
+              '--error-color': STATE_COLORS.error,
+            } as React.CSSProperties}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.error} strokeWidth="2">
               <circle cx="12" cy="12" r="10" />
               <line x1="12" y1="8" x2="12" y2="12" />
               <line x1="12" y1="16" x2="12.01" y2="16" />
             </svg>
-            <span style={{ color: STATE_COLORS.error, fontSize: 15 }}>
+            <span className={authStyles.errorBannerText}>
               {error}
             </span>
           </div>
@@ -552,25 +517,13 @@ export function LoginScreenVX2({
         
         {/* Sign Up Prompt - shown when email not found */}
         {showSignUpPrompt && (
-          <div 
-            className="mb-4 p-5 rounded-xl text-center"
-            style={{ 
-              background: 'url(/wr_blue.png) no-repeat center center',
-              backgroundSize: 'cover',
-            }}
-          >
-            <p style={{ color: TEXT_COLORS.primary, fontSize: 16, marginBottom: 12 }}>
+          <div className={styles.signUpPrompt}>
+            <p className={styles.signUpPromptTitle}>
               Don&apos;t have an account yet?
             </p>
             <button
               onClick={onSwitchToSignUp}
-              className="w-full font-bold py-3 rounded-xl transition-all"
-              style={{
-                background: 'url(/wr_blue.png) no-repeat center center',
-                backgroundSize: 'cover',
-                color: '#fff',
-                fontSize: 16,
-              }}
+              className={styles.signUpPromptButton}
             >
               Create Account
             </button>
@@ -578,7 +531,7 @@ export function LoginScreenVX2({
         )}
         
         {step === 'credentials' && (
-          <div className="space-y-4">
+          <div className={styles.credentialsStep}>
             {/* Email/Phone Input */}
             <Input
               inputRef={identifierRef}
@@ -589,17 +542,14 @@ export function LoginScreenVX2({
               disabled={isLoading}
               autoFocus
             />
-            
+
             {/* Input type indicator - only show for phone */}
             {identifier && inputType === 'phone' && (
-              <p 
-                className="px-1 -mt-2"
-                style={{ color: TEXT_COLORS.muted, fontSize: 13 }}
-              >
+              <p className={styles.inputFieldDescription}>
                 We'll send you a verification code
               </p>
             )}
-            
+
             {/* Password Input - show for email and unknown (default to email) */}
             {inputType !== 'phone' && (
               <Input
@@ -614,8 +564,7 @@ export function LoginScreenVX2({
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="p-1 rounded transition-colors hover:bg-white/10"
-                    style={{ color: TEXT_COLORS.muted }}
+                    className={authStyles.togglePasswordButton}
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                     tabIndex={-1}
                   >
@@ -634,24 +583,23 @@ export function LoginScreenVX2({
                 }
               />
             )}
-            
+
             {/* Remember Me & Forgot Password - show with password field */}
             {inputType !== 'phone' && (
-              <div className="flex items-center justify-between pt-2">
+              <div className={styles.rememberForgotRow}>
                 <button
                   type="button"
                   onClick={() => setRememberMe(!rememberMe)}
-                  className="flex items-center gap-3 cursor-pointer"
+                  className={styles.rememberMeButton}
                 >
                   <div
-                    className="w-5 h-5 rounded flex items-center justify-center transition-all"
+                    className={cn(
+                      styles.rememberMeCheckbox,
+                      rememberMe ? styles.checkboxChecked : styles.checkboxUnchecked
+                    )}
                     style={{
-                      backgroundImage: rememberMe ? 'url(/wr_blue.png)' : 'none',
-                      backgroundColor: rememberMe ? 'transparent' : 'transparent',
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center',
-                      border: rememberMe ? 'none' : `2px solid ${BORDER_COLORS.default}`,
-                    }}
+                      '--border-default': BORDER_COLORS.default,
+                    } as React.CSSProperties}
                   >
                     {rememberMe && (
                       <svg width="12" height="10" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -659,23 +607,15 @@ export function LoginScreenVX2({
                       </svg>
                     )}
                   </div>
-                  <span style={{ color: TEXT_COLORS.secondary, fontSize: 15 }}>
+                  <span className={styles.rememberMeLabel}>
                     Remember me
                   </span>
                 </button>
-                
+
                 <button
                   onClick={onForgotPassword}
                   type="button"
-                  className="font-medium"
-                  style={{ 
-                    background: 'url(/wr_blue.png) no-repeat center center',
-                    backgroundSize: 'cover',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
-                    fontSize: 15,
-                  } as React.CSSProperties}
+                  className={styles.forgotPasswordButton}
                 >
                   Forgot password?
                 </button>
@@ -685,15 +625,12 @@ export function LoginScreenVX2({
         )}
         
         {step === 'phoneCode' && (
-          <div className="text-center">
-            <p 
-              className="mb-6"
-              style={{ color: TEXT_COLORS.secondary, fontSize: 15 }}
-            >
+          <div className={styles.phoneCodeStep}>
+            <p className={styles.codeInputHelper}>
               Enter the 6-digit code sent to<br />
-              <span className="font-medium" style={{ color: TEXT_COLORS.primary }}>{identifier}</span>
+              <span className={styles.codeInputPhoneNumber}>{identifier}</span>
             </p>
-            
+
             <input
               type="text"
               value={phoneCode}
@@ -702,33 +639,19 @@ export function LoginScreenVX2({
               autoComplete="one-time-code"
               disabled={isLoading}
               autoFocus
-              className="w-full px-5 py-4 rounded-xl outline-none transition-all text-center tracking-[0.5em] font-mono"
+              className={authStyles.codeInput}
               style={{
-                backgroundColor: 'rgba(255,255,255,0.05)',
-                color: TEXT_COLORS.primary,
-                border: `2px solid ${BORDER_COLORS.default}`,
-                fontSize: 24,
-                height: 64,
                 opacity: isLoading ? 0.5 : 1,
               }}
             />
-            
+
             <button
               onClick={() => {
                 setStep('credentials');
                 setPhoneCode('');
                 setError(null);
               }}
-              className="mt-6 font-medium"
-              style={{
-                background: 'url(/wr_blue.png) no-repeat center center',
-                backgroundSize: 'cover',
-                WebkitBackgroundClip: 'text',
-                backgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                color: 'transparent',
-                fontSize: 15,
-              }}
+              className={styles.backButton}
             >
               Use a different number
             </button>
@@ -736,109 +659,81 @@ export function LoginScreenVX2({
         )}
         
         {/* Spacer */}
-        <div className="flex-1 min-h-[40px]" />
+        <div className={styles.spacer} />
       </div>
       
       {/* Footer */}
-      <div 
-        className="flex-shrink-0"
-        style={{ 
-          paddingTop: 0,
-          paddingLeft: 0,
-          paddingRight: 0,
-          paddingBottom: 'max(env(safe-area-inset-bottom), 24px)',
-          borderTop: `1px solid ${BORDER_COLORS.default}`,
-          backgroundColor: BG_COLORS.primary,
-          opacity: imagesLoaded ? 1 : 0,
-          transition: 'opacity 0.3s ease-out',
-        }}
+      <div
+        className={styles.footer}
+        style={{
+          '--border-default': BORDER_COLORS.default,
+          '--bg-primary': BG_COLORS.primary,
+          '--footer-opacity': imagesLoaded ? 1 : 0,
+        } as React.CSSProperties}
       >
         {step === 'credentials' ? (
           <button
             onClick={handleSignIn}
             disabled={!canSignIn}
-            className="w-full font-bold transition-all flex items-center justify-center gap-2"
-            style={{
-              fontSize: 17,
-              height: 72,
-              background: canSignIn ? 'url(/wr_blue.png) no-repeat center center' : BG_COLORS.tertiary,
-              backgroundSize: 'cover',
-              color: canSignIn ? '#fff' : TEXT_COLORS.disabled,
-              opacity: canSignIn ? 1 : 0.6,
-              borderRadius: 0,
-            }}
-          >
-            {isLoading ? (
-              <>
-                <div 
-                  className="animate-spin rounded-full h-5 w-5 border-2"
-                  style={{ borderColor: '#fff transparent transparent transparent' }}
-                />
-                {inputType === 'phone' ? 'Sending code...' : 'Logging in...'}
-              </>
-            ) : (
-              inputType === 'phone' ? 'Send Code' : 'Log In'
+            className={cn(
+              styles.footerButton,
+              canSignIn ? styles.footerButtonEnabled : styles.footerButtonDisabled
             )}
+            style={{
+              '--bg-tertiary': BG_COLORS.tertiary,
+              '--text-disabled': TEXT_COLORS.disabled,
+            } as React.CSSProperties}
+          >
+            <div className={styles.footerButtonInner}>
+              {isLoading ? (
+                <>
+                  <div className={styles.loadingSpinner} />
+                  <span className={styles.footerButtonText}>
+                    {inputType === 'phone' ? 'Sending code...' : 'Logging in...'}
+                  </span>
+                </>
+              ) : (
+                <span className={styles.footerButtonText}>
+                  {inputType === 'phone' ? 'Send Code' : 'Log In'}
+                </span>
+              )}
+            </div>
           </button>
         ) : (
           <button
             onClick={handleVerifyPhoneCode}
             disabled={phoneCode.length !== 6 || isLoading}
-            className="w-full font-bold transition-all flex items-center justify-center gap-2"
-            style={{
-              fontSize: 17,
-              height: 72,
-              background: phoneCode.length === 6 && !isLoading ? 'url(/wr_blue.png) no-repeat center center' : BG_COLORS.tertiary,
-              backgroundSize: 'cover',
-              color: phoneCode.length === 6 && !isLoading ? '#fff' : TEXT_COLORS.disabled,
-              opacity: phoneCode.length === 6 && !isLoading ? 1 : 0.6,
-              borderRadius: 0,
-            }}
-          >
-            {isLoading ? (
-              <>
-                <div 
-                  className="animate-spin rounded-full h-5 w-5 border-2"
-                  style={{ borderColor: '#fff transparent transparent transparent' }}
-                />
-                Verifying...
-              </>
-            ) : (
-              'Verify'
+            className={cn(
+              styles.footerButton,
+              phoneCode.length === 6 && !isLoading ? styles.footerButtonEnabled : styles.footerButtonDisabled
             )}
+            style={{
+              '--bg-tertiary': BG_COLORS.tertiary,
+              '--text-disabled': TEXT_COLORS.disabled,
+            } as React.CSSProperties}
+          >
+            <div className={styles.footerButtonInner}>
+              {isLoading ? (
+                <>
+                  <div className={styles.loadingSpinner} />
+                  <span className={styles.footerButtonText}>Verifying...</span>
+                </>
+              ) : (
+                <span className={styles.footerButtonText}>Verify</span>
+              )}
+            </div>
           </button>
         )}
-        
+
         {step === 'credentials' && (
           <>
             {/* Horizontal divider - full width */}
-            <div 
-              style={{ 
-                width: '100%',
-                height: 1, 
-                backgroundColor: BORDER_COLORS.default, 
-              }} 
-            />
-            <p 
-              className="text-center"
-              style={{ 
-                color: TEXT_COLORS.muted, 
-                fontSize: 15,
-                paddingTop: 16,
-                paddingBottom: 8,
-              }}
-            >
+            <div className={styles.footerDivider} />
+            <p className={styles.footerLinkRow}>
               Don&apos;t have an account?{' '}
-              <button 
+              <button
                 onClick={onSwitchToSignUp}
-                className="font-semibold"
-                style={{ 
-                  background: 'url(/wr_blue.png) no-repeat center center',
-                  backgroundSize: 'cover',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                } as React.CSSProperties}
+                className={styles.footerLink}
               >
                 Sign Up
               </button>
@@ -846,18 +741,6 @@ export function LoginScreenVX2({
           </>
         )}
       </div>
-      
-      {/* CSS for shake animation */}
-      <style>{`
-        @keyframes shake {
-          0%, 100% { transform: translateX(0); }
-          10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
-          20%, 40%, 60%, 80% { transform: translateX(4px); }
-        }
-        .animate-shake {
-          animation: shake 0.5s ease-in-out;
-        }
-      `}</style>
     </div>
   );
 }

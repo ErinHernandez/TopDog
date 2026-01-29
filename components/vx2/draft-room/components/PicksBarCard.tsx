@@ -1,21 +1,14 @@
 /**
  * PicksBarCard - Sandbox Component
  * Built from scratch using TeamHeader as exact template
- * 
- * TeamHeader source styling:
- * - flex-shrink: 0
- * - display: flex
- * - flex-direction: column
- * - background-color: rgb(55, 65, 81) = #374151
- * - margin: 1px
- * - min-width: 92px
- * - width: 92px
- * - border-radius: 6px
- * - border: 4px solid rgb(59, 130, 246)
- * - overflow: hidden
+ *
+ * CSP-compliant version using CSS Modules for styling.
+ * Dynamic values are handled via CSS custom properties.
  */
 
 import React from 'react';
+import { cn } from '@/lib/styles';
+import styles from './PicksBarCard.module.css';
 
 // ============================================================================
 // CONSTANTS - Exact copy from Board's TeamHeader
@@ -85,99 +78,32 @@ export default function PicksBarCard({
     ? participantName.substring(0, CARD.headerMaxChars)
     : participantName;
 
+  // Determine border color variant class
+  const borderColorClass = isOnTheClock && isUser
+    ? styles.borderOnTheClockRed
+    : isUser
+      ? styles.borderUserBlue
+      : styles.borderGray;
+
   return (
-    // Outer Container - EXACT TeamHeader styling
-    <div
-      style={{
-        flexShrink: 0,
-        display: 'flex',
-        flexDirection: 'column',
-        backgroundColor: CARD.backgroundColor,
-        margin: CARD.margin,
-        minWidth: CARD.minWidth,
-        width: CARD.width,
-        borderRadius: CARD.borderRadius,
-        border: `${CARD.borderWidth}px solid ${borderColor}`,
-        overflow: 'hidden',
-      }}
-    >
+    // Outer Container - EXACT TeamHeader styling (now via CSS Module)
+    <div className={cn(styles.container, borderColorClass)}>
       {/* Header - Participant Name */}
-      <div
-        style={{
-          height: CARD.headerHeight,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '0 4px',
-          backgroundColor: borderColor,
-          fontSize: CARD.headerFontSize,
-          fontWeight: 500,
-          color: '#FFFFFF',
-          textTransform: 'uppercase',
-          textAlign: 'center',
-        }}
-      >
+      <div className={styles.header}>
         {displayName}
       </div>
-      
+
       {/* Content Area */}
-      <div
-        style={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-          paddingBottom: CARD.contentPaddingBottom,
-          minHeight: CARD.contentMinHeight,
-        }}
-      >
+      <div className={styles.content}>
         {/* Pick Number (top-left) */}
-        {pickNumber && (
-          <div
-            style={{
-              alignSelf: 'flex-start',
-              fontSize: 8,
-              fontWeight: 500,
-              color: '#FFFFFF',
-              marginTop: 2,
-              marginLeft: 2,
-            }}
-          >
-            {pickNumber}
-          </div>
-        )}
-        
+        {pickNumber && <div className={styles.pickNumber}>{pickNumber}</div>}
+
         {/* Center content (timer, player info, etc.) */}
-        <div
-          style={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          {children}
-        </div>
-        
+        <div className={styles.centerContent}>{children}</div>
+
         {/* Position Tracker Bar */}
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            width: '100%',
-            marginTop: CARD.trackerMarginTop,
-          }}
-        >
-          <div
-            style={{
-              height: CARD.trackerHeight,
-              width: CARD.trackerEmptyWidth,
-              backgroundColor: COLORS.trackerEmpty,
-              borderRadius: CARD.trackerBorderRadius,
-            }}
-          />
+        <div className={styles.trackerContainer}>
+          <div className={styles.tracker} />
         </div>
       </div>
     </div>

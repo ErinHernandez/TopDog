@@ -7,7 +7,9 @@
  */
 
 import React from 'react';
+import { cn } from '@/lib/styles';
 import { CARD_SPACING_V3 } from '../constants/cardSpacingV3';
+import styles from './TournamentJoinButton.module.css';
 
 export interface TournamentJoinButtonProps {
   /** Click handler */
@@ -21,63 +23,39 @@ export interface TournamentJoinButtonProps {
 }
 
 /**
- * Default tiled background style
- * Matches the existing TILED_BG_STYLE pattern
+ * Default tiled background properties
  */
-const DEFAULT_BUTTON_STYLE: React.CSSProperties = {
-  backgroundImage: 'url(/wr_blue.png)',
-  backgroundSize: '200px',
-  backgroundRepeat: 'repeat',
-  backgroundColor: '#1E40AF', // Fallback color
-};
+const DEFAULT_BACKGROUND_IMAGE = 'url(/wr_blue.png)';
+const DEFAULT_BACKGROUND_COLOR = '#1e40af';
 
 export function TournamentJoinButton({
   onClick,
   label = 'Join Tournament',
   disabled = false,
-  backgroundStyle = DEFAULT_BUTTON_STYLE,
+  backgroundStyle,
 }: TournamentJoinButtonProps): React.ReactElement {
+  const backgroundImage = backgroundStyle?.backgroundImage
+    ? String(backgroundStyle.backgroundImage)
+    : DEFAULT_BACKGROUND_IMAGE;
+  const backgroundColor = backgroundStyle?.backgroundColor
+    ? String(backgroundStyle.backgroundColor)
+    : DEFAULT_BACKGROUND_COLOR;
+
   return (
     <button
-      className="tournament-join-button"
+      className={cn(styles.button)}
       onClick={onClick}
       disabled={disabled}
       style={{
-        // Background
-        ...backgroundStyle,
-        
-        // Sizing
-        height: `${CARD_SPACING_V3.buttonHeight}px`,
-        width: '100%',
-        
-        // Typography
-        fontSize: `${CARD_SPACING_V3.buttonFontSize}px`,
-        fontWeight: CARD_SPACING_V3.buttonFontWeight,
-        color: '#FFFFFF',
-        textAlign: 'center',
-        
-        // Shape
-        borderRadius: `${CARD_SPACING_V3.buttonBorderRadius}px`,
-        border: 'none',
-        
-        // Interaction
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        opacity: disabled ? 0.6 : 1,
-        
-        // Animation
-        transition: 'opacity 0.2s ease, transform 0.1s ease',
-      }}
-      onMouseDown={(e) => {
-        if (!disabled) {
-          (e.currentTarget as HTMLButtonElement).style.transform = 'scale(0.98)';
-        }
-      }}
-      onMouseUp={(e) => {
-        (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)';
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)';
-      }}
+        '--height': `${CARD_SPACING_V3.buttonHeight}px`,
+        '--font-size': `${CARD_SPACING_V3.buttonFontSize}px`,
+        '--font-weight': CARD_SPACING_V3.buttonFontWeight,
+        '--border-radius': `${CARD_SPACING_V3.buttonBorderRadius}px`,
+        '--background-image': backgroundImage,
+        '--background-color': backgroundColor,
+        '--background-size': '200px',
+        '--background-repeat': 'repeat',
+      } as React.CSSProperties}
     >
       {label}
     </button>

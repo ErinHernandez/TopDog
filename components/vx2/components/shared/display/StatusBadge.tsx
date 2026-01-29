@@ -1,6 +1,8 @@
 /**
  * StatusBadge - Display status with semantic colors
- * 
+ *
+ * Migrated to CSS Modules for CSP compliance.
+ *
  * @example
  * ```tsx
  * <StatusBadge status="success" label="YOUR TURN" />
@@ -11,6 +13,8 @@
 import React from 'react';
 import { STATE_COLORS, TEXT_COLORS } from '../../../core/constants/colors';
 import { RADIUS, TYPOGRAPHY, SPACING } from '../../../core/constants/sizes';
+import { cn } from '@/lib/styles';
+import styles from './StatusBadge.module.css';
 
 // ============================================================================
 // TYPES
@@ -84,21 +88,21 @@ export function StatusBadge({
 }: StatusBadgeProps): React.ReactElement {
   const colors = STATUS_CONFIG[status];
   const sizeConfig = SIZE_CONFIG[size];
-  
+
+  // CSS custom properties for dynamic values
+  const badgeStyle: React.CSSProperties = {
+    '--badge-bg': colors.bg,
+    '--badge-color': colors.text,
+    '--badge-padding-x': `${sizeConfig.paddingX}px`,
+    '--badge-padding-y': `${sizeConfig.paddingY}px`,
+    '--badge-radius': `${RADIUS.sm}px`,
+    '--badge-font-size': `${sizeConfig.fontSize}px`,
+  } as React.CSSProperties;
+
   return (
     <span
-      className={`inline-flex items-center font-semibold uppercase tracking-wide ${pulse ? 'animate-pulse' : ''} ${className}`}
-      style={{
-        backgroundColor: colors.bg,
-        color: colors.text,
-        paddingLeft: `${sizeConfig.paddingX}px`,
-        paddingRight: `${sizeConfig.paddingX}px`,
-        paddingTop: `${sizeConfig.paddingY}px`,
-        paddingBottom: `${sizeConfig.paddingY}px`,
-        borderRadius: `${RADIUS.sm}px`,
-        fontSize: `${sizeConfig.fontSize}px`,
-        lineHeight: 1.2,
-      }}
+      className={cn(styles.badge, pulse && styles.badgePulse, className)}
+      style={badgeStyle}
     >
       {label}
     </span>
@@ -106,4 +110,3 @@ export function StatusBadge({
 }
 
 export default StatusBadge;
-

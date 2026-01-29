@@ -31,6 +31,8 @@ import { CurrencySelector } from '../components/CurrencySelector';
 import { FXWarningBanner } from '../components/FXWarningBanner';
 import { AmountStepper } from '../components/AmountStepper';
 import { useStripeExchangeRate } from '../../../hooks/useStripeExchangeRate';
+import { cn } from '@/lib/styles';
+import styles from './DepositModalVX2.module.css';
 
 const logger = createScopedLogger('[DepositModal]');
 
@@ -87,13 +89,13 @@ function CardBrandIcon({ brand }: { brand: string }): React.ReactElement {
     amex: '#006FCF',
     discover: '#FF6000',
   };
-  
+
   const color = brandColors[brand.toLowerCase()] || TEXT_COLORS.muted;
-  
+
   return (
-    <div 
-      className="w-8 h-5 rounded flex items-center justify-center text-xs font-bold"
-      style={{ backgroundColor: color, color: '#fff' }}
+    <div
+      className={styles.cardBrandIcon}
+      style={{ '--brand-color': color } as React.CSSProperties}
     >
       {brand.slice(0, 4).toUpperCase()}
     </div>
@@ -137,9 +139,9 @@ function AmountStep({
 }: AmountStepProps): React.ReactElement {
   const isValid = amountUSD >= 25 && amountUSD <= 10000;
   const showFXWarning = currency !== localCurrency;
-  
+
   return (
-    <div className="space-y-6">
+    <div className={styles.amountStepContainer}>
       {/* Currency Selector */}
       <CurrencySelector
         selectedCurrency={currency}
@@ -147,7 +149,7 @@ function AmountStep({
         onSelect={onCurrencyChange}
         label="Deposit Currency"
       />
-      
+
       {/* FX Warning Banner - when currency differs from local */}
       {showFXWarning && (
         <FXWarningBanner
@@ -156,29 +158,26 @@ function AmountStep({
           dismissible={true}
         />
       )}
-      
+
       {/* Currency Exchange Notice for non-USD deposits */}
       {showCurrencyExchangeNotice && !showFXWarning && (
-        <div 
-          className="p-4 rounded-lg"
-          style={{ 
-            backgroundColor: `${STATE_COLORS.info}15`,
-            border: `1px solid ${STATE_COLORS.info}40`,
-          }}
+        <div
+          className={styles.currencyNotice}
+          style={{
+            '--info-bg': `${STATE_COLORS.info}15`,
+            '--info-border': `${STATE_COLORS.info}40`,
+          } as React.CSSProperties}
         >
-          <p style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px`, color: TEXT_COLORS.primary }}>
-            Your deposit will be converted to USD at no extra cost to you. 
+          <p className={styles.currencyNoticeTitle}>
+            Your deposit will be converted to USD at no extra cost to you.
             Your account balance is always kept in USD.
           </p>
-          <p 
-            className="mt-2"
-            style={{ fontSize: `${TYPOGRAPHY.fontSize.xs}px`, color: TEXT_COLORS.secondary }}
-          >
+          <p className={styles.currencyNoticeSubtitle}>
             When you withdraw, we will ask your preferred currency and convert free of charge.
           </p>
         </div>
       )}
-      
+
       {/* Amount Stepper with $25 increments */}
       <AmountStepper
         amountUSD={amountUSD}
@@ -190,16 +189,16 @@ function AmountStep({
         minUSD={25}
         maxUSD={10000}
       />
-      
+
       <button
         onClick={onContinue}
         disabled={!isValid}
-        className="w-full py-3 rounded-lg font-semibold transition-all"
+        className={cn(styles.continueButton, isValid && 'opacity-100')}
         style={{
-          backgroundColor: isValid ? STATE_COLORS.active : BG_COLORS.tertiary,
-          color: isValid ? '#000' : TEXT_COLORS.muted,
-          opacity: isValid ? 1 : 0.5,
-        }}
+          '--btn-bg': isValid ? STATE_COLORS.active : BG_COLORS.tertiary,
+          '--btn-text': isValid ? '#000' : TEXT_COLORS.muted,
+          '--btn-opacity': isValid ? '1' : '0.5',
+        } as React.CSSProperties}
       >
         Continue with ${amountUSD}
       </button>
@@ -242,19 +241,18 @@ function MethodStep({
 }: MethodStepProps): React.ReactElement {
   const canContinue = selectedMethodId || useNewCard;
   const hasWallets = walletAvailability.applePay || walletAvailability.googlePay;
-  
+
   return (
-    <div className="space-y-6">
+    <div className={cn(styles.amountStepContainer)}>
       <div>
-        <h3 
-          className="font-semibold mb-4"
-          style={{ fontSize: `${TYPOGRAPHY.fontSize.lg}px`, color: TEXT_COLORS.primary }}
+        <h3
+          className={cn(styles.methodStepTitle)}
         >
           Payment Method
         </h3>
-        
+
         {/* Express Checkout - Apple Pay / Google Pay */}
-        <div className="mb-4">
+        <div className={styles.expressCheckoutContainer}>
           <ExpressCheckoutElement
             options={{
               wallets: {
@@ -280,53 +278,47 @@ function MethodStep({
             }}
           />
         </div>
-        
+
         {/* Divider - only show if wallets are available */}
         {hasWallets && (
-          <div className="flex items-center gap-3 my-4">
-            <div className="flex-1 h-px" style={{ backgroundColor: BORDER_COLORS.default }} />
-            <span style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>or pay with</span>
-            <div className="flex-1 h-px" style={{ backgroundColor: BORDER_COLORS.default }} />
+          <div className={styles.dividerContainer}>
+            <div className={styles.dividerLine} style={{ '--border-default': BORDER_COLORS.default } as React.CSSProperties} />
+            <span className={styles.dividerText}>or pay with</span>
+            <div className={styles.dividerLine} style={{ '--border-default': BORDER_COLORS.default } as React.CSSProperties} />
           </div>
         )}
-        
+
         {/* Saved Payment Methods */}
         {savedMethods.length > 0 && (
-          <div className="space-y-2 mb-4">
-            <p 
-              className="mb-2"
-              style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px`, color: TEXT_COLORS.secondary }}
-            >
+          <div className={styles.savedMethodsSection}>
+            <p className={styles.savedMethodsLabel}>
               Saved cards
             </p>
             {savedMethods.map(method => (
               <button
                 key={method.id}
                 onClick={() => onSelectMethod(method.id)}
-                className="w-full flex items-center gap-3 p-3 rounded-lg transition-all"
+                className={styles.methodButton}
                 style={{
-                  backgroundColor: selectedMethodId === method.id 
-                    ? `${STATE_COLORS.active}20` 
+                  '--method-bg': selectedMethodId === method.id
+                    ? `${STATE_COLORS.active}20`
                     : BG_COLORS.tertiary,
-                  border: `1px solid ${selectedMethodId === method.id 
-                    ? STATE_COLORS.active 
-                    : BORDER_COLORS.default}`,
-                }}
+                  '--method-border': selectedMethodId === method.id
+                    ? STATE_COLORS.active
+                    : BORDER_COLORS.default,
+                } as React.CSSProperties}
               >
                 <CardBrandIcon brand={method.card.brand} />
-                <div className="flex-1 text-left">
-                  <p style={{ color: TEXT_COLORS.primary }}>
+                <div className={styles.methodButtonContent}>
+                  <p className={styles.methodCardBrand}>
                     {method.card.brand.charAt(0).toUpperCase() + method.card.brand.slice(1)} ****{method.card.last4}
                   </p>
-                  <p style={{ fontSize: `${TYPOGRAPHY.fontSize.xs}px`, color: TEXT_COLORS.muted }}>
+                  <p className={styles.methodCardExpiry}>
                     Expires {method.card.expMonth}/{method.card.expYear}
                   </p>
                 </div>
                 {method.isDefault && (
-                  <span 
-                    className="px-2 py-0.5 rounded text-xs"
-                    style={{ backgroundColor: STATE_COLORS.active, color: '#000' }}
-                  >
+                  <span className={styles.defaultBadge}>
                     Default
                   </span>
                 )}
@@ -334,35 +326,35 @@ function MethodStep({
             ))}
           </div>
         )}
-        
+
         {/* Add New Payment Method */}
         <button
           onClick={onUseNewCard}
-          className="w-full flex items-center gap-3 p-3 rounded-lg transition-all"
+          className={styles.addPaymentButton}
           style={{
-            backgroundColor: useNewCard ? `${STATE_COLORS.active}20` : BG_COLORS.tertiary,
-            border: `1px solid ${useNewCard ? STATE_COLORS.active : BORDER_COLORS.default}`,
-          }}
+            '--add-payment-bg': useNewCard ? `${STATE_COLORS.active}20` : BG_COLORS.tertiary,
+            '--add-payment-border': useNewCard ? STATE_COLORS.active : BORDER_COLORS.default,
+          } as React.CSSProperties}
         >
-          <div 
-            className="w-8 h-5 rounded flex items-center justify-center"
-            style={{ backgroundColor: STATE_COLORS.active }}
+          <div
+            className={styles.addPaymentIcon}
+            style={{ '--state-active': STATE_COLORS.active } as React.CSSProperties}
           >
-            <span style={{ color: '#000', display: 'inline-block' }}>
+            <span>
               <Plus className="w-3 h-3" />
             </span>
           </div>
-          <span style={{ color: TEXT_COLORS.primary }}>Add new payment method</span>
+          <span className={styles.addPaymentText}>Add new payment method</span>
         </button>
-        
+
         {useNewCard && (
-          <div className="mt-4 space-y-4">
-            <div 
-              className="p-4 rounded-lg"
-              style={{ backgroundColor: BG_COLORS.tertiary }}
+          <div className={styles.newCardSection}>
+            <div
+              className={styles.paymentElementContainer}
+              style={{ '--bg-tertiary': BG_COLORS.tertiary } as React.CSSProperties}
             >
               {/* PaymentElement shows Card, PayPal, Link tabs based on what's enabled */}
-              <PaymentElement 
+              <PaymentElement
                 options={{
                   layout: 'tabs',
                   paymentMethodOrder: ['card', 'paypal', 'link'],
@@ -374,44 +366,44 @@ function MethodStep({
                 }}
               />
             </div>
-            
-            <label className="flex items-center gap-2 cursor-pointer">
+
+            <label className={styles.saveCardLabel}>
               <input
                 type="checkbox"
                 checked={saveNewCard}
                 onChange={onToggleSaveCard}
-                className="w-4 h-4 rounded"
-                style={{ accentColor: STATE_COLORS.active }}
+                className={styles.saveCardCheckbox}
+                style={{ '--state-active': STATE_COLORS.active } as React.CSSProperties}
               />
-              <span style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px`, color: TEXT_COLORS.secondary }}>
+              <span className={styles.saveCardText}>
                 Save this payment method for future deposits
               </span>
             </label>
           </div>
         )}
       </div>
-      
-      <div className="flex gap-3">
+
+      <div className={styles.methodButtonsContainer}>
         <button
           onClick={onBack}
-          className="flex-1 py-3 rounded-lg font-medium"
+          className={styles.backButton}
           style={{
-            backgroundColor: BG_COLORS.tertiary,
-            color: TEXT_COLORS.primary,
-            border: `1px solid ${BORDER_COLORS.default}`,
-          }}
+            '--bg-tertiary': BG_COLORS.tertiary,
+            '--text-primary': TEXT_COLORS.primary,
+            '--border-default': BORDER_COLORS.default,
+          } as React.CSSProperties}
         >
           Back
         </button>
         <button
           onClick={onContinue}
           disabled={!canContinue || isLoading}
-          className="flex-1 py-3 rounded-lg font-semibold transition-all"
+          className={styles.nextButton}
           style={{
-            backgroundColor: canContinue && !isLoading ? STATE_COLORS.active : BG_COLORS.tertiary,
-            color: canContinue && !isLoading ? '#000' : TEXT_COLORS.muted,
-            opacity: canContinue && !isLoading ? 1 : 0.5,
-          }}
+            '--next-btn-bg': canContinue && !isLoading ? STATE_COLORS.active : BG_COLORS.tertiary,
+            '--next-btn-text': canContinue && !isLoading ? '#000' : TEXT_COLORS.muted,
+            '--next-btn-opacity': canContinue && !isLoading ? '1' : '0.5',
+          } as React.CSSProperties}
         >
           {isLoading ? 'Loading...' : 'Continue'}
         </button>
@@ -438,83 +430,79 @@ function ConfirmStep({
   isProcessing,
 }: ConfirmStepProps): React.ReactElement {
   const isNonUSD = currency !== 'USD';
-  
+
   return (
-    <div className="space-y-6">
+    <div className={cn(styles.amountStepContainer)}>
       <div>
-        <h3 
-          className="font-semibold mb-4"
-          style={{ fontSize: `${TYPOGRAPHY.fontSize.lg}px`, color: TEXT_COLORS.primary }}
+        <h3
+          className={styles.confirmStepTitle}
         >
           Confirm Deposit
         </h3>
-        
-        <div 
-          className="p-4 rounded-lg space-y-3"
-          style={{ backgroundColor: BG_COLORS.tertiary }}
+
+        <div
+          className={styles.summaryCard}
+          style={{ '--bg-tertiary': BG_COLORS.tertiary } as React.CSSProperties}
         >
-          <div className="flex justify-between">
-            <span style={{ color: TEXT_COLORS.secondary }}>Amount</span>
-            <span className="font-semibold" style={{ color: TEXT_COLORS.primary }}>
+          <div className={styles.summaryRow}>
+            <span className={styles.summaryLabel}>Amount</span>
+            <span className={styles.summaryValue}>
               {formatSmallestUnit(amount, { currency })}
             </span>
           </div>
-          <div className="flex justify-between">
-            <span style={{ color: TEXT_COLORS.secondary }}>Payment Method</span>
+          <div className={styles.summaryRow}>
+            <span className={styles.summaryLabel}>Payment Method</span>
             <span style={{ color: TEXT_COLORS.primary }}>{paymentMethod}</span>
           </div>
           {isNonUSD && (
-            <div className="flex justify-between">
-              <span style={{ color: TEXT_COLORS.secondary }}>Currency Conversion</span>
+            <div className={styles.summaryRow}>
+              <span className={styles.summaryLabel}>Currency Conversion</span>
               <span style={{ color: STATE_COLORS.success }}>Free</span>
             </div>
           )}
-          <div 
-            className="border-t pt-3 flex justify-between"
-            style={{ borderColor: BORDER_COLORS.default }}
+          <div
+            className={cn(styles.summaryDivider, styles.summaryRow)}
+            style={{ '--border-default': BORDER_COLORS.default } as React.CSSProperties}
           >
-            <span className="font-medium" style={{ color: TEXT_COLORS.primary }}>Total</span>
-            <span className="font-bold text-lg" style={{ color: STATE_COLORS.success }}>
+            <span className={styles.totalLabel}>Total</span>
+            <span className={styles.totalValue}>
               {formatSmallestUnit(amount, { currency })}
             </span>
           </div>
           {isNonUSD && (
-            <p 
-              className="text-center"
-              style={{ fontSize: `${TYPOGRAPHY.fontSize.xs}px`, color: TEXT_COLORS.muted }}
-            >
+            <p className={styles.conversionNote}>
               Will be converted to USD at the current exchange rate
             </p>
           )}
         </div>
       </div>
-      
-      <div className="flex gap-3">
+
+      <div className={styles.confirmButtonsContainer}>
         <button
           onClick={onBack}
           disabled={isProcessing}
-          className="flex-1 py-3 rounded-lg font-medium"
+          className={styles.confirmBackButton}
           style={{
-            backgroundColor: BG_COLORS.tertiary,
-            color: TEXT_COLORS.primary,
-            border: `1px solid ${BORDER_COLORS.default}`,
-            opacity: isProcessing ? 0.5 : 1,
-          }}
+            '--bg-tertiary': BG_COLORS.tertiary,
+            '--text-primary': TEXT_COLORS.primary,
+            '--border-default': BORDER_COLORS.default,
+            '--confirm-btn-opacity': isProcessing ? '0.5' : '1',
+          } as React.CSSProperties}
         >
           Back
         </button>
         <button
           onClick={onConfirm}
           disabled={isProcessing}
-          className="flex-1 py-3 rounded-lg font-semibold transition-all flex items-center justify-center gap-2"
+          className={styles.depositButton}
           style={{
-            backgroundColor: isProcessing ? BG_COLORS.tertiary : STATE_COLORS.success,
-            color: isProcessing ? TEXT_COLORS.muted : '#fff',
-          }}
+            '--deposit-btn-bg': isProcessing ? BG_COLORS.tertiary : STATE_COLORS.success,
+            '--deposit-btn-text': isProcessing ? TEXT_COLORS.muted : '#fff',
+          } as React.CSSProperties}
         >
           {isProcessing ? (
             <>
-              <span className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full" />
+              <span className={styles.processingSpinner} />
               Processing...
             </>
           ) : (
@@ -544,72 +532,63 @@ function ResultStep({
   onClose,
 }: ResultStepProps): React.ReactElement {
   return (
-    <div className="text-center space-y-6 py-8">
-      <div 
-        className="w-16 h-16 rounded-full mx-auto flex items-center justify-center"
-        style={{ 
-          backgroundColor: success ? `${STATE_COLORS.success}20` : `${STATE_COLORS.error}20` 
-        }}
+    <div className={styles.resultContainer}>
+      <div
+        className={styles.resultIcon}
+        style={{
+          '--result-icon-bg': success ? `${STATE_COLORS.success}20` : `${STATE_COLORS.error}20`,
+          '--result-icon-color': success ? STATE_COLORS.success : STATE_COLORS.error,
+        } as React.CSSProperties}
       >
         {success ? (
-          <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke={STATE_COLORS.success}>
+          <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         ) : (
-          <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke={STATE_COLORS.error}>
+          <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         )}
       </div>
-      
+
       <div>
-        <h3 
-          className="font-semibold mb-2"
-          style={{ 
-            fontSize: `${TYPOGRAPHY.fontSize.xl}px`, 
-            color: success ? STATE_COLORS.success : STATE_COLORS.error 
-          }}
+        <h3
+          className={styles.resultTitle}
+          style={{
+            '--result-title-color': success ? STATE_COLORS.success : STATE_COLORS.error,
+          } as React.CSSProperties}
         >
           {success ? 'Deposit Successful!' : 'Deposit Failed'}
         </h3>
-        
+
         {success && amount && (
           <>
-            <p style={{ color: TEXT_COLORS.secondary }}>
+            <p className={styles.resultMessage}>
               {formatSmallestUnit(amount, { currency })} has been added to your balance
             </p>
             {currency !== 'USD' && (
-              <p 
-                className="mt-1"
-                style={{ fontSize: `${TYPOGRAPHY.fontSize.xs}px`, color: TEXT_COLORS.muted }}
-              >
+              <p className={styles.resultSubtext}>
                 Converted to USD at no extra cost
               </p>
             )}
           </>
         )}
-        
+
         {!success && errorMessage && (
-          <p style={{ color: TEXT_COLORS.secondary }}>{errorMessage}</p>
+          <p className={styles.resultMessage}>{errorMessage}</p>
         )}
-        
+
         {success && transactionId && (
-          <p 
-            className="mt-2"
-            style={{ fontSize: `${TYPOGRAPHY.fontSize.xs}px`, color: TEXT_COLORS.muted }}
-          >
+          <p className={styles.resultTransactionId}>
             Transaction ID: {transactionId}
           </p>
         )}
       </div>
-      
+
       <button
         onClick={onClose}
-        className="w-full py-3 rounded-lg font-semibold"
-        style={{
-          backgroundColor: STATE_COLORS.active,
-          color: '#000',
-        }}
+        className={styles.resultButton}
+        style={{ '--state-active': STATE_COLORS.active } as React.CSSProperties}
       >
         {success ? 'Done' : 'Try Again'}
       </button>
@@ -939,61 +918,60 @@ function DepositModalContent({
   };
   
   if (!isOpen) return null;
-  
+
   return (
-    <div 
-      className="fixed inset-0 flex items-center justify-center p-4"
-      style={{ zIndex: Z_INDEX.modal }}
+    <div
+      className={styles.modalOverlay}
+      style={{ '--z-modal': Z_INDEX.modal } as React.CSSProperties}
     >
       {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/60"
+      <div
+        className={styles.backdrop}
         onClick={onClose}
       />
-      
+
       {/* Modal */}
-      <div 
-        className="relative w-full max-w-md rounded-xl overflow-hidden"
-        style={{ backgroundColor: BG_COLORS.secondary }}
+      <div
+        className={styles.modalContent}
+        style={{ '--bg-secondary': BG_COLORS.secondary } as React.CSSProperties}
       >
         {/* Header */}
-        <div 
-          className="flex items-center justify-between p-4 border-b"
-          style={{ borderColor: BORDER_COLORS.default }}
+        <div
+          className={styles.modalHeader}
+          style={{ '--border-default': BORDER_COLORS.default } as React.CSSProperties}
         >
-          <div className="flex items-center gap-3">
+          <div className={styles.headerLeft}>
             {step !== 'amount' && step !== 'success' && step !== 'error' && (
               <button
                 onClick={() => {
                   if (step === 'method') setStep('amount');
                   else if (step === 'confirm') setStep('method');
                 }}
-                className="p-1 rounded hover:bg-white/10"
+                className={styles.backNavButton}
               >
-                <span style={{ color: TEXT_COLORS.primary, display: 'inline-block' }}>
+                <span className={styles.backNavIcon}>
                   <ChevronLeft className="w-5 h-5" />
                 </span>
               </button>
             )}
-            <h2 
-              className="font-semibold"
-              style={{ fontSize: `${TYPOGRAPHY.fontSize.lg}px`, color: TEXT_COLORS.primary }}
+            <h2
+              className={styles.modalTitle}
             >
               Deposit Funds
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-full hover:bg-white/10"
+            className={styles.closeButton}
           >
-            <span style={{ color: TEXT_COLORS.muted, display: 'inline-block' }}>
+            <span className={styles.closeIcon}>
               <Close className="w-5 h-5" />
             </span>
           </button>
         </div>
-        
+
         {/* Content */}
-        <div className="p-6">
+        <div className={styles.modalBody}>
           {step === 'amount' && (
             <AmountStep
               amountUSD={amountUSD}
@@ -1189,59 +1167,52 @@ export function DepositModalVX2(props: DepositModalVX2Props): React.ReactElement
   }, []);
   
   if (!isOpen) return null;
-  
+
   // Show loading or error state
   if (!clientSecret || isCreatingIntent || error) {
     return (
-      <div 
-        className="fixed inset-0 flex items-center justify-center"
-        style={{ zIndex: Z_INDEX.modal }}
+      <div
+        className={styles.loadingOverlay}
+        style={{ '--z-modal': Z_INDEX.modal } as React.CSSProperties}
       >
-        <div className="absolute inset-0 bg-black/60" onClick={onClose} />
-        <div 
-          className="relative p-8 rounded-xl max-w-sm mx-4"
-          style={{ backgroundColor: BG_COLORS.secondary }}
+        <div className={styles.loadingBackdrop} onClick={onClose} />
+        <div
+          className={styles.loadingBox}
+          style={{ '--bg-secondary': BG_COLORS.secondary } as React.CSSProperties}
         >
           {error ? (
-            <div className="flex flex-col items-center gap-4 text-center">
-              <div 
-                className="w-12 h-12 rounded-full flex items-center justify-center"
-                style={{ backgroundColor: STATE_COLORS.error + '20' }}
+            <div className={styles.errorContainer}>
+              <div
+                className={styles.errorIcon}
+                style={{ '--error-bg': STATE_COLORS.error + '20' } as React.CSSProperties}
               >
-                <span style={{ color: STATE_COLORS.error, fontSize: '24px' }}>!</span>
+                <span className={styles.errorIconContent}>!</span>
               </div>
               <div>
-                <p style={{ color: TEXT_COLORS.primary, fontWeight: 600 }}>Payment Setup Failed</p>
-                <p style={{ color: TEXT_COLORS.secondary, fontSize: '14px', marginTop: '4px' }}>{error}</p>
+                <p className={styles.errorTitle}>Payment Setup Failed</p>
+                <p className={styles.errorMessage}>{error}</p>
               </div>
-              <div className="flex gap-3 mt-2">
+              <div className={styles.errorButtonsContainer}>
                 <button
                   onClick={onClose}
-                  className="px-4 py-2 rounded-lg"
-                  style={{ 
-                    backgroundColor: 'transparent',
-                    border: `1px solid ${BORDER_COLORS.subtle}`,
-                    color: TEXT_COLORS.secondary
-                  }}
+                  className={styles.errorCancelButton}
+                  style={{ '--border-subtle': BORDER_COLORS.subtle } as React.CSSProperties}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleRetry}
-                  className="px-4 py-2 rounded-lg"
-                  style={{ 
-                    backgroundColor: STATE_COLORS.info,
-                    color: 'white'
-                  }}
+                  className={styles.errorRetryButton}
+                  style={{ '--state-info': STATE_COLORS.info } as React.CSSProperties}
                 >
                   Try Again
                 </button>
               </div>
             </div>
           ) : (
-            <div className="flex items-center gap-3">
-              <span className="animate-spin w-5 h-5 border-2 border-white/30 border-t-white rounded-full" />
-              <span style={{ color: TEXT_COLORS.primary }}>Preparing payment...</span>
+            <div className={styles.loadingContainer}>
+              <span className={styles.loadingSpinner} />
+              <span className={styles.loadingText}>Preparing payment...</span>
             </div>
           )}
         </div>

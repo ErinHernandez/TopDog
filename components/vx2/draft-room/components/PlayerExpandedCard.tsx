@@ -26,6 +26,8 @@ import type { SeasonStats } from '@/lib/historicalStats/types';
 import * as historicalService from '@/lib/historicalStats/service';
 import type { Position } from '../types';
 import { createScopedLogger } from '../../../../lib/clientLogger';
+import { cn } from '@/lib/styles';
+import styles from './PlayerExpandedCard.module.css';
 
 const logger = createScopedLogger('[PlayerExpandedCard]');
 
@@ -255,13 +257,20 @@ interface BadgeProps {
   value: string | number;
   minWidth: number;
   labelColor: string;
+  badgeType: 'bye' | 'adp' | 'proj';
 }
 
-function Badge({ label, value, minWidth, labelColor }: BadgeProps): React.ReactElement {
+function Badge({ label, value, labelColor, badgeType }: BadgeProps): React.ReactElement {
+  const badgeClass = badgeType === 'bye'
+    ? styles.byeBadge
+    : badgeType === 'adp'
+    ? styles.adpBadge
+    : styles.projBadge;
+
   return (
-    <div style={{ textAlign: 'center', minWidth }}>
-      <div style={{ fontSize: PX.badgeLabelSize, color: labelColor }}>{label}</div>
-      <div style={{ fontSize: PX.badgeValueSize, fontWeight: 500, color: TEXT_COLORS.primary }}>
+    <div className={cn(styles.badge, badgeClass)} style={{ '--label-color': labelColor } as React.CSSProperties}>
+      <div className={styles.badgeLabel} style={{ color: labelColor }}>{label}</div>
+      <div className={styles.badgeValue}>
         {value}
       </div>
     </div>
@@ -272,45 +281,28 @@ interface StatsHeaderProps {
   columns: readonly { label: string; left: number; width: number }[];
   labelColor: string;
   lineColor: string;
+  isLightBg: boolean;
 }
 
-function StatsHeader({ columns, labelColor, lineColor }: StatsHeaderProps): React.ReactElement {
+function StatsHeader({ columns, isLightBg }: StatsHeaderProps): React.ReactElement {
+  const bgClass = isLightBg ? styles.lightBg : styles.darkBg;
+
   return (
-    <div
-      style={{
-        position: 'relative',
-        height: PX.headerHeight,
-        paddingTop: 3,
-        paddingBottom: 4,
-        color: labelColor,
-        fontSize: 14,
-        fontWeight: 500,
-      }}
-    >
+    <div className={cn(styles.statsHeader, bgClass)}>
       {/* Bottom border line */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: 1,
-          background: lineColor,
-        }}
-      />
-      
+      <div className={cn(styles.statsHeaderLine, bgClass)} />
+
       {/* Column headers */}
       {columns.map((col, i) => (
         <div
           key={col.label + i}
+          className={cn(
+            styles.statsHeaderColumn,
+            i === 0 ? styles.first : styles.other
+          )}
           style={{
-            position: 'absolute',
-            left: col.left,
-            width: col.width,
-            textAlign: i === 0 ? 'left' : 'center',
-            display: 'flex',
-            justifyContent: i === 0 ? 'flex-start' : 'center',
-            alignItems: 'center',
+            left: `${col.left}px`,
+            width: `${col.width}px`,
           }}
         >
           {col.label}
@@ -329,41 +321,22 @@ interface StatsRowProps {
 function StatsRow({ label, values, columns }: StatsRowProps): React.ReactElement {
   // Skip the YEAR column (index 0) for positioning values
   const dataColumns = columns.slice(1);
-  
+
   return (
-    <div
-      style={{
-        position: 'relative',
-        height: PX.rowHeight,
-        padding: '4px 0',
-        color: TEXT_COLORS.primary,
-        fontSize: 14,
-      }}
-    >
+    <div className={styles.statsRow}>
       {/* Year label */}
-      <div
-        style={{
-          position: 'absolute',
-          left: PX.yearLabelLeft,
-          width: PX.yearColumnWidth,
-          textAlign: 'left',
-        }}
-      >
+      <div className={styles.statsRowYear}>
         {label}
       </div>
-      
+
       {/* Data values */}
       {values.map((val, i) => (
         <div
           key={i}
+          className={styles.statsRowValue}
           style={{
-            position: 'absolute',
-            left: dataColumns[i]?.left ?? 0,
-            width: dataColumns[i]?.width ?? 30,
-            textAlign: 'center',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
+            left: `${dataColumns[i]?.left ?? 0}px`,
+            width: `${dataColumns[i]?.width ?? 30}px`,
           }}
         >
           {val}
@@ -382,30 +355,28 @@ interface PositionStatsTableProps {
 
 function PositionStatsTable({ position, team, historicalStats, projectedStats }: PositionStatsTableProps): React.ReactElement {
   const isLightBg = LIGHT_BG_TEAMS.includes(team);
-  const labelColor = isLightBg ? COLORS.headerLabelDark : COLORS.headerLabel;
-  const lineColor = isLightBg ? COLORS.lineColorDark : COLORS.lineColor;
-  
+
   // Select columns based on position
   let columns: readonly { label: string; left: number; width: number }[];
-  let minWidth: number;
+  let tableClass: string;
   let emptyDataLength: number;
-  
+
   if (position === 'QB') {
     columns = QB_COLUMNS;
-    minWidth = 650;
+    tableClass = styles.statsTableQB;
     emptyDataLength = 13;
   } else if (position === 'RB') {
     columns = RB_COLUMNS;
-    minWidth = 480;
+    tableClass = styles.statsTableRB;
     emptyDataLength = 10;
   } else {
     columns = WRTE_COLUMNS;
-    minWidth = 480;
+    tableClass = styles.statsTableWRTE;
     emptyDataLength = 10;
   }
-  
+
   const emptyData = Array(emptyDataLength).fill('-');
-  
+
   // Format historical data for each season
   const seasonRows = HISTORICAL_SEASONS.map(season => {
     const stats = historicalStats.get(season);
@@ -414,21 +385,15 @@ function PositionStatsTable({ position, team, historicalStats, projectedStats }:
       values: stats ? formatStatsForPosition(position, stats) : emptyData,
     };
   });
-  
+
   return (
-    <div
-      style={{
-        borderRadius: 4,
-        fontSize: 12,
-        minWidth,
-      }}
-    >
-      <StatsHeader columns={columns} labelColor={labelColor} lineColor={lineColor} />
-      
-      <div style={{ padding: '0 0 6px 0' }}>
+    <div className={cn(styles.statsTable, tableClass)}>
+      <StatsHeader columns={columns} isLightBg={isLightBg} labelColor="" lineColor="" />
+
+      <div className={styles.statsTablePadding}>
         {/* Projected stats row - placeholder until projection system integrated */}
         <StatsRow label="Proj." values={projectedStats ?? emptyData} columns={columns} />
-        
+
         {/* Historical stats rows */}
         {seasonRows.map(row => (
           <StatsRow key={row.label} label={row.label} values={row.values} columns={columns} />
@@ -508,62 +473,35 @@ export default function PlayerExpandedCard({
   return (
     <div
       onClick={handleCardClick}
-      style={{
-        background: teamGradient.firstGradient,
-        padding: 2,
-        borderRadius: 8,
-        boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.3)',
-      }}
+      className={styles.container}
+      style={{ background: teamGradient.firstGradient }}
     >
       {/* Header: Logo + Badges + Draft Button */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          paddingTop: PX.headerPaddingTop,
-          paddingBottom: PX.headerPaddingBottom,
-          paddingLeft: PX.headerPaddingX,
-          paddingRight: PX.headerPaddingX,
-        }}
-      >
+      <div className={styles.header}>
         {/* Team Logo */}
         <img
           src={`/logos/nfl/${team?.toLowerCase()}.png`}
           alt={`${team} logo`}
-          style={{
-            width: PX.logoSize,
-            height: PX.logoSize,
-            flexShrink: 0,
-            display: 'block',
-          }}
+          className={styles.logo}
           onError={handleImageError}
         />
         
         {/* Badges */}
-        <div
-          style={{
-            flex: 1,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: PX.badgeGap,
-            paddingLeft: 12,
-            paddingRight: 12,
-          }}
-        >
-          <Badge label="Bye" value={byeWeek} minWidth={PX.badgeMinWidths.bye} labelColor={labelColor} />
+        <div className={styles.badgesContainer}>
+          <Badge label="Bye" value={byeWeek} minWidth={0} labelColor={labelColor} badgeType="bye" />
           <Badge
             label="ADP"
             value={parseFloat(String(adp ?? 0)).toFixed(1)}
-            minWidth={PX.badgeMinWidths.adp}
+            minWidth={0}
             labelColor={labelColor}
+            badgeType="adp"
           />
           <Badge
             label="Proj"
             value={parseFloat(String(projectedPoints ?? 0)).toFixed(1) || 'N/A'}
-            minWidth={PX.badgeMinWidths.proj}
+            minWidth={0}
             labelColor={labelColor}
+            badgeType="proj"
           />
         </div>
         
@@ -571,43 +509,20 @@ export default function PlayerExpandedCard({
         <button
           onClick={handleDraft}
           aria-label={`Draft ${name}`}
-          style={{
-            paddingTop: PX.draftButtonPaddingY,
-            paddingBottom: PX.draftButtonPaddingY,
-            paddingLeft: PX.draftButtonPaddingX,
-            paddingRight: PX.draftButtonPaddingX,
-            borderRadius: 4,
-            fontSize: PX.draftButtonFontSize,
-            fontWeight: 700,
-            background: isMyTurn 
-              ? 'url(/wr_blue.png) no-repeat center center'
-              : COLORS.draftButtonInactive,
-            backgroundSize: isMyTurn ? 'cover' : undefined,
-            color: '#FFFFFF',
-            opacity: isMyTurn ? 1 : 0.7,
-            border: '1px solid rgba(255, 255, 255, 0.3)',
-            cursor: 'pointer',
-          }}
+          className={cn(
+            styles.draftButton,
+            isMyTurn ? styles.active : styles.inactive
+          )}
         >
           DRAFT
         </button>
       </div>
       
       {/* Stats Table - scrollable area (click doesn't close card) */}
-      <div 
+      <div
         onClick={(e) => e.stopPropagation()}
         onTouchStart={(e) => e.stopPropagation()}
-        style={{ 
-          paddingTop: 0, 
-          paddingBottom: 8, 
-          marginTop: 0,
-          overflowX: 'auto',
-          WebkitOverflowScrolling: 'touch',
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-          cursor: 'grab',
-        }}
-        className="hide-scrollbar"
+        className={styles.statsArea}
       >
         <PositionStatsTable
           position={position as FantasyPosition}

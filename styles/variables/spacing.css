@@ -1,0 +1,73 @@
+/**
+ * CSS Custom Properties - Spacing
+ *
+ * Mapped from components/vx2/core/constants/sizes.ts
+ */
+
+:root {
+  /* ============================================================================
+     SPACING SCALE
+     ============================================================================ */
+  --spacing-2xs: 2px;
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 24px;
+  --spacing-2xl: 32px;
+  --spacing-3xl: 48px;
+
+  /* ============================================================================
+     CONTENT PADDING
+     ============================================================================ */
+  --content-padding-x: 16px;
+  --content-padding-y: 16px;
+  --content-gap: 12px;
+  --content-gap-sm: 8px;
+  --content-gap-lg: 16px;
+
+  /* ============================================================================
+     TOUCH TARGETS (Apple HIG Compliant)
+     ============================================================================ */
+  --touch-target-min: 44px;
+  --touch-target-comfort: 48px;
+  --touch-target-large: 56px;
+
+  /* ============================================================================
+     HEADER DIMENSIONS
+     ============================================================================ */
+  --header-height: 26px;
+  --header-padding-x: 16px;
+  --header-logo-height: 22px;
+  --header-logo-max-width: 120px;
+  --header-button-size: 44px;
+  --header-icon-size: 24px;
+  --header-deposit-button-size: 32px;
+  --header-deposit-icon-size: 20px;
+
+  /* ============================================================================
+     TAB BAR DIMENSIONS
+     ============================================================================ */
+  --tab-bar-min-height: 44px;
+  --tab-bar-padding-top: 10px;
+  --tab-bar-padding-bottom: 10px;
+  --tab-bar-tab-padding-x: 2px;
+  --tab-bar-icon-size: 24px;
+  --tab-bar-label-margin-top: 4px;
+  --tab-bar-badge-min-width: 18px;
+  --tab-bar-badge-height: 18px;
+  --tab-bar-badge-offset-top: 1px;
+  --tab-bar-badge-offset-right: -12px;
+  --tab-bar-home-indicator-width: 134px;
+  --tab-bar-home-indicator-height: 5px;
+  --tab-bar-home-indicator-margin-top: 8px;
+  --tab-bar-home-indicator-margin-bottom: 4px;
+
+  /* ============================================================================
+     SAFE AREAS (iOS)
+     ============================================================================ */
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+}

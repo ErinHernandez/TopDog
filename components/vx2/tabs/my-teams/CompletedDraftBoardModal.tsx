@@ -1,11 +1,13 @@
 /**
  * CompletedDraftBoardModal - Shows completed draft board for a team
- * 
+ *
  * Displays a full draft board view with all picks from the draft
  */
 
 import React, { useCallback, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
+import { cn } from '@/lib/styles';
+import styles from './CompletedDraftBoardModal.module.css';
 import DraftBoard from '../../draft-room/components/DraftBoard';
 import type { DraftPick, Participant } from '../../draft-room/types';
 import type { MyTeam, TeamPlayer } from '../../hooks/data/useMyTeams';
@@ -127,43 +129,27 @@ export default function CompletedDraftBoardModal({
 
   return (
     <div
-      className="fixed inset-0 flex flex-col"
+      className={styles.container}
       style={{
-        backgroundColor: BG_COLORS.primary,
-        zIndex: Z_INDEX.modal,
-      }}
+        '--bg-color-primary': BG_COLORS.primary,
+        '--z-index-modal': Z_INDEX.modal,
+      } as React.CSSProperties}
     >
       {/* Header */}
       <div
+        className={styles.header}
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: `${SPACING.md}px ${SPACING.lg}px`,
-          borderBottom: '1px solid rgba(255,255,255,0.1)',
-        }}
+          '--padding-vertical': `${SPACING.md}px`,
+          '--padding-horizontal': `${SPACING.lg}px`,
+        } as React.CSSProperties}
       >
-        <h2
-          style={{
-            color: TEXT_COLORS.primary,
-            fontSize: '18px',
-            fontWeight: 700,
-          }}
-        >
-          Draft Board
-        </h2>
+        <h2 className={styles.title}>Draft Board</h2>
         <button
           onClick={onClose}
+          className={styles.closeButton}
           style={{
-            background: 'rgba(255,255,255,0.05)',
-            border: 'none',
-            cursor: 'pointer',
-            padding: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            borderRadius: `${RADIUS.md}px`,
-            transition: 'background 0.15s',
-          }}
+            '--border-radius-md': `${RADIUS.md}px`,
+          } as React.CSSProperties}
           aria-label="Close draft board"
         >
           <Close size={20} color={TEXT_COLORS.secondary} />
@@ -171,7 +157,7 @@ export default function CompletedDraftBoardModal({
       </div>
 
       {/* Draft Board */}
-      <div style={{ flex: 1, overflow: 'hidden', minHeight: 0 }}>
+      <div className={styles.boardContainer}>
         <DraftBoard
           picks={picks}
           currentPickNumber={currentPickNumber}

@@ -13,7 +13,9 @@
  */
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../../core/constants/colors';
+import { cn } from '@/lib/styles';
+import styles from './ForgotPasswordModal.module.css';
+import authStyles from './auth-shared.module.css';
 import { SPACING, TYPOGRAPHY, Z_INDEX } from '../../core/constants/sizes';
 import { Close, ChevronLeft } from '../../components/icons';
 import { useAuth } from '../hooks/useAuth';
@@ -104,66 +106,48 @@ function InputStep({
   return (
     <div className="flex flex-col h-full">
       {/* Header — close only; "Forgot your password?" is in content below */}
-      <div 
-        className="flex items-center justify-end flex-shrink-0"
-        style={{ 
+      <div
+        className={styles.stepHeader}
+        style={{
           padding: `${SPACING.md + 8}px ${SPACING.lg}px ${SPACING.md}px`
         }}
       >
-        <button 
-          onClick={onClose} 
-          className="p-2" 
+        <button
+          onClick={onClose}
+          className="p-2"
           aria-label="Close"
         >
-          <Close size={24} color={TEXT_COLORS.muted} />
+          <Close size={24} color="rgba(255, 255, 255, 0.5)" />
         </button>
       </div>
       
       {/* Content */}
-      <div 
-        className="flex-1 flex flex-col px-6"
-        style={{ paddingTop: '40px', paddingBottom: '20px' }}
+      <div
+        className={cn(styles.stepContent, styles.stepContentPadded)}
         onKeyDown={handleKeyDown}
       >
-        <div className="text-center mb-6">
-          <div 
-            className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-3"
-            style={{ background: 'url(/wr_blue.png) no-repeat center center', backgroundSize: 'cover' }}
-          >
+        <div className={styles.heading}>
+          <div className={cn(styles.headingIcon, styles.headingIconLarge)}>
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2" strokeLinecap="round" strokeLinejoin="round"/>
               <path d="M7 11V7a5 5 0 0110 0v4" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
-          <h3 
-            className="font-bold mb-2"
-            style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.xl}px` }}
-          >
+          <h3 className={styles.headingTitle}>
             Forgot your password?
           </h3>
-          <p style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
-            {method === 'email' 
+          <p className={styles.headingSubtitle}>
+            {method === 'email'
               ? "Enter your primary or secondary email and we'll send you a code to reset your password."
               : "Enter your phone number and we'll send you a code to reset your password."}
           </p>
         </div>
         
         {/* Method Toggle */}
-        <div 
-          className="flex mb-4 p-1.5 rounded-xl"
-          style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}
-        >
+        <div className={styles.methodToggle}>
           <button
             onClick={() => { setMethod('email'); setTouched(false); setInputFocused(false); }}
-            className="flex-1 py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2"
-            style={{
-              background: method === 'email' 
-                ? 'url(/wr_blue.png) center center / cover no-repeat' 
-                : 'transparent',
-              color: method === 'email' ? '#fff' : TEXT_COLORS.muted,
-              fontSize: `${TYPOGRAPHY.fontSize.base}px`,
-              textShadow: method === 'email' ? '0 1px 2px rgba(0,0,0,0.3)' : 'none',
-            }}
+            className={cn(styles.methodToggleButton, method === 'email' && styles.methodToggleButtonActive)}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -172,15 +156,7 @@ function InputStep({
           </button>
           <button
             onClick={() => { setMethod('phone'); setTouched(false); setInputFocused(false); }}
-            className="flex-1 py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2"
-            style={{
-              background: method === 'phone' 
-                ? 'url(/wr_blue.png) center center / cover no-repeat' 
-                : 'transparent',
-              color: method === 'phone' ? '#fff' : TEXT_COLORS.muted,
-              fontSize: `${TYPOGRAPHY.fontSize.base}px`,
-              textShadow: method === 'phone' ? '0 1px 2px rgba(0,0,0,0.3)' : 'none',
-            }}
+            className={cn(styles.methodToggleButton, method === 'phone' && styles.methodToggleButtonActive)}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -188,24 +164,17 @@ function InputStep({
             Phone
           </button>
         </div>
-        
+
         {/* Error Message */}
         {error && (
-          <div 
-            className="mb-4 p-3 rounded-lg"
-            style={{ 
-              backgroundColor: 'rgba(239, 68, 68, 0.1)', 
-              color: STATE_COLORS.error,
-              fontSize: `${TYPOGRAPHY.fontSize.sm}px` 
-            }}
-          >
+          <div className={styles.errorMessage}>
             {error}
           </div>
         )}
-        
+
         {/* Email Input */}
         {method === 'email' && (
-          <div className="mb-4">
+          <div className={styles.inputMarginBottom}>
             <input
               type="email"
               value={email}
@@ -216,20 +185,10 @@ function InputStep({
               autoComplete="email"
               autoFocus
               disabled={isLoading}
-              className="w-full px-4 py-3 rounded-xl outline-none transition-colors"
-              style={{
-                backgroundColor: 'rgba(255,255,255,0.05)',
-                color: TEXT_COLORS.primary,
-                border: `2px solid ${errorToShow ? STATE_COLORS.error : BORDER_COLORS.default}`,
-                fontSize: `${TYPOGRAPHY.fontSize.base}px`,
-                opacity: isLoading ? 0.5 : 1,
-              }}
+              className={cn(styles.input, isLoading && styles.inputDisabled, errorToShow && styles.inputError)}
             />
             {errorToShow && (
-              <span 
-                className="block mt-1"
-                style={{ color: STATE_COLORS.error, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}
-              >
+              <span className={styles.errorField}>
                 Please enter a valid email
               </span>
             )}
@@ -238,7 +197,7 @@ function InputStep({
         
         {/* Phone Input */}
         {method === 'phone' && (
-          <div className="mb-4">
+          <div className={styles.inputMarginBottom}>
             <input
               type="tel"
               value={phone}
@@ -249,20 +208,10 @@ function InputStep({
               autoComplete="tel"
               autoFocus
               disabled={isLoading}
-              className="w-full px-4 py-3 rounded-xl outline-none transition-colors"
-              style={{
-                backgroundColor: 'rgba(255,255,255,0.05)',
-                color: TEXT_COLORS.primary,
-                border: `2px solid ${errorToShow ? STATE_COLORS.error : BORDER_COLORS.default}`,
-                fontSize: `${TYPOGRAPHY.fontSize.base}px`,
-                opacity: isLoading ? 0.5 : 1,
-              }}
+              className={cn(styles.input, isLoading && styles.inputDisabled, errorToShow && styles.inputError)}
             />
             {errorToShow && (
-              <span 
-                className="block mt-1"
-                style={{ color: STATE_COLORS.error, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}
-              >
+              <span className={styles.errorField}>
                 Please enter a valid phone number
               </span>
             )}
@@ -271,51 +220,31 @@ function InputStep({
       </div>
       
       {/* Footer */}
-      <div 
-        className="flex-shrink-0"
+      <div
+        className={styles.stepFooter}
         style={{ padding: `12px ${SPACING.xl}px 16px` }}
       >
         <button
           onClick={onSubmit}
           disabled={!canSubmit}
-          className="w-full py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2"
-          style={{
-            fontSize: `${TYPOGRAPHY.fontSize.lg}px`,
-            background: canSubmit ? 'url(/wr_blue.png) center center / cover no-repeat' : BG_COLORS.tertiary,
-            color: canSubmit ? '#fff' : TEXT_COLORS.disabled,
-            opacity: canSubmit ? 1 : 0.5,
-          }}
+          className={cn(styles.primaryButton, canSubmit ? styles.primaryButtonEnabled : styles.primaryButtonDisabled)}
         >
           {isLoading ? (
             <>
-              <div 
-                className="animate-spin rounded-full h-5 w-5 border-2"
-                style={{ borderColor: '#fff transparent transparent transparent' }}
-              />
+              <div className={styles.spinner} />
               Sending...
             </>
           ) : (
             'Send Code'
           )}
         </button>
-        
+
         {onBackToSignIn && (
-          <p 
-            className="text-center mt-3"
-            style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
-          >
+          <p className={styles.footerText}>
             Remember your password?{' '}
-            <button 
+            <button
               onClick={onBackToSignIn}
-              className="font-semibold"
-              style={{
-                background: 'url(/wr_blue.png) no-repeat center center',
-                backgroundSize: 'cover',
-                WebkitBackgroundClip: 'text',
-                backgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                color: 'transparent',
-              }}
+              className={styles.footerLink}
             >
               Sign In
             </button>
@@ -366,30 +295,24 @@ function CodeStep({
   return (
     <div className="flex flex-col h-full">
       {/* Header — same top padding as Sign In/Sign Up so X height consistent when present */}
-      <div 
-        className="flex items-center gap-3 flex-shrink-0"
-        style={{ 
+      <div
+        className={cn(styles.stepHeader, styles.stepHeaderWithBack)}
+        style={{
           padding: `${SPACING.md + 8}px ${SPACING.lg}px ${SPACING.md}px`
         }}
       >
         <button onClick={onBack} className="p-2" aria-label="Back">
-          <ChevronLeft size={24} color={TEXT_COLORS.muted} />
+          <ChevronLeft size={24} color="rgba(255, 255, 255, 0.5)" />
         </button>
-        <h2 
-          className="flex-1 font-bold" 
-          style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}
-        >
+        <h2 className={styles.stepHeaderTitle}>
           Enter Code
         </h2>
       </div>
       
       {/* Content */}
-      <div className="flex-1 flex flex-col justify-center px-6" style={{ marginTop: '-4px' }}>
-        <div className="text-center mb-8">
-          <div 
-            className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-            style={{ background: 'url(/wr_blue.png) no-repeat center center', backgroundSize: 'cover' }}
-          >
+      <div className={cn(styles.stepContent, styles.stepContentCentered)}>
+        <div className={styles.heading}>
+          <div className={styles.headingIcon}>
             {method === 'phone' ? (
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -400,33 +323,23 @@ function CodeStep({
               </svg>
             )}
           </div>
-          <h3 
-            className="font-bold mb-2"
-            style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.xl}px` }}
-          >
+          <h3 className={styles.headingTitle}>
             Check your {method}
           </h3>
-          <p style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+          <p className={styles.headingSubtitle}>
             We sent a 6-digit code to
             <br />
-            <span style={{ color: TEXT_COLORS.primary, fontWeight: 500 }}>{maskedContact}</span>
+            <span className={styles.headingSubtitleHighlight}>{maskedContact}</span>
           </p>
         </div>
-        
+
         {/* Error Message */}
         {error && (
-          <div 
-            className="mb-4 p-3 rounded-lg text-center"
-            style={{ 
-              backgroundColor: 'rgba(239, 68, 68, 0.1)', 
-              color: STATE_COLORS.error,
-              fontSize: `${TYPOGRAPHY.fontSize.sm}px` 
-            }}
-          >
+          <div className={styles.errorMessage}>
             {error}
           </div>
         )}
-        
+
         {/* Code Input */}
         <input
           type="text"
@@ -436,38 +349,19 @@ function CodeStep({
           maxLength={6}
           autoFocus
           disabled={isLoading}
-          className="w-full px-5 py-4 rounded-xl outline-none text-center tracking-widest mb-4"
-          style={{
-            backgroundColor: 'rgba(255,255,255,0.05)',
-            color: TEXT_COLORS.primary,
-            border: `2px solid ${BORDER_COLORS.default}`,
-            fontSize: `${TYPOGRAPHY.fontSize['2xl']}px`,
-            letterSpacing: '0.5em',
-            opacity: isLoading ? 0.5 : 1,
-          }}
+          className={cn(styles.codeInput, isLoading && styles.codeInputDisabled)}
         />
-        
-        <p 
-          className="text-center"
-          style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
-        >
+
+        <p className={styles.codeVerificationText}>
           Didn't receive it?{' '}
           {method === 'email' && <span>Check your spam folder or </span>}
           {cooldownActive ? (
-            <span>resend in {cooldown}s</span>
+            <span className={styles.resendCooldown}>resend in {cooldown}s</span>
           ) : (
             <button
               onClick={handleResend}
               disabled={isLoading}
-              className="font-semibold"
-              style={{
-                background: 'url(/wr_blue.png) no-repeat center center',
-                backgroundSize: 'cover',
-                WebkitBackgroundClip: 'text',
-                backgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                color: 'transparent',
-              }}
+              className={styles.footerLink}
             >
               resend code
             </button>
@@ -476,27 +370,18 @@ function CodeStep({
       </div>
       
       {/* Footer */}
-      <div 
-        className="flex-shrink-0"
+      <div
+        className={styles.stepFooter}
         style={{ padding: SPACING.sm }}
       >
         <button
           onClick={() => onVerify(code)}
           disabled={!canSubmit}
-          className="w-full py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2"
-          style={{
-            fontSize: `${TYPOGRAPHY.fontSize.lg}px`,
-            background: canSubmit ? 'url(/wr_blue.png) center center / cover no-repeat' : BG_COLORS.tertiary,
-            color: canSubmit ? '#fff' : TEXT_COLORS.disabled,
-            opacity: canSubmit ? 1 : 0.5,
-          }}
+          className={cn(styles.primaryButton, canSubmit ? styles.primaryButtonEnabled : styles.primaryButtonDisabled)}
         >
           {isLoading ? (
             <>
-              <div 
-                className="animate-spin rounded-full h-5 w-5 border-2"
-                style={{ borderColor: '#fff transparent transparent transparent' }}
-              />
+              <div className={styles.spinner} />
               Verifying...
             </>
           ) : (
@@ -538,65 +423,50 @@ function NewPasswordStep({
   return (
     <div className="flex flex-col h-full">
       {/* Header — same top padding as Sign In/Sign Up so X height is consistent */}
-      <div 
-        className="flex items-center gap-3 flex-shrink-0"
-        style={{ 
-          padding: `${SPACING.md + 8}px ${SPACING.lg}px ${SPACING.md}px`
+      <div
+        className={cn(styles.stepHeader, styles.stepHeaderWithBack)}
+        style={{
+          padding: `${SPACING.md + 8}px ${SPACING.lg}px ${SPACING.md}px`,
+          justifyContent: 'space-between'
         }}
       >
-        <h2 
-          className="flex-1 font-bold" 
-          style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}
-        >
+        <h2 className={styles.stepHeaderTitle}>
           Create New Password
         </h2>
-        <button 
-          onClick={onClose} 
-          className="p-2" 
+        <button
+          onClick={onClose}
+          className="p-2"
           aria-label="Close"
         >
-          <Close size={24} color={TEXT_COLORS.muted} />
+          <Close size={24} color="rgba(255, 255, 255, 0.5)" />
         </button>
       </div>
       
       {/* Content */}
-      <div className="flex-1 flex flex-col justify-center px-6" style={{ marginTop: '-4px' }}>
-        <div className="text-center mb-8">
-          <div 
-            className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-            style={{ backgroundColor: 'rgba(16, 185, 129, 0.15)' }}
-          >
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.success} strokeWidth="2">
+      <div className={cn(styles.stepContent, styles.stepContentCentered)}>
+        <div className={styles.heading}>
+          <div className={styles.successIcon}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h3 
-            className="font-bold mb-2"
-            style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.xl}px` }}
-          >
+          <h3 className={styles.headingTitle}>
             Code verified!
           </h3>
-          <p style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+          <p className={styles.headingSubtitle}>
             Now create a new password for your account.
           </p>
         </div>
-        
+
         {/* Error Message */}
         {error && (
-          <div 
-            className="mb-4 p-3 rounded-lg"
-            style={{ 
-              backgroundColor: 'rgba(239, 68, 68, 0.1)', 
-              color: STATE_COLORS.error,
-              fontSize: `${TYPOGRAPHY.fontSize.sm}px` 
-            }}
-          >
+          <div className={styles.errorMessage}>
             {error}
           </div>
         )}
-        
+
         {/* Password Input */}
-        <div className="mb-4">
+        <div className={styles.inputMarginBottom}>
           <input
             type="password"
             value={password}
@@ -605,19 +475,12 @@ function NewPasswordStep({
             autoComplete="new-password"
             autoFocus
             disabled={isLoading}
-            className="w-full px-4 py-3 rounded-xl outline-none transition-colors"
-            style={{
-              backgroundColor: 'rgba(255,255,255,0.05)',
-              color: TEXT_COLORS.primary,
-              border: `2px solid ${BORDER_COLORS.default}`,
-              fontSize: `${TYPOGRAPHY.fontSize.base}px`,
-              opacity: isLoading ? 0.5 : 1,
-            }}
+            className={cn(styles.input, isLoading && styles.inputDisabled)}
           />
         </div>
         
         {/* Confirm Password Input */}
-        <div className="mb-4">
+        <div className={styles.inputMarginBottom}>
           <input
             type="password"
             value={confirmPassword}
@@ -625,37 +488,21 @@ function NewPasswordStep({
             placeholder="Confirm new password"
             autoComplete="new-password"
             disabled={isLoading}
-            className="w-full px-4 py-3 rounded-xl outline-none transition-colors"
-            style={{
-              backgroundColor: 'rgba(255,255,255,0.05)',
-              color: TEXT_COLORS.primary,
-              border: `2px solid ${confirmPassword && !passwordsMatch ? STATE_COLORS.error : BORDER_COLORS.default}`,
-              fontSize: `${TYPOGRAPHY.fontSize.base}px`,
-              opacity: isLoading ? 0.5 : 1,
-            }}
+            className={cn(styles.input, isLoading && styles.inputDisabled, confirmPassword && !passwordsMatch && styles.inputError)}
           />
           {confirmPassword && !passwordsMatch && (
-            <span 
-              className="block mt-1"
-              style={{ color: STATE_COLORS.error, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}
-            >
+            <span className={styles.errorField}>
               Passwords do not match
             </span>
           )}
         </div>
         
         {/* Password Requirements */}
-        <div
-          className="p-3 rounded-lg"
-          style={{ backgroundColor: 'rgba(255,255,255,0.03)' }}
-        >
-          <div
-            className="font-medium mb-2"
-            style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
-          >
+        <div className={styles.passwordRequirements}>
+          <div className={styles.requirementsTitle}>
             Password must have:
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <div className={styles.requirementsList}>
             {[
               { check: password.length >= 8, label: '8+ characters' },
               { check: /[A-Z]/.test(password), label: 'Uppercase' },
@@ -664,18 +511,14 @@ function NewPasswordStep({
             ].map((req, i) => (
               <div
                 key={i}
-                className="flex items-center gap-2"
-                style={{
-                  color: req.check ? STATE_COLORS.success : TEXT_COLORS.muted,
-                  fontSize: `${TYPOGRAPHY.fontSize.xs}px`
-                }}
+                className={cn(styles.requirementItem, req.check ? styles.requirementItemChecked : styles.requirementItemUnchecked)}
               >
                 {req.check ? (
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className={styles.requirementIcon}>
                     <path d="M20 6L9 17L4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 ) : (
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className={styles.requirementIcon}>
                     <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="2"/>
                   </svg>
                 )}
@@ -687,27 +530,18 @@ function NewPasswordStep({
       </div>
       
       {/* Footer */}
-      <div 
-        className="flex-shrink-0"
+      <div
+        className={styles.stepFooter}
         style={{ padding: SPACING.sm }}
       >
         <button
           onClick={() => onSubmit(password)}
           disabled={!canSubmit}
-          className="w-full py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2"
-          style={{
-            fontSize: `${TYPOGRAPHY.fontSize.lg}px`,
-            background: canSubmit ? 'url(/wr_blue.png) center center / cover no-repeat' : BG_COLORS.tertiary,
-            color: canSubmit ? '#fff' : TEXT_COLORS.disabled,
-            opacity: canSubmit ? 1 : 0.5,
-          }}
+          className={cn(styles.primaryButton, canSubmit ? styles.primaryButtonEnabled : styles.primaryButtonDisabled)}
         >
           {isLoading ? (
             <>
-              <div 
-                className="animate-spin rounded-full h-5 w-5 border-2"
-                style={{ borderColor: '#fff transparent transparent transparent' }}
-              />
+              <div className={styles.spinner} />
               Resetting...
             </>
           ) : (
@@ -821,40 +655,12 @@ export function ForgotPasswordModal({
   }, []);
   
   if (!isOpen) return null;
-  
+
   return (
-    <div
-      className="absolute left-0 right-0 bottom-0 flex flex-col"
-      style={{
-        top: 0,
-        backgroundColor: BG_COLORS.secondary,
-        zIndex: Z_INDEX.modal,
-      }}
-    >
+    <div className={styles.container}>
       {/* Blue outline wrapper - auth modal branding */}
       <div
-        style={{
-          position: 'absolute',
-          top: -8,
-          left: -8,
-          right: -8,
-          bottom: -8,
-          background: 'url(/wr_blue.png) no-repeat center center',
-          backgroundSize: '100% 100%',
-          borderRadius: '2.5rem',
-          zIndex: -1,
-          pointerEvents: 'none',
-          maskImage: `
-            linear-gradient(to bottom, black 0, black 8px, transparent 8px, transparent calc(100% - 8px), black calc(100% - 8px), black 100%),
-            linear-gradient(to right, black 0, black 8px, transparent 8px, transparent calc(100% - 8px), black calc(100% - 8px), black 100%)
-          `,
-          maskComposite: 'intersect',
-          WebkitMaskImage: `
-            linear-gradient(to bottom, black 0, black 8px, transparent 8px, transparent calc(100% - 8px), black calc(100% - 8px), black 100%),
-            linear-gradient(to right, black 0, black 8px, transparent 8px, transparent calc(100% - 8px), black calc(100% - 8px), black 100%)
-          `,
-          WebkitMaskComposite: 'source-in',
-        }}
+        className={styles.blueOutlineWrapper}
         aria-hidden="true"
       />
 

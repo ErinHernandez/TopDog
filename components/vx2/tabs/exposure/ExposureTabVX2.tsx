@@ -1,6 +1,6 @@
 /**
  * ExposureTabVX2 - Player Exposure Report Tab
- * 
+ *
  * A-Grade Requirements Met:
  * - TypeScript: Full type coverage
  * - Data Layer: Uses useExposure hook
@@ -15,16 +15,17 @@ import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useExposure, type ExposurePlayer } from '../../hooks/data';
 import { BG_COLORS, TEXT_COLORS, POSITION_COLORS } from '../../core/constants/colors';
 import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
-import { 
+import {
   PositionBadge,
-  Skeleton, 
-  EmptyState, 
+  Skeleton,
+  EmptyState,
   ErrorState,
   SearchInput,
   type Position,
   POSITIONS,
 } from '../../../ui';
 import { Rankings } from '../../components/icons';
+import styles from './ExposureTabVX2.module.css';
 
 // ============================================================================
 // CONSTANTS
@@ -61,7 +62,7 @@ interface PositionFiltersProps {
 function PositionFilters({ selected, onChange }: PositionFiltersProps): React.ReactElement {
   // Use shared POSITIONS constant
   const positions: PositionFilter[] = [...POSITIONS];
-  
+
   const handleClick = (pos: PositionFilter) => {
     if (selected.includes(pos)) {
       onChange(selected.filter(p => p !== pos));
@@ -69,32 +70,31 @@ function PositionFilters({ selected, onChange }: PositionFiltersProps): React.Re
       onChange([...selected, pos]);
     }
   };
-  
+
   return (
-    <div 
-      className="flex rounded-lg overflow-hidden"
-      style={{ 
-        backgroundColor: 'rgba(255,255,255,0.05)',
-        marginTop: `${SPACING.md}px`,
-        marginBottom: `${SPACING.xs}px`,
-      }}
+    <div
+      className={styles.positionFiltersWrapper}
+      style={{
+        '--filter-margin-top': `${SPACING.md}px`,
+        '--filter-margin-bottom': `${SPACING.xs}px`,
+      } as React.CSSProperties}
     >
       {positions.map(pos => {
         const isSelected = selected.includes(pos);
         const color = POSITION_COLORS[pos.toUpperCase() as keyof typeof POSITION_COLORS] || TEXT_COLORS.muted;
-        
+
         return (
           <button
             key={pos}
             onClick={() => handleClick(pos)}
-            className="flex-1 py-2.5 px-3 font-bold transition-all"
+            className={styles.positionButton}
             style={{
-              fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-              backgroundColor: isSelected ? 'rgba(255,255,255,0.1)' : 'transparent',
-              color: isSelected ? color : TEXT_COLORS.muted,
-              borderBottom: `2px solid ${color}`,
-              opacity: isSelected ? 1 : 0.4,
-            }}
+              '--button-bg': isSelected ? 'rgba(255,255,255,0.1)' : 'transparent',
+              '--button-color': isSelected ? color : TEXT_COLORS.muted,
+              '--button-border-color': color,
+              '--button-opacity': isSelected ? '1' : '0.4',
+              '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
+            } as React.CSSProperties}
           >
             {pos}
           </button>
@@ -111,24 +111,16 @@ interface SortHeaderProps {
 
 function SortHeader({ sortOrder, onToggle }: SortHeaderProps): React.ReactElement {
   return (
-    <div
+    <div className={styles.sortHeader}
       style={{
-        display: 'flex',
-        justifyContent: 'flex-end',
-        paddingRight: '20px',
-        paddingTop: `${SPACING.xs}px`,
-        paddingBottom: `${SPACING.xs}px`,
-      }}
+        '--sort-padding-y': `${SPACING.xs}px`,
+        '--text-secondary': TEXT_COLORS.secondary,
+        '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
+      } as React.CSSProperties}
     >
       <button
         onClick={onToggle}
-        className="transition-colors"
-        style={{ 
-          color: TEXT_COLORS.secondary, 
-          fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-          width: '60px',
-          textAlign: 'center',
-        }}
+        className={styles.sortButton}
         aria-label={`Sort by exposure ${sortOrder === 'asc' ? 'ascending' : 'descending'}`}
       >
         EXP%
@@ -145,49 +137,42 @@ interface ExposureRowProps {
 function ExposureRow({ player, isFirst = false }: ExposureRowProps): React.ReactElement {
   const [showShares, setShowShares] = useState(false);
   const exposurePercent = Math.round(player.exposure);
-  
+
   return (
     <div
+      className={`${styles.exposureRow} ${!isFirst ? styles.exposureRowNoBorderTop : ''}`}
       style={{
-        position: 'relative',
-        paddingLeft: '20px',
-        paddingTop: `${EXPOSURE_PX.rowPaddingY}px`,
-        paddingBottom: `${EXPOSURE_PX.rowPaddingY}px`,
-        minHeight: `${EXPOSURE_PX.rowMinHeight}px`,
-        borderTop: isFirst ? '1px solid rgba(255,255,255,0.1)' : 'none',
-        borderBottom: '1px solid rgba(255,255,255,0.1)',
-      }}
+        '--row-padding-y': `${EXPOSURE_PX.rowPaddingY}px`,
+        '--row-min-height': `${EXPOSURE_PX.rowMinHeight}px`,
+      } as React.CSSProperties}
     >
       {/* Player Info */}
-      <div>
-        <h3 
-          className="font-medium truncate"
-          style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
+      <div className={styles.playerInfo}>
+        <h3
+          className={styles.playerName}
+          style={{ '--text-primary': TEXT_COLORS.primary, '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px` } as React.CSSProperties}
         >
           {player.name}
         </h3>
-        <div className="flex items-center gap-2" style={{ marginTop: '2px' }}>
+        <div className={styles.playerDetails}>
           <PositionBadge position={player.position} size="sm" />
-          <span style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>
+          <span
+            className={styles.playerTeam}
+            style={{ '--text-muted': TEXT_COLORS.muted, '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px` } as React.CSSProperties}
+          >
             {player.team}
           </span>
         </div>
       </div>
-      
+
       {/* Exposure - positioned 20px from right edge */}
       <button
         onClick={() => setShowShares(!showShares)}
-        className="font-medium transition-colors"
+        className={styles.exposureValue}
         style={{
-          position: 'absolute',
-          right: '20px',
-          top: '50%',
-          transform: 'translateY(-50%)',
-          color: TEXT_COLORS.primary,
-          fontSize: `${TYPOGRAPHY.fontSize.base}px`,
-          width: '60px',
-          textAlign: 'center',
-        }}
+          '--text-primary': TEXT_COLORS.primary,
+          '--font-size-base': `${TYPOGRAPHY.fontSize.base}px`,
+        } as React.CSSProperties}
       >
         {showShares ? `${player.teams} shares` : `${exposurePercent}%`}
       </button>
@@ -198,19 +183,16 @@ function ExposureRow({ player, isFirst = false }: ExposureRowProps): React.React
 function ExposureRowSkeleton(): React.ReactElement {
   return (
     <div
-      className="flex items-center justify-between"
+      className={styles.skeletonRow}
       style={{
-        paddingLeft: `${EXPOSURE_PX.rowPaddingX}px`,
-        paddingRight: `${EXPOSURE_PX.rowPaddingX}px`,
-        paddingTop: `${EXPOSURE_PX.rowPaddingY}px`,
-        paddingBottom: `${EXPOSURE_PX.rowPaddingY}px`,
-        minHeight: `${EXPOSURE_PX.rowMinHeight}px`,
-        borderBottom: '1px solid rgba(255,255,255,0.1)',
-      }}
+        '--row-padding-x': `${EXPOSURE_PX.rowPaddingX}px`,
+        '--row-padding-y': `${EXPOSURE_PX.rowPaddingY}px`,
+        '--row-min-height': `${EXPOSURE_PX.rowMinHeight}px`,
+      } as React.CSSProperties}
     >
-      <div>
+      <div className={styles.skeletonPlayerInfo}>
         <Skeleton width={150} height={18} />
-        <div className="flex items-center gap-2" style={{ marginTop: '2px' }}>
+        <div className={styles.skeletonDetails}>
           <Skeleton width={28} height={18} />
           <Skeleton width={40} height={14} />
         </div>
@@ -229,28 +211,28 @@ export default function ExposureTabVX2(_props: ExposureTabVX2Props): React.React
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPositions, setSelectedPositions] = useState<PositionFilter[]>([]);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  
+
   // Note: Auth check removed - AuthGateVX2 ensures only logged-in users can access tabs
-  
+
   // Auto-reset when all positions are selected
   useEffect(() => {
     // Use shared POSITIONS constant
     const allPositions: PositionFilter[] = [...POSITIONS];
-    if (selectedPositions.length === allPositions.length && 
+    if (selectedPositions.length === allPositions.length &&
         allPositions.every(pos => selectedPositions.includes(pos))) {
       setSelectedPositions([]);
     }
   }, [selectedPositions]);
-  
+
   // Filter and sort players
   const filteredPlayers = useMemo(() => {
     let result = players;
-    
+
     // Position filter
     if (selectedPositions.length > 0) {
       result = result.filter(p => selectedPositions.includes(p.position as PositionFilter));
     }
-    
+
     // Search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
@@ -260,25 +242,25 @@ export default function ExposureTabVX2(_props: ExposureTabVX2Props): React.React
         (p.team?.toLowerCase() || '').includes(query)
       );
     }
-    
+
     // Sort
     return [...result].sort((a, b) =>
       sortOrder === 'desc' ? b.exposure - a.exposure : a.exposure - b.exposure
     );
   }, [players, selectedPositions, searchQuery, sortOrder]);
-  
+
   const handleToggleSort = useCallback(() => {
     setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
   }, []);
-  
+
   // Error State
   if (error) {
     return (
-      <div 
-        className="flex-1 flex items-center justify-center"
-        style={{ backgroundColor: BG_COLORS.primary, padding: SPACING.xl }}
+      <div
+        className={styles.errorStateContainer}
+        style={{ '--bg-primary': BG_COLORS.primary, '--error-padding': `${SPACING.xl}px` } as React.CSSProperties}
       >
-        <ErrorState 
+        <ErrorState
           title="Failed to load exposure"
           description={error || undefined}
           onRetry={refetch}
@@ -286,33 +268,30 @@ export default function ExposureTabVX2(_props: ExposureTabVX2Props): React.React
       </div>
     );
   }
-  
+
   return (
-    <div 
-      className="flex-1 flex flex-col"
-      style={{ backgroundColor: BG_COLORS.primary }}
+    <div
+      className={styles.mainContainer}
+      style={{ '--bg-primary': BG_COLORS.primary } as React.CSSProperties}
       role="main"
       aria-label="Player exposure report"
     >
       {/* Header */}
       <div
-        className="flex-shrink-0"
+        className={styles.header}
         style={{
-          paddingLeft: `${EXPOSURE_PX.headerPaddingX}px`,
-          paddingRight: `${EXPOSURE_PX.headerPaddingX}px`,
-          paddingTop: `${EXPOSURE_PX.headerPaddingY}px`,
-          paddingBottom: `${EXPOSURE_PX.headerPaddingY}px`,
-          borderBottom: '1px solid rgba(255,255,255,0.1)',
-        }}
+          '--header-padding-x': `${EXPOSURE_PX.headerPaddingX}px`,
+          '--header-padding-y': `${EXPOSURE_PX.headerPaddingY}px`,
+        } as React.CSSProperties}
       >
-        <div style={{ paddingTop: '4px' }}>
+        <div className={styles.headerSearchWrapper}>
           <SearchInput
             value={searchQuery}
             onChange={setSearchQuery}
             placeholder="Search..."
           />
         </div>
-        
+
         {!searchQuery && (
           <PositionFilters
             selected={selectedPositions}
@@ -320,20 +299,14 @@ export default function ExposureTabVX2(_props: ExposureTabVX2Props): React.React
           />
         )}
       </div>
-      
+
       {/* Sort Header */}
       {!isLoading && filteredPlayers.length > 0 && (
         <SortHeader sortOrder={sortOrder} onToggle={handleToggleSort} />
       )}
-      
+
       {/* Player List */}
-      <div
-        className="flex-1 min-h-0 overflow-y-auto"
-        style={{
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-        }}
-      >
+      <div className={styles.playerListContainer}>
         {isLoading ? (
           // Loading skeletons
           <>
@@ -343,7 +316,10 @@ export default function ExposureTabVX2(_props: ExposureTabVX2Props): React.React
           </>
         ) : filteredPlayers.length === 0 ? (
           // Empty state
-          <div className="flex items-center justify-center h-full" style={{ padding: SPACING.xl }}>
+          <div
+            className={styles.emptyStateContainer}
+            style={{ '--empty-padding': `${SPACING.xl}px` } as React.CSSProperties}
+          >
             <EmptyState
               title="No Players Found"
               description={searchQuery ? "Try a different search term" : "No exposure data available"}
@@ -356,11 +332,13 @@ export default function ExposureTabVX2(_props: ExposureTabVX2Props): React.React
               <ExposureRow key={player.id} player={player} isFirst={index === 0} />
             ))}
             {/* Bottom padding */}
-            <div style={{ height: `${SPACING['2xl']}px` }} />
+            <div
+              className={styles.listBottomPadding}
+              style={{ '--bottom-padding-height': `${SPACING['2xl']}px` } as React.CSSProperties}
+            />
           </>
         )}
       </div>
     </div>
   );
 }
-

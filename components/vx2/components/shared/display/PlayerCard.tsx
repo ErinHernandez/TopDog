@@ -1,23 +1,25 @@
 /**
  * PlayerCard Component
- * 
+ *
  * A reusable player list item component with consistent styling.
  * Can be used across Rankings, Draft Room, Queue, Roster, etc.
- * 
+ *
+ * Migrated to CSS Modules for CSP compliance.
+ *
  * @example
  * // Basic usage
  * <PlayerCard player={player} />
- * 
+ *
  * @example
  * // With add/remove action
- * <PlayerCard 
- *   player={player} 
+ * <PlayerCard
+ *   player={player}
  *   action={{ type: 'toggle', isActive: true, onToggle: handleToggle }}
  * />
- * 
+ *
  * @example
  * // With reorder arrows
- * <PlayerCard 
+ * <PlayerCard
  *   player={player}
  *   showRank={true}
  *   rank={1}
@@ -30,6 +32,8 @@ import { BG_COLORS, TEXT_COLORS, STATE_COLORS, POSITION_COLORS } from '../../../
 import { SPACING, RADIUS, TYPOGRAPHY } from '../../../core/constants/sizes';
 import { PositionBadge } from './PositionBadge';
 import { Plus, Minus, ChevronUp, ChevronDown } from '../../icons';
+import { cn } from '@/lib/styles';
+import styles from './PlayerCard.module.css';
 import type { Position, PlayerData } from './types';
 
 // ============================================================================
@@ -39,7 +43,7 @@ import type { Position, PlayerData } from './types';
 // Re-export shared types for convenience
 export type { Position, PlayerData };
 
-export type ActionType = 
+export type ActionType =
   | { type: 'toggle'; isActive: boolean; onToggle: () => void }
   | { type: 'reorder'; onMoveUp?: () => void; onMoveDown?: () => void; isFirst?: boolean; isLast?: boolean }
   | { type: 'remove'; onRemove: () => void }
@@ -107,76 +111,79 @@ interface ActionButtonProps {
 
 function ActionButton({ action, playerName, size, disabled }: ActionButtonProps): React.ReactElement | null {
   const px = CARD_PX[size];
-  
+
   if (action.type === 'none') return null;
-  
+
   if (action.type === 'custom') {
     return <>{action.render()}</>;
   }
-  
+
   if (action.type === 'toggle') {
+    const buttonStyle: React.CSSProperties = {
+      '--action-size': `${px.actionSize}px`,
+      '--action-radius': `${RADIUS.lg}px`,
+      '--action-bg': action.isActive ? 'rgba(239, 68, 68, 0.15)' : 'rgba(96, 165, 250, 0.15)',
+      '--action-color': action.isActive ? STATE_COLORS.error : STATE_COLORS.active,
+    } as React.CSSProperties;
+
     return (
       <button
         onClick={action.onToggle}
         disabled={disabled}
-        className="flex items-center justify-center transition-all flex-shrink-0"
-        style={{ 
-          width: `${px.actionSize}px`,
-          height: `${px.actionSize}px`,
-          borderRadius: `${RADIUS.lg}px`,
-          backgroundColor: action.isActive ? 'rgba(239, 68, 68, 0.15)' : 'rgba(96, 165, 250, 0.15)', 
-          color: action.isActive ? STATE_COLORS.error : STATE_COLORS.active,
-          border: 'none',
-          cursor: disabled ? 'not-allowed' : 'pointer',
-          opacity: disabled ? 0.5 : 1,
-        }}
+        className={cn(styles.actionButton, disabled && styles.actionButtonDisabled)}
+        style={buttonStyle}
         aria-label={action.isActive ? `Remove ${playerName}` : `Add ${playerName}`}
       >
         {action.isActive ? <Minus size={px.actionIconSize} /> : <Plus size={px.actionIconSize} />}
       </button>
     );
   }
-  
+
   if (action.type === 'remove') {
+    const buttonStyle: React.CSSProperties = {
+      '--action-size': `${px.actionSize}px`,
+      '--action-radius': `${RADIUS.lg}px`,
+      '--action-bg': 'rgba(239, 68, 68, 0.15)',
+      '--action-color': STATE_COLORS.error,
+    } as React.CSSProperties;
+
     return (
       <button
         onClick={action.onRemove}
         disabled={disabled}
-        className="flex items-center justify-center transition-all flex-shrink-0"
-        style={{ 
-          width: `${px.actionSize}px`,
-          height: `${px.actionSize}px`,
-          borderRadius: `${RADIUS.lg}px`,
-          backgroundColor: 'rgba(239, 68, 68, 0.15)', 
-          color: STATE_COLORS.error,
-          border: 'none',
-          cursor: disabled ? 'not-allowed' : 'pointer',
-          opacity: disabled ? 0.5 : 1,
-        }}
+        className={cn(styles.actionButton, disabled && styles.actionButtonDisabled)}
+        style={buttonStyle}
         aria-label={`Remove ${playerName}`}
       >
         <Minus size={px.actionIconSize} />
       </button>
     );
   }
-  
+
   if (action.type === 'reorder') {
+    const upStyle: React.CSSProperties = {
+      '--action-size': `${px.actionSize}px`,
+      '--reorder-height': `${px.actionSize / 2}px`,
+      '--reorder-radius': `${RADIUS.sm}px`,
+      '--reorder-bg': action.isFirst ? 'transparent' : 'rgba(255, 255, 255, 0.1)',
+      '--reorder-color': action.isFirst ? TEXT_COLORS.disabled : TEXT_COLORS.primary,
+    } as React.CSSProperties;
+
+    const downStyle: React.CSSProperties = {
+      '--action-size': `${px.actionSize}px`,
+      '--reorder-height': `${px.actionSize / 2}px`,
+      '--reorder-radius': `${RADIUS.sm}px`,
+      '--reorder-bg': action.isLast ? 'transparent' : 'rgba(255, 255, 255, 0.1)',
+      '--reorder-color': action.isLast ? TEXT_COLORS.disabled : TEXT_COLORS.primary,
+    } as React.CSSProperties;
+
     return (
-      <div className="flex flex-col gap-0.5 flex-shrink-0">
+      <div className={styles.reorderWrapper}>
         <button
           onClick={action.onMoveUp}
           disabled={disabled || action.isFirst}
-          className="flex items-center justify-center transition-all"
-          style={{ 
-            width: `${px.actionSize}px`,
-            height: `${px.actionSize / 2}px`,
-            borderRadius: `${RADIUS.sm}px`,
-            backgroundColor: action.isFirst ? 'transparent' : 'rgba(255, 255, 255, 0.1)', 
-            color: action.isFirst ? TEXT_COLORS.disabled : TEXT_COLORS.primary,
-            border: 'none',
-            cursor: (disabled || action.isFirst) ? 'not-allowed' : 'pointer',
-            opacity: action.isFirst ? 0.3 : 1,
-          }}
+          className={cn(styles.reorderButton, (disabled || action.isFirst) && styles.reorderButtonDisabled)}
+          style={upStyle}
           aria-label={`Move ${playerName} up`}
         >
           <ChevronUp size={14} />
@@ -184,17 +191,8 @@ function ActionButton({ action, playerName, size, disabled }: ActionButtonProps)
         <button
           onClick={action.onMoveDown}
           disabled={disabled || action.isLast}
-          className="flex items-center justify-center transition-all"
-          style={{ 
-            width: `${px.actionSize}px`,
-            height: `${px.actionSize / 2}px`,
-            borderRadius: `${RADIUS.sm}px`,
-            backgroundColor: action.isLast ? 'transparent' : 'rgba(255, 255, 255, 0.1)', 
-            color: action.isLast ? TEXT_COLORS.disabled : TEXT_COLORS.primary,
-            border: 'none',
-            cursor: (disabled || action.isLast) ? 'not-allowed' : 'pointer',
-            opacity: action.isLast ? 0.3 : 1,
-          }}
+          className={cn(styles.reorderButton, (disabled || action.isLast) && styles.reorderButtonDisabled)}
+          style={downStyle}
           aria-label={`Move ${playerName} down`}
         >
           <ChevronDown size={14} />
@@ -202,7 +200,7 @@ function ActionButton({ action, playerName, size, disabled }: ActionButtonProps)
       </div>
     );
   }
-  
+
   return null;
 }
 
@@ -224,105 +222,84 @@ export function PlayerCard({
 }: PlayerCardProps): React.ReactElement {
   const px = CARD_PX[size];
   const posColor = POSITION_COLORS[player.position.toUpperCase() as keyof typeof POSITION_COLORS] || TEXT_COLORS.muted;
-  
+
   // Format values
   const adpDisplay = typeof player.adp === 'number' ? player.adp.toFixed(1) : player.adp || '-';
   const projDisplay = typeof player.proj === 'number' ? Math.round(player.proj) : player.proj || '-';
   const rankDisplay = showRank && rank ? rank : null;
-  
+
+  // CSS custom properties for dynamic values
+  const containerStyle: React.CSSProperties = {
+    '--card-bg': BG_COLORS.secondary,
+    '--card-border-left': `${px.borderLeft}px solid ${posColor}`,
+    '--card-radius': `${RADIUS.lg}px`,
+    '--card-padding': `${px.paddingY}px ${px.paddingX}px`,
+    '--card-gap': `${px.gap}px`,
+    '--value-width': `${px.adpWidth}px`,
+    '--text-primary': TEXT_COLORS.primary,
+    '--text-secondary': TEXT_COLORS.secondary,
+    '--text-muted': TEXT_COLORS.muted,
+    '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
+    '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
+  } as React.CSSProperties;
+
   const Container = onClick ? 'button' : 'div';
-  
+
   return (
     <Container
       onClick={onClick}
       disabled={disabled}
-      className={`flex items-center transition-all ${className}`}
-      style={{ 
-        backgroundColor: BG_COLORS.secondary,
-        borderLeft: `${px.borderLeft}px solid ${posColor}`,
-        borderRadius: `${RADIUS.lg}px`,
-        padding: `${px.paddingY}px ${px.paddingX}px`,
-        gap: `${px.gap}px`,
-        cursor: onClick ? 'pointer' : 'default',
-        opacity: disabled ? 0.5 : 1,
-        width: '100%',
-        border: onClick ? 'none' : undefined,
-        textAlign: 'left',
-      }}
+      className={cn(
+        styles.container,
+        onClick && styles.containerClickable,
+        disabled && styles.containerDisabled,
+        className
+      )}
+      style={containerStyle}
     >
       {/* ADP or Rank */}
       {(showAdp || showRank) && (
-        <div className="text-center flex-shrink-0" style={{ width: `${px.adpWidth}px` }}>
-          <div 
-            className="font-bold" 
-            style={{ 
-              color: TEXT_COLORS.secondary, 
-              fontSize: `${TYPOGRAPHY.fontSize.sm}px` 
-            }}
-          >
+        <div className={styles.valueColumn}>
+          <div className={styles.valueText}>
             {rankDisplay ?? adpDisplay}
           </div>
         </div>
       )}
-      
+
       {/* Position Badge */}
       <PositionBadge position={player.position as Position} size="sm" />
-      
+
       {/* Name & Team */}
-      <div className="flex-1 min-w-0 flex items-center gap-1.5">
-        <span 
-          className="font-semibold truncate" 
-          style={{ 
-            color: TEXT_COLORS.primary, 
-            fontSize: `${TYPOGRAPHY.fontSize.sm}px` 
-          }}
-        >
+      <div className={styles.nameTeamWrapper}>
+        <span className={styles.playerName}>
           {player.name}
         </span>
-        <span 
-          className="flex-shrink-0" 
-          style={{ 
-            color: TEXT_COLORS.muted, 
-            fontSize: `${TYPOGRAPHY.fontSize.xs}px` 
-          }}
-        >
+        <span className={styles.playerTeam}>
           {player.team}
         </span>
       </div>
-      
+
       {/* Projection */}
       {showProjection && player.proj !== undefined && (
-        <div className="text-center flex-shrink-0">
-          <div 
-            className="font-semibold" 
-            style={{ 
-              color: TEXT_COLORS.primary, 
-              fontSize: `${TYPOGRAPHY.fontSize.xs}px` 
-            }}
-          >
+        <div className={styles.projectionColumn}>
+          <div className={styles.projectionValue}>
             {projDisplay}
           </div>
-          <div 
-            style={{ 
-              color: TEXT_COLORS.muted, 
-              fontSize: `${TYPOGRAPHY.fontSize.xs}px` 
-            }}
-          >
+          <div className={styles.projectionLabel}>
             Proj
           </div>
         </div>
       )}
-      
+
       {/* Action Button */}
-      <ActionButton 
-        action={action} 
-        playerName={player.name} 
-        size={size} 
-        disabled={disabled} 
+      <ActionButton
+        action={action}
+        playerName={player.name}
+        size={size}
+        disabled={disabled}
       />
     </Container>
   );
 }
 
 export default PlayerCard;
-

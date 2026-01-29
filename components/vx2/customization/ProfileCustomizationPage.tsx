@@ -1,11 +1,13 @@
 /**
  * Profile Customization Page
- * 
+ *
  * Enterprise-grade customization interface with location-based features.
  * Allows users to personalize their draft room cell appearance.
  */
 
 import React, { useState } from 'react';
+import { cn } from '@/lib/styles';
+import styles from './ProfileCustomizationPage.module.css';
 import { useCustomization } from './hooks/useCustomization';
 import { FlagGrid } from './FlagGrid';
 import { PatternPicker } from './PatternPicker';
@@ -97,37 +99,40 @@ export function ProfileCustomizationPage() {
   // The draft object always has valid default values, so we can render immediately
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: BG_COLORS.primary }}>
+    <div
+      className={styles.root}
+      style={{ '--bg-color-primary': BG_COLORS.primary } as React.CSSProperties}
+    >
       <AppHeaderVX2 title="Customization" />
 
-      <div className="flex flex-col" style={{ padding: '16px', paddingTop: '16px' }}>
-        <div className="w-full mb-6 order-first">
+      <div className={styles.container}>
+        <div className={styles.previewSection}>
           <LivePreview preferences={draft} />
         </div>
 
-        <div className="flex-1 space-y-4">
+        <div className={styles.sectionsContainer}>
           <div
-            className="flex border-b"
-            style={{ borderColor: BORDER_COLORS.light }}
+            className={styles.tabsHeader}
+            style={{ '--border-color-light': BORDER_COLORS.light } as React.CSSProperties}
           >
             <button
               onClick={() => setActiveSection('background')}
-              className={`flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors flex-1 min-h-[48px]`}
+              className={cn(styles.tabButton, activeSection === 'background' && styles.active)}
               style={{
-                borderColor: activeSection === 'background' ? STATE_COLORS.info : 'transparent',
-                color: activeSection === 'background' ? STATE_COLORS.info : TEXT_COLORS.secondary,
-              }}
+                '--state-color-info': STATE_COLORS.info,
+                '--text-color-secondary': TEXT_COLORS.secondary,
+              } as React.CSSProperties}
             >
               <PaletteIcon className="w-4 h-4" />
               <span className="inline">Background</span>
             </button>
             <button
               onClick={() => setActiveSection('overlay')}
-              className={`flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors flex-1 min-h-[48px]`}
+              className={cn(styles.tabButton, activeSection === 'overlay' && styles.active)}
               style={{
-                borderColor: activeSection === 'overlay' ? STATE_COLORS.info : 'transparent',
-                color: activeSection === 'overlay' ? STATE_COLORS.info : TEXT_COLORS.secondary,
-              }}
+                '--state-color-info': STATE_COLORS.info,
+                '--text-color-secondary': TEXT_COLORS.secondary,
+              } as React.CSSProperties}
             >
               <LayersIcon className="w-4 h-4" />
               <span className="inline">Overlay</span>
@@ -135,30 +140,30 @@ export function ProfileCustomizationPage() {
           </div>
 
           {activeSection === 'background' && (
-            <div className="space-y-4">
+            <div className={styles.contentSection}>
               {/* Background type selector */}
-              <div>
-                <label 
-                  className="block text-sm font-medium mb-2"
-                  style={{ color: TEXT_COLORS.secondary }}
+              <div className={styles.fieldGroup}>
+                <label
+                  className={styles.label}
+                  style={{ '--text-color-secondary': TEXT_COLORS.secondary } as React.CSSProperties}
                 >
                   Background Type
                 </label>
-                <div className="flex gap-2">
+                <div className={styles.backgroundTypeContainer}>
                   {(['none', 'flag', 'solid'] as const).map((type) => (
                     <button
                       key={type}
                       onClick={() => updateDraft({ backgroundType: type })}
-                      className={`flex-1 px-4 py-3 rounded-lg text-sm capitalize transition-colors min-h-[48px]`}
+                      className={cn(
+                        styles.backgroundTypeButton,
+                        draft.backgroundType === type && styles.active
+                      )}
                       style={{
-                        backgroundColor: draft.backgroundType === type 
-                          ? STATE_COLORS.info 
-                          : BG_COLORS.tertiary,
-                        color: draft.backgroundType === type 
-                          ? '#FFFFFF' 
-                          : TEXT_COLORS.secondary,
-                        border: `1px solid ${BORDER_COLORS.default}`,
-                      }}
+                        '--state-color-info': STATE_COLORS.info,
+                        '--bg-color-tertiary': BG_COLORS.tertiary,
+                        '--text-color-secondary': TEXT_COLORS.secondary,
+                        '--border-color-default': BORDER_COLORS.default,
+                      } as React.CSSProperties}
                     >
                       {type}
                     </button>
@@ -180,24 +185,24 @@ export function ProfileCustomizationPage() {
 
               {/* Solid color picker */}
               {draft.backgroundType === 'solid' && (
-                <div>
-                  <label 
-                    className="block text-sm font-medium mb-2"
-                    style={{ color: TEXT_COLORS.secondary }}
+                <div className={styles.fieldGroup}>
+                  <label
+                    className={styles.label}
+                    style={{ '--text-color-secondary': TEXT_COLORS.secondary } as React.CSSProperties}
                   >
                     Background Color
                   </label>
-                  <div className="flex items-center gap-3">
+                  <div className={styles.colorPickerContainer}>
                     <input
                       type="color"
                       value={draft.backgroundSolidColor || '#ffffff'}
                       onChange={(e) => updateDraft({ backgroundSolidColor: e.target.value })}
-                      className="w-16 h-10 rounded border cursor-pointer"
-                      style={{ borderColor: BORDER_COLORS.default }}
+                      className={styles.colorInput}
+                      style={{ '--border-color-default': BORDER_COLORS.default } as React.CSSProperties}
                     />
-                    <span 
-                      className="text-sm font-mono"
-                      style={{ color: TEXT_COLORS.muted }}
+                    <span
+                      className={styles.colorValue}
+                      style={{ '--text-color-muted': TEXT_COLORS.muted } as React.CSSProperties}
                     >
                       {draft.backgroundSolidColor || '#ffffff'}
                     </span>
@@ -208,18 +213,18 @@ export function ProfileCustomizationPage() {
           )}
 
           {activeSection === 'overlay' && (
-            <div className="space-y-4">
-              <label className="flex items-center gap-3 cursor-pointer min-h-[48px]">
+            <div className={styles.contentSection}>
+              <label className={styles.overlayCheckbox}>
                 <input
                   type="checkbox"
                   checked={draft.overlayEnabled}
                   onChange={(e) => updateDraft({ overlayEnabled: e.target.checked })}
-                  className="w-6 h-6 rounded"
-                  style={{ accentColor: STATE_COLORS.info }}
+                  className={styles.checkboxInput}
+                  style={{ '--state-color-info': STATE_COLORS.info } as React.CSSProperties}
                 />
-                <span 
-                  className="text-sm font-medium"
-                  style={{ color: TEXT_COLORS.primary }}
+                <span
+                  className={styles.checkboxLabel}
+                  style={{ '--text-color-primary': TEXT_COLORS.primary } as React.CSSProperties}
                 >
                   Enable overlay
                 </span>
@@ -228,29 +233,30 @@ export function ProfileCustomizationPage() {
               {draft.overlayEnabled && (
                 <>
                   {/* Image selector */}
-                  <div>
-                    <label 
-                      className="block text-sm font-medium mb-2"
-                      style={{ color: TEXT_COLORS.secondary }}
+                  <div className={styles.fieldGroup}>
+                    <label
+                      className={styles.label}
+                      style={{ '--text-color-secondary': TEXT_COLORS.secondary } as React.CSSProperties}
                     >
                       Image
                     </label>
-                    <div className="flex gap-2">
+                    <div className={styles.imageSelector}>
                       <button
-                        className={`p-3 rounded-lg border-2 transition-colors`}
+                        className={cn(
+                          styles.imageButton,
+                          draft.overlayImageId === 'hotdog' && styles.active
+                        )}
+                        onClick={() => updateDraft({ overlayImageId: 'hotdog' })}
                         style={{
-                          borderColor: draft.overlayImageId === 'hotdog' 
-                            ? STATE_COLORS.info 
-                            : BORDER_COLORS.light,
-                          backgroundColor: draft.overlayImageId === 'hotdog'
-                            ? 'rgba(59, 130, 246, 0.1)'
-                            : BG_COLORS.tertiary,
-                        }}
+                          '--state-color-info': STATE_COLORS.info,
+                          '--border-color-light': BORDER_COLORS.light,
+                          '--bg-color-tertiary': BG_COLORS.tertiary,
+                        } as React.CSSProperties}
                       >
                         <img
                           src="/customization/images/hotdog.svg"
                           alt="Hot Dog"
-                          className="w-10 h-10"
+                          className={styles.imageIcon}
                         />
                       </button>
                       {/* Add more images here in the future */}
@@ -258,10 +264,10 @@ export function ProfileCustomizationPage() {
                   </div>
 
                   {/* Pattern picker */}
-                  <div>
-                    <label 
-                      className="block text-sm font-medium mb-2"
-                      style={{ color: TEXT_COLORS.secondary }}
+                  <div className={styles.fieldGroup}>
+                    <label
+                      className={styles.label}
+                      style={{ '--text-color-secondary': TEXT_COLORS.secondary } as React.CSSProperties}
                     >
                       Pattern
                     </label>
@@ -288,29 +294,28 @@ export function ProfileCustomizationPage() {
           )}
 
           {/* Save/Reset buttons */}
-          <div 
-            className="flex flex-col sm:flex-row gap-3 pt-4 border-t"
-            style={{ borderColor: BORDER_COLORS.light }}
+          <div
+            className={styles.actionsContainer}
+            style={{ '--border-color-light': BORDER_COLORS.light } as React.CSSProperties}
           >
             <button
               onClick={save}
               disabled={!isDirty || isSaving}
-              className="flex-1 sm:flex-initial px-6 py-3 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-h-[48px]"
+              className={cn(styles.actionButton, styles.saveButton)}
               style={{
-                backgroundColor: STATE_COLORS.info,
-                color: '#FFFFFF',
-              }}
+                '--state-color-info': STATE_COLORS.info,
+              } as React.CSSProperties}
             >
               {isSaving ? 'Saving...' : 'Save Changes'}
             </button>
             <button
               onClick={reset}
               disabled={!isDirty}
-              className="flex-1 sm:flex-initial px-6 py-3 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-h-[48px]"
+              className={cn(styles.actionButton, styles.resetButton)}
               style={{
-                backgroundColor: BG_COLORS.tertiary,
-                color: TEXT_COLORS.secondary,
-              }}
+                '--bg-color-tertiary': BG_COLORS.tertiary,
+                '--text-color-secondary': TEXT_COLORS.secondary,
+              } as React.CSSProperties}
             >
               Reset
             </button>

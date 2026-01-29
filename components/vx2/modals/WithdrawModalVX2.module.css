@@ -1,0 +1,759 @@
+/* WithdrawModalVX2.module.css - CSP Compliant Styles */
+
+/* ============================================================================
+   SHARED LAYOUTS & CONTAINERS
+   ============================================================================ */
+
+.flexCol {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.flexColCenter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: var(--spacing-sm, 6px);
+}
+
+.flexBetween {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  padding: var(--spacing-md, 12px) var(--spacing-lg, 16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.flexGap {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm, 6px);
+  flex-shrink: 0;
+  padding: var(--spacing-md, 12px) var(--spacing-lg, 16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.contentArea {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-lg, 16px);
+  scrollbar-width: none;
+}
+
+.footer {
+  flex-shrink: 0;
+  padding: var(--spacing-lg, 16px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================================================
+   AMOUNT STEP
+   ============================================================================ */
+
+.balanceCard {
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.balanceLabel {
+  color: var(--text-secondary, #b3b3b3);
+  font-size: var(--font-xs, 12px);
+}
+
+.balanceAmount {
+  font-weight: 700;
+  color: var(--state-success, #10b981);
+  font-size: var(--font-2xl, 28px);
+}
+
+.amountInputSection {
+  margin-bottom: 24px;
+}
+
+.sectionLabel {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 12px;
+  color: var(--text-primary, #ffffff);
+  font-size: var(--font-sm, 14px);
+}
+
+.quickAmountsGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.quickAmountButton {
+  padding: 12px 0;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  font-size: var(--font-sm, 14px);
+  border: none;
+  cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary, #ffffff);
+}
+
+.quickAmountButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  color: var(--text-disabled, #666666);
+}
+
+.quickAmountButtonActive {
+  background-color: var(--state-active, #60a5fa);
+  color: #000;
+}
+
+.customInputWrapper {
+  position: relative;
+}
+
+.currencySymbol {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: 600;
+  color: var(--text-secondary, #b3b3b3);
+  font-size: var(--font-lg, 18px);
+}
+
+.amountInput {
+  width: 100%;
+  padding-left: 32px;
+  padding-right: 16px;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  border-radius: 12px;
+  font-weight: 600;
+  outline: none;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary, #ffffff);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: var(--font-lg, 18px);
+}
+
+.amountInput::placeholder {
+  color: inherit;
+  opacity: 0.5;
+}
+
+.errorText {
+  margin-top: 8px;
+  color: var(--state-error, #ef4444);
+  font-size: var(--font-sm, 14px);
+}
+
+.payoutMethodsSection {
+  margin-bottom: 24px;
+}
+
+.methodList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.methodButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 2px solid transparent;
+  cursor: pointer;
+}
+
+.methodButtonActive {
+  background-color: rgba(96, 165, 250, 0.15);
+  border-color: var(--state-active, #60a5fa);
+}
+
+.methodIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary, #ffffff);
+}
+
+.methodInfo {
+  flex: 1;
+  text-align: left;
+}
+
+.methodLabel {
+  font-weight: 600;
+  color: var(--text-primary, #ffffff);
+  font-size: var(--font-sm, 14px);
+}
+
+.methodDetail {
+  color: var(--text-muted, #808080);
+  font-size: var(--font-xs, 12px);
+}
+
+.defaultBadge {
+  padding: 4px 8px;
+  border-radius: 9999px;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary, #b3b3b3);
+  font-size: var(--font-xs, 12px);
+}
+
+.addMethodButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 2px dashed rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+}
+
+.addMethodIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted, #808080);
+}
+
+.addMethodText {
+  font-weight: 500;
+  color: var(--text-secondary, #b3b3b3);
+  font-size: var(--font-sm, 14px);
+}
+
+.freeNotice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--state-success, #10b981);
+  font-size: var(--font-sm, 14px);
+}
+
+.continueButton {
+  width: 100%;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  font-size: var(--font-lg, 18px);
+  border: none;
+  cursor: pointer;
+  background-color: var(--state-active, #60a5fa);
+  color: #000;
+}
+
+.continueButton:disabled {
+  background-color: var(--bg-tertiary, #2a2a2a);
+  color: var(--text-disabled, #666666);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================================================
+   CONFIRM STEP
+   ============================================================================ */
+
+.confirmHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  padding: var(--spacing-md, 12px) var(--spacing-lg, 16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.confirmContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-lg, 16px);
+}
+
+.amountDisplay {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.amountLabel {
+  color: var(--text-secondary, #b3b3b3);
+  font-size: var(--font-sm, 14px);
+}
+
+.amountLarge {
+  font-weight: 700;
+  color: var(--text-primary, #ffffff);
+  font-size: 36px;
+}
+
+.infoCard {
+  width: 100%;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.infoCardLabel {
+  color: var(--text-muted, #808080);
+  font-size: var(--font-xs, 12px);
+}
+
+.infoCardContent {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.summaryCard {
+  width: 100%;
+  border-radius: 12px;
+  padding: 16px;
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.summaryLabel {
+  color: var(--text-secondary, #b3b3b3);
+}
+
+.summaryValue {
+  font-weight: 600;
+  color: var(--text-primary, #ffffff);
+}
+
+.summaryValueSuccess {
+  font-weight: 600;
+  color: var(--state-success, #10b981);
+}
+
+.summaryDivider {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 8px;
+  margin-top: 8px;
+}
+
+.summaryTotal {
+  font-weight: 700;
+  color: var(--text-primary, #ffffff);
+  font-size: var(--font-lg, 18px);
+}
+
+.timelineNotice {
+  text-align: center;
+  margin-top: 24px;
+  color: var(--text-muted, #808080);
+  font-size: var(--font-sm, 14px);
+}
+
+.confirmButton {
+  width: 100%;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: var(--state-active, #60a5fa);
+  color: #000;
+  font-size: var(--font-lg, 18px);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.confirmButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spinnerSmall {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #000;
+  border-color: #000 transparent transparent transparent;
+  animation: spin 1s linear infinite;
+}
+
+/* ============================================================================
+   PROCESSING STEP
+   ============================================================================ */
+
+.processingContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.processingBackButton {
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  flex-shrink: 0;
+}
+
+.processingContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-lg, 16px);
+}
+
+.statusIcon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.statusIconError {
+  background-color: rgba(239, 68, 68, 0.15);
+}
+
+.statusIconProcessing {
+  background-color: rgba(96, 165, 250, 0.15);
+}
+
+.statusTitle {
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text-primary, #ffffff);
+  font-size: var(--font-xl, 20px);
+}
+
+.statusMessage {
+  text-align: center;
+  margin-bottom: 24px;
+  color: var(--state-error, #ef4444);
+  font-size: var(--font-sm, 14px);
+}
+
+.statusMessageProcessing {
+  color: var(--text-secondary, #b3b3b3);
+}
+
+.retryButton {
+  width: 100%;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  background-color: var(--state-active, #60a5fa);
+  color: #000;
+  font-size: var(--font-base);
+  border: none;
+  cursor: pointer;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-color: var(--state-active) transparent transparent transparent;
+  animation: spin 1s linear infinite;
+}
+
+.spinnerSmallProcessing {
+  width: 24px;
+  height: 24px;
+  border: 2px solid;
+  border-radius: 50%;
+  border-color: var(--state-active) transparent transparent transparent;
+  animation: spin 1s linear infinite;
+}
+
+.processingLoadingContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.processingLoadingText {
+  color: var(--text-secondary, #b3b3b3);
+}
+
+/* ============================================================================
+   BIOMETRIC STEP
+   ============================================================================ */
+
+.biometricContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.biometricBackButton {
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  flex-shrink: 0;
+}
+
+.biometricContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-lg, 16px);
+}
+
+.securityBadge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding-left: 12px;
+  padding-right: 12px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  border-radius: 9999px;
+  background-color: rgba(96, 165, 250, 0.1);
+  color: var(--state-active);
+  font-size: var(--font-xs, 12px);
+  font-weight: 500;
+}
+
+.biometricIcon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  background-color: rgba(96, 165, 250, 0.15);
+}
+
+.biometricTitle {
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text-primary, #ffffff);
+  font-size: var(--font-xl, 20px);
+}
+
+.biometricDescription {
+  text-align: center;
+  margin-bottom: 24px;
+  color: var(--text-secondary, #b3b3b3);
+  font-size: var(--font-sm, 14px);
+}
+
+.biometricError {
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.biometricErrorBox {
+  text-align: center;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--state-error, #ef4444);
+  font-size: var(--font-sm, 14px);
+}
+
+.biometricErrorButton {
+  width: 100%;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  background-color: var(--state-active, #60a5fa);
+  color: #000;
+  font-size: var(--font-base);
+  border: none;
+  cursor: pointer;
+}
+
+.biometricNote {
+  text-align: center;
+  color: var(--text-muted, #808080);
+  font-size: var(--font-xs, 12px);
+}
+
+.biometricFooter {
+  flex-shrink: 0;
+  padding-bottom: 24px;
+  text-align: center;
+}
+
+.skipButton {
+  background: none;
+  border: none;
+  color: var(--text-muted, #808080);
+  font-size: var(--font-sm, 14px);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* ============================================================================
+   SUCCESS STEP
+   ============================================================================ */
+
+.successContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: var(--spacing-lg, 16px);
+}
+
+.successIcon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  background-color: rgba(16, 185, 129, 0.15);
+}
+
+.successTitle {
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text-primary, #ffffff);
+  font-size: var(--font-2xl, 28px);
+}
+
+.successMessage {
+  text-align: center;
+  margin-bottom: 24px;
+  color: var(--text-secondary, #b3b3b3);
+  font-size: var(--font-lg, 18px);
+}
+
+.successDetail {
+  text-align: center;
+  margin-bottom: 32px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.03);
+  color: var(--text-muted, #808080);
+  font-size: var(--font-sm, 14px);
+}
+
+.successButton {
+  width: 100%;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  background-color: var(--state-active, #60a5fa);
+  color: #000;
+  font-size: var(--font-lg, 18px);
+  border: none;
+  cursor: pointer;
+}
+
+/* ============================================================================
+   LOADING STATE
+   ============================================================================ */
+
+.loadingContainer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-secondary);
+  z-index: var(--z-modal);
+}
+
+.loadingSpinner {
+  animation: spin 1s linear infinite;
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.3) transparent transparent transparent;
+  border-radius: 50%;
+  border-width: 3px;
+}
+
+.loadingText {
+  margin-top: 16px;
+  color: var(--text-secondary, #b3b3b3);
+}
+
+.mainContainer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 60px;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-secondary);
+  z-index: var(--z-modal);
+}
+
+/* ============================================================================
+   ANIMATIONS
+   ============================================================================ */
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================================================
+   CSS CUSTOM PROPERTIES (Variables)
+   ============================================================================ */

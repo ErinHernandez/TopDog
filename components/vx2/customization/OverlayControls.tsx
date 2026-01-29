@@ -1,5 +1,7 @@
 import React from 'react';
 import { OverlayPattern } from '@/lib/customization/types';
+import { cn } from '@/lib/styles';
+import styles from './OverlayControls.module.css';
 
 interface OverlayControlsProps {
   size: number;
@@ -19,10 +21,10 @@ export function OverlayControls({
   onPositionChange,
 }: OverlayControlsProps) {
   return (
-    <div className="space-y-4">
+    <div className={styles.container}>
       {/* Size Slider */}
-      <div>
-        <label className="block text-sm font-medium mb-2" style={{ color: 'inherit' }}>
+      <div className={styles.controlGroup}>
+        <label className={styles.label}>
           Size: {size}%
         </label>
         <input
@@ -31,20 +33,15 @@ export function OverlayControls({
           max={100}
           value={size}
           onChange={(e) => onSizeChange(Number(e.target.value))}
-          className="w-full h-3 sm:h-2 rounded-lg appearance-none cursor-pointer touch-none"
-          style={{
-            WebkitAppearance: 'none',
-            appearance: 'none',
-            background: 'rgba(156, 163, 175, 0.2)',
-          }}
+          className={styles.slider}
         />
       </div>
 
       {/* Position Controls (only for placement pattern) */}
       {pattern === 'placement' && onPositionChange && (
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-2" style={{ color: 'inherit' }}>
+        <div className={styles.positionControls}>
+          <div className={styles.controlGroup}>
+            <label className={styles.label}>
               Horizontal: {positionX}%
             </label>
             <input
@@ -53,16 +50,11 @@ export function OverlayControls({
               max={100}
               value={positionX}
               onChange={(e) => onPositionChange(Number(e.target.value), positionY)}
-              className="w-full h-3 sm:h-2 rounded-lg appearance-none cursor-pointer touch-none"
-              style={{
-                WebkitAppearance: 'none',
-                appearance: 'none',
-                background: 'rgba(156, 163, 175, 0.2)',
-              }}
+              className={styles.slider}
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-2" style={{ color: 'inherit' }}>
+          <div className={styles.controlGroup}>
+            <label className={styles.label}>
               Vertical: {positionY}%
             </label>
             <input
@@ -71,12 +63,7 @@ export function OverlayControls({
               max={100}
               value={positionY}
               onChange={(e) => onPositionChange(positionX, Number(e.target.value))}
-              className="w-full h-3 sm:h-2 rounded-lg appearance-none cursor-pointer touch-none"
-              style={{
-                WebkitAppearance: 'none',
-                appearance: 'none',
-                background: 'rgba(156, 163, 175, 0.2)',
-              }}
+              className={styles.slider}
             />
           </div>
         </div>

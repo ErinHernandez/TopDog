@@ -1,22 +1,26 @@
 /**
  * TournamentCardBottomSection - Stable bottom section for tournament card
- * 
+ *
  * Uses CSS Grid for stable positioning, eliminates layout shifts
- * 
+ * Migrated to CSS Modules for CSP compliance
+ *
  * A-Grade Requirements Met:
  * - TypeScript: Full type coverage
  * - Constants: All values from VX2 constants
  * - Single Responsibility: One component, one purpose
  * - Accessibility: ARIA labels, touch targets
  * - Documentation: JSDoc, props documented
+ * - CSP Compliance: No inline styles, uses CSS Modules
  */
 
 import React from 'react';
+import { cn } from '@/lib/styles';
 import { ProgressBar } from '../../../ui';
 import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
 import { TEXT_COLORS } from '../../core/constants/colors';
 import { TILED_BG_STYLE } from '../../draft-room/constants';
 import type { Tournament } from '../../hooks/data';
+import styles from './TournamentCardBottomSection.module.css';
 
 // ============================================================================
 // CONSTANTS (Preserve exact values from TournamentCard.tsx)
@@ -66,36 +70,22 @@ interface StatItemProps {
 
 function StatItem({ value, label }: StatItemProps): React.ReactElement {
   return (
-    <div 
-      className="text-center" 
-      style={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center' 
-      }}
-    >
-      <span 
-        className="vx2-tournament-stat-value font-bold" 
-        style={{ 
-          fontSize: `${BOTTOM_SECTION_PX.statsValueFontSize}px`, 
-          color: TEXT_COLORS.primary,
-          backgroundColor: '#000000',
-          padding: '2px 6px',
-          borderRadius: '4px',
-        }}
+    <div className={styles.statItem}>
+      <span
+        className={cn(styles.statValue, 'vx2-tournament-stat-value')}
+        style={{
+          '--stats-value-font-size': `${BOTTOM_SECTION_PX.statsValueFontSize}px`,
+          '--text-primary': TEXT_COLORS.primary,
+        } as React.CSSProperties}
       >
         {value}
       </span>
-      <span 
-        className="vx2-tournament-stat-label"
-        style={{ 
-          fontSize: `${BOTTOM_SECTION_PX.statsLabelFontSize}px`, 
-          color: TEXT_COLORS.secondary,
-          backgroundColor: '#000000',
-          padding: '1px 4px',
-          borderRadius: '3px',
-          marginTop: '2px',
-        }}
+      <span
+        className={cn(styles.statLabel, 'vx2-tournament-stat-label')}
+        style={{
+          '--stats-label-font-size': `${BOTTOM_SECTION_PX.statsLabelFontSize}px`,
+          '--text-secondary': TEXT_COLORS.secondary,
+        } as React.CSSProperties}
       >
         {label}
       </span>
@@ -118,37 +108,36 @@ export function TournamentCardBottomSection({
   
   const progressBg = styleOverrides.progressBg ?? 'rgba(55, 65, 81, 0.5)';
   
+  const hasProgress = Boolean(tournament.maxEntries);
+
   // CSS Grid layout with explicit rows
   // Row 1: Progress (conditional)
   // Row 2: Button
   // Row 3: Stats
   return (
     <div
-      className="vx2-tournament-bottom-section"
+      className={cn(styles.bottomSection, 'vx2-tournament-bottom-section')}
+      data-has-progress={hasProgress}
       style={{
-        display: 'grid',
-        gridTemplateRows: tournament.maxEntries 
-          ? 'auto auto auto' // Progress, Button, Stats
-          : 'auto auto', // Button, Stats (no progress)
-        gap: `${BOTTOM_SECTION_PX.rowGap}px`,
-        // CSS containment to isolate layout calculations
-        contain: 'layout style',
-        // Prevent layout shifts from propagating
-        willChange: 'auto',
-      }}
+        '--progress-height': `${BOTTOM_SECTION_PX.progressHeight}px`,
+        '--button-height': `${BOTTOM_SECTION_PX.buttonHeight}px`,
+        '--stats-height': '48px',
+        '--button-font-size': `${BOTTOM_SECTION_PX.buttonFontSize}px`,
+        '--stats-value-font-size': `${BOTTOM_SECTION_PX.statsValueFontSize}px`,
+        '--stats-label-font-size': `${BOTTOM_SECTION_PX.statsLabelFontSize}px`,
+        '--row-gap': `${BOTTOM_SECTION_PX.rowGap}px`,
+        '--stats-gap': `${BOTTOM_SECTION_PX.statsGap}px`,
+        '--text-primary': '#FFFFFF',
+        '--button-border-radius': `${BOTTOM_SECTION_PX.buttonBorderRadius}px`,
+      } as React.CSSProperties}
     >
       {/* Progress Bar Row */}
-      {tournament.maxEntries && (
-        <div 
-          className="vx2-progress-section"
-          style={{
-            // Fixed height container to prevent shifts
-            height: `${BOTTOM_SECTION_PX.progressHeight}px`,
-            contain: 'layout',
-          }}
+      {hasProgress && (
+        <div
+          className={cn(styles.progressSection, 'vx2-progress-section')}
         >
-          <ProgressBar 
-            value={fillPercentage} 
+          <ProgressBar
+            value={fillPercentage}
             fillBackgroundImage="url(/wr_blue.png)"
             backgroundColor={progressBg}
             size="md"
@@ -159,42 +148,33 @@ export function TournamentCardBottomSection({
       {/* Join Button Row */}
       <button
         onClick={onJoinClick}
-        className="vx2-tournament-button w-full font-semibold transition-colors duration-200 active:scale-[0.98]"
-        style={{ 
+        className={cn(
+          styles.button,
+          !styleOverrides.buttonBackgroundColor && 'vx2-tournament-button',
+          styleOverrides.buttonBackgroundColor && styles.buttonCustom,
+          'w-full font-semibold transition-colors duration-200 active:scale-[0.98]'
+        )}
+        style={{
           ...(styleOverrides.buttonBackground ? {} : TILED_BG_STYLE),
-          ...(styleOverrides.buttonBackground ? { 
-            backgroundImage: styleOverrides.buttonBackground,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          } : {}),
-          ...(styleOverrides.buttonBackgroundColor ? { 
-            backgroundColor: styleOverrides.buttonBackgroundColor 
-          } : {}),
-          color: '#FFFFFF',
-          height: `${BOTTOM_SECTION_PX.buttonHeight}px`,
-          fontSize: `${BOTTOM_SECTION_PX.buttonFontSize}px`,
-          borderRadius: `${BOTTOM_SECTION_PX.buttonBorderRadius}px`,
-          border: 'none',
-          cursor: 'pointer',
-          // Fixed height, no flex-based sizing
-          minHeight: `${BOTTOM_SECTION_PX.buttonHeight}px`,
-          maxHeight: `${BOTTOM_SECTION_PX.buttonHeight}px`,
-        }}
+          ...(styleOverrides.buttonBackground
+            ? {
+                '--button-bg-image': styleOverrides.buttonBackground,
+              }
+            : {}),
+          ...(styleOverrides.buttonBackgroundColor
+            ? {
+                '--button-bg-color': styleOverrides.buttonBackgroundColor,
+              }
+            : {}),
+        } as React.CSSProperties}
         aria-label={`Join ${tournament.title} for ${tournament.entryFee}`}
       >
         Join Tournament
       </button>
 
       {/* Stats Grid Row */}
-      <div 
-        className="vx2-tournament-stats"
-        style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(3, 1fr)', 
-          gap: `${BOTTOM_SECTION_PX.statsGap}px`,
-          // Fixed dimensions to prevent shifts
-          contain: 'layout',
-        }}
+      <div
+        className={cn(styles.statsGrid, 'vx2-tournament-stats')}
       >
         <StatItem value={tournament.entryFee} label="Entry" />
         <StatItem value={tournament.totalEntries} label="Entries" />

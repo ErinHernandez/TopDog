@@ -18,6 +18,7 @@ import {
   ROSTER_SIZE,
 } from '../constants';
 import { SPACING } from '../../../core/constants/sizes';
+import styles from './MyRosterStrip.module.css';
 
 // ============================================================================
 // COMPACT ROSTER SQUARE
@@ -37,17 +38,16 @@ function RosterSquare({ pick, index, size }: RosterSquareProps): React.ReactElem
 
   return (
     <div
+      className={styles.rosterSquare}
       style={{
         width: size,
         height: size,
-        borderRadius: SLOW_DRAFT_LAYOUT.rosterSquareBorderRadius,
-        backgroundColor: bgColor,
-        border: isEmpty
+        '--roster-square-border-radius': `${SLOW_DRAFT_LAYOUT.rosterSquareBorderRadius}px`,
+        '--roster-square-bg-color': bgColor,
+        '--roster-square-border': isEmpty
           ? `1px solid ${SLOW_DRAFT_COLORS.positions.emptyBorder}`
           : 'none',
-        transition: 'transform 0.15s ease, background-color 0.15s ease',
-        flexShrink: 0,
-      }}
+      } as React.CSSProperties}
       title={pick ? `${pick.player.name} (${pick.player.position})` : `Slot ${index + 1}`}
     />
   );
@@ -79,42 +79,29 @@ function PlayerMiniCard({ pick, onTap }: PlayerMiniCardProps): React.ReactElemen
   return (
     <button
       onClick={onTap}
-      className="flex flex-col items-center transition-transform active:scale-95"
+      className={styles.playerMiniCard}
       style={{
-        width: SLOW_DRAFT_LAYOUT.expandedPlayerCardWidth,
-        height: SLOW_DRAFT_LAYOUT.expandedPlayerCardHeight,
-        backgroundColor: 'rgba(255, 255, 255, 0.06)',
-        borderRadius: 8,
-        padding: 4,
-        border: `2px solid ${positionColor}`,
-      }}
+        '--player-card-width': `${SLOW_DRAFT_LAYOUT.expandedPlayerCardWidth}px`,
+        '--player-card-height': `${SLOW_DRAFT_LAYOUT.expandedPlayerCardHeight}px`,
+        '--player-card-border-color': positionColor,
+      } as React.CSSProperties}
     >
       {/* Position badge */}
       <div
+        className={styles.positionBadge}
         style={{
-          backgroundColor: positionColor,
-          color: pick.player.position === 'WR' ? '#000' : '#fff',
-          fontSize: 9,
-          fontWeight: 700,
-          padding: '2px 5px',
-          borderRadius: 3,
-          marginBottom: 3,
-        }}
+          '--position-color': positionColor,
+          '--position-text-color': pick.player.position === 'WR' ? '#000' : '#fff',
+        } as React.CSSProperties}
       >
         {pick.player.position}
       </div>
 
       {/* Player name */}
       <span
+        className={styles.playerName}
         style={{
           ...SLOW_DRAFT_TYPOGRAPHY.playerName,
-          textAlign: 'center',
-          lineHeight: 1.2,
-          overflow: 'hidden',
-          display: '-webkit-box',
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: 'vertical',
-          fontSize: 11,
         }}
       >
         {truncatedName}
@@ -122,10 +109,9 @@ function PlayerMiniCard({ pick, onTap }: PlayerMiniCardProps): React.ReactElemen
 
       {/* Team */}
       <span
+        className={styles.playerTeam}
         style={{
           ...SLOW_DRAFT_TYPOGRAPHY.playerPosition,
-          marginTop: 'auto',
-          fontSize: 9,
         }}
       >
         {pick.player.team}
@@ -147,22 +133,13 @@ function MoreIndicator({ count, onTap }: MoreIndicatorProps): React.ReactElement
   return (
     <button
       onClick={onTap}
-      className="flex items-center justify-center transition-transform active:scale-95"
+      className={styles.moreIndicator}
       style={{
-        width: SLOW_DRAFT_LAYOUT.expandedPlayerCardWidth,
-        height: SLOW_DRAFT_LAYOUT.expandedPlayerCardHeight,
-        backgroundColor: 'rgba(255, 255, 255, 0.04)',
-        borderRadius: 8,
-        border: '1px dashed rgba(255, 255, 255, 0.2)',
-      }}
+        '--player-card-width': `${SLOW_DRAFT_LAYOUT.expandedPlayerCardWidth}px`,
+        '--player-card-height': `${SLOW_DRAFT_LAYOUT.expandedPlayerCardHeight}px`,
+      } as React.CSSProperties}
     >
-      <span
-        style={{
-          fontSize: 13,
-          fontWeight: 600,
-          color: 'rgba(255, 255, 255, 0.6)',
-        }}
-      >
+      <span className={styles.moreIndicatorText}>
         +{count} more
       </span>
     </button>
@@ -192,10 +169,10 @@ export default function MyRosterStrip({
     // Compact mode: Show all 18 slots as small squares
     return (
       <div
-        className="flex flex-wrap"
+        className={styles.compactContainer}
         style={{
-          gap: SLOW_DRAFT_LAYOUT.rosterSquareGap,
-        }}
+          '--roster-square-gap': `${SLOW_DRAFT_LAYOUT.rosterSquareGap}px`,
+        } as React.CSSProperties}
       >
         {Array.from({ length: rosterSize }, (_, index) => (
           <RosterSquare
@@ -214,26 +191,24 @@ export default function MyRosterStrip({
   const remainingCount = sortedPicks.length - visiblePicks.length;
 
   return (
-    <div>
+    <div className={styles.expandedContainer}>
       {/* Section label */}
       <div
+        className={styles.sectionLabel}
         style={{
           ...SLOW_DRAFT_TYPOGRAPHY.sectionLabel,
-          marginBottom: SLOW_DRAFT_LAYOUT.sectionLabelMarginBottom,
-        }}
+          '--section-label-margin-bottom': `${SLOW_DRAFT_LAYOUT.sectionLabelMarginBottom}px`,
+        } as React.CSSProperties}
       >
         MY ROSTER ({picks.length} picks)
       </div>
 
       {/* Player cards row */}
       <div
-        className="flex overflow-x-auto"
+        className={styles.expandedCardsRow}
         style={{
-          gap: SLOW_DRAFT_LAYOUT.expandedPlayerCardGap,
-          paddingBottom: 4, // For scroll indicator
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-        }}
+          '--expanded-player-card-gap': `${SLOW_DRAFT_LAYOUT.expandedPlayerCardGap}px`,
+        } as React.CSSProperties}
       >
         {visiblePicks.map((pick) => (
           <PlayerMiniCard
@@ -252,13 +227,7 @@ export default function MyRosterStrip({
 
         {/* Empty state */}
         {picks.length === 0 && (
-          <div
-            style={{
-              color: 'rgba(255, 255, 255, 0.4)',
-              fontSize: 13,
-              fontStyle: 'italic',
-            }}
-          >
+          <div className={styles.emptyState}>
             No picks yet
           </div>
         )}

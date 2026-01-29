@@ -28,6 +28,8 @@ import {
   authenticateWithBiometric,
   getBiometricTypeName,
 } from '../../../../lib/webauthn';
+import { cn } from '@/lib/styles';
+import styles from './SignInModal.module.css';
 
 // ============================================================================
 // TYPES
@@ -50,10 +52,10 @@ export interface SignInModalProps {
 function TopDogLogo(): React.ReactElement {
   return (
     <div className="flex items-center justify-center">
-      <img 
-        src="/logo.png" 
-        alt="TopDog" 
-        style={{ height: 56 }}
+      <img
+        src="/logo.png"
+        alt="TopDog"
+        className={styles.logo}
       />
     </div>
   );
@@ -68,16 +70,7 @@ function BiometricButton({ onClick, disabled, label }: { onClick: () => void; di
     <button
       onClick={onClick}
       disabled={disabled}
-      className="w-full flex items-center justify-center gap-3 py-4 rounded-xl font-semibold transition-all"
-      style={{
-        background: 'url(/wr_blue.png) no-repeat center center',
-        backgroundSize: 'cover',
-        color: '#000',
-        border: 'none',
-        fontSize: 17,
-        opacity: disabled ? 0.5 : 1,
-        height: 52,
-      }}
+      className={cn(styles.biometricButton, "w-full flex items-center justify-center gap-3 py-4 rounded-xl font-semibold transition-all")}
     >
       {/* Face ID / Touch ID Icon */}
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -99,11 +92,16 @@ function BiometricButton({ onClick, disabled, label }: { onClick: () => void; di
 // ============================================================================
 
 function Divider(): React.ReactElement {
+  const dividerStyle: React.CSSProperties = {
+    '--border-default': BORDER_COLORS.default,
+    '--text-muted': TEXT_COLORS.muted,
+  } as React.CSSProperties;
+
   return (
-    <div className="flex items-center gap-4 my-6">
-      <div className="flex-1 h-px" style={{ backgroundColor: BORDER_COLORS.default }} />
-      <span style={{ color: TEXT_COLORS.muted, fontSize: 14 }}>or sign in with email</span>
-      <div className="flex-1 h-px" style={{ backgroundColor: BORDER_COLORS.default }} />
+    <div className={cn(styles.divider, "flex items-center gap-4 my-6")} style={dividerStyle}>
+      <div className={cn(styles.dividerLine, "flex-1 h-px")} />
+      <span className={styles.dividerText}>or sign in with email</span>
+      <div className={cn(styles.dividerLine, "flex-1 h-px")} />
     </div>
   );
 }
@@ -142,10 +140,16 @@ function Input({
   rightElement,
 }: InputProps): React.ReactElement {
   const hasError = touched && error;
-  
+
+  const inputStyle: React.CSSProperties = {
+    '--text-primary': TEXT_COLORS.primary,
+    '--input-border': hasError ? STATE_COLORS.error : BORDER_COLORS.default,
+    '--error-color': STATE_COLORS.error,
+  } as React.CSSProperties;
+
   return (
-    <div>
-      <div className="relative">
+    <div style={inputStyle}>
+      <div className={styles.inputWrapper}>
         <input
           ref={inputRef}
           type={type}
@@ -156,28 +160,20 @@ function Input({
           placeholder={placeholder}
           autoComplete={autoComplete}
           disabled={disabled}
-          className="w-full px-5 py-4 rounded-xl outline-none transition-all"
-          style={{
-            backgroundColor: 'rgba(255,255,255,0.05)',
-            color: TEXT_COLORS.primary,
-            border: `2px solid ${hasError ? STATE_COLORS.error : BORDER_COLORS.default}`,
-            fontSize: 17,
-            height: 56,
-            opacity: disabled ? 0.5 : 1,
-            paddingRight: rightElement ? 52 : 20,
-          }}
+          className={cn(
+            styles.input,
+            hasError && styles.inputError,
+            rightElement && styles.inputWithRight
+          )}
         />
         {rightElement && (
-          <div className="absolute right-4 top-1/2 -translate-y-1/2">
+          <div className={styles.inputRightElement}>
             {rightElement}
           </div>
         )}
       </div>
       {hasError && (
-        <div 
-          className="flex items-center gap-1.5 mt-2 px-1"
-          style={{ color: STATE_COLORS.error, fontSize: 13 }}
-        >
+        <div className={styles.fieldError}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="12" cy="12" r="10" />
             <line x1="12" y1="8" x2="12" y2="12" />
@@ -427,61 +423,38 @@ export function SignInModal({
                     (inputType === 'phone' && identifier && !isLoading);
   
   if (!isOpen) return null;
-  
+
+  const containerStyle: React.CSSProperties = {
+    '--content-top-inset': `${contentTopInset}px`,
+    '--modal-bg': BG_COLORS.secondary,
+    '--z-modal': Z_INDEX.modal,
+    '--content-padding': `40px ${SPACING.xl}px 20px`,
+    '--footer-padding': `12px ${SPACING.xl}px 16px`,
+    '--text-primary': TEXT_COLORS.primary,
+    '--text-secondary': TEXT_COLORS.secondary,
+    '--text-muted': TEXT_COLORS.muted,
+    '--text-disabled': TEXT_COLORS.disabled,
+    '--border-default': BORDER_COLORS.default,
+    '--bg-tertiary': BG_COLORS.tertiary,
+    '--error-color': STATE_COLORS.error,
+    '--focus-border': `${STATE_COLORS.active}80`,
+  } as React.CSSProperties;
+
   return (
-    <div
-      className="absolute left-0 right-0 bottom-0 flex flex-col"
-      style={{
-        top: `${contentTopInset}px`,
-        backgroundColor: BG_COLORS.secondary,
-        zIndex: Z_INDEX.modal,
-      }}
-    >
+    <div className={styles.modalContainer} style={containerStyle}>
       {/* Blue outline wrapper - auth modal branding */}
-      <div
-        style={{
-          position: 'absolute',
-          top: -8,
-          left: -8,
-          right: -8,
-          bottom: -8,
-          background: 'url(/wr_blue.png) no-repeat center center',
-          backgroundSize: '100% 100%',
-          borderRadius: '2.5rem',
-          zIndex: -1,
-          pointerEvents: 'none',
-          maskImage: `
-            linear-gradient(to bottom, black 0, black 8px, transparent 8px, transparent calc(100% - 8px), black calc(100% - 8px), black 100%),
-            linear-gradient(to right, black 0, black 8px, transparent 8px, transparent calc(100% - 8px), black calc(100% - 8px), black 100%)
-          `,
-          maskComposite: 'intersect',
-          WebkitMaskImage: `
-            linear-gradient(to bottom, black 0, black 8px, transparent 8px, transparent calc(100% - 8px), black calc(100% - 8px), black 100%),
-            linear-gradient(to right, black 0, black 8px, transparent 8px, transparent calc(100% - 8px), black calc(100% - 8px), black 100%)
-          `,
-          WebkitMaskComposite: 'source-in',
-        }}
-        aria-hidden="true"
-      />
+      <div className={styles.blueOutline} aria-hidden="true" />
 
       {/* Content */}
-      <div 
+      <div
         ref={formRef}
-        className={`flex-1 overflow-y-auto ${shakeError ? 'animate-shake' : ''}`}
-        style={{ 
-          padding: `40px ${SPACING.xl}px 20px`,
-          scrollbarWidth: 'none',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
+        className={cn(styles.contentArea, shakeError && styles.shake)}
         onKeyDown={handleKeyDown}
       >
         {/* Phone Code Message */}
         {step === 'phoneCode' && (
           <div className="text-center mb-6 mt-10">
-            <p 
-              style={{ color: TEXT_COLORS.secondary, fontSize: 17 }}
-            >
+            <p className={styles.textSecondary} style={{ fontSize: 17 }}>
               Verify your phone
             </p>
           </div>
@@ -503,21 +476,13 @@ export function SignInModal({
           
           {/* Error Message */}
           {error && (
-            <div 
-              className="mb-4 p-4 rounded-xl flex items-center gap-3"
-              style={{ 
-                backgroundColor: 'rgba(239, 68, 68, 0.1)', 
-                border: `1px solid ${STATE_COLORS.error}20`,
-              }}
-            >
+            <div className={styles.errorBanner}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.error} strokeWidth="2">
                 <circle cx="12" cy="12" r="10" />
                 <line x1="12" y1="8" x2="12" y2="12" />
                 <line x1="12" y1="16" x2="12.01" y2="16" />
               </svg>
-              <span style={{ color: STATE_COLORS.error, fontSize: 15 }}>
-                {error}
-              </span>
+              <span className={styles.errorBannerText}>{error}</span>
             </div>
           )}
           
@@ -545,10 +510,7 @@ export function SignInModal({
               
               {/* Input type indicator - only show for phone */}
               {identifier && inputType === 'phone' && !identifierError && (
-                <p 
-                  className="px-1 -mt-2"
-                  style={{ color: TEXT_COLORS.muted, fontSize: 13 }}
-                >
+                <p className={cn(styles.textMuted, "px-1 -mt-2")} style={{ fontSize: 13 }}>
                   We'll send you a verification code
                 </p>
               )}
@@ -571,8 +533,7 @@ export function SignInModal({
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="p-1 rounded transition-colors hover:bg-white/10"
-                      style={{ color: TEXT_COLORS.muted }}
+                      className={styles.togglePasswordButton}
                       aria-label={showPassword ? 'Hide password' : 'Show password'}
                       tabIndex={-1}
                     >
@@ -601,13 +562,10 @@ export function SignInModal({
                     className="flex items-center gap-3 cursor-pointer bg-transparent border-0 p-0 text-left"
                   >
                     <div
-                      className="w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-all"
-                      style={{
-                        backgroundImage: rememberMe ? 'url(/wr_blue.png)' : 'none',
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                        border: rememberMe ? 'none' : `2px solid ${BORDER_COLORS.default}`,
-                      }}
+                      className={cn(
+                        styles.checkbox,
+                        rememberMe ? styles.checkboxChecked : styles.checkboxUnchecked
+                      )}
                     >
                       {rememberMe && (
                         <svg width="12" height="10" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -615,16 +573,16 @@ export function SignInModal({
                         </svg>
                       )}
                     </div>
-                    <span style={{ color: TEXT_COLORS.secondary, fontSize: 15 }}>
+                    <span className={styles.textSecondary} style={{ fontSize: 15 }}>
                       Remember me
                     </span>
                   </button>
-                  
+
                   {onForgotPassword && (
                     <button
                       onClick={onForgotPassword}
-                      className="font-medium"
-                      style={{ color: TEXT_COLORS.secondary, fontSize: 15 }}
+                      className={cn(styles.textSecondary, "font-medium")}
+                      style={{ fontSize: 15 }}
                     >
                       Forgot password?
                     </button>
@@ -637,14 +595,11 @@ export function SignInModal({
           {/* Phone Code Step */}
           {step === 'phoneCode' && (
             <div className="text-center">
-              <p 
-                className="mb-6"
-                style={{ color: TEXT_COLORS.secondary, fontSize: 15 }}
-              >
+              <p className={cn(styles.textSecondary, "mb-6")} style={{ fontSize: 15 }}>
                 Enter the 6-digit code sent to<br />
-                <span className="font-medium" style={{ color: TEXT_COLORS.primary }}>{identifier}</span>
+                <span className={cn(styles.textPrimary, "font-medium")}>{identifier}</span>
               </p>
-              
+
               <input
                 type="text"
                 value={phoneCode}
@@ -653,33 +608,17 @@ export function SignInModal({
                 autoComplete="one-time-code"
                 disabled={isLoading}
                 autoFocus
-                className="w-full px-5 py-4 rounded-xl outline-none transition-all text-center tracking-[0.5em] font-mono"
-                style={{
-                  backgroundColor: 'rgba(255,255,255,0.05)',
-                  color: TEXT_COLORS.primary,
-                  border: `2px solid ${BORDER_COLORS.default}`,
-                  fontSize: 24,
-                  height: 64,
-                  opacity: isLoading ? 0.5 : 1,
-                }}
+                className={styles.phoneCodeInput}
               />
-              
+
               <button
                 onClick={() => {
                   setStep('credentials');
                   setPhoneCode('');
                   setError(null);
                 }}
-                className="mt-6 font-medium"
-                style={{
-                  background: 'url(/wr_blue.png) no-repeat center center',
-                  backgroundSize: 'cover',
-                  WebkitBackgroundClip: 'text',
-                  backgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  color: 'transparent',
-                  fontSize: 15,
-                }}
+                className={cn(styles.gradientText, "mt-6 font-medium")}
+                style={{ fontSize: 15 }}
               >
                 Use a different number
               </button>
@@ -693,30 +632,14 @@ export function SignInModal({
             <button
               onClick={handleSignIn}
               disabled={!canSignIn}
-              className="w-full rounded-xl font-bold transition-all flex items-center justify-center gap-2"
-              style={{
-                fontSize: 17,
-                height: 56,
-                ...(canSignIn
-                  ? {
-                      background: 'url(/wr_blue.png) no-repeat center center',
-                      backgroundSize: 'cover',
-                      color: '#000',
-                      border: 'none',
-                    }
-                  : {
-                      backgroundColor: BG_COLORS.tertiary,
-                      color: TEXT_COLORS.disabled,
-                    }),
-                opacity: canSignIn ? 1 : 0.6,
-              }}
+              className={cn(
+                styles.primaryButton,
+                canSignIn ? styles.primaryButtonEnabled : styles.primaryButtonDisabled
+              )}
             >
               {isLoading ? (
                 <>
-                  <div 
-                    className="animate-spin rounded-full h-5 w-5 border-2"
-                    style={{ borderColor: '#000 transparent transparent transparent' }}
-                  />
+                  <div className={styles.spinner} />
                   {inputType === 'phone' ? 'Sending code...' : 'Signing in...'}
                 </>
               ) : (
@@ -727,30 +650,14 @@ export function SignInModal({
             <button
               onClick={handleVerifyPhoneCode}
               disabled={phoneCode.length !== 6 || isLoading}
-              className="w-full rounded-xl font-bold transition-all flex items-center justify-center gap-2"
-              style={{
-                fontSize: 17,
-                height: 56,
-                ...(phoneCode.length === 6 && !isLoading
-                  ? {
-                      background: 'url(/wr_blue.png) no-repeat center center',
-                      backgroundSize: 'cover',
-                      color: '#000',
-                      border: 'none',
-                    }
-                  : {
-                      backgroundColor: BG_COLORS.tertiary,
-                      color: TEXT_COLORS.disabled,
-                    }),
-                opacity: phoneCode.length === 6 && !isLoading ? 1 : 0.6,
-              }}
+              className={cn(
+                styles.primaryButton,
+                phoneCode.length === 6 && !isLoading ? styles.primaryButtonEnabled : styles.primaryButtonDisabled
+              )}
             >
               {isLoading ? (
                 <>
-                  <div 
-                    className="animate-spin rounded-full h-5 w-5 border-2"
-                    style={{ borderColor: '#000 transparent transparent transparent' }}
-                  />
+                  <div className={styles.spinner} />
                   Verifying...
                 </>
               ) : (
@@ -762,49 +669,19 @@ export function SignInModal({
       </div>
       
       {/* Footer – line + "Don't have an account?" only */}
-      <div 
-        className="flex-shrink-0"
-        style={{ 
-          padding: `12px ${SPACING.xl}px 16px`,
-          borderTop: `1px solid ${BORDER_COLORS.default}`,
-        }}
-      >
+      <div className={styles.footer}>
         {onSwitchToSignUp && step === 'credentials' && (
-          <p 
-            className="text-center"
-            style={{ color: TEXT_COLORS.muted, fontSize: 15 }}
-          >
+          <p className={styles.footerText}>
             Don&apos;t have an account?{' '}
-            <button 
+            <button
               onClick={onSwitchToSignUp}
-              className="font-semibold bg-transparent border-0 p-0 cursor-pointer"
-              style={{
-                background: 'url(/wr_blue.png) no-repeat center center',
-                backgroundSize: 'cover',
-                WebkitBackgroundClip: 'text',
-                backgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                color: 'transparent',
-                fontSize: 15,
-              }}
+              className={styles.footerLink}
             >
               Sign Up
             </button>
           </p>
         )}
       </div>
-      
-      {/* CSS for shake animation */}
-      <style>{`
-        @keyframes shake {
-          0%, 100% { transform: translateX(0); }
-          10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
-          20%, 40%, 60%, 80% { transform: translateX(4px); }
-        }
-        .animate-shake {
-          animation: shake 0.5s ease-in-out;
-        }
-      `}</style>
     </div>
   );
 }

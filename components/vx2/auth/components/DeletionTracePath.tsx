@@ -10,6 +10,9 @@
  */
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { cn } from '@/lib/styles';
+import styles from './DeletionTracePath.module.css';
+import shared from './auth-shared.module.css';
 
 const W = 240;
 const H = 120;
@@ -103,18 +106,18 @@ export function DeletionTracePath({ onComplete, disabled }: DeletionTracePathPro
 
   return (
     <div>
-      <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13, marginBottom: 8 }}>
+      <p className={cn(styles.description)}>
         <strong>Why we ask you to trace:</strong> People have accidentally deleted accounts by
         pocket-dialing or brushing the screen. Tracing this path ensures a real person is
         intentionally confirming.
       </p>
-      <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13, marginBottom: 12 }}>
+      <p className={cn(styles.description, styles.descriptionLast)}>
         <strong>What to do:</strong> Trace from the green circle to the red circle with your finger.
       </p>
       <svg
         width="100%"
         viewBox={`0 0 ${W} ${H}`}
-        style={{ maxWidth: W, height: H, touchAction: 'none', background: COLORS.bg, borderRadius: 12 }}
+        className={styles.canvas}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerLeave={() => {}}

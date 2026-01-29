@@ -25,6 +25,7 @@ import type { SeasonStats } from '@/lib/historicalStats/types';
 import * as historicalService from '@/lib/historicalStats/service';
 import type { Position } from './display/types';
 import { createScopedLogger } from '../../../../lib/clientLogger';
+import styles from './PlayerStatsCard.module.css';
 
 const logger = createScopedLogger('[PlayerStatsCard]');
 
@@ -263,9 +264,9 @@ interface BadgeProps {
 
 function Badge({ label, value, minWidth, labelColor }: BadgeProps): React.ReactElement {
   return (
-    <div style={{ textAlign: 'center', minWidth }}>
-      <div style={{ fontSize: PX.badgeLabelSize, color: labelColor }}>{label}</div>
-      <div style={{ fontSize: PX.badgeValueSize, fontWeight: 500, color: TEXT_COLORS.primary }}>
+    <div className={styles.badge} style={{ '--badge-min-width': `${minWidth}px` } as React.CSSProperties}>
+      <div className={styles.badgeLabel} style={{ '--label-color': labelColor } as React.CSSProperties}>{label}</div>
+      <div className={styles.badgeValue} style={{ '--badge-value-color': TEXT_COLORS.primary } as React.CSSProperties}>
         {value}
       </div>
     </div>
@@ -281,41 +282,26 @@ interface StatsHeaderProps {
 function StatsHeader({ columns, labelColor, lineColor }: StatsHeaderProps): React.ReactElement {
   return (
     <div
+      className={styles.statsHeader}
       style={{
-        position: 'relative',
-        height: PX.headerHeight,
-        paddingTop: 3,
-        paddingBottom: 4,
-        color: labelColor,
-        fontSize: 14,
-        fontWeight: 500,
-      }}
+        '--header-label-color': labelColor,
+        '--line-color': lineColor,
+      } as React.CSSProperties}
     >
       {/* Bottom border line */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: 1,
-          background: lineColor,
-        }}
-      />
-      
+      <div className={styles.statsHeaderLine} />
+
       {/* Column headers */}
       {columns.map((col, i) => (
         <div
           key={col.label + i}
+          className={styles.statsHeaderColumn}
           style={{
-            position: 'absolute',
-            left: col.left,
-            width: col.width,
-            textAlign: i === 0 ? 'left' : 'center',
-            display: 'flex',
-            justifyContent: i === 0 ? 'flex-start' : 'center',
-            alignItems: 'center',
-          }}
+            '--column-left': `${col.left}px`,
+            '--column-width': `${col.width}px`,
+            '--column-text-align': i === 0 ? 'left' : 'center',
+            '--column-justify': i === 0 ? 'flex-start' : 'center',
+          } as React.CSSProperties}
         >
           {col.label}
         </div>
@@ -333,42 +319,35 @@ interface StatsRowProps {
 function StatsRow({ label, values, columns }: StatsRowProps): React.ReactElement {
   // Skip the YEAR column (index 0) for positioning values
   const dataColumns = columns.slice(1);
-  
+
   return (
     <div
+      className={styles.statsRow}
       style={{
-        position: 'relative',
-        height: PX.rowHeight,
-        padding: '4px 0',
-        color: TEXT_COLORS.primary,
-        fontSize: 14,
-      }}
+        '--row-height': `${PX.rowHeight}px`,
+        '--row-text-color': TEXT_COLORS.primary,
+      } as React.CSSProperties}
     >
       {/* Year label */}
       <div
+        className={styles.statsRowLabel}
         style={{
-          position: 'absolute',
-          left: PX.yearLabelLeft,
-          width: PX.yearColumnWidth,
-          textAlign: 'left',
-        }}
+          '--year-label-left': `${PX.yearLabelLeft}px`,
+          '--year-column-width': `${PX.yearColumnWidth}px`,
+        } as React.CSSProperties}
       >
         {label}
       </div>
-      
+
       {/* Data values */}
       {values.map((val, i) => (
         <div
           key={i}
+          className={styles.statsRowValue}
           style={{
-            position: 'absolute',
-            left: dataColumns[i]?.left ?? 0,
-            width: dataColumns[i]?.width ?? 30,
-            textAlign: 'center',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
+            '--value-left': `${dataColumns[i]?.left ?? 0}px`,
+            '--value-width': `${dataColumns[i]?.width ?? 30}px`,
+          } as React.CSSProperties}
         >
           {val}
         </div>
@@ -421,18 +400,17 @@ function PositionStatsTable({ position, team, historicalStats, projectedStats }:
   
   return (
     <div
+      className={styles.statsTable}
       style={{
-        borderRadius: 4,
-        fontSize: 12,
-        minWidth,
-      }}
+        '--stats-table-min-width': `${minWidth}px`,
+      } as React.CSSProperties}
     >
       <StatsHeader columns={columns} labelColor={labelColor} lineColor={lineColor} />
-      
-      <div style={{ padding: '0 0 6px 0' }}>
+
+      <div className={styles.statsRowPadding}>
         {/* Projected stats row - placeholder until projection system integrated */}
         <StatsRow label="Proj." values={projectedStats ?? emptyData} columns={columns} />
-        
+
         {/* Historical stats rows */}
         {seasonRows.map(row => (
           <StatsRow key={row.label} label={row.label} values={row.values} columns={columns} />
@@ -519,49 +497,35 @@ export default function PlayerStatsCard({
   return (
     <div
       onClick={handleCardClick}
+      className={styles.cardWrapper}
       style={{
-        background: teamGradient.firstGradient,
-        padding: 2,
-        borderRadius: 8,
-        boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.3)',
-      }}
+        '--team-gradient': teamGradient.firstGradient,
+      } as React.CSSProperties}
     >
       {/* Header: Logo + Badges + Draft Button */}
-      <div
+      <div className={styles.header}
         style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          paddingTop: PX.headerPaddingTop,
-          paddingBottom: PX.headerPaddingBottom,
-          paddingLeft: PX.headerPaddingX,
-          paddingRight: PX.headerPaddingX,
-        }}
+          '--header-padding-top': `${PX.headerPaddingTop}px`,
+          '--header-padding-bottom': `${PX.headerPaddingBottom}px`,
+          '--header-padding-x': `${PX.headerPaddingX}px`,
+        } as React.CSSProperties}
       >
         {/* Team Logo */}
         <img
           src={`/logos/nfl/${team?.toLowerCase()}.png`}
           alt={`${team} logo`}
+          className={styles.teamLogo}
           style={{
-            width: PX.logoSize,
-            height: PX.logoSize,
-            flexShrink: 0,
-            display: 'block',
-          }}
+            '--logo-size': `${PX.logoSize}px`,
+          } as React.CSSProperties}
           onError={handleImageError}
         />
-        
+
         {/* Badges */}
-        <div
+        <div className={styles.badgesContainer}
           style={{
-            flex: 1,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: PX.badgeGap,
-            paddingLeft: 12,
-            paddingRight: 12,
-          }}
+            '--badge-gap': `${PX.badgeGap}px`,
+          } as React.CSSProperties}
         >
           <Badge label="Bye" value={byeWeek} minWidth={PX.badgeMinWidths.bye} labelColor={labelColor} />
           <Badge
@@ -577,50 +541,34 @@ export default function PlayerStatsCard({
             labelColor={labelColor}
           />
         </div>
-        
+
         {/* Draft Button (optional) */}
         {showDraftButton && (
           <button
             onClick={handleDraft}
             aria-label={`Draft ${name}`}
+            className={styles.draftButton}
             style={{
-              paddingTop: PX.draftButtonPaddingY,
-              paddingBottom: PX.draftButtonPaddingY,
-              paddingLeft: PX.draftButtonPaddingX,
-              paddingRight: PX.draftButtonPaddingX,
-              borderRadius: 4,
-              fontSize: PX.draftButtonFontSize,
-              fontWeight: 700,
-              background: isMyTurn 
-                ? 'url(/wr_blue.png) no-repeat center center'
+              '--draft-button-padding-y': `${PX.draftButtonPaddingY}px`,
+              '--draft-button-padding-x': `${PX.draftButtonPaddingX}px`,
+              '--draft-button-font-size': `${PX.draftButtonFontSize}px`,
+              '--draft-button-bg': isMyTurn
+                ? 'url(/wr_blue.png)'
                 : COLORS.draftButtonInactive,
-              backgroundSize: isMyTurn ? 'cover' : undefined,
-              color: '#FFFFFF',
-              opacity: isMyTurn ? 1 : 0.7,
-              border: 'none',
-              cursor: 'pointer',
-            }}
+              '--draft-button-bg-size': isMyTurn ? 'cover' : 'auto',
+              '--draft-button-opacity': isMyTurn ? '1' : '0.7',
+            } as React.CSSProperties}
           >
             DRAFT
           </button>
         )}
       </div>
-      
+
       {/* Stats Table - scrollable area (click doesn't close card) */}
-      <div 
+      <div
         onClick={(e) => e.stopPropagation()}
         onTouchStart={(e) => e.stopPropagation()}
-        style={{ 
-          paddingTop: 0, 
-          paddingBottom: 8, 
-          marginTop: 0,
-          overflowX: 'auto',
-          WebkitOverflowScrolling: 'touch',
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-          cursor: 'grab',
-        }}
-        className="hide-scrollbar"
+        className={`${styles.statsContainer} hide-scrollbar`}
       >
         <PositionStatsTable
           position={position as FantasyPosition}

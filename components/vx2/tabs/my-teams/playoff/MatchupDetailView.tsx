@@ -9,6 +9,8 @@
  */
 
 import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
+import { cn } from '@/lib/styles';
+import styles from './MatchupDetailView.module.css';
 import { BG_COLORS, TEXT_COLORS } from '../../../core/constants/colors';
 import { SPACING, RADIUS, TYPOGRAPHY } from '../../../core/constants/sizes';
 import { ChevronLeft, ChevronRight } from '../../../components/icons';
@@ -84,95 +86,56 @@ interface PlayerChipProps {
 
 function PlayerChip({ player, isShared, side }: PlayerChipProps): React.ReactElement {
   const statusStyle = player.status ? STATUS_COLORS[player.status] : STATUS_COLORS.active;
-  
+  const positionColorVar = `--position-${player.position.toLowerCase()}`;
+
   return (
     <div
-      style={{
-        display: 'flex',
-        alignItems: side === 'left' ? 'flex-end' : 'flex-start',
-        flexDirection: 'column',
-        padding: '8px 10px',
-        backgroundColor: isShared ? 'rgba(251, 191, 37, 0.12)' : 'rgba(255,255,255,0.03)',
-        borderRadius: '8px',
-        border: isShared ? '1px solid rgba(251, 191, 37, 0.3)' : '1px solid rgba(255,255,255,0.05)',
-        marginBottom: '6px',
-      }}
+      className={cn(
+        styles.playerChip,
+        side === 'left' ? styles.playerChipLeft : styles.playerChipRight,
+        isShared ? styles.playerChipShared : styles.playerChipDefault
+      )}
     >
       <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-          flexDirection: side === 'left' ? 'row-reverse' : 'row',
-        }}
+        className={side === 'left' ? styles.playerChipContentLeft : styles.playerChipContentRight}
       >
         {/* Position Badge */}
         <span
-          style={{
-            fontSize: '9px',
-            fontWeight: 700,
-            color: POSITION_COLORS[player.position] || TEXT_COLORS.muted,
-            textTransform: 'uppercase',
-          }}
+          className={cn(styles.positionBadge, styles[`positionLabel${player.position}` as keyof typeof styles])}
         >
           {player.position}
         </span>
-        
+
         {/* Player Name */}
         <span
-          style={{
-            fontSize: '12px',
-            fontWeight: isShared ? 600 : 500,
-            color: isShared ? '#fbbf24' : TEXT_COLORS.primary,
-          }}
+          className={isShared ? styles.playerNameShared : styles.playerNameDefault}
         >
           {player.name}
         </span>
-        
+
         {/* Status Badge */}
         {player.status && player.status !== 'active' && (
           <span
-            style={{
-              padding: '1px 5px',
-              backgroundColor: statusStyle.bg,
-              borderRadius: '4px',
-              fontSize: '8px',
-              fontWeight: 600,
-              color: statusStyle.text,
-              textTransform: 'uppercase',
-            }}
+            className={cn(styles.statusBadge, styles[`status${player.status.charAt(0).toUpperCase() + player.status.slice(1)}` as keyof typeof styles])}
           >
             {player.status}
           </span>
         )}
-        
+
         {/* Shared Indicator */}
         {isShared && (
-          <span
-            style={{
-              width: '6px',
-              height: '6px',
-              borderRadius: '50%',
-              backgroundColor: '#fbbf24',
-            }}
-          />
+          <span className={styles.sharedIndicator} />
         )}
       </div>
-      
+
       {/* Team & Projected */}
       <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          marginTop: '3px',
-          flexDirection: side === 'left' ? 'row-reverse' : 'row',
-        }}
+        className={side === 'left' ? styles.playerChipMetaLeft : styles.playerChipMeta}
       >
-        <span style={{ fontSize: '10px', color: TEXT_COLORS.muted }}>
+        <span className={styles.playerTeam}>
           {player.team}
         </span>
-        <span style={{ fontSize: '10px', color: TEXT_COLORS.secondary }}>
+        <span className={styles.playerProjection}>
           {player.projectedPoints.toFixed(1)} proj
         </span>
       </div>
@@ -188,28 +151,14 @@ interface NavigationDotsProps {
 
 function NavigationDots({ total, current, onSelect }: NavigationDotsProps): React.ReactElement {
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '6px',
-        padding: '12px 0',
-      }}
-    >
+    <div className={styles.navigationDots}>
       {Array.from({ length: total }, (_, i) => (
         <button
           key={i}
           onClick={() => onSelect(i)}
-          style={{
-            width: current === i ? '16px' : '8px',
-            height: '8px',
-            borderRadius: '4px',
-            backgroundColor: current === i ? '#3b82f6' : 'rgba(255,255,255,0.2)',
-            border: 'none',
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-          }}
+          className={cn(
+            current === i ? styles.navigationDotActive : styles.navigationDotInactive
+          )}
           aria-label={`Go to opponent ${i + 1}`}
         />
       ))}
@@ -314,134 +263,83 @@ export function MatchupDetailView({
   return (
     <div
       ref={containerRef}
-      className="flex-1 flex flex-col min-h-0"
-      style={{ backgroundColor: BG_COLORS.primary }}
+      className={cn('flex-1 flex flex-col min-h-0', styles.container)}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
       {/* Header */}
-      <div
-        style={{
-          backgroundColor: '#0c1420',
-          padding: '14px 16px',
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div className={styles.header}>
+        <div className={styles.headerContent}>
           <button
             onClick={onBack}
-            style={{
-              background: 'rgba(255,255,255,0.05)',
-              border: 'none',
-              cursor: 'pointer',
-              padding: '8px',
-              display: 'flex',
-              alignItems: 'center',
-              borderRadius: '8px',
-            }}
+            className={styles.backButton}
             aria-label="Back to pod"
           >
             <ChevronLeft size={16} color={TEXT_COLORS.muted} />
           </button>
-          
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ color: TEXT_COLORS.muted, fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+
+          <div className={styles.headerTitle}>
+            <div className={styles.headerSubtitle}>
               Matchup {opponentIndex + 1} of {pod.opponents.length}
             </div>
-            <div style={{ color: TEXT_COLORS.primary, fontSize: '14px', fontWeight: 600, marginTop: '2px' }}>
+            <div className={styles.headerMain}>
               Week {pod.week}
             </div>
           </div>
-          
-          <div style={{ width: '40px' }} /> {/* Spacer for alignment */}
+
+          <div className={styles.spacer} />
         </div>
       </div>
       
       {/* Team Headers */}
-      <div
-        style={{
-          display: 'flex',
-          backgroundColor: '#0d1520',
-          borderBottom: '1px solid rgba(255,255,255,0.08)',
-        }}
-      >
+      <div className={styles.teamHeadersContainer}>
         {/* User Team Header */}
-        <div
-          style={{
-            flex: 1,
-            padding: '12px',
-            borderRight: '1px solid rgba(255,255,255,0.05)',
-            textAlign: 'right',
-          }}
-        >
-          <div style={{ color: '#60a5fa', fontSize: '11px', fontWeight: 600, marginBottom: '2px' }}>
+        <div className={styles.teamHeaderLeft}>
+          <div className={styles.teamHeaderLabel}>
             YOUR TEAM
           </div>
-          <div style={{ color: TEXT_COLORS.primary, fontSize: '13px', fontWeight: 500 }}>
+          <div className={styles.teamHeaderName}>
             {pod.userTeam.name}
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px', marginTop: '4px' }}>
+          <div className={styles.teamHeaderStatsLeft}>
             <span
-              style={{
-                padding: '2px 8px',
-                backgroundColor: pod.userTeam.rank <= advancementCount ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)',
-                borderRadius: '10px',
-                fontSize: '10px',
-                fontWeight: 600,
-                color: pod.userTeam.rank <= advancementCount ? '#10b981' : '#ef4444',
-              }}
+              className={cn(
+                styles.rankBadge,
+                pod.userTeam.rank <= advancementCount ? styles.rankBadgeAdvancing : styles.rankBadgeEliminated
+              )}
             >
               #{pod.userTeam.rank}
             </span>
-            <span style={{ color: TEXT_COLORS.secondary, fontSize: '12px' }}>
+            <span className={styles.pointsText}>
               {pod.userTeam.currentPoints.toFixed(1)} pts
             </span>
           </div>
         </div>
-        
+
         {/* VS Divider */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '0 8px',
-            backgroundColor: 'rgba(255,255,255,0.02)',
-          }}
-        >
-          <span style={{ color: TEXT_COLORS.muted, fontSize: '10px', fontWeight: 700 }}>VS</span>
+        <div className={styles.vsDivider}>
+          <span className={styles.vsDividerText}>VS</span>
         </div>
-        
+
         {/* Opponent Header */}
-        <div
-          style={{
-            flex: 1,
-            padding: '12px',
-            borderLeft: '1px solid rgba(255,255,255,0.05)',
-            textAlign: 'left',
-          }}
-        >
-          <div style={{ color: TEXT_COLORS.muted, fontSize: '11px', fontWeight: 600, marginBottom: '2px' }}>
+        <div className={styles.teamHeaderRight}>
+          <div className={styles.teamHeaderLabel}>
             OPPONENT
           </div>
-          <div style={{ color: TEXT_COLORS.primary, fontSize: '13px', fontWeight: 500 }}>
+          <div className={styles.teamHeaderName}>
             {opponent.name}
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+          <div className={styles.teamHeaderStatsRight}>
             <span
-              style={{
-                padding: '2px 8px',
-                backgroundColor: opponent.rank <= advancementCount ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)',
-                borderRadius: '10px',
-                fontSize: '10px',
-                fontWeight: 600,
-                color: opponent.rank <= advancementCount ? '#10b981' : '#ef4444',
-              }}
+              className={cn(
+                styles.rankBadge,
+                opponent.rank <= advancementCount ? styles.rankBadgeAdvancing : styles.rankBadgeEliminated
+              )}
             >
               #{opponent.rank}
             </span>
-            <span style={{ color: TEXT_COLORS.secondary, fontSize: '12px' }}>
+            <span className={styles.pointsText}>
               {opponent.currentPoints.toFixed(1)} pts
             </span>
           </div>
@@ -450,64 +348,29 @@ export function MatchupDetailView({
       
       {/* Shared Players Banner */}
       {sharedPlayerNames.size > 0 && (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '8px',
-            padding: '10px 16px',
-            backgroundColor: 'rgba(251, 191, 37, 0.1)',
-            borderBottom: '1px solid rgba(251, 191, 37, 0.2)',
-          }}
-        >
-          <span
-            style={{
-              width: '8px',
-              height: '8px',
-              borderRadius: '50%',
-              backgroundColor: '#fbbf24',
-            }}
-          />
-          <span style={{ color: '#fbbf24', fontSize: '12px', fontWeight: 600 }}>
+        <div className={styles.sharedPlayersBanner}>
+          <span className={styles.sharedPlayersIndicator} />
+          <span className={styles.sharedPlayersText}>
             {sharedPlayerNames.size} Shared {sharedPlayerNames.size === 1 ? 'Player' : 'Players'}
           </span>
         </div>
       )}
       
       {/* Rosters Side by Side */}
-      <div
-        className="flex-1 min-h-0 overflow-y-auto"
-        style={{
-          display: 'flex',
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-        }}
-      >
+      <div className={cn('flex-1 min-h-0 overflow-y-auto', styles.rostersContainer)}>
         {/* User Roster */}
-        <div
-          style={{
-            flex: 1,
-            padding: '12px 8px 12px 12px',
-            borderRight: '1px solid rgba(255,255,255,0.05)',
-          }}
-        >
+        <div className={styles.rosterSide}>
           {(['QB', 'RB', 'WR', 'TE'] as const).map(position => {
             const players = userPlayersByPosition[position] || [];
             if (players.length === 0) return null;
-            
+
             return (
-              <div key={position} style={{ marginBottom: '12px' }}>
+              <div key={position} className={styles.positionGroup}>
                 <div
-                  style={{
-                    color: POSITION_COLORS[position],
-                    fontSize: '10px',
-                    fontWeight: 700,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
-                    marginBottom: '6px',
-                    textAlign: 'right',
-                  }}
+                  className={cn(
+                    styles.positionLabelLeft,
+                    styles[`positionLabel${position}` as keyof typeof styles]
+                  )}
                 >
                   {position} ({players.length})
                 </div>
@@ -523,30 +386,20 @@ export function MatchupDetailView({
             );
           })}
         </div>
-        
+
         {/* Opponent Roster */}
-        <div
-          style={{
-            flex: 1,
-            padding: '12px 12px 12px 8px',
-            borderLeft: '1px solid rgba(255,255,255,0.05)',
-          }}
-        >
+        <div className={styles.rosterSideRight}>
           {(['QB', 'RB', 'WR', 'TE'] as const).map(position => {
             const players = opponentPlayersByPosition[position] || [];
             if (players.length === 0) return null;
-            
+
             return (
-              <div key={position} style={{ marginBottom: '12px' }}>
+              <div key={position} className={styles.positionGroup}>
                 <div
-                  style={{
-                    color: POSITION_COLORS[position],
-                    fontSize: '10px',
-                    fontWeight: 700,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
-                    marginBottom: '6px',
-                  }}
+                  className={cn(
+                    styles.positionLabel,
+                    styles[`positionLabel${position}` as keyof typeof styles]
+                  )}
                 >
                   {position} ({players.length})
                 </div>
@@ -565,71 +418,39 @@ export function MatchupDetailView({
       </div>
       
       {/* Navigation Controls */}
-      <div
-        style={{
-          backgroundColor: '#0c1420',
-          borderTop: '1px solid rgba(255,255,255,0.06)',
-          padding: '8px 16px 16px',
-        }}
-      >
+      <div className={styles.navigationControls}>
         {/* Navigation Dots */}
         <NavigationDots
           total={pod.opponents.length}
           current={opponentIndex}
           onSelect={goToOpponentByIndex}
         />
-        
+
         {/* Arrow Buttons */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
+        <div className={styles.navigationButtons}>
           <button
             onClick={goToPrevOpponent}
             disabled={opponentIndex === 0}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '10px 16px',
-              backgroundColor: opponentIndex === 0 ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.05)',
-              border: 'none',
-              borderRadius: '8px',
-              color: opponentIndex === 0 ? TEXT_COLORS.muted : TEXT_COLORS.secondary,
-              fontSize: '12px',
-              fontWeight: 500,
-              cursor: opponentIndex === 0 ? 'not-allowed' : 'pointer',
-              opacity: opponentIndex === 0 ? 0.5 : 1,
-            }}
+            className={cn(
+              styles.navigationButton,
+              opponentIndex === 0 && styles.navigationButtonDisabled
+            )}
           >
             <ChevronLeft size={14} color="currentColor" />
             <span>Prev</span>
           </button>
-          
-          <div style={{ color: TEXT_COLORS.muted, fontSize: '11px' }}>
+
+          <div className={styles.navigationHint}>
             Swipe to navigate
           </div>
-          
+
           <button
             onClick={goToNextOpponent}
             disabled={opponentIndex === pod.opponents.length - 1}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '10px 16px',
-              backgroundColor: opponentIndex === pod.opponents.length - 1 ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.05)',
-              border: 'none',
-              borderRadius: '8px',
-              color: opponentIndex === pod.opponents.length - 1 ? TEXT_COLORS.muted : TEXT_COLORS.secondary,
-              fontSize: '12px',
-              fontWeight: 500,
-              cursor: opponentIndex === pod.opponents.length - 1 ? 'not-allowed' : 'pointer',
-              opacity: opponentIndex === pod.opponents.length - 1 ? 0.5 : 1,
-            }}
+            className={cn(
+              styles.navigationButton,
+              opponentIndex === pod.opponents.length - 1 && styles.navigationButtonDisabled
+            )}
           >
             <span>Next</span>
             <ChevronRight size={14} color="currentColor" />

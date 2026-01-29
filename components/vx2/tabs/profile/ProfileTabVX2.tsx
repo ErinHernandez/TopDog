@@ -28,18 +28,19 @@ import { BG_COLORS, TEXT_COLORS, NAVBAR_BLUE } from '../../core/constants/colors
 import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
 import { TILED_BG_STYLE } from '../../draft-room/constants';
 import { createScopedLogger } from '../../../../lib/clientLogger';
-import { 
-  Payment, 
-  Rankings, 
-  Autodraft, 
-  UserIcon, 
-  History, 
+import {
+  Payment,
+  Rankings,
+  Autodraft,
+  UserIcon,
+  History,
   Withdraw,
   ChevronRight,
   Plus,
   Customize,
 } from '../../components/icons';
 import { Skeleton } from '../../../ui';
+import styles from './ProfileTabVX2.module.css';
 
 const logger = createScopedLogger('[ProfileTab]');
 
@@ -181,29 +182,22 @@ interface AvatarBoxProps {
 function AvatarBox({ displayName }: AvatarBoxProps): React.ReactElement {
   return (
     <div
-      className="relative flex flex-col"
+      className={styles.avatarBox}
       style={{
-        width: `${PROFILE_PX.boxWidth}px`,
-        height: `${PROFILE_PX.boxHeight}px`,
-        borderWidth: `${PROFILE_PX.boxBorderWidth}px`,
-        borderStyle: 'solid',
-        borderColor: PROFILE_COLORS.boxBorder,
-        borderTopWidth: `${PROFILE_PX.boxTopBorderWidth}px`,
-        backgroundColor: PROFILE_COLORS.boxBg,
-        borderRadius: `${PROFILE_PX.boxBorderRadius}px`,
-      }}
+        '--box-width': `${PROFILE_PX.boxWidth}px`,
+        '--box-height': `${PROFILE_PX.boxHeight}px`,
+        '--box-border-width': `${PROFILE_PX.boxBorderWidth}px`,
+        '--box-border-color': PROFILE_COLORS.boxBorder,
+        '--box-top-border-width': `${PROFILE_PX.boxTopBorderWidth}px`,
+        '--box-bg': PROFILE_COLORS.boxBg,
+        '--box-border-radius': `${PROFILE_PX.boxBorderRadius}px`,
+        '--username-font-size': `${PROFILE_PX.usernameFontSize}px`,
+        '--username-color': '#000000',
+        '--username-top': `${PROFILE_PX.usernameTop}px`,
+      } as React.CSSProperties}
     >
       {/* Username in top border */}
-      <div
-        className="absolute left-0 right-0 font-bold text-center truncate uppercase"
-        style={{
-          fontSize: `${PROFILE_PX.usernameFontSize}px`,
-          color: '#000000',
-          top: `${PROFILE_PX.usernameTop}px`,
-          transform: 'translateY(-50%)',
-          padding: '2px',
-        }}
-      >
+      <div className={`${styles.avatarBoxUsername} ${styles.avatarBoxBlack}`}>
         {displayName}
       </div>
     </div>
@@ -231,28 +225,26 @@ function MenuItemButton({ item, onClick }: MenuItemButtonProps): React.ReactElem
     e.stopPropagation();
     onClick();
   };
-  
+
   return (
     <button
       type="button"
       onClick={handleClick}
-      className="w-full flex items-center justify-between font-semibold transition-colors active:scale-[0.98]"
+      className={styles.menuItemButton}
       style={{
-        backgroundColor: PROFILE_COLORS.menuItemBg,
-        color: TEXT_COLORS.primary,
-        paddingTop: `${PROFILE_PX.menuItemPaddingY}px`,
-        paddingBottom: `${PROFILE_PX.menuItemPaddingY}px`,
-        paddingLeft: `${PROFILE_PX.menuItemPaddingX}px`,
-        paddingRight: `${PROFILE_PX.menuItemPaddingX}px`,
-        borderRadius: `${RADIUS.md}px`,
-        fontSize: `${PROFILE_PX.menuItemFontSize}px`,
-        border: 'none',
-        cursor: 'pointer',
-      }}
+        '--menu-item-bg': PROFILE_COLORS.menuItemBg,
+        '--text-primary': TEXT_COLORS.primary,
+        '--menu-item-padding-y': `${PROFILE_PX.menuItemPaddingY}px`,
+        '--menu-item-padding-x': `${PROFILE_PX.menuItemPaddingX}px`,
+        '--menu-item-border-radius': `${RADIUS.md}px`,
+        '--menu-item-font-size': `${PROFILE_PX.menuItemFontSize}px`,
+        '--menu-item-hover': PROFILE_COLORS.menuItemHover,
+        '--text-secondary': TEXT_COLORS.secondary,
+      } as React.CSSProperties}
       aria-label={item.label}
     >
-      <div className="flex items-center gap-3">
-        <span style={{ color: TEXT_COLORS.secondary }}>{item.icon}</span>
+      <div className={styles.menuItemIcon}>
+        <span className={styles.menuItemIconColor}>{item.icon}</span>
         <span>{item.label}</span>
       </div>
       <ChevronRight size={16} color={TEXT_COLORS.muted} />
@@ -262,7 +254,12 @@ function MenuItemButton({ item, onClick }: MenuItemButtonProps): React.ReactElem
 
 function MenuSkeleton(): React.ReactElement {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: `${PROFILE_PX.menuGap}px` }}>
+    <div
+      className={styles.menuSkeleton}
+      style={{
+        '--menu-gap': `${PROFILE_PX.menuGap}px`,
+      } as React.CSSProperties}
+    >
       {[1, 2, 3, 4, 5].map((i) => (
         <Skeleton key={i} width="100%" height={48} borderRadius={RADIUS.md} />
       ))}
@@ -280,23 +277,20 @@ function DepositButton({ onClick, disabled = false }: DepositButtonProps): React
     <button
       onClick={onClick}
       disabled={disabled}
-      className="w-full flex items-center justify-center font-bold transition-opacity"
+      className={styles.depositButton}
       style={{
-        background: disabled ? BG_COLORS.tertiary : 'url(/wr_blue.png) no-repeat center center',
-        backgroundSize: 'cover',
-        color: disabled ? TEXT_COLORS.disabled : PROFILE_COLORS.depositButtonText,
-        paddingTop: `${DEPOSIT_BUTTON_PX.paddingY}px`,
-        paddingBottom: `${DEPOSIT_BUTTON_PX.paddingY}px`,
-        paddingLeft: `${DEPOSIT_BUTTON_PX.paddingX}px`,
-        paddingRight: `${DEPOSIT_BUTTON_PX.paddingX}px`,
-        borderRadius: `${DEPOSIT_BUTTON_PX.borderRadius}px`,
-        fontSize: `${DEPOSIT_BUTTON_PX.fontSize}px`,
-        border: 'none',
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        marginBottom: `${DEPOSIT_BUTTON_PX.marginBottom}px`,
-        gap: `${DEPOSIT_BUTTON_PX.gap}px`,
-        opacity: disabled ? 0.5 : 1,
-      }}
+        '--deposit-padding-y': `${DEPOSIT_BUTTON_PX.paddingY}px`,
+        '--deposit-padding-x': `${DEPOSIT_BUTTON_PX.paddingX}px`,
+        '--deposit-border-radius': `${DEPOSIT_BUTTON_PX.borderRadius}px`,
+        '--deposit-font-size': `${DEPOSIT_BUTTON_PX.fontSize}px`,
+        '--deposit-margin-bottom': `${DEPOSIT_BUTTON_PX.marginBottom}px`,
+        '--deposit-gap': `${DEPOSIT_BUTTON_PX.gap}px`,
+        '--deposit-text-color': disabled ? TEXT_COLORS.disabled : PROFILE_COLORS.depositButtonText,
+        '--deposit-cursor': disabled ? 'not-allowed' : 'pointer',
+        '--deposit-opacity': disabled ? '0.5' : '1',
+        '--bg-tertiary': BG_COLORS.tertiary,
+        '--text-disabled': TEXT_COLORS.disabled,
+      } as React.CSSProperties}
       aria-label="Deposit funds"
     >
       <Plus size={DEPOSIT_BUTTON_PX.iconSize} color={disabled ? TEXT_COLORS.disabled : PROFILE_COLORS.depositButtonText} />
@@ -350,17 +344,24 @@ export default function ProfileTabVX2({
   // Note: Auth check removed - AuthGateVX2 ensures only logged-in users can access tabs
   
   return (
-    <div 
-      className="flex-1 flex flex-col overflow-y-auto"
+    <div
+      className={styles.mainContainer}
       style={{
-        paddingLeft: `${PROFILE_PX.paddingX}px`,
-        paddingRight: `${PROFILE_PX.paddingX}px`,
-        paddingTop: `${PROFILE_PX.paddingY}px`,
-        paddingBottom: `${PROFILE_PX.paddingY}px`,
-        backgroundColor: BG_COLORS.primary,
-        scrollbarWidth: 'none',
-        msOverflowStyle: 'none',
-      }}
+        '--profile-padding-x': `${PROFILE_PX.paddingX}px`,
+        '--profile-padding-y': `${PROFILE_PX.paddingY}px`,
+        '--bg-primary': BG_COLORS.primary,
+        '--spacing-lg': `${SPACING.lg}px`,
+        '--spacing-md': `${SPACING.md}px`,
+        '--spacing-xs': `${SPACING.xs}px`,
+        '--spacing-2xl': `${SPACING['2xl']}px`,
+        '--typography-xs': `${TYPOGRAPHY.fontSize.xs}px`,
+        '--typography-2xl': `${TYPOGRAPHY.fontSize['2xl']}px`,
+        '--text-primary': TEXT_COLORS.primary,
+        '--text-secondary': TEXT_COLORS.secondary,
+        '--text-muted': TEXT_COLORS.muted,
+        '--text-disabled': TEXT_COLORS.disabled,
+        '--menu-gap': `${PROFILE_PX.menuGap}px`,
+      } as React.CSSProperties}
       role="main"
       aria-label="Profile settings"
     >
@@ -371,16 +372,7 @@ export default function ProfileTabVX2({
       {!isLoading && (
         <>
           {/* Example Player Card Box */}
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              paddingTop: `${SPACING.lg}px`,
-              paddingBottom: `${SPACING.lg}px`,
-              marginBottom: `${SPACING.lg}px`,
-            }}
-          >
+          <div className={styles.playerCardContainer}>
             <button
               type="button"
               onClick={(e) => {
@@ -388,65 +380,28 @@ export default function ProfileTabVX2({
                 e.stopPropagation();
                 router.push('/profile-customization');
               }}
+              className={styles.playerCardButton}
               style={{
-                width: `${PROFILE_PX.boxWidth}px`,
-                height: `${PROFILE_PX.boxHeight}px`,
-                borderWidth: `${PROFILE_PX.boxBorderWidth}px`,
-                borderStyle: 'solid',
-                borderColor: PROFILE_COLORS.boxBorder, // Fixed border color (not customizable)
-                borderTopWidth: `${PROFILE_PX.boxTopBorderWidth}px`,
-                backgroundColor: profile?.preferences?.cellBackgroundColor || PROFILE_COLORS.boxBg, // Customizable inner area
-                borderRadius: `${PROFILE_PX.boxBorderRadius}px`,
-                position: 'relative',
-                display: 'flex',
-                flexDirection: 'column',
-                cursor: 'pointer',
-                padding: 0,
-                outline: 'none',
-              }}
+                '--box-width': `${PROFILE_PX.boxWidth}px`,
+                '--box-height': `${PROFILE_PX.boxHeight}px`,
+                '--box-border-width': `${PROFILE_PX.boxBorderWidth}px`,
+                '--box-border-color': PROFILE_COLORS.boxBorder,
+                '--box-top-border-width': `${PROFILE_PX.boxTopBorderWidth}px`,
+                '--player-card-bg': profile?.preferences?.cellBackgroundColor || PROFILE_COLORS.boxBg,
+                '--box-border-radius': `${PROFILE_PX.boxBorderRadius}px`,
+                '--username-font-size': `${PROFILE_PX.usernameFontSize}px`,
+                '--username-top': `${PROFILE_PX.usernameTop}px`,
+              } as React.CSSProperties}
               aria-label="Customize player cell background"
-              className="transition-opacity active:opacity-80"
             >
               {/* Username in border area */}
-              <div
-                style={{
-                  position: 'absolute',
-                  left: 0,
-                  right: 0,
-                  fontSize: `${PROFILE_PX.usernameFontSize}px`,
-                  color: '#FFFFFF',
-                  fontWeight: 'bold',
-                  textAlign: 'center',
-                  textTransform: 'uppercase',
-                  top: `${PROFILE_PX.usernameTop}px`,
-                  transform: 'translateY(-50%)',
-                  padding: '2px',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  zIndex: 10,
-                }}
-              >
+              <div className={styles.playerCardUsername}>
                 {profile?.username || 'Username'}
               </div>
-              
+
               {/* Customizable inner area (where player name would go) */}
-              <div
-                style={{
-                  flex: 1,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-                    color: TEXT_COLORS.muted,
-                    textAlign: 'center',
-                    fontStyle: 'italic',
-                  }}
-                >
+              <div className={styles.playerCardInner}>
+                <div className={styles.playerCardCustomizeText}>
                   Customize
                 </div>
               </div>
@@ -455,26 +410,11 @@ export default function ProfileTabVX2({
 
           {/* Account Balance */}
           {user && (
-            <div
-              className="flex flex-col items-center"
-              style={{ marginBottom: `${SPACING.md}px` }}
-            >
-              <div
-                style={{
-                  fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-                  color: TEXT_COLORS.muted,
-                  marginBottom: `${SPACING.xs}px`,
-                }}
-              >
+            <div className={styles.accountBalanceContainer}>
+              <div className={styles.accountBalanceLabel}>
                 Account Balance
               </div>
-              <div
-                className="font-bold"
-                style={{
-                  fontSize: `${TYPOGRAPHY.fontSize['2xl']}px`,
-                  color: TEXT_COLORS.primary,
-                }}
-              >
+              <div className={styles.accountBalanceValue}>
                 {user.balanceFormatted || '$0.00'}
               </div>
             </div>
@@ -487,12 +427,7 @@ export default function ProfileTabVX2({
 
           {/* Regular Menu Items */}
           <nav
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: `${PROFILE_PX.menuGap}px`,
-              marginBottom: `${SPACING.lg}px`,
-            }}
+            className={`${styles.menuNav} ${styles.menuNavFirst}`}
             aria-label="Profile menu"
           >
             {REGULAR_MENU_ITEMS.map((item) => (
@@ -506,22 +441,16 @@ export default function ProfileTabVX2({
 
           {/* Divider */}
           <div
+            className={styles.divider}
             style={{
-              height: '2px',
-              marginBottom: `${SPACING.lg}px`,
-              ...TILED_BG_STYLE,
-            }}
+              '--tiled-bg-image': TILED_BG_STYLE.backgroundImage,
+              '--tiled-bg-size': TILED_BG_STYLE.backgroundSize,
+              '--tiled-bg-repeat': TILED_BG_STYLE.backgroundRepeat,
+            } as React.CSSProperties}
           />
 
           {/* Play-Related Menu Items */}
-          <nav
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: `${PROFILE_PX.menuGap}px`,
-            }}
-            aria-label="Play-related settings"
-          >
+          <nav className={styles.menuNav} aria-label="Play-related settings">
             {PLAY_RELATED_MENU_ITEMS.map((item) => (
               <MenuItemButton
                 key={item.id}
@@ -534,7 +463,7 @@ export default function ProfileTabVX2({
       )}
 
       {/* Bottom padding for scroll */}
-      <div style={{ height: `${SPACING['2xl']}px`, flexShrink: 0 }} />
+      <div className={styles.bottomPadding} />
     </div>
   );
 }

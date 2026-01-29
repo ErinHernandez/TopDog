@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { FlagOption } from '@/lib/customization/types';
 import { getFlagUrl, getFlagDisplayName, COUNTRY_NAMES } from '@/lib/customization/flags';
 import { cn } from '@/lib/utils';
+import styles from './FlagGrid.module.css';
 
 interface FlagGridProps {
   flags: FlagOption[];
@@ -42,7 +43,7 @@ export function FlagGrid({ flags, selectedCode, onSelect, isLoading }: FlagGridP
 
   if (flags.length === 0) {
     return (
-      <div className="text-center py-8" style={{ color: 'rgba(156, 163, 175, 0.8)' }}>
+      <div className={styles.emptyContainer}>
         <p>No flags unlocked yet.</p>
         <p className="text-sm mt-1">Enable location tracking to unlock flags from places you visit.</p>
       </div>
@@ -53,7 +54,7 @@ export function FlagGrid({ flags, selectedCode, onSelect, isLoading }: FlagGridP
     <div className="space-y-4">
       {countries.length > 0 && (
         <div>
-          <h4 className="text-sm font-medium mb-2" style={{ color: 'rgba(209, 213, 219, 0.9)' }}>Countries</h4>
+          <h4 className={cn('text-sm font-medium mb-2', styles.sectionTitle)}>Countries</h4>
           <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 sm:gap-3">
             {countries.map((flag) => (
               <FlagItem
@@ -69,7 +70,7 @@ export function FlagGrid({ flags, selectedCode, onSelect, isLoading }: FlagGridP
 
       {states.length > 0 && (
         <div>
-          <h4 className="text-sm font-medium mb-2" style={{ color: 'rgba(209, 213, 219, 0.9)' }}>US States</h4>
+          <h4 className={cn('text-sm font-medium mb-2', styles.sectionTitle)}>US States</h4>
           <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 sm:gap-3">
             {states.map((flag) => (
               <FlagItem
@@ -85,7 +86,7 @@ export function FlagGrid({ flags, selectedCode, onSelect, isLoading }: FlagGridP
 
       {counties.length > 0 && (
         <div>
-          <h4 className="text-sm font-medium mb-2" style={{ color: 'rgba(209, 213, 219, 0.9)' }}>US Counties</h4>
+          <h4 className={cn('text-sm font-medium mb-2', styles.sectionTitle)}>US Counties</h4>
           <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 sm:gap-3">
             {counties.map((flag) => (
               <FlagItem
@@ -101,12 +102,12 @@ export function FlagGrid({ flags, selectedCode, onSelect, isLoading }: FlagGridP
 
       {Object.keys(divisionsByCountry).length > 0 && (
         <div>
-          <h4 className="text-sm font-medium mb-2" style={{ color: 'rgba(209, 213, 219, 0.9)' }}>
+          <h4 className={cn('text-sm font-medium mb-2', styles.sectionTitle)}>
             Regions & Provinces
           </h4>
           {Object.entries(divisionsByCountry).map(([countryCode, countryDivisions]) => (
             <div key={countryCode} className="mb-3">
-              <h5 className="text-xs font-medium mb-1" style={{ color: 'rgba(209, 213, 219, 0.6)' }}>
+              <h5 className={cn('text-xs font-medium mb-1', styles.divisionSubtitle)}>
                 {COUNTRY_NAMES[countryCode] || countryCode}
               </h5>
               <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 sm:gap-3">
@@ -143,30 +144,31 @@ function FlagItem({
       type="button"
       onClick={() => onSelect(flag.code)}
       className={cn(
-        'relative aspect-[3/2] rounded overflow-hidden border-2 transition-all',
-        isSelected
-          ? 'border-blue-500 ring-2 ring-blue-200 dark:ring-blue-800'
-          : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
+        styles.flagButton,
+        isSelected ? styles.flagButtonSelected : styles.flagButtonUnselected
       )}
       aria-label={`Select ${flag.name} flag`}
       aria-pressed={isSelected}
+      style={{
+        '--unselected-border-color': '#e5e7eb',
+      } as React.CSSProperties}
     >
       {imgError ? (
-        <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-          <span className="text-xs font-mono text-gray-500">{flag.code}</span>
+        <div className={styles.flagErrorContainer}>
+          <span className={styles.flagErrorText}>{flag.code}</span>
         </div>
       ) : (
         <img
           src={getFlagUrl(flag.code)}
           alt={flag.name}
-          className="w-full h-full object-cover"
+          className={styles.flagImage}
           loading="lazy"
           onError={() => setImgError(true)}
         />
       )}
 
       {isSelected && (
-        <div className="absolute top-1 right-1 bg-blue-500 rounded-full p-0.5">
+        <div className={styles.checkmarkContainer}>
           <svg
             width={12}
             height={12}
@@ -182,8 +184,8 @@ function FlagItem({
         </div>
       )}
 
-      <div className="absolute bottom-0 left-0 right-0 bg-black/50 px-1 py-0.5">
-        <span className="text-[10px] text-white truncate block">{getFlagDisplayName(flag.code)}</span>
+      <div className={styles.flagLabel}>
+        <span className={styles.flagLabelText}>{getFlagDisplayName(flag.code)}</span>
       </div>
     </button>
   );

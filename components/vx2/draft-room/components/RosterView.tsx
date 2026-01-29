@@ -24,6 +24,8 @@ import { useImageShare } from '../hooks/useImageShare';
 import { Share } from '../../components/icons/actions/Share';
 import ShareOptionsModal from './ShareOptionsModal';
 import { createScopedLogger } from '../../../../lib/clientLogger';
+import { cn } from '@/lib/styles';
+import styles from './RosterView.module.css';
 
 const logger = createScopedLogger('[RosterView]');
 
@@ -187,77 +189,34 @@ interface PositionBadgeProps {
 
 const PositionBadge = React.memo(function PositionBadge({ position, size }: PositionBadgeProps): React.ReactElement {
   const color = POSITION_COLORS[position as Position] || '#6B7280';
-  
-  const dimensions = {
-    sm: { width: 24, height: 16, fontSize: 9 },
-    md: { width: ROSTER_PX.benchBadgeWidth, height: ROSTER_PX.benchBadgeHeight, fontSize: 10 },
-    lg: { width: ROSTER_PX.starterBadgeWidth, height: ROSTER_PX.starterBadgeHeight, fontSize: 12 },
-    xl: { width: 56, height: 36, fontSize: 14 },
+
+  const sizeClasses = {
+    sm: styles.badgeSm,
+    md: styles.badgeMd,
+    lg: styles.badgeLg,
+    xl: styles.badgeXl,
   };
-  
-  const dim = dimensions[size];
-  
+
   // Special three-color gradient for FLEX (RB green, WR yellow, TE purple)
   if (position === 'FLEX') {
     return (
-      <div
-        style={{
-          width: dim.width,
-          height: dim.height,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          borderRadius: 6,
-          position: 'relative',
-          overflow: 'hidden',
-        }}
-      >
+      <div className={cn(styles.badge, styles.flexBadge, sizeClasses[size])}>
         {/* Three-color background stripes */}
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          <div style={{ flex: 1, backgroundColor: POSITION_COLORS.RB }} />
-          <div style={{ flex: 1, backgroundColor: POSITION_COLORS.WR }} />
-          <div style={{ flex: 1, backgroundColor: POSITION_COLORS.TE }} />
+        <div className={styles.flexBadgeBackground}>
+          <div className={cn(styles.flexBadgeStripe, styles.flexBadgeStripeRb)} />
+          <div className={cn(styles.flexBadgeStripe, styles.flexBadgeStripeWr)} />
+          <div className={cn(styles.flexBadgeStripe, styles.flexBadgeStripeTe)} />
         </div>
         {/* Text overlay */}
-        <span
-          style={{
-            position: 'relative',
-            zIndex: 1,
-            color: '#000000',
-            fontSize: dim.fontSize,
-            fontWeight: 700,
-          }}
-        >
-          FLEX
-        </span>
+        <span className={styles.flexBadgeText}>FLEX</span>
       </div>
     );
   }
-  
+
   return (
     <div
-      style={{
-        width: dim.width,
-        height: dim.height,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 6,
-        backgroundColor: color,
-        color: '#000000',
-        fontSize: dim.fontSize,
-        fontWeight: 700,
-      }}
+      className={cn(styles.badge, sizeClasses[size])}
+      style={{ backgroundColor: color }}
     >
       {position}
     </div>
@@ -276,89 +235,42 @@ interface RosterRowProps {
 const RosterRow = React.memo(function RosterRow({ position, player, isStarter, showTopBorder = false, isExpanded = false, onToggleExpand }: RosterRowProps): React.ReactElement {
   const badgeSize: 'sm' | 'md' | 'lg' | 'xl' = (isStarter || !player) ? 'lg' : 'md';
   const displayPosition = player ? player.position : position;
-  
+
   return (
     <div>
       <div
         onClick={player ? onToggleExpand : undefined}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          position: 'relative',
-          overflow: 'hidden',
-          height: ROSTER_PX.rowHeight,
-          backgroundColor: ROSTER_COLORS.rowBackground,
-          borderBottom: isExpanded ? 'none' : `${ROSTER_PX.rowBorderWidth}px solid ${ROSTER_COLORS.rowBorder}`,
-          borderTop: showTopBorder ? `${ROSTER_PX.rowBorderWidth}px solid ${ROSTER_COLORS.rowBorder}` : 'none',
-          cursor: player ? 'pointer' : 'default',
-        }}
+        className={cn(
+          styles.rosterRow,
+          player && styles.interactive,
+          isExpanded && styles.expanded,
+          showTopBorder && styles.withTopBorder
+        )}
       >
-        
         {/* Position Badge Column */}
-        <div
-          style={{
-            flexShrink: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: ROSTER_PX.badgeColumnWidth,
-            paddingLeft: ROSTER_PX.badgeColumnPaddingLeft,
-            zIndex: 10,
-          }}
-        >
+        <div className={styles.badgeColumn}>
           <PositionBadge position={displayPosition} size={badgeSize} />
         </div>
-        
+
         {/* Player Content */}
         {player ? (
-          <div
-            style={{
-              flex: 1,
-              display: 'flex',
-              alignItems: 'center',
-              paddingLeft: ROSTER_PX.playerContentPaddingX,
-              paddingRight: ROSTER_PX.playerContentPaddingX,
-              zIndex: 10,
-            }}
-          >
+          <div className={styles.playerContent}>
             {/* Player Name */}
-            <div
-              style={{
-                flex: 1,
-                fontWeight: 500,
-                fontSize: ROSTER_PX.playerNameFontSize,
-                color: ROSTER_COLORS.textPrimary,
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
-            >
-              {player.name}
-            </div>
-            
+            <div className={styles.playerName}>{player.name}</div>
+
             {/* Team (Bye) */}
-            <div
-              style={{
-                flexShrink: 0,
-                textAlign: 'right',
-                fontSize: ROSTER_PX.teamByeFontSize,
-                minWidth: ROSTER_PX.teamByeMinWidth,
-                marginLeft: ROSTER_PX.teamByeMarginLeft,
-                marginRight: ROSTER_PX.teamByeMarginRight,
-                color: ROSTER_COLORS.textSecondary,
-              }}
-            >
+            <div className={styles.teamByeDisplay}>
               {player.team} ({getByeWeek(player.team) || 'TBD'})
             </div>
           </div>
         ) : (
-          <div style={{ flex: 1, zIndex: 10 }} />
+          <div className={styles.emptyContent} />
         )}
       </div>
-      
+
       {/* Expanded Stats Card */}
       {isExpanded && player && (
-        <div style={{ borderBottom: `${ROSTER_PX.rowBorderWidth}px solid ${ROSTER_COLORS.rowBorder}` }}>
+        <div className={styles.expandedCardWrapper}>
           <PlayerExpandedCard
             player={{
               id: player.id,
@@ -416,99 +328,36 @@ const TeamSelector = React.memo(function TeamSelector({
   }, [isOpen]);
   
   return (
-    <div
-      style={{
-        flexShrink: 0,
-        display: 'flex',
-        justifyContent: 'center',
-        paddingTop: ROSTER_PX.headerPaddingTop,
-        paddingBottom: ROSTER_PX.headerPaddingBottom,
-        paddingLeft: ROSTER_PX.headerPaddingX,
-        paddingRight: ROSTER_PX.headerPaddingX,
-      }}
-    >
-      <div ref={dropdownRef} style={{ position: 'relative', width: ROSTER_PX.dropdownWidth }}>
+    <div className={styles.selectorWrapper}>
+      <div ref={dropdownRef} className={styles.dropdownContainer}>
         <button
           onClick={() => setIsOpen(!isOpen)}
           aria-expanded={isOpen}
           aria-haspopup="listbox"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '100%',
-            position: 'relative',
-            borderRadius: ROSTER_PX.dropdownBorderRadius,
-            paddingLeft: ROSTER_PX.dropdownItemPaddingX,
-            paddingRight: ROSTER_PX.dropdownItemPaddingX,
-            paddingTop: ROSTER_PX.buttonPaddingY,
-            paddingBottom: ROSTER_PX.buttonPaddingY,
-            backgroundColor: ROSTER_COLORS.buttonBg,
-            border: 'none',
-            cursor: 'pointer',
-          }}
+          className={styles.dropdownButton}
         >
-          <div
-            style={{
-              fontSize: 14,
-              fontWeight: 700,
-              textAlign: 'center',
-              color: ROSTER_COLORS.textPrimary,
-            }}
-          >
+          <div className={styles.dropdownButtonText}>
             {selectedParticipant?.name || 'Select Team'}
           </div>
-          <div
-            style={{
-              position: 'absolute',
-              right: ROSTER_PX.dropdownItemPaddingX,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: ROSTER_PX.chevronContainerSize,
-              height: ROSTER_PX.chevronContainerSize,
-              color: ROSTER_COLORS.chevronColor,
-              transition: 'transform 0.2s',
-            }}
-          >
+          <div className={styles.chevronContainer}>
             <svg
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
-              style={{
-                width: ROSTER_PX.chevronSize,
-                height: ROSTER_PX.chevronSize,
-              }}
+              className={styles.chevronIcon}
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
           </div>
         </button>
-        
+
         {/* Dropdown Menu */}
         {isOpen && (
-          <div
-            role="listbox"
-            style={{
-              position: 'absolute',
-              top: '100%',
-              left: 0,
-              right: 0,
-              zIndex: 50,
-              overflowY: 'auto',
-              borderRadius: ROSTER_PX.dropdownBorderRadius,
-              marginTop: ROSTER_PX.dropdownMarginTop,
-              backgroundColor: ROSTER_COLORS.dropdownBg,
-              border: `1px solid ${ROSTER_COLORS.dropdownBorder}`,
-              maxHeight: ROSTER_PX.dropdownMaxHeight,
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none',
-            }}
-          >
+          <div role="listbox" className={styles.dropdownMenu}>
             {participants.map((participant, index) => {
               const isSelected = index === selectedIndex;
               const isOnTheClock = index === onTheClockIndex;
-              
+
               return (
                 <button
                   key={participant.id || index}
@@ -518,33 +367,10 @@ const TeamSelector = React.memo(function TeamSelector({
                     onSelect(index);
                     setIsOpen(false);
                   }}
-                  style={{
-                    width: '100%',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    position: 'relative',
-                    paddingTop: ROSTER_PX.dropdownItemPaddingTop,
-                    paddingBottom: ROSTER_PX.dropdownItemPaddingBottom,
-                    paddingLeft: ROSTER_PX.dropdownItemPaddingX,
-                    paddingRight: ROSTER_PX.dropdownItemPaddingX,
-                    backgroundColor: isSelected ? ROSTER_COLORS.dropdownSelectedBg : 'transparent',
-                    border: 'none',
-                    cursor: 'pointer',
-                    transition: 'background-color 0.15s',
-                  }}
+                  className={styles.dropdownItem}
                 >
                   {/* Draft direction arrow */}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      left: ROSTER_PX.dropdownArrowLeft,
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
+                  <div className={styles.draftArrow}>
                     {isOnTheClock && (
                       <svg
                         width={ROSTER_PX.dropdownArrowSize}
@@ -554,7 +380,7 @@ const TeamSelector = React.memo(function TeamSelector({
                       >
                         <path
                           d={draftDirectionUp
-                            ? "M12 19V5M12 5L5 12M12 5L19 12"  // Up arrow
+                            ? "M12 19V5M12 5L5 12M12 5L19 12" // Up arrow
                             : "M12 5V19M12 19L5 12M12 19L19 12" // Down arrow
                           }
                           stroke={ROSTER_COLORS.arrowColor}
@@ -565,17 +391,7 @@ const TeamSelector = React.memo(function TeamSelector({
                       </svg>
                     )}
                   </div>
-                  <div
-                    style={{
-                      fontWeight: 500,
-                      fontSize: 14,
-                      textAlign: 'left',
-                      width: ROSTER_PX.dropdownNameWidth,
-                      color: ROSTER_COLORS.textPrimary,
-                    }}
-                  >
-                    {participant.name}
-                  </div>
+                  <div className={styles.dropdownItemText}>{participant.name}</div>
                 </button>
               );
             })}
@@ -704,20 +520,9 @@ const RosterView = React.memo(function RosterView({
   const team = getTeamForParticipant(selectedIndex);
   
   return (
-    <div
-      style={{
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-        backgroundColor: ROSTER_COLORS.background,
-        color: ROSTER_COLORS.textPrimary,
-        position: 'relative',
-        paddingTop: 16, // Space below PicksBar
-      }}
-    >
+    <div className={styles.container}>
       {/* Header with Dropdown - fixed at top */}
-      <div style={{ flexShrink: 0 }}>
+      <div className={styles.headerSection}>
         <TeamSelector
           participants={participants}
           selectedIndex={selectedIndex}
@@ -726,25 +531,15 @@ const RosterView = React.memo(function RosterView({
           draftDirectionUp={draftDirectionUp}
         />
       </div>
-      
+
       {/* Roster List - Scrollable */}
       <div
         ref={scrollContainerRef}
         onScroll={handleScroll}
-        style={{
-          flex: 1,
-          minHeight: 0,
-          overflowY: 'auto',
-          WebkitOverflowScrolling: 'touch',
-          overscrollBehavior: 'contain',
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-          borderTop: `2px solid ${ROSTER_COLORS.headerBorder}`,
-          paddingBottom: 24,
-        }}
+        className={styles.rosterContainer}
       >
         {/* Capturable Roster Content */}
-        <div ref={rosterContentRef}>
+        <div ref={rosterContentRef} className={styles.rosterContent}>
           {/* Starting Lineup */}
           {STARTING_POSITIONS.map((position, index) => {
             const player = getPlayerForSlot(team, position, index, STARTING_POSITIONS);
@@ -759,28 +554,15 @@ const RosterView = React.memo(function RosterView({
               />
             );
           })}
-          
+
           {/* Bench Header */}
-          <div
-            style={{
-              fontWeight: 500,
-              paddingLeft: ROSTER_PX.benchHeaderPaddingX,
-              paddingRight: ROSTER_PX.benchHeaderPaddingX,
-              paddingTop: ROSTER_PX.benchHeaderPaddingTop,
-              paddingBottom: ROSTER_PX.benchHeaderPaddingBottom,
-              fontSize: ROSTER_PX.benchHeaderFontSize,
-              transform: `translateY(${ROSTER_PX.benchHeaderTranslateY}px)`,
-              color: ROSTER_COLORS.textSecondary,
-            }}
-          >
-            BENCH
-          </div>
-          
+          <div className={styles.benchHeader}>BENCH</div>
+
           {/* Bench Slots */}
           {[...Array(ROSTER_PX.benchSlots)].map((_, index) => {
             const benchPlayers = team.slice(ROSTER_PX.startingSlots);
             const benchPlayer = benchPlayers[index] || null;
-            
+
             return (
               <RosterRow
                 key={`bench-${index}`}
@@ -795,54 +577,21 @@ const RosterView = React.memo(function RosterView({
           })}
         </div>
       </div>
-      
+
       {/* Floating Share Button */}
       <button
         onClick={handleShare}
         disabled={isCapturing}
         aria-label="Share roster as image"
-        style={{
-          position: 'absolute',
-          bottom: 16,
-          right: 16,
-          width: 48,
-          height: 48,
-          borderRadius: 24,
-          backgroundColor: '#3B82F6',
-          border: 'none',
-          cursor: isCapturing ? 'wait' : 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
-          opacity: isCapturing ? 0.7 : 1,
-          transition: 'opacity 0.2s, transform 0.2s',
-          zIndex: 20,
-        }}
+        className={cn(styles.shareButton, isCapturing && 'disabled')}
       >
         {isCapturing ? (
-          <div
-            style={{
-              width: 20,
-              height: 20,
-              border: '2px solid #FFFFFF',
-              borderTopColor: 'transparent',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite',
-            }}
-          />
+          <div className={styles.shareButtonSpinner} />
         ) : (
           <Share size={24} color="#FFFFFF" strokeWidth={2} aria-hidden />
         )}
       </button>
-      
-      {/* Spinner animation */}
-      <style>{`
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
-      
+
       {/* Share Options Modal */}
       <ShareOptionsModal
         isOpen={isShareModalOpen}

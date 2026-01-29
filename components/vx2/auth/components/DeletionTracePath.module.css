@@ -1,0 +1,31 @@
+/**
+ * DeletionTracePath.module.css
+ * Component-specific styles for the DeletionTracePath component
+ */
+
+/* ============================================================================
+   DESCRIPTION PARAGRAPHS
+   ============================================================================ */
+
+.description {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.descriptionLast {
+  margin-bottom: 12px;
+}
+
+/* ============================================================================
+   SVG CONTAINER
+   ============================================================================ */
+
+.canvas {
+  max-width: 240px;
+  height: 120px;
+  touch-action: none;
+  background-color: var(--color-bg, rgba(255, 255, 255, 0.05));
+  border-radius: 12px;
+  display: block;
+}

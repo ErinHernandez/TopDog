@@ -1,0 +1,416 @@
+/**
+ * ConnectOnboardingModalVX2 CSS Module
+ *
+ * Stripe Connect Setup onboarding flow styling.
+ * Migrated from inline styles for CSP compliance.
+ */
+
+/* ============================================================================
+   MODAL OVERLAY & CONTAINER
+   ============================================================================ */
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: var(--z-index, 1000);
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.modal {
+  position: relative;
+  width: 100%;
+  max-width: 28rem;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background-color: var(--bg-color, #1a1f2e);
+}
+
+/* ============================================================================
+   MODAL HEADER
+   ============================================================================ */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+}
+
+.headerTitle {
+  font-weight: 600;
+  font-size: var(--title-font-size, 1.125rem);
+  color: var(--text-primary-color, rgba(255, 255, 255, 0.9));
+}
+
+.closeButton {
+  padding: 0.5rem;
+  border-radius: 9999px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+
+.closeButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.closeIcon {
+  display: inline-block;
+  color: var(--text-muted-color, rgba(255, 255, 255, 0.5));
+}
+
+/* ============================================================================
+   MODAL CONTENT
+   ============================================================================ */
+
+.content {
+  padding: 1.5rem;
+}
+
+.contentSpacing {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ============================================================================
+   INTRO STEP
+   ============================================================================ */
+
+.introContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.centerSection {
+  text-align: center;
+}
+
+.iconCircle {
+  width: 5rem;
+  height: 5rem;
+  border-radius: 9999px;
+  margin: 0 auto 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--icon-bg-color, rgba(34, 197, 94, 0.2));
+}
+
+.introTitle {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: var(--intro-title-font-size, 1.25rem);
+  color: var(--text-primary-color, rgba(255, 255, 255, 0.9));
+}
+
+.introDescription {
+  color: var(--text-secondary-color, rgba(255, 255, 255, 0.7));
+}
+
+.featuresList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.featureItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background-color: var(--feature-item-bg, rgba(255, 255, 255, 0.05));
+}
+
+.featureIcon {
+  color: var(--feature-icon-color, #22c55e);
+  flex-shrink: 0;
+}
+
+.featureContent {
+  flex: 1;
+}
+
+.featureTitle {
+  font-weight: 500;
+  color: var(--text-primary-color, rgba(255, 255, 255, 0.9));
+}
+
+.featureDescription {
+  font-size: var(--small-font-size, 0.875rem);
+  color: var(--text-muted-color, rgba(255, 255, 255, 0.5));
+}
+
+/* ============================================================================
+   BUTTONS
+   ============================================================================ */
+
+.primaryButton {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  background-color: var(--button-bg-color, #22c55e);
+  color: var(--button-text-color, #000);
+  border: none;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+}
+
+.primaryButton:hover {
+  opacity: 0.9;
+}
+
+.primaryButton:active {
+  opacity: 0.8;
+}
+
+/* ============================================================================
+   TEXT UTILITIES
+   ============================================================================ */
+
+.footer {
+  text-align: center;
+  font-size: var(--footer-font-size, 0.75rem);
+  color: var(--text-muted-color, rgba(255, 255, 255, 0.5));
+}
+
+.textPrimary {
+  color: var(--text-primary-color, rgba(255, 255, 255, 0.9));
+}
+
+.textSecondary {
+  color: var(--text-secondary-color, rgba(255, 255, 255, 0.7));
+}
+
+.textMuted {
+  color: var(--text-muted-color, rgba(255, 255, 255, 0.5));
+}
+
+/* ============================================================================
+   LOADING STEP
+   ============================================================================ */
+
+.loadingContainer {
+  text-align: center;
+  padding: 3rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.spinner {
+  width: 3rem;
+  height: 3rem;
+  margin: 0 auto;
+  animation: spin 1s linear infinite;
+  display: block;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: rgba(255, 255, 255, 1);
+  border-radius: 50%;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loadingMessage {
+  color: var(--text-primary-color, rgba(255, 255, 255, 0.9));
+}
+
+/* ============================================================================
+   ONBOARDING STEP
+   ============================================================================ */
+
+.onboardingContainer {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1rem 0;
+}
+
+.onboardingIconCircle {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 9999px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--onboarding-icon-bg, rgba(34, 197, 94, 0.2));
+}
+
+.onboardingTitle {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: var(--onboarding-title-font-size, 1.125rem);
+  color: var(--text-primary-color, rgba(255, 255, 255, 0.9));
+}
+
+.onboardingDescription {
+  color: var(--text-secondary-color, rgba(255, 255, 255, 0.7));
+}
+
+.openPortalButton {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  background-color: var(--button-bg-color, #22c55e);
+  color: var(--button-text-color, #000);
+  border: none;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+}
+
+.openPortalButton:hover {
+  opacity: 0.9;
+}
+
+.infoBox {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: var(--info-box-bg, rgba(255, 255, 255, 0.05));
+}
+
+.infoBoxText {
+  font-size: var(--small-font-size, 0.875rem);
+  color: var(--text-muted-color, rgba(255, 255, 255, 0.5));
+}
+
+/* ============================================================================
+   COMPLETE STEP
+   ============================================================================ */
+
+.completeContainer {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 2rem 0;
+}
+
+.successIconCircle {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 9999px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--success-icon-bg, rgba(34, 197, 94, 0.2));
+}
+
+.successTitle {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: var(--success-title-font-size, 1.25rem);
+  color: var(--success-color, #22c55e);
+}
+
+.successDescription {
+  color: var(--text-secondary-color, rgba(255, 255, 255, 0.7));
+}
+
+.continueButton {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  background-color: var(--button-bg-color, #22c55e);
+  color: var(--button-text-color, #000);
+  border: none;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.continueButton:hover {
+  opacity: 0.9;
+}
+
+/* ============================================================================
+   ERROR STEP
+   ============================================================================ */
+
+.errorContainer {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 2rem 0;
+}
+
+.errorIconCircle {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 9999px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--error-icon-bg, rgba(239, 68, 68, 0.2));
+}
+
+.errorTitle {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: var(--error-title-font-size, 1.125rem);
+  color: var(--error-color, #ef4444);
+}
+
+.errorMessage {
+  color: var(--text-secondary-color, rgba(255, 255, 255, 0.7));
+}
+
+.retryButton {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  background-color: var(--button-bg-color, #22c55e);
+  color: var(--button-text-color, #000);
+  border: none;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.retryButton:hover {
+  opacity: 0.9;
+}

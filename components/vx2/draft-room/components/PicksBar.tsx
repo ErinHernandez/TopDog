@@ -27,6 +27,8 @@ import { useImageShare } from '../hooks/useImageShare';
 import { Share } from '../../components/icons/actions/Share';
 import ShareOptionsModal from './ShareOptionsModal';
 import { createScopedLogger } from '../../../../lib/clientLogger';
+import { cn } from '@/lib/styles';
+import styles from './PicksBar.module.css';
 
 const logger = createScopedLogger('[PicksBar]');
 
@@ -88,26 +90,27 @@ const ScrollingUsername = React.memo<ScrollingUsernameProps>(function ScrollingU
     <div
       ref={containerRef}
       onClick={handleClick}
+      className={cn(
+        styles.scrollingUsernameContainer,
+        isTruncated && styles.scrollingUsernameContainerTruncated
+      )}
       style={{
-        overflow: 'hidden',
-        width: '100%',
-        cursor: isTruncated ? 'pointer' : 'default',
         textAlign: isScrolling ? 'left' : 'center',
       }}
     >
       <span
         ref={textRef}
+        className={cn(
+          styles.scrollingUsernameText,
+          isScrolling && styles.scrollingUsernameTextScrolling
+        )}
         style={{
-          display: 'inline-block',
           color,
           fontSize,
           fontWeight,
-          whiteSpace: 'nowrap',
           transform: isScrolling ? `translateX(-${scrollDistance}px)` : 'translateX(0)',
-          transition: isScrolling 
-            ? `transform ${animationDuration}s ease-in-out`
-            : 'transform 0.3s ease-out',
-        }}
+          '--animation-duration': `${animationDuration}s`,
+        } as React.CSSProperties & { '--animation-duration': string }}
       >
         {isScrolling ? fullName : displayName}
       </span>
@@ -336,39 +339,19 @@ const FilledCard = React.forwardRef<HTMLDivElement, FilledCardProps>(
         onClick={onClick}
         role="listitem"
         aria-label={`Pick ${pickNumber}: ${player.name}, ${player.position} from ${player.team}`}
+        className={styles.filledCard}
+        data-clickable={!!onClick}
         style={{
-          flexShrink: 0,
-          flexGrow: 0,
-          boxSizing: 'border-box',
-          width: PICKS_BAR_PX.cardWidth,
-          minWidth: PICKS_BAR_PX.cardWidth,
-          maxWidth: PICKS_BAR_PX.cardWidth,
-          marginTop: 4,
-          marginBottom: PICKS_BAR_PX.cardMargin,
-          marginLeft: PICKS_BAR_PX.cardMargin,
-          marginRight: PICKS_BAR_PX.cardMargin,
-          borderRadius: PICKS_BAR_PX.cardBorderRadius,
-          border: `${PICKS_BAR_PX.cardBorderWidth}px solid ${positionColor}`,
-          backgroundColor: PICKS_BAR_PX.cardBg,
-          overflow: 'hidden',
-          cursor: onClick ? 'pointer' : 'default',
-          display: 'flex',
-          flexDirection: 'column',
-          position: 'relative',
+          borderWidth: PICKS_BAR_PX.cardBorderWidth,
+          borderStyle: 'solid',
+          borderColor: positionColor,
         }}
       >
         {/* Header - Participant Name centered in full colored area (header + outer border) */}
         <div
+          className={styles.filledCardHeader}
           style={{
-            height: PICKS_BAR_PX.headerHeight + (PICKS_BAR_PX.cardBorderWidth * 2),
-            marginTop: -(PICKS_BAR_PX.cardBorderWidth * 2),
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '0 4px',
             backgroundColor: positionColor,
-            borderTopLeftRadius: PICKS_BAR_PX.cardBorderRadius,
-            borderTopRightRadius: PICKS_BAR_PX.cardBorderRadius,
           }}
         >
           <ScrollingUsername
@@ -379,119 +362,38 @@ const FilledCard = React.forwardRef<HTMLDivElement, FilledCardProps>(
             fontWeight={500}
           />
         </div>
-        
+
         {/* Content Area */}
-        <div
-          style={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            minHeight: PICKS_BAR_PX.contentMinHeight,
-            position: 'relative',
-          }}
-        >
+        <div className={styles.filledCardContent}>
           {/* Pick Number & Position Row - absolutely positioned at top */}
-          <div
-            style={{
-              position: 'absolute',
-              top: PICKS_BAR_PX.pickNumberTop,
-              left: PICKS_BAR_PX.pickNumberMarginLeft,
-              right: PICKS_BAR_PX.pickNumberMarginLeft,
-              display: 'flex',
-              justifyContent: 'space-between',
-              fontSize: PICKS_BAR_PX.pickNumberFontSize,
-              fontWeight: 500,
-              color: '#FFFFFF',
-            }}
-          >
+          <div className={styles.filledCardPickNumberRow}>
             <span>{formatPickDisplay(pickNumber, teamCount)}</span>
             <span>{player.position}</span>
           </div>
-          
+
           {/* Player Names - first + last on two lines */}
-          <div
-            style={{
-              flex: 1,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginTop: 12,
-            }}
-          >
+          <div className={styles.filledCardPlayerNames}>
             {/* First Name */}
-            <div
-              style={{
-                color: '#FFFFFF',
-                fontWeight: 700,
-                fontSize: PICKS_BAR_PX.playerLastNameFontSize,
-                textAlign: 'center',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                lineHeight: 1.2,
-              }}
-            >
+            <div className={styles.filledCardPlayerName}>
               {firstName}
             </div>
             {/* Last Name */}
-            <div
-              style={{
-                color: '#FFFFFF',
-                fontWeight: 700,
-                fontSize: PICKS_BAR_PX.playerLastNameFontSize,
-                textAlign: 'center',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                lineHeight: 1.2,
-              }}
-            >
+            <div className={styles.filledCardPlayerName}>
               {lastName}
             </div>
           </div>
-          
+
           {/* Team - just above tracker */}
-          <div
-            style={{
-              color: '#FFFFFF',
-              fontSize: PICKS_BAR_PX.playerPosTeamFontSize,
-              textAlign: 'center',
-              lineHeight: 1.2,
-              marginBottom: 2,
-            }}
-          >
+          <div className={styles.filledCardTeam}>
             {player.team}
           </div>
-          
+
           {/* Position Tracker Bar - at bottom with padding */}
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              width: '100%',
-              paddingBottom: 5,
-            }}
-          >
+          <div className={styles.filledCardTrackerContainer}>
             {participantPicks.length === 0 ? (
-              <div
-                style={{
-                  height: PICKS_BAR_PX.trackerHeight,
-                  width: PICKS_BAR_PX.trackerEmptyWidth,
-                  backgroundColor: CARD_COLORS.emptyTracker,
-                  borderRadius: PICKS_BAR_PX.trackerBorderRadius,
-                }}
-              />
+              <div className={styles.positionTrackerEmpty} />
             ) : (
-              <div
-                style={{
-                  display: 'flex',
-                  height: PICKS_BAR_PX.trackerHeight,
-                  width: PICKS_BAR_PX.trackerWidth,
-                  borderRadius: PICKS_BAR_PX.trackerBorderRadius,
-                  overflow: 'hidden',
-                }}
-              >
+              <div className={styles.positionTrackerFilled}>
                 {POSITION_ORDER
                   .filter(pos => participantPicks.filter(p => p.position === pos).length > 0)
                   .map((pos) => {
@@ -500,6 +402,7 @@ const FilledCard = React.forwardRef<HTMLDivElement, FilledCardProps>(
                     return (
                       <div
                         key={pos}
+                        className={styles.positionTrackerSegment}
                         style={{
                           flex: count / total,
                           backgroundColor: POSITION_COLORS[pos],
@@ -537,29 +440,12 @@ interface BlankCardProps {
 /** Position tracker bar showing draft composition by position */
 const PositionTrackerBar = React.memo(function PositionTrackerBar({ picks }: { picks: DraftPlayer[] }) {
   if (picks.length === 0) {
-    return (
-      <div
-        style={{
-          height: PICKS_BAR_PX.trackerHeight,
-          width: PICKS_BAR_PX.trackerEmptyWidth,
-          backgroundColor: CARD_COLORS.emptyTracker,
-          borderRadius: PICKS_BAR_PX.trackerBorderRadius,
-        }}
-      />
-    );
+    return <div className={styles.positionTrackerEmpty} />;
   }
 
   const total = picks.length;
   return (
-    <div
-      style={{
-        display: 'flex',
-        height: PICKS_BAR_PX.trackerHeight,
-        width: PICKS_BAR_PX.trackerWidth,
-        borderRadius: PICKS_BAR_PX.trackerBorderRadius,
-        overflow: 'hidden',
-      }}
-    >
+    <div className={styles.positionTrackerFilled}>
       {POSITION_ORDER
         .filter(pos => picks.some(p => p.position === pos))
         .map((pos) => {
@@ -567,6 +453,7 @@ const PositionTrackerBar = React.memo(function PositionTrackerBar({ picks }: { p
           return (
             <div
               key={pos}
+              className={styles.positionTrackerSegment}
               style={{
                 flex: count / total,
                 backgroundColor: POSITION_COLORS[pos],
@@ -579,15 +466,15 @@ const PositionTrackerBar = React.memo(function PositionTrackerBar({ picks }: { p
 });
 
 /** Status text shown in center of blank card */
-const BlankCardStatus = React.memo(function BlankCardStatus({ 
-  isCurrent, 
-  isUserPick, 
+const BlankCardStatus = React.memo(function BlankCardStatus({
+  isCurrent,
+  isUserPick,
   picksAway,
   timer,
   isDraftActive
-}: { 
-  isCurrent: boolean; 
-  isUserPick: boolean; 
+}: {
+  isCurrent: boolean;
+  isUserPick: boolean;
   picksAway?: number;
   timer?: number;
   isDraftActive: boolean;
@@ -595,37 +482,20 @@ const BlankCardStatus = React.memo(function BlankCardStatus({
   if (isCurrent && isDraftActive) {
     // Only show "On The Clock" text when draft is active
     return (
-      <div
-        style={{
-          fontWeight: 600,
-          color: '#FFFFFF',
-          fontSize: 11,
-          lineHeight: 1.2,
-          textAlign: 'center',
-          marginTop: 6,
-        }}
-      >
+      <div className={styles.blankCardStatus}>
         On The<br />Clock
       </div>
     );
   }
-  
+
   if (isUserPick && picksAway !== undefined && picksAway > 0) {
     return (
-      <div
-        style={{
-          color: '#FFFFFF',
-          fontWeight: 500,
-          fontSize: 11,
-          textAlign: 'center',
-          lineHeight: 1.2,
-        }}
-      >
+      <div className={cn(styles.blankCardStatus, styles.blankCardStatusUserPick)}>
         {picksAway === 1 ? 'Up Next' : `${picksAway} away`}
       </div>
     );
   }
-  
+
   return null;
 });
 
@@ -650,61 +520,26 @@ const BlankCardContent = React.memo(function BlankCardContent({
   isDraftActive: boolean;
 }) {
   return (
-    <div
-      style={{
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        minHeight: PICKS_BAR_PX.contentMinHeight,
-        position: 'relative',
-      }}
-    >
+    <div className={styles.blankCardContent}>
       {/* Pick Number Row */}
-      <div
-        style={{
-          position: 'absolute',
-          top: PICKS_BAR_PX.pickNumberTop,
-          left: PICKS_BAR_PX.pickNumberMarginLeft,
-          right: PICKS_BAR_PX.pickNumberMarginLeft,
-          display: 'flex',
-          justifyContent: 'space-between',
-          fontSize: PICKS_BAR_PX.pickNumberFontSize,
-          fontWeight: 500,
-          color: '#FFFFFF',
-        }}
-      >
+      <div className={styles.blankCardPickNumberRow}>
         <span>{formatPickDisplay(pickNumber, teamCount)}</span>
         <span></span>
       </div>
-      
+
       {/* Center Content - Status */}
-      <div
-        style={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <BlankCardStatus 
-          isCurrent={isCurrent} 
-          isUserPick={isUserPick} 
+      <div className={styles.blankCardCenterContent}>
+        <BlankCardStatus
+          isCurrent={isCurrent}
+          isUserPick={isUserPick}
           picksAway={picksAway}
           timer={timer}
           isDraftActive={isDraftActive}
         />
       </div>
-      
+
       {/* Position Tracker Bar */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          width: '100%',
-          paddingBottom: 5,
-        }}
-      >
+      <div className={styles.blankCardTrackerContainer}>
         <PositionTrackerBar picks={participantPicks} />
       </div>
     </div>
@@ -743,57 +578,29 @@ function getBlankCardStyle(
 // ============================================================================
 
 const BlankCard = React.forwardRef<HTMLDivElement, BlankCardProps>(
-  function BlankCard({ 
-    pickNumber, 
-    participantName, 
-    isCurrent, 
-    isUserPick, 
-    participantPicks, 
+  function BlankCard({
+    pickNumber,
+    participantName,
+    isCurrent,
+    isUserPick,
+    participantPicks,
     teamCount,
-    timer, 
+    timer,
     status,
-    picksAway, 
-    onClick 
+    picksAway,
+    onClick
   }, ref) {
     const isPreDraft = status === 'waiting' && pickNumber === 1;
     const isDraftActive = status === 'active';
     const isOnTheClock = isCurrent && isDraftActive;
-    
+
     const { cardColor, useTiledStyle, isUrgent } = getBlankCardStyle(
       isUserPick, isOnTheClock, isPreDraft, timer
     );
-    
+
     const borderWidth = PICKS_BAR_PX.cardBorderWidth;
     const ariaLabel = `Pick ${pickNumber}: ${participantName}${isCurrent ? ' (current)' : ''}`;
-    
-    // Shared card wrapper styles
-    const cardWrapperStyle: React.CSSProperties = {
-      flexShrink: 0,
-      flexGrow: 0,
-      boxSizing: 'border-box',
-      width: PICKS_BAR_PX.cardWidth,
-      minWidth: PICKS_BAR_PX.cardWidth,
-      maxWidth: PICKS_BAR_PX.cardWidth,
-      marginTop: 4,
-      marginBottom: PICKS_BAR_PX.cardMargin,
-      marginLeft: PICKS_BAR_PX.cardMargin,
-      marginRight: PICKS_BAR_PX.cardMargin,
-      borderRadius: PICKS_BAR_PX.cardBorderRadius,
-      cursor: onClick ? 'pointer' : 'default',
-    };
-    
-    // Header styles
-    const headerBaseStyle: React.CSSProperties = {
-      height: PICKS_BAR_PX.headerHeight + (borderWidth * 2),
-      marginTop: -(borderWidth * 2),
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '0 4px',
-      borderTopLeftRadius: PICKS_BAR_PX.cardBorderRadius,
-      borderTopRightRadius: PICKS_BAR_PX.cardBorderRadius,
-    };
-    
+
     if (useTiledStyle) {
       // Tiled image border style for user picks
       return (
@@ -802,24 +609,17 @@ const BlankCard = React.forwardRef<HTMLDivElement, BlankCardProps>(
           onClick={onClick}
           role="listitem"
           aria-label={ariaLabel}
+          className={cn(styles.blankCard, styles.blankCardTiled, styles.blankCardTiledBg)}
+          data-clickable={!!onClick}
           style={{
-            ...cardWrapperStyle,
-            ...TILED_BG_STYLE,
             padding: borderWidth,
-          }}
+            '--tiled-bg-image': `url("data:image/svg+xml,%3Csvg width='4' height='4' viewBox='0 0 4 4' xmlns='http://www.w3.org/2000/svg'%3E%3Crect fill='%231E3A5F' x='0' y='0' width='2' height='2'/%3E%3Crect fill='%232D5A8C' x='2' y='2' width='2' height='2'/%3E%3C/svg%3E")`,
+          } as React.CSSProperties & { '--tiled-bg-image': string }}
         >
-          <div
-            style={{
-              width: '100%',
-              height: '100%',
-              backgroundColor: PICKS_BAR_PX.cardBg,
-              borderRadius: PICKS_BAR_PX.cardBorderRadius - 2,
-              overflow: 'hidden',
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-          >
-            <div style={{ ...headerBaseStyle, ...TILED_BG_STYLE }}>
+          <div className={styles.blankCardInner}>
+            <div
+              className={cn(styles.blankCardHeader, styles.blankCardHeaderHeight, styles.blankCardTiledBg)}
+            >
               <ScrollingUsername
                 name={participantName}
                 maxChars={PICKS_BAR_PX.headerMaxChars}
@@ -842,7 +642,7 @@ const BlankCard = React.forwardRef<HTMLDivElement, BlankCardProps>(
         </div>
       );
     }
-    
+
     // Solid border style for non-user picks, urgent, and pre-draft
     return (
       <div
@@ -850,17 +650,20 @@ const BlankCard = React.forwardRef<HTMLDivElement, BlankCardProps>(
         onClick={onClick}
         role="listitem"
         aria-label={ariaLabel}
+        className={styles.blankCard}
+        data-clickable={!!onClick}
         style={{
-          ...cardWrapperStyle,
-          border: `${borderWidth}px solid ${cardColor}`,
-          backgroundColor: PICKS_BAR_PX.cardBg,
-          overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column',
-          position: 'relative',
+          borderWidth: borderWidth,
+          borderStyle: 'solid',
+          borderColor: cardColor,
         }}
       >
-        <div style={{ ...headerBaseStyle, backgroundColor: cardColor }}>
+        <div
+          className={cn(styles.blankCardHeader, styles.blankCardHeaderHeight)}
+          style={{
+            backgroundColor: cardColor,
+          }}
+        >
           <ScrollingUsername
             name={participantName}
             maxChars={PICKS_BAR_PX.headerMaxChars}
@@ -1004,66 +807,22 @@ const PicksBar = React.memo(function PicksBar({
   }, [currentPickNumber]);
   
   return (
-    <div
-      style={{
-        width: '100%',
-        height: '100%',
-        backgroundColor: PICKS_BAR_PX.containerBg,
-        paddingTop: PICKS_BAR_PX.containerPaddingTop,
-        paddingBottom: 0,
-        paddingLeft: 0,
-        paddingRight: 0,
-        marginBottom: 0,
-        position: 'relative',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
+    <div className={styles.container}>
       {/* Scrollable Container */}
       <div
         ref={scrollRef}
         role="list"
         aria-label="Draft picks"
-        className="picks-bar-scroll-vx2"
-        style={{
-          display: 'flex',
-          gap: PICKS_BAR_PX.cardGap,
-          height: '100%',
-          overflowX: 'auto',
-          overflowY: 'hidden',
-          WebkitOverflowScrolling: 'touch',
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-          marginBottom: 0,
-          paddingBottom: 0,
-        }}
+        className={styles.scrollableContainer}
       >
-        {/* Hidden scrollbar CSS */}
-        <style>{`
-          .picks-bar-scroll-vx2::-webkit-scrollbar {
-            width: 0px !important;
-            height: 0px !important;
-            display: none !important;
-          }
-          @keyframes spin {
-            to { transform: rotate(360deg); }
-          }
-        `}</style>
-        
         {/* Inner flex container (capturable) */}
         {/* Padding allows first/last cards to be centered */}
         <div
           ref={picksContentRef}
+          className={styles.picksContent}
           style={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            height: '100%',
-            gap: PICKS_BAR_PX.cardGap,
             paddingLeft: `calc(50% - ${PICKS_BAR_PX.cardWidth / 2}px)`,
             paddingRight: `calc(50% - ${PICKS_BAR_PX.cardWidth / 2}px)`,
-            backgroundColor: PICKS_BAR_PX.containerBg,
-            marginBottom: 0,
-            paddingBottom: 0,
           }}
         >
           {pickSlots.map(({ pickNumber, pick, participantIndex }) => {
@@ -1119,36 +878,10 @@ const PicksBar = React.memo(function PicksBar({
           onClick={handleShare}
           disabled={isCapturing}
           aria-label="Share picks bar as image"
-          style={{
-            position: 'absolute',
-            bottom: 8,
-            right: 8,
-            width: 36,
-            height: 36,
-            borderRadius: 18,
-            backgroundColor: '#3B82F6',
-            border: 'none',
-            cursor: isCapturing ? 'wait' : 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
-            opacity: isCapturing ? 0.7 : 1,
-            transition: 'opacity 0.2s, transform 0.2s',
-            zIndex: 20,
-          }}
+          className={styles.shareButton}
         >
           {isCapturing ? (
-            <div
-              style={{
-                width: 16,
-                height: 16,
-                border: '2px solid #FFFFFF',
-                borderTopColor: 'transparent',
-                borderRadius: '50%',
-                animation: 'spin 1s linear infinite',
-              }}
-            />
+            <div className={styles.spinnerIcon} />
           ) : (
             <Share size={18} color="#FFFFFF" strokeWidth={2} aria-hidden />
           )}

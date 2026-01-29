@@ -12,6 +12,8 @@
  */
 
 import React, { useState, useMemo } from 'react';
+import { cn } from '@/lib/styles';
+import styles from './DepositHistoryModalVX2.module.css';
 import { useTransactionHistory, type Transaction } from '../hooks/data';
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS } from '../core/constants/colors';
 import { SPACING, RADIUS, TYPOGRAPHY, Z_INDEX } from '../core/constants/sizes';
@@ -64,33 +66,30 @@ function FilterTabBar({ activeFilter, onFilterChange, counts }: FilterTabBarProp
   ];
 
   return (
-    <div 
-      className="flex rounded-lg p-1 mb-4"
-      style={{ backgroundColor: BG_COLORS.tertiary }}
+    <div
+      className={styles.filterTabBar}
+      style={{
+        '--tab-bar-bg': BG_COLORS.tertiary,
+      } as React.CSSProperties}
       role="tablist"
     >
       {tabs.map(tab => (
         <button
           key={tab.id}
           onClick={() => onFilterChange(tab.id)}
-          className="flex-1 py-2 px-2 rounded-lg font-medium transition-all flex items-center justify-center gap-1.5"
+          className={cn(styles.filterTab, activeFilter === tab.id && styles.active)}
           style={{
-            fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-            backgroundColor: activeFilter === tab.id ? STATE_COLORS.active : 'transparent',
-            color: activeFilter === tab.id ? '#000000' : TEXT_COLORS.secondary,
-          }}
+            '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
+            '--active-color': STATE_COLORS.active,
+            '--text-color-secondary': TEXT_COLORS.secondary,
+            '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
+            '--text-color-muted': TEXT_COLORS.muted,
+          } as React.CSSProperties}
           role="tab"
           aria-selected={activeFilter === tab.id}
         >
           {tab.label}
-          <span
-            className="px-1.5 py-0.5 rounded-full"
-            style={{
-              fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-              backgroundColor: activeFilter === tab.id ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.1)',
-              color: activeFilter === tab.id ? '#000000' : TEXT_COLORS.muted,
-            }}
-          >
+          <span className={styles.filterTabCount}>
             {tab.count}
           </span>
         </button>
@@ -109,19 +108,20 @@ function TransactionCard({ transaction }: TransactionCardProps): React.ReactElem
   const amountColor = isDeposit ? STATE_COLORS.success : STATE_COLORS.error;
 
   return (
-    <div 
-      className="rounded-xl p-4 transition-all"
+    <div
+      className={styles.transactionCard}
       style={{
-        backgroundColor: 'rgba(255, 255, 255, 0.03)',
-        borderLeft: `3px solid ${amountColor}`,
-      }}
+        '--card-border-color': amountColor,
+      } as React.CSSProperties}
     >
-      <div className="flex items-start justify-between">
-        <div className="flex items-start gap-3 flex-1 min-w-0">
+      <div className={styles.transactionCardContent}>
+        <div className={styles.transactionCardLeft}>
           {/* Icon */}
-          <div 
-            className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
-            style={{ backgroundColor: 'rgba(255, 255, 255, 0.08)', color: TEXT_COLORS.secondary }}
+          <div
+            className={styles.transactionCardIcon}
+            style={{
+              '--text-color-secondary': TEXT_COLORS.secondary,
+            } as React.CSSProperties}
           >
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
@@ -129,46 +129,68 @@ function TransactionCard({ transaction }: TransactionCardProps): React.ReactElem
           </div>
 
           {/* Details */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <span 
-                className="font-semibold capitalize"
-                style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
+          <div className={styles.transactionCardDetails}>
+            <div className={styles.transactionCardHeader}>
+              <span
+                className={styles.transactionCardType}
+                style={{
+                  '--text-color-primary': TEXT_COLORS.primary,
+                  '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
+                } as React.CSSProperties}
               >
                 {transaction.type}
               </span>
-              <span 
-                className="px-2 py-0.5 rounded-full font-medium"
+              <span
+                className={cn(
+                  styles.transactionCardStatus,
+                  styles[transaction.status]
+                )}
                 style={{
-                  fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-                  backgroundColor: `${statusColor}20`,
-                  color: statusColor,
-                }}
+                  '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
+                } as React.CSSProperties}
               >
                 {transaction.status}
               </span>
             </div>
-            <p 
-              className="truncate mb-1"
-              style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
+            <p
+              className={styles.transactionCardDescription}
+              style={{
+                '--text-color-secondary': TEXT_COLORS.secondary,
+                '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
+              } as React.CSSProperties}
             >
               {transaction.description}
             </p>
-            <p style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>
+            <p
+              className={styles.transactionCardDate}
+              style={{
+                '--text-color-muted': TEXT_COLORS.muted,
+                '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
+              } as React.CSSProperties}
+            >
               {formatDate(transaction.createdAt)}
             </p>
           </div>
         </div>
 
         {/* Amount */}
-        <div className="text-right flex-shrink-0 ml-3">
-          <div 
-            className="font-bold"
-            style={{ color: amountColor, fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}
+        <div className={styles.transactionCardRight}>
+          <div
+            className={styles.transactionCardAmount}
+            style={{
+              '--amount-color': amountColor,
+              '--font-size-lg': `${TYPOGRAPHY.fontSize.lg}px`,
+            } as React.CSSProperties}
           >
             {transaction.amountFormatted}
           </div>
-          <div style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>
+          <div
+            className={styles.transactionCardPaymentMethod}
+            style={{
+              '--text-color-muted': TEXT_COLORS.muted,
+              '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
+            } as React.CSSProperties}
+          >
             {transaction.paymentMethod || '-'}
           </div>
         </div>
@@ -179,17 +201,19 @@ function TransactionCard({ transaction }: TransactionCardProps): React.ReactElem
 
 function BalanceHeader({ balance }: { balance: number }): React.ReactElement {
   return (
-    <div 
-      className="px-4 py-3 mb-4 rounded-xl"
-      style={{ backgroundColor: 'rgba(96, 165, 250, 0.1)' }}
+    <div
+      className={styles.balanceHeader}
+      style={{
+        '--text-color-secondary': TEXT_COLORS.secondary,
+        '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
+        '--active-color': STATE_COLORS.active,
+        '--font-size-2xl': `${TYPOGRAPHY.fontSize['2xl']}px`,
+      } as React.CSSProperties}
     >
-      <div style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>
+      <div className={styles.balanceLabel}>
         Current Balance
       </div>
-      <div 
-        className="font-bold"
-        style={{ color: STATE_COLORS.active, fontSize: `${TYPOGRAPHY.fontSize['2xl']}px` }}
-      >
+      <div className={styles.balanceAmount}>
         {formatDollars(balance)}
       </div>
     </div>
@@ -205,21 +229,56 @@ function TransactionSummary({ transactions }: { transactions: Transaction[] }): 
   }, [transactions]);
 
   return (
-    <div 
-      className="px-4 py-3 flex-shrink-0"
-      style={{ backgroundColor: BG_COLORS.tertiary, borderTop: '1px solid rgba(255,255,255,0.1)' }}
+    <div
+      className={styles.summaryFooter}
+      style={{
+        '--summary-bg': BG_COLORS.tertiary,
+      } as React.CSSProperties}
     >
-      <div className="flex justify-between items-center mb-1" style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
-        <span style={{ color: TEXT_COLORS.secondary }}>Transactions:</span>
-        <span className="font-semibold" style={{ color: TEXT_COLORS.primary }}>{stats.count}</span>
+      <div
+        className={styles.summaryRow}
+        style={{
+          '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
+          '--text-color-secondary': TEXT_COLORS.secondary,
+          '--text-color-primary': TEXT_COLORS.primary,
+        } as React.CSSProperties}
+      >
+        <span className={styles.summaryLabel}>Transactions:</span>
+        <span className={styles.summaryValue}>{stats.count}</span>
       </div>
-      <div className="flex justify-between items-center mb-1" style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
-        <span style={{ color: TEXT_COLORS.secondary }}>Total Deposits:</span>
-        <span className="font-semibold" style={{ color: STATE_COLORS.success }}>+{formatDollars(stats.totalDeposits)}</span>
+      <div
+        className={styles.summaryRow}
+        style={{
+          '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
+          '--text-color-secondary': TEXT_COLORS.secondary,
+        } as React.CSSProperties}
+      >
+        <span className={styles.summaryLabel}>Total Deposits:</span>
+        <span
+          className={cn(styles.summaryValue, styles.deposits)}
+          style={{
+            color: STATE_COLORS.success,
+          }}
+        >
+          +{formatDollars(stats.totalDeposits)}
+        </span>
       </div>
-      <div className="flex justify-between items-center" style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
-        <span style={{ color: TEXT_COLORS.secondary }}>Total Withdrawals:</span>
-        <span className="font-semibold" style={{ color: STATE_COLORS.error }}>-{formatDollars(stats.totalWithdrawals)}</span>
+      <div
+        className={styles.summaryRow}
+        style={{
+          '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
+          '--text-color-secondary': TEXT_COLORS.secondary,
+        } as React.CSSProperties}
+      >
+        <span className={styles.summaryLabel}>Total Withdrawals:</span>
+        <span
+          className={cn(styles.summaryValue, styles.withdrawals)}
+          style={{
+            color: STATE_COLORS.error,
+          }}
+        >
+          -{formatDollars(stats.totalWithdrawals)}
+        </span>
       </div>
     </div>
   );
@@ -264,35 +323,38 @@ export default function DepositHistoryModalVX2({
 
   return (
     <div
-      className="absolute left-0 right-0 bottom-0 flex flex-col"
+      className={styles.container}
       style={{
-        top: '60px',
-        backgroundColor: BG_COLORS.secondary,
-        zIndex: Z_INDEX.modal,
-      }}
+        '--bg-color': BG_COLORS.secondary,
+        '--z-index': Z_INDEX.modal,
+      } as React.CSSProperties}
       role="dialog"
       aria-modal="true"
       aria-labelledby="history-modal-title"
     >
       {/* Header */}
-      <div 
-        className="flex items-center justify-between flex-shrink-0"
-        style={{ 
-          padding: `${MODAL_PX.headerPadding}px`,
-          borderBottom: '1px solid rgba(255,255,255,0.1)',
-        }}
+      <div
+        className={styles.header}
+        style={{
+          '--header-padding': `${MODAL_PX.headerPadding}px`,
+        } as React.CSSProperties}
       >
-        <h2 
+        <h2
           id="history-modal-title"
-          className="font-bold"
-          style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}
+          className={styles.headerTitle}
+          style={{
+            '--text-color-primary': TEXT_COLORS.primary,
+            '--font-size-lg': `${TYPOGRAPHY.fontSize.lg}px`,
+          } as React.CSSProperties}
         >
           Transaction History
         </h2>
         <button
           onClick={onClose}
-          className="p-2 rounded-lg hover:bg-white/10 transition-colors"
-          style={{ color: TEXT_COLORS.secondary }}
+          className={styles.closeButton}
+          style={{
+            '--text-color-secondary': TEXT_COLORS.secondary,
+          } as React.CSSProperties}
           aria-label="Close"
         >
           <Close size={24} />
@@ -300,27 +362,21 @@ export default function DepositHistoryModalVX2({
       </div>
 
       {/* Content */}
-      <div 
-        className="flex-1 flex flex-col min-h-0 px-4 pt-4 overflow-hidden"
-        style={{ paddingBottom: 0 }}
-      >
+      <div className={styles.contentWrapper}>
         {isLoading ? (
           <LoadingSkeleton />
         ) : (
           <>
             <BalanceHeader balance={0} />
             <FilterTabBar activeFilter={filter} onFilterChange={setFilter} counts={counts} />
-            
+
             {filteredTransactions.length === 0 ? (
               <EmptyState
                 title="No transactions found"
                 description="Your deposit and withdrawal history will appear here"
               />
             ) : (
-              <div 
-                className="flex-1 overflow-y-auto space-y-3 pb-3"
-                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-              >
+              <div className={styles.transactionList}>
                 {filteredTransactions.map(transaction => (
                   <TransactionCard key={transaction.id} transaction={transaction} />
                 ))}

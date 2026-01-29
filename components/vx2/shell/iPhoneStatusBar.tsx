@@ -1,14 +1,18 @@
 /**
  * iPhoneStatusBar - Native iPhone Status Bar Component
- * 
+ *
  * Displays native iPhone status bar elements:
  * - Time
  * - Signal strength bars
  * - WiFi icon
  * - Battery icon with percentage
+ *
+ * Migrated to CSS Modules for CSP compliance.
  */
 
 import React, { useState, useEffect } from 'react';
+import { cn } from '@/lib/styles';
+import styles from './iPhoneStatusBar.module.css';
 
 // ============================================================================
 // TYPES
@@ -51,36 +55,36 @@ export default function IPhoneStatusBar({
     const minutes = now.getMinutes();
     return `${hours}:${minutes.toString().padStart(2, '0')}`;
   };
-  
+
   // Use provided time or manage state for auto-updating time
   // Initialize with a placeholder that matches server/client to prevent hydration mismatch
   // Will be updated in useEffect on client-side
   const [displayTime, setDisplayTime] = useState(time || '12:00');
   const [isMounted, setIsMounted] = useState(false);
-  
+
   // Track mount state to prevent hydration mismatch
   useEffect(() => {
     setIsMounted(true);
   }, []);
-  
+
   // Update time every minute if time prop is not provided
   useEffect(() => {
     if (time) {
       setDisplayTime(time);
       return;
     }
-    
+
     // Only run on client-side after mount to prevent hydration mismatch
     if (!isMounted || typeof window === 'undefined') return;
-    
+
     // Update immediately
     setDisplayTime(getCurrentTime());
-    
+
     // Update every minute
     const interval = setInterval(() => {
       setDisplayTime(getCurrentTime());
     }, 60000); // 60 seconds
-    
+
     return () => clearInterval(interval);
   }, [time, isMounted]);
 
@@ -88,61 +92,38 @@ export default function IPhoneStatusBar({
   const batteryLevel = Math.max(0, Math.min(100, battery));
   const signalLevel = Math.max(0, Math.min(4, signalBars));
 
-  // Use wr_blue.png background to match header, or provided backgroundColor
-  const statusBarStyle: React.CSSProperties = backgroundColor
-    ? { backgroundColor }
-    : {
-        backgroundImage: 'url(/wr_blue.png)',
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center center',
-        backgroundSize: 'cover',
-        backgroundOrigin: 'border-box',
-        backgroundClip: 'border-box',
-      };
+  const statusBarStyle: React.CSSProperties = {
+    '--status-bar-height': `${STATUS_BAR_HEIGHT}px`,
+    ...(backgroundColor ? { '--status-bar-bg': backgroundColor } : {}),
+  } as React.CSSProperties;
 
   return (
     <div
-      className="flex items-center justify-between px-4 text-white text-sm font-medium"
-      style={{
-        height: `${STATUS_BAR_HEIGHT}px`,
-        ...statusBarStyle,
-        paddingTop: 'env(safe-area-inset-top, 0px)',
-        paddingLeft: 'max(16px, env(safe-area-inset-left, 0px))',
-        paddingRight: 'max(16px, env(safe-area-inset-right, 0px))',
-        zIndex: 9999, // Ensure it's above everything including header
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-      }}
+      className={cn(
+        styles.statusBar,
+        backgroundColor ? styles.statusBarColored : styles.statusBarDefault
+      )}
+      style={statusBarStyle}
       role="status"
       aria-label="Status bar"
     >
       {/* Left side - Time */}
-      <div
-        style={{
-          fontSize: '15px',
-          fontWeight: 600,
-          letterSpacing: '-0.5px',
-          color: '#FFFFFF', // Explicit white color
-        }}
-      >
+      <div className={styles.time}>
         {displayTime}
       </div>
 
       {/* Right side - Signal, WiFi, Battery */}
-      <div className="flex items-center gap-1" style={{ gap: '4px' }}>
+      <div className={styles.rightSide}>
         {/* Signal bars */}
-        <div className="flex items-end" style={{ gap: '2px', height: '12px' }}>
+        <div className={styles.signalBars}>
           {[1, 2, 3, 4].map((bar) => (
             <div
               key={bar}
-              style={{
-                width: '3px',
-                height: `${3 + (bar - 1) * 2}px`,
-                backgroundColor: bar <= signalLevel ? '#FFFFFF' : 'rgba(255, 255, 255, 0.3)',
-                borderRadius: '0.5px',
-              }}
+              className={cn(
+                styles.signalBar,
+                bar <= signalLevel ? styles.signalBarActive : styles.signalBarInactive
+              )}
+              style={{ height: `${3 + (bar - 1) * 2}px` }}
               aria-hidden="true"
             />
           ))}
@@ -156,7 +137,7 @@ export default function IPhoneStatusBar({
             viewBox="0 0 16 12"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            style={{ marginLeft: '2px' }}
+            className={styles.wifiIcon}
             aria-hidden="true"
           >
             <path
@@ -175,15 +156,8 @@ export default function IPhoneStatusBar({
         )}
 
         {/* Battery icon */}
-        <div className="flex items-center" style={{ marginLeft: '4px', gap: '4px' }}>
-          <div
-            style={{
-              fontSize: '14px',
-              fontWeight: 600,
-              letterSpacing: '-0.3px',
-              color: '#FFFFFF', // Explicit white color
-            }}
-          >
+        <div className={styles.batterySection}>
+          <div className={styles.batteryLevel}>
             {batteryLevel}
           </div>
           <svg
@@ -229,4 +203,3 @@ export default function IPhoneStatusBar({
     </div>
   );
 }
-

@@ -1,6 +1,6 @@
 /**
  * Location Consent Modal
- * 
+ *
  * Prompts user to enable location tracking with context-aware messaging.
  * Enterprise-grade UX with clear value proposition.
  */
@@ -8,12 +8,13 @@
 import React, { useState } from 'react';
 import { createScopedLogger } from '@/lib/clientLogger';
 import { BG_COLORS, TEXT_COLORS, BORDER_COLORS, STATE_COLORS } from '@/components/vx2/core/constants/colors';
-
-const logger = createScopedLogger('[LocationConsentModal]');
 import { SPACING, RADIUS } from '@/components/vx2/core/constants/sizes';
 import { useLocationConsent } from './hooks/useLocationConsent';
 import type { ConsentModalContext } from '@/lib/location/types';
 import { CONSENT_MODAL_CONFIGS } from '@/lib/location/types';
+import styles from './LocationConsentModal.module.css';
+
+const logger = createScopedLogger('[LocationConsentModal]');
 
 interface LocationConsentModalProps {
   isOpen: boolean;
@@ -52,20 +53,20 @@ const BENEFITS = [
   },
 ];
 
-export function LocationConsentModal({ 
-  isOpen, 
-  onClose, 
-  context 
+export function LocationConsentModal({
+  isOpen,
+  onClose,
+  context
 }: LocationConsentModalProps) {
   const { grantConsent, dismissPrompt } = useLocationConsent();
   const [rememberChoice, setRememberChoice] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const config = CONSENT_MODAL_CONFIGS[context];
-  
+
   async function handleGrant() {
     setIsSubmitting(true);
-    
+
     try {
       await grantConsent(rememberChoice);
       onClose();
@@ -75,10 +76,10 @@ export function LocationConsentModal({
       setIsSubmitting(false);
     }
   }
-  
+
   async function handleDeny() {
     setIsSubmitting(true);
-    
+
     try {
       await dismissPrompt(rememberChoice);
       onClose();
@@ -88,46 +89,43 @@ export function LocationConsentModal({
       setIsSubmitting(false);
     }
   }
-  
+
   if (!isOpen) return null;
-  
+
   return (
-    <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ backgroundColor: 'rgba(0, 0, 0, 0.75)' }}
+    <div
+      className={styles.backdrop}
       onClick={(e) => {
         if (e.target === e.currentTarget && !isSubmitting) {
           handleDeny();
         }
       }}
     >
-      <div 
-        className="w-full max-w-md animate-in fade-in zoom-in-95 duration-200"
-        style={{ 
-          backgroundColor: BG_COLORS.secondary,
-          borderRadius: RADIUS.xl,
-          border: `1px solid ${BORDER_COLORS.subtle}`,
-        }}
+      <div
+        className={styles.modal}
+        style={{
+          '--bg-secondary': BG_COLORS.secondary,
+          '--radius-xl': `${RADIUS.xl}px`,
+          '--border-subtle': BORDER_COLORS.subtle,
+        } as React.CSSProperties}
       >
         {/* Header */}
-        <div 
-          style={{ 
-            padding: SPACING.xl,
-            paddingBottom: SPACING.lg,
-            borderBottom: `1px solid ${BORDER_COLORS.light}`,
-          }}
+        <div
+          className={styles.header}
+          style={{
+            '--spacing-xl': `${SPACING.xl}px`,
+            '--spacing-lg': `${SPACING.lg}px`,
+            '--border-light': BORDER_COLORS.light,
+          } as React.CSSProperties}
         >
-          <div className="flex items-center gap-3 mb-2">
-            <div 
-              className="w-10 h-10 rounded-full flex items-center justify-center"
-              style={{ backgroundColor: 'rgba(59, 130, 246, 0.2)' }}
-            >
-              <svg 
-                width={24} 
-                height={24} 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="#3B82F6" 
+          <div className={styles.headerContent}>
+            <div className={styles.iconContainer}>
+              <svg
+                width={24}
+                height={24}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#3B82F6"
                 strokeWidth={2}
               >
                 <circle cx="12" cy="12" r="10" />
@@ -136,107 +134,95 @@ export function LocationConsentModal({
               </svg>
             </div>
             <div>
-              <h2 
-                className="text-lg font-bold"
-                style={{ color: TEXT_COLORS.primary }}
+              <h2
+                className={styles.title}
+                style={{ '--text-primary': TEXT_COLORS.primary } as React.CSSProperties}
               >
                 {config.title}
               </h2>
-              <p 
-                className="text-sm"
-                style={{ color: TEXT_COLORS.secondary }}
+              <p
+                className={styles.subtitle}
+                style={{ '--text-secondary': TEXT_COLORS.secondary } as React.CSSProperties}
               >
                 {config.subtitle}
               </p>
             </div>
           </div>
         </div>
-        
+
         {/* Body */}
-        <div style={{ padding: SPACING.xl }}>
+        <div
+          className={styles.body}
+          style={{
+            '--spacing-xl': `${SPACING.xl}px`,
+            '--text-primary': TEXT_COLORS.primary,
+            '--text-secondary': TEXT_COLORS.secondary,
+            '--text-muted': TEXT_COLORS.muted,
+            '--state-success': STATE_COLORS.success,
+            '--state-info': STATE_COLORS.info,
+          } as React.CSSProperties}
+        >
           {/* Benefits list */}
-          <div className="space-y-4">
+          <div className={styles.benefitsList}>
             {BENEFITS.map((benefit, index) => (
-              <div key={index} className="flex items-start gap-3">
-                <div 
-                  className="flex-shrink-0 mt-0.5"
-                  style={{ color: STATE_COLORS.success }}
-                >
+              <div key={index} className={styles.benefitItem}>
+                <div className={styles.benefitIcon}>
                   {benefit.icon}
                 </div>
-                <span 
-                  className="text-sm"
-                  style={{ color: TEXT_COLORS.primary }}
-                >
+                <span className={styles.benefitText}>
                   {benefit.text}
                 </span>
               </div>
             ))}
           </div>
-          
+
           {/* Privacy note */}
-          <p 
-            className="text-xs mt-6 text-center"
-            style={{ color: TEXT_COLORS.muted }}
-          >
+          <p className={styles.privacyNote}>
             We only track country/state level - never your precise location.
             <br />
             You can disable this anytime in Settings.
           </p>
-          
+
           {/* Remember choice */}
-          <label 
-            className="flex items-center justify-center gap-2 mt-4 cursor-pointer select-none"
-          >
-            <input 
+          <label className={styles.rememberChoiceLabel}>
+            <input
               type="checkbox"
               checked={rememberChoice}
               onChange={(e) => setRememberChoice(e.target.checked)}
-              className="w-4 h-4 rounded"
-              style={{ accentColor: STATE_COLORS.info }}
+              className={styles.checkbox}
             />
-            <span 
-              className="text-sm"
-              style={{ color: TEXT_COLORS.secondary }}
-            >
+            <span className={styles.rememberChoiceText}>
               Remember my choice
             </span>
           </label>
         </div>
-        
+
         {/* Footer */}
-        <div 
-          className="flex gap-3"
-          style={{ 
-            padding: SPACING.xl,
-            paddingTop: SPACING.lg,
-            borderTop: `1px solid ${BORDER_COLORS.light}`,
-          }}
+        <div
+          className={styles.footer}
+          style={{
+            '--spacing-xl': `${SPACING.xl}px`,
+            '--spacing-lg': `${SPACING.lg}px`,
+            '--border-light': BORDER_COLORS.light,
+            '--bg-tertiary': BG_COLORS.tertiary,
+            '--text-secondary': TEXT_COLORS.secondary,
+            '--state-success': STATE_COLORS.success,
+          } as React.CSSProperties}
         >
           <button
             onClick={handleDeny}
             disabled={isSubmitting}
-            className="flex-1 py-3 px-4 rounded-lg font-medium transition-colors"
-            style={{ 
-              backgroundColor: BG_COLORS.tertiary,
-              color: TEXT_COLORS.secondary,
-              opacity: isSubmitting ? 0.5 : 1,
-            }}
+            className={styles.denyButton}
           >
             Not Now
           </button>
           <button
             onClick={handleGrant}
             disabled={isSubmitting}
-            className="flex-1 py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
-            style={{ 
-              backgroundColor: STATE_COLORS.success,
-              color: '#FFFFFF',
-              opacity: isSubmitting ? 0.5 : 1,
-            }}
+            className={styles.grantButton}
           >
             {isSubmitting ? (
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              <div className={styles.spinner} />
             ) : (
               <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3}>
                 <polyline points="20 6 9 17 4 12" />

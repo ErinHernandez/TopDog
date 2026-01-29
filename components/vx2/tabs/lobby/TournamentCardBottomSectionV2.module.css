@@ -1,0 +1,25 @@
+/**
+ * TournamentCardBottomSectionV2 - Version 2 specific styles
+ * Extends base styles with V2-specific custom properties
+ */
+
+@import './TournamentCardBottomSection.module.css';
+
+/* Override V2 specific dimensions and spacing */
+.bottomSectionV2 {
+  display: grid;
+  width: 100%;
+  contain: layout style paint;
+}
+
+.bottomSectionV2[data-has-progress="true"] {
+  grid-template-rows: var(--progress-height) var(--button-height) var(--stats-height);
+}
+
+.bottomSectionV2[data-has-progress="false"] {
+  grid-template-rows: var(--button-height) var(--stats-height);
+}
+
+.bottomSectionV2 {
+  gap: var(--row-gap);
+}

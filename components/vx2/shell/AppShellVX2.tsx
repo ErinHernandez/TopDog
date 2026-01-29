@@ -1,6 +1,6 @@
 /**
  * AppShellVX2 - Main App Shell/Orchestrator
- * 
+ *
  * The root component for the VX2 mobile app that orchestrates:
  * - Authentication gate (mandatory login before app access)
  * - Tab navigation via context
@@ -8,13 +8,15 @@
  * - Content area
  * - Tab bar
  * - Modal layer
- * 
+ *
  * This replaces MobileAppVX with a cleaner, context-driven architecture.
- * 
+ *
  * AUTHENTICATION:
  * The app is wrapped with AuthGateVX2, which completely blocks access
  * to the app content until the user is authenticated. This is NOT a
  * dismissable modal - users MUST sign in or sign up to access the app.
+ *
+ * Migrated to CSS Modules for CSP compliance.
  */
 
 import React, { useCallback, useState, useEffect, createContext, useContext } from 'react';
@@ -35,6 +37,7 @@ import type { DepositModalVX2Props } from '../modals/DepositModalVX2';
 import type { WithdrawModalVX2Props } from '../modals/WithdrawModalVX2';
 import { useAuth, AuthGateVX2 } from '../auth';
 import { useStableViewportHeight } from '../hooks/ui/useStableViewportHeight';
+import styles from './AppShellVX2.module.css';
 
 // ============================================================================
 // DYNAMIC IMPORTS FOR HEAVY PAYMENT MODALS
@@ -43,17 +46,17 @@ import { useStableViewportHeight } from '../hooks/ui/useStableViewportHeight';
 // Loading placeholder for payment modals - matches app visual style
 const PaymentModalLoadingPlaceholder = () => (
   <div
-    className="fixed inset-0 flex items-center justify-center"
-    style={{ zIndex: 9999 }}
+    className={styles.loadingOverlay}
+    style={{
+      '--loading-modal-bg': BG_COLORS.secondary,
+      '--loading-text-color': TEXT_COLORS.primary,
+    } as React.CSSProperties}
   >
-    <div className="absolute inset-0 bg-black/60" />
-    <div
-      className="relative p-8 rounded-xl max-w-sm mx-4"
-      style={{ backgroundColor: BG_COLORS.secondary }}
-    >
-      <div className="flex items-center gap-3">
-        <span className="animate-spin w-5 h-5 border-2 border-white/30 border-t-white rounded-full" />
-        <span style={{ color: TEXT_COLORS.primary }}>Loading payment...</span>
+    <div className={styles.loadingBackdrop} />
+    <div className={styles.loadingModal}>
+      <div className={styles.loadingContent}>
+        <span className={styles.loadingSpinner} />
+        <span className={styles.loadingText}>Loading payment...</span>
       </div>
     </div>
   </div>
@@ -125,22 +128,22 @@ function InnerShell({ badgeOverrides }: InnerShellProps): React.ReactElement {
   // Note: Hook always runs to set the CSS variable (needed for mobile), but when inPhoneFrame=true,
   // we use height: 100% which ignores the CSS variable and fills the fixed phone frame container
   useStableViewportHeight();
-  
+
   const { state: authState } = useAuth();
   const [isMounted, setIsMounted] = useState(false);
-  
+
   // Track mount state to prevent hydration mismatch with conditional modal rendering
   useEffect(() => {
     setIsMounted(true);
   }, []);
-  
+
   // Modal state
   const [showAutodraftLimits, setShowAutodraftLimits] = useState(false);
   const [showDeposit, setShowDeposit] = useState(false);
   const [showDepositHistory, setShowDepositHistory] = useState(false);
   const [showWithdraw, setShowWithdraw] = useState(false);
   const [showRankings, setShowRankings] = useState(false);
-  
+
   // Modal handlers
   const modalContext: ModalContextType = {
     openAutodraftLimits: useCallback(() => {
@@ -159,41 +162,29 @@ function InnerShell({ badgeOverrides }: InnerShellProps): React.ReactElement {
       setShowRankings(true);
     }, []),
   };
-  
+
   return (
     <ModalContext.Provider value={modalContext}>
-      <div 
-        style={{ 
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100%',
-          width: '100%',
-          backgroundColor: BG_COLORS.primary,
-          overflow: 'hidden',
-        }}
+      <div
+        className={styles.shellContainer}
+        style={{
+          '--shell-bg': BG_COLORS.primary,
+        } as React.CSSProperties}
       >
         {/* Main content - flex so TabContentVX2 gets defined height. In phone frame, no marginBottom so content sits flush with tab bar (goal). */}
-        <main
-          style={{
-            flex: 1,
-            minHeight: 0,  // CRITICAL: Allow shrinking
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-          }}
-        >
+        <main className={styles.mainContent}>
           <TabContentVX2 />
         </main>
-        
+
         {/* Tab Bar */}
-        <div style={{ flexShrink: 0 }}>
+        <div className={styles.tabBarWrapper}>
           <TabBarVX2 badgeOverrides={badgeOverrides} />
         </div>
-        
+
         {/* Modals - Only show for authenticated users after mount to prevent hydration mismatch */}
-        <AutodraftLimitsModalVX2 
-          isOpen={showAutodraftLimits} 
-          onClose={() => setShowAutodraftLimits(false)} 
+        <AutodraftLimitsModalVX2
+          isOpen={showAutodraftLimits}
+          onClose={() => setShowAutodraftLimits(false)}
         />
         {isMounted && authState.user && (
           <DepositModalVX2
@@ -205,21 +196,21 @@ function InnerShell({ badgeOverrides }: InnerShellProps): React.ReactElement {
             onSuccess={() => setShowDeposit(false)}
           />
         )}
-        <DepositHistoryModalVX2 
-          isOpen={showDepositHistory} 
-          onClose={() => setShowDepositHistory(false)} 
+        <DepositHistoryModalVX2
+          isOpen={showDepositHistory}
+          onClose={() => setShowDepositHistory(false)}
         />
         {isMounted && authState.user && (
-          <WithdrawModalVX2 
-            isOpen={showWithdraw} 
+          <WithdrawModalVX2
+            isOpen={showWithdraw}
             onClose={() => setShowWithdraw(false)}
             userId={authState.user.uid}
             userEmail={authState.user.email || ''}
           />
         )}
-        <RankingsModalVX2 
-          isOpen={showRankings} 
-          onClose={() => setShowRankings(false)} 
+        <RankingsModalVX2
+          isOpen={showRankings}
+          onClose={() => setShowRankings(false)}
         />
       </div>
     </ModalContext.Provider>

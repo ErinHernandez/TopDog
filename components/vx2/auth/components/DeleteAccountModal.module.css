@@ -1,0 +1,364 @@
+/**
+ * DeleteAccountModal Component Styles
+ *
+ * Component-specific styles for the account deletion and pause flow.
+ * Uses CSS custom properties for dynamic values from constants.
+ */
+
+/* ============================================================================
+   BACKDROP / MODAL OVERLAY
+   ============================================================================ */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal-backdrop, 1010);
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--modal-padding, 16px);
+}
+
+/* ============================================================================
+   MODAL CONTENT
+   ============================================================================ */
+
+.modalContent {
+  width: 100%;
+  max-width: 400px;
+  max-height: 90vh;
+  overflow: auto;
+  background: var(--bg-secondary, #1a1f2e);
+  border-radius: 16px;
+  padding: var(--modal-content-padding, 24px);
+}
+
+/* ============================================================================
+   HEADER
+   ============================================================================ */
+
+.headerContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--header-margin-bottom, 24px);
+}
+
+.headerTitle {
+  color: var(--text-primary, rgba(255, 255, 255, 0.9));
+  font-size: var(--header-font-size, 18px);
+  font-weight: 700;
+  margin: 0;
+}
+
+.closeButton {
+  padding: 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: background-color 150ms ease;
+}
+
+.closeButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================================================
+   ERROR BANNER
+   ============================================================================ */
+
+.errorMessage {
+  padding: var(--error-padding, 12px);
+  margin-bottom: var(--error-margin-bottom, 16px);
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error-color, #ef4444);
+  font-size: var(--text-sm, 14px);
+}
+
+/* ============================================================================
+   DESCRIPTION TEXT
+   ============================================================================ */
+
+.descriptionText {
+  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+  font-size: var(--text-sm, 14px);
+  margin-bottom: var(--description-margin-bottom, 16px);
+}
+
+.warningText {
+  color: var(--text-muted, rgba(255, 255, 255, 0.5));
+  font-size: var(--text-sm, 14px);
+  margin-top: 24px;
+}
+
+/* ============================================================================
+   PAUSE BUTTON
+   ============================================================================ */
+
+.pauseButton {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border-default, rgba(255, 255, 255, 0.1));
+  background: var(--bg-tertiary, rgba(255, 255, 255, 0.1));
+  color: var(--text-primary, rgba(255, 255, 255, 0.9));
+  font-weight: 600;
+  font-size: var(--text-base, 16px);
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.pauseButton:disabled {
+  opacity: 0.6;
+}
+
+.pauseButtonPaused {
+  background: url(/wr_blue.png) no-repeat center center;
+  background-size: cover;
+  color: #000;
+}
+
+.pauseButtonPaused:hover {
+  opacity: 0.9;
+}
+
+/* ============================================================================
+   DELETION BUTTON (ERROR/DANGER)
+   ============================================================================ */
+
+.deleteButton {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--error-color, #ef4444);
+  background: transparent;
+  color: var(--error-color, #ef4444);
+  font-weight: 600;
+  font-size: var(--text-base, 16px);
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.deleteButton:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+/* ============================================================================
+   INELIGIBILITY ALERT BOX
+   ============================================================================ */
+
+.ineligibilityBox {
+  padding: var(--alert-padding, 16px);
+  border-radius: 12px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  margin-bottom: var(--alert-margin-bottom, 16px);
+}
+
+.ineligibilityTitle {
+  color: var(--error-color, #ef4444);
+  font-weight: 600;
+  margin-bottom: 8px;
+  margin-top: 0;
+}
+
+.ineligibilityReasons {
+  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+  font-size: var(--text-sm, 14px);
+  margin: 0;
+  padding-left: 20px;
+}
+
+.ineligibilityReason {
+  margin-bottom: 6px;
+}
+
+.ineligibilityHint {
+  color: var(--text-muted, rgba(255, 255, 255, 0.5));
+  font-size: var(--text-xs, 12px);
+  margin-top: 12px;
+  margin-bottom: 0;
+}
+
+/* ============================================================================
+   ELIGIBILITY MESSAGE
+   ============================================================================ */
+
+.eligibilityMessage {
+  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+  font-size: var(--text-sm, 14px);
+  margin-bottom: var(--message-margin-bottom, 16px);
+}
+
+/* ============================================================================
+   BUTTON GROUP (HORIZONTAL)
+   ============================================================================ */
+
+.buttonGroup {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.buttonGroupItem {
+  flex: 1;
+}
+
+/* ============================================================================
+   BACK BUTTON (SECONDARY)
+   ============================================================================ */
+
+.backButton {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border-default, rgba(255, 255, 255, 0.1));
+  background: transparent;
+  color: var(--text-primary, rgba(255, 255, 255, 0.9));
+  font-size: var(--text-base, 16px);
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.backButton:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.backButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================================================
+   CONFIRM BUTTON (PRIMARY BLUE)
+   ============================================================================ */
+
+.confirmButton {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: none;
+  background: url(/wr_blue.png) no-repeat center center;
+  background-size: cover;
+  color: #000;
+  font-weight: 600;
+  font-size: var(--text-base, 16px);
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.confirmButton:hover {
+  opacity: 0.9;
+}
+
+/* ============================================================================
+   CONFIRMATION SECTION
+   ============================================================================ */
+
+.confirmationBox {
+  padding: var(--alert-padding, 16px);
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: 12px;
+  margin-bottom: var(--section-margin-bottom, 24px);
+}
+
+.confirmationText {
+  color: var(--text-primary, rgba(255, 255, 255, 0.9));
+  font-size: var(--text-sm, 14px);
+  margin: 0;
+}
+
+/* ============================================================================
+   PASSWORD FIELD
+   ============================================================================ */
+
+.passwordFieldWrapper {
+  margin-bottom: var(--field-margin-bottom, 24px);
+}
+
+.passwordLabel {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: var(--text-primary, rgba(255, 255, 255, 0.9));
+  font-size: var(--text-sm, 14px);
+}
+
+.passwordInput {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 2px solid var(--border-default, rgba(255, 255, 255, 0.1));
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary, rgba(255, 255, 255, 0.9));
+  font-size: var(--text-base, 16px);
+  transition: border-color 150ms ease;
+}
+
+.passwordInput:focus {
+  outline: none;
+  border-color: var(--focus-border, rgba(96, 165, 250, 0.5));
+}
+
+.passwordInput::placeholder {
+  color: var(--text-muted, rgba(255, 255, 255, 0.5));
+}
+
+/* ============================================================================
+   DELETE FINAL BUTTON (WITH CONDITIONAL STYLING)
+   ============================================================================ */
+
+.deleteFinalButton {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+  font-size: var(--text-base, 16px);
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.deleteFinalButtonEnabled {
+  background: var(--error-color, #ef4444);
+  color: #fff;
+}
+
+.deleteFinalButtonDisabled {
+  background: var(--bg-tertiary, rgba(255, 255, 255, 0.1));
+  color: var(--text-disabled, rgba(255, 255, 255, 0.3));
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.deleting {
+  opacity: 0.7;
+}
+
+/* ============================================================================
+   LOADING STATE
+   ============================================================================ */
+
+.loadingText {
+  color: var(--text-muted, rgba(255, 255, 255, 0.5));
+}
+
+/* ============================================================================
+   LAYOUT
+   ============================================================================ */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.spacer {
+  height: 24px;
+}

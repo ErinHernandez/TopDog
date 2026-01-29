@@ -14,6 +14,7 @@ import {
   SLOW_DRAFT_LAYOUT,
 } from '../constants';
 import { TEXT_COLORS } from '../../../core/constants/colors';
+import styles from './PositionNeedsIndicator.module.css';
 
 // ============================================================================
 // URGENCY HELPERS
@@ -47,37 +48,24 @@ function NeedPill({ need }: NeedPillProps): React.ReactElement {
 
   return (
     <span
+      className={styles.pill}
       style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 4,
-        padding: '3px 8px',
-        borderRadius: 6,
-        backgroundColor: isUrgent ? `${urgencyColor}20` : 'rgba(255, 255, 255, 0.06)',
-        border: `1px solid ${isUrgent ? urgencyColor : 'rgba(255, 255, 255, 0.1)'}`,
-      }}
+        '--pill-bg': isUrgent ? `${urgencyColor}20` : 'rgba(255, 255, 255, 0.06)',
+        '--pill-border': isUrgent ? urgencyColor : 'rgba(255, 255, 255, 0.1)',
+        '--position-color': positionColor,
+        '--position-text-color': need.position === 'WR' ? '#000' : '#fff',
+        '--count-color': isUrgent ? urgencyColor : 'rgba(255, 255, 255, 0.8)',
+        '--needs-text-font-size': `${SLOW_DRAFT_TYPOGRAPHY.needsText.fontSize}px`,
+        '--needs-text-font-weight': SLOW_DRAFT_TYPOGRAPHY.needsText.fontWeight,
+      } as React.CSSProperties}
     >
       {/* Position badge */}
-      <span
-        style={{
-          backgroundColor: positionColor,
-          color: need.position === 'WR' ? '#000' : '#fff',
-          fontSize: 9,
-          fontWeight: 700,
-          padding: '1px 4px',
-          borderRadius: 3,
-        }}
-      >
+      <span className={styles.pillBadge}>
         {need.position}
       </span>
 
       {/* Count needed */}
-      <span
-        style={{
-          ...SLOW_DRAFT_TYPOGRAPHY.needsText,
-          color: isUrgent ? urgencyColor : 'rgba(255, 255, 255, 0.8)',
-        }}
-      >
+      <span className={styles.pillCount}>
         {need.needed}
       </span>
     </span>
@@ -98,55 +86,29 @@ function PositionRow({ need }: PositionRowProps): React.ReactElement {
   const progress = Math.min(100, (need.current / need.recommended) * 100);
 
   return (
-    <div className="flex items-center gap-3">
+    <div
+      className={styles.row}
+      style={{
+        '--position-color': positionColor,
+        '--position-text-color': need.position === 'WR' ? '#000' : '#fff',
+        '--urgency-color': urgencyColor,
+        '--progress-width': `${progress}%`,
+      } as React.CSSProperties}
+    >
       {/* Position badge */}
-      <div
-        style={{
-          width: 32,
-          backgroundColor: positionColor,
-          color: need.position === 'WR' ? '#000' : '#fff',
-          fontSize: 11,
-          fontWeight: 700,
-          padding: '3px 0',
-          borderRadius: 4,
-          textAlign: 'center',
-        }}
-      >
+      <div className={styles.rowBadge}>
         {need.position}
       </div>
 
       {/* Progress bar */}
-      <div className="flex-1">
-        <div
-          style={{
-            height: 6,
-            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-            borderRadius: 3,
-            overflow: 'hidden',
-          }}
-        >
-          <div
-            style={{
-              width: `${progress}%`,
-              height: '100%',
-              backgroundColor: urgencyColor,
-              borderRadius: 3,
-              transition: 'width 0.3s ease',
-            }}
-          />
+      <div className={styles.progressContainer}>
+        <div className={styles.progressBar}>
+          <div className={styles.progressFill} />
         </div>
       </div>
 
       {/* Count */}
-      <div
-        style={{
-          minWidth: 50,
-          textAlign: 'right',
-          fontSize: 12,
-          fontWeight: 600,
-          color: urgencyColor,
-        }}
-      >
+      <div className={styles.rowCount}>
         {need.current}/{need.recommended}
       </div>
       {/* No status indicator - checkmarks removed */}
@@ -179,22 +141,12 @@ export default function PositionNeedsIndicator({
   // Expanded mode: Show position rows without checkmarks
   return (
     <div
+      className={styles.container}
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 12,
-      }}
+        '--header-color': TEXT_COLORS.secondary,
+      } as React.CSSProperties}
     >
-      <div
-        style={{
-          fontSize: 12,
-          fontWeight: 600,
-          color: TEXT_COLORS.secondary,
-          marginBottom: 4,
-          textTransform: 'uppercase',
-          letterSpacing: '0.05em',
-        }}
-      >
+      <div className={styles.header}>
         POSITION NEEDS
       </div>
       {needs.map((need) => (

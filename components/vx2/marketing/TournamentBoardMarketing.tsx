@@ -15,6 +15,7 @@
  */
 
 import React, { useMemo, type ReactElement, type CSSProperties } from 'react';
+import styles from './TournamentBoardMarketing.module.css';
 
 // ============================================================================
 // CONSTANTS
@@ -197,24 +198,18 @@ interface CellProps {
 
 function Cell({ data, size, borderWidth, borderRadius, animated }: CellProps): ReactElement {
   const animationDelay = animated ? `${(data.row * 0.02 + data.col * 0.03)}s` : undefined;
-  
+
   return (
     <div
+      className={`${styles.cell} ${animated ? styles.cellAnimated : ''}`}
       style={{
-        width: size,
-        height: size,
-        borderRadius: borderRadius,
-        border: `${borderWidth}px solid ${data.borderColor}`,
-        backgroundColor: data.bgColor,
-        boxSizing: 'border-box',
-        flexShrink: 0,
-        // Subtle inner shadow for depth
-        boxShadow: `inset 0 2px 4px rgba(0, 0, 0, 0.3)`,
-        // Animation
-        animation: animated ? 'cellFadeIn 0.5s ease-out forwards' : undefined,
-        animationDelay,
-        opacity: animated ? 0 : 1,
-      }}
+        '--cell-size': `${size}px`,
+        '--border-radius': `${borderRadius}px`,
+        '--border-width': `${borderWidth}px`,
+        '--border-color': data.borderColor,
+        '--bg-color': data.bgColor,
+        '--animation-delay': animationDelay,
+      } as CSSProperties}
       aria-hidden="true"
     />
   );
@@ -247,42 +242,22 @@ export default function TournamentBoardMarketing({
   
   return (
     <div
-      className={className}
+      className={`${styles.container} ${className}`}
       style={{
-        display: 'inline-flex',
-        flexDirection: 'column',
-        gap: gap,
-        backgroundColor: '#0d1117',
-        padding: gap,
-        borderRadius: borderRadius + 4,
+        '--gap': `${gap}px`,
+        '--border-radius': `${borderRadius + 4}px`,
         ...style,
-      }}
+      } as CSSProperties}
       role="img"
       aria-label={`Tournament board grid with ${columns} teams and ${rows} rounds`}
     >
-      {/* Animation keyframes */}
-      {animated && (
-        <style>{`
-          @keyframes cellFadeIn {
-            from {
-              opacity: 0;
-              transform: scale(0.8);
-            }
-            to {
-              opacity: 1;
-              transform: scale(1);
-            }
-          }
-        `}</style>
-      )}
-      
       {gridData.map((row, rowIndex) => (
         <div
           key={rowIndex}
+          className={styles.row}
           style={{
-            display: 'flex',
-            gap: gap,
-          }}
+            '--gap': `${gap}px`,
+          } as CSSProperties}
         >
           {row.map((cell, colIndex) => (
             <Cell

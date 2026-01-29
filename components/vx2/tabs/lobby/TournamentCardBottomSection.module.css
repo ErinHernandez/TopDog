@@ -1,0 +1,117 @@
+/**
+ * TournamentCardBottomSection shared styles
+ * Supports all three versions (v1, v2, v3) with CSS custom properties
+ */
+
+/* ============================================================================
+   ROOT CONTAINER - Main grid layout
+   ============================================================================ */
+
+.bottomSection {
+  display: grid;
+  width: 100%;
+  contain: layout style;
+  will-change: auto;
+}
+
+.bottomSection[data-has-progress="true"] {
+  grid-template-rows: var(--progress-height) var(--button-height) var(--stats-height);
+}
+
+.bottomSection[data-has-progress="false"] {
+  grid-template-rows: var(--button-height) var(--stats-height);
+}
+
+/* ============================================================================
+   PROGRESS SECTION
+   ============================================================================ */
+
+.progressSection {
+  height: var(--progress-height);
+  display: flex;
+  align-items: center;
+  contain: layout;
+}
+
+/* ============================================================================
+   BUTTON
+   ============================================================================ */
+
+.button {
+  width: 100%;
+  height: var(--button-height);
+  min-height: var(--button-height);
+  max-height: var(--button-height);
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  border-radius: var(--button-border-radius);
+  color: var(--text-primary);
+  font-size: var(--button-font-size);
+  transition: background-color 0.2s ease;
+  contain: layout style;
+}
+
+/* Background handling */
+.button:not(.buttonCustom) {
+  background-image: var(--button-bg-image);
+  background-size: cover;
+  background-position: center;
+}
+
+.buttonCustom {
+  background-color: var(--button-bg-color);
+}
+
+/* Interaction states */
+.button:active {
+  transform: scale(0.98);
+}
+
+/* ============================================================================
+   STATS GRID
+   ============================================================================ */
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--stats-gap);
+  height: var(--stats-height);
+  align-content: center;
+  contain: layout;
+}
+
+/* ============================================================================
+   STAT ITEM
+   ============================================================================ */
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.statValue {
+  font-weight: bold;
+  font-size: var(--stats-value-font-size);
+  color: var(--text-primary);
+  background-color: var(--stat-bg);
+  padding: var(--stat-value-padding);
+  border-radius: var(--stat-value-border-radius);
+}
+
+.statLabel {
+  font-size: var(--stats-label-font-size);
+  color: var(--text-secondary);
+  background-color: var(--stat-bg);
+  padding: var(--stat-label-padding);
+  border-radius: var(--stat-label-border-radius);
+  margin-top: var(--stat-label-margin-top);
+}
+
+/* ============================================================================
+   CSS CUSTOM PROPERTIES - Default values (V1)
+   ============================================================================ */
+

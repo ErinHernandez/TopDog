@@ -22,6 +22,8 @@ import { POSITION_COLORS } from '../constants';
 import { BG_COLORS, TEXT_COLORS } from '../../core/constants/colors';
 import { SPACING, TYPOGRAPHY } from '../../core/constants/sizes';
 import { useDeviceCapabilities, useBatchSize } from '../../hooks/ui/useDeviceCapabilities';
+import { cn } from '@/lib/styles';
+import styles from './VirtualizedPlayerList.module.css';
 import PlayerExpandedCard from './PlayerExpandedCard';
 
 // ============================================================================
@@ -171,27 +173,23 @@ interface FilterButtonProps {
   onToggle: () => void;
 }
 
-const FilterButton = React.memo(function FilterButton({ 
-  position, 
-  count, 
-  isActive, 
-  onToggle 
+const FilterButton = React.memo(function FilterButton({
+  position,
+  count,
+  isActive,
+  onToggle
 }: FilterButtonProps): React.ReactElement {
   const color = POSITION_COLORS[position];
-  
+
   return (
     <button
       onClick={onToggle}
       aria-label={`Filter by ${position}, ${count} drafted`}
       aria-pressed={isActive}
-      className="flex-1 py-2.5 px-3 font-bold transition-all"
+      className={cn(styles.filterButton, isActive && styles.active)}
       style={{
-        fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-        backgroundColor: isActive ? 'rgba(255,255,255,0.1)' : 'transparent',
-        color: isActive ? color : TEXT_COLORS.muted,
-        borderBottom: `2px solid ${color}`,
-        opacity: isActive ? 1 : 0.4,
-        cursor: 'pointer',
+        borderBottomColor: color,
+        color: isActive ? color : undefined,
       }}
     >
       {position} {count}
@@ -205,78 +203,35 @@ interface SearchBarProps {
   onClear: () => void;
 }
 
-const SearchBar = React.memo(function SearchBar({ 
-  value, 
-  onChange, 
-  onClear 
+const SearchBar = React.memo(function SearchBar({
+  value,
+  onChange,
+  onClear
 }: SearchBarProps): React.ReactElement {
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 8,
-        marginTop: PLAYER_LIST_PX.searchMarginTop,
-        marginLeft: PLAYER_LIST_PX.searchMarginX,
-        marginRight: PLAYER_LIST_PX.searchMarginX,
-      }}
-    >
-      <div
-        style={{
-          flex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          height: PLAYER_LIST_PX.searchHeight,
-          backgroundColor: PLAYER_LIST_COLORS.searchBg,
-          borderRadius: 8,
-          paddingLeft: 12,
-          paddingRight: 12,
-        }}
-      >
+    <div className={styles.searchContainer}>
+      <div className={styles.searchInputWrapper}>
         <svg
-          width="18"
-          height="18"
+          className={styles.searchInputIcon}
           viewBox="0 0 24 24"
           fill="none"
-          stroke={PLAYER_LIST_COLORS.searchPlaceholder}
           strokeWidth="2"
-          style={{ marginRight: 8, flexShrink: 0 }}
         >
           <circle cx="11" cy="11" r="8" />
           <path d="M21 21l-4.35-4.35" />
         </svg>
-        
+
         <input
           type="text"
+          className={styles.searchInput}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder="Search..."
           aria-label="Search players"
-          style={{
-            flex: 1,
-            border: 'none',
-            background: 'transparent',
-            color: TEXT_COLORS.primary,
-            fontSize: PLAYER_LIST_PX.searchFontSize,
-            outline: 'none',
-          }}
         />
       </div>
-      
-      <button
-        onClick={onClear}
-        style={{
-          width: PLAYER_LIST_PX.clearButtonWidth,
-          height: PLAYER_LIST_PX.searchHeight,
-          backgroundColor: PLAYER_LIST_COLORS.searchBg,
-          border: 'none',
-          borderRadius: 8,
-          color: TEXT_COLORS.primary,
-          fontSize: 14,
-          fontWeight: 500,
-          cursor: 'pointer',
-        }}
-      >
+
+      <button onClick={onClear} className={styles.clearButton}>
         Clear
       </button>
     </div>
@@ -292,16 +247,16 @@ interface VirtualPlayerRowProps {
   style: React.CSSProperties;
 }
 
-const VirtualPlayerRow = React.memo(function VirtualPlayerRow({ 
-  player, 
-  rank, 
-  isQueued, 
+const VirtualPlayerRow = React.memo(function VirtualPlayerRow({
+  player,
+  rank,
+  isQueued,
   onToggleQueue,
   onRowClick,
   style,
 }: VirtualPlayerRowProps): React.ReactElement {
   const positionColor = POSITION_COLORS[player.position];
-  
+
   return (
     <div
       onClick={onRowClick}
@@ -313,86 +268,46 @@ const VirtualPlayerRow = React.memo(function VirtualPlayerRow({
           onRowClick();
         }
       }}
-      style={{
-        ...style,
-        display: 'flex',
-        alignItems: 'center',
-        height: ROW_HEIGHT,
-        backgroundColor: PLAYER_LIST_COLORS.rowBg,
-        cursor: 'pointer',
-        borderBottom: `1px solid ${PLAYER_LIST_COLORS.rowBorder}`,
-      }}
+      className={styles.playerRow}
+      style={style}
     >
       {/* ADP Column */}
-      <div style={{ 
-        width: PLAYER_LIST_PX.adpColumnWidth, 
-        textAlign: 'center', 
-        fontSize: PLAYER_LIST_PX.statFontSize, 
-        color: '#9CA3AF', 
-        fontVariantNumeric: 'tabular-nums',
-        flexShrink: 0,
-      }}>
+      <div className={styles.adpColumn}>
         {player.adp?.toFixed(1) || '-'}
       </div>
-      
+
       {/* Player Info */}
-      <div style={{ flex: 1, paddingLeft: 10, paddingRight: 8, minWidth: 0 }}>
-        <div
-          style={{
-            fontSize: PLAYER_LIST_PX.playerNameFontSize,
-            fontWeight: 500,
-            color: TEXT_COLORS.primary,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
+      <div className={styles.playerInfo}>
+        <div className={styles.playerName}>
           {player.name}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
+        <div className={styles.playerMetadata}>
           <span
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '1px 5px',
-              borderRadius: 3,
-              backgroundColor: positionColor,
-              color: '#000000',
-              fontSize: 10,
-              fontWeight: 700,
-            }}
+            className={styles.positionBadge}
+            style={{ backgroundColor: positionColor }}
           >
             {player.position}
           </span>
-          <span style={{ fontSize: PLAYER_LIST_PX.playerTeamFontSize, color: TEXT_COLORS.secondary }}>
+          <span className={styles.playerTeam}>
             {player.team} ({player.byeWeek || 'TBD'})
           </span>
         </div>
       </div>
-      
+
       {/* Queue Button */}
-      <div style={{ width: PLAYER_LIST_PX.queueButtonContainerWidth, display: 'flex', justifyContent: 'center', flexShrink: 0 }}>
+      <div className={styles.queueButtonContainer}>
         <button
           onClick={(e) => {
             e.stopPropagation();
             onToggleQueue();
           }}
           aria-label={isQueued ? `Remove ${player.name} from queue` : `Add ${player.name} to queue`}
+          className={cn(styles.queueButton, isQueued && styles.active)}
           style={{
-            width: 28,
-            height: 28,
-            borderRadius: '50%',
-            border: `2px solid ${isQueued ? '#60A5FA' : '#6B7280'}`,
-            backgroundColor: isQueued ? 'rgba(96, 165, 250, 0.2)' : 'transparent',
-            cursor: 'pointer',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: 0,
+            borderColor: isQueued ? '#60a5fa' : undefined,
           }}
         >
-          <svg width="12" height="12" viewBox="0 0 12 12">
+          <svg className={styles.queueButtonSvg} viewBox="0 0 12 12">
             {isQueued ? (
               <rect x="1" y="5" width="10" height="2" rx="1" fill="#FFFFFF" />
             ) : (
@@ -404,30 +319,14 @@ const VirtualPlayerRow = React.memo(function VirtualPlayerRow({
           </svg>
         </button>
       </div>
-      
+
       {/* PROJ Column */}
-      <div style={{ 
-        width: PLAYER_LIST_PX.projColumnWidth, 
-        textAlign: 'right', 
-        paddingRight: 8,
-        fontSize: PLAYER_LIST_PX.statFontSize, 
-        color: TEXT_COLORS.secondary, 
-        fontVariantNumeric: 'tabular-nums',
-        flexShrink: 0,
-      }}>
+      <div className={styles.projColumn}>
         {player.projectedPoints ? Math.round(player.projectedPoints) : '-'}
       </div>
-      
+
       {/* RANK Column */}
-      <div style={{ 
-        width: PLAYER_LIST_PX.rankColumnWidth, 
-        textAlign: 'center', 
-        paddingRight: 4,
-        fontSize: PLAYER_LIST_PX.playerRankFontSize, 
-        color: TEXT_COLORS.secondary, 
-        fontVariantNumeric: 'tabular-nums',
-        flexShrink: 0,
-      }}>
+      <div className={styles.rankColumn}>
         {rank || '-'}
       </div>
     </div>
@@ -556,23 +455,9 @@ export function VirtualizedPlayerList({
   }, [shouldVirtualize, players, visibleRange]);
   
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        backgroundColor: BG_COLORS.primary,
-      }}
-    >
+    <div className={styles.container}>
       {/* Position Filter Buttons */}
-      <div 
-        className="flex rounded-lg overflow-hidden"
-        style={{ 
-          backgroundColor: 'rgba(255,255,255,0.05)',
-          marginTop: `${SPACING.md}px`,
-          marginBottom: `${SPACING.xs}px`,
-        }}
-      >
+      <div className={styles.filterButtonGroup}>
         {POSITIONS.map(position => (
           <FilterButton
             key={position}
@@ -592,71 +477,30 @@ export function VirtualizedPlayerList({
       />
       
       {/* Column Headers */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          padding: `${PLAYER_LIST_PX.headerPaddingY}px 4px`,
-          borderBottom: `1px solid ${PLAYER_LIST_COLORS.rowBorder}`,
-          backgroundColor: BG_COLORS.primary,
-        }}
-      >
+      <div className={styles.header}>
         <div
           onClick={handleSortAdp}
-          style={{
-            width: PLAYER_LIST_PX.adpColumnWidth,
-            textAlign: 'center',
-            fontSize: 14,
-            fontWeight: 500,
-            color: sortMode === 'adp' ? TEXT_COLORS.primary : TEXT_COLORS.secondary,
-            cursor: 'pointer',
-            flexShrink: 0,
-          }}
+          className={cn(styles.headerColumn, styles.headerColumnAdp, sortMode === 'adp' && styles.active)}
         >
-          <span style={{
-            borderBottom: sortMode === 'adp' ? '2px solid #6B7280' : '2px solid transparent',
-            paddingBottom: 2,
-          }}>
+          <span className={styles.headerColumnLabel}>
             ADP
           </span>
         </div>
-        <div style={{ flex: 1 }} />
-        <div style={{ width: PLAYER_LIST_PX.queueButtonContainerWidth, flexShrink: 0 }} />
+        <div className={styles.headerColumnSpacer} />
+        <div className={styles.headerColumnQueueSpacer} />
         <div
           onClick={handleSortProj}
-          style={{
-            width: PLAYER_LIST_PX.projColumnWidth,
-            textAlign: 'center',
-            fontSize: 13,
-            fontWeight: 500,
-            color: sortMode === 'proj' ? TEXT_COLORS.primary : TEXT_COLORS.secondary,
-            cursor: 'pointer',
-            flexShrink: 0,
-          }}
+          className={cn(styles.headerColumn, styles.headerColumnProj, sortMode === 'proj' && styles.active)}
         >
-          <span style={{
-            borderBottom: sortMode === 'proj' ? '2px solid #6B7280' : '2px solid transparent',
-            paddingBottom: 2,
-          }}>
+          <span className={styles.headerColumnLabel}>
             PROJ
           </span>
         </div>
         <div
           onClick={handleSortRank}
-          style={{
-            width: PLAYER_LIST_PX.rankColumnWidth,
-            textAlign: 'center',
-            fontSize: 13,
-            fontWeight: 500,
-            color: sortMode === 'rank' ? TEXT_COLORS.primary : TEXT_COLORS.secondary,
-            cursor: 'pointer',
-            flexShrink: 0,
-          }}
+          className={cn(styles.headerColumn, styles.headerColumnRank, sortMode === 'rank' && styles.active)}
         >
-          <span style={{
-            borderBottom: sortMode === 'rank' ? '2px solid #6B7280' : '2px solid transparent',
-            paddingBottom: 2,
-          }}>
+          <span className={styles.headerColumnLabel}>
             RANK
           </span>
         </div>
@@ -669,38 +513,28 @@ export function VirtualizedPlayerList({
         role="grid"
         aria-label="Available players"
         aria-rowcount={players.length}
-        style={{
-          flex: 1,
-          overflowY: 'auto',
-          WebkitOverflowScrolling: 'touch',
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-          position: 'relative',
-        }}
-        className="hide-scrollbar"
+        className={styles.scrollContainer}
       >
         {isLoading ? (
-          <div style={{ padding: 24, textAlign: 'center', color: TEXT_COLORS.secondary }}>
+          <div className={styles.emptyState}>
             Loading players...
           </div>
         ) : players.length === 0 ? (
-          <div style={{ padding: 24, textAlign: 'center', color: TEXT_COLORS.secondary }}>
+          <div className={styles.emptyState}>
             No players found
           </div>
         ) : shouldVirtualize ? (
           // Virtualized rendering
           <div
+            className={styles.virtualizedContent}
             style={{
               height: totalHeight,
-              position: 'relative',
             }}
           >
             <div
+              className={styles.virtualizedViewport}
               style={{
-                position: 'absolute',
                 top: offsetY,
-                left: 0,
-                right: 0,
               }}
             >
               {visiblePlayers.map((player, idx) => {
@@ -718,7 +552,7 @@ export function VirtualizedPlayerList({
                       style={{}}
                     />
                     {isExpanded && (
-                      <div style={{ padding: '8px 4px' }}>
+                      <div className={styles.expandedCardContainer}>
                         <PlayerExpandedCard
                           player={{
                             id: player.id,
@@ -744,7 +578,7 @@ export function VirtualizedPlayerList({
           </div>
         ) : (
           // Non-virtualized rendering for small lists
-          <div style={{ paddingBottom: 24 }}>
+          <div className={styles.nonVirtualizedContent}>
             {players.map((player) => (
               <React.Fragment key={player.id}>
                 <VirtualPlayerRow
@@ -756,7 +590,7 @@ export function VirtualizedPlayerList({
                   style={{}}
                 />
                 {expandedPlayerId === player.id && (
-                  <div style={{ padding: '8px 4px' }}>
+                  <div className={styles.expandedCardContainer}>
                     <PlayerExpandedCard
                       player={{
                         id: player.id,
@@ -783,16 +617,7 @@ export function VirtualizedPlayerList({
       
       {/* Debug info for development */}
       {process.env.NODE_ENV === 'development' && shouldVirtualize && (
-        <div style={{ 
-          position: 'absolute', 
-          bottom: 4, 
-          right: 4, 
-          fontSize: 10, 
-          color: '#666',
-          background: 'rgba(0,0,0,0.5)',
-          padding: '2px 4px',
-          borderRadius: 2,
-        }}>
+        <div className={styles.debugInfo}>
           {visibleRange.start}-{visibleRange.end} / {players.length}
           {isLegacyDevice && ' (legacy)'}
         </div>

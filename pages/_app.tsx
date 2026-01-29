@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { SWRConfig } from 'swr';
 import type { AppProps } from 'next/app';
 import '../styles/globals.css';
+import '../styles/index.css'; // CSS custom properties & utility classes
 import '../styles/legacy-support.css';
 import '../styles/device-sizing.css';
 import DevNav from '../components/dev/DevNav';

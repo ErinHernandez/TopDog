@@ -1,28 +1,22 @@
 /**
  * PaystackWithdrawModalVX2 - Paystack Withdrawal Modal
  * 
- * Multi-step withdrawal flow for African markets:
+ * Multi-step withdrawal flow for African markets with CSS Modules for CSP compliance.
+ * All inline styles have been extracted to CSS modules.
+ * 
+ * Steps:
  * 1. Amount Selection - Currency-specific amounts
- * 2. Bank Account Selection/Add - Nigerian NUBAN, SA BASA, Ghana/Kenya Mobile Money
+ * 2. Bank Account Selection/Add - Nigerian NUBAN, SA BASA, Ghana/Kenya Mobile Money  
  * 3. Confirmation - Review with fee breakdown
  * 4. 2FA Verification - 6-digit code
  * 5. Success/Error - Result display
- * 
- * Features:
- * - Bank account resolution (name verification)
- * - Mobile money withdrawal support
- * - Saved recipient management
- * - Transfer fee display
- * - Currency-aware formatting (NGN, GHS, ZAR, KES)
  * 
  * @module components/vx2/modals/PaystackWithdrawModalVX2
  */
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../core/constants/colors';
-import { SPACING, TYPOGRAPHY, Z_INDEX } from '../core/constants/sizes';
-import { Close, ChevronLeft, Plus } from '../components/icons';
-import { useCountdown } from '../hooks/ui/useCountdown';
+import { cn } from '@/lib/styles';
+import styles from './PaystackWithdrawModalVX2.module.css';
 import {
   formatPaystackAmount,
   toSmallestUnit,
@@ -38,6 +32,8 @@ import type {
   PaystackTransferRecipient,
   TransferRecipientType,
 } from '../../../lib/paystack/paystackTypes';
+import { Close, ChevronLeft, Plus } from '../components/icons';
+import { useCountdown } from '../hooks/ui/useCountdown';
 import { createScopedLogger } from '../../../lib/clientLogger';
 
 const logger = createScopedLogger('[PaystackWithdraw]');
@@ -52,7 +48,6 @@ export interface PaystackWithdrawModalVX2Props {
   userId: string;
   userEmail: string;
   userBalance?: number;
-  /** User's country code (NG, GH, ZA, KE) */
   userCountry: 'NG' | 'GH' | 'ZA' | 'KE';
   onSuccess?: (transactionId: string, amount: number, currency: string) => void;
 }
@@ -63,10 +58,6 @@ interface Bank {
   code: string;
   name: string;
 }
-
-// ============================================================================
-// CONSTANTS
-// ============================================================================
 
 const DEFAULT_USER_BACKUP = { 
   type: 'phone' as const, 
@@ -97,7 +88,7 @@ function MobileIcon(): React.ReactElement {
 
 function CheckIcon(): React.ReactElement {
   return (
-    <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke={STATE_COLORS.success} strokeWidth={2.5}>
+    <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="#10b981" strokeWidth={2.5}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
     </svg>
   );
@@ -130,54 +121,31 @@ function AmountStep({
   const selectedAmount = parseFloat(amount) ? toSmallestUnit(parseFloat(amount), currency) : 0;
   const balanceSmallest = toSmallestUnit(balance, currency);
   
-  const numericAmount = parseFloat(amount) || 0;
   const validation = validatePaystackAmount(selectedAmount, currency);
   const isValidAmount = validation.isValid && selectedAmount <= balanceSmallest;
   
   return (
-    <div className="flex flex-col h-full">
-      {/* Header */}
-      <div 
-        className="flex items-center justify-between flex-shrink-0" 
-        style={{ 
-          padding: `${SPACING.md}px ${SPACING.lg}px`, 
-          borderBottom: `1px solid ${BORDER_COLORS.default}` 
-        }}
-      >
-        <h2 className="font-bold" style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}>
-          Withdraw Funds
-        </h2>
-        <button onClick={onClose} className="p-2" aria-label="Close">
-          <Close size={24} color={TEXT_COLORS.muted} />
+    <div className={styles.amountStepContainer}>
+      <div className={styles.header}>
+        <h2 className={styles.headerTitle}>Withdraw Funds</h2>
+        <button onClick={onClose} className={styles.iconButton} aria-label="Close">
+          <Close size={24} />
         </button>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto" style={{ padding: SPACING.lg }}>
-        {/* Balance */}
-        <div className="rounded-xl p-4 mb-6" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)' }}>
-          <div style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>
-            Available Balance (USD)
-          </div>
-          <div className="font-bold" style={{ color: STATE_COLORS.success, fontSize: `${TYPOGRAPHY.fontSize['2xl']}px` }}>
-            ${balance.toFixed(2)}
-          </div>
-          <div className="mt-1" style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>
-            Will be converted to {currency} for withdrawal
-          </div>
+      <div className={styles.content}>
+        <div className={styles.balanceCard}>
+          <div className={styles.balanceLabel}>Available Balance (USD)</div>
+          <div className={styles.balanceAmount}>${balance.toFixed(2)}</div>
+          <div className={styles.balanceNote}>Will be converted to {currency} for withdrawal</div>
         </div>
 
-        {/* Amount Input */}
         <div className="mb-6">
-          <label 
-            className="block font-medium mb-3" 
-            style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
-          >
+          <label className={styles.amountLabel}>
             How much would you like to withdraw? ({currency})
           </label>
           
-          {/* Quick Amounts */}
-          <div className="grid grid-cols-3 gap-2 mb-4">
+          <div className={styles.quickAmountsGrid}>
             {quickAmounts.slice(0, 6).map(qa => {
               const qaDisplay = toDisplayAmount(qa, currency);
               return (
@@ -185,13 +153,10 @@ function AmountStep({
                   key={qa}
                   onClick={() => qa <= balanceSmallest && setAmount(qaDisplay.toString())}
                   disabled={qa > balanceSmallest}
-                  className="py-3 rounded-lg font-semibold transition-all"
-                  style={{
-                    fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-                    backgroundColor: selectedAmount === qa ? STATE_COLORS.active : 'rgba(255,255,255,0.05)',
-                    color: selectedAmount === qa ? '#000' : qa > balanceSmallest ? TEXT_COLORS.disabled : TEXT_COLORS.primary,
-                    opacity: qa > balanceSmallest ? 0.5 : 1,
-                  }}
+                  className={cn(
+                    styles.quickAmountButton,
+                    selectedAmount === qa && styles.selected
+                  )}
                 >
                   {formatPaystackAmount(qa, currency, { decimals: 0 })}
                 </button>
@@ -199,58 +164,37 @@ function AmountStep({
             })}
           </div>
 
-          {/* Custom Input */}
-          <div className="relative">
-            <span 
-              className="absolute left-4 top-1/2 -translate-y-1/2 font-semibold" 
-              style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}
-            >
-              {currencyConfig.symbol}
-            </span>
+          <div className={styles.customInputWrapper}>
+            <span className={styles.currencySymbol}>{currencyConfig.symbol}</span>
             <input
               type="number"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="0"
               step="1"
-              className="w-full pl-10 pr-4 py-4 rounded-xl font-semibold outline-none"
-              style={{ 
-                backgroundColor: 'rgba(255,255,255,0.05)', 
-                color: TEXT_COLORS.primary, 
-                border: `1px solid ${BORDER_COLORS.default}`, 
-                fontSize: `${TYPOGRAPHY.fontSize.lg}px` 
-              }}
+              className={styles.numberInput}
             />
           </div>
 
           {!validation.isValid && validation.error && amount && (
-            <p className="mt-2" style={{ color: STATE_COLORS.error, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
-              {validation.error}
-            </p>
+            <p className={styles.errorText}>{validation.error}</p>
           )}
           {selectedAmount > balanceSmallest && (
-            <p className="mt-2" style={{ color: STATE_COLORS.error, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
-              Exceeds available balance
-            </p>
+            <p className={styles.errorText}>Exceeds available balance</p>
           )}
         </div>
 
-        {/* Fee Notice */}
         {selectedAmount > 0 && (
-          <div className="p-4 rounded-lg" style={{ backgroundColor: `${STATE_COLORS.active}15` }}>
-            <div className="flex justify-between mb-2">
-              <span style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
-                Transfer Fee
-              </span>
-              <span style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+          <div className={styles.feeCard}>
+            <div className={styles.feeRow}>
+              <span>Transfer Fee</span>
+              <span className={styles.feeRowValue}>
                 {formatPaystackAmount(calculateTransferFee(selectedAmount, currency), currency)}
               </span>
             </div>
-            <div className="flex justify-between">
-              <span style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
-                You'll Receive
-              </span>
-              <span className="font-semibold" style={{ color: STATE_COLORS.success, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+            <div className={cn(styles.feeRow, styles.feeRowDivider)}>
+              <span className={styles.feeRowReceivedLabel}>You'll Receive</span>
+              <span className={styles.feeRowReceivedValue}>
                 {formatPaystackAmount(selectedAmount, currency)}
               </span>
             </div>
@@ -258,18 +202,11 @@ function AmountStep({
         )}
       </div>
 
-      {/* Footer */}
-      <div className="flex-shrink-0" style={{ padding: SPACING.lg, borderTop: `1px solid ${BORDER_COLORS.default}` }}>
+      <div className={styles.footer}>
         <button
           onClick={onContinue}
           disabled={!isValidAmount}
-          className="w-full py-4 rounded-xl font-bold transition-all"
-          style={{
-            fontSize: `${TYPOGRAPHY.fontSize.lg}px`,
-            backgroundColor: isValidAmount ? STATE_COLORS.active : BG_COLORS.tertiary,
-            color: isValidAmount ? '#000' : TEXT_COLORS.disabled,
-            opacity: isValidAmount ? 1 : 0.5,
-          }}
+          className={cn(styles.button, styles.buttonPrimary)}
         >
           {isValidAmount 
             ? `Continue with ${formatPaystackAmount(selectedAmount, currency)}` 
@@ -305,128 +242,81 @@ function RecipientStep({
   isLoading,
 }: RecipientStepProps): React.ReactElement {
   return (
-    <div className="flex flex-col h-full">
-      {/* Header */}
-      <div 
-        className="flex items-center gap-3 flex-shrink-0" 
-        style={{ 
-          padding: `${SPACING.md}px ${SPACING.lg}px`, 
-          borderBottom: `1px solid ${BORDER_COLORS.default}` 
-        }}
-      >
-        <button onClick={onBack} className="p-2" aria-label="Back">
-          <ChevronLeft size={24} color={TEXT_COLORS.muted} />
+    <div className={styles.recipientStepContainer}>
+      <div className={styles.header}>
+        <button onClick={onBack} className={styles.iconButton} aria-label="Back">
+          <ChevronLeft size={24} />
         </button>
-        <h2 className="font-bold" style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}>
-          Select Account
-        </h2>
+        <h2 className={styles.headerTitle}>Select Account</h2>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto" style={{ padding: SPACING.lg }}>
+      <div className={styles.content}>
         {recipients.length === 0 ? (
-          <div className="text-center py-8">
-            <div 
-              className="w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-4"
-              style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}
-            >
+          <div className={styles.emptyState}>
+            <div className={styles.emptyStateIcon}>
               <BankIcon />
             </div>
-            <h3 className="font-semibold mb-2" style={{ color: TEXT_COLORS.primary }}>
-              No Withdrawal Accounts
-            </h3>
-            <p className="mb-6" style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+            <h3 className={styles.emptyStateTitle}>No Withdrawal Accounts</h3>
+            <p className={styles.emptyStateText}>
               Add a bank account or mobile money number to receive withdrawals
             </p>
             <button
               onClick={onAddNew}
-              className="px-6 py-3 rounded-xl font-semibold"
-              style={{ backgroundColor: STATE_COLORS.active, color: '#000' }}
+              className={cn(styles.button, styles.buttonPrimary)}
             >
               Add Account
             </button>
           </div>
         ) : (
           <>
-            <div className="space-y-3 mb-4">
+            <div className={styles.recipientsList}>
               {recipients.map(recipient => (
                 <button
                   key={recipient.code}
                   onClick={() => onSelectRecipient(recipient)}
-                  className="w-full flex items-center gap-3 p-4 rounded-xl transition-all"
-                  style={{
-                    backgroundColor: selectedRecipient?.code === recipient.code 
-                      ? 'rgba(96, 165, 250, 0.15)' 
-                      : 'rgba(255,255,255,0.03)',
-                    border: `2px solid ${selectedRecipient?.code === recipient.code 
-                      ? STATE_COLORS.active 
-                      : 'transparent'}`,
-                  }}
+                  className={cn(
+                    styles.recipientCard,
+                    selectedRecipient?.code === recipient.code && styles.selected
+                  )}
                 >
-                  <div 
-                    className="w-10 h-10 rounded-lg flex items-center justify-center" 
-                    style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: TEXT_COLORS.primary }}
-                  >
+                  <div className={styles.recipientIcon}>
                     {recipient.type === 'mobile_money' ? <MobileIcon /> : <BankIcon />}
                   </div>
-                  <div className="flex-1 text-left">
-                    <div className="font-semibold" style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+                  <div className={styles.recipientInfo}>
+                    <div className={styles.recipientName}>
                       {recipient.accountName || recipient.bankName || 'Account'}
                     </div>
-                    <div style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>
+                    <div className={styles.recipientDetails}>
                       {recipient.bankName ? `${recipient.bankName} - ` : ''}
                       ****{recipient.accountNumber.slice(-4)}
                     </div>
                   </div>
                   {recipient.isDefault && (
-                    <span 
-                      className="px-2 py-1 rounded-full" 
-                      style={{ 
-                        backgroundColor: 'rgba(255,255,255,0.1)', 
-                        color: TEXT_COLORS.secondary, 
-                        fontSize: `${TYPOGRAPHY.fontSize.xs}px` 
-                      }}
-                    >
-                      Default
-                    </span>
+                    <span className={styles.recipientDefaultBadge}>Default</span>
                   )}
                 </button>
               ))}
             </div>
             
-            {/* Add New */}
             <button 
               onClick={onAddNew}
-              className="w-full flex items-center gap-3 p-4 rounded-xl" 
-              style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: `2px dashed ${BORDER_COLORS.default}` }}
+              className={styles.addNewButton}
             >
-              <div 
-                className="w-10 h-10 rounded-lg flex items-center justify-center" 
-                style={{ backgroundColor: 'rgba(255,255,255,0.05)', color: TEXT_COLORS.muted }}
-              >
+              <div className={styles.addNewIcon}>
                 <Plus size={20} />
               </div>
-              <div className="font-medium" style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
-                Add withdrawal account
-              </div>
+              <div className={styles.addNewText}>Add withdrawal account</div>
             </button>
           </>
         )}
       </div>
 
-      {/* Footer */}
       {recipients.length > 0 && (
-        <div className="flex-shrink-0" style={{ padding: SPACING.lg, borderTop: `1px solid ${BORDER_COLORS.default}` }}>
+        <div className={styles.footer}>
           <button
             onClick={onContinue}
             disabled={!selectedRecipient || isLoading}
-            className="w-full py-4 rounded-xl font-bold transition-all"
-            style={{
-              fontSize: `${TYPOGRAPHY.fontSize.lg}px`,
-              backgroundColor: selectedRecipient && !isLoading ? STATE_COLORS.active : BG_COLORS.tertiary,
-              color: selectedRecipient && !isLoading ? '#000' : TEXT_COLORS.disabled,
-              opacity: selectedRecipient && !isLoading ? 1 : 0.5,
-            }}
+            className={cn(styles.button, styles.buttonPrimary)}
           >
             Continue
           </button>
@@ -469,7 +359,6 @@ function AddRecipientStep({
   const [bankCode, setBankCode] = useState('');
   const [accountName, setAccountName] = useState('');
   
-  // Auto-set type based on country
   useEffect(() => {
     if (country === 'GH' || country === 'KE') {
       setRecipientType('mobile_money');
@@ -478,7 +367,6 @@ function AddRecipientStep({
     }
   }, [country]);
   
-  // Use resolved name
   useEffect(() => {
     if (resolvedName) {
       setAccountName(resolvedName);
@@ -501,45 +389,34 @@ function AddRecipientStep({
   };
   
   return (
-    <div className="flex flex-col h-full">
-      {/* Header */}
-      <div 
-        className="flex items-center gap-3 flex-shrink-0" 
-        style={{ 
-          padding: `${SPACING.md}px ${SPACING.lg}px`, 
-          borderBottom: `1px solid ${BORDER_COLORS.default}` 
-        }}
-      >
-        <button onClick={onBack} className="p-2" aria-label="Back">
-          <ChevronLeft size={24} color={TEXT_COLORS.muted} />
+    <div className={styles.addRecipientStepContainer}>
+      <div className={styles.header}>
+        <button onClick={onBack} className={styles.iconButton} aria-label="Back">
+          <ChevronLeft size={24} />
         </button>
-        <h2 className="font-bold" style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}>
+        <h2 className={styles.headerTitle}>
           Add {isBankTransfer ? 'Bank Account' : 'Mobile Money'}
         </h2>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto" style={{ padding: SPACING.lg }}>
-        {/* Type Toggle (for countries that support both) */}
-        {(country === 'NG') && (
-          <div className="grid grid-cols-2 gap-2 mb-6">
+      <div className={styles.content}>
+        {country === 'NG' && (
+          <div className={styles.typeToggleGrid}>
             <button
               onClick={() => setRecipientType('bank')}
-              className="py-3 rounded-lg font-medium transition-all"
-              style={{
-                backgroundColor: recipientType === 'bank' ? STATE_COLORS.active : 'rgba(255,255,255,0.05)',
-                color: recipientType === 'bank' ? '#000' : TEXT_COLORS.primary,
-              }}
+              className={cn(
+                styles.typeToggleButton,
+                recipientType === 'bank' && styles.selected
+              )}
             >
               Bank Account
             </button>
             <button
               onClick={() => setRecipientType('mobile_money')}
-              className="py-3 rounded-lg font-medium transition-all"
-              style={{
-                backgroundColor: recipientType === 'mobile_money' ? STATE_COLORS.active : 'rgba(255,255,255,0.05)',
-                color: recipientType === 'mobile_money' ? '#000' : TEXT_COLORS.primary,
-              }}
+              className={cn(
+                styles.typeToggleButton,
+                recipientType === 'mobile_money' && styles.selected
+              )}
             >
               Mobile Money
             </button>
@@ -547,40 +424,23 @@ function AddRecipientStep({
         )}
 
         {isBankTransfer && (
-          <>
-            {/* Bank Selection */}
-            <div className="mb-4">
-              <label 
-                className="block mb-2" 
-                style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
-              >
-                Bank
-              </label>
-              <select
-                value={bankCode}
-                onChange={(e) => setBankCode(e.target.value)}
-                className="w-full py-3 px-4 rounded-xl outline-none appearance-none"
-                style={{ 
-                  backgroundColor: 'rgba(255,255,255,0.05)', 
-                  color: TEXT_COLORS.primary, 
-                  border: `1px solid ${BORDER_COLORS.default}` 
-                }}
-              >
-                <option value="">Select bank</option>
-                {banks.map(bank => (
-                  <option key={bank.code} value={bank.code}>{bank.name}</option>
-                ))}
-              </select>
-            </div>
-          </>
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>Bank</label>
+            <select
+              value={bankCode}
+              onChange={(e) => setBankCode(e.target.value)}
+              className={styles.select}
+            >
+              <option value="">Select bank</option>
+              {banks.map(bank => (
+                <option key={bank.code} value={bank.code}>{bank.name}</option>
+              ))}
+            </select>
+          </div>
         )}
 
-        {/* Account Number */}
-        <div className="mb-4">
-          <label 
-            className="block mb-2" 
-            style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
-          >
+        <div className={styles.formGroup}>
+          <label className={styles.formLabel}>
             {isBankTransfer ? 'Account Number' : 'Phone Number'}
           </label>
           <input
@@ -589,27 +449,14 @@ function AddRecipientStep({
             onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, ''))}
             placeholder={isBankTransfer ? '0123456789' : '0712345678'}
             maxLength={isBankTransfer ? 10 : 12}
-            className="w-full py-3 px-4 rounded-xl outline-none"
-            style={{ 
-              backgroundColor: 'rgba(255,255,255,0.05)', 
-              color: TEXT_COLORS.primary, 
-              border: `1px solid ${BORDER_COLORS.default}` 
-            }}
+            className={styles.input}
           />
         </div>
 
-        {/* Account Name (resolved or manual) */}
-        <div className="mb-4">
-          <label 
-            className="block mb-2" 
-            style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
-          >
-            Account Name
-            {isResolving && (
-              <span className="ml-2 text-xs" style={{ color: STATE_COLORS.active }}>
-                Verifying...
-              </span>
-            )}
+        <div className={styles.formGroup}>
+          <label className={cn(styles.formLabel, styles.formLabelWithStatus)}>
+            <span>Account Name</span>
+            {isResolving && <span className={styles.verifyingText}>Verifying...</span>}
           </label>
           <input
             type="text"
@@ -617,37 +464,27 @@ function AddRecipientStep({
             onChange={(e) => setAccountName(e.target.value)}
             placeholder="Account holder name"
             readOnly={!!resolvedName}
-            className="w-full py-3 px-4 rounded-xl outline-none"
-            style={{ 
-              backgroundColor: resolvedName ? 'rgba(16, 185, 129, 0.1)' : 'rgba(255,255,255,0.05)', 
-              color: TEXT_COLORS.primary, 
-              border: `1px solid ${resolvedName ? STATE_COLORS.success : BORDER_COLORS.default}` 
-            }}
+            className={cn(
+              styles.input,
+              resolvedName && styles.inputVerified
+            )}
           />
           {resolvedName && (
-            <p className="mt-1" style={{ color: STATE_COLORS.success, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>
-              Account verified
-            </p>
+            <p className={styles.accountVerifiedText}>Account verified</p>
           )}
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="flex-shrink-0" style={{ padding: SPACING.lg, borderTop: `1px solid ${BORDER_COLORS.default}` }}>
+      <div className={styles.footer}>
         <button
           onClick={handleSubmit}
           disabled={!canSubmit || isLoading}
-          className="w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2"
-          style={{
-            fontSize: `${TYPOGRAPHY.fontSize.lg}px`,
-            backgroundColor: canSubmit && !isLoading ? STATE_COLORS.active : BG_COLORS.tertiary,
-            color: canSubmit && !isLoading ? '#000' : TEXT_COLORS.disabled,
-          }}
+          className={cn(styles.button, styles.submitButton)}
         >
           {isLoading ? (
             <>
-              <span className="animate-spin w-5 h-5 border-2 border-black/30 border-t-black rounded-full" />
-              Adding...
+              <span className={styles.spinner} />
+              <span className={styles.loadingText}>Adding...</span>
             </>
           ) : (
             'Add Account'
@@ -682,98 +519,81 @@ function ConfirmStep({
   isLoading 
 }: ConfirmStepProps): React.ReactElement {
   return (
-    <div className="flex flex-col h-full">
-      <div 
-        className="flex items-center gap-3 flex-shrink-0" 
-        style={{ 
-          padding: `${SPACING.md}px ${SPACING.lg}px`, 
-          borderBottom: `1px solid ${BORDER_COLORS.default}` 
-        }}
-      >
-        <button onClick={onBack} className="p-2" aria-label="Back">
-          <ChevronLeft size={24} color={TEXT_COLORS.muted} />
+    <div className={styles.confirmStepContainer}>
+      <div className={styles.header}>
+        <button onClick={onBack} className={styles.iconButton} aria-label="Back">
+          <ChevronLeft size={24} />
         </button>
-        <h2 className="font-bold" style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}>
-          Confirm Withdrawal
-        </h2>
+        <h2 className={styles.headerTitle}>Confirm Withdrawal</h2>
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center px-6">
-        <div className="text-center mb-8">
-          <div style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
-            You're withdrawing
-          </div>
-          <div className="font-bold" style={{ color: TEXT_COLORS.primary, fontSize: '36px' }}>
+      <div className={styles.confirmContent}>
+        <div className={styles.withdrawAmount}>
+          <div className={styles.withdrawLabel}>You're withdrawing</div>
+          <div className={styles.withdrawValue}>
             {formatPaystackAmount(amount, currency)}
           </div>
         </div>
 
-        <div className="w-full rounded-xl p-4 mb-6" style={{ backgroundColor: 'rgba(255,255,255,0.03)' }}>
-          <div style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>Sending to</div>
-          <div className="flex items-center gap-3 mt-2">
-            <div 
-              className="w-10 h-10 rounded-lg flex items-center justify-center" 
-              style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: TEXT_COLORS.primary }}
-            >
+        <div className={styles.recipientCard2}>
+          <div className={styles.recipientCardLabel}>Sending to</div>
+          <div className={styles.recipientCardContent}>
+            <div className={styles.recipientIcon}>
               {recipient.type === 'mobile_money' ? <MobileIcon /> : <BankIcon />}
             </div>
             <div>
-              <div className="font-semibold" style={{ color: TEXT_COLORS.primary }}>
+              <div className={styles.recipientName}>
                 {recipient.accountName || 'Account'}
               </div>
-              <div style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+              <div className={styles.recipientDetails}>
                 {recipient.bankName} - ****{recipient.accountNumber.slice(-4)}
               </div>
             </div>
           </div>
         </div>
 
-        <div className="w-full rounded-xl p-4" style={{ backgroundColor: 'rgba(255,255,255,0.03)' }}>
-          <div className="flex justify-between items-center mb-2">
-            <span style={{ color: TEXT_COLORS.secondary }}>Amount</span>
-            <span className="font-semibold" style={{ color: TEXT_COLORS.primary }}>
+        <div className={styles.feeBreakdownCard}>
+          <div className={styles.feeBreakdownRow}>
+            <span className={styles.feeBreakdownLabel}>Amount</span>
+            <span className={styles.feeBreakdownValue}>
               {formatPaystackAmount(amount, currency)}
             </span>
           </div>
-          <div className="flex justify-between items-center mb-2">
-            <span style={{ color: TEXT_COLORS.secondary }}>Transfer Fee</span>
-            <span style={{ color: TEXT_COLORS.muted }}>
+          <div className={styles.feeBreakdownRow}>
+            <span className={styles.feeBreakdownLabel}>Transfer Fee</span>
+            <span className={styles.feeBreakdownValue}>
               {formatPaystackAmount(fee, currency)}
             </span>
           </div>
-          <div 
-            className="flex justify-between items-center pt-2" 
-            style={{ borderTop: `1px solid ${BORDER_COLORS.default}` }}
-          >
-            <span style={{ color: TEXT_COLORS.secondary }}>You'll receive</span>
-            <span className="font-bold" style={{ color: STATE_COLORS.success, fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}>
+          <div className={cn(styles.feeBreakdownRow, styles.feeBreakdownDivider)}>
+            <span className={styles.receiveLabel}>You'll receive</span>
+            <span className={styles.receiveValue}>
               {formatPaystackAmount(amount, currency)}
             </span>
           </div>
         </div>
 
-        <div className="text-center mt-6" style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+        <div className={styles.typicalTimeText}>
           Typically arrives within 24 hours
         </div>
       </div>
 
-      <div className="flex-shrink-0" style={{ padding: SPACING.lg, borderTop: `1px solid ${BORDER_COLORS.default}` }}>
+      <div className={styles.footer}>
         <button
           onClick={onConfirm}
           disabled={isLoading}
-          className="w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2"
-          style={{ backgroundColor: STATE_COLORS.active, color: '#000', fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}
+          className={cn(styles.button, styles.buttonPrimary)}
         >
           {isLoading ? (
             <>
-              <span className="animate-spin w-5 h-5 border-2 border-black/30 border-t-black rounded-full" />
+              <span className={styles.spinner} />
               Sending code...
             </>
           ) : (
             'Continue'
           )}
         </button>
-        <p className="text-center mt-3" style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>
+        <p className={styles.confirmFooterText}>
           We'll send a confirmation code to verify this withdrawal
         </p>
       </div>
@@ -843,44 +663,34 @@ function CodeStep({
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="px-4 py-3 flex-shrink-0">
-        <button onClick={onBack} className="p-2" aria-label="Back">
-          <ChevronLeft size={24} color={TEXT_COLORS.muted} />
+    <div className={styles.codeStepContainer}>
+      <div className={styles.codeHeader}>
+        <button onClick={onBack} className={styles.iconButton} aria-label="Back">
+          <ChevronLeft size={24} />
         </button>
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center px-6">
-        <div 
-          className="flex items-center gap-2 mb-4 px-3 py-1.5 rounded-full" 
-          style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)' }}
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.success} strokeWidth={2}>
+      <div className={styles.codeContent}>
+        <div className={styles.securityBadge}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
           </svg>
-          <span style={{ color: STATE_COLORS.success, fontSize: `${TYPOGRAPHY.fontSize.xs}px`, fontWeight: 500 }}>
-            Two-Step Verification
-          </span>
+          <span>Two-Step Verification</span>
         </div>
         
-        <div 
-          className="w-16 h-16 rounded-full flex items-center justify-center mb-6" 
-          style={{ backgroundColor: 'rgba(96, 165, 250, 0.15)' }}
-        >
-          <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke={STATE_COLORS.active} strokeWidth={2}>
+        <div className={styles.verificationIcon}>
+          <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="#60a5fa" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
           </svg>
         </div>
 
-        <h3 className="font-bold mb-2" style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.xl}px` }}>
-          Verify your withdrawal
-        </h3>
-        <p className="text-center mb-8" style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+        <h3 className={styles.codeTitle}>Verify your withdrawal</h3>
+        <p className={styles.codeDescription}>
           We sent a 6-digit code to your {contact.type}<br />
-          <span style={{ color: TEXT_COLORS.primary }}>{contact.masked}</span>
+          <span className={styles.codeDescriptionHighlight}>{contact.masked}</span>
         </p>
 
-        <div className="flex gap-2 mb-6" onPaste={handlePaste}>
+        <div className={styles.codeInputContainer} onPaste={handlePaste}>
           {code.map((digit, index) => (
             <input
               key={index}
@@ -894,29 +704,20 @@ function CodeStep({
               onChange={(e) => handleChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
               disabled={isVerifying}
-              className="w-12 h-14 text-center font-bold rounded-lg outline-none transition-all"
-              style={{
-                fontSize: `${TYPOGRAPHY.fontSize['2xl']}px`,
-                backgroundColor: 'rgba(255,255,255,0.05)',
-                color: TEXT_COLORS.primary,
-                border: error 
-                  ? `2px solid ${STATE_COLORS.error}` 
-                  : digit 
-                    ? `2px solid ${STATE_COLORS.active}` 
-                    : `2px solid ${BORDER_COLORS.default}`,
-              }}
+              className={cn(
+                styles.codeInput,
+                digit && styles.filled,
+                error && styles.error
+              )}
             />
           ))}
         </div>
 
         {error && (
-          <div 
-            className="text-center mb-4 px-4 py-2 rounded-lg" 
-            style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: STATE_COLORS.error, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
-          >
+          <div className={styles.codeErrorMessage}>
             {error}
             {attemptsRemaining > 0 && attemptsRemaining < 5 && (
-              <span className="block mt-1" style={{ fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>
+              <span className={styles.attemptsRemaining}>
                 {attemptsRemaining} attempts remaining
               </span>
             )}
@@ -924,25 +725,22 @@ function CodeStep({
         )}
 
         {isVerifying && (
-          <div className="flex items-center gap-2 mb-4">
-            <span className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full" />
-            <span style={{ color: TEXT_COLORS.secondary }}>Processing...</span>
+          <div className={styles.processingIndicator}>
+            <span className={styles.processingSpinner} />
+            <span className={styles.processingText}>Processing...</span>
           </div>
         )}
 
-        <div className="text-center">
-          <p style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
-            Didn't receive it?
-          </p>
+        <div className={styles.resendSection}>
+          <p className={styles.resendLabel}>Didn't receive it?</p>
           {cooldownActive ? (
-            <p style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+            <p className={styles.resendCooldown}>
               Resend in {resendCooldown}s
             </p>
           ) : (
             <button 
               onClick={handleResend} 
-              className="font-semibold" 
-              style={{ color: STATE_COLORS.active, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
+              className={styles.resendButton}
             >
               Resend Code
             </button>
@@ -966,30 +764,21 @@ interface SuccessStepProps {
 
 function SuccessStep({ amount, currency, recipient, onClose }: SuccessStepProps): React.ReactElement {
   return (
-    <div className="flex flex-col h-full items-center justify-center px-6">
-      <div 
-        className="w-20 h-20 rounded-full flex items-center justify-center mb-6" 
-        style={{ backgroundColor: 'rgba(16, 185, 129, 0.15)' }}
-      >
+    <div className={styles.successStepContainer}>
+      <div className={styles.successIcon}>
         <CheckIcon />
       </div>
-      <h2 className="font-bold mb-2" style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize['2xl']}px` }}>
-        Success!
-      </h2>
-      <p className="text-center mb-6" style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}>
+      <h2 className={styles.successTitle}>Success!</h2>
+      <p className={styles.successMessage}>
         {formatPaystackAmount(amount, currency)} is on its way to your account
       </p>
-      <div 
-        className="text-center mb-8 px-4 py-3 rounded-lg w-full" 
-        style={{ backgroundColor: 'rgba(255,255,255,0.03)', color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
-      >
+      <div className={styles.successDetails}>
         {recipient.bankName} - ****{recipient.accountNumber.slice(-4)}<br />
         Typically arrives within 24 hours
       </div>
       <button 
         onClick={onClose} 
-        className="w-full py-4 rounded-xl font-bold" 
-        style={{ backgroundColor: STATE_COLORS.active, color: '#000', fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}
+        className={cn(styles.button, styles.successButton)}
       >
         Done
       </button>
@@ -1009,38 +798,24 @@ interface ErrorStepProps {
 
 function ErrorStep({ message, onRetry, onClose }: ErrorStepProps): React.ReactElement {
   return (
-    <div className="flex flex-col h-full items-center justify-center px-6">
-      <div 
-        className="w-20 h-20 rounded-full flex items-center justify-center mb-6" 
-        style={{ backgroundColor: 'rgba(239, 68, 68, 0.15)' }}
-      >
-        <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke={STATE_COLORS.error} strokeWidth={2.5}>
+    <div className={styles.errorStepContainer}>
+      <div className={styles.errorIcon}>
+        <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="#ef4444" strokeWidth={2.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </div>
-      <h2 className="font-bold mb-2" style={{ color: STATE_COLORS.error, fontSize: `${TYPOGRAPHY.fontSize['2xl']}px` }}>
-        Withdrawal Failed
-      </h2>
-      <p className="text-center mb-8" style={{ color: TEXT_COLORS.secondary }}>
-        {message}
-      </p>
-      <div className="w-full space-y-3">
+      <h2 className={styles.errorTitle}>Withdrawal Failed</h2>
+      <p className={styles.errorMessage}>{message}</p>
+      <div className={styles.errorButtonGroup}>
         <button 
           onClick={onRetry} 
-          className="w-full py-4 rounded-xl font-bold" 
-          style={{ backgroundColor: STATE_COLORS.active, color: '#000', fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}
+          className={cn(styles.button, styles.errorRetryButton)}
         >
           Try Again
         </button>
         <button 
           onClick={onClose} 
-          className="w-full py-4 rounded-xl font-bold" 
-          style={{ 
-            backgroundColor: 'transparent', 
-            color: TEXT_COLORS.secondary, 
-            border: `1px solid ${BORDER_COLORS.default}`,
-            fontSize: `${TYPOGRAPHY.fontSize.base}px` 
-          }}
+          className={cn(styles.button, styles.errorCancelButton)}
         >
           Cancel
         </button>
@@ -1062,7 +837,6 @@ export function PaystackWithdrawModalVX2({
   userCountry,
   onSuccess,
 }: PaystackWithdrawModalVX2Props): React.ReactElement | null {
-  // Currency config
   const currency = useMemo(() => PAYSTACK_CURRENCIES[
     userCountry === 'NG' ? 'NGN' :
     userCountry === 'GH' ? 'GHS' :
@@ -1071,7 +845,6 @@ export function PaystackWithdrawModalVX2({
   
   const currencyCode = currency.code;
   
-  // State
   const [step, setStep] = useState<WithdrawStep>('amount');
   const [amount, setAmount] = useState('');
   const [recipients, setRecipients] = useState<PaystackTransferRecipient[]>([]);
@@ -1087,29 +860,21 @@ export function PaystackWithdrawModalVX2({
   const [error, setError] = useState<string | null>(null);
   const [transactionId, setTransactionId] = useState<string | null>(null);
 
-  // Load recipients callback
   const loadRecipients = useCallback(async () => {
     try {
       const response = await fetch(`/api/paystack/transfer/recipient?userId=${userId}`);
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
       if (data.ok && data.data?.recipients) {
         setRecipients(data.data.recipients);
         const defaultRecipient = data.data.recipients.find((r: PaystackTransferRecipient) => r.isDefault);
-        if (defaultRecipient) {
-          setSelectedRecipient(defaultRecipient);
-        }
+        if (defaultRecipient) setSelectedRecipient(defaultRecipient);
       }
     } catch (err) {
       logger.error('Failed to load recipients', err);
     }
   }, [userId]);
 
-  // Load banks callback
   const loadBanks = useCallback(async () => {
     try {
       const countryMap: Record<string, string> = {
@@ -1119,21 +884,14 @@ export function PaystackWithdrawModalVX2({
         KE: 'kenya',
       };
       const response = await fetch(`/api/paystack/transfer/recipient?banks=${countryMap[userCountry]}`);
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
-      if (data.ok && data.data?.banks) {
-        setBanks(data.data.banks);
-      }
+      if (data.ok && data.data?.banks) setBanks(data.data.banks);
     } catch (err) {
       logger.error('Failed to load banks', err);
     }
   }, [userCountry]);
 
-  // Load recipients and banks on mount
   useEffect(() => {
     if (isOpen && userId) {
       loadRecipients();
@@ -1141,7 +899,6 @@ export function PaystackWithdrawModalVX2({
     }
   }, [isOpen, userId, loadRecipients, loadBanks]);
 
-  // Reset on close
   useEffect(() => {
     if (!isOpen) {
       setStep('amount');
@@ -1179,10 +936,7 @@ export function PaystackWithdrawModalVX2({
         }),
       });
       
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
       
       if (data.ok && data.data?.recipient) {
@@ -1202,14 +956,10 @@ export function PaystackWithdrawModalVX2({
 
   const handleConfirm = useCallback(async () => {
     setIsLoading(true);
-    
-    // Generate and "send" verification code
     const code = generateVerificationCode();
     setVerificationCode(code);
     logger.debug('Withdrawal confirmation code', { code });
-    
     await new Promise(resolve => setTimeout(resolve, 1500));
-    
     setIsLoading(false);
     setStep('code');
   }, []);
@@ -1218,11 +968,9 @@ export function PaystackWithdrawModalVX2({
     setIsVerifying(true);
     setCodeError(null);
     
-    // Accept the generated code or test code
     if (enteredCode === verificationCode || enteredCode === '123456') {
       try {
         const amountSmallest = toSmallestUnit(parseFloat(amount), currencyCode);
-        
         const response = await fetch('/api/paystack/transfer/initiate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -1235,10 +983,7 @@ export function PaystackWithdrawModalVX2({
           }),
         });
         
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
         
         if (data.ok) {
@@ -1275,21 +1020,9 @@ export function PaystackWithdrawModalVX2({
   if (!isOpen) return null;
 
   return (
-    <div 
-      className="fixed inset-0 flex items-end justify-center"
-      style={{ zIndex: Z_INDEX.modal }}
-    >
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60" onClick={onClose} />
-      
-      {/* Modal */}
-      <div 
-        className="relative w-full max-w-md rounded-t-2xl overflow-hidden"
-        style={{ 
-          backgroundColor: BG_COLORS.secondary,
-          height: 'calc(100% - 60px)',
-        }}
-      >
+    <div className={styles.modalWrapper}>
+      <div className={styles.backdrop} onClick={onClose} />
+      <div className={styles.modal}>
         {step === 'amount' && (
           <AmountStep
             balance={userBalance}
@@ -1351,9 +1084,9 @@ export function PaystackWithdrawModalVX2({
         )}
         
         {step === 'processing' && (
-          <div className="flex flex-col h-full items-center justify-center">
-            <span className="animate-spin w-12 h-12 border-4 border-white/20 border-t-white rounded-full mb-4" />
-            <p style={{ color: TEXT_COLORS.primary }}>Processing withdrawal...</p>
+          <div className={styles.processingStepContainer}>
+            <span className={styles.processingLargeSpinner} />
+            <p className={styles.processingStepText}>Processing withdrawal...</p>
           </div>
         )}
         
@@ -1379,4 +1112,3 @@ export function PaystackWithdrawModalVX2({
 }
 
 export default PaystackWithdrawModalVX2;
-

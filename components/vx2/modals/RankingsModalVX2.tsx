@@ -1,6 +1,6 @@
 /**
  * RankingsModalVX2 - Custom Player Rankings Modal
- * 
+ *
  * A-Grade Requirements Met:
  * - TypeScript: Full type coverage
  * - Tabbed interface: Players / Rankings
@@ -9,16 +9,19 @@
  * - Constants: VX2 constants
  * - Accessibility: ARIA labels
  * - Icons: VX2 icon library
+ * - CSP Compliance: CSS Modules with CSS custom properties
  */
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { createScopedLogger } from '@/lib/clientLogger';
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS, POSITION_COLORS } from '../core/constants/colors';
-
-const logger = createScopedLogger('[RankingsModalVX2]');
 import { SPACING, RADIUS, TYPOGRAPHY, Z_INDEX } from '../core/constants/sizes';
 import { Close, Plus, Minus, Search } from '../components/icons';
 import { PositionBadge, type Position, POSITIONS } from '../../ui';
+import { cn } from '@/lib/styles';
+import styles from './RankingsModalVX2.module.css';
+
+const logger = createScopedLogger('[RankingsModalVX2]');
 
 // ============================================================================
 // TYPES
@@ -53,40 +56,34 @@ interface TabBarProps {
 
 function TabBar({ activeTab, onTabChange }: TabBarProps): React.ReactElement {
   return (
-    <div className="flex mb-4 rounded-lg overflow-hidden" style={{ backgroundColor: 'rgba(255,255,255,0.05)', marginRight: '44px' }}>
+    <div className={styles.tabBar} style={{ '--tab-font-size': `${TYPOGRAPHY.fontSize.sm}px` } as React.CSSProperties}>
       <button
         onClick={() => onTabChange('build')}
-        className="flex-1 py-2.5 px-4 font-bold transition-all"
-        style={{ 
-          fontSize: `${TYPOGRAPHY.fontSize.sm}px`, 
-          backgroundColor: activeTab === 'build' ? 'rgba(255,255,255,0.1)' : 'transparent', 
-          color: activeTab === 'build' ? TEXT_COLORS.primary : TEXT_COLORS.muted,
-          borderBottom: activeTab === 'build' ? `2px solid ${TEXT_COLORS.primary}` : '2px solid transparent'
-        }}
+        className={cn(styles.tabButton, activeTab === 'build' && styles.active)}
+        style={{
+          '--tab-color': activeTab === 'build' ? TEXT_COLORS.primary : TEXT_COLORS.muted,
+          '--tab-active-color': TEXT_COLORS.primary,
+        } as React.CSSProperties}
       >
         Players
       </button>
       <button
         onClick={() => onTabChange('rankings')}
-        className="flex-1 py-2.5 px-4 font-bold transition-all flex items-center justify-center gap-2"
-        style={{ 
-          fontSize: `${TYPOGRAPHY.fontSize.sm}px`, 
-          backgroundColor: activeTab === 'rankings' ? 'rgba(255,255,255,0.1)' : 'transparent', 
-          color: activeTab === 'rankings' ? TEXT_COLORS.primary : TEXT_COLORS.muted,
-          borderBottom: activeTab === 'rankings' ? `2px solid ${TEXT_COLORS.primary}` : '2px solid transparent'
-        }}
+        className={cn(styles.tabButton, activeTab === 'rankings' && styles.active)}
+        style={{
+          '--tab-color': activeTab === 'rankings' ? TEXT_COLORS.primary : TEXT_COLORS.muted,
+          '--tab-active-color': TEXT_COLORS.primary,
+        } as React.CSSProperties}
       >
         Rankings
       </button>
       <button
         onClick={() => onTabChange('excluded')}
-        className="flex-1 py-2.5 px-4 font-bold transition-all flex items-center justify-center gap-2"
-        style={{ 
-          fontSize: `${TYPOGRAPHY.fontSize.sm}px`, 
-          backgroundColor: activeTab === 'excluded' ? 'rgba(255,255,255,0.1)' : 'transparent', 
-          color: activeTab === 'excluded' ? TEXT_COLORS.primary : TEXT_COLORS.muted,
-          borderBottom: activeTab === 'excluded' ? `2px solid ${TEXT_COLORS.primary}` : '2px solid transparent'
-        }}
+        className={cn(styles.tabButton, activeTab === 'excluded' && styles.active)}
+        style={{
+          '--tab-color': activeTab === 'excluded' ? TEXT_COLORS.primary : TEXT_COLORS.muted,
+          '--tab-active-color': TEXT_COLORS.primary,
+        } as React.CSSProperties}
       >
         Excluded
       </button>
@@ -101,11 +98,16 @@ interface PositionFilterProps {
 
 function PositionFilter({ activePosition, onPositionChange }: PositionFilterProps): React.ReactElement {
   return (
-    <div className="flex mb-3 rounded-lg overflow-hidden" style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}>
+    <div className={styles.positionFilter} style={{ '--filter-font-size': `${TYPOGRAPHY.fontSize.xs}px` } as React.CSSProperties}>
       <button
         onClick={() => onPositionChange(null)}
-        className="flex-1 py-2.5 px-3 font-bold transition-all"
-        style={{ fontSize: `${TYPOGRAPHY.fontSize.xs}px`, backgroundColor: activePosition === null ? 'rgba(255,255,255,0.1)' : 'transparent', color: activePosition === null ? TEXT_COLORS.primary : TEXT_COLORS.muted, borderBottom: `2px solid ${TEXT_COLORS.primary}`, opacity: activePosition === null ? 1 : 0.4 }}
+        className={cn(styles.filterButton, 'all', activePosition === null && styles.active)}
+        style={{
+          '--filter-color': activePosition === null ? TEXT_COLORS.primary : TEXT_COLORS.muted,
+          '--filter-active-color': TEXT_COLORS.primary,
+          '--filter-border-color': TEXT_COLORS.primary,
+          opacity: activePosition === null ? 1 : 0.4,
+        } as React.CSSProperties}
       >
         ALL
       </button>
@@ -116,8 +118,13 @@ function PositionFilter({ activePosition, onPositionChange }: PositionFilterProp
           <button
             key={pos}
             onClick={() => onPositionChange(isActive ? null : pos)}
-            className="flex-1 py-2.5 px-3 font-bold transition-all"
-            style={{ fontSize: `${TYPOGRAPHY.fontSize.xs}px`, backgroundColor: isActive ? 'rgba(255,255,255,0.1)' : 'transparent', color: isActive ? color : TEXT_COLORS.muted, borderBottom: `2px solid ${color}`, opacity: isActive ? 1 : 0.4 }}
+            className={cn(styles.filterButton, isActive && styles.active)}
+            style={{
+              '--filter-color': isActive ? color : TEXT_COLORS.muted,
+              '--filter-active-color': color,
+              '--filter-border-color': color,
+              opacity: isActive ? 1 : 0.4,
+            } as React.CSSProperties}
           >
             {pos}
           </button>
@@ -141,57 +148,56 @@ function PlayerListItem({ player, isRanked, isExcluded, onToggle, onToggleExclud
   const proj = typeof player.proj === 'number' ? Math.round(player.proj) : player.proj || '-';
 
   return (
-    <div 
-      className="flex items-center transition-all"
-      style={{ 
-        backgroundColor: BG_COLORS.secondary,
-        borderLeft: `4px solid ${posColor}`,
-        borderRadius: `${RADIUS.lg}px`,
-        padding: `${SPACING.xs}px ${SPACING.md}px`,
-        gap: `${SPACING.sm}px`,
-        opacity: isExcluded ? 0.5 : 1,
-      }}
+    <div
+      className={cn(styles.playerListItem, isExcluded && styles.excluded)}
+      style={{
+        '--item-bg': BG_COLORS.secondary,
+        '--item-border-color': posColor,
+        '--item-radius': `${RADIUS.lg}px`,
+        '--item-py': `${SPACING.xs}px`,
+        '--item-px': `${SPACING.md}px`,
+        '--item-gap': `${SPACING.sm}px`,
+        '--adp-font-size': `${TYPOGRAPHY.fontSize.sm}px`,
+        '--adp-color': TEXT_COLORS.secondary,
+        '--name-font-size': `${TYPOGRAPHY.fontSize.sm}px`,
+        '--name-color': TEXT_COLORS.primary,
+        '--team-font-size': `${TYPOGRAPHY.fontSize.xs}px`,
+        '--team-color': TEXT_COLORS.muted,
+        '--proj-font-size': `${TYPOGRAPHY.fontSize.xs}px`,
+        '--proj-color': TEXT_COLORS.primary,
+        '--proj-label-font-size': `${TYPOGRAPHY.fontSize.xs}px`,
+        '--proj-label-color': TEXT_COLORS.muted,
+        '--button-radius': `${RADIUS.lg}px`,
+      } as React.CSSProperties}
     >
-      <div className="text-center flex-shrink-0" style={{ width: '28px' }}>
-        <div className="font-bold" style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>{adp}</div>
-      </div>
+      <div className={styles.playerADP}>{adp}</div>
       <PositionBadge position={player.position as 'QB' | 'RB' | 'WR' | 'TE'} size="sm" />
-      <div className="flex-1 min-w-0 flex items-center gap-1.5">
-        <span className="font-semibold truncate" style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>{player.name}</span>
-        <span className="flex-shrink-0" style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>{player.team}</span>
+      <div className={styles.playerInfo}>
+        <span className={styles.playerName}>{player.name}</span>
+        <span className={styles.playerTeam}>{player.team}</span>
       </div>
-      <div className="text-center flex-shrink-0" style={{ marginRight: '4px' }}>
-        <div className="font-semibold" style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>{proj}</div>
-        <div style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>Proj</div>
+      <div className={styles.playerProj}>
+        <div className={styles.playerProjValue}>{proj}</div>
+        <div className={styles.playerProjLabel}>Proj</div>
       </div>
       <button
         onClick={onToggleExclude}
-        className="flex items-center justify-center transition-all flex-shrink-0"
-        style={{ 
-          width: '32px',
-          height: '32px',
-          borderRadius: `${RADIUS.lg}px`,
-          backgroundColor: isExcluded ? 'rgba(239, 68, 68, 0.25)' : 'rgba(255,255,255,0.05)', 
-          color: isExcluded ? STATE_COLORS.error : TEXT_COLORS.muted,
-          border: isExcluded ? `1px solid ${STATE_COLORS.error}` : '1px solid rgba(255,255,255,0.1)',
-          cursor: 'pointer',
-        }}
+        className={cn(styles.playerActionButton, styles.excludeButton, isExcluded && styles.active)}
+        style={{
+          '--exclude-color': isExcluded ? STATE_COLORS.error : TEXT_COLORS.muted,
+          '--exclude-bg': isExcluded ? 'rgba(239, 68, 68, 0.25)' : 'rgba(255,255,255,0.05)',
+        } as React.CSSProperties}
         aria-label={isExcluded ? `Unexclude ${player.name}` : `Exclude ${player.name}`}
       >
         <Close size={14} />
       </button>
       <button
         onClick={onToggle}
-        className="flex items-center justify-center transition-all flex-shrink-0"
-        style={{ 
-          width: '32px',
-          height: '32px',
-          borderRadius: `${RADIUS.lg}px`,
-          backgroundColor: isRanked ? 'rgba(239, 68, 68, 0.15)' : 'rgba(96, 165, 250, 0.15)', 
-          color: isRanked ? STATE_COLORS.error : STATE_COLORS.active,
-          border: 'none',
-          cursor: 'pointer',
-        }}
+        className={cn(styles.playerActionButton, styles.rankButton, isRanked && styles.active)}
+        style={{
+          '--rank-bg': isRanked ? 'rgba(239, 68, 68, 0.15)' : 'rgba(96, 165, 250, 0.15)',
+          '--rank-color': isRanked ? STATE_COLORS.error : STATE_COLORS.active,
+        } as React.CSSProperties}
         aria-label={isRanked ? `Remove ${player.name}` : `Add ${player.name}`}
       >
         {isRanked ? <Minus size={16} /> : <Plus size={16} />}
@@ -241,46 +247,45 @@ function RankedPlayerRow({ player, rank, totalRanked, onRemove, onMoveToRank, di
   };
 
   return (
-    <div 
-      className="flex items-center relative transition-all select-none cursor-grab active:cursor-grabbing"
-      style={{ 
-        backgroundColor: BG_COLORS.secondary,
-        borderLeft: `4px solid ${posColor}`,
-        borderRadius: `${RADIUS.lg}px`,
-        padding: `${SPACING.xs}px ${SPACING.md}px`,
-        gap: `${SPACING.sm}px`,
-        opacity: isDragging ? 0.5 : 1,
-        transform: isDragging ? 'scale(1.02)' : 'scale(1)',
-        touchAction: 'none',
-      }}
+    <div
+      className={cn(styles.rankedPlayerRow, isDragging && styles.dragging)}
+      style={{
+        '--row-bg': BG_COLORS.secondary,
+        '--row-border-color': posColor,
+        '--row-radius': `${RADIUS.lg}px`,
+        '--row-py': `${SPACING.xs}px`,
+        '--row-px': `${SPACING.md}px`,
+        '--row-gap': `${SPACING.sm}px`,
+        '--row-opacity': isDragging ? 0.5 : 1,
+        '--row-transform': isDragging ? 'scale(1.02)' : 'scale(1)',
+        '--rank-number-font-size': `${TYPOGRAPHY.fontSize.sm}px`,
+        '--rank-number-color': TEXT_COLORS.secondary,
+        '--button-radius': `${RADIUS.lg}px`,
+      } as React.CSSProperties}
       onDoubleClick={handleDoubleClick}
       {...dragHandleProps}
     >
-      <div className="text-center flex-shrink-0" style={{ width: '28px' }}>
-        <div className="font-bold" style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>{rank}</div>
-      </div>
+      <div className={styles.playerRank}>{rank}</div>
       <PositionBadge position={player.position as 'QB' | 'RB' | 'WR' | 'TE'} size="sm" />
-      <div className="flex-1 min-w-0 flex items-center gap-1.5">
-        <span className="font-semibold truncate" style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>{player.name}</span>
-        <span className="flex-shrink-0" style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>{player.team}</span>
+      <div className={styles.playerInfo}>
+        <span className={styles.playerName}>{player.name}</span>
+        <span className={styles.playerTeam}>{player.team}</span>
       </div>
-      <div className="text-center flex-shrink-0" style={{ marginRight: '4px' }}>
-        <div className="font-semibold" style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>{proj}</div>
-        <div style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>Proj</div>
+      <div className={styles.playerProj}>
+        <div className={styles.playerProjValue}>{proj}</div>
+        <div className={styles.playerProjLabel}>Proj</div>
       </div>
-      <button 
-        onClick={onRemove} 
-        disabled={disabled} 
-        className="flex items-center justify-center transition-all flex-shrink-0" 
-        style={{ 
+      <button
+        onClick={onRemove}
+        disabled={disabled}
+        className={styles.playerActionButton}
+        style={{
+          backgroundColor: 'rgba(239, 68, 68, 0.15)',
+          color: STATE_COLORS.error,
           width: '32px',
           height: '32px',
           borderRadius: `${RADIUS.lg}px`,
-          backgroundColor: 'rgba(239, 68, 68, 0.15)', 
-          color: STATE_COLORS.error,
-          border: 'none',
-          cursor: 'pointer',
-        }} 
+        }}
         aria-label={`Remove ${player.name}`}
       >
         <Close size={16} />
@@ -288,28 +293,25 @@ function RankedPlayerRow({ player, rank, totalRanked, onRemove, onMoveToRank, di
 
       {/* Move Popup */}
       {showMovePopup && (
-        <div 
-          className="absolute inset-0 flex items-center justify-center"
-          style={{ backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 200, borderRadius: `${RADIUS.lg}px` }}
+        <div
+          className={styles.movePopupOverlay}
+          style={{ '--popup-radius': `${RADIUS.lg}px` } as React.CSSProperties}
           onClick={() => setShowMovePopup(false)}
         >
-          <div 
-            className="flex items-center gap-2"
+          <div
+            className={styles.movePopupContent}
             onClick={e => e.stopPropagation()}
           >
             <button
               onClick={() => { if (rank > 1) { onMoveToRank(rank - 1); setShowMovePopup(false); } }}
               disabled={rank <= 1}
-              className="flex items-center justify-center transition-all"
-              style={{ 
-                width: '32px',
-                height: '32px',
-                borderRadius: `${RADIUS.md}px`,
-                backgroundColor: rank <= 1 ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.15)', 
-                color: rank <= 1 ? TEXT_COLORS.disabled : TEXT_COLORS.primary,
-                border: 'none',
-                cursor: rank <= 1 ? 'not-allowed' : 'pointer',
-              }}
+              className={styles.moveButton}
+              style={{
+                '--move-button-color': rank <= 1 ? TEXT_COLORS.disabled : TEXT_COLORS.primary,
+                '--move-button-disabled-color': TEXT_COLORS.disabled,
+                '--move-button-radius': `${RADIUS.md}px`,
+                backgroundColor: rank <= 1 ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.15)',
+              } as React.CSSProperties}
               aria-label="Move up"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -324,30 +326,24 @@ function RankedPlayerRow({ player, rank, totalRanked, onRemove, onMoveToRank, di
               value={customRank}
               onChange={e => setCustomRank(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') handleMoveSubmit(); if (e.key === 'Escape') setShowMovePopup(false); }}
-              className="text-center font-bold outline-none"
-              style={{ 
-                width: '48px',
-                height: '32px',
-                borderRadius: `${RADIUS.md}px`,
-                backgroundColor: 'rgba(255,255,255,0.1)', 
-                color: TEXT_COLORS.primary,
-                border: `1px solid ${STATE_COLORS.active}`,
-                fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-              }}
+              className={styles.rankInput}
+              style={{
+                '--input-color': TEXT_COLORS.primary,
+                '--input-border-color': STATE_COLORS.active,
+                '--input-radius': `${RADIUS.md}px`,
+                '--input-font-size': `${TYPOGRAPHY.fontSize.sm}px`,
+              } as React.CSSProperties}
             />
             <button
               onClick={() => { if (rank < totalRanked) { onMoveToRank(rank + 1); setShowMovePopup(false); } }}
               disabled={rank >= totalRanked}
-              className="flex items-center justify-center transition-all"
-              style={{ 
-                width: '32px',
-                height: '32px',
-                borderRadius: `${RADIUS.md}px`,
-                backgroundColor: rank >= totalRanked ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.15)', 
-                color: rank >= totalRanked ? TEXT_COLORS.disabled : TEXT_COLORS.primary,
-                border: 'none',
-                cursor: rank >= totalRanked ? 'not-allowed' : 'pointer',
-              }}
+              className={styles.moveButton}
+              style={{
+                '--move-button-color': rank >= totalRanked ? TEXT_COLORS.disabled : TEXT_COLORS.primary,
+                '--move-button-disabled-color': TEXT_COLORS.disabled,
+                '--move-button-radius': `${RADIUS.md}px`,
+                backgroundColor: rank >= totalRanked ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.15)',
+              } as React.CSSProperties}
               aria-label="Move down"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -356,32 +352,23 @@ function RankedPlayerRow({ player, rank, totalRanked, onRemove, onMoveToRank, di
             </button>
             <button
               onClick={handleMoveSubmit}
-              className="font-bold transition-all"
-              style={{ 
-                padding: '0 12px',
-                height: '32px',
-                borderRadius: `${RADIUS.md}px`,
-                backgroundColor: STATE_COLORS.active, 
-                color: '#000',
-                border: 'none',
-                cursor: 'pointer',
-                fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-              }}
+              className={styles.moveSubmitButton}
+              style={{
+                '--submit-bg': STATE_COLORS.active,
+                '--submit-color': '#000',
+                '--submit-radius': `${RADIUS.md}px`,
+                '--submit-font-size': `${TYPOGRAPHY.fontSize.xs}px`,
+              } as React.CSSProperties}
             >
               Go
             </button>
             <button
               onClick={() => setShowMovePopup(false)}
-              className="flex items-center justify-center transition-all"
-              style={{ 
-                width: '32px',
-                height: '32px',
-                borderRadius: `${RADIUS.md}px`,
-                backgroundColor: 'rgba(255,255,255,0.1)', 
-                color: TEXT_COLORS.muted,
-                border: 'none',
-                cursor: 'pointer',
-              }}
+              className={styles.moveCancelButton}
+              style={{
+                '--cancel-color': TEXT_COLORS.muted,
+                '--cancel-radius': `${RADIUS.md}px`,
+              } as React.CSSProperties}
               aria-label="Cancel"
             >
               <Close size={14} />
@@ -410,11 +397,11 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
-  
+
   // Drag and drop state
   const [draggedPlayer, setDraggedPlayer] = useState<string | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
-  
+
   // Undo history - stores previous states
   const [undoHistory, setUndoHistory] = useState<string[][]>([]);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
@@ -513,19 +500,19 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
     }
   }, [isOpen]);
 
-  useEffect(() => { 
-    if (isOpen) { loadData(); setUndoHistory([]); } 
+  useEffect(() => {
+    if (isOpen) { loadData(); setUndoHistory([]); }
   }, [isOpen, loadData]);
 
   const getRank = useCallback((name: string) => { const idx = customRankings.indexOf(name); return idx >= 0 ? idx + 1 : undefined; }, [customRankings]);
   const isPlayerRanked = useCallback((name: string) => customRankings.includes(name), [customRankings]);
   const isPlayerExcluded = useCallback((name: string) => excludedPlayers.includes(name), [excludedPlayers]);
-  
+
   // Helper to save current state to history before making changes
   const pushToHistory = useCallback(() => {
     setUndoHistory(prev => [...prev, customRankings]);
   }, [customRankings]);
-  
+
   const togglePlayerExclude = useCallback((name: string) => {
     pushToHistory();
     setExcludedPlayers(prev => {
@@ -540,14 +527,14 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
     });
   }, [pushToHistory]);
 
-  const togglePlayerRanking = useCallback((name: string) => { 
+  const togglePlayerRanking = useCallback((name: string) => {
     pushToHistory();
-    setCustomRankings(prev => prev.includes(name) ? prev.filter(n => n !== name) : [...prev, name]); 
+    setCustomRankings(prev => prev.includes(name) ? prev.filter(n => n !== name) : [...prev, name]);
   }, [pushToHistory]);
-  
-  const removeFromRankings = useCallback((name: string) => { 
+
+  const removeFromRankings = useCallback((name: string) => {
     pushToHistory();
-    setCustomRankings(prev => prev.filter(n => n !== name)); 
+    setCustomRankings(prev => prev.filter(n => n !== name));
   }, [pushToHistory]);
 
   const reorderPlayer = useCallback((fromName: string, toIndex: number) => {
@@ -629,12 +616,12 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
     });
     return players;
   }, [playerPool, positionFilter, searchQuery, excludedPlayers]);
-  
+
   // Excluded players list
   const excludedPlayersList = useMemo(() => {
     return excludedPlayers.map(name => playerPool.find(p => p.name === name)).filter((p): p is Player => !!p);
   }, [excludedPlayers, playerPool]);
-  
+
   const filteredExcludedPlayers = useMemo(() => {
     if (!searchQuery.trim()) return excludedPlayersList;
     const q = searchQuery.toLowerCase();
@@ -674,86 +661,97 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
   if (!isOpen) return null;
 
   return (
-    <div className="absolute left-0 right-0 bottom-0 flex flex-col" style={{ top: '60px', backgroundColor: '#0f172a', zIndex: Z_INDEX.modal }}>
+    <div className={styles.modalContainer} style={{ '--modal-top': '60px', '--z-modal': Z_INDEX.modal } as React.CSSProperties}>
       {/* Close button */}
-      <button onClick={handleClose} className="absolute flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors" style={{ color: TEXT_COLORS.secondary, zIndex: 110, top: '16px', right: '8px', width: '40px', height: '40px' }} aria-label="Close">
+      <button
+        onClick={handleClose}
+        className={styles.closeButton}
+        style={{ '--close-color': TEXT_COLORS.secondary } as React.CSSProperties}
+        aria-label="Close"
+      >
         <Close size={24} />
       </button>
 
-      <div className="flex-1 flex flex-col min-h-0 px-4 pt-3 pb-3 overflow-hidden">
+      <div className={styles.contentWrapper}>
         {isLoading ? (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-2" style={{ borderColor: `${STATE_COLORS.active} transparent transparent transparent` }} />
+          <div className={styles.loadingContainer}>
+            <div className={styles.spinnerCircle} style={{ '--spinner-color': STATE_COLORS.active } as React.CSSProperties} />
           </div>
         ) : (
-          <div className="flex flex-col flex-1 min-h-0">
+          <div className={styles.innerContainer}>
             <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
 
             {/* Search */}
-            <div className="mb-3 relative">
-              <Search size={16} color={TEXT_COLORS.muted} className="absolute left-3 top-1/2 -translate-y-1/2" />
+            <div className={styles.searchContainer} style={{ '--search-icon-color': TEXT_COLORS.muted } as React.CSSProperties}>
+              <Search size={16} className={styles.searchIcon} />
               <input
                 type="text"
                 placeholder="Search players..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl outline-none transition-all"
-                style={{ backgroundColor: 'rgba(255,255,255,0.05)', color: TEXT_COLORS.primary, border: '1px solid rgba(255,255,255,0.1)', fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
+                className={styles.searchInput}
+                style={{
+                  '--search-text-color': TEXT_COLORS.primary,
+                  '--search-placeholder-color': TEXT_COLORS.muted,
+                  '--search-font-size': `${TYPOGRAPHY.fontSize.sm}px`,
+                } as React.CSSProperties}
               />
             </div>
 
-            <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
+            <div className={styles.scrollableContent}>
               {activeTab === 'build' ? (
                 <>
                   <PositionFilter activePosition={positionFilter} onPositionChange={setPositionFilter} />
-                  <div className="flex-1 overflow-y-auto space-y-1 pr-1" style={{ scrollbarWidth: 'thin' }}>
+                  <div className={styles.playerList}>
                     {filteredPlayers.length === 0 ? (
-                      <div className="flex flex-col items-center justify-center py-12 text-center" style={{ color: TEXT_COLORS.muted }}>
-                        <Search size={48} color={TEXT_COLORS.muted} className="mb-3 opacity-50" />
-                        <p style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>No players found</p>
+                      <div className={styles.emptyState} style={{ '--empty-color': TEXT_COLORS.muted } as React.CSSProperties}>
+                        <Search size={48} className={styles.emptyIcon} />
+                        <p className={styles.emptyDescription} style={{ '--empty-desc-font-size': `${TYPOGRAPHY.fontSize.sm}px` } as React.CSSProperties}>No players found</p>
                       </div>
                     ) : (
-                      filteredPlayers.slice(0, 50).map(player => (
-                        <PlayerListItem 
-                          key={player.name} 
-                          player={player} 
-                          isRanked={isPlayerRanked(player.name)} 
-                          isExcluded={isPlayerExcluded(player.name)}
-                          onToggle={() => togglePlayerRanking(player.name)} 
-                          onToggleExclude={() => togglePlayerExclude(player.name)}
-                        />
-                      ))
-                    )}
-                    {filteredPlayers.length > 50 && (
-                      <p className="text-center py-3" style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>Showing 50 of {filteredPlayers.length}. Use search for more.</p>
+                      <>
+                        {filteredPlayers.slice(0, 50).map(player => (
+                          <PlayerListItem
+                            key={player.name}
+                            player={player}
+                            isRanked={isPlayerRanked(player.name)}
+                            isExcluded={isPlayerExcluded(player.name)}
+                            onToggle={() => togglePlayerRanking(player.name)}
+                            onToggleExclude={() => togglePlayerExclude(player.name)}
+                          />
+                        ))}
+                        {filteredPlayers.length > 50 && (
+                          <p className={styles.infoText} style={{ '--info-color': TEXT_COLORS.muted, '--info-font-size': `${TYPOGRAPHY.fontSize.xs}px` } as React.CSSProperties}>Showing 50 of <span className={styles.resultCount}>{filteredPlayers.length}</span>. Use search for more.</p>
+                        )}
+                      </>
                     )}
                   </div>
                 </>
               ) : activeTab === 'rankings' ? (
                 <>
                   {rankedPlayers.length === 0 ? (
-                    <div className="flex-1 flex flex-col items-center justify-center text-center px-4" style={{ color: TEXT_COLORS.muted }}>
-                      <svg className="w-16 h-16 mb-4 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
-                      <p className="font-medium mb-2" style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>No rankings yet</p>
-                      <p style={{ fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>Go to "Players" tab to add players</p>
+                    <div className={styles.emptyState} style={{ '--empty-color': TEXT_COLORS.muted } as React.CSSProperties}>
+                      <svg className={styles.emptyIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                      <p className={styles.emptyTitle} style={{ '--empty-title-color': TEXT_COLORS.secondary, '--empty-title-font-size': `${TYPOGRAPHY.fontSize.sm}px` } as React.CSSProperties}>No rankings yet</p>
+                      <p className={styles.emptyDescription} style={{ '--empty-desc-font-size': `${TYPOGRAPHY.fontSize.xs}px` } as React.CSSProperties}>Go to "Players" tab to add players</p>
                     </div>
                   ) : filteredRankedPlayers.length === 0 ? (
-                    <div className="flex-1 flex flex-col items-center justify-center" style={{ color: TEXT_COLORS.muted }}>
-                      <Search size={48} color={TEXT_COLORS.muted} className="mb-3 opacity-50" />
-                      <p style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>No matching players</p>
+                    <div className={styles.searchNoResults} style={{ '--empty-color': TEXT_COLORS.muted } as React.CSSProperties}>
+                      <Search size={48} className={styles.emptyIcon} />
+                      <p style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px`, color: TEXT_COLORS.muted }}>No matching players</p>
                     </div>
                   ) : (
                     <>
-                      <p className="mb-3" style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>
+                      <p className={styles.infoText} style={{ '--info-color': TEXT_COLORS.muted, '--info-font-size': `${TYPOGRAPHY.fontSize.xs}px` } as React.CSSProperties}>
                         {searchQuery.trim() ? `Showing ${filteredRankedPlayers.length} of ${rankedPlayers.length}` : 'Drag to reorder'}
                       </p>
-                      <div className="flex-1 overflow-y-auto space-y-1 pr-1" style={{ scrollbarWidth: 'thin' }}>
+                      <div className={styles.playerList}>
                         {filteredRankedPlayers.map((player, displayIndex) => {
                           const actualRank = customRankings.indexOf(player.name) + 1;
                           const actualIndex = actualRank - 1;
                           const isDragging = draggedPlayer === player.name;
                           const isOver = dragOverIndex === actualIndex;
-                          
+
                           return (
                             <div
                               key={player.name}
@@ -786,8 +784,8 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
                                 marginTop: isOver ? '-2px' : 0,
                               }}
                             >
-                              <RankedPlayerRow 
-                                player={player} 
+                              <RankedPlayerRow
+                                player={player}
                                 rank={actualRank}
                                 totalRanked={rankedPlayers.length}
                                 onRemove={() => removeFromRankings(player.name)}
@@ -809,58 +807,61 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
               ) : (
                 <>
                   {excludedPlayersList.length === 0 ? (
-                    <div className="flex-1 flex flex-col items-center justify-center text-center px-4" style={{ color: TEXT_COLORS.muted }}>
-                      <svg className="w-16 h-16 mb-4 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
-                      <p className="font-medium mb-2" style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>No excluded players</p>
-                      <p style={{ fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>Go to "Players" tab to exclude players</p>
+                    <div className={styles.emptyState} style={{ '--empty-color': TEXT_COLORS.muted } as React.CSSProperties}>
+                      <svg className={styles.emptyIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
+                      <p className={styles.emptyTitle} style={{ '--empty-title-color': TEXT_COLORS.secondary, '--empty-title-font-size': `${TYPOGRAPHY.fontSize.sm}px` } as React.CSSProperties}>No excluded players</p>
+                      <p className={styles.emptyDescription} style={{ '--empty-desc-font-size': `${TYPOGRAPHY.fontSize.xs}px` } as React.CSSProperties}>Go to "Players" tab to exclude players</p>
                     </div>
                   ) : filteredExcludedPlayers.length === 0 ? (
-                    <div className="flex-1 flex flex-col items-center justify-center" style={{ color: TEXT_COLORS.muted }}>
-                      <Search size={48} color={TEXT_COLORS.muted} className="mb-3 opacity-50" />
-                      <p style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>No matching players</p>
+                    <div className={styles.searchNoResults} style={{ '--empty-color': TEXT_COLORS.muted } as React.CSSProperties}>
+                      <Search size={48} className={styles.emptyIcon} />
+                      <p style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px`, color: TEXT_COLORS.muted }}>No matching players</p>
                     </div>
                   ) : (
                     <>
-                      <p className="mb-3" style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>
+                      <p className={styles.infoText} style={{ '--info-color': TEXT_COLORS.muted, '--info-font-size': `${TYPOGRAPHY.fontSize.xs}px` } as React.CSSProperties}>
                         {searchQuery.trim() ? `Showing ${filteredExcludedPlayers.length} of ${excludedPlayersList.length}` : `${excludedPlayersList.length} excluded players`}
                       </p>
-                      <div className="flex-1 overflow-y-auto space-y-1 pr-1" style={{ scrollbarWidth: 'thin' }}>
-                        {filteredExcludedPlayers.map(player => (
-                          <div 
-                            key={player.name}
-                            className="flex items-center transition-all"
-                            style={{ 
-                              backgroundColor: BG_COLORS.secondary,
-                              borderLeft: `4px solid ${POSITION_COLORS[player.position.toUpperCase() as keyof typeof POSITION_COLORS] || TEXT_COLORS.muted}`,
-                              borderRadius: `${RADIUS.lg}px`,
-                              padding: `${SPACING.xs}px ${SPACING.md}px`,
-                              gap: `${SPACING.sm}px`,
-                              opacity: 0.6,
-                            }}
-                          >
-                            <PositionBadge position={player.position as 'QB' | 'RB' | 'WR' | 'TE'} size="sm" />
-                            <div className="flex-1 min-w-0 flex items-center gap-1.5">
-                              <span className="font-semibold truncate" style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>{player.name}</span>
-                              <span className="flex-shrink-0" style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>{player.team}</span>
-                            </div>
-                            <button 
-                              onClick={() => togglePlayerExclude(player.name)} 
-                              className="flex items-center justify-center transition-all flex-shrink-0" 
-                              style={{ 
-                                width: '32px',
-                                height: '32px',
-                                borderRadius: `${RADIUS.lg}px`,
-                                backgroundColor: 'rgba(96, 165, 250, 0.15)', 
-                                color: STATE_COLORS.active,
-                                border: 'none',
-                                cursor: 'pointer',
-                              }} 
-                              aria-label={`Unexclude ${player.name}`}
+                      <div className={styles.playerList}>
+                        {filteredExcludedPlayers.map(player => {
+                          const posColor = POSITION_COLORS[player.position.toUpperCase() as keyof typeof POSITION_COLORS] || TEXT_COLORS.muted;
+                          return (
+                            <div
+                              key={player.name}
+                              className={cn(styles.playerListItem, styles.excluded)}
+                              style={{
+                                '--item-bg': BG_COLORS.secondary,
+                                '--item-border-color': posColor,
+                                '--item-radius': `${RADIUS.lg}px`,
+                                '--item-py': `${SPACING.xs}px`,
+                                '--item-px': `${SPACING.md}px`,
+                                '--item-gap': `${SPACING.sm}px`,
+                                '--name-font-size': `${TYPOGRAPHY.fontSize.sm}px`,
+                                '--name-color': TEXT_COLORS.primary,
+                                '--team-font-size': `${TYPOGRAPHY.fontSize.xs}px`,
+                                '--team-color': TEXT_COLORS.muted,
+                              } as React.CSSProperties}
                             >
-                              <Plus size={16} />
-                            </button>
-                          </div>
-                        ))}
+                              <PositionBadge position={player.position as 'QB' | 'RB' | 'WR' | 'TE'} size="sm" />
+                              <div className={styles.playerInfo}>
+                                <span className={styles.playerName}>{player.name}</span>
+                                <span className={styles.playerTeam}>{player.team}</span>
+                              </div>
+                              <button
+                                onClick={() => togglePlayerExclude(player.name)}
+                                className={cn(styles.playerActionButton, styles.rankButton)}
+                                style={{
+                                  '--rank-color': STATE_COLORS.active,
+                                  '--rank-bg': 'rgba(96, 165, 250, 0.15)',
+                                  '--button-radius': `${RADIUS.lg}px`,
+                                } as React.CSSProperties}
+                                aria-label={`Unexclude ${player.name}`}
+                              >
+                                <Plus size={16} />
+                              </button>
+                            </div>
+                          );
+                        })}
                       </div>
                     </>
                   )}
@@ -868,24 +869,37 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
               )}
             </div>
 
-            {error && <div className="mt-3 p-3 rounded-lg" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: STATE_COLORS.error, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>{error}</div>}
+            {error && <div className={styles.errorMessage} style={{ '--error-color': STATE_COLORS.error, '--error-font-size': `${TYPOGRAPHY.fontSize.sm}px` } as React.CSSProperties}>{error}</div>}
 
-            <div className="flex gap-3 mt-1" style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '8px' }}>
-              <button 
-                onClick={handleUndo} 
+            <div className={styles.footer}>
+              <button
+                onClick={handleUndo}
                 onMouseDown={handleUndoLongPressStart}
                 onMouseUp={handleUndoLongPressEnd}
                 onMouseLeave={handleUndoLongPressEnd}
                 onTouchStart={handleUndoLongPressStart}
                 onTouchEnd={handleUndoLongPressEnd}
-                disabled={(!canUndo && rankedCount === 0) || isSaving} 
-                className="flex-1 py-2 px-4 rounded-lg font-semibold transition-all select-none" 
-                style={{ backgroundColor: (!canUndo && rankedCount === 0) ? BG_COLORS.tertiary : 'rgba(255,255,255,0.1)', color: (!canUndo && rankedCount === 0) ? TEXT_COLORS.disabled : TEXT_COLORS.primary, opacity: (!canUndo && rankedCount === 0) ? 0.5 : 1, cursor: (!canUndo && rankedCount === 0) ? 'not-allowed' : 'pointer' }}
+                disabled={(!canUndo && rankedCount === 0) || isSaving}
+                className={cn(styles.actionButton, styles.undoButton)}
+                style={{
+                  '--undo-bg': (!canUndo && rankedCount === 0) ? BG_COLORS.tertiary : 'rgba(255,255,255,0.1)',
+                  '--undo-color': (!canUndo && rankedCount === 0) ? TEXT_COLORS.disabled : TEXT_COLORS.primary,
+                  '--action-font-size': `${TYPOGRAPHY.fontSize.sm}px`,
+                } as React.CSSProperties}
               >
                 Undo
               </button>
-              <button onClick={handleSave} disabled={!hasChanges || isSaving} className="flex-1 py-2 px-4 rounded-lg font-semibold transition-all flex items-center justify-center gap-2" style={{ backgroundColor: (!hasChanges || isSaving) ? BG_COLORS.tertiary : STATE_COLORS.active, color: (!hasChanges || isSaving) ? TEXT_COLORS.disabled : '#000', opacity: (!hasChanges || isSaving) ? 0.5 : 1, cursor: (!hasChanges || isSaving) ? 'not-allowed' : 'pointer' }}>
-                {isSaving ? (<><div className="animate-spin rounded-full h-4 w-4 border-2" style={{ borderColor: 'currentColor transparent transparent transparent' }} />Saving...</>) : 'Save'}
+              <button
+                onClick={handleSave}
+                disabled={!hasChanges || isSaving}
+                className={cn(styles.actionButton, styles.saveButton)}
+                style={{
+                  '--save-bg': (!hasChanges || isSaving) ? BG_COLORS.tertiary : STATE_COLORS.active,
+                  '--save-color': (!hasChanges || isSaving) ? TEXT_COLORS.disabled : '#000',
+                  '--action-font-size': `${TYPOGRAPHY.fontSize.sm}px`,
+                } as React.CSSProperties}
+              >
+                {isSaving ? (<><div className={styles.loadingSpinner} />Saving...</>) : 'Save'}
               </button>
             </div>
           </div>
@@ -894,13 +908,33 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
 
       {/* Unsaved Changes Warning */}
       {showUnsavedWarning && (
-        <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 300 }}>
-          <div className="rounded-xl p-5 w-72 mx-4" style={{ backgroundColor: BG_COLORS.secondary }}>
-            <h3 className="font-bold mb-2" style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}>Unsaved Changes</h3>
-            <p className="mb-5" style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>You have unsaved changes. Are you sure you want to leave?</p>
-            <div className="flex gap-3">
-              <button onClick={() => setShowUnsavedWarning(false)} className="flex-1 py-2.5 px-4 rounded-lg font-semibold transition-all" style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>Go Back</button>
-              <button onClick={handleDiscardAndClose} className="flex-1 py-2.5 px-4 rounded-lg font-semibold transition-all" style={{ backgroundColor: STATE_COLORS.error, color: '#FFF', fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>Discard</button>
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalDialog} style={{ '--dialog-bg': BG_COLORS.secondary } as React.CSSProperties}>
+            <h3 className={styles.modalDialogTitle} style={{ '--dialog-title-color': TEXT_COLORS.primary, '--dialog-title-font-size': `${TYPOGRAPHY.fontSize.base}px` } as React.CSSProperties}>Unsaved Changes</h3>
+            <p className={styles.modalDialogDescription} style={{ '--dialog-desc-color': TEXT_COLORS.muted, '--dialog-desc-font-size': `${TYPOGRAPHY.fontSize.sm}px` } as React.CSSProperties}>You have unsaved changes. Are you sure you want to leave?</p>
+            <div className={styles.modalDialogButtons}>
+              <button
+                onClick={() => setShowUnsavedWarning(false)}
+                className={styles.modalDialogButton}
+                style={{
+                  backgroundColor: 'rgba(255,255,255,0.1)',
+                  color: TEXT_COLORS.primary,
+                  fontSize: `${TYPOGRAPHY.fontSize.sm}px`
+                }}
+              >
+                Go Back
+              </button>
+              <button
+                onClick={handleDiscardAndClose}
+                className={cn(styles.modalDialogButton, styles.dialogDestructiveButton)}
+                style={{
+                  '--dialog-destructive-bg': STATE_COLORS.error,
+                  '--dialog-destructive-color': '#FFF',
+                  fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
+                } as React.CSSProperties}
+              >
+                Discard
+              </button>
             </div>
           </div>
         </div>
@@ -908,13 +942,33 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
 
       {/* Clear Rankings Confirmation */}
       {showClearConfirm && (
-        <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 300 }}>
-          <div className="rounded-xl p-5 w-72 mx-4" style={{ backgroundColor: BG_COLORS.secondary }}>
-            <h3 className="font-bold mb-2" style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}>Clear Rankings?</h3>
-            <p className="mb-5" style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>Do you want to clear all your rankings? This can be undone.</p>
-            <div className="flex gap-3">
-              <button onClick={() => setShowClearConfirm(false)} className="flex-1 py-2.5 px-4 rounded-lg font-semibold transition-all" style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>Cancel</button>
-              <button onClick={handleClearAll} className="flex-1 py-2.5 px-4 rounded-lg font-semibold transition-all" style={{ backgroundColor: STATE_COLORS.error, color: '#FFF', fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>Clear All</button>
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalDialog} style={{ '--dialog-bg': BG_COLORS.secondary } as React.CSSProperties}>
+            <h3 className={styles.modalDialogTitle} style={{ '--dialog-title-color': TEXT_COLORS.primary, '--dialog-title-font-size': `${TYPOGRAPHY.fontSize.base}px` } as React.CSSProperties}>Clear Rankings?</h3>
+            <p className={styles.modalDialogDescription} style={{ '--dialog-desc-color': TEXT_COLORS.muted, '--dialog-desc-font-size': `${TYPOGRAPHY.fontSize.sm}px` } as React.CSSProperties}>Do you want to clear all your rankings? This can be undone.</p>
+            <div className={styles.modalDialogButtons}>
+              <button
+                onClick={() => setShowClearConfirm(false)}
+                className={styles.modalDialogButton}
+                style={{
+                  backgroundColor: 'rgba(255,255,255,0.1)',
+                  color: TEXT_COLORS.primary,
+                  fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleClearAll}
+                className={cn(styles.modalDialogButton, styles.dialogDestructiveButton)}
+                style={{
+                  '--dialog-destructive-bg': STATE_COLORS.error,
+                  '--dialog-destructive-color': '#FFF',
+                  fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
+                } as React.CSSProperties}
+              >
+                Clear All
+              </button>
             </div>
           </div>
         </div>
@@ -922,4 +976,3 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
     </div>
   );
 }
-

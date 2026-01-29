@@ -21,6 +21,8 @@ import {
 import { PH_BANK_CODES, getBankName } from '../../../lib/paymongo/paymongoTypes';
 import type { PayMongoSavedBankAccount } from '../../../lib/paymongo/paymongoTypes';
 import { createScopedLogger } from '../../../lib/clientLogger';
+import { cn } from '@/lib/styles';
+import styles from './PayMongoWithdrawModalVX2.module.css';
 
 const logger = createScopedLogger('[PayMongoWithdraw]');
 
@@ -230,25 +232,25 @@ export function PayMongoWithdrawModalVX2({
   }, [handleReset, onClose]);
   
   if (!isOpen) return null;
-  
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div 
-        className="w-full max-w-md bg-[#101927] rounded-2xl overflow-hidden shadow-2xl"
+    <div className={styles.modalOverlay} onClick={handleClose}>
+      <div
+        className={styles.modalContent}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
-          <div className="flex items-center gap-3">
+        <div className={styles.modalHeader}>
+          <div className={styles.headerLeft}>
             {(step === 'bank' || step === 'confirm') && (
               <button
                 onClick={handleBack}
-                className="p-1 -ml-1 hover:bg-white/10 rounded-lg transition-colors"
+                className={styles.backButton}
               >
-                <ChevronLeft className="w-5 h-5 text-gray-400" />
+                <ChevronLeft className={cn(styles.backIcon, 'w-5 h-5')} />
               </button>
             )}
-            <h2 className="text-lg font-semibold text-white">
+            <h2 className={styles.modalTitle}>
               {step === 'amount' && 'Withdraw'}
               {step === 'bank' && 'Select Bank Account'}
               {step === 'confirm' && 'Confirm Withdrawal'}
@@ -259,32 +261,32 @@ export function PayMongoWithdrawModalVX2({
           </div>
           <button
             onClick={handleClose}
-            className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+            className={styles.closeButton}
           >
-            <Close className="w-5 h-5 text-gray-400" />
+            <Close className={cn(styles.closeIcon, 'w-5 h-5')} />
           </button>
         </div>
-        
+
         {/* Content */}
-        <div className="p-6">
+        <div className={styles.modalBody}>
           {/* Amount Step */}
           {step === 'amount' && (
-            <div className="space-y-6">
+            <div className={styles.contentContainer}>
               {/* Balance display */}
-              <div className="text-center py-4 bg-[#1a2537] rounded-lg">
-                <p className="text-sm text-gray-400 mb-1">Available Balance</p>
-                <p className="text-2xl font-bold text-white">
+              <div className={styles.balanceDisplay}>
+                <p className={styles.balanceLabel}>Available Balance</p>
+                <p className={styles.balanceAmount}>
                   {formatPhpAmount(balanceCentavos)}
                 </p>
               </div>
-              
+
               {/* Amount input */}
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">
+              <div className={styles.amountInputContainer}>
+                <label className={styles.amountInputLabel}>
                   Withdrawal Amount
                 </label>
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">
+                <div className={styles.amountInputWrapper}>
+                  <span className={styles.amountCurrencySymbol}>
                     {PHP_CONFIG.symbol}
                   </span>
                   <input
@@ -293,78 +295,77 @@ export function PayMongoWithdrawModalVX2({
                     value={customAmount}
                     onChange={(e) => handleAmountChange(e.target.value)}
                     placeholder="0.00"
-                    className="w-full pl-10 pr-24 py-3 bg-[#1a2537] border border-white/10 rounded-lg text-white text-lg focus:outline-none focus:border-blue-500 transition-colors"
+                    className={styles.amountInput}
                   />
                   <button
                     onClick={handleWithdrawAll}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 text-sm bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 rounded-md transition-colors"
+                    className={styles.amountMaxButton}
                   >
                     Max
                   </button>
                 </div>
-                <p className="mt-2 text-xs text-gray-500">
+                <p className={styles.amountMinimumNote}>
                   Minimum: {formatPhpAmount(PHP_CONFIG.minimumWithdrawalCentavos)}
                 </p>
               </div>
-              
+
               {/* Error */}
               {error && (
-                <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                  <p className="text-sm text-red-400">{error}</p>
+                <div className={styles.errorContainer}>
+                  <p className={styles.errorText}>{error}</p>
                 </div>
               )}
-              
+
               {/* Continue button */}
               <button
                 onClick={handleContinueToBank}
                 disabled={!canProceedToBank}
-                className={`w-full py-3 rounded-lg font-semibold transition-all ${
-                  canProceedToBank
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                    : 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                }`}
+                className={styles.continueButton}
+                style={{
+                  '--btn-opacity': canProceedToBank ? '1' : '0.5',
+                } as React.CSSProperties}
               >
                 Continue
               </button>
             </div>
           )}
-          
+
+
           {/* Bank Account Step */}
           {step === 'bank' && (
-            <div className="space-y-4">
+            <div className={styles.contentContainer}>
               {/* Amount display */}
-              <div className="text-center py-3 bg-[#1a2537] rounded-lg">
-                <p className="text-sm text-gray-400">Withdrawing</p>
-                <p className="text-xl font-bold text-white">
+              <div className={styles.amountDisplayContainer}>
+                <p className={styles.amountDisplayLabel}>Withdrawing</p>
+                <p className={styles.amountDisplayValue}>
                   {formatPhpAmount(amountCentavos)}
                 </p>
               </div>
-              
+
               {/* Saved accounts */}
               {savedAccounts.length > 0 && !isAddingNew && (
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-gray-400">Saved Accounts</p>
+                <div className={styles.savedAccountsSection}>
+                  <p className={styles.savedAccountsLabel}>Saved Accounts</p>
                   {savedAccounts.map((account) => (
                     <button
                       key={account.id}
                       onClick={() => setSelectedAccountId(account.id)}
-                      className={`w-full flex items-center gap-4 p-4 rounded-lg border transition-all ${
-                        selectedAccountId === account.id
-                          ? 'bg-blue-600/10 border-blue-500'
-                          : 'bg-[#1a2537] border-white/10 hover:border-white/20'
-                      }`}
+                      className={cn(
+                        styles.accountButton,
+                        selectedAccountId === account.id && styles.selected
+                      )}
                     >
-                      <div className="w-10 h-10 rounded-lg bg-[#243044] flex items-center justify-center">
-                        <span className="text-white font-bold text-xs">
+                      <div className={styles.bankIconBox}>
+                        <span className={styles.bankIconText}>
                           {account.bankCode.slice(0, 2)}
                         </span>
                       </div>
-                      <div className="flex-1 text-left">
-                        <p className="font-medium text-white">{account.bankName}</p>
-                        <p className="text-sm text-gray-400">{account.accountNumberMasked}</p>
+                      <div className={styles.accountInfo}>
+                        <p className={styles.bankName}>{account.bankName}</p>
+                        <p className={styles.accountNumber}>{account.accountNumberMasked}</p>
                       </div>
                       {account.isDefault && (
-                        <span className="px-2 py-0.5 text-xs bg-green-500/20 text-green-400 rounded-full">
+                        <span className={styles.defaultBadge}>
                           Default
                         </span>
                       )}
@@ -372,27 +373,27 @@ export function PayMongoWithdrawModalVX2({
                   ))}
                 </div>
               )}
-              
+
               {/* Add new account */}
               {!isAddingNew ? (
                 <button
                   onClick={() => setIsAddingNew(true)}
-                  className="w-full flex items-center justify-center gap-2 py-3 border border-dashed border-white/20 rounded-lg text-gray-400 hover:text-white hover:border-white/40 transition-colors"
+                  className={styles.addNewBankButton}
                 >
-                  <span className="text-xl">+</span>
-                  <span>Add New Bank Account</span>
+                  <span className={styles.addNewBankIcon}>+</span>
+                  <span className={styles.addNewBankText}>Add New Bank Account</span>
                 </button>
               ) : (
-                <div className="space-y-4 p-4 bg-[#1a2537] rounded-lg">
-                  <p className="font-medium text-white">New Bank Account</p>
-                  
+                <div className={styles.newBankForm}>
+                  <p className={styles.formTitle}>New Bank Account</p>
+
                   {/* Bank selection */}
-                  <div>
-                    <label className="block text-sm text-gray-400 mb-1">Bank</label>
+                  <div className={styles.formFieldGroup}>
+                    <label className={styles.formLabel}>Bank</label>
                     <select
                       value={newBankCode}
                       onChange={(e) => setNewBankCode(e.target.value)}
-                      className="w-full px-4 py-2 bg-[#243044] border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                      className={styles.formSelect}
                     >
                       <option value="">Select Bank</option>
                       {Object.entries(PH_BANK_CODES).map(([code, name]) => (
@@ -400,169 +401,172 @@ export function PayMongoWithdrawModalVX2({
                       ))}
                     </select>
                   </div>
-                  
+
                   {/* Account number */}
-                  <div>
-                    <label className="block text-sm text-gray-400 mb-1">Account Number</label>
+                  <div className={styles.formFieldGroup}>
+                    <label className={styles.formLabel}>Account Number</label>
                     <input
                       type="text"
                       inputMode="numeric"
                       value={newAccountNumber}
                       onChange={(e) => setNewAccountNumber(e.target.value.replace(/\D/g, ''))}
                       placeholder="Enter account number"
-                      className="w-full px-4 py-2 bg-[#243044] border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                      className={styles.formInput}
                     />
                   </div>
-                  
+
                   {/* Account name */}
-                  <div>
-                    <label className="block text-sm text-gray-400 mb-1">Account Holder Name</label>
+                  <div className={styles.formFieldGroup}>
+                    <label className={styles.formLabel}>Account Holder Name</label>
                     <input
                       type="text"
                       value={newAccountName}
                       onChange={(e) => setNewAccountName(e.target.value)}
                       placeholder="Enter name as shown on account"
-                      className="w-full px-4 py-2 bg-[#243044] border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                      className={styles.formInput}
                     />
                   </div>
-                  
+
                   {/* Save for future */}
-                  <label className="flex items-center gap-2 cursor-pointer">
+                  <label className={styles.saveCheckboxLabel}>
                     <input
                       type="checkbox"
                       checked={saveNewAccount}
                       onChange={(e) => setSaveNewAccount(e.target.checked)}
-                      className="w-4 h-4 rounded border-gray-600 text-blue-600 focus:ring-blue-500"
+                      className={styles.saveCheckbox}
                     />
-                    <span className="text-sm text-gray-400">Save for future withdrawals</span>
+                    <span className={styles.saveCheckboxText}>Save for future withdrawals</span>
                   </label>
-                  
+
                   {/* Cancel */}
                   <button
                     onClick={() => setIsAddingNew(false)}
-                    className="text-sm text-gray-400 hover:text-white"
+                    className={styles.cancelButton}
                   >
                     Cancel
                   </button>
                 </div>
               )}
-              
+
               {/* Continue button */}
               <button
                 onClick={handleContinueToConfirm}
                 disabled={!canProceedToConfirm}
-                className={`w-full py-3 rounded-lg font-semibold transition-all ${
-                  canProceedToConfirm
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                    : 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                }`}
+                className={styles.continueButton}
+                style={{
+                  '--btn-opacity': canProceedToConfirm ? '1' : '0.5',
+                } as React.CSSProperties}
               >
                 Continue
               </button>
             </div>
           )}
-          
+
+
           {/* Confirm Step */}
           {step === 'confirm' && (
-            <div className="space-y-6">
-              <div className="space-y-4 p-4 bg-[#1a2537] rounded-lg">
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Amount</span>
-                  <span className="font-semibold text-white">{formatPhpAmount(amountCentavos)}</span>
+            <div className={styles.contentContainer}>
+              <div className={styles.confirmSummary}>
+                <div className={styles.summaryRow}>
+                  <span className={styles.summaryLabel}>Amount</span>
+                  <span className={styles.summaryValue}>{formatPhpAmount(amountCentavos)}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Bank</span>
-                  <span className="text-white">
+                <div className={styles.summaryRow}>
+                  <span className={styles.summaryLabel}>Bank</span>
+                  <span className={styles.summaryValue}>
                     {isAddingNew ? getBankName(newBankCode) : selectedAccount?.bankName}
                   </span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Account</span>
-                  <span className="text-white">
-                    {isAddingNew 
-                      ? `****${newAccountNumber.slice(-4)}` 
+                <div className={styles.summaryRow}>
+                  <span className={styles.summaryLabel}>Account</span>
+                  <span className={styles.summaryValue}>
+                    {isAddingNew
+                      ? `****${newAccountNumber.slice(-4)}`
                       : selectedAccount?.accountNumberMasked}
                   </span>
                 </div>
-                <div className="border-t border-white/10 pt-4">
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">You will receive</span>
-                    <span className="font-bold text-green-400">{formatPhpAmount(amountCentavos)}</span>
+                <div className={styles.summaryDivider}>
+                  <div className={styles.summaryRow}>
+                    <span className={styles.receivedLabel}>You will receive</span>
+                    <span className={styles.receivedAmount}>{formatPhpAmount(amountCentavos)}</span>
                   </div>
                 </div>
               </div>
-              
-              <p className="text-sm text-gray-500 text-center">
+
+              <p className={styles.processingNote}>
                 Withdrawals are typically processed within 1-2 business days
               </p>
-              
+
               {/* Error */}
               {error && (
-                <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                  <p className="text-sm text-red-400">{error}</p>
+                <div className={styles.errorContainer}>
+                  <p className={styles.errorText}>{error}</p>
                 </div>
               )}
-              
+
               {/* Confirm button */}
               <button
                 onClick={handleSubmit}
                 disabled={isLoading}
-                className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-all disabled:opacity-50"
+                className={styles.confirmButton}
               >
                 {isLoading ? 'Processing...' : 'Confirm Withdrawal'}
               </button>
             </div>
           )}
-          
+
+
           {/* Processing Step */}
           {step === 'processing' && (
-            <div className="text-center py-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-blue-600/20">
-                <svg className="animate-spin w-8 h-8 text-blue-500" fill="none" viewBox="0 0 24 24">
+            <div className={styles.processingContainer}>
+              <div className={styles.processingIconBox}>
+                <svg className={styles.processingIcon} fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">Processing Withdrawal</h3>
-              <p className="text-gray-400">Please wait...</p>
+              <h3 className={styles.processingTitle}>Processing Withdrawal</h3>
+              <p className={styles.processingText}>Please wait...</p>
             </div>
           )}
-          
+
+
           {/* Success Step */}
           {step === 'success' && (
-            <div className="text-center py-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-green-600/20">
-                <svg className="w-8 h-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className={styles.successContainer}>
+              <div className={styles.successIconBox}>
+                <svg className={styles.successIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">Withdrawal Initiated</h3>
-              <p className="text-gray-400 mb-6">
+              <h3 className={styles.successTitle}>Withdrawal Initiated</h3>
+              <p className={styles.successMessage}>
                 Your withdrawal of {formatPhpAmount(amountCentavos)} is being processed.
                 You will receive the funds within 1-2 business days.
               </p>
               <button
                 onClick={handleClose}
-                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+                className={styles.doneButton}
               >
                 Done
               </button>
             </div>
           )}
-          
+
+
           {/* Error Step */}
           {step === 'error' && (
-            <div className="text-center py-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-red-600/20">
-                <svg className="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className={styles.errorResultContainer}>
+              <div className={styles.errorIconBox}>
+                <svg className={styles.errorIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">Withdrawal Failed</h3>
-              <p className="text-gray-400 mb-6">{error || 'An error occurred. Please try again.'}</p>
+              <h3 className={styles.errorTitle}>Withdrawal Failed</h3>
+              <p className={styles.errorResultMessage}>{error || 'An error occurred. Please try again.'}</p>
               <button
                 onClick={handleReset}
-                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+                className={styles.tryAgainButton}
               >
                 Try Again
               </button>

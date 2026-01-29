@@ -52,6 +52,9 @@ import JoinTournamentModal from './JoinTournamentModal';
 // Logging
 import { createScopedLogger } from '../../../../lib/clientLogger';
 
+// CSS Modules
+import styles from './LobbyTabVX2.module.css';
+
 const logger = createScopedLogger('[LobbyTab]');
 
 // ============================================================================
@@ -93,19 +96,7 @@ export interface LobbyTabVX2Props {
 function LoadingState(): React.ReactElement {
   return (
     <div
-      className="vx2-lobby-loading"
-      style={{
-        position: 'absolute',
-        top: '16px',
-        bottom: '16px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        width: 'calc(100% - 32px)',
-        maxWidth: '420px',
-        backgroundColor: 'rgba(255,255,255,0.08)',
-        borderRadius: `${CARD_SPACING_V3.borderRadius}px`,
-        animation: 'pulse 2s infinite',
-      }}
+      className={styles.loadingState}
       aria-label="Loading tournament"
     />
   );
@@ -210,18 +201,11 @@ export default function LobbyTabVX2({
   }, [isJoining]);
 
   // ----------------------------------------
-  // Container style (shared across states)
+  // Container classes
   // ----------------------------------------
-  const containerStyle: React.CSSProperties = {
-    position: 'relative',
-    width: '100%',
-    height: '100%',
-    minHeight: inPhoneFrame ? 0 : '400px', // In phone frame: shrink so border + bottom strip layout correctly
-    flex: 1,
-    backgroundColor: BG_COLORS.primary,
-    // In phone frame: flex column so border wrapper is height-constrained and bottom strip (progress, join, stats) stays visible
-    ...(inPhoneFrame ? { display: 'flex', flexDirection: 'column' as const } : {}),
-  };
+  const containerClasses = inPhoneFrame
+    ? `${styles.container} ${styles.inPhoneFrame}`
+    : styles.container;
 
   // ----------------------------------------
   // SERVER/CLIENT CONSISTENT RENDERING
@@ -238,9 +222,8 @@ export default function LobbyTabVX2({
   
   if (shouldShowLoading) {
     return (
-      <div 
-        className="vx2-lobby-container" 
-        style={containerStyle}
+      <div
+        className={containerClasses}
       >
         <LoadingState />
       </div>
@@ -253,8 +236,7 @@ export default function LobbyTabVX2({
   if (error) {
     return (
       <div
-        className="vx2-lobby-container flex-1 flex items-center justify-center"
-        style={containerStyle}
+        className={`${containerClasses} flex-1 flex items-center justify-center`}
       >
         <ErrorState
           title="Failed to load tournaments"
@@ -271,8 +253,7 @@ export default function LobbyTabVX2({
   if (!isLoading && tournaments.length === 0) {
     return (
       <div
-        className="vx2-lobby-container flex-1 flex items-center justify-center"
-        style={containerStyle}
+        className={`${containerClasses} flex-1 flex items-center justify-center`}
       >
         <EmptyState
           title="No Tournaments Available"
@@ -306,22 +287,15 @@ export default function LobbyTabVX2({
   // Shared bottom strip (used in phone-frame layout; uses spec for px-per-px match)
   const bottomStrip = (
     <div
-      className="vx2-lobby-bottom"
-      style={{
-        flexShrink: 0,
-        padding: `0 ${SPEC.lobby.outer_padding_px}px ${SPEC.lobby.outer_padding_px}px`,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: SPEC.lobby.bottom_row_gap_px,
-      }}
+      className={styles.bottomStrip}
     >
-      <div style={{ transform: 'translateY(-14px)' }}>
+      <div className={styles.progressBarWrapper}>
         <TournamentProgressBar
           currentEntries={featuredTournament.currentEntries}
           maxEntries={featuredTournament.maxEntries}
         />
       </div>
-      <div style={{ transform: 'translateY(-4px)' }}>
+      <div className={styles.joinButtonWrapper}>
         <TournamentJoinButton
           onClick={() => handleJoinClick(featuredTournament.id)}
           label="Join Tournament"
@@ -370,8 +344,7 @@ export default function LobbyTabVX2({
       : base;
     return (
       <div
-        className="vx2-lobby-container"
-        style={containerStyle}
+        className={containerClasses}
         role="main"
         aria-label="Tournament lobby"
       >
@@ -386,87 +359,48 @@ export default function LobbyTabVX2({
   }
 
   // Default: centered card layout
+  const cardClasses = `${styles.card}${featuredTournament.isFeatured ? ` ${styles.featured}` : ''}`;
+
+  // Set CSS custom properties for dynamic values
+  const cardStyle: React.CSSProperties = {
+    '--card-width': `${finalWidth}px`,
+    '--card-height': `${finalHeight}px`,
+  } as React.CSSProperties & Record<string, any>;
+
   return (
     <div
-      className="vx2-lobby-container"
-      style={containerStyle}
+      className={containerClasses}
       role="main"
       aria-label="Tournament lobby"
     >
       <div
-        className="vx2-lobby-card"
-        style={{
-          position: 'absolute',
-          top: '16px',
-          bottom: '16px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: `${finalWidth}px`,
-          height: `${finalHeight}px`,
-          maxWidth: '420px',
-          display: 'flex',
-          flexDirection: 'column',
-          backgroundColor: CARD_VISUALS.backgroundFallback,
-          borderRadius: `${CARD_SPACING_V3.borderRadius}px`,
-          border: `${borderWidth}px solid ${borderColor}`,
-          overflow: 'hidden',
-          contain: 'layout style paint',
-          isolation: 'isolate',
-        }}
+        className={cardClasses}
+        style={cardStyle}
       >
         <div
-          className="vx2-lobby-content"
-          style={{
-            flex: 1,
-            minHeight: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-            zIndex: 1,
-            position: 'relative',
-          }}
+          className={styles.content}
         >
           <div
-            style={{
-              flex: 1,
-              minHeight: 0,
-              overflow: 'auto',
-              display: 'flex',
-              flexDirection: 'column',
-            }}
+            className={styles.scrollableContent}
           >
             <div
-              style={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                padding: `${CARD_SPACING_V3.outerPadding}px`,
-                gap: CARD_SPACING_V3.bottomRowGap,
-                minHeight: 0,
-              }}
+              className={styles.contentPadding}
             >
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div className={styles.logoSection}>
                 <TournamentCardLogo src={CARD_VISUALS.logoImage} alt="Tournament logo" maxHeight={60} />
-                <div style={{ marginTop: 14, transform: 'translateY(-24px)' }}>
+                <div className={styles.titleWrapper}>
                   <TournamentTitle title={featuredTournament.title} fontSize={38} />
                 </div>
               </div>
               <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  minHeight: SPEC.lobby.globe_size_px,
-                  marginTop: 24,
-                  transform: 'translateY(-24px)',
-                }}
+                className={styles.globeSection}
               >
                 <img
                   src={GLOBE_IMAGE}
                   alt=""
                   width={SPEC.lobby.globe_size_px}
                   height={SPEC.lobby.globe_size_px}
-                  style={{ width: SPEC.lobby.globe_size_px, height: SPEC.lobby.globe_size_px, objectFit: 'contain', display: 'block' }}
+                  className={styles.globeImage}
                 />
               </div>
             </div>

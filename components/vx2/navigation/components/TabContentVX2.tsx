@@ -1,11 +1,13 @@
 /**
  * TabContentVX2 - Tab Content Container
- * 
+ *
  * Renders the active tab with:
  * - Direct imports for SSR compatibility
  * - Error boundary protection
  * - Scroll position preservation
  * - Loading states
+ *
+ * Migrated to CSS Modules for CSP compliance.
  */
 
 import React, { useEffect, useRef, useCallback, useState, useMemo } from 'react';
@@ -17,6 +19,8 @@ import { useDebouncedCallback } from '../../hooks/ui/useDebounce';
 import TabErrorBoundary from './TabErrorBoundary';
 import { createScopedLogger } from '../../../../lib/clientLogger';
 import { useInPhoneFrame } from '../../../../lib/inPhoneFrameContext';
+import { cn } from '@/lib/styles';
+import styles from './TabContentVX2.module.css';
 
 const logger = createScopedLogger('[TabContentVX2]');
 
@@ -26,21 +30,9 @@ import dynamic from 'next/dynamic';
 
 // Create a stable loading component that's identical on server and client
 const LobbyTabLoading = () => (
-  <div 
-    className="vx2-lobby-container" 
+  <div
+    className={styles.lobbyLoading}
     suppressHydrationWarning
-    style={{ 
-      position: 'relative', 
-      width: '100%', 
-      height: '100%', 
-      minHeight: '400px',
-      flex: 1,
-      backgroundColor: '#0a0a1a',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      color: '#fff'
-    }}
   >
     <div>Loading tournaments...</div>
   </div>
@@ -90,7 +82,7 @@ const TAB_COMPONENTS: Record<TabId, React.ComponentType> = {
 // MAIN COMPONENT
 // ============================================================================
 
-export default function TabContentVX2({ 
+export default function TabContentVX2({
   className = '',
   errorComponent,
 }: TabContentVX2Props): React.ReactElement {
@@ -100,7 +92,7 @@ export default function TabContentVX2({
   logger.debug('Tab navigation initialized', { activeTab: state.activeTab });
   const contentRef = useRef<HTMLDivElement>(null);
   const isLobbyInPhone = state.activeTab === 'lobby' && inPhoneFrame;
-  
+
   // Get tab config with fallback to default tab if not found
   // Use useMemo to ensure proper React tracking and memoization
   const tabConfig = useMemo(() => {
@@ -111,21 +103,20 @@ export default function TabContentVX2({
     }
     return config;
   }, [state.activeTab, getTabConfig]);
-  
+
   const [isMounted, setIsMounted] = useState(false);
-  
+
   // Track mount state for SSR
   useEffect(() => {
     setIsMounted(true);
-   
   }, []);
-  
+
   // Restore scroll position when tab becomes active
   useEffect(() => {
     if (!isMounted || !tabConfig || !tabConfig.preserveState) {
       return;
     }
-    
+
     const savedState = getTabState(state.activeTab);
     if (savedState?.scrollPosition && contentRef.current) {
       // Use requestAnimationFrame to ensure DOM is ready
@@ -138,44 +129,44 @@ export default function TabContentVX2({
       });
     }
   }, [state.activeTab, tabConfig, getTabState, isMounted]);
-  
+
   // Save scroll position on scroll (debounced)
   // Use refs to capture current values for the debounced callback
   const tabConfigRef = useRef(tabConfig);
   const activeTabRef = useRef(state.activeTab);
   const saveTabStateRef = useRef(saveTabState);
-  
+
   useEffect(() => {
     tabConfigRef.current = tabConfig;
     activeTabRef.current = state.activeTab;
     saveTabStateRef.current = saveTabState;
   }, [tabConfig, state.activeTab, saveTabState]);
-  
+
   const { debouncedCallback: handleScrollDebounced } = useDebouncedCallback((target: HTMLElement) => {
     if (!tabConfigRef.current || !tabConfigRef.current.preserveState) return;
-    
+
     saveTabStateRef.current(activeTabRef.current, {
-      scrollPosition: { 
-        x: target.scrollLeft, 
-        y: target.scrollTop 
+      scrollPosition: {
+        x: target.scrollLeft,
+        y: target.scrollTop
       },
     });
   }, 100);
-  
+
   // Scroll event handler
   const onScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     handleScrollDebounced(e.currentTarget);
   }, [handleScrollDebounced]);
-  
+
   // Error retry handler
   const handleRetry = useCallback(() => {
     // Force re-mount by clearing tab state
     window.location.reload();
   }, []);
-  
+
   // Router for navigation
   const router = useRouter();
-  
+
   // Handle entering a draft room
   const handleEnterDraft = useCallback((draft: { id: string; pickNumber: number; teamCount: number }) => {
     logger.debug('Entering draft', { draftId: draft.id, pickNumber: draft.pickNumber });
@@ -186,16 +177,16 @@ export default function TabContentVX2({
     });
     router.push(`/testing-grounds/vx2-draft-room?${params.toString()}`);
   }, [router]);
-  
+
   // Get the active tab component
   const TabComponent = TAB_COMPONENTS[state.activeTab];
-  
+
   logger.debug('Tab component lookup', { activeTab: state.activeTab, hasTabComponent: !!TabComponent });
-  
+
   if (!TabComponent) {
     logger.error('Tab component not found', undefined, { activeTab: state.activeTab });
   }
-  
+
   // Render tab content with appropriate props
   const renderTabContent = () => {
     switch (state.activeTab) {
@@ -214,35 +205,22 @@ export default function TabContentVX2({
         return TabComponent ? <TabComponent /> : null;
     }
   };
-  
+
   return (
-    <div 
+    <div
       ref={contentRef}
-      className={`flex-1 min-h-0 flex flex-col ${isLobbyInPhone ? '' : 'overflow-y-auto'} ${className}`}
+      className={cn(
+        styles.contentContainer,
+        isLobbyInPhone ? styles.contentContainerHidden : styles.contentContainerScrollable,
+        className
+      )}
       onScroll={onScroll}
-      style={{
-        // Lobby in phone frame: no outer scroll so shell marginBottom gap is visible
-        ...(isLobbyInPhone ? { overflow: 'hidden' } : {}),
-        scrollbarWidth: 'none',
-        msOverflowStyle: 'none',
-        WebkitOverflowScrolling: 'touch',
-        flexBasis: 0,
-      }}
       role="tabpanel"
       id={`tabpanel-${state.activeTab}`}
       aria-labelledby={`tab-${state.activeTab}`}
       tabIndex={0}
       suppressHydrationWarning
     >
-      {/* Hide scrollbar for WebKit browsers - only render after mount to prevent hydration mismatch */}
-      {isMounted && (
-        <style>{`
-          #tabpanel-${state.activeTab}::-webkit-scrollbar {
-            display: none;
-          }
-        `}</style>
-      )}
-      
       <TabErrorBoundary
         tabId={state.activeTab}
         onRetry={handleRetry}
@@ -252,13 +230,17 @@ export default function TabContentVX2({
         {isMounted && TabComponent ? (
           renderTabContent()
         ) : isMounted && !TabComponent ? (
-          <div style={{ padding: '20px', color: '#fff' }} suppressHydrationWarning>
+          <div className={styles.errorMessage} suppressHydrationWarning>
             <p>Error: Tab component not found for "{state.activeTab}"</p>
-            <p style={{ fontSize: '12px', color: '#999' }}>
+            <p className={styles.errorDetail}>
               Available tabs: {Object.keys(TAB_COMPONENTS).join(', ')}
             </p>
           </div>
-        ) : null}
+        ) : (
+          <div className={styles.loadingMessage} suppressHydrationWarning>
+            Loading...
+          </div>
+        )}
       </TabErrorBoundary>
     </div>
   );

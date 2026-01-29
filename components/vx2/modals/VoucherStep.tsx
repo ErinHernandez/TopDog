@@ -21,6 +21,8 @@ import React from 'react';
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../core/constants/colors';
 import { TYPOGRAPHY } from '../core/constants/sizes';
 import { formatSmallestUnit } from '../utils/formatting';
+import { cn } from '@/lib/styles';
+import styles from './VoucherStep.module.css';
 
 // ============================================================================
 // TYPES
@@ -160,106 +162,128 @@ export function VoucherStep({
   };
   
   return (
-    <div className="space-y-6">
+    <div className={styles.container}>
       {/* Header */}
-      <div className="text-center">
-        <div 
-          className="text-5xl mb-4"
+      <div className={styles.header}>
+        <div
+          className={styles.icon}
           role="img"
           aria-label={config.title}
         >
           {config.icon}
         </div>
-        <h3 
-          className="text-xl font-semibold"
-          style={{ color: TEXT_COLORS.primary }}
+        <h3
+          className={styles.title}
+          style={{ '--text-primary': TEXT_COLORS.primary } as React.CSSProperties}
         >
           {config.title}
         </h3>
-        <p style={{ color: TEXT_COLORS.secondary, marginTop: '4px' }}>
+        <p
+          className={styles.subtitle}
+          style={{ '--text-secondary': TEXT_COLORS.secondary } as React.CSSProperties}
+        >
           {config.subtitle}
         </p>
       </div>
       
       {/* Amount */}
-      <div 
-        className="text-center py-4 rounded-lg"
-        style={{ backgroundColor: BG_COLORS.tertiary }}
+      <div
+        className={styles.amountBox}
+        style={{
+          '--bg-tertiary': BG_COLORS.tertiary,
+          '--state-success': STATE_COLORS.success,
+          '--text-muted': TEXT_COLORS.muted,
+        } as React.CSSProperties}
       >
-        <p 
-          className="text-2xl font-bold"
-          style={{ color: STATE_COLORS.success }}
+        <p
+          className={styles.amountValue}
+          style={{ '--state-success': STATE_COLORS.success } as React.CSSProperties}
         >
           {formatSmallestUnit(voucherInfo.amount, { currency: voucherInfo.currency })}
         </p>
-        <p 
-          className="text-sm mt-1"
-          style={{ color: TEXT_COLORS.muted }}
+        <p
+          className={styles.amountLabel}
+          style={{ '--text-muted': TEXT_COLORS.muted } as React.CSSProperties}
         >
           Amount to pay
         </p>
       </div>
       
       {/* Expiration Warning */}
-      <div 
-        className="p-4 rounded-lg"
-        style={{ 
-          backgroundColor: expiringSoon 
-            ? `${STATE_COLORS.error}15`
-            : `${STATE_COLORS.warning}15`,
-          border: `1px solid ${expiringSoon 
-            ? STATE_COLORS.error 
-            : STATE_COLORS.warning}40`,
-        }}
+      <div
+        className={cn(styles.expirationBox, {
+          [styles.expiring]: expiringSoon,
+          [styles.warning]: !expiringSoon,
+        })}
+        style={{
+          '--text-primary': TEXT_COLORS.primary,
+          '--text-muted': TEXT_COLORS.muted,
+          '--state-error': STATE_COLORS.error,
+          '--state-error-light': `${STATE_COLORS.error}15`,
+          '--state-error-border': `${STATE_COLORS.error}40`,
+          '--state-warning': STATE_COLORS.warning,
+          '--state-warning-light': `${STATE_COLORS.warning}15`,
+          '--state-warning-border': `${STATE_COLORS.warning}40`,
+        } as React.CSSProperties}
       >
-        <div className="flex items-center justify-between">
-          <span style={{ color: TEXT_COLORS.primary, fontWeight: 500 }}>
+        <div className={styles.expirationHeader}>
+          <span
+            className={styles.expirationLabel}
+            style={{ '--text-primary': TEXT_COLORS.primary } as React.CSSProperties}
+          >
             Expires in:
           </span>
-          <span 
-            className="font-semibold"
-            style={{ 
-              color: expiringSoon ? STATE_COLORS.error : STATE_COLORS.warning 
-            }}
+          <span
+            className={cn(styles.expirationTime, {
+              [styles.expiring]: expiringSoon,
+              [styles.warning]: !expiringSoon,
+            })}
+            style={{
+              '--state-error': STATE_COLORS.error,
+              '--state-warning': STATE_COLORS.warning,
+            } as React.CSSProperties}
           >
             {timeRemaining}
           </span>
         </div>
-        <p 
-          className="text-xs mt-2"
-          style={{ color: TEXT_COLORS.muted }}
+        <p
+          className={styles.expirationDate}
+          style={{ '--text-muted': TEXT_COLORS.muted } as React.CSSProperties}
         >
           {expiresDate.toLocaleString()}
         </p>
       </div>
       
       {/* Instructions */}
-      <div 
-        className="p-4 rounded-lg"
-        style={{ backgroundColor: BG_COLORS.tertiary }}
+      <div
+        className={styles.instructionsBox}
+        style={{
+          '--bg-tertiary': BG_COLORS.tertiary,
+          '--text-primary': TEXT_COLORS.primary,
+          '--text-secondary': TEXT_COLORS.secondary,
+          '--state-active': STATE_COLORS.active,
+          '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
+        } as React.CSSProperties}
       >
-        <p 
-          className="font-medium mb-3"
-          style={{ color: TEXT_COLORS.primary }}
+        <p
+          className={styles.instructionsTitle}
+          style={{ '--text-primary': TEXT_COLORS.primary } as React.CSSProperties}
         >
           How to complete your payment:
         </p>
-        <ol 
-          className="space-y-2"
-          style={{ color: TEXT_COLORS.secondary }}
+        <ol
+          className={styles.instructionsList}
+          style={{ '--text-secondary': TEXT_COLORS.secondary } as React.CSSProperties}
         >
           {config.instructions.map((instruction, index) => (
-            <li 
+            <li
               key={index}
-              className="flex gap-3"
-              style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
+              className={styles.instructionItem}
+              style={{ '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px` } as React.CSSProperties}
             >
-              <span 
-                className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs font-medium"
-                style={{ 
-                  backgroundColor: STATE_COLORS.active,
-                  color: '#000',
-                }}
+              <span
+                className={styles.instructionNumber}
+                style={{ '--state-active': STATE_COLORS.active } as React.CSSProperties}
               >
                 {index + 1}
               </span>
@@ -270,51 +294,50 @@ export function VoucherStep({
       </div>
       
       {/* Actions */}
-      <div className="space-y-3">
+      <div className={styles.actionsContainer}>
         <button
           onClick={handleViewVoucher}
-          className="w-full py-4 px-4 rounded-lg font-semibold transition-all flex items-center justify-center gap-2"
+          className={styles.primaryButton}
           style={{
-            backgroundColor: STATE_COLORS.success,
-            color: '#fff',
-          }}
+            '--state-success': STATE_COLORS.success,
+          } as React.CSSProperties}
         >
-          <svg 
-            className="w-5 h-5" 
-            fill="none" 
-            viewBox="0 0 24 24" 
+          <svg
+            className={styles.buttonIcon}
+            fill="none"
+            viewBox="0 0 24 24"
             stroke="currentColor"
           >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
-              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" 
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
             />
           </svg>
           {config.buttonText}
         </button>
-        
+
         <button
           onClick={onClose}
-          className="w-full py-3 px-4 rounded-lg font-medium transition-all"
+          className={styles.secondaryButton}
           style={{
-            backgroundColor: BG_COLORS.tertiary,
-            color: TEXT_COLORS.secondary,
-            border: `1px solid ${BORDER_COLORS.default}`,
-          }}
+            '--bg-tertiary': BG_COLORS.tertiary,
+            '--text-secondary': TEXT_COLORS.secondary,
+            '--border-default': BORDER_COLORS.default,
+          } as React.CSSProperties}
         >
           I'll Pay Later
         </button>
       </div>
       
       {/* Confirmation Note */}
-      <p 
-        className="text-center"
-        style={{ 
-          fontSize: `${TYPOGRAPHY.fontSize.xs}px`, 
-          color: TEXT_COLORS.muted 
-        }}
+      <p
+        className={styles.confirmationNote}
+        style={{
+          '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
+          '--text-muted': TEXT_COLORS.muted,
+        } as React.CSSProperties}
       >
         {config.confirmationNote}
       </p>

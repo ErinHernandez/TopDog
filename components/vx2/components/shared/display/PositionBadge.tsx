@@ -1,8 +1,10 @@
 /**
  * PositionBadge - Display player position with color coding
- * 
+ *
  * Consistent position badge used throughout the app.
- * 
+ *
+ * Migrated to CSS Modules for CSP compliance.
+ *
  * @example
  * ```tsx
  * <PositionBadge position="WR" />
@@ -14,6 +16,8 @@ import React from 'react';
 import { POSITION_COLORS } from '../../../core/constants/colors';
 import { RADIUS, TYPOGRAPHY } from '../../../core/constants/sizes';
 import type { Position } from '../../../hooks/data';
+import { cn } from '@/lib/styles';
+import styles from './PositionBadge.module.css';
 
 // ============================================================================
 // TYPES
@@ -65,23 +69,24 @@ export function PositionBadge({
   const positionUpper = position.toUpperCase() as keyof typeof POSITION_COLORS;
   const color = POSITION_COLORS[positionUpper] || POSITION_COLORS.BN;
   const config = SIZE_CONFIG[size];
-  
+
   const isFilled = variant === 'filled';
-  
+
+  // CSS custom properties for dynamic values
+  const badgeStyle: React.CSSProperties = {
+    '--badge-width': `${config.width}px`,
+    '--badge-height': `${config.height}px`,
+    '--badge-radius': `${RADIUS.sm}px`,
+    '--badge-bg': isFilled ? color : 'transparent',
+    '--badge-color': isFilled ? '#000000' : color,
+    '--badge-font-size': `${config.fontSize}px`,
+    '--badge-border': isFilled ? 'none' : `2px solid ${color}`,
+  } as React.CSSProperties;
+
   return (
     <span
-      className={`inline-flex items-center justify-center font-bold ${className}`}
-      style={{
-        width: `${config.width}px`,
-        height: `${config.height}px`,
-        borderRadius: `${RADIUS.sm}px`,
-        backgroundColor: isFilled ? color : 'transparent',
-        color: isFilled ? '#000000' : color,
-        fontSize: `${config.fontSize}px`,
-        border: isFilled ? 'none' : `2px solid ${color}`,
-        lineHeight: 1,
-        letterSpacing: '-0.02em',
-      }}
+      className={cn(styles.badge, className)}
+      style={badgeStyle}
       role="img"
       aria-label={`Position: ${position}`}
     >
@@ -91,4 +96,3 @@ export function PositionBadge({
 }
 
 export default PositionBadge;
-

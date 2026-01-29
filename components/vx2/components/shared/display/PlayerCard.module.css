@@ -1,0 +1,163 @@
+/**
+ * PlayerCard CSS Module
+ *
+ * Migrated from inline styles for CSP compliance.
+ */
+
+/* ============================================================================
+   CONTAINER
+   ============================================================================ */
+
+.container {
+  display: flex;
+  align-items: center;
+  transition: all 150ms ease;
+  background-color: var(--card-bg, rgba(255, 255, 255, 0.05));
+  border-left: var(--card-border-left, 4px solid #60a5fa);
+  border-radius: var(--card-radius, 12px);
+  padding: var(--card-padding, 4px 12px);
+  gap: var(--card-gap, 8px);
+  width: 100%;
+  text-align: left;
+}
+
+.containerClickable {
+  cursor: pointer;
+  border: none;
+}
+
+.containerClickable:hover {
+  filter: brightness(1.1);
+}
+
+.containerDisabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ============================================================================
+   ADP/RANK COLUMN
+   ============================================================================ */
+
+.valueColumn {
+  text-align: center;
+  flex-shrink: 0;
+  width: var(--value-width, 28px);
+}
+
+.valueText {
+  font-weight: 700;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+  font-size: var(--font-size-sm, 14px);
+}
+
+/* ============================================================================
+   NAME & TEAM
+   ============================================================================ */
+
+.nameTeamWrapper {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.playerName {
+  font-weight: 600;
+  color: var(--text-primary, rgba(255, 255, 255, 0.9));
+  font-size: var(--font-size-sm, 14px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.playerTeam {
+  flex-shrink: 0;
+  color: var(--text-muted, rgba(255, 255, 255, 0.5));
+  font-size: var(--font-size-xs, 12px);
+}
+
+/* ============================================================================
+   PROJECTION COLUMN
+   ============================================================================ */
+
+.projectionColumn {
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.projectionValue {
+  font-weight: 600;
+  color: var(--text-primary, rgba(255, 255, 255, 0.9));
+  font-size: var(--font-size-xs, 12px);
+}
+
+.projectionLabel {
+  color: var(--text-muted, rgba(255, 255, 255, 0.5));
+  font-size: var(--font-size-xs, 12px);
+}
+
+/* ============================================================================
+   ACTION BUTTONS
+   ============================================================================ */
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 150ms ease;
+  flex-shrink: 0;
+  width: var(--action-size, 32px);
+  height: var(--action-size, 32px);
+  border-radius: var(--action-radius, 12px);
+  background-color: var(--action-bg, rgba(96, 165, 250, 0.15));
+  color: var(--action-color, #60a5fa);
+  border: none;
+  cursor: pointer;
+}
+
+.actionButton:hover {
+  filter: brightness(1.2);
+}
+
+.actionButtonDisabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* ============================================================================
+   REORDER BUTTONS
+   ============================================================================ */
+
+.reorderWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.reorderButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 150ms ease;
+  width: var(--action-size, 32px);
+  height: var(--reorder-height, 16px);
+  border-radius: var(--reorder-radius, 4px);
+  background-color: var(--reorder-bg, rgba(255, 255, 255, 0.1));
+  color: var(--reorder-color, rgba(255, 255, 255, 0.9));
+  border: none;
+  cursor: pointer;
+}
+
+.reorderButton:hover:not(:disabled) {
+  filter: brightness(1.2);
+}
+
+.reorderButtonDisabled {
+  background-color: transparent;
+  color: var(--text-disabled, rgba(255, 255, 255, 0.3));
+  cursor: not-allowed;
+  opacity: 0.3;
+}

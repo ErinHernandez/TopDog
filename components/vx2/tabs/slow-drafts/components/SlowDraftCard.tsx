@@ -21,6 +21,8 @@ import {
 import { TILED_BG_STYLE } from '../../../draft-room/constants';
 import { RADIUS } from '../../../core/constants/sizes';
 import { TEXT_COLORS, STATE_COLORS } from '../../../core/constants/colors';
+import { cn } from '@/lib/styles';
+import styles from './SlowDraftCard.module.css';
 
 import MyRosterStrip from './MyRosterStrip';
 import PositionNeedsIndicator from './PositionNeedsIndicator';
@@ -75,41 +77,27 @@ interface DraftProgressBarProps {
 
 function DraftProgressBar({ currentRound, totalRounds, isYourTurn }: DraftProgressBarProps): React.ReactElement {
   const progress = (currentRound / totalRounds) * 100;
+  const progressColor = isYourTurn ? '#FFFFFF' : STATE_COLORS.active;
 
   return (
-    <div className="relative" style={{ marginTop: 12 }}>
+    <div
+      className={styles.progressBar}
+      style={
+        {
+          '--progress-color': progressColor,
+          '--progress-width': `${progress}%`,
+        } as React.CSSProperties
+      }
+    >
       {/* Track */}
-      <div
-        style={{
-          height: 4,
-          backgroundColor: 'rgba(255, 255, 255, 0.1)',
-          borderRadius: 2,
-        }}
-      >
+      <div className={styles.progressTrack}>
         {/* Fill */}
-        <div
-          style={{
-            width: `${progress}%`,
-            height: '100%',
-            backgroundColor: isYourTurn ? '#FFFFFF' : STATE_COLORS.active,
-            borderRadius: 2,
-            transition: 'width 0.3s ease',
-          }}
-        />
+        <div className={styles.progressFill} />
       </div>
 
       {/* Round indicator */}
-      <div
-        className="flex justify-between items-center"
-        style={{ marginTop: 6 }}
-      >
-        <span
-          style={{
-            fontSize: 11,
-            color: 'rgba(255, 255, 255, 0.5)',
-            fontWeight: 500,
-          }}
-        >
+      <div className={styles.progressLabel}>
+        <span className={styles.progressText}>
           Round {currentRound}/{totalRounds}
         </span>
       </div>
@@ -122,21 +110,23 @@ function DraftProgressBar({ currentRound, totalRounds, isYourTurn }: DraftProgre
 // ============================================================================
 
 function OnTheClockBadge(): React.ReactElement {
+  const badgeStyle = TILED_BG_STYLE as React.CSSProperties & {
+    backgroundImage?: string;
+    backgroundSize?: string;
+    backgroundPosition?: string;
+  };
+
   return (
     <span
-      className="inline-flex flex-col items-center font-bold uppercase tracking-wider"
+      className={cn(
+        'inline-flex flex-col items-center font-bold uppercase tracking-wider',
+        styles.badge
+      )}
       style={{
-        ...TILED_BG_STYLE,
-        color: '#FFFFFF',
-        paddingLeft: 10,
-        paddingRight: 10,
-        paddingTop: 4,
-        paddingBottom: 4,
-        borderRadius: 8,
-        fontSize: 10,
-        lineHeight: 1.2,
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
-      }}
+        '--badge-bg-image': badgeStyle.backgroundImage || '',
+        '--badge-bg-size': badgeStyle.backgroundSize || '',
+        '--badge-bg-position': badgeStyle.backgroundPosition || '',
+      } as React.CSSProperties}
     >
       <span>YOUR</span>
       <span>TURN</span>
@@ -167,22 +157,17 @@ function QuickActions({ draft, onEnterDraft, onQuickPick }: QuickActionsProps): 
   }
 
   return (
-    <div
-      className="flex gap-3"
-      style={{ marginTop: SLOW_DRAFT_LAYOUT.sectionGap }}
-    >
+    <div className={styles.quickActionsContainer}>
       {/* Enter Draft button */}
       <button
         onClick={onEnterDraft}
-        className="flex-1 font-semibold transition-all active:scale-[0.98]"
-        style={{
-          height: 44,
-          borderRadius: RADIUS.lg,
-          backgroundColor: 'rgba(255, 255, 255, 0.08)',
-          border: '1px solid rgba(255, 255, 255, 0.15)',
-          color: TEXT_COLORS.primary,
-          fontSize: 14,
-        }}
+        className={cn(styles.actionButton, styles.enterDraftButton)}
+        style={
+          {
+            '--text-color': TEXT_COLORS.primary,
+            '--button-radius': `${RADIUS.lg}px`,
+          } as React.CSSProperties
+        }
       >
         Enter Draft
       </button>
@@ -191,14 +176,13 @@ function QuickActions({ draft, onEnterDraft, onQuickPick }: QuickActionsProps): 
       {draft.status === 'your-turn' && recommendedPlayer && onQuickPick && (
         <button
           onClick={() => onQuickPick(recommendedPlayer.id)}
-          className="flex-1 font-semibold transition-all active:scale-[0.98]"
-          style={{
-            height: 44,
-            borderRadius: RADIUS.lg,
-            backgroundColor: STATE_COLORS.active,
-            color: '#FFFFFF',
-            fontSize: 14,
-          }}
+          className={cn(styles.actionButton, styles.quickPickButton)}
+          style={
+            {
+              '--quick-pick-bg': STATE_COLORS.active,
+              '--button-radius': `${RADIUS.lg}px`,
+            } as React.CSSProperties
+          }
         >
           Quick Pick: {recommendedPlayer.name.split(' ').pop()}
         </button>
@@ -226,100 +210,79 @@ export default function SlowDraftCard({
     : null;
 
   // Card background and border based on state
-  const cardStyle = isYourTurn
-    ? {
-        backgroundColor: SLOW_DRAFT_COLORS.card.default,
-        border: `1px solid ${SLOW_DRAFT_COLORS.card.yourTurnBorder}`,
-        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)',
-      }
-    : {
-        backgroundColor: SLOW_DRAFT_COLORS.card.default,
-        border: `1px solid ${SLOW_DRAFT_COLORS.card.defaultBorder}`,
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
-      };
+  const cardBg = SLOW_DRAFT_COLORS.card.default;
+  const cardBorder = isYourTurn
+    ? `1px solid ${SLOW_DRAFT_COLORS.card.yourTurnBorder}`
+    : `1px solid ${SLOW_DRAFT_COLORS.card.defaultBorder}`;
+  const cardShadow = isYourTurn
+    ? '0 4px 16px rgba(0, 0, 0, 0.3)'
+    : '0 2px 8px rgba(0, 0, 0, 0.2)';
+
+  const timerColor = timeInfo ? getTimerColor(timeInfo) : SLOW_DRAFT_COLORS.timer.normal;
 
   return (
     <div
-      className="relative overflow-hidden transition-all"
-      style={{
-        ...cardStyle,
-        borderRadius: SLOW_DRAFT_LAYOUT.cardBorderRadius,
-        padding: SLOW_DRAFT_LAYOUT.cardPaddingX,
-      }}
+      className={cn('relative overflow-hidden transition-all', styles.card)}
+      style={
+        {
+          '--bg-color': cardBg,
+          '--border': cardBorder,
+          '--shadow': cardShadow,
+          '--border-radius': `${SLOW_DRAFT_LAYOUT.cardBorderRadius}px`,
+          '--padding-x': `${SLOW_DRAFT_LAYOUT.cardPaddingX}px`,
+          '--tournament-name-size': `${SLOW_DRAFT_TYPOGRAPHY.tournamentName.fontSize}px`,
+          '--tournament-name-weight': SLOW_DRAFT_TYPOGRAPHY.tournamentName.fontWeight,
+          '--tournament-name-letter-spacing': SLOW_DRAFT_TYPOGRAPHY.tournamentName.letterSpacing,
+          '--pick-info-size': `${SLOW_DRAFT_TYPOGRAPHY.pickInfo.fontSize}px`,
+          '--pick-info-weight': SLOW_DRAFT_TYPOGRAPHY.pickInfo.fontWeight,
+          '--pick-info-color': SLOW_DRAFT_TYPOGRAPHY.pickInfo.color,
+          '--section-label-size': `${SLOW_DRAFT_TYPOGRAPHY.sectionLabel.fontSize}px`,
+          '--section-label-weight': SLOW_DRAFT_TYPOGRAPHY.sectionLabel.fontWeight,
+          '--section-label-letter-spacing': SLOW_DRAFT_TYPOGRAPHY.sectionLabel.letterSpacing,
+          '--section-gap': `${SLOW_DRAFT_LAYOUT.sectionGap}px`,
+          '--timer-color': timerColor,
+          '--expand-duration': `${SLOW_DRAFT_ANIMATIONS.expandDuration}ms`,
+          '--expand-easing': SLOW_DRAFT_ANIMATIONS.expandEasing,
+        } as React.CSSProperties
+      }
     >
-
       {/* Content wrapper */}
-      <div className="relative z-10">
+      <div className={styles.contentWrapper}>
         {/* ============================================================ */}
         {/* HEADER: Tournament name + Timer/Status */}
         {/* ============================================================ */}
-        <button
-          onClick={onToggleExpand}
-          className="w-full text-left"
-        >
-          <div className="flex items-start justify-between gap-3">
+        <button onClick={onToggleExpand} className={styles.headerButton}>
+          <div className={styles.headerContent}>
             {/* Left: Name and pick info */}
-            <div className="flex-1 min-w-0">
-              <h3
-                style={{
-                  ...SLOW_DRAFT_TYPOGRAPHY.tournamentName,
-                  color: '#FFFFFF',
-                  marginBottom: 4,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
+            <div className={styles.nameSection}>
+              <h3 className={styles.tournamentName}>
                 {draft.tournamentName}
               </h3>
-              <p style={{ color: SLOW_DRAFT_TYPOGRAPHY.pickInfo.color }}>
+              <p className={styles.pickInfo}>
                 {formatPickInfo(draft)}
               </p>
             </div>
 
             {/* Right: Timer or status */}
-            <div className="flex items-center gap-3 flex-shrink-0">
+            <div className={styles.rightSection}>
               {isYourTurn ? (
-                <div className="flex flex-col items-end gap-1">
+                <div className={styles.yourTurnSection}>
                   <OnTheClockBadge />
                   {timeInfo && (
-                    <div
-                      style={{
-                        ...SLOW_DRAFT_TYPOGRAPHY.timer,
-                        color: getTimerColor(timeInfo),
-                        fontSize: 14,
-                        fontWeight: 700,
-                        lineHeight: 1,
-                      }}
-                    >
+                    <div className={styles.timerDisplay}>
                       {timeInfo.text}
                     </div>
                   )}
                 </div>
               ) : (
-                <div className="text-right">
+                <div className={styles.statusSection}>
                   {draft.picksAway > 0 && (
-                    <span
-                      style={{
-                        fontSize: 13,
-                        fontWeight: 600,
-                        color: 'rgba(255, 255, 255, 0.6)',
-                      }}
-                    >
+                    <span className={styles.picksAwayText}>
                       {draft.picksAway} pick{draft.picksAway !== 1 ? 's' : ''} away
                     </span>
                   )}
                   {timeInfo && (
-                    <div
-                      style={{
-                        ...SLOW_DRAFT_TYPOGRAPHY.timer,
-                        fontSize: 14,
-                        fontWeight: 600,
-                        color: getTimerColor(timeInfo),
-                        marginTop: 2,
-                        lineHeight: 1,
-                      }}
-                    >
+                    <div className={styles.statusTimer}>
                       ⏱ {timeInfo.text}
                     </div>
                   )}
@@ -335,17 +298,11 @@ export default function SlowDraftCard({
         {!isExpanded && (
           <button
             onClick={onToggleExpand}
-            className="w-full text-left"
-            style={{ marginTop: SLOW_DRAFT_LAYOUT.sectionGap }}
+            className={styles.collapsedButton}
           >
             {/* Roster strip (compact) */}
-            <div style={{ marginBottom: 10 }}>
-              <div
-                style={{
-                  ...SLOW_DRAFT_TYPOGRAPHY.sectionLabel,
-                  marginBottom: 6,
-                }}
-              >
+            <div className={styles.rosterSection}>
+              <div className={styles.sectionLabel}>
                 MY ROSTER
               </div>
               <MyRosterStrip
@@ -374,14 +331,9 @@ export default function SlowDraftCard({
         {/* EXPANDED VIEW */}
         {/* ============================================================ */}
         {isExpanded && (
-          <div
-            style={{
-              marginTop: SLOW_DRAFT_LAYOUT.sectionGap,
-              animation: `slideDown ${SLOW_DRAFT_ANIMATIONS.expandDuration}ms ${SLOW_DRAFT_ANIMATIONS.expandEasing}`,
-            }}
-          >
+          <div className={styles.expandedView}>
             {/* Roster strip (expanded with player names) */}
-            <div style={{ marginBottom: SLOW_DRAFT_LAYOUT.sectionGap }}>
+            <div className={styles.expandedRosterSection}>
               <MyRosterStrip
                 picks={draft.myPicks}
                 rosterSize={18}
@@ -390,7 +342,7 @@ export default function SlowDraftCard({
             </div>
 
             {/* Position needs (expanded) */}
-            <div style={{ marginBottom: SLOW_DRAFT_LAYOUT.sectionGap }}>
+            <div className={styles.expandedNeedsSection}>
               <PositionNeedsIndicator
                 needs={draft.positionNeeds}
                 compact={false}
@@ -414,10 +366,7 @@ export default function SlowDraftCard({
         )}
 
         {/* Expand/collapse indicator */}
-        <div
-          className="flex justify-center"
-          style={{ marginTop: 8 }}
-        >
+        <div className={styles.expandIndicator}>
           <svg
             width="20"
             height="20"
@@ -427,11 +376,7 @@ export default function SlowDraftCard({
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            style={{
-              color: 'rgba(255, 255, 255, 0.3)',
-              transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
-              transition: 'transform 0.2s ease',
-            }}
+            className={cn(styles.expandIcon, isExpanded && styles.expanded)}
           >
             <polyline points="6 9 12 15 18 9" />
           </svg>

@@ -1,8 +1,9 @@
 /**
  * EmptyState - Display when there's no data to show
- * 
+ *
  * Provides a consistent empty state UI across the app.
- * 
+ * Migrated to CSS Modules for CSP compliance.
+ *
  * @example
  * ```tsx
  * <EmptyState
@@ -14,8 +15,8 @@
  */
 
 import React from 'react';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS } from '../../../core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY } from '../../../core/constants/sizes';
+import { cn } from '@/lib/styles';
+import styles from './EmptyState.module.css';
 
 // ============================================================================
 // TYPES
@@ -58,7 +59,7 @@ function DefaultEmptyIcon(): React.ReactElement {
       height={48}
       viewBox="0 0 24 24"
       fill="none"
-      stroke={TEXT_COLORS.muted}
+      stroke="var(--text-muted)"
       strokeWidth={1.5}
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -81,101 +82,53 @@ export function EmptyState({
   className = '',
   compact = false,
 }: EmptyStateProps): React.ReactElement {
-  const padding = compact ? SPACING.lg : SPACING['2xl'];
-  
   return (
     <div
-      className={`flex flex-col items-center justify-center text-center ${className}`}
-      style={{
-        padding: `${padding}px`,
-        minHeight: compact ? 'auto' : '200px',
-      }}
+      className={cn(styles.container, compact && styles.compact, className)}
       role="status"
       aria-label={title}
     >
       {/* Icon */}
-      <div
-        className="flex items-center justify-center rounded-full mb-4"
-        style={{
-          width: compact ? '48px' : '64px',
-          height: compact ? '48px' : '64px',
-          backgroundColor: 'rgba(255, 255, 255, 0.05)',
-        }}
-      >
+      <div className={cn(styles.iconWrapper, compact && styles.compact)}>
         {icon || <DefaultEmptyIcon />}
       </div>
 
       {/* Title */}
       <h3
-        className="font-semibold"
-        style={{
-          color: TEXT_COLORS.primary,
-          fontSize: compact ? `${TYPOGRAPHY.fontSize.base}px` : `${TYPOGRAPHY.fontSize.lg}px`,
-          marginBottom: description ? `${SPACING.sm}px` : 0,
-        }}
+        className={cn(
+          styles.title,
+          compact && styles.compact,
+          description && styles.hasDescription
+        )}
       >
         {title}
       </h3>
 
       {/* Description */}
       {description && (
-        <p
-          style={{
-            color: TEXT_COLORS.secondary,
-            fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-            maxWidth: '280px',
-            marginBottom: action ? `${SPACING.lg}px` : 0,
-          }}
-        >
+        <p className={cn(styles.description, action && styles.hasAction)}>
           {description}
         </p>
       )}
 
       {/* Actions */}
       {(action || secondaryAction) && (
-        <div
-          className="flex items-center"
-          style={{ gap: `${SPACING.md}px` }}
-        >
+        <div className={styles.actions}>
           {action && (
             <button
               onClick={action.onClick}
-              className="font-medium transition-colors"
-              style={{
-                backgroundColor: action.variant === 'secondary' 
-                  ? 'rgba(255, 255, 255, 0.1)' 
-                  : STATE_COLORS.active,
-                color: action.variant === 'secondary' 
-                  ? TEXT_COLORS.primary 
-                  : '#000000',
-                paddingLeft: `${SPACING.lg}px`,
-                paddingRight: `${SPACING.lg}px`,
-                paddingTop: `${SPACING.md}px`,
-                paddingBottom: `${SPACING.md}px`,
-                borderRadius: `${RADIUS.md}px`,
-                fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-                border: 'none',
-                cursor: 'pointer',
-              }}
+              className={
+                action.variant === 'secondary'
+                  ? styles.secondaryButton
+                  : styles.primaryButton
+              }
             >
               {action.label}
             </button>
           )}
-          
+
           {secondaryAction && (
-            <button
-              onClick={secondaryAction.onClick}
-              className="font-medium transition-colors"
-              style={{
-                backgroundColor: 'transparent',
-                color: TEXT_COLORS.secondary,
-                padding: `${SPACING.md}px`,
-                fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-                border: 'none',
-                cursor: 'pointer',
-                textDecoration: 'underline',
-              }}
-            >
+            <button onClick={secondaryAction.onClick} className={styles.textButton}>
               {secondaryAction.label}
             </button>
           )}
@@ -186,4 +139,3 @@ export function EmptyState({
 }
 
 export default EmptyState;
-

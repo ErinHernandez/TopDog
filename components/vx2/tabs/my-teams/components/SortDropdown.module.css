@@ -1,0 +1,96 @@
+.dropdownContainer {
+  position: relative;
+}
+
+.dropdownButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background-color: var(--bg-color);
+  border: var(--border);
+  border-radius: var(--border-radius);
+  color: var(--text-color);
+  font-size: var(--font-size);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.dropdownButton:hover {
+  background-color: var(--bg-hover);
+}
+
+.sortLabel {
+  color: var(--label-color);
+}
+
+.sortValue {
+  color: var(--value-color);
+  font-weight: 500;
+}
+
+.sortIcon {
+  width: 12px;
+  height: 12px;
+  transition: transform 0.2s ease;
+}
+
+.sortIcon.rotated {
+  transform: rotate(180deg);
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  background-color: var(--menu-bg);
+  border: var(--menu-border);
+  border-radius: var(--menu-border-radius);
+  overflow: hidden;
+  z-index: 1000;
+  box-shadow: var(--menu-shadow);
+  min-width: 160px;
+}
+
+.menuOption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 14px;
+  background-color: var(--option-bg);
+  border: none;
+  border-bottom: var(--option-border);
+  color: var(--option-text-color);
+  font-size: var(--option-font-size);
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.15s ease;
+}
+
+.menuOption:hover {
+  background-color: var(--option-hover-bg);
+}
+
+.menuOption.active {
+  background-color: var(--option-active-bg);
+  color: var(--option-active-color);
+}
+
+.menuOption:last-child {
+  border-bottom: none;
+}
+
+.optionText {
+  white-space: pre-line;
+}
+
+.optionCheckIcon {
+  width: 12px;
+  height: 12px;
+}
+
+.optionCheckIcon.rotated {
+  transform: rotate(180deg);
+}

@@ -1,27 +1,52 @@
 /**
  * LeaveConfirmModal - Confirmation modal for leaving draft
- * 
+ *
  * Renders inside the phone frame using absolute positioning.
  * No portal needed - renders directly in component tree.
  * iOS-native design pattern.
- * 
+ *
  * A-Grade Requirements:
  * - TypeScript: Full type coverage
  * - Constants: VX2 constants for colors/sizes
  * - Accessibility: ARIA labels, focus trap
+ * - CSP Compliance: CSS Modules for all styles
  */
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useMemo } from 'react';
 import type { DraftStatus } from '../types';
 import { SPACING, TYPOGRAPHY, RADIUS } from '../../core/constants/sizes';
 import { createScopedLogger } from '../../../../lib/clientLogger';
+import { cn, cssVars } from '@/lib/styles';
+import styles from './LeaveConfirmModal.module.css';
 
 const logger = createScopedLogger('[LeaveConfirmModal]');
 
 // ============================================================================
-// CONSTANTS
+// CONSTANTS - CSS VARIABLE MAPPINGS
 // ============================================================================
 
+/**
+ * CSS variable names for modal styling.
+ * Values are set dynamically via cssVars() in the render phase.
+ * Separated from component logic for easier theming.
+ */
+const MODAL_CSS_VARS = {
+  backdropColor: '--backdrop-color',
+  bgColor: '--bg-color',
+  titleColor: '--title-color',
+  descriptionColor: '--description-color',
+  primaryButtonBg: '--primary-button-bg',
+  primaryButtonText: '--primary-button-text',
+  secondaryButtonBg: '--secondary-button-bg',
+  secondaryButtonText: '--secondary-button-text',
+  warningIconColor: '--warning-icon-color',
+  warningIconBg: '--warning-icon-bg',
+} as const;
+
+/**
+ * Default color values for CSS variables.
+ * These are actual color values that will be passed as CSS custom properties.
+ */
 const MODAL_COLORS = {
   backdrop: 'rgba(0, 0, 0, 0.7)',
   background: '#1E293B',
@@ -93,7 +118,25 @@ export default function LeaveConfirmModal({
   }, [isOpen, onCancel]);
   
   if (!isOpen) return null;
-  
+
+  // Prepare CSS variables for modal colors
+  const cssVariables = useMemo(
+    () =>
+      cssVars({
+        'backdrop-color': MODAL_COLORS.backdrop,
+        'bg-color': MODAL_COLORS.background,
+        'title-color': MODAL_COLORS.title,
+        'description-color': MODAL_COLORS.description,
+        'primary-button-bg': MODAL_COLORS.primaryButton,
+        'primary-button-text': MODAL_COLORS.primaryButtonText,
+        'secondary-button-bg': MODAL_COLORS.secondaryButton,
+        'secondary-button-text': MODAL_COLORS.secondaryButtonText,
+        'warning-icon-color': MODAL_COLORS.warningIcon,
+        'warning-icon-bg': MODAL_COLORS.warningIconBg,
+      }),
+    []
+  );
+
   // Render modal directly (no portal - stays inside parent container)
   return (
     <div
@@ -101,20 +144,8 @@ export default function LeaveConfirmModal({
       aria-modal="true"
       aria-labelledby="leave-modal-title"
       aria-describedby="leave-modal-description"
-      style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: MODAL_COLORS.backdrop,
-        zIndex: 9999,
-        padding: SPACING.lg,
-        pointerEvents: 'auto',
-      }}
+      className={styles.backdrop}
+      style={cssVariables}
       onClick={(e) => {
         // Only cancel if clicking the backdrop, not the content
         if (e.target === e.currentTarget) {
@@ -124,46 +155,19 @@ export default function LeaveConfirmModal({
     >
       {/* Modal Content */}
       <div
+        className={styles.content}
         onClick={(e) => e.stopPropagation()}
         onMouseDown={(e) => e.stopPropagation()}
         onTouchStart={(e) => e.stopPropagation()}
-        style={{
-          width: '100%',
-          maxWidth: 340,
-          backgroundColor: MODAL_COLORS.background,
-          borderRadius: 20,
-          padding: 24,
-          position: 'relative',
-          zIndex: 1001,
-          pointerEvents: 'auto',
-        }}
       >
         {/* Warning Icon */}
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            marginBottom: 20,
-          }}
-        >
-          <div
-            style={{
-              width: 64,
-              height: 64,
-              borderRadius: 32,
-              backgroundColor: MODAL_COLORS.warningIconBg,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
+        <div className={styles.iconWrapper}>
+          <div className={styles.iconCircle}>
             {/* Warning Triangle Icon */}
             <svg
-              width="32"
-              height="32"
+              className={styles.warningIcon}
               viewBox="0 0 24 24"
               fill="none"
-              stroke={MODAL_COLORS.warningIcon}
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -176,30 +180,12 @@ export default function LeaveConfirmModal({
         </div>
         
         {/* Title */}
-        <h2
-          id="leave-modal-title"
-          style={{
-            fontSize: 22,
-            fontWeight: 700,
-            color: MODAL_COLORS.title,
-            textAlign: 'center',
-            marginBottom: 12,
-          }}
-        >
+        <h2 id="leave-modal-title" className={styles.title}>
           Exit Draft Room?
         </h2>
-        
+
         {/* Description */}
-        <p
-          id="leave-modal-description"
-          style={{
-            fontSize: 15,
-            color: MODAL_COLORS.description,
-            textAlign: 'center',
-            lineHeight: 1.5,
-            marginBottom: 28,
-          }}
-        >
+        <p id="leave-modal-description" className={styles.description}>
           {canWithdraw
             ? 'You can leave the draft room or withdraw your entry. Withdrawing will remove you from this draft and refund your entry fee.'
             : (
@@ -218,22 +204,16 @@ export default function LeaveConfirmModal({
         
         {/* Buttons - Stacked */}
         <div
+          className={styles.buttonContainer}
           onClick={(e) => e.stopPropagation()}
           onMouseDown={(e) => e.stopPropagation()}
           onTouchStart={(e) => e.stopPropagation()}
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 12,
-            position: 'relative',
-            zIndex: 1002,
-            pointerEvents: 'auto',
-          }}
         >
           {/* Primary: Withdraw Button (only before draft starts) */}
           {canWithdraw && (
             <button
               type="button"
+              className={cn(styles.button, styles.buttonPrimary)}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -267,23 +247,6 @@ export default function LeaveConfirmModal({
                   logger.error('Error in onWithdraw (touch)', error instanceof Error ? error : new Error(String(error)));
                 }
               }}
-              style={{
-                width: '100%',
-                height: 52,
-                backgroundColor: MODAL_COLORS.primaryButton,
-                border: 'none',
-                borderRadius: 12,
-                color: MODAL_COLORS.primaryButtonText,
-                fontSize: 16,
-                fontWeight: 600,
-                cursor: 'pointer',
-                pointerEvents: 'auto',
-                position: 'relative',
-                zIndex: 10000,
-                WebkitTapHighlightColor: 'transparent',
-                userSelect: 'none',
-                touchAction: 'manipulation',
-              }}
             >
               Withdraw Entry
             </button>
@@ -292,6 +255,10 @@ export default function LeaveConfirmModal({
           {/* Primary: Leave Button (during active draft or as secondary option before start) */}
           <button
             type="button"
+            className={cn(
+              styles.button,
+              canWithdraw ? styles.buttonSecondaryStyle : styles.buttonPrimary
+            )}
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -326,23 +293,6 @@ export default function LeaveConfirmModal({
                 logger.error('Error in onConfirm (touch)', error instanceof Error ? error : new Error(String(error)));
               }
             }}
-            style={{
-              width: '100%',
-              height: 52,
-              backgroundColor: canWithdraw ? MODAL_COLORS.secondaryButton : MODAL_COLORS.primaryButton,
-              border: 'none',
-              borderRadius: 12,
-              color: MODAL_COLORS.primaryButtonText,
-              fontSize: 16,
-              fontWeight: 600,
-              cursor: 'pointer',
-              pointerEvents: 'auto',
-              position: 'relative',
-              zIndex: 10000,
-              WebkitTapHighlightColor: 'transparent',
-              userSelect: 'none',
-              touchAction: 'manipulation',
-            }}
           >
             {canWithdraw ? 'Leave Draft Room' : 'Yes, Leave Draft Room'}
           </button>
@@ -351,6 +301,7 @@ export default function LeaveConfirmModal({
           <button
             ref={stayButtonRef}
             type="button"
+            className={cn(styles.button, styles.buttonSecondary)}
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -363,19 +314,6 @@ export default function LeaveConfirmModal({
               e.preventDefault();
               e.stopPropagation();
               onCancel();
-            }}
-            style={{
-              width: '100%',
-              height: 52,
-              backgroundColor: MODAL_COLORS.secondaryButton,
-              border: 'none',
-              borderRadius: 12,
-              color: MODAL_COLORS.secondaryButtonText,
-              fontSize: 16,
-              fontWeight: 600,
-              cursor: 'pointer',
-              pointerEvents: 'auto',
-              touchAction: 'manipulation',
             }}
           >
             Stay

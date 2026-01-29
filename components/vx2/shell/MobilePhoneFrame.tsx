@@ -6,9 +6,13 @@
  * Safe area ends at the bottom of the Dynamic Island (not below it). paddingTop is the
  * distance from the top of the screen to the bottom of the island, so content starts
  * exactly where the safe area ends.
+ *
+ * Migrated to CSS Modules for CSP compliance.
  */
 
 import React from 'react';
+import { cn } from '@/lib/styles';
+import styles from './MobilePhoneFrame.module.css';
 
 const BEZEL_PX = 12;
 const INNER_WIDTH_PX = 375;
@@ -27,72 +31,51 @@ export function MobilePhoneFrame({ children, contentOverSafeArea = false }: Mobi
   const outerW = INNER_WIDTH_PX + BEZEL_PX * 2;
   const outerH = INNER_HEIGHT_PX + BEZEL_PX * 2;
   const contentTop = contentOverSafeArea ? 0 : SAFE_AREA_TOP_TO_ISLAND_BOTTOM_PX;
+
+  const frameStyle: React.CSSProperties = {
+    '--frame-outer-width': `${outerW}px`,
+    '--frame-outer-height': `${outerH}px`,
+    '--bezel-px': `${BEZEL_PX}px`,
+  } as React.CSSProperties;
+
+  const innerStyle: React.CSSProperties = {
+    '--inner-bg': '#101927',
+    '--safe-area-height': `${contentTop}px`,
+    '--content-top': `${contentTop}px`,
+  } as React.CSSProperties;
+
   return (
     <div
-      className="relative bg-black rounded-[3rem] shadow-2xl"
-      style={{
-        width: `${outerW}px`,
-        height: `${outerH}px`,
-        padding: `${BEZEL_PX}px`,
-        boxSizing: 'border-box',
-      }}
+      className={styles.frame}
+      style={frameStyle}
       data-phone-frame="true"
     >
-      {/* Screen - dark bg so rounded corners don’t show white at top-left/top-right of bezel */}
-      <div 
-        className="w-full h-full rounded-[2.5rem] overflow-hidden relative"
-        style={{
-          padding: 8,
-          boxSizing: 'border-box',
-          background: '#000',
-        }}
-      >
+      {/* Screen - dark bg so rounded corners don't show white at top-left/top-right of bezel */}
+      <div className={styles.screen}>
         {/* Dynamic Island - in border zone so it moves with the frame */}
         <div
-          className="absolute left-1/2 -translate-x-1/2"
-          style={{
-            top: 8,
-            width: '70px',
-            height: '20px',
-            backgroundColor: '#000',
-            borderRadius: '12px',
-            zIndex: 9999,
-          }}
+          className={styles.dynamicIsland}
           aria-hidden
         />
-        <div 
-          className="w-full h-full rounded-[2.125rem] overflow-hidden relative"
-          style={{ backgroundColor: '#101927' }}
-        >
+        <div className={styles.innerScreen} style={innerStyle}>
           {/* Safe area - matches background color */}
           {!contentOverSafeArea && (
             <div
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: `${contentTop}px`,
-                backgroundColor: '#101927',
-                zIndex: 1,
-              }}
+              className={styles.safeArea}
+              style={innerStyle}
               aria-hidden="true"
             />
           )}
           {/* Content: contentOverSafeArea=0 lets modals go over safe area */}
           <div
-          style={{
-            paddingTop: contentTop,
-            height: '100%',
-            width: '100%',
-            boxSizing: 'border-box',
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-          }}
-        >
-          {children}
-        </div>
+            className={cn(
+              styles.contentContainer,
+              contentOverSafeArea && styles.contentContainerNoSafeArea
+            )}
+            style={innerStyle}
+          >
+            {children}
+          </div>
         </div>
       </div>
     </div>

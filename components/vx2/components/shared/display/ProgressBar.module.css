@@ -1,0 +1,104 @@
+/**
+ * ProgressBar CSS Module
+ *
+ * Migrated from inline styles for CSP compliance.
+ * Uses CSS custom properties for dynamic values.
+ */
+
+/* ============================================================================
+   CONTAINER WITH LABEL
+   ============================================================================ */
+
+.containerWithLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+/* ============================================================================
+   PROGRESS BAR TRACK
+   ============================================================================ */
+
+.track {
+  position: relative;
+  overflow: hidden;
+  flex: 1;
+  /* Dynamic values via CSS custom properties */
+  height: var(--progress-height, 8px);
+  border-radius: var(--progress-radius, 4px);
+  background-color: var(--progress-bg, rgba(255, 255, 255, 0.1));
+}
+
+/* Size variants */
+.track.sm {
+  --progress-height: 4px;
+  --progress-radius: 2px;
+}
+
+.track.md {
+  --progress-height: 8px;
+  --progress-radius: 4px;
+}
+
+.track.lg {
+  --progress-height: 12px;
+  --progress-radius: 6px;
+}
+
+/* ============================================================================
+   PROGRESS BAR FILL
+   ============================================================================ */
+
+.fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  transition: width 300ms ease-out;
+  /* Dynamic values via CSS custom properties */
+  width: var(--progress-value, 0%);
+  border-radius: var(--progress-radius, 4px);
+  background-color: var(--progress-color, var(--color-active));
+}
+
+/* When using background image */
+.fill.hasBackgroundImage {
+  background-size: cover;
+  background-position: center;
+  /* background-image set via inline style for dynamic URL */
+}
+
+/* ============================================================================
+   INSIDE LABEL
+   ============================================================================ */
+
+.insideLabel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  /* Color changes based on progress */
+  color: var(--label-color, #fff);
+}
+
+.insideLabel.dark {
+  --label-color: #000;
+}
+
+/* ============================================================================
+   RIGHT LABEL
+   ============================================================================ */
+
+.rightLabel {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  flex-shrink: 0;
+  min-width: 36px;
+  color: rgba(255, 255, 255, 0.7);
+}

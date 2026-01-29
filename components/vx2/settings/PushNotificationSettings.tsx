@@ -7,6 +7,7 @@
 import React, { useState, useEffect } from 'react';
 import { createScopedLogger } from '@/lib/clientLogger';
 import { fcmService } from '../../../lib/pushNotifications/fcmService';
+import styles from './PushNotificationSettings.module.css';
 
 const logger = createScopedLogger('[PushNotificationSettings]');
 
@@ -67,7 +68,7 @@ export function PushNotificationSettings(): React.ReactElement {
         <div>
           <p>✅ Notifications enabled</p>
           {token && (
-            <p style={{ fontSize: '12px', color: '#666' }}>
+            <p className={styles.tokenText}>
               Token: {token.substring(0, 20)}...
             </p>
           )}
@@ -78,14 +79,7 @@ export function PushNotificationSettings(): React.ReactElement {
           <button
             onClick={handleRequestPermission}
             disabled={isRequesting}
-            style={{
-              padding: '12px 24px',
-              backgroundColor: '#1E3A5F',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: isRequesting ? 'not-allowed' : 'pointer',
-            }}
+            className={styles.enableButton}
           >
             {isRequesting ? 'Requesting...' : 'Enable Notifications'}
           </button>

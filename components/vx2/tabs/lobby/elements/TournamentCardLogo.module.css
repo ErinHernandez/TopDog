@@ -1,0 +1,3 @@
+.container {
+  max-height: var(--max-height, 72px);
+}

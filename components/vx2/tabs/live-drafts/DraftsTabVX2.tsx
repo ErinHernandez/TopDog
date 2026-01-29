@@ -12,6 +12,8 @@
 import React, { useState, useCallback } from 'react';
 import { BG_COLORS, TEXT_COLORS } from '../../core/constants/colors';
 import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
+import { cn } from '@/lib/styles';
+import styles from './DraftsTabVX2.module.css';
 import type { LiveDraft } from '../../hooks/data';
 import type { SlowDraft } from '../slow-drafts/types';
 
@@ -49,37 +51,30 @@ interface TabSwitcherProps {
 
 function TabSwitcher({ selected, onSelect }: TabSwitcherProps): React.ReactElement {
   return (
-    <div
-      className="flex rounded-lg overflow-hidden"
-      style={{
-        backgroundColor: 'rgba(255,255,255,0.06)',
-        padding: '3px',
-        gap: '3px',
-      }}
-    >
+    <div className={styles.tabSwitcher}>
       <button
         onClick={() => onSelect('fast')}
-        className="flex-1 py-2.5 px-3 font-semibold transition-all"
+        className={cn(styles.tabButton)}
+        data-active={selected === 'fast'}
         style={{
-          fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-          backgroundColor: selected === 'fast' ? 'rgba(255,255,255,0.12)' : 'transparent',
-          color: selected === 'fast' ? TEXT_COLORS.primary : TEXT_COLORS.muted,
-          borderRadius: `${RADIUS.md}px`,
-          letterSpacing: '-0.01em',
-        }}
+          '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
+          '--text-color-primary': TEXT_COLORS.primary,
+          '--text-color-muted': TEXT_COLORS.muted,
+          '--border-radius-md': `${RADIUS.md}px`,
+        } as React.CSSProperties}
       >
         Fast Drafts (30 Sec)
       </button>
       <button
         onClick={() => onSelect('slow')}
-        className="flex-1 py-2.5 px-3 font-semibold transition-all"
+        className={cn(styles.tabButton)}
+        data-active={selected === 'slow'}
         style={{
-          fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-          backgroundColor: selected === 'slow' ? 'rgba(255,255,255,0.12)' : 'transparent',
-          color: selected === 'slow' ? TEXT_COLORS.primary : TEXT_COLORS.muted,
-          borderRadius: `${RADIUS.md}px`,
-          letterSpacing: '-0.01em',
-        }}
+          '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
+          '--text-color-primary': TEXT_COLORS.primary,
+          '--text-color-muted': TEXT_COLORS.muted,
+          '--border-radius-md': `${RADIUS.md}px`,
+        } as React.CSSProperties}
       >
         Slow Drafts
       </button>
@@ -117,23 +112,19 @@ export default function DraftsTabVX2({
 
   return (
     <div
-      className="flex-1 flex flex-col"
-      style={{ backgroundColor: BG_COLORS.primary }}
+      className={styles.container}
+      style={{
+        '--bg-color-primary': BG_COLORS.primary,
+      } as React.CSSProperties}
     >
       {/* Tab Switcher Header */}
       <div
-        className="flex-shrink-0"
+        className={styles.header}
         style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 10,
-          backgroundColor: BG_COLORS.primary,
-          paddingLeft: SPACING.lg,
-          paddingRight: SPACING.lg,
-          paddingTop: SPACING.md,
-          paddingBottom: SPACING.md,
-          borderBottom: '1px solid rgba(255,255,255,0.1)',
-        }}
+          '--bg-color-primary': BG_COLORS.primary,
+          '--spacing-lg': SPACING.lg,
+          '--spacing-md': SPACING.md,
+        } as React.CSSProperties}
       >
         <TabSwitcher selected={mode} onSelect={setMode} />
       </div>

@@ -8,7 +8,9 @@
  */
 
 import React from 'react';
+import { cn } from '@/lib/styles';
 import { CARD_SPACING_V3 } from '../constants/cardSpacingV3';
+import styles from './TournamentBackground.module.css';
 
 export interface TournamentBackgroundProps {
   /** Full resolution image URL or CSS gradient */
@@ -28,57 +30,42 @@ export function TournamentBackground({
   borderRadius = CARD_SPACING_V3.borderRadius,
 }: TournamentBackgroundProps): React.ReactElement {
   const transitionStyle = `opacity ${CARD_SPACING_V3.imageFadeDuration} ${CARD_SPACING_V3.imageFadeEasing}`;
+  const backgroundImage = image.startsWith('url(') ? image : `url(${image})`;
 
   return (
     <div
-      className="tournament-background"
+      className={cn(styles.container)}
       style={{
-        position: 'absolute',
-        inset: 0,
-        zIndex: 0,
-        borderRadius: `${borderRadius}px`,
-        overflow: 'hidden',
-      }}
+        '--border-radius': `${borderRadius}px`,
+        '--transition': transitionStyle,
+      } as React.CSSProperties}
     >
       {/* Blur Placeholder Layer */}
       {placeholder && (
         <div
-          className="tournament-background__placeholder"
+          className={cn(styles.placeholder)}
           style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundImage: `url(${placeholder})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            opacity: isLoaded ? 0 : 1,
-            transition: transitionStyle,
-          }}
+            '--placeholder-image': `url(${placeholder})`,
+            '--is-loaded': isLoaded ? '0' : '1',
+            '--transition': transitionStyle,
+          } as React.CSSProperties}
           aria-hidden="true"
         />
       )}
 
       {/* Full Resolution Image Layer */}
       <div
-        className="tournament-background__image"
+        className={cn(styles.image)}
         style={{
-          position: 'absolute',
-          inset: 0,
-          backgroundImage: image.startsWith('url(') ? image : `url(${image})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          opacity: isLoaded ? 1 : 0,
-          transition: transitionStyle,
-        }}
+          '--image': backgroundImage,
+          '--is-loaded': isLoaded ? '1' : '0',
+          '--transition': transitionStyle,
+        } as React.CSSProperties}
       />
 
       {/* Gradient Overlay for Text Readability */}
       <div
-        className="tournament-background__overlay"
-        style={{
-          position: 'absolute',
-          inset: 0,
-          background: 'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.4) 100%)',
-        }}
+        className={cn(styles.overlay)}
         aria-hidden="true"
       />
     </div>

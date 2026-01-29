@@ -7,7 +7,9 @@
  */
 
 import React from 'react';
+import { cn } from '@/lib/styles';
 import { CARD_SPACING_V3 } from '../constants/cardSpacingV3';
+import styles from './TournamentStats.module.css';
 
 export interface TournamentStatsProps {
   /** Entry fee (e.g., "$25", "Free") */
@@ -26,39 +28,17 @@ interface StatItemProps {
 function StatItem({ label, value }: StatItemProps): React.ReactElement {
   return (
     <div
-      className="tournament-stat-item"
+      className={cn(styles.statItem)}
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '6px',
-      }}
+        '--value-font-size': `${CARD_SPACING_V3.statsValueFontSize}px`,
+        '--label-font-size': `${CARD_SPACING_V3.statsLabelFontSize}px`,
+      } as React.CSSProperties}
     >
-      {/* Value */}
-      <span
-        className="tournament-stat-item__value"
-        style={{
-          fontSize: `${CARD_SPACING_V3.statsValueFontSize}px`,
-          fontWeight: 'bold',
-          color: '#FFFFFF',
-          lineHeight: 1,
-        }}
-      >
+      <span className={cn(styles.statValue)}>
         {value}
       </span>
-      
-      {/* Label */}
-      <span
-        className="tournament-stat-item__label"
-        style={{
-          fontSize: `${CARD_SPACING_V3.statsLabelFontSize}px`,
-          color: 'rgba(255, 255, 255, 0.7)',
-          lineHeight: 1,
-          textTransform: 'uppercase',
-          letterSpacing: '0.5px',
-        }}
-      >
+
+      <span className={cn(styles.statLabel)}>
         {label}
       </span>
     </div>
@@ -72,14 +52,11 @@ export function TournamentStats({
 }: TournamentStatsProps): React.ReactElement {
   return (
     <div
-      className="tournament-stats"
+      className={cn(styles.container)}
       style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: `${CARD_SPACING_V3.bottomStatsGap}px`,
-        height: `${CARD_SPACING_V3.statsHeight}px`,
-        alignContent: 'center',
-      }}
+        '--gap': `${CARD_SPACING_V3.bottomStatsGap}px`,
+        '--height': `${CARD_SPACING_V3.statsHeight}px`,
+      } as React.CSSProperties}
     >
       <StatItem label="Entry" value={entryFee} />
       <StatItem label="Entries" value={entries} />

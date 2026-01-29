@@ -14,6 +14,8 @@
  */
 
 import React from 'react';
+import { cn } from '@/lib/styles';
+import styles from './TournamentCardV3.module.css';
 import { CARD_SPACING_V3, CARD_GRID_V3 } from './constants/cardSpacingV3';
 import { BottomSectionV3 } from './TournamentCardBottomSectionV3';
 import { TournamentCardLogo } from './elements';
@@ -98,41 +100,27 @@ export interface TournamentCardV3Props {
 
 /**
  * TitleSection - Renders the tournament title
- * 
+ *
  * Uses V3 spacing values for margins and typography
  */
-function TitleSection({ 
-  titleFontSize 
-}: { 
-  titleFontSize?: number 
+function TitleSection({
+  titleFontSize
+}: {
+  titleFontSize?: number
 }): React.ReactElement {
   const fontSize = titleFontSize ?? CARD_SPACING_V3.titleFontSize;
-  
+
   return (
     <div
-      style={{
-        display: 'flex',
-        alignItems: 'flex-start',
-        justifyContent: 'center',
-        marginTop: `${CARD_SPACING_V3.titleMarginTop}px`,
-        textAlign: 'center',
-        contain: 'layout style',
-      }}
+      className={styles.titleWrapper}
+      style={
+        titleFontSize
+          ? { '--title-font-size': `${fontSize}px` } as React.CSSProperties
+          : undefined
+      }
     >
       <h2
-        className="vx2-tournament-title-v3"
-        style={{
-          fontSize: `${fontSize}px`,
-          fontFamily: "'Anton SC', sans-serif",
-          fontWeight: 'bold',
-          textTransform: 'uppercase',
-          letterSpacing: '2px',
-          lineHeight: CARD_SPACING_V3.titleLineHeight,
-          textAlign: 'center',
-          color: CARD_COLORS.textPrimary,
-          textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
-          margin: 0,
-        }}
+        className={cn('vx2-tournament-title-v3', styles.title)}
       >
         The TopDog<br />
         International
@@ -147,9 +135,9 @@ function TitleSection({
 
 /**
  * TournamentCardV3 - Main tournament card component
- * 
+ *
  * Complete rebuild with "Flex-in-Grid" architecture.
- * Uses V3 spacing constants throughout.
+ * Uses V3 spacing constants throughout with CSS Modules for CSP compliance.
  */
 export function TournamentCardV3({
   tournament,
@@ -175,63 +163,43 @@ export function TournamentCardV3({
     minHeight: styleOverrides.minHeight ?? CARD_SPACING_V3.minHeight,
   };
 
-  const borderColor = featured ? finalColors.accent : finalColors.border;
+  // Build CSS custom properties for dynamic overrides
+  const cardStyle: React.CSSProperties = {};
+  if (styleOverrides.backgroundFallback) {
+    cardStyle['--card-bg' as any] = finalColors.backgroundFallback;
+  }
+  if (styleOverrides.border || featured) {
+    cardStyle['--card-border' as any] = finalColors.border;
+  }
+  if (styleOverrides.minHeight) {
+    cardStyle['--card-min-height' as any] = `${finalSizes.minHeight}px`;
+  }
+  if (styleOverrides.borderRadius) {
+    cardStyle['--card-border-radius' as any] = `${finalSizes.borderRadius}px`;
+  }
+  if (styleOverrides.padding) {
+    cardStyle['--card-padding' as any] = `${finalSizes.padding}px`;
+  }
 
   // ----------------------------------------
   // Render
   // ----------------------------------------
   return (
     <article
-      className={`vx2-tournament-card-v3 ${className}`}
-      style={{
-        // ========================================
-        // Container Setup
-        // ========================================
-        position: 'relative',
-        width: '100%',
-        minHeight: `${finalSizes.minHeight}px`,
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        boxSizing: 'border-box',
-        flexShrink: 0,
-        
-        // ========================================
-        // Appearance
-        // ========================================
-        backgroundColor: finalColors.backgroundFallback,
-        borderRadius: `${finalSizes.borderRadius}px`,
-        border: `${finalColors.borderWidth}px solid ${borderColor}`,
-        
-        // ========================================
-        // Positioning
-        // ========================================
-        overflow: 'hidden',
-        
-        // ========================================
-        // CSS CONTAINMENT
-        // ========================================
-        contain: 'layout style paint',
-        isolation: 'isolate',
-      }}
+      className={cn(
+        'vx2-tournament-card-v3',
+        styles.card,
+        { [styles.featured]: featured },
+        className
+      )}
+      style={cardStyle}
       role="article"
       aria-label={`${tournament.title} tournament`}
     >
       {/* Content Grid - The Layout Engine */}
-      <div
-        style={{
-          flex: 1,
-          display: 'grid',
-          gridTemplateRows: CARD_GRID_V3.template,
-          padding: `${finalSizes.padding}px`,
-          zIndex: 1,
-          position: 'relative',
-          contain: 'layout',
-          overflow: 'hidden',
-        }}
-      >
+      <div className={styles.contentGrid}>
         {/* Row 1: Logo + Title (no full-bleed background; logo as logo only) */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div className={styles.titleContainer}>
           <TournamentCardLogo src={CARD_COLORS.logoImage} alt="Tournament logo" maxHeight={72} />
           <TitleSection titleFontSize={styleOverrides.titleFontSize} />
         </div>
@@ -240,9 +208,7 @@ export function TournamentCardV3({
             Row 2: Spacer (Takes 1fr)
             ======================================== */}
         <div
-          style={{
-            minHeight: `${CARD_SPACING_V3.spacerMinHeight}px`,
-          }}
+          className={styles.spacer}
           aria-hidden="true"
         />
 
@@ -250,16 +216,7 @@ export function TournamentCardV3({
             Row 3: Bottom Anchor
             CRITICAL: Do not change these flex properties
             ======================================== */}
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'flex-end', // <--- This guarantees bottom alignment
-            paddingBottom: 0,
-            marginBottom: 0,
-            minHeight: 0,
-          }}
-        >
+        <div className={styles.bottomAnchor}>
           <BottomSectionV3
             tournament={tournament}
             onJoinClick={onJoinClick}
@@ -281,127 +238,49 @@ export function TournamentCardV3({
 
 /**
  * TournamentCardSkeletonV3 - Loading state placeholder
- * 
+ *
  * Uses the same grid structure as the main card to prevent
  * layout shifts when the real content loads.
- * Uses V3 spacing constants.
+ * Uses V3 spacing constants with CSS Modules for CSP compliance.
  */
 export function TournamentCardSkeletonV3(): React.ReactElement {
   return (
     <article
-      className="vx2-tournament-card-skeleton-v3 animate-pulse"
-      style={{
-        position: 'relative',
-        width: '100%',
-        minHeight: `${CARD_SPACING_V3.minHeight}px`,
-        display: 'flex',
-        flexDirection: 'column',
-        boxSizing: 'border-box',
-        backgroundColor: CARD_COLORS.backgroundFallback,
-        borderRadius: `${CARD_SPACING_V3.borderRadius}px`,
-        border: `1px solid ${CARD_COLORS.borderDefault}`,
-        overflow: 'hidden',
-      }}
+      className={cn('vx2-tournament-card-skeleton-v3 animate-pulse', styles.skeleton)}
       aria-hidden="true"
       aria-label="Loading tournament card"
     >
       {/* Content Grid */}
-      <div
-        style={{
-          flex: 1,
-          display: 'grid',
-          gridTemplateRows: CARD_GRID_V3.template,
-          padding: `${CARD_SPACING_V3.outerPadding}px`,
-        }}
-      >
+      <div className={styles.skeletonGrid}>
         {/* Title skeleton */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            justifyContent: 'center',
-            marginTop: `${CARD_SPACING_V3.titleMarginTop}px`,
-          }}
-        >
-          <div
-            style={{
-              width: '70%',
-              height: `${CARD_SPACING_V3.titleFontSize}px`,
-              backgroundColor: 'rgba(255,255,255,0.1)',
-              borderRadius: '4px',
-            }}
-          />
+        <div className={styles.skeletonTitleWrapper}>
+          <div className={styles.skeletonBar} />
         </div>
 
         {/* Spacer */}
-        <div
-          style={{
-            minHeight: `${CARD_SPACING_V3.spacerMinHeight}px`,
-          }}
-        />
+        <div className={styles.skeletonSpacer} />
 
         {/* Bottom section skeleton */}
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'flex-end',
-            paddingBottom: 0,
-          }}
-        >
+        <div className={styles.skeletonBottomSection}>
           <div
             style={{
               display: 'grid',
-              gridTemplateRows: `${CARD_SPACING_V3.buttonHeight}px ${CARD_SPACING_V3.statsHeight}px`,
-              gap: `${CARD_SPACING_V3.bottomRowGap}px`,
+              gridTemplateRows: `var(--button-height) var(--stats-height)`,
+              gap: 'var(--bottom-row-gap)',
             }}
           >
             {/* Button skeleton */}
-            <div
-              style={{
-                width: '100%',
-                height: `${CARD_SPACING_V3.buttonHeight}px`,
-                backgroundColor: 'rgba(255,255,255,0.1)',
-                borderRadius: `${CARD_SPACING_V3.buttonBorderRadius}px`,
-              }}
-            />
+            <div className={styles.skeletonButton} />
 
             {/* Stats skeleton */}
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, 1fr)',
-                gap: `${CARD_SPACING_V3.bottomStatsGap}px`,
-                height: `${CARD_SPACING_V3.statsHeight}px`,
-              }}
-            >
+            <div className={styles.skeletonStatsGrid}>
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
+                  className={styles.skeletonStatItem}
                 >
-                  <div
-                    style={{
-                      width: '60px',
-                      height: '26px',
-                      backgroundColor: 'rgba(255,255,255,0.1)',
-                      borderRadius: '5px',
-                      marginBottom: '4px',
-                    }}
-                  />
-                  <div
-                    style={{
-                      width: '50px',
-                      height: '17px',
-                      backgroundColor: 'rgba(255,255,255,0.1)',
-                      borderRadius: '4px',
-                    }}
-                  />
+                  <div className={styles.skeletonStatValue} />
+                  <div className={styles.skeletonStatLabel} />
                 </div>
               ))}
             </div>

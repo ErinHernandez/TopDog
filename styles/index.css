@@ -1,0 +1,28 @@
+/**
+ * Main Styles Index
+ *
+ * This file imports all CSS custom properties and utility classes.
+ * Import this single file in _app.tsx to enable the CSS variable system.
+ *
+ * @example
+ * // In _app.tsx
+ * import '@/styles/index.css';
+ */
+
+/* ============================================================================
+   CSS CUSTOM PROPERTIES (Variables)
+   ============================================================================ */
+
+@import './variables/colors.css';
+@import './variables/spacing.css';
+@import './variables/typography.css';
+@import './variables/layout.css';
+@import './variables/animations.css';
+
+/* ============================================================================
+   UTILITY CLASSES
+   ============================================================================ */
+
+@import './utilities/layout.css';
+@import './utilities/spacing.css';
+@import './utilities/display.css';

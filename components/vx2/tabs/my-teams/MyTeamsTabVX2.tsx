@@ -18,10 +18,12 @@ import { BG_COLORS, TEXT_COLORS, POSITION_COLORS } from '../../core/constants/co
 import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
 import { useHeader, useTabNavigation } from '../../core';
 import { useTemporaryState } from '../../hooks/ui/useTemporaryState';
-import { 
+import { cn } from '@/lib/styles';
+import styles from './MyTeamsTabVX2.module.css';
+import {
   PositionBadge,
-  Skeleton, 
-  EmptyState, 
+  Skeleton,
+  EmptyState,
   ErrorState,
   PlayerStatsCard,
   SearchInput,
@@ -177,7 +179,7 @@ function TeamCard({
   const handleClick = (e: React.MouseEvent) => {
     onSelect();
   };
-  
+
   return (
     <div
       onClick={handleClick}
@@ -186,95 +188,59 @@ function TeamCard({
       onDragOver={isCustomSort ? onDragOver : undefined}
       onDragEnd={isCustomSort ? onDragEnd : undefined}
       onDrop={isCustomSort ? onDrop : undefined}
-      className="w-full flex items-center justify-between transition-all active:scale-[0.98] cursor-pointer"
+      className={cn(
+        styles.teamCard,
+        isDragging && styles.teamCardDragging,
+        isDragOver && styles.teamCardDragOver,
+        isCustomSort && styles.teamCardDraggable
+      )}
       style={{
-        paddingTop: `${MYTEAMS_PX.cardPadding + 6}px`,
-        paddingBottom: `${MYTEAMS_PX.cardPadding + 6}px`,
-        paddingLeft: `${MYTEAMS_PX.cardPadding + 4}px`,
-        paddingRight: `${MYTEAMS_PX.cardPadding + 4}px`,
-        backgroundColor: BG_COLORS.secondary,
-        borderRadius: `${RADIUS.lg}px`,
-        border: '1px solid rgba(255,255,255,0.1)',
-        opacity: isDragging ? 0.5 : 1,
-        borderTop: isDragOver ? '2px solid rgba(59, 130, 246, 0.6)' : '1px solid rgba(255,255,255,0.1)',
-        cursor: isCustomSort ? 'move' : 'pointer',
-        minHeight: '54px',
-        height: '54px',
-      }}
+        '--card-padding': `${MYTEAMS_PX.cardPadding}px`,
+      } as React.CSSProperties}
       aria-label={`View ${team.name}`}
     >
-      <div className="flex items-center flex-1 min-w-0">
+      <div className={styles.teamCardContent}>
         {/* Standing - only shown when season has started and rank is available */}
         {seasonStarted && team.rank && team.rank >= 1 && team.rank <= 12 && (
-          <div
-            className="p-1 mr-2 flex items-center justify-center"
-            style={{
-              borderRadius: `${RADIUS.md}px`,
-              minWidth: '28px',
-              height: '28px',
-            }}
-          >
-            <span
-              style={{
-                fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-                color: TEXT_COLORS.primary,
-                fontWeight: 600,
-              }}
-            >
+          <div className={styles.teamCardRankBadge}>
+            <span className={styles.teamCardRankText}>
               {formatRank(team.rank)}
             </span>
           </div>
         )}
-        <div className="flex-1 text-left min-w-0">
-          <div className="flex items-center gap-3" style={{ minWidth: 0, flex: 1 }}>
-            <h3 
-              className="font-medium flex-shrink-0"
-              style={{ 
-                color: TEXT_COLORS.primary, 
-                fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-              }}
-            >
+        <div className={styles.teamCardInfoContainer}>
+          <div className={styles.teamCardInfoContent}>
+            <h3 className={styles.teamCardName}>
               {formattedName}
             </h3>
             {sortMethod === 'draftedAt' && team.draftedAt && (
-              <span
-                style={{
-                  fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-                  color: TEXT_COLORS.muted,
-                  marginLeft: 'auto',
-                  whiteSpace: 'nowrap',
-                }}
-              >
+              <span className={styles.teamCardDraftDate}>
                 {formatDraftDate(team.draftedAt)}
               </span>
             )}
-              {showPointsDiff && ((pointsBack ?? null) !== null || (pointsAhead ?? null) !== null) && (
-                <div className="flex flex-col" style={{ fontSize: `${TYPOGRAPHY.fontSize.xs}px`, color: TEXT_COLORS.muted, marginLeft: 'auto', textAlign: 'right' }}>
-                  {(pointsBack ?? null) !== null && (pointsBack ?? 0) > 0 && (
-                    <span style={{ whiteSpace: 'nowrap' }}>{(pointsBack ?? 0).toFixed(1)} pts back</span>
-                  )}
-                  {(pointsAhead ?? null) !== null && (pointsAhead ?? 0) > 0 && (
-                    <span style={{ whiteSpace: 'nowrap' }}>{(pointsAhead ?? 0).toFixed(1)} pts ahead</span>
-                  )}
-                </div>
-              )}
-            </div>
+            {showPointsDiff && ((pointsBack ?? null) !== null || (pointsAhead ?? null) !== null) && (
+              <div className={styles.teamCardPointsContainer}>
+                {(pointsBack ?? null) !== null && (pointsBack ?? 0) > 0 && (
+                  <span className={styles.teamCardPointsValue}>{(pointsBack ?? 0).toFixed(1)} pts back</span>
+                )}
+                {(pointsAhead ?? null) !== null && (pointsAhead ?? 0) > 0 && (
+                  <span className={styles.teamCardPointsValue}>{(pointsAhead ?? 0).toFixed(1)} pts ahead</span>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
       {isCustomSort ? (
-        <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+        <div className={styles.teamCardActionsContainer} onClick={(e) => e.stopPropagation()}>
           {index > 0 && onMoveUp && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 onMoveUp();
               }}
-              className="p-1 flex items-center justify-center transition-all active:scale-95"
+              className={cn(styles.moveButton, styles.moveButtonActive)}
               aria-label="Move up"
-              style={{
-                borderRadius: `${RADIUS.sm}px`,
-                backgroundColor: 'rgba(255,255,255,0.05)',
-              }}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={TEXT_COLORS.muted} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="18 15 12 9 6 15" />
@@ -287,12 +253,8 @@ function TeamCard({
                 e.stopPropagation();
                 onMoveDown();
               }}
-              className="p-1 flex items-center justify-center transition-all active:scale-95"
+              className={cn(styles.moveButton, styles.moveButtonActive)}
               aria-label="Move down"
-              style={{
-                borderRadius: `${RADIUS.sm}px`,
-                backgroundColor: 'rgba(255,255,255,0.05)',
-              }}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={TEXT_COLORS.muted} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="6 9 12 15 18 9" />
@@ -301,7 +263,7 @@ function TeamCard({
           )}
         </div>
       ) : (
-        <div style={{ paddingLeft: `${SPACING.sm}px` }}>
+        <div className={styles.chevronContainer}>
           <ChevronRight size={20} color={TEXT_COLORS.muted} />
         </div>
       )}
@@ -312,14 +274,10 @@ function TeamCard({
 function TeamCardSkeleton(): React.ReactElement {
   return (
     <div
+      className={styles.teamCard}
       style={{
-        paddingTop: `${MYTEAMS_PX.cardPadding + 6}px`,
-        paddingBottom: `${MYTEAMS_PX.cardPadding + 6}px`,
-        paddingLeft: `${MYTEAMS_PX.cardPadding + 4}px`,
-        paddingRight: `${MYTEAMS_PX.cardPadding + 4}px`,
-        backgroundColor: BG_COLORS.secondary,
-        borderRadius: `${RADIUS.lg}px`,
-      }}
+        '--card-padding': `${MYTEAMS_PX.cardPadding}px`,
+      } as React.CSSProperties}
     >
       <Skeleton width={150} height={18} />
     </div>
@@ -346,21 +304,21 @@ interface SortDropdownProps {
 function SortDropdown({ currentSort, onSortChange }: SortDropdownProps): React.ReactElement {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  
+
   // Available sort options (excluding playoffOverlap for now - regular season only)
   const sortOptions: TeamSortOption[] = [
-    'draftedAt', 
-    'rank', 
+    'draftedAt',
+    'rank',
     'projectedPointsThisWeek',
-    'pointsScored', 
+    'pointsScored',
     'lastWeekScore',
     'last4WeeksScore',
     'pointsBackOfFirst',
     'pointsBackOfPlayoffs',
-    'name', 
+    'name',
     'custom'
   ];
-  
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -370,102 +328,57 @@ function SortDropdown({ currentSort, onSortChange }: SortDropdownProps): React.R
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-  
+
   const handleOptionClick = (option: TeamSortOption) => {
     const nextState = getNextTeamSortState(currentSort, option);
     onSortChange(nextState);
     setIsOpen(false);
   };
-  
+
   return (
-    <div ref={dropdownRef} style={{ position: 'relative' }}>
+    <div ref={dropdownRef} className={styles.sortDropdownWrapper}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-          padding: '8px 12px',
-          backgroundColor: BG_COLORS.secondary,
-          border: '1px solid rgba(255,255,255,0.1)',
-          borderRadius: `${RADIUS.md}px`,
-          color: TEXT_COLORS.secondary,
-          fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-          cursor: 'pointer',
-          transition: 'all 0.15s ease',
-        }}
+        className={styles.sortDropdownButton}
         aria-label={`Sort by ${TEAM_SORT_LABELS[currentSort.primary]}, ${currentSort.direction === 'asc' ? 'ascending' : 'descending'}`}
       >
-        <span style={{ color: TEXT_COLORS.muted }}>Sort:</span>
-        <span style={{ color: TEXT_COLORS.primary, fontWeight: 500 }}>
+        <span className={styles.sortDropdownButtonLabel}>Sort:</span>
+        <span className={styles.sortDropdownButtonValue}>
           {TEAM_SORT_LABELS[currentSort.primary]}
         </span>
-        <svg 
-          width="12" 
-          height="12" 
-          viewBox="0 0 24 24" 
-          fill="none" 
-          stroke="currentColor" 
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
           strokeWidth="2"
-          style={{ 
-            transform: currentSort.direction === 'desc' ? 'rotate(180deg)' : 'rotate(0deg)',
-            transition: 'transform 0.2s ease',
-          }}
+          className={cn(styles.sortDropdownArrow, currentSort.direction === 'desc' && styles.sortDropdownArrowRotated)}
         >
           <polyline points="18 15 12 9 6 15" />
         </svg>
       </button>
-      
+
       {isOpen && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '100%',
-            right: 0,
-            marginTop: '4px',
-            backgroundColor: BG_COLORS.secondary,
-            border: '1px solid rgba(255,255,255,0.1)',
-            borderRadius: `${RADIUS.lg}px`,
-            overflow: 'hidden',
-            zIndex: 1000,
-            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-            minWidth: '160px',
-          }}
-        >
+        <div className={styles.sortDropdownPanel}>
           {sortOptions.map((option) => {
             const isActive = currentSort.primary === option;
             return (
               <button
                 key={option}
                 onClick={() => handleOptionClick(option)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  width: '100%',
-                  padding: '10px 14px',
-                  backgroundColor: isActive ? 'rgba(255,255,255,0.05)' : 'transparent',
-                  border: 'none',
-                  borderBottom: '1px solid rgba(255,255,255,0.05)',
-                  color: isActive ? TEXT_COLORS.primary : TEXT_COLORS.secondary,
-                  fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  transition: 'background-color 0.15s ease',
-                }}
+                className={cn(styles.sortDropdownItem, isActive && styles.sortDropdownItemActive)}
               >
-                <span style={{ whiteSpace: 'pre-line' }}>{TEAM_SORT_LABELS[option]}</span>
+                <span className={styles.sortDropdownItemLabel}>{TEAM_SORT_LABELS[option]}</span>
                 {isActive && (
-                  <svg 
-                    width="12" 
-                    height="12" 
-                    viewBox="0 0 24 24" 
-                    fill="none" 
-                    stroke="currentColor" 
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
                     strokeWidth="2"
-                    style={{ 
-                      transform: currentSort.direction === 'desc' ? 'rotate(180deg)' : 'rotate(0deg)',
-                    }}
+                    className={cn(styles.sortDropdownItemCheckmark, currentSort.direction === 'desc' && styles.sortDropdownItemCheckmarkRotated)}
                   >
                     <polyline points="18 15 12 9 6 15" />
                   </svg>
@@ -915,23 +828,10 @@ function TeamListView({ teams, isLoading, onSelect, sortState, onSortChange }: T
   }, [filteredTeams, sortState, onSortChange, userId, saveToHistory, setJustSavedPermanent]);
 
   return (
-    <div 
-      className="flex-1 flex flex-col min-h-0"
-      style={{ backgroundColor: BG_COLORS.primary }}
-    >
+    <div className={styles.teamListContainer}>
       {/* Search */}
-      <div
-        ref={searchRef}
-        style={{
-          paddingLeft: `${MYTEAMS_PX.listPadding}px`,
-          paddingRight: `${MYTEAMS_PX.listPadding}px`,
-          paddingTop: `${MYTEAMS_PX.listPadding + 2 + 4}px`,
-          paddingBottom: `${MYTEAMS_PX.listPadding + 2}px`,
-          borderBottom: '1px solid rgba(255,255,255,0.1)',
-          position: 'relative',
-        }}
-      >
-        <div style={{ position: 'relative' }}>
+      <div ref={searchRef} className={styles.searchSection}>
+        <div className={styles.searchInputWrapper}>
           <SearchInput
             value={searchQuery}
             onChange={(value) => {
@@ -940,50 +840,31 @@ function TeamListView({ teams, isLoading, onSelect, sortState, onSortChange }: T
             }}
             placeholder="Search for player(s)"
           />
-          
+
           {/* Dropdown */}
           {showDropdown && dropdownOptions.length > 0 && (
-            <div
-              style={{
-                position: 'absolute',
-                top: '100%',
-                left: 0,
-                right: 0,
-                marginTop: `${SPACING.xs}px`,
-                backgroundColor: BG_COLORS.secondary,
-                borderRadius: `${RADIUS.lg}px`,
-                border: '1px solid rgba(255,255,255,0.1)',
-                maxHeight: '300px',
-                overflowY: 'auto',
-                zIndex: 1000,
-                boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
-              }}
-            >
+            <div className={styles.dropdownMenu}>
               {dropdownOptions.map((option) => (
                 <button
                   key={`${option.type}-${option.id}`}
                   onClick={() => handleSelectItem(option)}
-                  className="w-full text-left px-3 py-2 hover:bg-opacity-10 transition-colors"
-                  style={{
-                    borderBottom: '1px solid rgba(255,255,255,0.05)',
-                    color: TEXT_COLORS.primary,
-                  }}
+                  className={styles.dropdownOption}
                 >
-                  <div className="flex items-center gap-2">
+                  <div className={styles.dropdownOptionContent}>
                     {option.type === 'player' && option.position && (
                       <PositionBadge position={option.position as 'QB' | 'RB' | 'WR' | 'TE'} size="sm" />
                     )}
-                    <div className="flex-1">
-                      <div style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px`, fontWeight: 500 }}>
+                    <div className={styles.dropdownOptionInfo}>
+                      <div className={styles.dropdownOptionName}>
                         {option.name}
                       </div>
                       {option.type === 'player' && option.team && (
-                        <div style={{ fontSize: `${TYPOGRAPHY.fontSize.xs}px`, color: TEXT_COLORS.muted }}>
+                        <div className={styles.dropdownOptionTeam}>
                           {option.team}
                         </div>
                       )}
                       {option.type === 'team' && (
-                        <div style={{ fontSize: `${TYPOGRAPHY.fontSize.xs}px`, color: TEXT_COLORS.muted }}>
+                        <div className={styles.dropdownOptionTeam}>
                           NFL Team
                         </div>
                       )}
@@ -994,40 +875,24 @@ function TeamListView({ teams, isLoading, onSelect, sortState, onSortChange }: T
             </div>
           )}
         </div>
-        
+
         {/* Selected Items */}
         {selectedItems.length > 0 && (
-          <div
-            className="flex flex-wrap gap-2"
-            style={{ marginTop: `${SPACING.md}px` }}
-          >
+          <div className={styles.selectedItemsWrapper}>
             {selectedItems.map((item) => (
               <div
                 key={`${item.type}-${item.id}`}
-                className="flex items-center gap-2 px-3 py-1"
-                style={{
-                  backgroundColor: BG_COLORS.tertiary,
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: `${RADIUS.sm}px`,
-                }}
+                className={styles.selectedItem}
               >
                 {item.type === 'player' && item.position && (
                   <PositionBadge position={item.position as 'QB' | 'RB' | 'WR' | 'TE'} size="sm" />
                 )}
-                <span style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px`, color: TEXT_COLORS.primary }}>
+                <span>
                   {item.name}
                 </span>
                 <button
                   onClick={() => handleRemoveItem(item.id)}
-                  className="flex items-center justify-center"
-                  style={{
-                    width: '18px',
-                    height: '18px',
-                    borderRadius: '50%',
-                    backgroundColor: 'rgba(255,255,255,0.1)',
-                    border: 'none',
-                    cursor: 'pointer',
-                  }}
+                  className={styles.selectedItemRemoveButton}
                   aria-label={`Remove ${item.name}`}
                 >
                   <Close size={12} color={TEXT_COLORS.muted} />
@@ -1039,19 +904,11 @@ function TeamListView({ teams, isLoading, onSelect, sortState, onSortChange }: T
       </div>
       
       {/* Sort Controls */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: `${SPACING.sm}px ${MYTEAMS_PX.listPadding}px`,
-          borderBottom: '1px solid rgba(255,255,255,0.05)',
-        }}
-      >
-        <span style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>
+      <div className={styles.sortControlsSection}>
+        <span className={styles.teamCountLabel}>
           {filteredTeams.length} {filteredTeams.length === 1 ? 'team' : 'teams'}
         </span>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div className={styles.sortButtonsContainer}>
           {sortState.primary === 'custom' && (
             <>
               {/* Save button - turns blue when order has changed, shows checkmark after clicking */}
@@ -1064,23 +921,12 @@ function TeamListView({ teams, isLoading, onSelect, sortState, onSortChange }: T
                   }
                 }}
                 disabled={!hasOrderChanged && !justSaved}
-                className="flex items-center justify-center gap-1"
-                style={{
-                  padding: '6px 10px',
-                  background: hasOrderChanged 
-                    ? 'url(/wr_blue.png) no-repeat center center' 
-                    : justSaved 
-                      ? 'url(/wr_blue.png) no-repeat center center'
-                      : 'rgba(255,255,255,0.05)',
-                  backgroundSize: (hasOrderChanged || justSaved) ? 'cover' : undefined,
-                  border: (hasOrderChanged || justSaved) ? 'none' : '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: `${RADIUS.md}px`,
-                  color: (hasOrderChanged || justSaved) ? '#fff' : TEXT_COLORS.secondary,
-                  fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-                  cursor: hasOrderChanged ? 'pointer' : 'default',
-                  transition: 'all 0.15s ease',
-                  opacity: justSaved ? 0.5 : 1,
-                }}
+                className={cn(
+                  styles.saveButton,
+                  hasOrderChanged && styles.saveButtonActive,
+                  justSaved && styles.saveButtonSaved,
+                  !hasOrderChanged && !justSaved && styles.saveButtonDisabled
+                )}
                 aria-label={justSaved ? 'Changes saved' : 'Save custom order'}
               >
                 {justSaved ? (
@@ -1096,17 +942,11 @@ function TeamListView({ teams, isLoading, onSelect, sortState, onSortChange }: T
               <button
                 onClick={handleUndo}
                 disabled={orderHistory.length === 0}
-                className="flex items-center justify-center"
-                style={{
-                  padding: '6px',
-                  backgroundColor: orderHistory.length > 0 ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: `${RADIUS.md}px`,
-                  color: orderHistory.length > 0 ? TEXT_COLORS.secondary : TEXT_COLORS.muted,
-                  cursor: orderHistory.length > 0 ? 'pointer' : 'default',
-                  transition: 'all 0.15s ease',
-                  opacity: orderHistory.length > 0 ? 1 : 0.5,
-                }}
+                className={cn(
+                  styles.undoButton,
+                  orderHistory.length > 0 && styles.undoButtonActive,
+                  orderHistory.length === 0 && styles.undoButtonDisabled
+                )}
                 aria-label={`Undo last move (${orderHistory.length} moves in history)`}
               >
                 <Undo size={12} color={orderHistory.length > 0 ? TEXT_COLORS.secondary : TEXT_COLORS.muted} />
@@ -1118,16 +958,9 @@ function TeamListView({ teams, isLoading, onSelect, sortState, onSortChange }: T
       </div>
       
       {/* Team List */}
-      <div
-        className="flex-1 min-h-0 overflow-y-auto"
-        style={{
-          padding: `${MYTEAMS_PX.listPadding}px`,
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-        }}
-      >
+      <div className={styles.teamListContent}>
         {isLoading ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: `${MYTEAMS_PX.cardGap}px` }}>
+          <div className={styles.teamListLoadingContainer}>
             {[1, 2, 3, 4].map(i => <TeamCardSkeleton key={i} />)}
           </div>
         ) : filteredTeams.length === 0 ? (
@@ -1136,24 +969,24 @@ function TeamListView({ teams, isLoading, onSelect, sortState, onSortChange }: T
             description={selectedItems.length > 0 ? "No teams match your search criteria" : "Join a draft to build your first team!"}
           />
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: `${MYTEAMS_PX.cardGap}px` }}>
+          <div className={styles.teamListActualContainer}>
             {filteredTeams.map((team, index) => {
               const pointsDiff = pointsDiffMap.get(team.id);
               const isCustomSort = sortState.primary === 'custom';
               return (
-                <TeamCard 
-                  key={team.id} 
-                  team={team} 
+                <TeamCard
+                  key={team.id}
+                  team={team}
                   onSelect={() => onSelect(team)}
                   pointsBack={pointsDiff?.pointsBack ?? null}
                   pointsAhead={pointsDiff?.pointsAhead ?? null}
                   showPointsDiff={sortState.primary === 'rank' || sortState.primary === 'projectedPoints' || sortState.primary === 'pointsScored' || sortState.primary === 'pointsBackOfFirst' || sortState.primary === 'pointsBackOfPlayoffs'}
                   sortMethod={
-                    sortState.primary === 'rank' ? 'rank' : 
-                    sortState.primary === 'projectedPoints' ? 'projectedPoints' : 
-                    sortState.primary === 'pointsScored' ? 'pointsScored' : 
-                    sortState.primary === 'pointsBackOfFirst' ? 'pointsBackOfFirst' : 
-                    sortState.primary === 'pointsBackOfPlayoffs' ? 'pointsBackOfPlayoffs' : 
+                    sortState.primary === 'rank' ? 'rank' :
+                    sortState.primary === 'projectedPoints' ? 'projectedPoints' :
+                    sortState.primary === 'pointsScored' ? 'pointsScored' :
+                    sortState.primary === 'pointsBackOfFirst' ? 'pointsBackOfFirst' :
+                    sortState.primary === 'pointsBackOfPlayoffs' ? 'pointsBackOfPlayoffs' :
                     sortState.primary === 'draftedAt' ? 'draftedAt' :
                     undefined
                   }
@@ -1173,9 +1006,9 @@ function TeamListView({ teams, isLoading, onSelect, sortState, onSortChange }: T
             })}
           </div>
         )}
-        
+
         {/* Bottom padding */}
-        <div style={{ height: `${SPACING['2xl']}px` }} />
+        <div className={styles.teamListBottomPadding} />
       </div>
       
       {/* Unsaved Changes Modal */}
@@ -1214,7 +1047,22 @@ const POSITION_STYLES: Record<string, { bg: string; text: string; accent: string
 function PlayerRow({ player, onClick, isExpanded, isLastInGroup, isFirstInGroup }: PlayerRowProps): React.ReactElement {
   const [isPressed, setIsPressed] = useState(false);
   const style = POSITION_STYLES[player.position] || { bg: '#6B7280', text: '#fff', accent: 'rgba(107, 114, 128, 0.12)' };
-  
+
+  const getPositionBadgeClass = () => {
+    switch (player.position) {
+      case 'QB':
+        return styles.positionBadgeQB;
+      case 'RB':
+        return styles.positionBadgeRB;
+      case 'WR':
+        return styles.positionBadgeWR;
+      case 'TE':
+        return styles.positionBadgeTE;
+      default:
+        return styles.positionBadgeDefault;
+    }
+  };
+
   return (
     <div
       onClick={onClick}
@@ -1223,85 +1071,40 @@ function PlayerRow({ player, onClick, isExpanded, isLastInGroup, isFirstInGroup 
       onMouseDown={() => setIsPressed(true)}
       onMouseUp={() => setIsPressed(false)}
       onMouseLeave={() => setIsPressed(false)}
+      className={cn(
+        styles.playerRow,
+        isPressed && styles.playerRowPressed,
+        isFirstInGroup && isLastInGroup && styles.playerRowBoth,
+        isFirstInGroup && !isLastInGroup && styles.playerRowFirstInGroup,
+        isLastInGroup && !isFirstInGroup && styles.playerRowLastInGroup,
+        !isLastInGroup && styles.playerRowWithGap
+      )}
       style={{
-        backgroundColor: isPressed ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.02)',
-        borderRadius: isFirstInGroup && isLastInGroup ? '6px' : isFirstInGroup ? '6px 6px 0 0' : isLastInGroup ? '0 0 6px 6px' : '0',
-        marginBottom: isLastInGroup ? '0px' : '1px',
-        overflow: 'hidden',
-        cursor: onClick ? 'pointer' : 'default',
-        transition: 'background-color 0.1s ease',
-        borderLeft: `3px solid ${style.bg}`,
+        borderLeftColor: style.bg,
       }}
     >
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          padding: '10px 12px 10px 10px',
-          minHeight: '44px',
-        }}
-      >
+      <div className={styles.playerRowContent}>
         {/* Position Badge - refined with better contrast */}
-        <div
-          style={{
-            backgroundColor: style.bg,
-            color: style.text,
-            fontSize: '10px',
-            fontWeight: 700,
-            letterSpacing: '0.3px',
-            padding: '4px 8px',
-            borderRadius: '4px',
-            textTransform: 'uppercase',
-            minWidth: '32px',
-            textAlign: 'center',
-            boxShadow: '0 1px 2px rgba(0,0,0,0.2)',
-          }}
-        >
+        <div className={cn(styles.positionBadge, getPositionBadgeClass())}>
           {player.position}
         </div>
-        
+
         {/* Player Info - improved typography and spacing */}
-        <div style={{ flex: 1, marginLeft: '12px', minWidth: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-            <span 
-              style={{ 
-                color: '#ffffff', 
-                fontSize: '14px', 
-                fontWeight: 600,
-                letterSpacing: '-0.2px',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
-            >
+        <div className={styles.playerInfoContainer}>
+          <div className={styles.playerInfoContent}>
+            <span className={styles.playerName}>
               {player.name}
             </span>
-            <span 
-              style={{ 
-                color: '#64748b', 
-                fontSize: '11px',
-                fontWeight: 500,
-                letterSpacing: '0.5px',
-                textTransform: 'uppercase',
-                flexShrink: 0,
-              }}
-            >
+            <span className={styles.playerTeam}>
               {player.team}
             </span>
           </div>
         </div>
-        
+
         {/* Down arrow indicator for expandable rows */}
         {onClick && (
-          <div
-            style={{
-              marginLeft: '8px',
-              transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
-              transition: 'transform 0.2s ease',
-              opacity: 0.4,
-            }}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#94a3b8' }}>
+          <div className={cn(styles.playerExpandIndicator, isExpanded && styles.playerExpandIndicatorExpanded)}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="6 9 12 15 18 9" />
             </svg>
           </div>
@@ -1329,34 +1132,18 @@ function PlayerSortPill({ option, isActive, direction, onClick }: PlayerSortPill
   return (
     <button
       onClick={onClick}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '4px',
-        padding: '6px 10px',
-        backgroundColor: isActive ? 'rgba(59, 130, 246, 0.2)' : 'rgba(255,255,255,0.05)',
-        border: isActive ? '1px solid rgba(59, 130, 246, 0.4)' : '1px solid rgba(255,255,255,0.08)',
-        borderRadius: '16px',
-        color: isActive ? '#60a5fa' : TEXT_COLORS.secondary,
-        fontSize: '11px',
-        fontWeight: isActive ? 600 : 400,
-        cursor: 'pointer',
-        transition: 'all 0.15s ease',
-        whiteSpace: 'nowrap',
-      }}
+      className={cn(styles.playerSortPill, isActive && styles.playerSortPillActive)}
     >
       <span>{PLAYER_SORT_LABELS[option]}</span>
       {isActive && (
-        <svg 
-          width="10" 
-          height="10" 
-          viewBox="0 0 24 24" 
-          fill="none" 
-          stroke="currentColor" 
+        <svg
+          width="10"
+          height="10"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
           strokeWidth="2.5"
-          style={{ 
-            transform: direction === 'desc' ? 'rotate(180deg)' : 'rotate(0deg)',
-          }}
+          className={cn(styles.playerSortPillCheckmark, direction === 'desc' && styles.playerSortPillCheckmarkRotated)}
         >
           <polyline points="18 15 12 9 6 15" />
         </svg>
@@ -1468,48 +1255,21 @@ function TeamDetailsView({ team, onBack, onViewDraftBoard }: TeamDetailsViewProp
   }, [sortedPlayers, playerSort]);
   
   return (
-    <div 
-      className="flex-1 flex flex-col min-h-0"
-      style={{ backgroundColor: BG_COLORS.primary }}
-    >
+    <div className={styles.teamDetailsContainer}>
       {/* Position Tracker */}
-      <div
-        style={{
-          backgroundColor: '#0c1420',
-          padding: '16px 16px 16px 0',
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
-        }}
-      >
+      <div className={styles.positionTrackerSection}>
         {/* Team Name and Pick Position */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingLeft: '16px' }}>
+        <div className={styles.teamHeaderWrapper}>
+          <div className={styles.teamHeaderLeftSection}>
             <button
               onClick={onBack}
-              style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: 'none',
-                cursor: 'pointer',
-                padding: '6px',
-                display: 'flex',
-                alignItems: 'center',
-                borderRadius: '6px',
-                transition: 'background 0.15s ease',
-              }}
+              className={styles.backButton}
               aria-label="Back to teams"
             >
               <ChevronLeft size={14} color={TEXT_COLORS.muted} />
             </button>
             <button
-              style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: 'none',
-                cursor: 'pointer',
-                padding: '6px',
-                display: 'flex',
-                alignItems: 'center',
-                borderRadius: '6px',
-                transition: 'background 0.15s ease',
-              }}
+              className={styles.editButton}
               aria-label="Edit team name"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1517,31 +1277,21 @@ function TeamDetailsView({ team, onBack, onViewDraftBoard }: TeamDetailsViewProp
                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
               </svg>
             </button>
-            <div>
-              <div style={{ color: '#ffffff', fontSize: '16px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            <div className={styles.teamNameContainer}>
+              <div className={styles.teamName}>
                 {formattedName}
               </div>
               {pickPosition !== null && (
-                <div style={{ color: '#94a3b8', fontSize: '12px', marginTop: '2px' }}>
+                <div className={styles.pickPositionLabel}>
                   Pick position: {pickPosition}
                 </div>
               )}
             </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className={styles.teamHeaderRightSection}>
             <button
               onClick={handleDraftBoardClick}
-              style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: 'none',
-                cursor: 'pointer',
-                padding: '6px',
-                display: 'flex',
-                alignItems: 'center',
-                borderRadius: '6px',
-                transition: 'background 0.15s ease',
-                marginLeft: 'auto',
-              }}
+              className={styles.draftBoardButton}
               aria-label="View draft board"
             >
               <Grid size={14} color={TEXT_COLORS.muted} />
@@ -1550,96 +1300,75 @@ function TeamDetailsView({ team, onBack, onViewDraftBoard }: TeamDetailsViewProp
         </div>
 
         {/* Position Distribution Bar */}
-        <div style={{ marginBottom: '8px', paddingLeft: '16px', paddingRight: '16px' }}>
-          <div
-            style={{
-              display: 'flex',
-              height: '8px',
-              borderRadius: '4px',
-              overflow: 'hidden',
-            }}
-          >
+        <div className={styles.positionDistributionWrapper}>
+          <div className={styles.positionDistributionBar}>
             {team.players.length > 0 ? (
               <>
                 <div
+                  className={cn(styles.positionSegment, styles.positionSegmentQB)}
                   style={{
                     width: `${(positionCounts.QB / team.players.length) * 100}%`,
-                    backgroundColor: '#F472B6',
                     minWidth: positionCounts.QB > 0 ? '2px' : '0',
                   }}
                 />
                 <div
+                  className={cn(styles.positionSegment, styles.positionSegmentRB)}
                   style={{
                     width: `${(positionCounts.RB / team.players.length) * 100}%`,
-                    backgroundColor: '#0fba80',
                     minWidth: positionCounts.RB > 0 ? '2px' : '0',
                   }}
                 />
                 <div
+                  className={cn(styles.positionSegment, styles.positionSegmentWR)}
                   style={{
                     width: `${(positionCounts.WR / team.players.length) * 100}%`,
-                    backgroundColor: '#FBBF25',
                     minWidth: positionCounts.WR > 0 ? '2px' : '0',
                   }}
                 />
                 <div
+                  className={cn(styles.positionSegment, styles.positionSegmentTE)}
                   style={{
                     width: `${(positionCounts.TE / team.players.length) * 100}%`,
-                    backgroundColor: '#7C3AED',
                     minWidth: positionCounts.TE > 0 ? '2px' : '0',
                   }}
                 />
               </>
             ) : (
-              <div style={{ width: '100%', backgroundColor: '#374151' }} />
+              <div className={cn(styles.positionSegment, styles.positionSegmentEmpty)} style={{ width: '100%' }} />
             )}
           </div>
         </div>
 
         {/* Position Counts */}
-        <div style={{ display: 'flex', gap: '16px', paddingLeft: '16px' }}>
-          <span style={{ color: '#F472B6', fontSize: '13px', fontWeight: 600 }}>{positionCounts.QB}</span>
-          <span style={{ color: '#0fba80', fontSize: '13px', fontWeight: 600 }}>{positionCounts.RB}</span>
-          <span style={{ color: '#FBBF25', fontSize: '13px', fontWeight: 600 }}>{positionCounts.WR}</span>
-          <span style={{ color: '#7C3AED', fontSize: '13px', fontWeight: 600 }}>{positionCounts.TE}</span>
+        <div className={styles.positionCountsWrapper}>
+          <span className={cn(styles.positionCount, styles.positionCountQB)}>{positionCounts.QB}</span>
+          <span className={cn(styles.positionCount, styles.positionCountRB)}>{positionCounts.RB}</span>
+          <span className={cn(styles.positionCount, styles.positionCountWR)}>{positionCounts.WR}</span>
+          <span className={cn(styles.positionCount, styles.positionCountTE)}>{positionCounts.TE}</span>
         </div>
       </div>
       
       {/* Player Roster */}
-      <div
-        className="flex-1 min-h-0 overflow-y-auto"
-        style={{
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-          backgroundColor: '#101927',
-          padding: '12px 14px',
-        }}
-      >
+      <div className={styles.playerRosterSection}>
         {groupedPlayers.map(([position, players], groupIndex) => {
           return (
             <React.Fragment key={position}>
               {/* Spacing between position groups */}
-              {groupIndex > 0 && <div style={{ height: '12px' }} />}
-              
+              {groupIndex > 0 && <div className={styles.positionGroupSpacing} />}
+
               {/* Position group container */}
-              <div
-                style={{
-                  backgroundColor: 'rgba(255,255,255,0.015)',
-                  borderRadius: '8px',
-                  overflow: 'hidden',
-                }}
-              >
+              <div className={styles.positionGroup}>
                 {/* Players in this position group */}
                 {players.map((player, index) => {
                   const playerId = `${player.name}-${player.pick}`;
                   const isExpanded = expandedPlayerId === playerId;
                   const isFirstInGroup = index === 0;
                   const isLastInGroup = index === players.length - 1;
-                  
+
                   return (
                     <React.Fragment key={playerId}>
-                      <PlayerRow 
-                        player={player} 
+                      <PlayerRow
+                        player={player}
                         onClick={() => handlePlayerClick(player)}
                         isExpanded={isExpanded}
                         isFirstInGroup={isFirstInGroup}
@@ -1647,13 +1376,7 @@ function TeamDetailsView({ team, onBack, onViewDraftBoard }: TeamDetailsViewProp
                       />
                       {/* Expanded Stats Card */}
                       {isExpanded && (
-                        <div 
-                          style={{ 
-                            padding: '8px 12px 12px',
-                            backgroundColor: 'rgba(0,0,0,0.2)',
-                            borderRadius: isLastInGroup ? '0 0 6px 6px' : '0',
-                          }}
-                        >
+                        <div className={cn(styles.playerStatsContainer, isLastInGroup && styles.playerStatsContainerLastInGroup)}>
                           <PlayerStatsCard
                             player={{
                               name: player.name,
@@ -1675,9 +1398,9 @@ function TeamDetailsView({ team, onBack, onViewDraftBoard }: TeamDetailsViewProp
             </React.Fragment>
           );
         })}
-        
+
         {/* Bottom padding for safe area */}
-        <div style={{ height: '24px' }} />
+        <div className={styles.playerRosterPadding} />
       </div>
       
       {/* Share Options Modal */}

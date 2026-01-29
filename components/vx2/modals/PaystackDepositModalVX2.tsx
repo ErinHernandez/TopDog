@@ -18,6 +18,8 @@
  */
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { cn } from '@/lib/styles';
+import styles from './PaystackDepositModalVX2.module.css';
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../core/constants/colors';
 import { SPACING, RADIUS, TYPOGRAPHY, Z_INDEX } from '../core/constants/sizes';
 import { Close, ChevronLeft, ChevronRight } from '../components/icons';
@@ -223,7 +225,7 @@ function AmountStep({
   const showFXWarning = currency !== localCurrency;
   
   return (
-    <div className="space-y-6">
+    <div className={styles.amountContainer}>
       {/* Currency Selector - shows ALL currencies */}
       <CurrencySelector
         selectedCurrency={currency}
@@ -231,7 +233,7 @@ function AmountStep({
         onSelect={onCurrencyChange}
         label="Deposit Currency"
       />
-      
+
       {/* FX Warning Banner - when currency differs from local */}
       {showFXWarning && (
         <FXWarningBanner
@@ -240,49 +242,31 @@ function AmountStep({
           dismissible={true}
         />
       )}
-      
+
       {/* Non-Paystack Currency Notice */}
       {!isPaystackSupported && (
-        <div 
-          className="p-4 rounded-lg"
-          style={{ 
-            backgroundColor: `${STATE_COLORS.info}15`,
-            border: `1px solid ${STATE_COLORS.info}40`,
-          }}
-        >
-          <p style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px`, color: TEXT_COLORS.primary }}>
+        <div className={styles.infoBanner}>
+          <p className={styles.infoBannerText}>
             {stripeCurrencyConfig.name} ({currency}) will be processed via card payment.
           </p>
-          <p 
-            className="mt-2"
-            style={{ fontSize: `${TYPOGRAPHY.fontSize.xs}px`, color: TEXT_COLORS.secondary }}
-          >
+          <p className={styles.infoBannerSubtext}>
             Local payment methods (USSD, Mobile Money, EFT) are only available for NGN, GHS, ZAR, and KES.
           </p>
         </div>
       )}
-      
+
       {/* Currency info notice - only for Paystack currencies when NOT showing FX warning */}
       {isPaystackSupported && !showFXWarning && (
-        <div 
-          className="p-4 rounded-lg"
-          style={{ 
-            backgroundColor: `${STATE_COLORS.active}15`,
-            border: `1px solid ${STATE_COLORS.active}40`,
-          }}
-        >
-          <p style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px`, color: TEXT_COLORS.primary }}>
+        <div className={styles.activeBanner}>
+          <p className={styles.activeBannerText}>
             Your deposit in {stripeCurrencyConfig.name} ({stripeCurrencyConfig.symbol}) will be converted to USD at no extra cost.
           </p>
-          <p 
-            className="mt-2"
-            style={{ fontSize: `${TYPOGRAPHY.fontSize.xs}px`, color: TEXT_COLORS.secondary }}
-          >
+          <p className={styles.activeBannerSubtext}>
             Your account balance is kept in USD for tournament entries.
           </p>
         </div>
       )}
-      
+
       {/* Amount Stepper with $25 increments */}
       <AmountStepper
         amountUSD={amountUSD}
@@ -294,16 +278,11 @@ function AmountStep({
         minUSD={25}
         maxUSD={10000}
       />
-      
+
       <button
         onClick={onContinue}
         disabled={!isValid}
-        className="w-full py-3 rounded-lg font-semibold transition-all"
-        style={{
-          backgroundColor: isValid ? STATE_COLORS.active : BG_COLORS.tertiary,
-          color: isValid ? '#000' : TEXT_COLORS.muted,
-          opacity: isValid ? 1 : 0.5,
-        }}
+        className={cn(styles.continueButton, !isValid && styles.opacity50)}
       >
         Continue with ${amountUSD}
       </button>
@@ -340,71 +319,49 @@ function MethodStep({
   }, [country, isPaystackSupported]);
   
   return (
-    <div className="space-y-6">
+    <div className={styles.methodSection}>
       <div>
-        <h3 
-          className="font-semibold mb-4"
-          style={{ fontSize: `${TYPOGRAPHY.fontSize.lg}px`, color: TEXT_COLORS.primary }}
-        >
+        <h3 className={cn(styles.methodHeader, styles.mb4)}>
           Payment Method
         </h3>
-        
+
         {/* Notice for non-Paystack currencies */}
         {!isPaystackSupported && (
-          <div 
-            className="p-3 rounded-lg mb-4"
-            style={{ 
-              backgroundColor: `${STATE_COLORS.info}15`,
-              border: `1px solid ${STATE_COLORS.info}40`,
-            }}
-          >
-            <p style={{ fontSize: `${TYPOGRAPHY.fontSize.xs}px`, color: TEXT_COLORS.secondary }}>
+          <div className={styles.methodNotice}>
+            <p className={styles.methodNoticeText}>
               Card payment is the only option for this currency. Local payment methods are available for NGN, GHS, ZAR, and KES.
             </p>
           </div>
         )}
-        
-        <div className="space-y-3">
+
+        <div className={styles.methodList}>
           {availableMethods.map(method => (
             <button
               key={method.id}
               onClick={() => onSelectMethod(method.id)}
-              className="w-full flex items-center gap-4 p-4 rounded-lg transition-all"
-              style={{
-                backgroundColor: selectedMethod === method.id 
-                  ? `${STATE_COLORS.active}20` 
-                  : BG_COLORS.tertiary,
-                border: `1px solid ${selectedMethod === method.id 
-                  ? STATE_COLORS.active 
-                  : BORDER_COLORS.default}`,
-              }}
+              className={cn(
+                styles.methodButton,
+                selectedMethod === method.id && styles.methodButtonSelected
+              )}
             >
-              <div 
-                className="w-10 h-10 rounded-full flex items-center justify-center"
-                style={{ 
-                  backgroundColor: selectedMethod === method.id 
-                    ? STATE_COLORS.active 
-                    : `${STATE_COLORS.active}30`,
-                  color: selectedMethod === method.id 
-                    ? '#000' 
-                    : STATE_COLORS.active,
-                }}
+              <div
+                className={cn(
+                  styles.methodIcon,
+                  selectedMethod === method.id && styles.methodIconSelected
+                )}
               >
                 {method.icon}
               </div>
-              <div className="flex-1 text-left">
-                <p className="font-medium" style={{ color: TEXT_COLORS.primary }}>
+              <div className={styles.methodContent}>
+                <p className={cn(styles.methodName, styles.fontMedium)}>
                   {method.name}
                 </p>
-                <p style={{ fontSize: `${TYPOGRAPHY.fontSize.xs}px`, color: TEXT_COLORS.muted }}>
+                <p className={styles.methodDescription}>
                   {method.description}
                 </p>
               </div>
               {selectedMethod === method.id && (
-                <div 
-                  className="w-6 h-6 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: STATE_COLORS.active }}
-                >
+                <div className={styles.checkmarkIcon}>
                   <CheckIcon />
                 </div>
               )}
@@ -412,28 +369,22 @@ function MethodStep({
           ))}
         </div>
       </div>
-      
-      <div className="flex gap-3">
+
+      <div className={styles.actionButtons}>
         <button
           onClick={onBack}
-          className="flex-1 py-3 rounded-lg font-medium"
-          style={{
-            backgroundColor: BG_COLORS.tertiary,
-            color: TEXT_COLORS.primary,
-            border: `1px solid ${BORDER_COLORS.default}`,
-          }}
+          className={styles.actionButton}
         >
           Back
         </button>
         <button
           onClick={onContinue}
           disabled={!selectedMethod}
-          className="flex-1 py-3 rounded-lg font-semibold transition-all"
-          style={{
-            backgroundColor: selectedMethod ? STATE_COLORS.active : BG_COLORS.tertiary,
-            color: selectedMethod ? '#000' : TEXT_COLORS.muted,
-            opacity: selectedMethod ? 1 : 0.5,
-          }}
+          className={cn(
+            styles.actionButton,
+            selectedMethod && styles.primaryActionButton,
+            !selectedMethod && styles.opacity50
+          )}
         >
           Continue
         </button>
@@ -474,97 +425,76 @@ function UssdStep({
   };
   
   return (
-    <div className="space-y-6 text-center">
-      <div 
-        className="w-16 h-16 rounded-full mx-auto flex items-center justify-center"
-        style={{ backgroundColor: `${STATE_COLORS.active}20` }}
-      >
+    <div className={styles.ussdContainer}>
+      <div className={styles.iconCircle}>
         <PhoneIcon />
       </div>
-      
+
       <div>
-        <h3 
-          className="font-semibold mb-2"
-          style={{ fontSize: `${TYPOGRAPHY.fontSize.xl}px`, color: TEXT_COLORS.primary }}
-        >
+        <h3 className={cn(styles.sectionTitle, styles.mb2)}>
           Dial USSD Code
         </h3>
-        <p style={{ color: TEXT_COLORS.secondary }}>
+        <p className={styles.sectionSubtitle}>
           Dial the code below on your phone to complete payment
         </p>
       </div>
-      
-      <div 
-        className="p-4 rounded-lg"
-        style={{ backgroundColor: BG_COLORS.tertiary }}
-      >
-        <p style={{ fontSize: `${TYPOGRAPHY.fontSize.xs}px`, color: TEXT_COLORS.muted, marginBottom: '8px' }}>
+
+      <div className={styles.ussdCodeBox}>
+        <p className={styles.ussdCodeLabel}>
           {bankName}
         </p>
-        <div className="flex items-center justify-center gap-3">
-          <code 
-            className="text-2xl font-mono font-bold"
-            style={{ color: STATE_COLORS.active }}
-          >
+        <div className={styles.ussdCodeDisplay}>
+          <code className={styles.ussdCodeText}>
             {ussdCode}
           </code>
           <button
             onClick={handleCopy}
-            className="p-2 rounded-lg hover:bg-white/10 transition-colors"
-            style={{ color: copied ? STATE_COLORS.success : TEXT_COLORS.muted }}
+            className={cn(
+              styles.copyButton,
+              copied && styles.copyButtonCopied
+            )}
           >
             {copied ? <CheckIcon /> : <CopyIcon />}
           </button>
         </div>
-        <p 
-          className="mt-2"
-          style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px`, color: TEXT_COLORS.secondary }}
-        >
+        <p className={styles.ussdAmount}>
           Amount: {formatPaystackAmount(amount, currency)}
         </p>
       </div>
-      
-      <div 
-        className="p-4 rounded-lg text-left"
-        style={{ backgroundColor: `${STATE_COLORS.warning}15`, border: `1px solid ${STATE_COLORS.warning}40` }}
-      >
-        <p className="font-medium" style={{ color: STATE_COLORS.warning, marginBottom: '8px' }}>
+
+      <div className={styles.warningBanner}>
+        <p className={styles.warningBannerTitle}>
           Instructions
         </p>
-        <ol className="list-decimal list-inside space-y-1" style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
-          <li>Dial the USSD code on your phone</li>
-          <li>Follow the prompts</li>
-          <li>Enter your PIN to confirm</li>
-          <li>Return here and check status</li>
+        <ol className={styles.warningBannerList}>
+          <li className={styles.warningBannerListItem}>Dial the USSD code on your phone</li>
+          <li className={styles.warningBannerListItem}>Follow the prompts</li>
+          <li className={styles.warningBannerListItem}>Enter your PIN to confirm</li>
+          <li className={styles.warningBannerListItem}>Return here and check status</li>
         </ol>
       </div>
-      
-      <div className="flex gap-3">
+
+      <div className={styles.actionButtons}>
         <button
           onClick={onBack}
-          className="flex-1 py-3 rounded-lg font-medium"
-          style={{
-            backgroundColor: BG_COLORS.tertiary,
-            color: TEXT_COLORS.primary,
-            border: `1px solid ${BORDER_COLORS.default}`,
-          }}
+          className={styles.actionButton}
         >
           Cancel
         </button>
         <button
           onClick={onCheckStatus}
           disabled={isChecking}
-          className="flex-1 py-3 rounded-lg font-semibold flex items-center justify-center gap-2"
-          style={{
-            backgroundColor: STATE_COLORS.active,
-            color: '#000',
-          }}
+          className={cn(
+            styles.actionButton,
+            styles.primaryActionButton,
+            isChecking && styles.opacity50
+          )}
         >
           {isChecking ? (
-            <>
-              <span className="animate-spin w-4 h-4 border-2 border-black/30 border-t-black rounded-full" />
+            <span className={styles.spinnerContainer}>
+              <span className={styles.miniSpinner} />
               Checking...
-            </>
+            </span>
           ) : (
             'Check Status'
           )}
@@ -605,49 +535,35 @@ function MobileMoneyStep({
   const isValid = provider && phoneNumber.length >= 10;
   
   return (
-    <div className="space-y-6">
+    <div className={styles.mobileMoneyContainer}>
       {displayText ? (
         // Waiting for push notification
-        <div className="text-center space-y-4">
-          <div 
-            className="w-16 h-16 rounded-full mx-auto flex items-center justify-center animate-pulse"
-            style={{ backgroundColor: `${STATE_COLORS.active}20` }}
-          >
+        <div className={styles.mobileMoneyWaiting}>
+          <div className={styles.loadingIcon}>
             <MobileIcon />
           </div>
-          
+
           <div>
-            <h3 
-              className="font-semibold mb-2"
-              style={{ fontSize: `${TYPOGRAPHY.fontSize.lg}px`, color: TEXT_COLORS.primary }}
-            >
+            <h3 className={cn(styles.mobileMoneyTitle, styles.mb2)}>
               Approve on Your Phone
             </h3>
-            <p style={{ color: TEXT_COLORS.secondary }}>
+            <p className={styles.mobileMoneySubtitle}>
               {displayText}
             </p>
           </div>
-          
-          <div 
-            className="p-4 rounded-lg"
-            style={{ backgroundColor: BG_COLORS.tertiary }}
-          >
-            <p style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px`, color: TEXT_COLORS.muted }}>
+
+          <div className={styles.mobileMoneyInfo}>
+            <p className={styles.mobileMoneyInfoText}>
               Amount: {formatPaystackAmount(amount, currency)}
             </p>
-            <p className="mt-1" style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px`, color: TEXT_COLORS.muted }}>
+            <p className={styles.mobileMoneyPhoneText}>
               Phone: {phoneNumber}
             </p>
           </div>
-          
+
           <button
             onClick={onBack}
-            className="w-full py-3 rounded-lg font-medium"
-            style={{
-              backgroundColor: BG_COLORS.tertiary,
-              color: TEXT_COLORS.primary,
-              border: `1px solid ${BORDER_COLORS.default}`,
-            }}
+            className={styles.actionButton}
           >
             Cancel
           </button>
@@ -655,111 +571,79 @@ function MobileMoneyStep({
       ) : (
         // Select provider and enter phone
         <>
-          <div>
-            <h3 
-              className="font-semibold mb-4"
-              style={{ fontSize: `${TYPOGRAPHY.fontSize.lg}px`, color: TEXT_COLORS.primary }}
-            >
-              Mobile Money
-            </h3>
-            
-            {/* Provider selection */}
-            <p 
-              className="mb-2"
-              style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px`, color: TEXT_COLORS.secondary }}
-            >
-              Select provider
-            </p>
-            <div className="grid grid-cols-2 gap-2 mb-4">
-              {availableProviders.map(p => (
-                <button
-                  key={p.id}
-                  onClick={() => onSelectProvider(p)}
-                  className="py-3 px-4 rounded-lg font-medium transition-all"
-                  style={{
-                    backgroundColor: provider?.id === p.id 
-                      ? STATE_COLORS.active 
-                      : BG_COLORS.tertiary,
-                    color: provider?.id === p.id 
-                      ? '#000' 
-                      : TEXT_COLORS.primary,
-                    border: `1px solid ${provider?.id === p.id 
-                      ? STATE_COLORS.active 
-                      : BORDER_COLORS.default}`,
-                  }}
-                >
-                  {p.name}
-                </button>
-              ))}
+          <div className={styles.mobileMoneySelectForm}>
+            <div>
+              <h3 className={cn(styles.mobileMoneyTitle, styles.mb4)}>
+                Mobile Money
+              </h3>
+
+              {/* Provider selection */}
+              <p className={styles.providerLabel}>
+                Select provider
+              </p>
+              <div className={styles.providerGrid}>
+                {availableProviders.map(p => (
+                  <button
+                    key={p.id}
+                    onClick={() => onSelectProvider(p)}
+                    className={cn(
+                      styles.providerButton,
+                      provider?.id === p.id && styles.providerButtonSelected
+                    )}
+                  >
+                    {p.name}
+                  </button>
+                ))}
+              </div>
+
+              {/* Phone number */}
+              <p className={styles.phoneInputLabel}>
+                Phone number
+              </p>
+              <input
+                type="tel"
+                value={phoneNumber}
+                onChange={(e) => onPhoneChange(e.target.value)}
+                placeholder={country === 'KE' ? '0712345678' : '0241234567'}
+                className={styles.phoneInput}
+              />
+              <p className={styles.phoneInputHelper}>
+                Enter the phone number linked to your {provider?.name || 'mobile money'} account
+              </p>
             </div>
-            
-            {/* Phone number */}
-            <p 
-              className="mb-2"
-              style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px`, color: TEXT_COLORS.secondary }}
-            >
-              Phone number
-            </p>
-            <input
-              type="tel"
-              value={phoneNumber}
-              onChange={(e) => onPhoneChange(e.target.value)}
-              placeholder={country === 'KE' ? '0712345678' : '0241234567'}
-              className="w-full py-3 px-4 rounded-lg"
-              style={{
-                backgroundColor: BG_COLORS.tertiary,
-                color: TEXT_COLORS.primary,
-                border: `1px solid ${BORDER_COLORS.default}`,
-              }}
-            />
-            <p 
-              className="mt-2"
-              style={{ fontSize: `${TYPOGRAPHY.fontSize.xs}px`, color: TEXT_COLORS.muted }}
-            >
-              Enter the phone number linked to your {provider?.name || 'mobile money'} account
-            </p>
-          </div>
-          
-          <div 
-            className="p-4 rounded-lg"
-            style={{ backgroundColor: `${STATE_COLORS.active}15`, border: `1px solid ${STATE_COLORS.active}40` }}
-          >
-            <p style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px`, color: TEXT_COLORS.primary }}>
-              A push notification will be sent to your phone. Approve it with your PIN to complete the payment.
-            </p>
-          </div>
-          
-          <div className="flex gap-3">
-            <button
-              onClick={onBack}
-              className="flex-1 py-3 rounded-lg font-medium"
-              style={{
-                backgroundColor: BG_COLORS.tertiary,
-                color: TEXT_COLORS.primary,
-                border: `1px solid ${BORDER_COLORS.default}`,
-              }}
-            >
-              Back
-            </button>
-            <button
-              onClick={onSubmit}
-              disabled={!isValid || isProcessing}
-              className="flex-1 py-3 rounded-lg font-semibold flex items-center justify-center gap-2"
-              style={{
-                backgroundColor: isValid && !isProcessing ? STATE_COLORS.active : BG_COLORS.tertiary,
-                color: isValid && !isProcessing ? '#000' : TEXT_COLORS.muted,
-                opacity: isValid && !isProcessing ? 1 : 0.5,
-              }}
-            >
-              {isProcessing ? (
-                <>
-                  <span className="animate-spin w-4 h-4 border-2 border-black/30 border-t-black rounded-full" />
-                  Sending...
-                </>
-              ) : (
-                `Pay ${formatPaystackAmount(amount, currency)}`
-              )}
-            </button>
+
+            <div className={styles.instructionBanner}>
+              <p className={styles.instructionBannerText}>
+                A push notification will be sent to your phone. Approve it with your PIN to complete the payment.
+              </p>
+            </div>
+
+            <div className={styles.actionButtons}>
+              <button
+                onClick={onBack}
+                className={styles.actionButton}
+              >
+                Back
+              </button>
+              <button
+                onClick={onSubmit}
+                disabled={!isValid || isProcessing}
+                className={cn(
+                  styles.actionButton,
+                  isValid && !isProcessing && styles.primaryActionButton,
+                  (!isValid || isProcessing) && styles.opacity50
+                )}
+              >
+                {isProcessing ? (
+                  <span className={styles.spinnerContainer}>
+                    <span className={styles.miniSpinner} />
+                    Sending...
+                  </span>
+                ) : (
+                  `Pay ${formatPaystackAmount(amount, currency)}`
+                )}
+              </button>
+            </div>
           </div>
         </>
       )}
@@ -785,70 +669,56 @@ function ResultStep({
   onClose,
 }: ResultStepProps): React.ReactElement {
   return (
-    <div className="text-center space-y-6 py-8">
-      <div 
-        className="w-16 h-16 rounded-full mx-auto flex items-center justify-center"
-        style={{ 
-          backgroundColor: success ? `${STATE_COLORS.success}20` : `${STATE_COLORS.error}20` 
-        }}
-      >
+    <div className={styles.resultContainer}>
+      <div className={cn(
+        styles.iconCircle,
+        success ? styles.iconCircleSuccess : styles.iconCircleError
+      )}>
         {success ? (
-          <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke={STATE_COLORS.success}>
+          <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         ) : (
-          <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke={STATE_COLORS.error}>
+          <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         )}
       </div>
-      
+
       <div>
-        <h3 
-          className="font-semibold mb-2"
-          style={{ 
-            fontSize: `${TYPOGRAPHY.fontSize.xl}px`, 
-            color: success ? STATE_COLORS.success : STATE_COLORS.error 
-          }}
-        >
+        <h3 className={cn(
+          styles.sectionTitle,
+          styles.mb2,
+          success ? styles.resultTitleSuccess : styles.resultTitleError
+        )}>
           {success ? 'Deposit Successful!' : 'Deposit Failed'}
         </h3>
-        
+
         {success && amount && (
           <>
-            <p style={{ color: TEXT_COLORS.secondary }}>
+            <p className={styles.resultMessage}>
               {formatPaystackAmount(amount, currency)} has been added to your balance
             </p>
-            <p 
-              className="mt-1"
-              style={{ fontSize: `${TYPOGRAPHY.fontSize.xs}px`, color: TEXT_COLORS.muted }}
-            >
+            <p className={styles.resultDetails}>
               Converted to USD at no extra cost
             </p>
           </>
         )}
-        
+
         {!success && errorMessage && (
-          <p style={{ color: TEXT_COLORS.secondary }}>{errorMessage}</p>
+          <p className={styles.resultMessage}>{errorMessage}</p>
         )}
-        
+
         {success && transactionId && (
-          <p 
-            className="mt-2"
-            style={{ fontSize: `${TYPOGRAPHY.fontSize.xs}px`, color: TEXT_COLORS.muted }}
-          >
+          <p className={styles.resultDetails}>
             Transaction ID: {transactionId}
           </p>
         )}
       </div>
-      
+
       <button
         onClick={onClose}
-        className="w-full py-3 rounded-lg font-semibold"
-        style={{
-          backgroundColor: STATE_COLORS.active,
-          color: '#000',
-        }}
+        className={cn(styles.continueButton)}
       >
         {success ? 'Done' : 'Try Again'}
       </button>
@@ -876,66 +746,52 @@ function UssdBankSelector({
   isLoading,
 }: UssdBankSelectorProps): React.ReactElement {
   return (
-    <div className="space-y-6">
+    <div className={styles.bankSelectorContainer}>
       <div>
-        <h3 
-          className="font-semibold mb-4"
-          style={{ fontSize: `${TYPOGRAPHY.fontSize.lg}px`, color: TEXT_COLORS.primary }}
-        >
+        <h3 className={cn(styles.bankHeader, styles.mb4)}>
           Select Your Bank
         </h3>
-        
-        <div className="space-y-2 max-h-64 overflow-y-auto">
+
+        <div className={styles.bankList}>
           {NIGERIAN_USSD_BANKS.map(bank => (
             <button
               key={bank.code}
               onClick={() => onSelectBank(bank)}
-              className="w-full flex items-center justify-between p-3 rounded-lg transition-all"
-              style={{
-                backgroundColor: selectedBank?.code === bank.code 
-                  ? `${STATE_COLORS.active}20` 
-                  : BG_COLORS.tertiary,
-                border: `1px solid ${selectedBank?.code === bank.code 
-                  ? STATE_COLORS.active 
-                  : BORDER_COLORS.default}`,
-              }}
+              className={cn(
+                styles.bankButton,
+                selectedBank?.code === bank.code && styles.bankButtonSelected
+              )}
             >
-              <span style={{ color: TEXT_COLORS.primary }}>{bank.name}</span>
-              <span style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+              <span className={styles.bankName}>{bank.name}</span>
+              <span className={styles.bankCode}>
                 *{bank.ussdType}#
               </span>
             </button>
           ))}
         </div>
       </div>
-      
-      <div className="flex gap-3">
+
+      <div className={styles.actionButtons}>
         <button
           onClick={onBack}
-          className="flex-1 py-3 rounded-lg font-medium"
-          style={{
-            backgroundColor: BG_COLORS.tertiary,
-            color: TEXT_COLORS.primary,
-            border: `1px solid ${BORDER_COLORS.default}`,
-          }}
+          className={styles.actionButton}
         >
           Back
         </button>
         <button
           onClick={onContinue}
           disabled={!selectedBank || isLoading}
-          className="flex-1 py-3 rounded-lg font-semibold flex items-center justify-center gap-2"
-          style={{
-            backgroundColor: selectedBank && !isLoading ? STATE_COLORS.active : BG_COLORS.tertiary,
-            color: selectedBank && !isLoading ? '#000' : TEXT_COLORS.muted,
-            opacity: selectedBank && !isLoading ? 1 : 0.5,
-          }}
+          className={cn(
+            styles.actionButton,
+            selectedBank && !isLoading && styles.primaryActionButton,
+            (!selectedBank || isLoading) && styles.opacity50
+          )}
         >
           {isLoading ? (
-            <>
-              <span className="animate-spin w-4 h-4 border-2 border-black/30 border-t-black rounded-full" />
+            <span className={styles.spinnerContainer}>
+              <span className={styles.miniSpinner} />
               Loading...
-            </>
+            </span>
           ) : (
             'Continue'
           )}
@@ -1316,74 +1172,53 @@ export function PaystackDepositModalVX2({
   }, [selectedMethod, initializeCardPayment, setStep, setShowBankSelector]);
   
   if (!isOpen) return null;
-  
+
   return (
-    <div 
-      className="fixed inset-0 flex items-center justify-center p-4"
-      style={{ zIndex: Z_INDEX.modal }}
-    >
+    <div className={styles.modal}>
       {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/60"
+      <div
+        className={styles.backdrop}
         onClick={onClose}
       />
-      
+
       {/* Modal */}
-      <div 
-        className="relative w-full max-w-md rounded-xl overflow-hidden max-h-[90vh] overflow-y-auto"
-        style={{ backgroundColor: BG_COLORS.secondary }}
-      >
+      <div className={styles.modalContainer}>
         {/* Header */}
-        <div 
-          className="flex items-center justify-between p-4 border-b sticky top-0"
-          style={{ 
-            borderColor: BORDER_COLORS.default,
-            backgroundColor: BG_COLORS.secondary,
-          }}
-        >
-          <div className="flex items-center gap-3">
+        <div className={styles.header}>
+          <div className={styles.headerLeft}>
             {step !== 'amount' && step !== 'success' && step !== 'error' && !showBankSelector && (
               <button
                 onClick={() => {
                   if (step === 'method') setStep('amount');
                   else if (step === 'ussd' || step === 'mobile_money') setStep('method');
                 }}
-                className="p-1 rounded hover:bg-white/10"
+                className={styles.backButton}
               >
-                <span style={{ color: TEXT_COLORS.primary, display: 'inline-block' }}>
-                  <ChevronLeft className="w-5 h-5" />
-                </span>
+                <ChevronLeft className="w-5 h-5" />
               </button>
             )}
             {showBankSelector && (
               <button
                 onClick={() => setShowBankSelector(false)}
-                className="p-1 rounded hover:bg-white/10"
+                className={styles.backButton}
               >
-                <span style={{ color: TEXT_COLORS.primary, display: 'inline-block' }}>
-                  <ChevronLeft className="w-5 h-5" />
-                </span>
+                <ChevronLeft className="w-5 h-5" />
               </button>
             )}
-            <h2 
-              className="font-semibold"
-              style={{ fontSize: `${TYPOGRAPHY.fontSize.lg}px`, color: TEXT_COLORS.primary }}
-            >
+            <h2 className={styles.headerTitle}>
               Deposit Funds
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-full hover:bg-white/10"
+            className={styles.closeButton}
           >
-            <span style={{ color: TEXT_COLORS.muted, display: 'inline-block' }}>
-              <Close className="w-5 h-5" />
-            </span>
+            <Close className="w-5 h-5" />
           </button>
         </div>
-        
+
         {/* Content */}
-        <div className="p-6">
+        <div className={styles.content}>
           {step === 'amount' && (
             <AmountStep
               amountUSD={amountUSD}
@@ -1421,9 +1256,9 @@ export function PaystackDepositModalVX2({
           )}
           
           {step === 'processing' && (
-            <div className="text-center py-12">
-              <div className="animate-spin w-12 h-12 border-4 border-white/20 border-t-white rounded-full mx-auto mb-4" />
-              <p style={{ color: TEXT_COLORS.primary }}>Preparing payment...</p>
+            <div className={styles.processingContainer}>
+              <div className={styles.spinner} />
+              <p className={styles.processingText}>Preparing payment...</p>
             </div>
           )}
           

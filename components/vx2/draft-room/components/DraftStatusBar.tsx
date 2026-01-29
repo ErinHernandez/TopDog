@@ -10,41 +10,13 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
+import { cn } from '@/lib/styles';
 import { TILED_BG_STYLE } from '../constants';
 import { DRAFT_TIMER } from '../../core/constants/timing';
 import { createScopedLogger } from '../../../../lib/clientLogger';
+import styles from './DraftStatusBar.module.css';
 
 const logger = createScopedLogger('[DraftStatusBar]');
-
-// ============================================================================
-// SHAKE ANIMATION KEYFRAMES
-// ============================================================================
-
-const SHAKE_KEYFRAMES = `
-@keyframes header-shake {
-  0%, 100% { transform: translateX(0) rotate(0deg); }
-  10% { transform: translateX(-4px) rotate(-2deg); }
-  20% { transform: translateX(4px) rotate(2deg); }
-  30% { transform: translateX(-4px) rotate(-2deg); }
-  40% { transform: translateX(4px) rotate(2deg); }
-  50% { transform: translateX(-4px) rotate(-2deg); }
-  60% { transform: translateX(4px) rotate(2deg); }
-  70% { transform: translateX(-4px) rotate(-2deg); }
-  80% { transform: translateX(4px) rotate(2deg); }
-  90% { transform: translateX(-2px) rotate(-1deg); }
-}
-`;
-
-// Inject keyframes into document head (only once)
-if (typeof document !== 'undefined') {
-  const styleId = 'header-shake-keyframes';
-  if (!document.getElementById(styleId)) {
-    const style = document.createElement('style');
-    style.id = styleId;
-    style.textContent = SHAKE_KEYFRAMES;
-    document.head.appendChild(style);
-  }
-}
 
 // ============================================================================
 // CONSTANTS
@@ -114,28 +86,33 @@ const DraftStatusBar = React.memo(function DraftStatusBar({
     return undefined;
   }, [timerSeconds, isUserTurn]);
 
-  // Background logic
-  const getBackgroundStyle = (): React.CSSProperties => {
+  // Background styles as CSS custom properties
+  const getContainerStyles = (): React.CSSProperties => {
+    const baseStyles: React.CSSProperties = {
+      '--header-height': `${HEADER_HEIGHT}px`,
+    } as any;
+
     // Pre-draft countdown - use same color as PicksBar (only when countdown is active)
     if (draftStatus === 'waiting' && preDraftCountdown != null && preDraftCountdown > 0) {
-      return { backgroundColor: '#101927' }; // Match PicksBar background color
+      return { ...baseStyles, '--bg-color': '#101927' } as any;
     }
     if (!isUserTurn) {
-      return { backgroundColor: '#101927' }; // Match PicksBar background - not your turn
+      return { ...baseStyles, '--bg-color': '#101927' } as any;
     }
     if (timerSeconds <= 9) {
-      return { backgroundColor: '#DC2626' }; // Red-600 - urgent
+      return { ...baseStyles, '--bg-color': '#DC2626' } as any; // Red-600 - urgent
     }
     return {
-      backgroundImage: TILED_BG_STYLE.backgroundImage,
-      backgroundRepeat: TILED_BG_STYLE.backgroundRepeat,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center center',
-      backgroundColor: TILED_BG_STYLE.backgroundColor,
-    };
+      ...baseStyles,
+      '--bg-image': TILED_BG_STYLE.backgroundImage,
+      '--bg-repeat': TILED_BG_STYLE.backgroundRepeat,
+      '--bg-size': 'cover',
+      '--bg-position': 'center center',
+      '--bg-color': TILED_BG_STYLE.backgroundColor,
+    } as any;
   };
 
-  const backgroundStyle = getBackgroundStyle();
+  const containerStyles = getContainerStyles();
 
   // Handle click anywhere in safe area to leave draft
   const handleSafeAreaClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -152,48 +129,22 @@ const DraftStatusBar = React.memo(function DraftStatusBar({
     <div
       key={shakeKey}
       onClick={onLeave ? handleSafeAreaClick : undefined}
-      style={{
-        position: 'relative',
-        height: `${HEADER_HEIGHT}px`,
-        ...backgroundStyle,
-        paddingTop: '28px', // Space for Dynamic Island (8px top + 20px height)
-        paddingBottom: '2px', // Padding below safe area
-        zIndex: 60,
-        flexShrink: 0,
-        transition: 'background-color 0.15s ease',
-        animation: shouldShake ? 'header-shake 0.6s ease-in-out' : 'none',
-        transformOrigin: 'center center',
-        cursor: onLeave ? 'pointer' : 'default',
-        WebkitTapHighlightColor: 'transparent',
-      }}
+      className={cn(
+        styles.container,
+        onLeave && styles.clickable,
+        !onLeave && styles.notClickable,
+        shouldShake && styles.shaking,
+      )}
+      style={containerStyles}
       role="banner"
       aria-label={onLeave ? "Draft header - tap anywhere to leave draft" : "Draft header"}
     >
       {/* Centered Timer - large and prominent (hidden when shown in pick card) */}
       {/* Positioned below Dynamic Island */}
       {!hideTimer && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '28px', // Below Dynamic Island (8px top + 20px height)
-            left: 0,
-            right: 0,
-            bottom: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            pointerEvents: 'none', // Allow clicks through to parent container
-            zIndex: 1,
-          }}
-        >
+        <div className={styles.timerContainer}>
           <div
-            style={{
-              fontSize: '24px',
-              fontWeight: 700,
-              fontVariantNumeric: 'tabular-nums',
-              color: '#FFFFFF',
-              pointerEvents: 'none',
-            }}
+            className={styles.timerValue}
             aria-label={
               draftStatus === 'waiting' && preDraftCountdown != null && preDraftCountdown > 0
                 ? `Draft starts in ${preDraftCountdown} seconds`

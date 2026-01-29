@@ -21,15 +21,17 @@
  */
 
 import React, { useCallback, useState, useMemo } from 'react';
+import { cn } from '@/lib/styles';
+import styles from './LiveDraftsTabVX2.module.css';
 import { useLiveDrafts, type LiveDraft } from '../../hooks/data';
 import { BG_COLORS, TEXT_COLORS, STATE_COLORS, POSITION_COLORS } from '../../core/constants/colors';
 import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
 import { TILED_BG_STYLE } from '../../draft-room/constants';
-import { 
-  ProgressBar, 
-  StatusBadge, 
-  Skeleton, 
-  EmptyState, 
+import {
+  ProgressBar,
+  StatusBadge,
+  Skeleton,
+  EmptyState,
   ErrorState,
 } from '../../../ui';
 import { List } from '../../components/icons';
@@ -74,37 +76,26 @@ interface TabSwitcherProps {
 
 function TabSwitcher({ selected, onSelect }: TabSwitcherProps): React.ReactElement {
   return (
-    <div
-      className="flex rounded-lg overflow-hidden"
-      style={{
-        backgroundColor: 'rgba(255,255,255,0.06)',
-        padding: '3px',
-        gap: '3px',
-      }}
-    >
+    <div className={styles.tabSwitcher}>
       <button
         onClick={() => onSelect('live')}
-        className="flex-1 py-2.5 px-3 font-semibold transition-all"
+        className={cn(styles.tabButton, selected === 'live' && styles.tabButtonActive)}
         style={{
-          fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-          backgroundColor: selected === 'live' ? 'rgba(255,255,255,0.12)' : 'transparent',
-          color: selected === 'live' ? TEXT_COLORS.primary : TEXT_COLORS.muted,
-          borderRadius: `${RADIUS.md}px`,
-          letterSpacing: '-0.01em',
-        }}
+          '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
+          '--border-radius-md': `${RADIUS.md}px`,
+          '--tab-text-color': selected === 'live' ? TEXT_COLORS.primary : TEXT_COLORS.muted,
+        } as React.CSSProperties}
       >
         Fast Drafts (30 Sec)
       </button>
       <button
         onClick={() => onSelect('slow')}
-        className="flex-1 py-2.5 px-3 font-semibold transition-all"
+        className={cn(styles.tabButton, selected === 'slow' && styles.tabButtonActive)}
         style={{
-          fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-          backgroundColor: selected === 'slow' ? 'rgba(255,255,255,0.12)' : 'transparent',
-          color: selected === 'slow' ? TEXT_COLORS.primary : TEXT_COLORS.muted,
-          borderRadius: `${RADIUS.md}px`,
-          letterSpacing: '-0.01em',
-        }}
+          '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
+          '--border-radius-md': `${RADIUS.md}px`,
+          '--tab-text-color': selected === 'slow' ? TEXT_COLORS.primary : TEXT_COLORS.muted,
+        } as React.CSSProperties}
       >
         Slow Drafts
       </button>
@@ -121,30 +112,23 @@ interface DraftProgressBarProps {
 
 function DraftProgressBar({ value, totalRounds, currentRound, color }: DraftProgressBarProps): React.ReactElement {
   const clampedValue = Math.max(0, Math.min(100, value));
-  
+
   return (
     <div
-      className="relative"
-      style={{
-        height: '5px',
-        borderRadius: '3px',
-        backgroundColor: 'rgba(255, 255, 255, 0.12)',
-        marginBottom: '18px',
-      }}
+      className={styles.progressBarContainer}
       role="progressbar"
       aria-valuenow={clampedValue}
       aria-valuemin={0}
       aria-valuemax={100}
+      style={{
+        '--progress-color': color,
+        '--progress-color-shadow': `${color}40`,
+        '--progress-percent': `${clampedValue}%`,
+      } as React.CSSProperties}
     >
       {/* Progress fill */}
       <div
-        className="absolute inset-y-0 left-0 transition-all duration-300 ease-out"
-        style={{
-          width: `${clampedValue}%`,
-          backgroundColor: color,
-          borderRadius: '3px',
-          boxShadow: `0 0 4px ${color}40`,
-        }}
+        className={styles.progressBarFill}
       />
       
       {/* Round knobs */}
@@ -153,55 +137,41 @@ function DraftProgressBar({ value, totalRounds, currentRound, color }: DraftProg
         const roundPosition = (roundNumber / totalRounds) * 100;
         const isPastRound = roundNumber < currentRound;
         const isCurrentRound = roundNumber === currentRound;
-        
+
+        const dotSize = isCurrentRound ? '8px' : '6px';
+        const dotBgColor = isCurrentRound
+          ? '#FFFFFF'
+          : isPastRound
+            ? color
+            : 'rgba(255, 255, 255, 0.4)';
+        const dotBorder = isCurrentRound
+          ? `2px solid ${color}`
+          : isPastRound
+            ? `1px solid ${color}`
+            : '1px solid rgba(255, 255, 255, 0.5)';
+        const dotShadow = isCurrentRound ? `0 0 6px ${color}80` : 'none';
+
         return (
           <div
             key={roundNumber}
-            className="absolute"
+            className={styles.roundKnobContainer}
             style={{
-              left: `${roundPosition}%`,
-              top: '50%',
-              transform: 'translateX(-50%) translateY(-50%)',
-              zIndex: 2,
-            }}
+              '--knob-position': `${roundPosition}%`,
+            } as React.CSSProperties}
           >
             {/* Round dot - positioned at progress bar center */}
             <div
+              className={styles.roundDot}
               style={{
-                width: isCurrentRound ? '8px' : '6px',
-                height: isCurrentRound ? '8px' : '6px',
-                borderRadius: '50%',
-                backgroundColor: isCurrentRound 
-                  ? '#FFFFFF' 
-                  : isPastRound 
-                    ? color 
-                    : 'rgba(255, 255, 255, 0.4)',
-                border: isCurrentRound 
-                  ? `2px solid ${color}` 
-                  : isPastRound 
-                    ? `1px solid ${color}` 
-                    : '1px solid rgba(255, 255, 255, 0.5)',
-                boxShadow: isCurrentRound ? `0 0 6px ${color}80` : 'none',
-                transition: 'all 0.2s ease',
-              }}
+                '--dot-size': dotSize,
+                '--dot-bg-color': dotBgColor,
+                '--dot-border': dotBorder,
+                '--dot-shadow': dotShadow,
+              } as React.CSSProperties}
             />
             {/* Round label - only for current round, positioned absolutely below dot */}
             {isCurrentRound && (
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '100%',
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  marginTop: '10px',
-                  fontSize: '11px',
-                  color: 'rgba(255, 255, 255, 0.85)',
-                  fontWeight: 600,
-                  whiteSpace: 'nowrap',
-                  lineHeight: 1,
-                  letterSpacing: '-0.01em',
-                }}
-              >
+              <div className={styles.roundLabel}>
                 Round {roundNumber}
               </div>
             )}
@@ -222,95 +192,73 @@ function DraftCard({ draft, onEnter }: DraftCardProps): React.ReactElement {
   const progress = (draft.pickNumber / draft.totalPicks) * 100;
   const picksAway = calculatePicksAway(draft);
   const isSlowDraft = draft.draftSpeed === 'slow';
-  
+
   return (
     <button
       onClick={onEnter}
-      className={`w-full text-left transition-all relative overflow-hidden ${!isYourTurn ? 'active:scale-[0.98]' : ''}`}
+      className={cn(
+        styles.draftCard,
+        isYourTurn && styles.draftCardYourTurn,
+        !isYourTurn && 'active:scale-[0.98]'
+      )}
       style={{
-        padding: `${LIVE_DRAFTS_PX.cardPadding}px`,
-        borderRadius: `${LIVE_DRAFTS_PX.cardBorderRadius}px`,
-        height: '110px',
-        display: 'flex',
-        flexDirection: 'column' as const,
-        ...(isYourTurn 
-          ? {
-              ...TILED_BG_STYLE,
-              border: '1px solid rgba(255,255,255,0.35)',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
-            }
-          : {
-              backgroundColor: BG_COLORS.secondary,
-              border: '1px solid rgba(255,255,255,0.12)',
-              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)',
-            }
-        ),
-      }}
+        '--card-padding': `${LIVE_DRAFTS_PX.cardPadding}px`,
+        '--card-border-radius': `${LIVE_DRAFTS_PX.cardBorderRadius}px`,
+        '--card-bg-color': isYourTurn ? undefined : BG_COLORS.secondary,
+        ...(isYourTurn && TILED_BG_STYLE),
+      } as React.CSSProperties}
       aria-label={`${isYourTurn ? 'Your turn' : 'Waiting'} - Pick ${draft.pickNumber} of ${draft.totalPicks}`}
     >
       {/* Semi-transparent overlay for wr_blue background when on the clock */}
       {isYourTurn && (
         <div
-          className="absolute inset-0 pointer-events-none"
+          className={styles.cardOverlay}
           style={{
-            backgroundColor: 'rgba(0, 0, 0, 0.45)',
-            borderRadius: `${LIVE_DRAFTS_PX.cardBorderRadius}px`,
-            zIndex: 0,
-          }}
+            '--card-border-radius': `${LIVE_DRAFTS_PX.cardBorderRadius}px`,
+          } as React.CSSProperties}
         />
       )}
-      <div className="relative z-10 h-full flex flex-col justify-between">
+      <div className={styles.cardContent}>
       {/* Info Row - Team Name on left, Badge/Timer or Picks Away on right */}
-      <div className="flex items-center justify-between mb-3">
+      <div className={styles.cardInfoRow}>
         {/* Team Name on left */}
         <div className="flex items-center min-w-0 flex-1">
           <span
-            className="font-semibold truncate"
+            className={styles.teamName}
             style={{
-              color: isYourTurn ? '#FFFFFF' : TEXT_COLORS.primary,
-              fontSize: `${TYPOGRAPHY.fontSize.sm + 1}px`,
-              letterSpacing: '-0.01em',
-            }}
+              '--team-name-color': isYourTurn ? '#FFFFFF' : TEXT_COLORS.primary,
+              '--team-name-font-size': `${TYPOGRAPHY.fontSize.sm + 1}px`,
+            } as React.CSSProperties}
           >
             {draft.teamName}
           </span>
         </div>
-        
+
         {/* Badge/Timer or Picks Away on right */}
-        <div className="flex-shrink-0 ml-3">
+        <div className={styles.badgeContainer}>
           {isYourTurn ? (
             <div className="flex items-center gap-2.5">
               {/* On the Clock badge */}
               <span
-                className="inline-flex flex-col items-center font-bold uppercase tracking-wider"
+                className={styles.onTheClockBadge}
                 style={{
+                  '--border-radius-md': `${RADIUS.md}px`,
+                  '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
+                  '--badge-padding-x': `${SPACING.sm + 2}px`,
                   ...TILED_BG_STYLE,
-                  color: '#FFFFFF',
-                  paddingLeft: `${SPACING.sm + 2}px`,
-                  paddingRight: `${SPACING.sm + 2}px`,
-                  paddingTop: '3px',
-                  paddingBottom: '3px',
-                  borderRadius: `${RADIUS.md}px`,
-                  fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-                  lineHeight: 1.3,
-                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.3)',
-                }}
+                } as React.CSSProperties}
               >
                 <span>ON THE</span>
                 <span>CLOCK</span>
               </span>
               {/* Timer to the right of badge */}
               {draft.timeLeftSeconds !== undefined && (
-                <span 
-                  style={{ 
-                    color: '#FFFFFF',
-                    fontSize: isSlowDraft ? '18px' : '24px',
-                    fontWeight: 800,
-                    fontVariantNumeric: 'tabular-nums',
-                    lineHeight: 1,
-                    textShadow: '0 1px 2px rgba(0, 0, 0, 0.4)',
-                    letterSpacing: isSlowDraft ? '-0.02em' : '0',
-                  }}
+                <span
+                  className={styles.timerDisplay}
+                  style={{
+                    '--timer-font-size': isSlowDraft ? '18px' : '24px',
+                    '--timer-letter-spacing': isSlowDraft ? '-0.02em' : '0',
+                  } as React.CSSProperties}
                 >
                   {formatTime(
                     isSlowDraft ? draft.timeLeftSeconds : Math.min(draft.timeLeftSeconds, 30),
@@ -320,13 +268,12 @@ function DraftCard({ draft, onEnter }: DraftCardProps): React.ReactElement {
               )}
             </div>
           ) : picksAway > 0 ? (
-            <span 
-              className="font-semibold"
-              style={{ 
-                color: TEXT_COLORS.muted,
-                fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-                letterSpacing: '-0.01em',
-              }}
+            <span
+              className={styles.picksAwayText}
+              style={{
+                '--picks-away-color': TEXT_COLORS.muted,
+                '--picks-away-font-size': `${TYPOGRAPHY.fontSize.sm}px`,
+              } as React.CSSProperties}
             >
               {picksAway} pick{picksAway !== 1 ? 's' : ''} away
             </span>
@@ -349,18 +296,19 @@ function DraftCard({ draft, onEnter }: DraftCardProps): React.ReactElement {
 function DraftCardSkeleton(): React.ReactElement {
   return (
     <div
+      className={styles.skeletonCard}
       style={{
-        padding: `${LIVE_DRAFTS_PX.cardPadding}px`,
-        borderRadius: `${LIVE_DRAFTS_PX.cardBorderRadius}px`,
-        backgroundColor: BG_COLORS.secondary,
-      }}
+        '--card-padding': `${LIVE_DRAFTS_PX.cardPadding}px`,
+        '--card-border-radius': `${LIVE_DRAFTS_PX.cardBorderRadius}px`,
+        '--skeleton-bg-color': BG_COLORS.secondary,
+      } as React.CSSProperties}
     >
-      <div className="flex items-center justify-between mb-2">
+      <div className={styles.skeletonHeader}>
         <Skeleton width={180} height={20} />
         <Skeleton width={80} height={24} borderRadius={12} />
       </div>
       <Skeleton width={120} height={16} />
-      <div className="mt-3">
+      <div className={styles.skeletonProgress}>
         <Skeleton width="100%" height={6} borderRadius={3} />
       </div>
     </div>
@@ -370,21 +318,20 @@ function DraftCardSkeleton(): React.ReactElement {
 function JoinDraftButton({ onClick }: { onClick: () => void }): React.ReactElement {
   return (
     <div
+      className={styles.joinButtonSection}
       style={{
-        padding: `${LIVE_DRAFTS_PX.footerPadding}px`,
-        borderTop: '1px solid rgba(255,255,255,0.1)',
-      }}
+        '--footer-padding': `${LIVE_DRAFTS_PX.footerPadding}px`,
+      } as React.CSSProperties}
     >
       <button
         onClick={onClick}
-        className="w-full font-semibold transition-all active:scale-[0.98]"
+        className={styles.joinButton}
         style={{
-          height: `${LIVE_DRAFTS_PX.buttonHeight}px`,
-          borderRadius: `${RADIUS.lg}px`,
-          backgroundColor: STATE_COLORS.active,
-          color: '#FFFFFF',
-          fontSize: `${TYPOGRAPHY.fontSize.base}px`,
-        }}
+          '--button-height': `${LIVE_DRAFTS_PX.buttonHeight}px`,
+          '--border-radius-lg': `${RADIUS.lg}px`,
+          '--button-bg-color': STATE_COLORS.active,
+          '--font-size-base': `${TYPOGRAPHY.fontSize.base}px`,
+        } as React.CSSProperties}
       >
         Join New Draft
       </button>
@@ -503,22 +450,21 @@ export default function LiveDraftsTabVX2({
   if (isLoading && drafts.length === 0) {
     return (
       <div
-        className="flex-1 flex flex-col"
-        style={{ backgroundColor: BG_COLORS.primary }}
+        className={styles.stateContainer}
+        style={{
+          '--bg-color': BG_COLORS.primary,
+          '--header-padding-x': `${LIVE_DRAFTS_PX.headerPaddingX}px`,
+          '--header-padding-y': `${LIVE_DRAFTS_PX.headerPaddingY}px`,
+          '--list-padding-x': `${LIVE_DRAFTS_PX.listPaddingX}px`,
+          '--list-padding-y': `${LIVE_DRAFTS_PX.listPaddingY}px`,
+          '--card-gap': `${LIVE_DRAFTS_PX.cardGap}px`,
+        } as React.CSSProperties}
       >
         {/* Header - only show tab switcher if not hidden */}
         {!hideTabSwitcher && (
-          <div
-            style={{
-              paddingLeft: `${LIVE_DRAFTS_PX.headerPaddingX}px`,
-              paddingRight: `${LIVE_DRAFTS_PX.headerPaddingX}px`,
-              paddingTop: `${LIVE_DRAFTS_PX.headerPaddingY}px`,
-              paddingBottom: `${LIVE_DRAFTS_PX.headerPaddingY}px`,
-              borderBottom: '1px solid rgba(255,255,255,0.1)',
-            }}
-          >
+          <div className={styles.header}>
             <TabSwitcher selected={draftType} onSelect={setDraftType} />
-            <div className="mt-1">
+            <div className={styles.skeletonMetaWrapper}>
               <Skeleton width={100} height={16} />
             </div>
           </div>
@@ -526,12 +472,14 @@ export default function LiveDraftsTabVX2({
 
         {/* List */}
         <div
+          className={styles.draftsList}
           style={{
-            padding: `${LIVE_DRAFTS_PX.listPaddingY}px ${LIVE_DRAFTS_PX.listPaddingX}px`,
+            '--list-padding-y': `${LIVE_DRAFTS_PX.listPaddingY}px`,
+            '--list-padding-x': `${LIVE_DRAFTS_PX.listPaddingX}px`,
             display: 'flex',
             flexDirection: 'column',
-            gap: `${LIVE_DRAFTS_PX.cardGap}px`,
-          }}
+            padding: `${LIVE_DRAFTS_PX.listPaddingY}px ${LIVE_DRAFTS_PX.listPaddingX}px`,
+          } as React.CSSProperties}
         >
           <DraftCardSkeleton />
           <DraftCardSkeleton />
@@ -544,11 +492,14 @@ export default function LiveDraftsTabVX2({
   // Error State
   if (error) {
     return (
-      <div 
-        className="flex-1 flex flex-col items-center justify-center"
-        style={{ backgroundColor: BG_COLORS.primary, padding: SPACING.xl }}
+      <div
+        className={styles.errorStateContainer}
+        style={{
+          '--bg-color': BG_COLORS.primary,
+          '--error-padding': `${SPACING.xl}px`,
+        } as React.CSSProperties}
       >
-        <ErrorState 
+        <ErrorState
           title="Failed to load drafts"
           description={error || undefined}
           onRetry={refetch}
@@ -561,32 +512,24 @@ export default function LiveDraftsTabVX2({
   if (filteredDrafts.length === 0 && !isLoading) {
     return (
       <div
-        className="flex-1 flex flex-col"
-        style={{ backgroundColor: BG_COLORS.primary }}
+        className={styles.emptyStateContainer}
         role="main"
         aria-label="Fast drafts"
+        style={{
+          '--bg-color': BG_COLORS.primary,
+          '--header-padding-x': `${LIVE_DRAFTS_PX.headerPaddingX}px`,
+          '--header-padding-y': `${LIVE_DRAFTS_PX.headerPaddingY}px`,
+          '--empty-padding': `${SPACING.xl}px`,
+        } as React.CSSProperties}
       >
         {/* Header - only show tab switcher if not hidden */}
         {!hideTabSwitcher && (
-          <div
-            className="flex-shrink-0"
-            style={{
-              position: 'sticky',
-              top: 0,
-              zIndex: 10,
-              backgroundColor: BG_COLORS.primary,
-              paddingLeft: `${LIVE_DRAFTS_PX.headerPaddingX}px`,
-              paddingRight: `${LIVE_DRAFTS_PX.headerPaddingX}px`,
-              paddingTop: `${LIVE_DRAFTS_PX.headerPaddingY}px`,
-              paddingBottom: `${LIVE_DRAFTS_PX.headerPaddingY}px`,
-              borderBottom: '1px solid rgba(255,255,255,0.1)',
-            }}
-          >
+          <div className={styles.header}>
             <TabSwitcher selected={draftType} onSelect={setDraftType} />
           </div>
         )}
 
-        <div className="flex-1 flex items-center justify-center" style={{ padding: SPACING.xl }}>
+        <div className={styles.emptyStateCentral}>
           <EmptyState
             title="No Active Drafts"
             description="Join a tournament to start drafting your team!"
@@ -603,50 +546,28 @@ export default function LiveDraftsTabVX2({
   // Main Content
   return (
     <div
-      className="flex-1 flex flex-col"
-      style={{ backgroundColor: BG_COLORS.primary }}
+      className={styles.container}
       role="main"
       aria-label="Fast drafts"
+      style={{
+        '--bg-color': BG_COLORS.primary,
+        '--header-padding-x': `${LIVE_DRAFTS_PX.headerPaddingX}px`,
+        '--header-padding-y': `${LIVE_DRAFTS_PX.headerPaddingY}px`,
+        '--list-padding-x': `${LIVE_DRAFTS_PX.listPaddingX}px`,
+        '--list-padding-y': `${LIVE_DRAFTS_PX.listPaddingY}px`,
+        '--card-gap': `${LIVE_DRAFTS_PX.cardGap}px`,
+      } as React.CSSProperties}
     >
       {/* Header - only show tab switcher if not hidden */}
       {!hideTabSwitcher && (
-        <div
-          className="flex-shrink-0"
-          style={{
-            position: 'sticky',
-            top: 0,
-            zIndex: 10,
-            backgroundColor: BG_COLORS.primary,
-            paddingLeft: `${LIVE_DRAFTS_PX.headerPaddingX}px`,
-            paddingRight: `${LIVE_DRAFTS_PX.headerPaddingX}px`,
-            paddingTop: `${LIVE_DRAFTS_PX.headerPaddingY}px`,
-            paddingBottom: `${LIVE_DRAFTS_PX.headerPaddingY}px`,
-            borderBottom: '1px solid rgba(255,255,255,0.1)',
-          }}
-        >
+        <div className={styles.header}>
           <TabSwitcher selected={draftType} onSelect={setDraftType} />
         </div>
       )}
-      
+
       {/* Drafts List */}
-      <div
-        className="flex-1 min-h-0 overflow-y-auto"
-        style={{
-          paddingLeft: `${LIVE_DRAFTS_PX.listPaddingX}px`,
-          paddingRight: `${LIVE_DRAFTS_PX.listPaddingX}px`,
-          paddingTop: `${LIVE_DRAFTS_PX.listPaddingY}px`,
-          paddingBottom: `${LIVE_DRAFTS_PX.listPaddingY}px`,
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: `${LIVE_DRAFTS_PX.cardGap}px`,
-          }}
-        >
+      <div className={styles.listContainer}>
+        <div className={styles.draftsList}>
           {filteredDrafts.map((draft) => (
             <DraftCard
               key={draft.id}
@@ -655,11 +576,16 @@ export default function LiveDraftsTabVX2({
             />
           ))}
         </div>
-        
+
         {/* Bottom padding */}
-        <div style={{ height: `${SPACING['2xl']}px`, flexShrink: 0 }} />
+        <div
+          className={styles.bottomPadding}
+          style={{
+            '--bottom-padding-height': `${SPACING['2xl']}px`,
+          } as React.CSSProperties}
+        />
       </div>
-      
+
       {/* Join Button */}
       {onJoinDraft && <JoinDraftButton onClick={handleJoinDraft} />}
     </div>

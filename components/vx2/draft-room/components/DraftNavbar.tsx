@@ -13,47 +13,13 @@
  */
 
 import React, { useEffect, useState, useRef } from 'react';
+import { cn } from '@/lib/styles';
 import { TILED_BG_STYLE } from '../constants';
 import { createScopedLogger } from '../../../../lib/clientLogger';
 import { DRAFT_TIMER } from '../../core/constants/timing';
+import styles from './DraftNavbar.module.css';
 
 const logger = createScopedLogger('[DraftNavbar]');
-
-// ============================================================================
-// PULSE ANIMATION STYLE
-// ============================================================================
-
-const PULSE_KEYFRAMES = `
-@keyframes navbar-pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.5); }
-  100% { transform: scale(1); }
-}
-
-@keyframes navbar-shake {
-  0%, 100% { transform: translateX(0) rotate(0deg); }
-  10% { transform: translateX(-4px) rotate(-2deg); }
-  20% { transform: translateX(4px) rotate(2deg); }
-  30% { transform: translateX(-4px) rotate(-2deg); }
-  40% { transform: translateX(4px) rotate(2deg); }
-  50% { transform: translateX(-4px) rotate(-2deg); }
-  60% { transform: translateX(4px) rotate(2deg); }
-  70% { transform: translateX(-4px) rotate(-2deg); }
-  80% { transform: translateX(4px) rotate(2deg); }
-  90% { transform: translateX(-2px) rotate(-1deg); }
-}
-`;
-
-// Inject keyframes into document head (only once)
-if (typeof document !== 'undefined') {
-  const styleId = 'navbar-pulse-keyframes';
-  if (!document.getElementById(styleId)) {
-    const style = document.createElement('style');
-    style.id = styleId;
-    style.textContent = PULSE_KEYFRAMES;
-    document.head.appendChild(style);
-  }
-}
 
 // ============================================================================
 // PIXEL-PERFECT CONSTANTS
@@ -118,23 +84,10 @@ function BackButton({ onClick }: { onClick: () => void }): React.ReactElement {
     <button
       onClick={onClick}
       aria-label="Leave draft"
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: NAVBAR_PX.buttonSize,
-        height: NAVBAR_PX.buttonSize,
-        borderRadius: NAVBAR_PX.buttonSize / 2,
-        background: 'transparent',
-        border: 'none',
-        cursor: 'pointer',
-        WebkitTapHighlightColor: 'transparent',
-        transition: 'background-color 0.2s',
-      }}
-      onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
-      onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+      className={styles.button}
     >
       <svg
+        className={styles.buttonSvg}
         width={NAVBAR_PX.iconSize}
         height={NAVBAR_PX.iconSize}
         viewBox="0 0 24 24"
@@ -158,9 +111,9 @@ function ExitDraftButton({ onLeaveCallback }: { onLeaveCallback?: () => void }):
     // Prevent any default behavior
     event.preventDefault();
     event.stopPropagation();
-    
+
     logger.debug('Exit button clicked', { hasCallback: !!onLeaveCallback });
-    
+
     // Call the callback to open confirmation modal (if provided)
     if (onLeaveCallback) {
       try {
@@ -172,46 +125,20 @@ function ExitDraftButton({ onLeaveCallback }: { onLeaveCallback?: () => void }):
       logger.warn('No onLeave callback provided');
     }
   }, [onLeaveCallback]);
-  
+
   return (
     <button
       type="button"
       onClick={handleExitClick}
       aria-label="Leave draft room"
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: NAVBAR_PX.buttonSize,
-        height: NAVBAR_PX.buttonSize,
-        borderRadius: NAVBAR_PX.buttonSize / 2,
-        background: 'transparent',
-        border: 'none',
-        cursor: 'pointer',
-        WebkitTapHighlightColor: 'transparent',
-        transition: 'background-color 0.2s',
-        position: 'relative',
-        zIndex: 100,
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor = 'transparent';
-      }}
-      onTouchStart={(e) => {
-        e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)';
-      }}
-      onTouchEnd={(e) => {
-        e.currentTarget.style.backgroundColor = 'transparent';
-      }}
+      className={cn(styles.button, styles.exitButton)}
     >
       <svg
+        className={styles.buttonSvg}
         width={NAVBAR_PX.iconSize}
         height={NAVBAR_PX.iconSize}
         viewBox="0 0 24 24"
         fill="none"
-        style={{ pointerEvents: 'none' }}
       >
         <path
           d="M15 19L8 12L15 5"
@@ -231,23 +158,10 @@ function InfoButton({ onClick }: { onClick?: () => void }): React.ReactElement {
     <button
       onClick={onClick}
       aria-label="Draft info"
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: NAVBAR_PX.buttonSize,
-        height: NAVBAR_PX.buttonSize,
-        borderRadius: NAVBAR_PX.buttonSize / 2,
-        background: 'transparent',
-        border: 'none',
-        cursor: 'pointer',
-        WebkitTapHighlightColor: 'transparent',
-        transition: 'background-color 0.2s',
-      }}
-      onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
-      onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+      className={styles.button}
     >
       <svg
+        className={styles.buttonSvg}
         width={NAVBAR_PX.iconSize}
         height={NAVBAR_PX.iconSize}
         viewBox="0 0 24 24"
@@ -285,13 +199,13 @@ function InfoButton({ onClick }: { onClick?: () => void }): React.ReactElement {
 }
 
 // Countdown timer display - matches PicksBar timer style
-function TimerDisplay({ 
-  seconds, 
+function TimerDisplay({
+  seconds,
   isUserTurn,
   pulseKey,
   shouldPulse,
-}: { 
-  seconds: number; 
+}: {
+  seconds: number;
   isUserTurn: boolean;
   pulseKey: number;
   shouldPulse: boolean;
@@ -301,18 +215,7 @@ function TimerDisplay({
       key={pulseKey}
       aria-label={`${seconds} seconds remaining${isUserTurn ? ', your turn' : ''}`}
       aria-live="polite"
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: NAVBAR_PX.height,
-        fontWeight: NAVBAR_PX.timerFontWeight,
-        fontSize: NAVBAR_PX.timerFontSize,
-        fontVariantNumeric: 'tabular-nums',
-        lineHeight: 1,
-        color: '#FFFFFF',
-        animation: shouldPulse ? 'navbar-pulse 0.4s ease-out' : 'none',
-      }}
+      className={cn(styles.timerDisplay, shouldPulse && styles.pulse)}
     >
       {seconds}
     </div>
@@ -369,102 +272,60 @@ export default function DraftNavbar({
     return undefined;
   }, [timerSeconds, isUserTurn]);
 
-  // Background changes based on turn and timer
+  // Background class based on turn and timer
   // - User's turn + timer <= 9s: Red urgent background
   // - User's turn + timer > 9s: Blue tiled background
   // - Not user's turn: Dark background
-  const getBackgroundStyle = () => {
+  const getBackgroundClass = () => {
     if (!isUserTurn) {
-      return { backgroundColor: '#1F2937' }; // Match SearchBar background
+      return styles.bgDark;
     }
     if (timerSeconds <= 9) {
-      return { backgroundColor: '#DC2626' }; // Red-600
+      return styles.bgRed;
     }
-    return TILED_BG_STYLE;
+    return styles.bgTiled;
   };
 
-  const backgroundStyle = getBackgroundStyle();
-
-  // Position style - when inside a container, use relative; otherwise absolute/fixed
-  const getPositionStyle = () => {
+  // Position class - when inside a container, use relative; otherwise absolute/fixed
+  const getPositionClass = () => {
     if (useAbsolutePosition === true) {
-      return {
-        position: 'absolute' as const,
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 50,
-        // Extend background behind status bar using safe area inset
-        paddingTop: 'max(0px, calc(env(safe-area-inset-top, 0px) - 20px))',
-      };
+      return styles.absolute;
     }
     if (useAbsolutePosition === false) {
-      // No positioning - used when navbar is inside a flex container
-      return {
-        flexShrink: 0,
-      };
+      return styles.relative;
     }
-    // Default: fixed position
-    return {
-      position: 'fixed' as const,
-      top: 0,
-      left: 0,
-      right: 0,
-      zIndex: 50,
-      paddingTop: 'max(0px, calc(env(safe-area-inset-top, 0px) - 20px))',
-    };
+    return styles.fixed;
   };
 
   return (
     <header
       key={shakeKey}
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        ...backgroundStyle,
-        ...getPositionStyle(),
-      }}
+      className={cn(styles.header, getBackgroundClass(), getPositionClass())}
     >
       {/* Navbar content - fixed height below safe area */}
       <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          height: NAVBAR_PX.height,
-          paddingLeft: NAVBAR_PX.paddingX,
-          paddingRight: NAVBAR_PX.paddingX,
-          animation: shouldShake ? 'navbar-shake 0.6s ease-in-out' : 'none',
-        }}
+        className={cn(styles.navContent, shouldShake && styles.shake)}
       >
         {/* Left: Exit Button */}
         <ExitDraftButton onLeaveCallback={onLeave} />
-        
+
         {/* Center: Countdown Timer (hidden when rendered externally) */}
         {!hideTimer && (
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flex: 1,
-              height: '100%',
-            }}
-          >
-            <TimerDisplay 
-              seconds={timerSeconds} 
-              isUserTurn={isUserTurn} 
+          <div className={styles.timerWrapper}>
+            <TimerDisplay
+              seconds={timerSeconds}
+              isUserTurn={isUserTurn}
               pulseKey={pulseKey}
               shouldPulse={shouldPulse}
             />
           </div>
         )}
-        
+
         {/* Center spacer when timer hidden */}
-        {hideTimer && <div style={{ flex: 1 }} />}
-        
+        {hideTimer && <div className={styles.spacerFlex} />}
+
         {/* Right: Spacer for layout balance */}
-        <div style={{ width: NAVBAR_PX.buttonSize }} />
+        <div className={styles.spacer} />
       </div>
     </header>
   );

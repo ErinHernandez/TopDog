@@ -1,0 +1,89 @@
+/**
+ * CurrencyIcon CSS Module
+ *
+ * Migrated from inline styles for CSP compliance.
+ */
+
+/* ============================================================================
+   ICON CONTAINER (base styles for all variants)
+   ============================================================================ */
+
+.iconContainer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--icon-size, 24px);
+  height: var(--icon-size, 24px);
+  color: var(--icon-color, currentColor);
+}
+
+/* ============================================================================
+   LOADING PLACEHOLDER
+   ============================================================================ */
+
+.placeholder {
+  position: absolute;
+  width: var(--icon-size, 24px);
+  height: var(--icon-size, 24px);
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* ============================================================================
+   ICON IMAGE
+   ============================================================================ */
+
+.iconImage {
+  width: var(--icon-size, 24px);
+  height: var(--icon-size, 24px);
+  object-fit: contain;
+  transition: opacity 200ms ease;
+}
+
+.iconImageLoading {
+  opacity: 0;
+}
+
+.iconImageLoaded {
+  opacity: 1;
+}
+
+/* ============================================================================
+   UNICODE FALLBACK
+   ============================================================================ */
+
+.unicodeFallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  width: var(--icon-size, 24px);
+  height: var(--icon-size, 24px);
+  font-size: var(--fallback-font-size, 14px);
+  color: var(--icon-color, currentColor);
+}
+
+/* ============================================================================
+   CODE FALLBACK
+   ============================================================================ */
+
+.codeFallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  font-size: var(--code-font-size, 10px);
+  width: var(--icon-size, 24px);
+  height: var(--icon-size, 24px);
+  color: var(--icon-color, currentColor);
+}

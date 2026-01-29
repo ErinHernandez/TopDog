@@ -15,6 +15,8 @@ import {
   type TeamSortState,
   type TeamSortOption,
 } from '../sortUtils';
+import { cn } from '@/lib/styles';
+import styles from './SortDropdown.module.css';
 
 // ============================================================================
 // TYPES
@@ -64,26 +66,22 @@ export function SortDropdown({ currentSort, onSortChange }: SortDropdownProps): 
   };
 
   return (
-    <div ref={dropdownRef} style={{ position: 'relative' }}>
+    <div ref={dropdownRef} className={styles.dropdownContainer}>
       <button
         onClick={() => setIsOpen(!isOpen)}
+        className={styles.dropdownButton}
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-          padding: '8px 12px',
-          backgroundColor: BG_COLORS.secondary,
-          border: '1px solid rgba(255,255,255,0.1)',
-          borderRadius: `${RADIUS.md}px`,
-          color: TEXT_COLORS.secondary,
-          fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-          cursor: 'pointer',
-          transition: 'all 0.15s ease',
-        }}
+          '--bg-color': BG_COLORS.secondary,
+          '--border': '1px solid rgba(255,255,255,0.1)',
+          '--border-radius': `${RADIUS.md}px`,
+          '--text-color': TEXT_COLORS.secondary,
+          '--font-size': `${TYPOGRAPHY.fontSize.xs}px`,
+          '--bg-hover': 'rgba(255,255,255,0.08)',
+        } as React.CSSProperties}
         aria-label={`Sort by ${TEAM_SORT_LABELS[currentSort.primary]}, ${currentSort.direction === 'asc' ? 'ascending' : 'descending'}`}
       >
-        <span style={{ color: TEXT_COLORS.muted }}>Sort:</span>
-        <span style={{ color: TEXT_COLORS.primary, fontWeight: 500 }}>
+        <span className={styles.sortLabel} style={{ '--label-color': TEXT_COLORS.muted } as React.CSSProperties}>Sort:</span>
+        <span className={styles.sortValue} style={{ '--value-color': TEXT_COLORS.primary } as React.CSSProperties}>
           {TEAM_SORT_LABELS[currentSort.primary]}
         </span>
         <svg
@@ -93,10 +91,7 @@ export function SortDropdown({ currentSort, onSortChange }: SortDropdownProps): 
           fill="none"
           stroke="currentColor"
           strokeWidth="2"
-          style={{
-            transform: currentSort.direction === 'desc' ? 'rotate(180deg)' : 'rotate(0deg)',
-            transition: 'transform 0.2s ease',
-          }}
+          className={cn(styles.sortIcon, currentSort.direction === 'desc' && styles.rotated)}
         >
           <polyline points="18 15 12 9 6 15" />
         </svg>
@@ -104,19 +99,13 @@ export function SortDropdown({ currentSort, onSortChange }: SortDropdownProps): 
 
       {isOpen && (
         <div
+          className={styles.dropdownMenu}
           style={{
-            position: 'absolute',
-            top: '100%',
-            right: 0,
-            marginTop: '4px',
-            backgroundColor: BG_COLORS.secondary,
-            border: '1px solid rgba(255,255,255,0.1)',
-            borderRadius: `${RADIUS.lg}px`,
-            overflow: 'hidden',
-            zIndex: 1000,
-            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-            minWidth: '160px',
-          }}
+            '--menu-bg': BG_COLORS.secondary,
+            '--menu-border': '1px solid rgba(255,255,255,0.1)',
+            '--menu-border-radius': `${RADIUS.lg}px`,
+            '--menu-shadow': '0 4px 12px rgba(0,0,0,0.3)',
+          } as React.CSSProperties}
         >
           {sortOptions.map((option) => {
             const isActive = currentSort.primary === option;
@@ -124,23 +113,18 @@ export function SortDropdown({ currentSort, onSortChange }: SortDropdownProps): 
               <button
                 key={option}
                 onClick={() => handleOptionClick(option)}
+                className={cn(styles.menuOption, isActive && styles.active)}
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  width: '100%',
-                  padding: '10px 14px',
-                  backgroundColor: isActive ? 'rgba(255,255,255,0.05)' : 'transparent',
-                  border: 'none',
-                  borderBottom: '1px solid rgba(255,255,255,0.05)',
-                  color: isActive ? TEXT_COLORS.primary : TEXT_COLORS.secondary,
-                  fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  transition: 'background-color 0.15s ease',
-                }}
+                  '--option-bg': isActive ? 'rgba(255,255,255,0.05)' : 'transparent',
+                  '--option-border': '1px solid rgba(255,255,255,0.05)',
+                  '--option-text-color': isActive ? TEXT_COLORS.primary : TEXT_COLORS.secondary,
+                  '--option-font-size': `${TYPOGRAPHY.fontSize.sm}px`,
+                  '--option-hover-bg': 'rgba(255,255,255,0.08)',
+                  '--option-active-bg': 'rgba(255,255,255,0.05)',
+                  '--option-active-color': TEXT_COLORS.primary,
+                } as React.CSSProperties}
               >
-                <span style={{ whiteSpace: 'pre-line' }}>{TEAM_SORT_LABELS[option]}</span>
+                <span className={styles.optionText}>{TEAM_SORT_LABELS[option]}</span>
                 {isActive && (
                   <svg
                     width="12"
@@ -149,9 +133,7 @@ export function SortDropdown({ currentSort, onSortChange }: SortDropdownProps): 
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="2"
-                    style={{
-                      transform: currentSort.direction === 'desc' ? 'rotate(180deg)' : 'rotate(0deg)',
-                    }}
+                    className={cn(styles.optionCheckIcon, currentSort.direction === 'desc' && styles.rotated)}
                   >
                     <polyline points="18 15 12 9 6 15" />
                   </svg>

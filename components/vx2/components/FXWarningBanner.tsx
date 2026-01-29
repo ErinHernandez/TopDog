@@ -1,6 +1,6 @@
 /**
  * FXWarningBanner Component
- * 
+ *
  * Displays a warning when user selects a currency different from their
  * geolocated currency. Informs them about potential foreign transaction
  * fees from their bank.
@@ -11,6 +11,7 @@ import { TEXT_COLORS, STATE_COLORS } from '../core/constants/colors';
 import { SPACING, RADIUS, TYPOGRAPHY } from '../core/constants/sizes';
 import { Close } from './icons';
 import { getCurrencyConfig } from '../../../lib/stripe/currencyConfig';
+import styles from './FXWarningBanner.module.css';
 
 // ============================================================================
 // TYPES
@@ -38,37 +39,37 @@ export function FXWarningBanner({
   onDismiss,
 }: FXWarningBannerProps): React.ReactElement | null {
   const [isDismissed, setIsDismissed] = useState(false);
-  
+
   // Don't show if currencies match or dismissed
   if (selectedCurrency === localCurrency || isDismissed) {
     return null;
   }
-  
+
   const selectedConfig = getCurrencyConfig(selectedCurrency);
   const localConfig = getCurrencyConfig(localCurrency);
-  
+
   const handleDismiss = () => {
     setIsDismissed(true);
     onDismiss?.();
   };
-  
+
   return (
     <div
-      className="rounded-xl overflow-hidden"
+      className={styles.banner}
       style={{
-        backgroundColor: 'rgba(245, 158, 11, 0.1)',
-        border: `1px solid rgba(245, 158, 11, 0.3)`,
-      }}
+        '--banner-bg-color': 'rgba(245, 158, 11, 0.1)',
+        '--banner-border-color': 'rgba(245, 158, 11, 0.3)',
+      } as React.CSSProperties}
     >
       {/* Header */}
-      <div 
-        className="flex items-center justify-between px-4 py-3"
+      <div
+        className={styles.header}
         style={{
-          backgroundColor: 'rgba(245, 158, 11, 0.15)',
-          borderBottom: '1px solid rgba(245, 158, 11, 0.2)',
-        }}
+          '--header-bg-color': 'rgba(245, 158, 11, 0.15)',
+          '--header-border-color': 'rgba(245, 158, 11, 0.2)',
+        } as React.CSSProperties}
       >
-        <div className="flex items-center gap-2">
+        <div className={styles.iconContainer}>
           {/* Warning Icon */}
           <svg
             width="20"
@@ -85,63 +86,56 @@ export function FXWarningBanner({
             />
           </svg>
           <span
-            className="font-semibold"
+            className={styles.title}
             style={{
-              color: STATE_COLORS.warning,
-              fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-            }}
+              '--warning-color': STATE_COLORS.warning,
+            } as React.CSSProperties}
           >
             Currency Mismatch Notice
           </span>
         </div>
-        
+
         {dismissible && (
           <button
             type="button"
             onClick={handleDismiss}
-            className="p-1 rounded-lg transition-all hover:bg-white/10"
+            className={styles.closeButton}
             aria-label="Dismiss warning"
           >
             <Close size={16} color={TEXT_COLORS.muted} />
           </button>
         )}
       </div>
-      
+
       {/* Content */}
-      <div className="px-4 py-3 space-y-3">
+      <div className={styles.content}>
         {/* Main Warning */}
         <p
+          className={styles.warningText}
           style={{
-            fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-            color: TEXT_COLORS.primary,
-            lineHeight: 1.5,
-          }}
+            '--text-primary-color': TEXT_COLORS.primary,
+            '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
+          } as React.CSSProperties}
         >
-          Your selected currency ({selectedConfig.symbol} {selectedConfig.name}) does not match 
+          Your selected currency ({selectedConfig.symbol} {selectedConfig.name}) does not match
           your detected location ({localConfig.symbol} {localConfig.name}).
         </p>
-        
+
         {/* Bank Fee Warning */}
         <p
+          className={styles.secondaryText}
           style={{
-            fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-            color: TEXT_COLORS.secondary,
-            lineHeight: 1.5,
-          }}
+            '--text-secondary-color': TEXT_COLORS.secondary,
+            '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
+          } as React.CSSProperties}
         >
-          Your bank may charge you a foreign transaction fee (typically 1-3%) when using a 
+          Your bank may charge you a foreign transaction fee (typically 1-3%) when using a
           card that doesn&apos;t match this currency.
         </p>
-        
+
         {/* Tip Box */}
-        <div
-          className="rounded-lg px-3 py-2 mt-2"
-          style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.05)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-          }}
-        >
-          <div className="flex items-start gap-2">
+        <div className={styles.tipBox}>
+          <div className={styles.tipContent}>
             {/* Lightbulb Icon */}
             <svg
               width="16"
@@ -150,7 +144,7 @@ export function FXWarningBanner({
               fill="none"
               stroke={STATE_COLORS.info}
               strokeWidth="2"
-              className="flex-shrink-0 mt-0.5"
+              className={styles.tipIcon}
             >
               <path
                 strokeLinecap="round"
@@ -159,14 +153,15 @@ export function FXWarningBanner({
               />
             </svg>
             <p
+              className={styles.tipText}
               style={{
-                fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-                color: TEXT_COLORS.secondary,
-                lineHeight: 1.4,
-              }}
+                '--text-secondary-color': TEXT_COLORS.secondary,
+                '--text-primary-color': TEXT_COLORS.primary,
+                '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
+              } as React.CSSProperties}
             >
-              <strong style={{ color: TEXT_COLORS.primary }}>Tip:</strong> Select the currency 
-              that matches your card&apos;s native currency for the best rates. For example, if you 
+              <strong className={styles.tipHighlight}>Tip:</strong> Select the currency
+              that matches your card&apos;s native currency for the best rates. For example, if you
               are a US user traveling abroad, select USD to avoid foreign transaction fees.
             </p>
           </div>
@@ -177,4 +172,3 @@ export function FXWarningBanner({
 }
 
 export default FXWarningBanner;
-

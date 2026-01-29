@@ -22,6 +22,9 @@ import { useTemporaryState } from '../../hooks/ui/useTemporaryState';
 import { RATE_LIMITS } from '../constants';
 import { createScopedLogger } from '../../../../lib/clientLogger';
 import { getAuth } from 'firebase/auth';
+import { cn } from '@/lib/styles';
+import styles from './ProfileSettingsModal.module.css';
+import sharedStyles from './auth-shared.module.css';
 
 const logger = createScopedLogger('[ProfileSettingsModal]');
 
@@ -76,73 +79,31 @@ function ProfileTabContent({ onEditName, onAddEmail, onAddPhone, onOpenDeleteMod
   return (
     <div className="space-y-6">
       {/* Customization Section */}
-      <div className="space-y-3">
+      <div className={styles.customizationSection}>
         {/* Example Player Box */}
-        <div className="flex justify-center">
-          <div 
-            className="flex-shrink-0 flex flex-col"
-            style={{ 
-              width: '96px',
-              height: '105px',
-              border: '4px solid',
-              borderColor: fixedBorderColor, // Fixed border color - matches unpicked card border (#6B7280)
-              backgroundColor: '#374151', // Matches PICKS_BAR_PX.cardBg
-              borderRadius: '6px', 
-              overflow: 'hidden',
-              display: 'flex',
-              flexDirection: 'column',
-              position: 'relative',
-            }}
+        <div className={styles.playerBoxContainer}>
+          <div
+            className={styles.playerBox}
+            style={{
+              '--player-box-border': fixedBorderColor,
+              '--player-box-bg': innerCellColor,
+            } as React.CSSProperties}
           >
             {/* Header - matches draft room card header structure */}
-            <div 
-              style={{ 
-                height: '28px', // 20px visible + 8px overlap
-                marginTop: '-8px', // Overlaps top border
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '0 4px',
-                backgroundColor: fixedBorderColor, // Border color used as header background
-                borderTopLeftRadius: '6px',
-                borderTopRightRadius: '6px',
-                fontSize: '11px',
-                fontWeight: 500,
-                color: '#FFFFFF',
-                textTransform: 'uppercase',
-                textAlign: 'center',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
+            <div className={styles.playerBoxHeader}>
               {profile?.username || 'Username'}
             </div>
-            
+
             {/* Content area - matches draft room card content */}
-            <div 
-              style={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                minHeight: '78px',
-                position: 'relative',
-                backgroundColor: innerCellColor, // Customizable inner area
-              }}
-            >
+            <div className={styles.playerBoxContent}>
             </div>
           </div>
         </div>
-        
-        <div className="flex items-center justify-center">
+
+        <div className={cn('flex items-center justify-center')}>
           <button
             onClick={() => router.push('/profile-customization')}
-            className="px-3 py-1.5 rounded-lg font-medium text-sm"
-            style={{ 
-              background: 'url(/wr_blue.png) no-repeat center center',
-              backgroundSize: 'cover',
-              color: '#000',
-            }}
+            className={styles.customizeButton}
           >
             Customize
           </button>
@@ -151,145 +112,102 @@ function ProfileTabContent({ onEditName, onAddEmail, onAddPhone, onOpenDeleteMod
 
 
       {/* Name */}
-      <div 
-        className="p-4 rounded-xl"
-        style={{ backgroundColor: 'rgba(255,255,255,0.03)' }}
-      >
-        <div className="flex items-center justify-between mb-2">
-          <span style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+      <div className={styles.infoBox}>
+        <div className={styles.infoBoxHeader}>
+          <span className={styles.infoLabel}>
             Name
           </span>
         </div>
-        <p style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}>
+        <p className={styles.infoValue}>
           {displayName || 'Not added yet'}
         </p>
       </div>
-      
+
       {/* Email */}
-      <div 
-        className="p-4 rounded-xl"
-        style={{ backgroundColor: 'rgba(255,255,255,0.03)' }}
-      >
-        <div className="flex items-center justify-between mb-2">
-          <span style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+      <div className={styles.infoBox}>
+        <div className={styles.infoBoxHeader}>
+          <span className={styles.infoLabel}>
             Email
           </span>
           {user?.email ? (
             user?.emailVerified ? (
-            <span 
-              className="px-2 py-0.5 rounded-full text-xs"
-              style={{ backgroundColor: 'rgba(16, 185, 129, 0.15)', color: STATE_COLORS.success }}
-            >
+            <span className={cn(styles.badge, styles.badgeVerified)}>
               Verified
             </span>
           ) : (
             <button
               onClick={handleResendVerification}
               disabled={emailSent}
-              className="px-2 py-0.5 rounded-full text-xs"
-              style={{ 
-                backgroundColor: 'rgba(245, 158, 11, 0.15)', 
-                color: STATE_COLORS.warning,
-                opacity: emailSent ? 0.5 : 1,
-              }}
+              className={styles.verifyButton}
             >
               {emailSent ? 'Email sent' : 'Verify'}
               </button>
             )
           ) : null}
         </div>
-        <p style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}>
+        <p className={styles.infoValue}>
           {user?.email || 'Not added yet'}
         </p>
       </div>
-      
+
       {/* Phone */}
-        <div 
-          className="p-4 rounded-xl"
-          style={{ backgroundColor: 'rgba(255,255,255,0.03)' }}
-        >
-        <div className="flex items-center justify-between mb-2">
-          <span style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+      <div className={styles.infoBox}>
+        <div className={styles.infoBoxHeader}>
+          <span className={styles.infoLabel}>
             Phone
           </span>
         </div>
-          <p style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}>
+        <p className={styles.infoValue}>
           {user?.phoneNumber || 'Not added yet'}
-          </p>
-        </div>
-      
+        </p>
+      </div>
+
       {/* Country */}
-      <div 
-        className="p-4 rounded-xl"
-        style={{ backgroundColor: 'rgba(255,255,255,0.03)' }}
-      >
-        <span 
-          className="block mb-2"
-          style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
-        >
+      <div className={styles.infoBox}>
+        <span className={cn(styles.infoLabel, 'block mb-2')}>
           Country
         </span>
-        <p style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}>
+        <p className={styles.infoValue}>
           {profile?.countryCode || 'Not set'}
         </p>
       </div>
       
       {/* Stats */}
-      <div className="grid grid-cols-2 gap-3">
-        <div 
-          className="p-4 rounded-xl text-center"
-          style={{ backgroundColor: 'rgba(255,255,255,0.03)' }}
-        >
-          <span 
-            className="block font-bold text-xl"
-            style={{ color: TEXT_COLORS.primary }}
-          >
+      <div className={styles.statsGrid}>
+        <div className={styles.statCard}>
+          <span className={cn(styles.statValue, 'block font-bold text-xl')}>
             {profile?.tournamentsEntered || 0}
           </span>
-          <span style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+          <span className={styles.statLabel}>
             Tournaments
           </span>
         </div>
-        <div 
-          className="p-4 rounded-xl text-center"
-          style={{ backgroundColor: 'rgba(255,255,255,0.03)' }}
-        >
-          <span 
-            className="block font-bold text-xl"
+        <div className={styles.statCard}>
+          <span
+            className={cn(styles.statValue, 'block font-bold text-xl')}
             style={{ color: STATE_COLORS.success }}
           >
             ${(profile?.totalWinnings || 0).toLocaleString()}
           </span>
-          <span style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+          <span className={styles.statLabel}>
             Winnings
           </span>
         </div>
       </div>
 
       {/* Delete account — opens modal (eligibility, maze, password) */}
-      <div
-        className="flex items-center justify-between p-4 rounded-xl"
-        style={{ backgroundColor: 'rgba(255,255,255,0.03)' }}
-      >
-        <div>
-          <span className="block font-medium" style={{ color: TEXT_COLORS.primary }}>
+      <div className={styles.deleteAccountSection}>
+        <div className={styles.deleteAccountInfo}>
+          <span className={styles.deleteAccountTitle}>
             Delete account
           </span>
-          <span style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+          <span className={styles.deleteAccountDescription}>
             Permanently delete your account and data
           </span>
         </div>
         <button
           onClick={onOpenDeleteModal}
-          style={{
-            padding: '8px 16px',
-            borderRadius: 10,
-            border: `1px solid ${STATE_COLORS.error}`,
-            background: 'transparent',
-            color: STATE_COLORS.error,
-            fontWeight: 600,
-            fontSize: TYPOGRAPHY.fontSize.sm,
-          }}
+          className={styles.deleteButton}
         >
           Delete account
         </button>
@@ -412,88 +330,68 @@ function PreferencesTabContent(): React.ReactElement {
     <button
       onClick={onChange}
       disabled={disabled}
-      className="relative w-11 h-6 rounded-full transition-colors"
-      style={{ 
-        background: checked ? 'url(/wr_blue.png) no-repeat center center' : 'rgba(255,255,255,0.1)',
-        backgroundSize: checked ? 'cover' : undefined,
-        opacity: disabled ? 0.5 : 1,
-        cursor: disabled ? 'not-allowed' : 'pointer',
-      }}
+      className={styles.toggleSwitch}
+      data-checked={checked}
       role="switch"
       aria-checked={checked}
     >
-      <div 
-        className="absolute w-5 h-5 rounded-full bg-white transition-transform"
-        style={{ 
-          top: '2px', 
-          left: checked ? '22px' : '2px',
-        }}
-      />
+      <div className={styles.toggleSwitchThumb} />
     </button>
   );
   
   return (
-    <div className="space-y-4">
+    <div className={styles.preferencesContent}>
       {saved && (
-        <div 
-          className="p-3 rounded-lg text-center"
-          style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', color: STATE_COLORS.success }}
-        >
+        <div className={styles.savedMessage}>
           Preferences saved
         </div>
       )}
-      
+
       {/* Dynamic Island / Live Activity toggle - only show on supported iOS devices */}
       {dynamicIslandSupported && (
-        <div 
-          className="flex items-center justify-between p-4 rounded-xl"
-          style={{ backgroundColor: 'rgba(255,255,255,0.03)' }}
-        >
-          <div>
-            <span 
-              className="block font-medium"
-              style={{ color: TEXT_COLORS.primary }}
-            >
+        <div className={styles.preferenceItem}>
+          <div className={styles.preferenceItemLabel}>
+            <span className={styles.preferenceItemTitle}>
               Dynamic Island Timer
             </span>
-            <span style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+            <span className={styles.preferenceItemDescription}>
               See draft timer when using other apps
             </span>
           </div>
-          <ToggleSwitch 
-            checked={preferences.dynamicIslandEnabled} 
-            onChange={() => handleToggle('dynamicIslandEnabled')} 
+          <ToggleSwitch
+            checked={preferences.dynamicIslandEnabled}
+            onChange={() => handleToggle('dynamicIslandEnabled')}
           />
         </div>
       )}
       
       {/* Draft Alerts - Show for ALL users */}
-      <div className="space-y-3 mt-4">
-        <h3 className="text-lg font-semibold" style={{ color: TEXT_COLORS.primary }}>
+      <div className={styles.alertPreferencesSection}>
+        <h3 className={styles.alertsTitle}>
           Draft Alerts
         </h3>
-        <p style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+        <p className={styles.alertsDescription}>
           {dynamicIslandSupported
             ? 'Alerts appear in Dynamic Island and Lock Screen'
             : 'Alerts appear as browser notifications'
           }
         </p>
-        
+
         {/* Show permission request for non-Dynamic Island users */}
         {notificationPermission !== 'granted' && !dynamicIslandSupported && (
-          <div className="p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/20 mb-4">
-            <p className="text-yellow-400 text-sm mb-2">
+          <div className={styles.notificationPermissionBox}>
+            <p className={styles.notificationPermissionText}>
               Enable browser notifications to receive draft alerts
             </p>
             <button
               onClick={requestNotificationPermission}
-              className="px-4 py-2 bg-yellow-500 text-black rounded-lg font-medium"
+              className={styles.notificationPermissionButton}
             >
               Enable Notifications
             </button>
           </div>
         )}
-        
+
         {[
           { key: 'roomFilled' as const, label: 'Room Filled', desc: 'When draft room reaches capacity' },
           { key: 'draftStarting' as const, label: 'Draft Starting', desc: 'When draft countdown begins' },
@@ -501,54 +399,41 @@ function PreferencesTabContent(): React.ReactElement {
           { key: 'onTheClock' as const, label: 'On The Clock', desc: "When it's your turn to pick" },
           { key: 'tenSecondsRemaining' as const, label: '10 Seconds Remaining', desc: 'When timer hits 10 seconds' },
         ].map(({ key, label, desc }) => (
-          <div
-            key={key}
-            className="flex items-center justify-between p-4 rounded-xl"
-            style={{ backgroundColor: 'rgba(255,255,255,0.03)' }}
-          >
-            <div>
-              <span
-                className="block font-medium"
-                style={{ color: TEXT_COLORS.primary }}
-              >
+          <div key={key} className={styles.preferenceItem}>
+            <div className={styles.preferenceItemLabel}>
+              <span className={styles.preferenceItemTitle}>
                 {label}
               </span>
-              <span style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+              <span className={styles.preferenceItemDescription}>
                 {desc}
               </span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className={cn('flex items-center gap-2', styles.alertItemWithSaving)}>
               <ToggleSwitch
                 checked={alertPreferences[key]}
                 onChange={() => handleAlertToggle(key)}
                 disabled={savingKey === key || isSaving}
               />
               {savingKey === key && (
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <div className={styles.savingSpinner} />
               )}
             </div>
           </div>
         ))}
       </div>
       
-      <div 
-        className="flex items-center justify-between p-4 rounded-xl"
-        style={{ backgroundColor: 'rgba(255,255,255,0.03)' }}
-      >
-        <div>
-          <span 
-            className="block font-medium"
-            style={{ color: TEXT_COLORS.primary }}
-          >
+      <div className={styles.preferenceItem}>
+        <div className={styles.preferenceItemLabel}>
+          <span className={styles.preferenceItemTitle}>
             Slow draft email updates
           </span>
-          <span style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+          <span className={styles.preferenceItemDescription}>
             Updates about your slow drafts
           </span>
         </div>
-        <ToggleSwitch 
-          checked={preferences.emailUpdates} 
-          onChange={() => handleToggle('emailUpdates')} 
+        <ToggleSwitch
+          checked={preferences.emailUpdates}
+          onChange={() => handleToggle('emailUpdates')}
         />
       </div>
     </div>
@@ -573,51 +458,32 @@ function SecurityTabContent(): React.ReactElement {
   };
   
   return (
-    <div className="space-y-4">
+    <div className={styles.securityContent}>
       {/* Password */}
-      <div 
-        className="p-4 rounded-xl"
-        style={{ backgroundColor: 'rgba(255,255,255,0.03)' }}
-      >
-        <div className="flex items-center justify-between">
-          <div>
-            <span 
-              className="block font-medium"
-              style={{ color: TEXT_COLORS.primary }}
-            >
-              Password
-            </span>
-            <span style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
-              {user?.email ? 'Change your password' : 'Add a password'}
-            </span>
-          </div>
-          <button
-            onClick={handlePasswordReset}
-            disabled={resetSent || !user?.email}
-            className="px-4 py-2 rounded-lg font-medium"
-            style={{ 
-              backgroundColor: 'rgba(255,255,255,0.1)', 
-              color: TEXT_COLORS.primary,
-              opacity: resetSent || !user?.email ? 0.5 : 1,
-            }}
-          >
-            {resetSent ? 'Email Sent' : 'Reset'}
-          </button>
+      <div className={styles.securityItem}>
+        <div className={styles.securityItemInfo}>
+          <span className={styles.securityItemTitle}>
+            Password
+          </span>
+          <span className={styles.securityItemDescription}>
+            {user?.email ? 'Change your password' : 'Add a password'}
+          </span>
         </div>
-      </div>
-      
-      {/* Session Info */}
-      <div 
-        className="p-4 rounded-xl"
-        style={{ backgroundColor: 'rgba(255,255,255,0.03)' }}
-      >
-        <span 
-          className="block font-medium mb-2"
-          style={{ color: TEXT_COLORS.primary }}
+        <button
+          onClick={handlePasswordReset}
+          disabled={resetSent || !user?.email}
+          className={styles.resetButton}
         >
+          {resetSent ? 'Email Sent' : 'Reset'}
+        </button>
+      </div>
+
+      {/* Session Info */}
+      <div className={styles.securityItem}>
+        <span className={cn(styles.securityItemTitle, 'block mb-2')}>
           Current Session
         </span>
-        <span style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+        <span className={styles.securityItemDescription}>
           Last login: {user?.lastLoginAt ? new Date(user.lastLoginAt).toLocaleString() : 'Unknown'}
         </span>
       </div>
@@ -671,86 +537,59 @@ function ChangeUsernameModal({ isOpen, onClose, currentUsername }: ChangeUsernam
   };
   
   if (!isOpen) return null;
-  
+
   return (
-    <div 
-      className="absolute inset-0 flex items-center justify-center"
-      style={{ backgroundColor: 'rgba(0,0,0,0.75)', zIndex: Z_INDEX.modal + 10 }}
-    >
-      <div 
-        className="w-full max-w-md mx-4 rounded-2xl"
-        style={{ backgroundColor: BG_COLORS.secondary }}
-      >
+    <div className={styles.modalOverlay}>
+      <div className={styles.modalDialog}>
         {/* Header */}
-        <div 
-          className="flex items-center justify-between p-4"
-          style={{ borderBottom: `1px solid ${BORDER_COLORS.default}` }}
-        >
-          <h3 
-            className="font-bold"
-            style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}
-          >
+        <div className={styles.modalHeader}>
+          <h3 className={styles.modalTitle}>
             Change Username
           </h3>
-          <button onClick={onClose} className="p-2">
+          <button onClick={onClose} className={styles.modalCloseButton}>
             <Close size={20} color={TEXT_COLORS.muted} />
           </button>
         </div>
-        
+
         {/* Content */}
-        <div className="p-4 space-y-4">
+        <div className={styles.modalContent}>
           {success ? (
-            <div 
-              className="text-center py-8"
-              style={{ color: STATE_COLORS.success }}
-            >
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mx-auto mb-4">
+            <div className={styles.successMessage}>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={cn(styles.successIcon, 'mx-auto mb-4')}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
-              <p className="font-semibold">Username changed!</p>
+              <p className={cn(styles.successText, 'font-semibold')}>Username changed!</p>
             </div>
           ) : (
             <>
-              <div 
-                className="p-3 rounded-lg"
-                style={{ backgroundColor: 'rgba(245, 158, 11, 0.1)' }}
-              >
-                <p style={{ color: STATE_COLORS.warning, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+              <div className={styles.warningBox}>
+                <p className={styles.warningText}>
                   You can change your username {RATE_LIMITS.MAX_USERNAME_CHANGES_PER_YEAR} times per year.
                 </p>
               </div>
-              
+
               {error && (
-                <div 
-                  className="p-3 rounded-lg"
-                  style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: STATE_COLORS.error }}
-                >
+                <div className={styles.errorBox}>
                   {error}
                 </div>
               )}
-              
-              <div>
-                <label 
-                  className="block font-medium mb-2"
-                  style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
-                >
+
+              <div className={styles.formField}>
+                <label className={styles.fieldLabel}>
                   Current username
                 </label>
-                <p style={{ color: TEXT_COLORS.muted }}>@{currentUsername}</p>
+                <p className={styles.fieldValue}>@{currentUsername}</p>
               </div>
-              
+
               <UsernameInput
                 value={newUsername}
                 onChange={setNewUsername}
                 countryCode={profile?.countryCode || 'US'}
                 placeholder="Enter new username"
               />
-              
-              <div>
-                <label 
-                  className="block font-medium mb-2"
-                  style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
-                >
+
+              <div className={styles.formField}>
+                <label className={styles.fieldLabel}>
                   Reason (optional)
                 </label>
                 <input
@@ -758,26 +597,17 @@ function ChangeUsernameModal({ isOpen, onClose, currentUsername }: ChangeUsernam
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
                   placeholder="Why are you changing?"
-                  className="w-full px-4 py-3 rounded-xl outline-none"
-                  style={{
-                    backgroundColor: 'rgba(255,255,255,0.05)',
-                    color: TEXT_COLORS.primary,
-                    border: `1px solid ${BORDER_COLORS.default}`,
-                    fontSize: `${TYPOGRAPHY.fontSize.base}px`,
-                  }}
+                  className={styles.fieldInput}
                 />
               </div>
-              
+
               <button
                 onClick={handleChange}
                 disabled={!canChange || isChanging}
-                className="w-full py-3 rounded-xl font-bold"
-                style={{
-                  background: canChange ? 'url(/wr_blue.png) no-repeat center center' : BG_COLORS.tertiary,
-                  backgroundSize: canChange ? 'cover' : undefined,
-                  color: canChange ? '#000' : TEXT_COLORS.disabled,
-                  opacity: canChange ? 1 : 0.5,
-                }}
+                className={cn(
+                  styles.primaryButton,
+                  canChange ? styles.primaryButtonEnabled : styles.primaryButtonDisabled
+                )}
               >
                 {isChanging ? 'Changing...' : 'Change Username'}
               </button>
@@ -890,82 +720,48 @@ function AddContactModal({ isOpen, onClose, type }: AddContactModalProps): React
   }, [isOpen]);
   
   if (!isOpen) return null;
-  
+
   return (
-    <div 
-      className="absolute inset-0 flex items-center justify-center"
-      style={{ backgroundColor: 'rgba(0,0,0,0.75)', zIndex: Z_INDEX.modal + 10 }}
-    >
-      <div 
-        className="w-full max-w-md mx-4 rounded-2xl"
-        style={{ backgroundColor: BG_COLORS.secondary }}
-      >
+    <div className={styles.modalOverlay}>
+      <div className={styles.modalDialog}>
         {/* Header */}
-        <div 
-          className="flex items-center justify-between p-4"
-          style={{ borderBottom: `1px solid ${BORDER_COLORS.default}` }}
-        >
-          <h3 
-            className="font-bold"
-            style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}
-          >
+        <div className={styles.modalHeader}>
+          <h3 className={styles.modalTitle}>
             Add {label}
           </h3>
-          <button onClick={onClose} className="p-2">
+          <button onClick={onClose} className={styles.modalCloseButton}>
             <Close size={20} color={TEXT_COLORS.muted} />
           </button>
         </div>
-        
+
         {/* Content */}
-        <div className="p-4 space-y-4">
+        <div className={styles.modalContent}>
           {success ? (
-            <div 
-              className="text-center py-8"
-              style={{ color: STATE_COLORS.success }}
-            >
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mx-auto mb-4">
+            <div className={styles.successMessage}>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={cn(styles.successIcon, 'mx-auto mb-4')}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
-              <p className="font-semibold">{label} added!</p>
-              <p style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }} className="mt-2">
+              <p className={cn(styles.successText, 'font-semibold')}>{label} added!</p>
+              <p className={cn(styles.infoLabel, 'mt-2')}>
                 {isEmail ? 'Check your inbox to verify.' : 'Verification code sent.'}
               </p>
             </div>
           ) : (
             <>
-              <div 
-                className="p-3 rounded-lg"
-                style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}
-              >
-                <p
-                  style={{
-                    background: 'url(/wr_blue.png) no-repeat center center',
-                    backgroundSize: 'cover',
-                    WebkitBackgroundClip: 'text',
-                    backgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    color: 'transparent',
-                    fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-                  }}
-                >
+              <div className={styles.infoMessageBox}>
+                <p className={styles.infoMessageText}>
                   Adding {isEmail ? 'an email' : 'a phone number'} gives you another way to sign in to your account.
                 </p>
               </div>
-              
+
               {error && (
-                <div 
-                  className="p-3 rounded-lg"
-                  style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: STATE_COLORS.error }}
-                >
+                <div className={styles.errorBox}>
                   {error}
                 </div>
               )}
-              
-              <div>
-                <label 
-                  className="block font-medium mb-2"
-                  style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
-                >
+
+              <div className={styles.formField}>
+                <label className={styles.fieldLabel}>
                   {label}
                 </label>
                 <input
@@ -974,41 +770,29 @@ function AddContactModal({ isOpen, onClose, type }: AddContactModalProps): React
                   onChange={(e) => setValue(e.target.value)}
                   placeholder={placeholder}
                   autoComplete={isEmail ? 'email' : 'tel'}
-                  className="w-full px-4 py-3 rounded-xl outline-none"
-                  style={{
-                    backgroundColor: 'rgba(255,255,255,0.05)',
-                    color: TEXT_COLORS.primary,
-                    border: `2px solid ${value && !isValid ? STATE_COLORS.error : BORDER_COLORS.default}`,
-                    fontSize: `${TYPOGRAPHY.fontSize.base}px`,
-                  }}
+                  className={cn(
+                    styles.fieldInput,
+                    value && !isValid && styles.fieldInputError
+                  )}
                 />
                 {value && !isValid && (
-                  <span 
-                    className="block mt-1"
-                    style={{ color: STATE_COLORS.error, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}
-                  >
+                  <span className={styles.fieldError}>
                     Please enter a valid {label.toLowerCase()}
                   </span>
                 )}
               </div>
-              
+
               <button
                 onClick={handleAdd}
                 disabled={!isValid || isAdding}
-                className="w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2"
-                style={{
-                  background: isValid ? 'url(/wr_blue.png) no-repeat center center' : BG_COLORS.tertiary,
-                  backgroundSize: isValid ? 'cover' : undefined,
-                  color: isValid ? '#000' : TEXT_COLORS.disabled,
-                  opacity: isValid ? 1 : 0.5,
-                }}
+                className={cn(
+                  styles.primaryButton,
+                  isValid ? styles.primaryButtonEnabled : styles.primaryButtonDisabled
+                )}
               >
                 {isAdding ? (
                   <>
-                    <div 
-                      className="animate-spin rounded-full h-5 w-5 border-2"
-                      style={{ borderColor: '#000 transparent transparent transparent' }}
-                    />
+                    <div className={styles.spinnerContainer} />
                     Adding...
                   </>
                 ) : (
@@ -1081,60 +865,39 @@ function EditNameModal({ isOpen, onClose, currentFirstName, currentLastName }: E
   }, [isOpen, currentFirstName, currentLastName]);
   
   if (!isOpen) return null;
-  
+
   return (
-    <div 
-      className="absolute inset-0 flex items-center justify-center"
-      style={{ backgroundColor: 'rgba(0,0,0,0.75)', zIndex: Z_INDEX.modal + 10 }}
-    >
-      <div 
-        className="w-full max-w-md mx-4 rounded-2xl"
-        style={{ backgroundColor: BG_COLORS.secondary }}
-      >
+    <div className={styles.modalOverlay}>
+      <div className={styles.modalDialog}>
         {/* Header */}
-        <div 
-          className="flex items-center justify-between p-4"
-          style={{ borderBottom: `1px solid ${BORDER_COLORS.default}` }}
-        >
-          <h3 
-            className="font-bold"
-            style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}
-          >
+        <div className={styles.modalHeader}>
+          <h3 className={styles.modalTitle}>
             {currentFirstName ? 'Edit Name' : 'Add Name'}
           </h3>
-          <button onClick={onClose} className="p-2">
+          <button onClick={onClose} className={styles.modalCloseButton}>
             <Close size={20} color={TEXT_COLORS.muted} />
           </button>
         </div>
-        
+
         {/* Content */}
-        <div className="p-4 space-y-4">
+        <div className={styles.modalContent}>
           {success ? (
-            <div 
-              className="text-center py-8"
-              style={{ color: STATE_COLORS.success }}
-            >
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mx-auto mb-4">
+            <div className={styles.successMessage}>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={cn(styles.successIcon, 'mx-auto mb-4')}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
-              <p className="font-semibold">Name updated!</p>
+              <p className={cn(styles.successText, 'font-semibold')}>Name updated!</p>
             </div>
           ) : (
             <>
               {error && (
-                <div 
-                  className="p-3 rounded-lg"
-                  style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: STATE_COLORS.error }}
-                >
+                <div className={styles.errorBox}>
                   {error}
                 </div>
               )}
-              
-              <div>
-                <label 
-                  className="block font-medium mb-2"
-                  style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
-                >
+
+              <div className={styles.formField}>
+                <label className={styles.fieldLabel}>
                   First Name
                 </label>
                 <input
@@ -1143,21 +906,12 @@ function EditNameModal({ isOpen, onClose, currentFirstName, currentLastName }: E
                   onChange={(e) => setFirstName(e.target.value)}
                   placeholder="Enter first name"
                   autoComplete="given-name"
-                  className="w-full px-4 py-3 rounded-xl outline-none"
-                  style={{
-                    backgroundColor: 'rgba(255,255,255,0.05)',
-                    color: TEXT_COLORS.primary,
-                    border: `2px solid ${BORDER_COLORS.default}`,
-                    fontSize: `${TYPOGRAPHY.fontSize.base}px`,
-                  }}
+                  className={styles.fieldInput}
                 />
               </div>
-              
-              <div>
-                <label 
-                  className="block font-medium mb-2"
-                  style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
-                >
+
+              <div className={styles.formField}>
+                <label className={styles.fieldLabel}>
                   Last Name
                 </label>
                 <input
@@ -1166,33 +920,21 @@ function EditNameModal({ isOpen, onClose, currentFirstName, currentLastName }: E
                   onChange={(e) => setLastName(e.target.value)}
                   placeholder="Enter last name"
                   autoComplete="family-name"
-                  className="w-full px-4 py-3 rounded-xl outline-none"
-                  style={{
-                    backgroundColor: 'rgba(255,255,255,0.05)',
-                    color: TEXT_COLORS.primary,
-                    border: `2px solid ${BORDER_COLORS.default}`,
-                    fontSize: `${TYPOGRAPHY.fontSize.base}px`,
-                  }}
+                  className={styles.fieldInput}
                 />
               </div>
-              
+
               <button
                 onClick={handleSave}
                 disabled={!isValid || !hasChanges || isSaving}
-                className="w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2"
-                style={{
-                  background: isValid && hasChanges ? 'url(/wr_blue.png) no-repeat center center' : BG_COLORS.tertiary,
-                  backgroundSize: isValid && hasChanges ? 'cover' : undefined,
-                  color: isValid && hasChanges ? '#000' : TEXT_COLORS.disabled,
-                  opacity: isValid && hasChanges ? 1 : 0.5,
-                }}
+                className={cn(
+                  styles.primaryButton,
+                  isValid && hasChanges ? styles.primaryButtonEnabled : styles.primaryButtonDisabled
+                )}
               >
                 {isSaving ? (
                   <>
-                    <div 
-                      className="animate-spin rounded-full h-5 w-5 border-2"
-                      style={{ borderColor: '#000 transparent transparent transparent' }}
-                    />
+                    <div className={styles.spinnerContainer} />
                     Saving...
                   </>
                 ) : (
@@ -1240,78 +982,49 @@ export function ProfileSettingsModal({
   ];
   
   if (!isOpen) return null;
-  
+
   return (
-    <div 
-      className="absolute left-0 right-0 bottom-0 flex flex-col"
-      style={{ 
-        top: `${contentTopInset}px`, 
-        backgroundColor: BG_COLORS.secondary, 
-        zIndex: Z_INDEX.modal 
-      }}
+    <div
+      className={styles.modal}
+      style={{
+        '--content-top-inset': `${contentTopInset}px`,
+      } as React.CSSProperties}
     >
       {/* Header — same top padding as Sign In/Sign Up/Forgot Password so X height is consistent */}
-      <div 
-        className="flex items-center justify-between flex-shrink-0"
-        style={{ 
-          padding: `${SPACING.md + 8}px ${SPACING.lg}px ${SPACING.md}px`,
-          borderBottom: `1px solid ${BORDER_COLORS.default}`,
-        }}
-      >
-        <h2 
-          className="font-bold" 
-          style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}
-        >
+      <div className={styles.header}>
+        <h2 className={styles.headerTitle}>
           Settings
         </h2>
-        <button 
-          onClick={onClose} 
-          className="p-2" 
+        <button
+          onClick={onClose}
+          className={sharedStyles.closeButton}
           aria-label="Close"
         >
           <Close size={24} color={TEXT_COLORS.muted} />
         </button>
       </div>
-      
+
       {/* Tabs */}
-      <div 
-        className="flex border-b"
-        style={{ borderColor: BORDER_COLORS.default }}
-      >
+      <div className={styles.tabsContainer}>
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className="flex-1 py-3 transition-colors relative"
-            style={{
-              color: TEXT_COLORS.muted,
-              borderBottom: '2px solid transparent',
-              fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-              fontWeight: activeTab === tab.id ? 600 : 500,
-            }}
+            className={styles.tab}
+            aria-selected={activeTab === tab.id}
           >
             <span style={{ position: 'relative', zIndex: 1 }}>{tab.label}</span>
             {activeTab === tab.id && (
-              <div
-                className="absolute left-0 right-0 bottom-0"
-                style={{
-                  height: 2,
-                  background: 'url(/wr_blue.png) no-repeat center center',
-                  backgroundSize: 'cover',
-                }}
-              />
+              <div className={styles.tabIndicator} />
             )}
           </button>
         ))}
       </div>
-      
+
       {/* Content */}
-      <div 
-        className="flex-1 overflow-y-auto" 
-        style={{ padding: SPACING.lg, scrollbarWidth: 'none' }}
-      >
+      <div className={styles.content}>
         {activeTab === 'profile' && (
-          <ProfileTabContent 
+          <ProfileTabContent
             onEditName={() => setShowNameModal(true)}
             onAddEmail={() => setShowAddContactModal('email')}
             onAddPhone={() => setShowAddContactModal('phone')}
@@ -1321,16 +1034,12 @@ export function ProfileSettingsModal({
         {activeTab === 'preferences' && <PreferencesTabContent />}
         {activeTab === 'security' && <SecurityTabContent />}
       </div>
-      
+
       {/* Footer */}
-      <div 
-        className="flex-shrink-0 text-center py-3"
-        style={{ borderTop: `1px solid ${BORDER_COLORS.default}` }}
-      >
+      <div className={styles.footer}>
         <button
           onClick={async () => { await signOut(); onClose(); }}
-          className="py-2 px-8 rounded-xl"
-          style={{ color: STATE_COLORS.error, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}
+          className={styles.signOutButton}
         >
           Sign Out
         </button>

@@ -1,0 +1,18 @@
+.container {
+  height: var(--height, 4px);
+  width: 100%;
+  background-color: var(--background-color, #e5e7eb);
+  border-radius: var(--border-radius, 2px);
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  width: var(--percentage, 0%);
+  background-image: var(--background-image, url(/wr_blue.png));
+  background-size: var(--background-size, 200px);
+  background-repeat: var(--background-repeat, repeat);
+  background-color: var(--background-color, #1e40af);
+  border-radius: var(--border-radius, 2px);
+  transition: width 0.3s ease-out;
+}
