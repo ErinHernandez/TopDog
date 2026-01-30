@@ -11,6 +11,9 @@ module.exports = {
       // COLORS - Mapped to CSS Custom Properties
       // ========================================================================
       colors: {
+        // Top-level aliases for common colors (enables text-accent, text-primary, etc.)
+        accent: 'var(--color-brand-accent)',
+        primary: 'var(--color-brand-primary)',
         // Brand
         brand: {
           primary: 'var(--color-brand-primary)',

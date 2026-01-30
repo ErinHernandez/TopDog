@@ -6,7 +6,6 @@
  */
 
 import React, { useMemo, useCallback } from 'react';
-import { POSITION_COLORS } from '@/lib/constants/positions';
 import type { FantasyPosition } from '@/types/player';
 import DraftBoard from '@/components/vx2/draft-room/components/DraftBoard';
 import type { DraftPick, Participant, Position } from '@/components/vx2/draft-room/types';

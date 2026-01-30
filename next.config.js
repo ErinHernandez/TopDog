@@ -139,7 +139,7 @@ const nextConfig = {
             value: [
               "default-src 'self'",
               "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://fonts.googleapis.com https://www.googletagmanager.com https://js.stripe.com https://js.paystack.co",
-              "style-src 'self' https://fonts.googleapis.com",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "img-src 'self' data: blob: https://js.stripe.com https://www.paypalobjects.com https://developers.google.com https://developer.apple.com https://upload.wikimedia.org https://ui-avatars.com",
               "font-src 'self' https://fonts.gstatic.com data:",
               "connect-src 'self' https://api.stripe.com https://*.firebaseio.com https://*.googleapis.com wss://*.firebaseio.com https://api.paystack.co https://api.xendit.co https://api.paymongo.com https://*.sentry.io https://*.ingest.sentry.io",
