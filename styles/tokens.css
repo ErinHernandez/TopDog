@@ -341,4 +341,582 @@
   --bottom-row-gap: 12px;
   --progress-bar-y-offset: -8px;
   --join-button-y-offset: -4px;
+
+  /* ============================================================================
+     ADDITIONAL SPACING ALIASES
+     Numeric spacing for components using 1-4 scale.
+     ============================================================================ */
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+
+  /* ============================================================================
+     ADDITIONAL BORDER ALIASES
+     Extended border tokens for component styling.
+     ============================================================================ */
+  --border: var(--border-default);
+  --border-color: var(--border-default);
+  --border-lighter: rgba(255, 255, 255, 0.08);
+  --border-lightest: rgba(255, 255, 255, 0.03);
+  --border-radius: var(--radius-md);
+  --border-width: 1px;
+
+  /* ============================================================================
+     ADDITIONAL COLOR ALIASES
+     Extended color tokens for common patterns.
+     ============================================================================ */
+  --color-text: var(--text-primary);
+  --color-accent: var(--color-brand-accent);
+  --color-active: var(--color-state-active);
+  --color-error: var(--color-state-error);
+  --color-success: var(--color-state-success);
+  --color-green: #10B981;
+  --color-red: #EF4444;
+  --color-yellow: #FBBF24;
+  --color-blue: #3B82F6;
+  --color-blue-light: #60A5FA;
+  --color-gray-400: #9CA3AF;
+  --color-gray-600: #4B5563;
+
+  /* Background variants */
+  --color-background: var(--bg-primary);
+  --color-card-bg: var(--bg-card);
+  --color-input-bg: var(--bg-secondary);
+  --color-stat-bg: rgba(255, 255, 255, 0.05);
+  --color-error-bg: rgba(239, 68, 68, 0.1);
+  --color-error-bg-light: rgba(239, 68, 68, 0.05);
+  --color-success-bg-light: rgba(16, 185, 129, 0.05);
+  --color-active-bg-light: rgba(59, 130, 246, 0.1);
+  --color-red-bg: rgba(239, 68, 68, 0.15);
+  --color-bg-overlay: rgba(0, 0, 0, 0.5);
+  --color-bg-panel: var(--bg-secondary);
+  --color-bg-panel-lighter: var(--bg-tertiary);
+
+  /* Border color variants */
+  --color-border-default: var(--border-default);
+  --color-border-lighter: var(--border-lighter);
+  --color-error-border: var(--border-error);
+
+  /* Dot indicators */
+  --color-dot-active: var(--color-brand-primary);
+  --color-dot-inactive: var(--text-muted);
+
+  /* Input variants */
+  --color-input-bg-verified: rgba(16, 185, 129, 0.1);
+  --color-input-border-verified: var(--border-success);
+  --input-border: var(--border-default);
+  --input-border-color: var(--border-default);
+
+  /* ============================================================================
+     STATE COLOR ALIASES
+     Additional state tokens for form validation.
+     ============================================================================ */
+  --state-active: var(--color-state-active);
+  --state-success: var(--color-state-success);
+  --state-error: var(--color-state-error);
+  --state-warning: var(--color-state-warning);
+  --state-error-border: var(--border-error);
+  --state-warning-border: #F59E0B;
+  --state-error-light: rgba(239, 68, 68, 0.1);
+  --state-warning-light: rgba(245, 158, 11, 0.1);
+
+  /* ============================================================================
+     MODAL TOKENS
+     Modal and overlay styling variables.
+     ============================================================================ */
+  --modal-bg: var(--bg-secondary);
+  --modal-background: var(--bg-secondary);
+  --modal-backdrop: rgba(0, 0, 0, 0.75);
+  --modal-border: var(--border-default);
+  --modal-divider: var(--border-light);
+  --modal-title: var(--text-primary);
+  --modal-text: var(--text-primary);
+  --modal-text-light: var(--text-secondary);
+  --modal-description: var(--text-secondary);
+  --modal-label: var(--text-secondary);
+  --modal-close-button: var(--text-muted);
+  --modal-close-button-text: var(--text-primary);
+  --modal-primary-button: var(--color-brand-primary);
+  --modal-primary-text: #000000;
+  --modal-secondary-button: var(--bg-tertiary);
+  --modal-secondary-text: var(--text-primary);
+  --modal-tutorial-button: var(--color-navbar-solid);
+
+  /* ============================================================================
+     BUTTON TOKENS
+     Button-specific styling variables.
+     ============================================================================ */
+  --button-height: 44px;
+  --button-size: 44px;
+  --button-border-radius: var(--radius-md);
+  --button-hover-alpha: 0.08;
+  --primary-button-bg: var(--color-brand-primary);
+  --primary-button-text: #000000;
+  --secondary-button-bg: var(--bg-tertiary);
+  --secondary-button-text: var(--text-primary);
+  --button-bg-active: var(--color-brand-primary);
+  --button-bg-inactive: var(--bg-tertiary);
+  --button-bg-inactive-hover: var(--bg-secondary);
+  --button-text-active: #000000;
+  --button-text-inactive: var(--text-secondary);
+  --button-bg-color: var(--bg-tertiary);
+  --button-bg-image: none;
+
+  /* ============================================================================
+     LAYOUT TOKENS
+     Navbar, footer, and layout dimensions.
+     ============================================================================ */
+  --navbar-height: 56px;
+  --navbar-padding-x: 16px;
+  --layout-navbar-height: 56px;
+  --layout-footer-height: 83px;
+  --layout-picks-bar-height: 100px;
+
+  /* Footer styling */
+  --footer-bg-color: var(--tab-bar-bg);
+  --footer-border-color: var(--tab-bar-border);
+  --footer-active-color: var(--tab-bar-icon-active);
+  --footer-inactive-color: var(--tab-bar-icon-inactive);
+  --footer-icon-size: 24px;
+  --footer-label-font-size: 10px;
+  --footer-label-line-height: 1.2;
+  --footer-label-margin-top: 2px;
+  --footer-tab-min-height: 49px;
+  --footer-tab-padding-top: 8px;
+  --footer-tab-padding-x: 16px;
+  --footer-container-height: 83px;
+  --footer-container-border-top: 1px solid var(--tab-bar-border);
+  --footer-badge-bg-color: var(--tab-bar-badge-bg);
+  --footer-badge-text-color: var(--tab-bar-badge-text);
+  --footer-badge-font-size: 10px;
+  --footer-badge-height: 16px;
+  --footer-badge-min-width: 16px;
+  --footer-badge-offset-right: -8px;
+  --footer-home-indicator-width: 134px;
+  --footer-home-indicator-height: 5px;
+  --footer-home-indicator-color: var(--text-primary);
+  --footer-home-indicator-margin-top: 12px;
+  --footer-home-indicator-margin-bottom: 8px;
+
+  /* ============================================================================
+     HEADER TOKENS
+     Header and section header styling.
+     ============================================================================ */
+  --header-padding: 16px;
+  --header-padding-x: 16px;
+  --header-padding-y: 12px;
+  --header-padding-top: 12px;
+  --header-padding-bottom: 12px;
+  --header-label-color: var(--text-secondary);
+
+  /* ============================================================================
+     MISCELLANEOUS COMPONENT TOKENS
+     Additional tokens for various components.
+     ============================================================================ */
+
+  /* Text color aliases */
+  --text-color-primary: var(--text-primary);
+  --text-color-secondary: var(--text-secondary);
+  --text-color-muted: var(--text-muted);
+  --text-color-white: #FFFFFF;
+  --black-text: #000000;
+
+  /* Background variants */
+  --bg-color: var(--bg-primary);
+  --bg-color-dark: var(--bg-tertiary);
+  --bg-color-blue: rgba(59, 130, 246, 0.1);
+  --bg-color-red: rgba(239, 68, 68, 0.1);
+
+  /* Logo and branding */
+  --logo-size: 48px;
+  --logo-top-margin: 24px;
+  --brand-color: var(--color-brand-primary);
+
+  /* Shadow variants */
+  --shadow: var(--shadow-small);
+  --shadow-elevated: var(--shadow-medium);
+  --shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.6);
+
+  /* Transition variants */
+  --transition-colors: color var(--duration-normal) ease, background-color var(--duration-normal) ease, border-color var(--duration-normal) ease;
+  --transition-duration: var(--duration-normal);
+
+  /* Z-index extensions */
+  --z-modal-top: 550;
+  --z-tabbar: var(--z-tab-bar);
+
+  /* Progress indicators */
+  --progress-height: 8px;
+  --progress-percent: 0%;
+
+  /* Row styling */
+  --row-min-height: 44px;
+  --row-height-button: 44px;
+  --row-height-stats: 24px;
+  --row-height-text-boxes: 40px;
+  --row-height-progress: 8px;
+  --row-padding-x: 16px;
+  --row-padding-y: 12px;
+  --row-value-left: auto;
+  --row-value-width: auto;
+
+  /* Stats section */
+  --stats-height: 80px;
+  --stats-gap: 16px;
+  --bottom-stats-gap: 12px;
+  --stats-table-min-width: 300px;
+
+  /* Badge styling */
+  --badge-gap: 8px;
+  --badge-min-width: 40px;
+  --badge-label-size: 10px;
+  --badge-value-size: 14px;
+
+  /* Timer styling */
+  --timer-color: var(--color-state-on-the-clock);
+  --timer-font-size: 24px;
+  --timer-font-weight: 700;
+  --timer-font-family: inherit;
+  --timer-progress-percent: 0%;
+
+  /* Title styling */
+  --title-color: var(--text-primary);
+  --title-font-size: 24px;
+  --title-line-height: 1.2;
+  --title-margin-top: 0;
+  --title-margin-bottom: 8px;
+
+  /* Label styling */
+  --label-color: var(--text-secondary);
+  --description-color: var(--text-muted);
+  --count-color: var(--text-secondary);
+
+  /* Section styling */
+  --section-label-margin-bottom: 8px;
+  --spacer-min-height: 8px;
+
+  /* Gap utilities */
+  --gap: 16px;
+
+  /* Column styling */
+  --column-width: auto;
+  --column-left: 0;
+  --column-justify: flex-start;
+  --column-text-align: left;
+  --value-left: auto;
+  --value-width: auto;
+
+  /* Active states */
+  --active-color: var(--color-state-active);
+  --backdrop-color: rgba(0, 0, 0, 0.5);
+  --urgency-color: var(--color-state-error);
+  --strength-color: var(--color-state-success);
+
+  /* Position colors (additional aliases) */
+  --position-color: var(--text-primary);
+  --position-qb: var(--color-position-qb);
+  --position-rb: var(--color-position-rb);
+  --position-wr: var(--color-position-wr);
+  --position-te: var(--color-position-te);
+  --position-text-color: #000000;
+
+  /* Position badge styling */
+  --position-badge-font-size: 10px;
+  --position-badge-font-weight: 600;
+  --position-badge-padding: 2px 6px;
+  --position-badge-border-radius: 4px;
+
+  /* Queue button variants */
+  --queue-button-svg-size: 16px;
+
+  /* Tracker segments */
+  --tracker-segment-width: 8px;
+
+  /* Search styling */
+  --search-margin-x: 16px;
+  --search-margin-top: 12px;
+
+  /* Scroll indicator */
+  --scroll-color: var(--text-muted);
+  --scroll-font-size: 12px;
+  --scroll-font-weight: 500;
+  --scroll-transform: none;
+
+  /* Dropdown styling */
+  --dropdown-height: 44px;
+  --dropdown-border-color: var(--border-default);
+  --dropdown-gradient: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+
+  /* Error states */
+  --error-bg: rgba(239, 68, 68, 0.1);
+  --warning-icon-bg: rgba(245, 158, 11, 0.1);
+  --warning-icon-color: var(--color-state-warning);
+
+  /* Pill styling */
+  --pill-bg: var(--bg-tertiary);
+  --pill-border: var(--border-default);
+
+  /* Summary section */
+  --summary-bg: var(--bg-secondary);
+
+  /* Team styling */
+  --team-gradient: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+  --team-header-border-color: var(--border-default);
+  --team-header-username-bg: var(--bg-tertiary);
+
+  /* Username styling */
+  --username-color: var(--text-primary);
+  --username-top: 0;
+
+  /* Event styling */
+  --event-color: var(--text-primary);
+  --event-bg-color: var(--bg-secondary);
+  --event-border-color: var(--border-default);
+  --event-badge-bg: var(--color-brand-primary);
+
+  /* Expiration styling */
+  --expiration-color: var(--color-state-warning);
+  --expiration-bg: rgba(245, 158, 11, 0.1);
+  --expiration-border: var(--color-state-warning);
+
+  /* Unselected state */
+  --unselected-border-color: var(--border-default);
+
+  /* Box styling */
+  --box-bg: var(--bg-secondary);
+  --box-border-color: var(--border-default);
+  --box-border-width: 1px;
+  --box-top-border-width: 1px;
+  --box-width: 100%;
+  --box-height: auto;
+
+  /* Info styling (extended) */
+  --info-bg: var(--bg-secondary);
+  --info-border: var(--border-default);
+
+  /* Virtualized list */
+  --virtualized-height: 400px;
+
+  /* Viewport */
+  --viewport-offset: 0px;
+
+  /* Grid styling */
+  --grid-row-min-width: 300px;
+  --headers-row-min-width: 300px;
+
+  /* Line styling */
+  --line-color: var(--border-default);
+
+  /* Confirm button */
+  --confirm-btn-opacity: 1;
+
+  /* Draft button */
+  --draft-button-bg: var(--color-brand-primary);
+  --draft-button-opacity: 1;
+  --draft-button-font-size: 14px;
+  --draft-button-padding-x: 16px;
+  --draft-button-padding-y: 8px;
+  --draft-button-bg-size: contain;
+
+  /* Deposit button */
+  --deposit-btn-bg: var(--color-brand-primary);
+  --deposit-btn-text: #000000;
+
+  /* Next button */
+  --next-btn-bg: var(--color-brand-primary);
+  --next-btn-text: #000000;
+  --next-btn-opacity: 1;
+
+  /* Button variants */
+  --btn-bg: var(--bg-tertiary);
+  --btn-text: var(--text-primary);
+  --btn-opacity: 1;
+
+  /* Status styling */
+  --status-bg-color: var(--bg-secondary);
+  --status-text-color: var(--text-primary);
+  --status-bar-bg: var(--bg-primary);
+
+  /* Content scaling */
+  --content-scale: 1;
+  --content-z-index: 1;
+
+  /* Image placeholders */
+  --image: none;
+  --placeholder-image: none;
+  --globe-bg-image: url('/!!_GLOBE_NOBACKGROUND.webp');
+
+  /* Knob position (for toggles) */
+  --knob-position: 0;
+
+  /* Full image z-index */
+  --full-image-z-index: 100;
+
+  /* Safe area */
+  --safe-area-top: 0px;
+  --safe-area-bg-image: none;
+
+  /* WR Blue background */
+  --wr-blue-bg: #1E3A5F;
+
+  /* Blank card styling */
+  --blank-card-border-color: var(--border-default);
+  --blank-card-header-bg: var(--bg-tertiary);
+
+  /* Card extras */
+  --card-bg: var(--bg-card);
+  --card-background: var(--bg-card);
+  --card-border: var(--border-default);
+  --card-border-color: var(--border-default);
+  --card-border-width: 1px;
+  --card-padding: 16px;
+  --card-gradient: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+  --card-bg-image-display: none;
+  --card-color-empty-tracker: var(--tracker-empty);
+  --card-color-player-name-text: var(--text-primary);
+
+  /* Player card styling */
+  --player-card-bg: var(--bg-card);
+  --player-card-border-color: var(--border-default);
+  --player-card-width: 92px;
+  --player-card-height: 62px;
+
+  /* Cell extras */
+  --cell-size: 92px;
+
+  /* Roster square styling */
+  --roster-square-size: 40px;
+  --roster-square-bg-color: var(--bg-secondary);
+  --roster-square-border: var(--border-default);
+  --roster-square-border-radius: 8px;
+  --roster-square-gap: 8px;
+
+  /* Expanded player card */
+  --expanded-player-card-gap: 12px;
+
+  /* Blur placeholder */
+  --blur-placeholder: none;
+  --blur-placeholder-bg: var(--bg-secondary);
+  --blur-border-radius: 12px;
+  --blur-placeholder-z-index: 5;
+
+  /* Tab styling */
+  --tab-icon-size: 24px;
+  --tab-label-font-size: 10px;
+  --tab-label-line-height: 1.2;
+  --tab-label-margin-top: 2px;
+
+  /* Year column */
+  --year-column-width: 60px;
+  --year-label-left: 8px;
+
+  /* User color */
+  --color-user-blue: var(--color-navbar-solid);
+
+  /* ============================================================================
+     IOS SHARE SHEET TOKENS
+     Native iOS-style share sheet styling.
+     ============================================================================ */
+  --ios-sheet-bg: #1C1C1E;
+  --ios-backdrop: rgba(0, 0, 0, 0.4);
+  --ios-handle-bar: rgba(255, 255, 255, 0.3);
+  --ios-header-border: rgba(255, 255, 255, 0.1);
+  --ios-title: #FFFFFF;
+  --ios-subtitle: #8E8E93;
+  --ios-action-bg: #2C2C2E;
+  --ios-action-bg-active: #3A3A3C;
+  --ios-action-border: rgba(255, 255, 255, 0.1);
+  --ios-action-text: #FFFFFF;
+  --ios-cancel-text: #0A84FF;
+  --ios-success-check: #30D158;
+  --ios-app-icon-messages: #30D158;
+  --ios-app-icon-mail: #0A84FF;
+  --ios-app-icon-copy: #8E8E93;
+  --ios-app-icon-more: #8E8E93;
+  --ios-app-icon-image: #FF9500;
+
+  /* ============================================================================
+     PICKS BAR CARD TOKENS (PBC)
+     Picks bar card component styling.
+     ============================================================================ */
+  --pbc-width: 92px;
+  --pbc-min-width: 92px;
+  --pbc-margin: 1px;
+  --pbc-border-radius: 6px;
+  --pbc-border-width: 4px;
+  --pbc-border-color: rgba(255, 255, 255, 0.1);
+  --pbc-bg-color: transparent;
+  --pbc-text-color: var(--text-primary);
+  --pbc-header-height: 20px;
+  --pbc-header-font-size: 10px;
+  --pbc-content-min-height: 70px;
+  --pbc-content-padding-bottom: 8px;
+  --pbc-tracker-height: 9px;
+  --pbc-tracker-empty-width: 79px;
+  --pbc-tracker-margin-top: 2px;
+  --pbc-tracker-border-radius: 1px;
+  --pbc-tracker-bg-color: var(--tracker-empty);
+
+  /* ============================================================================
+     PICKS BAR TOKENS
+     Picks bar container styling.
+     ============================================================================ */
+  --picks-bar-container-bg: var(--bg-primary);
+  --picks-bar-container-padding-top: 8px;
+  --picks-bar-header-height: 20px;
+  --picks-bar-card-width: 92px;
+  --picks-bar-card-margin: 1px;
+  --picks-bar-card-border-radius: 6px;
+  --picks-bar-card-border-width: 4px;
+  --picks-bar-card-bg: transparent;
+  --picks-bar-card-gap: 8px;
+  --picks-bar-content-min-height: 70px;
+  --picks-bar-pick-number-font-size: 8px;
+  --picks-bar-pick-number-margin-left: 1px;
+  --picks-bar-pick-number-top: 2px;
+  --picks-bar-player-last-name-font-size: 11px;
+  --picks-bar-player-pos-team-font-size: 9px;
+  --picks-bar-tracker-height: 9px;
+  --picks-bar-tracker-width: 78px;
+  --picks-bar-tracker-empty-width: 79px;
+  --picks-bar-tracker-border-radius: 1px;
+  --picks-content-padding: 16px;
+
+  /* ============================================================================
+     PLAYER EXPANDED CARD TOKENS (PEC)
+     Player expanded card component styling.
+     ============================================================================ */
+  --pec-row-height: 44px;
+  --pec-header-height: 48px;
+  --pec-header-padding-x: 16px;
+  --pec-header-padding-top: 12px;
+  --pec-header-padding-bottom: 12px;
+  --pec-header-label-color: var(--text-secondary);
+  --pec-header-label-color-dark: var(--text-muted);
+  --pec-line-color: var(--border-default);
+  --pec-line-color-dark: var(--border-light);
+  --pec-logo-size: 48px;
+  --pec-primary-text-color: var(--text-primary);
+  --pec-badge-gap: 8px;
+  --pec-badge-label-size: 10px;
+  --pec-badge-value-size: 14px;
+  --pec-badge-min-width-adp: 50px;
+  --pec-badge-min-width-proj: 50px;
+  --pec-badge-min-width-bye: 40px;
+  --pec-draft-button-font-size: 14px;
+  --pec-draft-button-padding-x: 16px;
+  --pec-draft-button-padding-y: 8px;
+  --pec-draft-button-inactive-color: var(--text-muted);
+  --pec-year-column-width: 60px;
+  --pec-year-label-left: 8px;
+
+  /* ============================================================================
+     ISLAND (DYNAMIC ISLAND) TOKENS
+     Dynamic Island-style notification styling.
+     ============================================================================ */
+  --island-width: 126px;
+  --island-height: 37px;
+  --island-bg-color: #000000;
+  --island-bg-image: none;
 }
