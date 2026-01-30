@@ -89,32 +89,32 @@ interface FooterTabConfig {
 
 // Players icon - single person
 const PlayersIcon = (isActive: boolean) => (
-  <svg 
+  <svg
     width={FOOTER_PX.iconSize}
     height={FOOTER_PX.iconSize}
     viewBox="0 0 24 24"
-    fill={isActive ? 'currentColor' : 'none'} 
+    fill={isActive ? 'currentColor' : 'none'}
     stroke="currentColor"
-    style={{ color: isActive ? FOOTER_COLORS.active : FOOTER_COLORS.inactive }}
+    className={isActive ? 'icon-active' : 'icon-inactive'}
   >
-    <path 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      strokeWidth={isActive ? 0 : 2} 
-      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" 
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={isActive ? 0 : 2}
+      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
     />
   </svg>
 );
 
 // Queue icon - plus sign
 const QueueIcon = (isActive: boolean) => (
-  <svg 
+  <svg
     width={FOOTER_PX.iconSize}
     height={FOOTER_PX.iconSize}
     viewBox="0 0 24 24"
-    fill="none" 
+    fill="none"
     stroke="currentColor"
-    style={{ color: isActive ? FOOTER_COLORS.active : FOOTER_COLORS.inactive }}
+    className={isActive ? 'icon-active' : 'icon-inactive'}
   >
     <path strokeLinecap="round" strokeWidth={2} d="M12 5v14M5 12h14" />
   </svg>
@@ -122,12 +122,12 @@ const QueueIcon = (isActive: boolean) => (
 
 // Roster icon - horizontal lines
 const RosterIcon = (isActive: boolean) => (
-  <svg 
+  <svg
     width={FOOTER_PX.iconSize}
     height={FOOTER_PX.iconSize}
     viewBox="0 0 24 24"
     fill="currentColor"
-    style={{ color: isActive ? FOOTER_COLORS.active : FOOTER_COLORS.inactive }}
+    className={isActive ? 'icon-active' : 'icon-inactive'}
   >
     <path d="M1,6H23a1,1,0,0,0,0-2H1A1,1,0,0,0,1,6Z"/>
     <path d="M23,9H1a1,1,0,0,0,0,2H23a1,1,0,0,0,0-2Z"/>
@@ -138,12 +138,12 @@ const RosterIcon = (isActive: boolean) => (
 
 // Board icon - 3x3 grid
 const BoardIcon = (isActive: boolean) => (
-  <svg 
+  <svg
     width={FOOTER_PX.iconSize}
     height={FOOTER_PX.iconSize}
     viewBox="0 0 24 24"
     fill="currentColor"
-    style={{ color: isActive ? FOOTER_COLORS.active : FOOTER_COLORS.inactive }}
+    className={isActive ? 'icon-active' : 'icon-inactive'}
   >
     <rect x="4" y="4" width="4" height="4" rx="0.5" />
     <rect x="10" y="4" width="4" height="4" rx="0.5" />
@@ -159,12 +159,12 @@ const BoardIcon = (isActive: boolean) => (
 
 // Info icon
 const InfoIcon = (isActive: boolean) => (
-  <svg 
+  <svg
     width={FOOTER_PX.iconSize}
     height={FOOTER_PX.iconSize}
     viewBox="0 0 24 24"
     fill="currentColor"
-    style={{ color: isActive ? FOOTER_COLORS.active : FOOTER_COLORS.inactive }}
+    className={isActive ? 'icon-active' : 'icon-inactive'}
   >
     <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="2"/>
     <circle cx="12" cy="8" r="1.5" fill="currentColor"/>

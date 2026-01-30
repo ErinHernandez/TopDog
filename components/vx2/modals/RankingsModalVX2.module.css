@@ -18,7 +18,7 @@
   flex-direction: column;
   top: var(--modal-top, 60px);
   background-color: var(--modal-bg, #0f172a);
-  z-index: var(--z-modal, 100);
+  z-index: var(--z-modal, 1000);
 }
 
 /* ============================================================================
@@ -32,7 +32,7 @@
   justify-content: center;
   border-radius: 8px;
   transition: background-color 150ms ease;
-  color: var(--close-color, #64748b);
+  color: var(--text-secondary, #64748b);
   border: none;
   cursor: pointer;
   z-index: 110;
@@ -85,7 +85,7 @@
   transition: all 150ms ease;
   border: none;
   background-color: transparent;
-  color: var(--tab-color, #64748b);
+  color: var(--text-muted, #64748b);
   border-bottom: 2px solid transparent;
   cursor: pointer;
   font-size: var(--tab-font-size, 14px);
@@ -93,12 +93,12 @@
 
 .tabButton.active {
   background-color: rgba(255, 255, 255, 0.1);
-  color: var(--tab-active-color, #f1f5f9);
-  border-bottom-color: var(--tab-active-color, #f1f5f9);
+  color: var(--text-primary, #f1f5f9);
+  border-bottom-color: var(--text-primary, #f1f5f9);
 }
 
 .tabButton:not(.active) {
-  color: var(--tab-inactive-color, #64748b);
+  color: var(--text-muted, #64748b);
 }
 
 /* ============================================================================
@@ -124,6 +124,9 @@
   border-bottom: 2px solid var(--filter-border-color, #64748b);
   cursor: pointer;
   font-size: var(--filter-font-size, 12px);
+}
+
+.filterButton.inactive {
   opacity: 0.4;
 }
 
@@ -135,6 +138,43 @@
 
 .filterButton.active.all {
   border-bottom-color: var(--filter-active-color, #f1f5f9);
+}
+
+/* Position-specific filter button colors */
+.filterButton[data-position="qb"] {
+  --position-color: var(--color-position-qb);
+  --filter-border-color: var(--position-color);
+}
+.filterButton[data-position="qb"].active {
+  --filter-color: var(--position-color);
+  --filter-active-color: var(--position-color);
+}
+
+.filterButton[data-position="rb"] {
+  --position-color: var(--color-position-rb);
+  --filter-border-color: var(--position-color);
+}
+.filterButton[data-position="rb"].active {
+  --filter-color: var(--position-color);
+  --filter-active-color: var(--position-color);
+}
+
+.filterButton[data-position="wr"] {
+  --position-color: var(--color-position-wr);
+  --filter-border-color: var(--position-color);
+}
+.filterButton[data-position="wr"].active {
+  --filter-color: var(--position-color);
+  --filter-active-color: var(--position-color);
+}
+
+.filterButton[data-position="te"] {
+  --position-color: var(--color-position-te);
+  --filter-border-color: var(--position-color);
+}
+.filterButton[data-position="te"].active {
+  --filter-color: var(--position-color);
+  --filter-active-color: var(--position-color);
 }
 
 /* ============================================================================
@@ -151,7 +191,7 @@
   left: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--search-icon-color, #64748b);
+  color: var(--text-muted, #64748b);
   pointer-events: none;
 }
 
@@ -165,13 +205,13 @@
   outline: none;
   transition: all 150ms ease;
   background-color: rgba(255, 255, 255, 0.05);
-  color: var(--search-text-color, #f1f5f9);
+  color: var(--text-primary, #f1f5f9);
   border: 1px solid rgba(255, 255, 255, 0.1);
   font-size: var(--search-font-size, 14px);
 }
 
 .searchInput::placeholder {
-  color: var(--search-placeholder-color, #64748b);
+  color: var(--text-muted, #64748b);
 }
 
 .searchInput:focus {
@@ -233,6 +273,20 @@
 
 .playerListItem.excluded {
   opacity: 0.5;
+}
+
+/* Position-specific player list item border colors */
+.playerListItem[data-position="qb"] {
+  --item-border-color: var(--color-position-qb);
+}
+.playerListItem[data-position="rb"] {
+  --item-border-color: var(--color-position-rb);
+}
+.playerListItem[data-position="wr"] {
+  --item-border-color: var(--color-position-wr);
+}
+.playerListItem[data-position="te"] {
+  --item-border-color: var(--color-position-te);
 }
 
 .playerADP {
@@ -351,6 +405,20 @@
   transform: scale(1.02);
 }
 
+/* Position-specific ranked player row border colors */
+.rankedPlayerRow[data-position="qb"] {
+  --row-border-color: var(--color-position-qb);
+}
+.rankedPlayerRow[data-position="rb"] {
+  --row-border-color: var(--color-position-rb);
+}
+.rankedPlayerRow[data-position="wr"] {
+  --row-border-color: var(--color-position-wr);
+}
+.rankedPlayerRow[data-position="te"] {
+  --row-border-color: var(--color-position-te);
+}
+
 .playerRank {
   text-align: center;
   flex-shrink: 0;
@@ -397,7 +465,7 @@
 
 .moveButton:disabled {
   background-color: rgba(255, 255, 255, 0.05);
-  color: var(--move-button-disabled-color, #475569);
+  color: var(--text-muted, #475569);
   cursor: not-allowed;
 }
 
@@ -444,7 +512,7 @@
   height: 32px;
   border-radius: var(--cancel-radius, 8px);
   background-color: rgba(255, 255, 255, 0.1);
-  color: var(--cancel-color, #64748b);
+  color: var(--text-muted, #64748b);
   border: none;
   cursor: pointer;
 }
@@ -460,7 +528,7 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  color: var(--empty-color, #64748b);
+  color: var(--text-muted, #64748b);
   padding: var(--empty-p, 16px);
 }
 
@@ -474,12 +542,13 @@
 .emptyTitle {
   font-weight: 500;
   margin-bottom: 8px;
-  color: var(--empty-title-color, #cbd5e1);
+  color: var(--text-secondary, #cbd5e1);
   font-size: var(--empty-title-font-size, 14px);
 }
 
 .emptyDescription {
   font-size: var(--empty-desc-font-size, 12px);
+  color: var(--text-muted, #64748b);
 }
 
 .searchNoResults {
@@ -488,7 +557,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: var(--empty-color, #64748b);
+  color: var(--text-muted, #64748b);
 }
 
 /* ============================================================================
@@ -497,7 +566,7 @@
 
 .infoText {
   margin-bottom: 12px;
-  color: var(--info-color, #64748b);
+  color: var(--text-muted, #64748b);
   font-size: var(--info-font-size, 12px);
 }
 
@@ -514,7 +583,7 @@
   padding: 12px;
   border-radius: var(--error-radius, 8px);
   background-color: rgba(239, 68, 68, 0.1);
-  color: var(--error-color, #ef4444);
+  color: var(--color-state-error, #ef4444);
   font-size: var(--error-font-size, 14px);
 }
 
@@ -644,13 +713,13 @@
 .modalDialogTitle {
   font-weight: 700;
   margin-bottom: 8px;
-  color: var(--dialog-title-color, #f1f5f9);
+  color: var(--text-primary, #f1f5f9);
   font-size: var(--dialog-title-font-size, 16px);
 }
 
 .modalDialogDescription {
   margin-bottom: 20px;
-  color: var(--dialog-desc-color, #64748b);
+  color: var(--text-muted, #64748b);
   font-size: var(--dialog-desc-font-size, 14px);
 }
 
@@ -680,12 +749,16 @@
 }
 
 .dialogDestructiveButton {
-  background-color: var(--dialog-destructive-bg, #ef4444);
-  color: var(--dialog-destructive-color, #fff);
+  background-color: var(--color-state-error, #ef4444);
+  color: #fff;
 }
 
 .dialogDestructiveButton:hover {
   opacity: 0.9;
+}
+
+.dialogBackButton {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 /* ============================================================================

@@ -1,6 +1,17 @@
 /**
  * TournamentCardBottomSectionV3 - Version 3 specific styles
- * Extends base styles with V3-specific custom properties
+ * Uses hardcoded spacing values for V3 dimensions
+ *
+ * Fixed dimensions:
+ * - Progress bar: 8px
+ * - Button: 57px
+ * - Stats: 48px
+ * - Row gap: 16px
+ * - Stats gap: 24px
+ * - Button border radius: 12px
+ * - Button font size: 18px
+ * - Stats value font size: 16px
+ * - Stats label font size: 11px
  */
 
 @import './TournamentCardBottomSection.module.css';
@@ -13,13 +24,32 @@
 }
 
 .bottomSectionV3[data-has-progress="true"] {
-  grid-template-rows: var(--progress-height) var(--button-height) var(--stats-height);
+  grid-template-rows: 8px 57px 48px;
+  gap: 16px;
 }
 
 .bottomSectionV3[data-has-progress="false"] {
-  grid-template-rows: var(--button-height) var(--stats-height);
+  grid-template-rows: 57px 48px;
+  gap: 16px;
 }
 
-.bottomSectionV3 {
-  gap: var(--row-gap);
+.bottomSectionV3 .button {
+  border-radius: 12px;
+  font-size: 18px;
+}
+
+.bottomSectionV3 .button[data-button-bg-image] {
+  --button-bg-image: attr(data-button-bg-image);
+}
+
+.bottomSectionV3 .button[data-button-bg-color] {
+  --button-bg-color: attr(data-button-bg-color);
+}
+
+.bottomSectionV3 .statValue {
+  font-size: 16px;
+}
+
+.bottomSectionV3 .statLabel {
+  font-size: 11px;
 }

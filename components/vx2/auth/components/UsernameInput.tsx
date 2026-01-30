@@ -21,8 +21,6 @@
 
 import React, { useCallback, useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/styles';
-import { BG_COLORS, TEXT_COLORS, BORDER_COLORS, STATE_COLORS } from '../../core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
 import { useUsernameValidation } from '../hooks/useUsernameValidation';
 import type { UsernameValidationResult, UsernameAvailabilityResult } from '../types';
 import { USERNAME_CONSTRAINTS } from '../constants';
@@ -73,20 +71,20 @@ export interface UsernameInputProps {
 const SIZE_CONFIG = {
   sm: {
     height: 36,
-    paddingX: SPACING.md,
-    fontSize: TYPOGRAPHY.fontSize.sm,
+    paddingX: 12, // spacing-md
+    fontSize: 14, // font-size-sm
     iconSize: 16,
   },
   md: {
     height: 44,
-    paddingX: SPACING.md,
-    fontSize: TYPOGRAPHY.fontSize.base,
+    paddingX: 12, // spacing-md
+    fontSize: 16, // font-size-base
     iconSize: 18,
   },
   lg: {
     height: 52,
-    paddingX: SPACING.lg,
-    fontSize: TYPOGRAPHY.fontSize.lg,
+    paddingX: 16, // spacing-lg
+    fontSize: 18, // font-size-lg
     iconSize: 20,
   },
 } as const;
@@ -110,7 +108,6 @@ function StatusIcon({ status, size }: StatusIconProps): React.ReactElement | nul
         height={size}
         viewBox="0 0 24 24"
         className={styles.statusIconLoading}
-        style={{ '--text-muted': TEXT_COLORS.muted } as React.CSSProperties}
       >
         <circle
           cx="12"
@@ -133,7 +130,6 @@ function StatusIcon({ status, size }: StatusIconProps): React.ReactElement | nul
         height={size}
         viewBox="0 0 24 24"
         fill="none"
-        style={{ '--success-color': STATE_COLORS.success } as React.CSSProperties}
       >
         <path
           d="M20 6L9 17L4 12"
@@ -153,7 +149,6 @@ function StatusIcon({ status, size }: StatusIconProps): React.ReactElement | nul
       height={size}
       viewBox="0 0 24 24"
       fill="none"
-      style={{ '--error-color': STATE_COLORS.error } as React.CSSProperties}
     >
       <path
         d="M18 6L6 18M6 6L18 18"
@@ -253,12 +248,12 @@ export function UsernameInput({
   const errorMessage = externalError || internalErrorMessage;
   const hasError = !!errorMessage && status === 'invalid';
   
-  // Border color based on state
-  const getBorderColor = (): string => {
-    if (hasError) return BORDER_COLORS.error;
-    if (status === 'valid') return BORDER_COLORS.success;
-    if (isFocused) return BORDER_COLORS.focus;
-    return BORDER_COLORS.default;
+  // Status styles based on state - handled in CSS via data attributes
+  const statusClass = {
+    error: styles.statusError,
+    valid: styles.statusValid,
+    focus: styles.statusFocus,
+    default: styles.statusDefault,
   };
   
   // Determine size class
@@ -279,11 +274,6 @@ export function UsernameInput({
       {/* Input container */}
       <div
         className={cn(styles.inputContainer, sizeClass)}
-        style={{
-          '--input-height': `${config.height}px`,
-          '--input-padding-x': `${config.paddingX}px`,
-          '--input-font-size': `${config.fontSize}px`,
-        } as React.CSSProperties}
       >
         {/* Input */}
         <input
@@ -302,12 +292,6 @@ export function UsernameInput({
           spellCheck={false}
           maxLength={USERNAME_CONSTRAINTS.MAX_LENGTH}
           className={cn(styles.input, inputStateClass)}
-          style={{
-            '--bg-secondary': BG_COLORS.secondary,
-            '--text-primary': TEXT_COLORS.primary,
-            '--input-border-color': getBorderColor(),
-            '--input-radius': `${RADIUS.md}px`,
-          } as React.CSSProperties}
           aria-label={ariaLabel}
           aria-describedby={ariaDescribedBy || (hasError ? 'username-error' : undefined)}
           aria-invalid={hasError}
@@ -316,9 +300,6 @@ export function UsernameInput({
         {/* Status icon */}
         <div
           className={cn('absolute right-0 flex items-center justify-center', styles.statusIconContainer)}
-          style={{
-            '--input-height': `${config.height}px`,
-          } as React.CSSProperties}
         >
           <StatusIcon status={status} size={config.iconSize} />
         </div>
@@ -332,20 +313,12 @@ export function UsernameInput({
             id="username-error"
             role="alert"
             className={styles.errorMessage}
-            style={{
-              '--error-color': STATE_COLORS.error,
-              '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
-            } as React.CSSProperties}
           >
             {errorMessage}
           </span>
         ) : showRequirements && isFocused && username.length === 0 ? (
           <span
             className={styles.requirementsText}
-            style={{
-              '--text-muted': TEXT_COLORS.muted,
-              '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
-            } as React.CSSProperties}
           >
             {requirements.allowedCharactersDescription}
           </span>
@@ -359,10 +332,6 @@ export function UsernameInput({
         <div className={styles.suggestionsSection}>
           <div
             className={styles.suggestionsLabel}
-            style={{
-              '--text-muted': TEXT_COLORS.muted,
-              '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
-            } as React.CSSProperties}
           >
             Suggested alternatives:
           </div>
@@ -378,13 +347,6 @@ export function UsernameInput({
                   internalSetUsername(suggestion);
                 }}
                 className={styles.suggestionButton}
-                style={{
-                  '--bg-tertiary': BG_COLORS.tertiary,
-                  '--bg-secondary': BG_COLORS.secondary,
-                  '--text-primary': TEXT_COLORS.primary,
-                  '--border-light': BORDER_COLORS.light,
-                  '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
-                } as React.CSSProperties}
               >
                 {suggestion}
               </button>
@@ -400,10 +362,6 @@ export function UsernameInput({
             <div
               key={index}
               className={styles.warningMessage}
-              style={{
-                '--warning-color': STATE_COLORS.warning || '#f59e0b',
-                '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
-              } as React.CSSProperties}
             >
               {warning}
             </div>
@@ -417,10 +375,6 @@ export function UsernameInput({
             <div
               key={index}
               className={styles.warningMessage}
-              style={{
-                '--warning-color': STATE_COLORS.warning || '#f59e0b',
-                '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
-              } as React.CSSProperties}
             >
               {warning}
             </div>
@@ -432,10 +386,6 @@ export function UsernameInput({
       {showRequirements && isFocused && username.length > 0 && validation && (
         <div
           className={styles.requirementsPanel}
-          style={{
-            '--bg-tertiary': BG_COLORS.tertiary,
-            '--border-light': BORDER_COLORS.light,
-          } as React.CSSProperties}
         >
           <RequirementsList
             validation={validation}
@@ -484,11 +434,6 @@ function RequirementsList({
             [styles.requirementItemPassed]: check.passed,
             [styles.requirementItemPending]: !check.passed,
           })}
-          style={{
-            '--success-color': STATE_COLORS.success,
-            '--text-muted': TEXT_COLORS.muted,
-            '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
-          } as React.CSSProperties}
         >
           <span className={styles.requirementIcon}>
             {check.passed ? (

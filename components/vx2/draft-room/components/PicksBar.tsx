@@ -22,7 +22,7 @@
 
 import React, { useRef, useEffect, useMemo, useState, useCallback } from 'react';
 import type { DraftPick, DraftPlayer, Participant, Position, DraftStatus } from '../types';
-import { POSITION_COLORS, DRAFT_DEFAULTS, TILED_BG_STYLE } from '../constants';
+import { DRAFT_DEFAULTS } from '../constants';
 import { useImageShare } from '../hooks/useImageShare';
 import { Share } from '../../components/icons/actions/Share';
 import ShareOptionsModal from './ShareOptionsModal';
@@ -92,11 +92,9 @@ const ScrollingUsername = React.memo<ScrollingUsernameProps>(function ScrollingU
       onClick={handleClick}
       className={cn(
         styles.scrollingUsernameContainer,
-        isTruncated && styles.scrollingUsernameContainerTruncated
+        isTruncated && styles.scrollingUsernameContainerTruncated,
+        isScrolling && styles.scrollingUsernameContainerScrolling
       )}
-      style={{
-        textAlign: isScrolling ? 'left' : 'center',
-      }}
     >
       <span
         ref={textRef}
@@ -105,12 +103,12 @@ const ScrollingUsername = React.memo<ScrollingUsernameProps>(function ScrollingU
           isScrolling && styles.scrollingUsernameTextScrolling
         )}
         style={{
-          color,
-          fontSize,
-          fontWeight,
-          transform: isScrolling ? `translateX(-${scrollDistance}px)` : 'translateX(0)',
+          '--scroll-color': color,
+          '--scroll-font-size': `${fontSize}px`,
+          '--scroll-font-weight': fontWeight,
+          '--scroll-transform': isScrolling ? `translateX(-${scrollDistance}px)` : 'translateX(0)',
           '--animation-duration': `${animationDuration}s`,
-        } as React.CSSProperties & { '--animation-duration': string }}
+        } as React.CSSProperties & { '--scroll-color': string; '--scroll-font-size': string; '--scroll-font-weight': number; '--scroll-transform': string; '--animation-duration': string }}
       >
         {isScrolling ? fullName : displayName}
       </span>
@@ -254,51 +252,6 @@ function formatPickDisplay(pickNumber: number, teamCount: number): string {
 }
 
 /**
- * Create position tracker gradient from picks
- * Shows proportional colors for QB, RB, WR, TE
- */
-function createPositionGradient(picks: DraftPlayer[]): string {
-  if (!picks || picks.length === 0) {
-    return CARD_COLORS.emptyTracker;
-  }
-  
-  // Count positions
-  const counts: Record<Position, number> = { QB: 0, RB: 0, WR: 0, TE: 0 };
-  picks.forEach(p => {
-    if (counts.hasOwnProperty(p.position)) {
-      counts[p.position]++;
-    }
-  });
-  
-  // Build gradient segments in fixed order
-  const totalPicks = picks.length;
-  const segments: { color: string; percent: number }[] = [];
-  
-  POSITION_ORDER.forEach(pos => {
-    if (counts[pos] > 0) {
-      segments.push({
-        color: POSITION_COLORS[pos] || CARD_COLORS.emptyTracker,
-        percent: (counts[pos] / totalPicks) * 100,
-      });
-    }
-  });
-  
-  if (segments.length === 0) return CARD_COLORS.emptyTracker;
-  if (segments.length === 1) return segments[0].color;
-  
-  // Build gradient stops
-  let currentPercent = 0;
-  const stops = segments.map(segment => {
-    const start = currentPercent;
-    const end = currentPercent + segment.percent;
-    currentPercent = end;
-    return `${segment.color} ${start}%, ${segment.color} ${end}%`;
-  });
-  
-  return `linear-gradient(to right, ${stops.join(', ')})`;
-}
-
-/**
  * Format player name for card display (e.g., "J. Chase")
  */
 function formatPlayerName(name: string): string {
@@ -326,13 +279,13 @@ interface FilledCardProps {
 const FilledCard = React.forwardRef<HTMLDivElement, FilledCardProps>(
   function FilledCard({ pick, participantName, isCurrent, participantPicks, teamCount, onClick }, ref) {
     const { player, pickNumber } = pick;
-    const positionColor = POSITION_COLORS[player.position] || CARD_COLORS.otherPick;
-    
+    const positionLower = player.position.toLowerCase();
+
     // Split name into first and last
     const nameParts = player.name.split(' ');
     const firstName = nameParts[0] || '';
     const lastName = nameParts.slice(1).join(' ') || player.name;
-    
+
     return (
       <div
         ref={ref}
@@ -341,18 +294,11 @@ const FilledCard = React.forwardRef<HTMLDivElement, FilledCardProps>(
         aria-label={`Pick ${pickNumber}: ${player.name}, ${player.position} from ${player.team}`}
         className={styles.filledCard}
         data-clickable={!!onClick}
-        style={{
-          borderWidth: PICKS_BAR_PX.cardBorderWidth,
-          borderStyle: 'solid',
-          borderColor: positionColor,
-        }}
+        data-position={positionLower}
       >
         {/* Header - Participant Name centered in full colored area (header + outer border) */}
         <div
           className={styles.filledCardHeader}
-          style={{
-            backgroundColor: positionColor,
-          }}
         >
           <ScrollingUsername
             name={participantName}
@@ -403,10 +349,10 @@ const FilledCard = React.forwardRef<HTMLDivElement, FilledCardProps>(
                       <div
                         key={pos}
                         className={styles.positionTrackerSegment}
+                        data-position={pos.toLowerCase()}
                         style={{
-                          flex: count / total,
-                          backgroundColor: POSITION_COLORS[pos],
-                        }}
+                          '--segment-flex': count / total,
+                        } as React.CSSProperties & { '--segment-flex': number }}
                       />
                     );
                   })}
@@ -454,10 +400,10 @@ const PositionTrackerBar = React.memo(function PositionTrackerBar({ picks }: { p
             <div
               key={pos}
               className={styles.positionTrackerSegment}
+              data-position={pos.toLowerCase()}
               style={{
-                flex: count / total,
-                backgroundColor: POSITION_COLORS[pos],
-              }}
+                '--segment-flex': count / total,
+              } as React.CSSProperties & { '--segment-flex': number }}
             />
           );
         })}
@@ -611,10 +557,6 @@ const BlankCard = React.forwardRef<HTMLDivElement, BlankCardProps>(
           aria-label={ariaLabel}
           className={cn(styles.blankCard, styles.blankCardTiled, styles.blankCardTiledBg)}
           data-clickable={!!onClick}
-          style={{
-            padding: borderWidth,
-            '--tiled-bg-image': `url("data:image/svg+xml,%3Csvg width='4' height='4' viewBox='0 0 4 4' xmlns='http://www.w3.org/2000/svg'%3E%3Crect fill='%231E3A5F' x='0' y='0' width='2' height='2'/%3E%3Crect fill='%232D5A8C' x='2' y='2' width='2' height='2'/%3E%3C/svg%3E")`,
-          } as React.CSSProperties & { '--tiled-bg-image': string }}
         >
           <div className={styles.blankCardInner}>
             <div
@@ -653,16 +595,14 @@ const BlankCard = React.forwardRef<HTMLDivElement, BlankCardProps>(
         className={styles.blankCard}
         data-clickable={!!onClick}
         style={{
-          borderWidth: borderWidth,
-          borderStyle: 'solid',
-          borderColor: cardColor,
-        }}
+          '--blank-card-border-color': cardColor,
+        } as React.CSSProperties & { '--blank-card-border-color': string }}
       >
         <div
           className={cn(styles.blankCardHeader, styles.blankCardHeaderHeight)}
           style={{
-            backgroundColor: cardColor,
-          }}
+            '--blank-card-header-bg': cardColor,
+          } as React.CSSProperties & { '--blank-card-header-bg': string }}
         >
           <ScrollingUsername
             name={participantName}
@@ -821,9 +761,8 @@ const PicksBar = React.memo(function PicksBar({
           ref={picksContentRef}
           className={styles.picksContent}
           style={{
-            paddingLeft: `calc(50% - ${PICKS_BAR_PX.cardWidth / 2}px)`,
-            paddingRight: `calc(50% - ${PICKS_BAR_PX.cardWidth / 2}px)`,
-          }}
+            '--picks-content-padding': `calc(50% - ${PICKS_BAR_PX.cardWidth / 2}px)`,
+          } as React.CSSProperties & { '--picks-content-padding': string }}
         >
           {pickSlots.map(({ pickNumber, pick, participantIndex }) => {
             const isCurrent = pickNumber === currentPickNumber;

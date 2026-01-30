@@ -14,8 +14,6 @@
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { createScopedLogger } from '@/lib/clientLogger';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS, POSITION_COLORS } from '../core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY, Z_INDEX } from '../core/constants/sizes';
 import { Close, Plus, Minus, Search } from '../components/icons';
 import { PositionBadge, type Position, POSITIONS } from '../../ui';
 import { cn } from '@/lib/styles';
@@ -56,34 +54,22 @@ interface TabBarProps {
 
 function TabBar({ activeTab, onTabChange }: TabBarProps): React.ReactElement {
   return (
-    <div className={styles.tabBar} style={{ '--tab-font-size': `${TYPOGRAPHY.fontSize.sm}px` } as React.CSSProperties}>
+    <div className={styles.tabBar}>
       <button
         onClick={() => onTabChange('build')}
         className={cn(styles.tabButton, activeTab === 'build' && styles.active)}
-        style={{
-          '--tab-color': activeTab === 'build' ? TEXT_COLORS.primary : TEXT_COLORS.muted,
-          '--tab-active-color': TEXT_COLORS.primary,
-        } as React.CSSProperties}
       >
         Players
       </button>
       <button
         onClick={() => onTabChange('rankings')}
         className={cn(styles.tabButton, activeTab === 'rankings' && styles.active)}
-        style={{
-          '--tab-color': activeTab === 'rankings' ? TEXT_COLORS.primary : TEXT_COLORS.muted,
-          '--tab-active-color': TEXT_COLORS.primary,
-        } as React.CSSProperties}
       >
         Rankings
       </button>
       <button
         onClick={() => onTabChange('excluded')}
         className={cn(styles.tabButton, activeTab === 'excluded' && styles.active)}
-        style={{
-          '--tab-color': activeTab === 'excluded' ? TEXT_COLORS.primary : TEXT_COLORS.muted,
-          '--tab-active-color': TEXT_COLORS.primary,
-        } as React.CSSProperties}
       >
         Excluded
       </button>
@@ -98,33 +84,21 @@ interface PositionFilterProps {
 
 function PositionFilter({ activePosition, onPositionChange }: PositionFilterProps): React.ReactElement {
   return (
-    <div className={styles.positionFilter} style={{ '--filter-font-size': `${TYPOGRAPHY.fontSize.xs}px` } as React.CSSProperties}>
+    <div className={styles.positionFilter}>
       <button
         onClick={() => onPositionChange(null)}
-        className={cn(styles.filterButton, 'all', activePosition === null && styles.active)}
-        style={{
-          '--filter-color': activePosition === null ? TEXT_COLORS.primary : TEXT_COLORS.muted,
-          '--filter-active-color': TEXT_COLORS.primary,
-          '--filter-border-color': TEXT_COLORS.primary,
-          opacity: activePosition === null ? 1 : 0.4,
-        } as React.CSSProperties}
+        className={cn(styles.filterButton, 'all', activePosition === null && styles.active, activePosition !== null && styles.inactive)}
       >
         ALL
       </button>
       {POSITIONS.map(pos => {
         const isActive = activePosition === pos;
-        const color = POSITION_COLORS[pos.toUpperCase() as keyof typeof POSITION_COLORS] || TEXT_COLORS.muted;
         return (
           <button
             key={pos}
             onClick={() => onPositionChange(isActive ? null : pos)}
-            className={cn(styles.filterButton, isActive && styles.active)}
-            style={{
-              '--filter-color': isActive ? color : TEXT_COLORS.muted,
-              '--filter-active-color': color,
-              '--filter-border-color': color,
-              opacity: isActive ? 1 : 0.4,
-            } as React.CSSProperties}
+            className={cn(styles.filterButton, isActive && styles.active, !isActive && styles.inactive)}
+            data-position={pos.toLowerCase()}
           >
             {pos}
           </button>
@@ -143,32 +117,13 @@ interface PlayerListItemProps {
 }
 
 function PlayerListItem({ player, isRanked, isExcluded, onToggle, onToggleExclude }: PlayerListItemProps): React.ReactElement {
-  const posColor = POSITION_COLORS[player.position.toUpperCase() as keyof typeof POSITION_COLORS] || TEXT_COLORS.muted;
   const adp = typeof player.adp === 'number' ? player.adp.toFixed(1) : player.adp || '-';
   const proj = typeof player.proj === 'number' ? Math.round(player.proj) : player.proj || '-';
 
   return (
     <div
       className={cn(styles.playerListItem, isExcluded && styles.excluded)}
-      style={{
-        '--item-bg': BG_COLORS.secondary,
-        '--item-border-color': posColor,
-        '--item-radius': `${RADIUS.lg}px`,
-        '--item-py': `${SPACING.xs}px`,
-        '--item-px': `${SPACING.md}px`,
-        '--item-gap': `${SPACING.sm}px`,
-        '--adp-font-size': `${TYPOGRAPHY.fontSize.sm}px`,
-        '--adp-color': TEXT_COLORS.secondary,
-        '--name-font-size': `${TYPOGRAPHY.fontSize.sm}px`,
-        '--name-color': TEXT_COLORS.primary,
-        '--team-font-size': `${TYPOGRAPHY.fontSize.xs}px`,
-        '--team-color': TEXT_COLORS.muted,
-        '--proj-font-size': `${TYPOGRAPHY.fontSize.xs}px`,
-        '--proj-color': TEXT_COLORS.primary,
-        '--proj-label-font-size': `${TYPOGRAPHY.fontSize.xs}px`,
-        '--proj-label-color': TEXT_COLORS.muted,
-        '--button-radius': `${RADIUS.lg}px`,
-      } as React.CSSProperties}
+      data-position={player.position.toLowerCase()}
     >
       <div className={styles.playerADP}>{adp}</div>
       <PositionBadge position={player.position as 'QB' | 'RB' | 'WR' | 'TE'} size="sm" />
@@ -183,10 +138,6 @@ function PlayerListItem({ player, isRanked, isExcluded, onToggle, onToggleExclud
       <button
         onClick={onToggleExclude}
         className={cn(styles.playerActionButton, styles.excludeButton, isExcluded && styles.active)}
-        style={{
-          '--exclude-color': isExcluded ? STATE_COLORS.error : TEXT_COLORS.muted,
-          '--exclude-bg': isExcluded ? 'rgba(239, 68, 68, 0.25)' : 'rgba(255,255,255,0.05)',
-        } as React.CSSProperties}
         aria-label={isExcluded ? `Unexclude ${player.name}` : `Exclude ${player.name}`}
       >
         <Close size={14} />
@@ -194,10 +145,6 @@ function PlayerListItem({ player, isRanked, isExcluded, onToggle, onToggleExclud
       <button
         onClick={onToggle}
         className={cn(styles.playerActionButton, styles.rankButton, isRanked && styles.active)}
-        style={{
-          '--rank-bg': isRanked ? 'rgba(239, 68, 68, 0.15)' : 'rgba(96, 165, 250, 0.15)',
-          '--rank-color': isRanked ? STATE_COLORS.error : STATE_COLORS.active,
-        } as React.CSSProperties}
         aria-label={isRanked ? `Remove ${player.name}` : `Add ${player.name}`}
       >
         {isRanked ? <Minus size={16} /> : <Plus size={16} />}
@@ -221,7 +168,6 @@ interface RankedPlayerRowProps {
 }
 
 function RankedPlayerRow({ player, rank, totalRanked, onRemove, onMoveToRank, disabled, isDragging, dragHandleProps }: RankedPlayerRowProps): React.ReactElement {
-  const posColor = POSITION_COLORS[player.position.toUpperCase() as keyof typeof POSITION_COLORS] || TEXT_COLORS.muted;
   const proj = typeof player.proj === 'number' ? Math.round(player.proj) : player.proj || '-';
   const [showMovePopup, setShowMovePopup] = useState(false);
   const [customRank, setCustomRank] = useState(String(rank));
@@ -249,19 +195,7 @@ function RankedPlayerRow({ player, rank, totalRanked, onRemove, onMoveToRank, di
   return (
     <div
       className={cn(styles.rankedPlayerRow, isDragging && styles.dragging)}
-      style={{
-        '--row-bg': BG_COLORS.secondary,
-        '--row-border-color': posColor,
-        '--row-radius': `${RADIUS.lg}px`,
-        '--row-py': `${SPACING.xs}px`,
-        '--row-px': `${SPACING.md}px`,
-        '--row-gap': `${SPACING.sm}px`,
-        '--row-opacity': isDragging ? 0.5 : 1,
-        '--row-transform': isDragging ? 'scale(1.02)' : 'scale(1)',
-        '--rank-number-font-size': `${TYPOGRAPHY.fontSize.sm}px`,
-        '--rank-number-color': TEXT_COLORS.secondary,
-        '--button-radius': `${RADIUS.lg}px`,
-      } as React.CSSProperties}
+      data-position={player.position.toLowerCase()}
       onDoubleClick={handleDoubleClick}
       {...dragHandleProps}
     >
@@ -279,13 +213,6 @@ function RankedPlayerRow({ player, rank, totalRanked, onRemove, onMoveToRank, di
         onClick={onRemove}
         disabled={disabled}
         className={styles.playerActionButton}
-        style={{
-          backgroundColor: 'rgba(239, 68, 68, 0.15)',
-          color: STATE_COLORS.error,
-          width: '32px',
-          height: '32px',
-          borderRadius: `${RADIUS.lg}px`,
-        }}
         aria-label={`Remove ${player.name}`}
       >
         <Close size={16} />
@@ -295,7 +222,6 @@ function RankedPlayerRow({ player, rank, totalRanked, onRemove, onMoveToRank, di
       {showMovePopup && (
         <div
           className={styles.movePopupOverlay}
-          style={{ '--popup-radius': `${RADIUS.lg}px` } as React.CSSProperties}
           onClick={() => setShowMovePopup(false)}
         >
           <div
@@ -306,12 +232,6 @@ function RankedPlayerRow({ player, rank, totalRanked, onRemove, onMoveToRank, di
               onClick={() => { if (rank > 1) { onMoveToRank(rank - 1); setShowMovePopup(false); } }}
               disabled={rank <= 1}
               className={styles.moveButton}
-              style={{
-                '--move-button-color': rank <= 1 ? TEXT_COLORS.disabled : TEXT_COLORS.primary,
-                '--move-button-disabled-color': TEXT_COLORS.disabled,
-                '--move-button-radius': `${RADIUS.md}px`,
-                backgroundColor: rank <= 1 ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.15)',
-              } as React.CSSProperties}
               aria-label="Move up"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -327,23 +247,11 @@ function RankedPlayerRow({ player, rank, totalRanked, onRemove, onMoveToRank, di
               onChange={e => setCustomRank(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') handleMoveSubmit(); if (e.key === 'Escape') setShowMovePopup(false); }}
               className={styles.rankInput}
-              style={{
-                '--input-color': TEXT_COLORS.primary,
-                '--input-border-color': STATE_COLORS.active,
-                '--input-radius': `${RADIUS.md}px`,
-                '--input-font-size': `${TYPOGRAPHY.fontSize.sm}px`,
-              } as React.CSSProperties}
             />
             <button
               onClick={() => { if (rank < totalRanked) { onMoveToRank(rank + 1); setShowMovePopup(false); } }}
               disabled={rank >= totalRanked}
               className={styles.moveButton}
-              style={{
-                '--move-button-color': rank >= totalRanked ? TEXT_COLORS.disabled : TEXT_COLORS.primary,
-                '--move-button-disabled-color': TEXT_COLORS.disabled,
-                '--move-button-radius': `${RADIUS.md}px`,
-                backgroundColor: rank >= totalRanked ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.15)',
-              } as React.CSSProperties}
               aria-label="Move down"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -353,22 +261,12 @@ function RankedPlayerRow({ player, rank, totalRanked, onRemove, onMoveToRank, di
             <button
               onClick={handleMoveSubmit}
               className={styles.moveSubmitButton}
-              style={{
-                '--submit-bg': STATE_COLORS.active,
-                '--submit-color': '#000',
-                '--submit-radius': `${RADIUS.md}px`,
-                '--submit-font-size': `${TYPOGRAPHY.fontSize.xs}px`,
-              } as React.CSSProperties}
             >
               Go
             </button>
             <button
               onClick={() => setShowMovePopup(false)}
               className={styles.moveCancelButton}
-              style={{
-                '--cancel-color': TEXT_COLORS.muted,
-                '--cancel-radius': `${RADIUS.md}px`,
-              } as React.CSSProperties}
               aria-label="Cancel"
             >
               <Close size={14} />
@@ -661,12 +559,11 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
   if (!isOpen) return null;
 
   return (
-    <div className={styles.modalContainer} style={{ '--modal-top': '60px', '--z-modal': Z_INDEX.modal } as React.CSSProperties}>
+    <div className={styles.modalContainer}>
       {/* Close button */}
       <button
         onClick={handleClose}
         className={styles.closeButton}
-        style={{ '--close-color': TEXT_COLORS.secondary } as React.CSSProperties}
         aria-label="Close"
       >
         <Close size={24} />
@@ -675,14 +572,14 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
       <div className={styles.contentWrapper}>
         {isLoading ? (
           <div className={styles.loadingContainer}>
-            <div className={styles.spinnerCircle} style={{ '--spinner-color': STATE_COLORS.active } as React.CSSProperties} />
+            <div className={styles.spinnerCircle} />
           </div>
         ) : (
           <div className={styles.innerContainer}>
             <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
 
             {/* Search */}
-            <div className={styles.searchContainer} style={{ '--search-icon-color': TEXT_COLORS.muted } as React.CSSProperties}>
+            <div className={styles.searchContainer}>
               <Search size={16} className={styles.searchIcon} />
               <input
                 type="text"
@@ -690,11 +587,6 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 className={styles.searchInput}
-                style={{
-                  '--search-text-color': TEXT_COLORS.primary,
-                  '--search-placeholder-color': TEXT_COLORS.muted,
-                  '--search-font-size': `${TYPOGRAPHY.fontSize.sm}px`,
-                } as React.CSSProperties}
               />
             </div>
 
@@ -704,9 +596,9 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
                   <PositionFilter activePosition={positionFilter} onPositionChange={setPositionFilter} />
                   <div className={styles.playerList}>
                     {filteredPlayers.length === 0 ? (
-                      <div className={styles.emptyState} style={{ '--empty-color': TEXT_COLORS.muted } as React.CSSProperties}>
+                      <div className={styles.emptyState}>
                         <Search size={48} className={styles.emptyIcon} />
-                        <p className={styles.emptyDescription} style={{ '--empty-desc-font-size': `${TYPOGRAPHY.fontSize.sm}px` } as React.CSSProperties}>No players found</p>
+                        <p className={styles.emptyDescription}>No players found</p>
                       </div>
                     ) : (
                       <>
@@ -721,7 +613,7 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
                           />
                         ))}
                         {filteredPlayers.length > 50 && (
-                          <p className={styles.infoText} style={{ '--info-color': TEXT_COLORS.muted, '--info-font-size': `${TYPOGRAPHY.fontSize.xs}px` } as React.CSSProperties}>Showing 50 of <span className={styles.resultCount}>{filteredPlayers.length}</span>. Use search for more.</p>
+                          <p className={styles.infoText}>Showing 50 of <span className={styles.resultCount}>{filteredPlayers.length}</span>. Use search for more.</p>
                         )}
                       </>
                     )}
@@ -730,19 +622,19 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
               ) : activeTab === 'rankings' ? (
                 <>
                   {rankedPlayers.length === 0 ? (
-                    <div className={styles.emptyState} style={{ '--empty-color': TEXT_COLORS.muted } as React.CSSProperties}>
+                    <div className={styles.emptyState}>
                       <svg className={styles.emptyIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
-                      <p className={styles.emptyTitle} style={{ '--empty-title-color': TEXT_COLORS.secondary, '--empty-title-font-size': `${TYPOGRAPHY.fontSize.sm}px` } as React.CSSProperties}>No rankings yet</p>
-                      <p className={styles.emptyDescription} style={{ '--empty-desc-font-size': `${TYPOGRAPHY.fontSize.xs}px` } as React.CSSProperties}>Go to "Players" tab to add players</p>
+                      <p className={styles.emptyTitle}>No rankings yet</p>
+                      <p className={styles.emptyDescription}>Go to "Players" tab to add players</p>
                     </div>
                   ) : filteredRankedPlayers.length === 0 ? (
-                    <div className={styles.searchNoResults} style={{ '--empty-color': TEXT_COLORS.muted } as React.CSSProperties}>
+                    <div className={styles.searchNoResults}>
                       <Search size={48} className={styles.emptyIcon} />
-                      <p style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px`, color: TEXT_COLORS.muted }}>No matching players</p>
+                      <p>No matching players</p>
                     </div>
                   ) : (
                     <>
-                      <p className={styles.infoText} style={{ '--info-color': TEXT_COLORS.muted, '--info-font-size': `${TYPOGRAPHY.fontSize.xs}px` } as React.CSSProperties}>
+                      <p className={styles.infoText}>
                         {searchQuery.trim() ? `Showing ${filteredRankedPlayers.length} of ${rankedPlayers.length}` : 'Drag to reorder'}
                       </p>
                       <div className={styles.playerList}>
@@ -778,11 +670,11 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
                                   setDragOverIndex(null);
                                 }
                               }}
-                              style={{
-                                borderTop: isOver && draggedPlayer && customRankings.indexOf(draggedPlayer) > actualIndex ? '2px solid #60a5fa' : '2px solid transparent',
-                                borderBottom: isOver && draggedPlayer && customRankings.indexOf(draggedPlayer) < actualIndex ? '2px solid #60a5fa' : '2px solid transparent',
-                                marginTop: isOver ? '-2px' : 0,
-                              }}
+                              className={cn(
+                                isOver && draggedPlayer && customRankings.indexOf(draggedPlayer) > actualIndex && styles.dragIndicatorTop,
+                                isOver && draggedPlayer && customRankings.indexOf(draggedPlayer) < actualIndex && styles.dragIndicatorBottom,
+                                isOver && styles.dragIndicatorMargin
+                              )}
                             >
                               <RankedPlayerRow
                                 player={player}
@@ -807,40 +699,28 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
               ) : (
                 <>
                   {excludedPlayersList.length === 0 ? (
-                    <div className={styles.emptyState} style={{ '--empty-color': TEXT_COLORS.muted } as React.CSSProperties}>
+                    <div className={styles.emptyState}>
                       <svg className={styles.emptyIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
-                      <p className={styles.emptyTitle} style={{ '--empty-title-color': TEXT_COLORS.secondary, '--empty-title-font-size': `${TYPOGRAPHY.fontSize.sm}px` } as React.CSSProperties}>No excluded players</p>
-                      <p className={styles.emptyDescription} style={{ '--empty-desc-font-size': `${TYPOGRAPHY.fontSize.xs}px` } as React.CSSProperties}>Go to "Players" tab to exclude players</p>
+                      <p className={styles.emptyTitle}>No excluded players</p>
+                      <p className={styles.emptyDescription}>Go to "Players" tab to exclude players</p>
                     </div>
                   ) : filteredExcludedPlayers.length === 0 ? (
-                    <div className={styles.searchNoResults} style={{ '--empty-color': TEXT_COLORS.muted } as React.CSSProperties}>
+                    <div className={styles.searchNoResults}>
                       <Search size={48} className={styles.emptyIcon} />
-                      <p style={{ fontSize: `${TYPOGRAPHY.fontSize.sm}px`, color: TEXT_COLORS.muted }}>No matching players</p>
+                      <p>No matching players</p>
                     </div>
                   ) : (
                     <>
-                      <p className={styles.infoText} style={{ '--info-color': TEXT_COLORS.muted, '--info-font-size': `${TYPOGRAPHY.fontSize.xs}px` } as React.CSSProperties}>
+                      <p className={styles.infoText}>
                         {searchQuery.trim() ? `Showing ${filteredExcludedPlayers.length} of ${excludedPlayersList.length}` : `${excludedPlayersList.length} excluded players`}
                       </p>
                       <div className={styles.playerList}>
                         {filteredExcludedPlayers.map(player => {
-                          const posColor = POSITION_COLORS[player.position.toUpperCase() as keyof typeof POSITION_COLORS] || TEXT_COLORS.muted;
                           return (
                             <div
                               key={player.name}
                               className={cn(styles.playerListItem, styles.excluded)}
-                              style={{
-                                '--item-bg': BG_COLORS.secondary,
-                                '--item-border-color': posColor,
-                                '--item-radius': `${RADIUS.lg}px`,
-                                '--item-py': `${SPACING.xs}px`,
-                                '--item-px': `${SPACING.md}px`,
-                                '--item-gap': `${SPACING.sm}px`,
-                                '--name-font-size': `${TYPOGRAPHY.fontSize.sm}px`,
-                                '--name-color': TEXT_COLORS.primary,
-                                '--team-font-size': `${TYPOGRAPHY.fontSize.xs}px`,
-                                '--team-color': TEXT_COLORS.muted,
-                              } as React.CSSProperties}
+                              data-position={player.position.toLowerCase()}
                             >
                               <PositionBadge position={player.position as 'QB' | 'RB' | 'WR' | 'TE'} size="sm" />
                               <div className={styles.playerInfo}>
@@ -850,11 +730,6 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
                               <button
                                 onClick={() => togglePlayerExclude(player.name)}
                                 className={cn(styles.playerActionButton, styles.rankButton)}
-                                style={{
-                                  '--rank-color': STATE_COLORS.active,
-                                  '--rank-bg': 'rgba(96, 165, 250, 0.15)',
-                                  '--button-radius': `${RADIUS.lg}px`,
-                                } as React.CSSProperties}
                                 aria-label={`Unexclude ${player.name}`}
                               >
                                 <Plus size={16} />
@@ -869,7 +744,7 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
               )}
             </div>
 
-            {error && <div className={styles.errorMessage} style={{ '--error-color': STATE_COLORS.error, '--error-font-size': `${TYPOGRAPHY.fontSize.sm}px` } as React.CSSProperties}>{error}</div>}
+            {error && <div className={styles.errorMessage}>{error}</div>}
 
             <div className={styles.footer}>
               <button
@@ -881,11 +756,6 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
                 onTouchEnd={handleUndoLongPressEnd}
                 disabled={(!canUndo && rankedCount === 0) || isSaving}
                 className={cn(styles.actionButton, styles.undoButton)}
-                style={{
-                  '--undo-bg': (!canUndo && rankedCount === 0) ? BG_COLORS.tertiary : 'rgba(255,255,255,0.1)',
-                  '--undo-color': (!canUndo && rankedCount === 0) ? TEXT_COLORS.disabled : TEXT_COLORS.primary,
-                  '--action-font-size': `${TYPOGRAPHY.fontSize.sm}px`,
-                } as React.CSSProperties}
               >
                 Undo
               </button>
@@ -893,11 +763,6 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
                 onClick={handleSave}
                 disabled={!hasChanges || isSaving}
                 className={cn(styles.actionButton, styles.saveButton)}
-                style={{
-                  '--save-bg': (!hasChanges || isSaving) ? BG_COLORS.tertiary : STATE_COLORS.active,
-                  '--save-color': (!hasChanges || isSaving) ? TEXT_COLORS.disabled : '#000',
-                  '--action-font-size': `${TYPOGRAPHY.fontSize.sm}px`,
-                } as React.CSSProperties}
               >
                 {isSaving ? (<><div className={styles.loadingSpinner} />Saving...</>) : 'Save'}
               </button>
@@ -909,29 +774,19 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
       {/* Unsaved Changes Warning */}
       {showUnsavedWarning && (
         <div className={styles.modalOverlay}>
-          <div className={styles.modalDialog} style={{ '--dialog-bg': BG_COLORS.secondary } as React.CSSProperties}>
-            <h3 className={styles.modalDialogTitle} style={{ '--dialog-title-color': TEXT_COLORS.primary, '--dialog-title-font-size': `${TYPOGRAPHY.fontSize.base}px` } as React.CSSProperties}>Unsaved Changes</h3>
-            <p className={styles.modalDialogDescription} style={{ '--dialog-desc-color': TEXT_COLORS.muted, '--dialog-desc-font-size': `${TYPOGRAPHY.fontSize.sm}px` } as React.CSSProperties}>You have unsaved changes. Are you sure you want to leave?</p>
+          <div className={styles.modalDialog}>
+            <h3 className={styles.modalDialogTitle}>Unsaved Changes</h3>
+            <p className={styles.modalDialogDescription}>You have unsaved changes. Are you sure you want to leave?</p>
             <div className={styles.modalDialogButtons}>
               <button
                 onClick={() => setShowUnsavedWarning(false)}
-                className={styles.modalDialogButton}
-                style={{
-                  backgroundColor: 'rgba(255,255,255,0.1)',
-                  color: TEXT_COLORS.primary,
-                  fontSize: `${TYPOGRAPHY.fontSize.sm}px`
-                }}
+                className={cn(styles.modalDialogButton, styles.dialogBackButton)}
               >
                 Go Back
               </button>
               <button
                 onClick={handleDiscardAndClose}
                 className={cn(styles.modalDialogButton, styles.dialogDestructiveButton)}
-                style={{
-                  '--dialog-destructive-bg': STATE_COLORS.error,
-                  '--dialog-destructive-color': '#FFF',
-                  fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-                } as React.CSSProperties}
               >
                 Discard
               </button>
@@ -943,29 +798,19 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
       {/* Clear Rankings Confirmation */}
       {showClearConfirm && (
         <div className={styles.modalOverlay}>
-          <div className={styles.modalDialog} style={{ '--dialog-bg': BG_COLORS.secondary } as React.CSSProperties}>
-            <h3 className={styles.modalDialogTitle} style={{ '--dialog-title-color': TEXT_COLORS.primary, '--dialog-title-font-size': `${TYPOGRAPHY.fontSize.base}px` } as React.CSSProperties}>Clear Rankings?</h3>
-            <p className={styles.modalDialogDescription} style={{ '--dialog-desc-color': TEXT_COLORS.muted, '--dialog-desc-font-size': `${TYPOGRAPHY.fontSize.sm}px` } as React.CSSProperties}>Do you want to clear all your rankings? This can be undone.</p>
+          <div className={styles.modalDialog}>
+            <h3 className={styles.modalDialogTitle}>Clear Rankings?</h3>
+            <p className={styles.modalDialogDescription}>Do you want to clear all your rankings? This can be undone.</p>
             <div className={styles.modalDialogButtons}>
               <button
                 onClick={() => setShowClearConfirm(false)}
-                className={styles.modalDialogButton}
-                style={{
-                  backgroundColor: 'rgba(255,255,255,0.1)',
-                  color: TEXT_COLORS.primary,
-                  fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-                }}
+                className={cn(styles.modalDialogButton, styles.dialogBackButton)}
               >
                 Cancel
               </button>
               <button
                 onClick={handleClearAll}
                 className={cn(styles.modalDialogButton, styles.dialogDestructiveButton)}
-                style={{
-                  '--dialog-destructive-bg': STATE_COLORS.error,
-                  '--dialog-destructive-color': '#FFF',
-                  fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-                } as React.CSSProperties}
               >
                 Clear All
               </button>

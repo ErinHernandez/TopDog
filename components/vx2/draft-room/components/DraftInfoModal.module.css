@@ -18,7 +18,7 @@
   justify-content: center;
   background-color: var(--modal-backdrop);
   z-index: 1000;
-  padding: var(--spacing-md, 16px);
+  padding: 16px;
 }
 
 .modalContent {
@@ -133,7 +133,19 @@
   height: 16px;
   border-radius: 4px;
   flex-shrink: 0;
+  /* Position color from data-position attribute */
+  background-color: var(--position-color, #6B7280);
 }
+
+/* Position-specific key dot colors */
+.keyDot[data-position="qb"] { --position-color: var(--color-position-qb); }
+.keyDot[data-position="rb"] { --position-color: var(--color-position-rb); }
+.keyDot[data-position="wr"] { --position-color: var(--color-position-wr); }
+.keyDot[data-position="te"] { --position-color: var(--color-position-te); }
+.keyDot[data-position="bn"] { --position-color: var(--color-position-bn); }
+.keyDot[data-position="k"] { --position-color: var(--text-muted); }
+.keyDot[data-position="dst"] { --position-color: var(--text-muted); }
+.keyDot[data-position="def"] { --position-color: var(--text-muted); }
 
 .keyLabel {
   font-size: 14px;

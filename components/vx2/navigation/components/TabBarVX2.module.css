@@ -15,7 +15,7 @@
   flex-direction: column;
   background-color: var(--tab-bar-bg, rgba(18, 18, 18, 0.98));
   border-top: 1px solid var(--tab-bar-border, rgba(255, 255, 255, 0.08));
-  z-index: var(--tab-bar-z-index, 100);
+  z-index: var(--z-tabbar);
 }
 
 /* ============================================================================
@@ -71,8 +71,9 @@
    ============================================================================ */
 
 .activeIcon {
-  width: var(--tab-icon-size, 24px);
-  height: var(--tab-icon-size, 24px);
+  --tab-icon-size: 24px;
+  width: var(--tab-icon-size);
+  height: var(--tab-icon-size);
   background: url(/wr_blue.png) no-repeat center center;
   background-size: cover;
   /* Mask values set via inline style for dynamic SVG */
@@ -114,9 +115,13 @@
    ============================================================================ */
 
 .label {
-  font-size: var(--tab-label-font-size, 10px);
-  line-height: var(--tab-label-line-height, 12px);
-  margin-top: var(--tab-label-margin-top, 2px);
+  --tab-label-font-size: 10px;
+  --tab-label-line-height: 12px;
+  --tab-label-margin-top: 2px;
+  --tab-label-inactive: rgba(255, 255, 255, 0.5);
+  font-size: var(--tab-label-font-size);
+  line-height: var(--tab-label-line-height);
+  margin-top: var(--tab-label-margin-top);
 }
 
 .labelInactive {

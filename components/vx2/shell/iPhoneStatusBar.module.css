@@ -77,6 +77,7 @@
 .signalBar {
   width: 3px;
   border-radius: 0.5px;
+  height: var(--signal-bar-height, 3px);
 }
 
 .signalBarActive {

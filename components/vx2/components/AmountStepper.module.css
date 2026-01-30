@@ -1,7 +1,8 @@
 /**
  * AmountStepper CSS Module
  *
- * Migrated from inline styles for CSP compliance.
+ * Zero-runtime CSS for CSP compliance.
+ * Uses tokens.css variables for all colors.
  */
 
 /* ============================================================================
@@ -19,16 +20,17 @@
    ============================================================================ */
 
 .explanationBanner {
-  padding: 1rem;
-  border-radius: 0.75rem;
-  background-color: var(--info-bg, rgba(59, 130, 246, 0.07));
-  border: 1px solid var(--info-border, rgba(59, 130, 246, 0.19));
+  padding: var(--spacing-md);
+  border-radius: var(--radius-lg);
+  background-color: rgba(59, 130, 246, 0.07);
+  border: 1px solid rgba(59, 130, 246, 0.19);
 }
 
 .explanationText {
-  font-size: var(--font-size-sm, 14px);
-  color: var(--text-primary, rgba(255, 255, 255, 0.9));
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
   line-height: 1.5;
+  margin: 0;
 }
 
 /* ============================================================================
@@ -58,11 +60,12 @@
   justify-content: center;
   border-radius: 9999px;
   transition: all 150ms ease;
-  width: var(--button-size, 48px);
-  height: var(--button-size, 48px);
-  background-color: var(--button-bg, rgba(255, 255, 255, 0.1));
-  border: 1px solid var(--button-border, rgba(255, 255, 255, 0.1));
+  width: 48px;
+  height: 48px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-default);
   cursor: pointer;
+  color: var(--text-primary);
 }
 
 .stepperButton:active:not(:disabled) {
@@ -72,11 +75,18 @@
 .stepperButtonDisabled {
   opacity: 0.5;
   cursor: not-allowed;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: var(--border-light);
+}
+
+.stepperButtonDisabled svg {
+  color: var(--text-muted);
 }
 
 .stepperButtonIncrement {
-  background-color: var(--active-color, #60a5fa);
-  border-color: var(--active-color, #60a5fa);
+  background-color: var(--color-state-active);
+  border-color: var(--color-state-active);
+  color: #000;
 }
 
 /* ============================================================================
@@ -90,14 +100,14 @@
 
 .amountValue {
   font-weight: 700;
-  font-size: var(--amount-font-size, 30px);
-  color: var(--text-primary, rgba(255, 255, 255, 0.9));
+  font-size: var(--font-size-3xl);
+  color: var(--text-primary);
 }
 
 .localEquivalent {
   margin-top: 0.25rem;
-  font-size: var(--font-size-sm, 14px);
-  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
 }
 
 /* ============================================================================
@@ -105,8 +115,9 @@
    ============================================================================ */
 
 .limitMessage {
-  font-size: var(--font-size-xs, 12px);
-  color: var(--text-muted, rgba(255, 255, 255, 0.5));
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  margin: 0;
 }
 
 /* ============================================================================
@@ -120,33 +131,37 @@
 .quickSelectLabel {
   text-align: center;
   margin-bottom: 0.75rem;
-  font-size: var(--font-size-xs, 12px);
-  color: var(--text-muted, rgba(255, 255, 255, 0.5));
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
 }
 
 .quickSelectGrid {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: var(--spacing-sm);
 }
 
 .quickSelectChip {
-  padding: 0.5rem 1rem;
+  padding: var(--spacing-sm) var(--spacing-md);
   border-radius: 9999px;
   font-weight: 500;
   transition: all 150ms ease;
-  font-size: var(--font-size-sm, 14px);
-  background-color: var(--chip-bg, rgba(255, 255, 255, 0.05));
-  color: var(--chip-color, rgba(255, 255, 255, 0.9));
-  border: 1px solid var(--chip-border, rgba(255, 255, 255, 0.1));
+  font-size: var(--font-size-sm);
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  border: 1px solid var(--border-default);
   cursor: pointer;
 }
 
+.quickSelectChip:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
 .quickSelectChipSelected {
-  background-color: var(--active-color, #60a5fa);
+  background-color: var(--color-state-active);
   color: #000;
-  border-color: var(--active-color, #60a5fa);
+  border-color: var(--color-state-active);
 }
 
 /* ============================================================================
@@ -155,21 +170,22 @@
 
 .exchangeRateBox {
   padding: 0.75rem;
-  border-radius: 0.5rem;
+  border-radius: var(--radius-md);
   background-color: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border-light, rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--border-light);
 }
 
 .exchangeRateText {
   text-align: center;
-  font-size: var(--font-size-xs, 12px);
-  color: var(--text-muted, rgba(255, 255, 255, 0.5));
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  margin: 0;
 }
 
 .exchangeRateDisclaimer {
   text-align: center;
   margin-top: 0.25rem;
-  font-size: var(--font-size-xs, 12px);
-  color: var(--text-muted, rgba(255, 255, 255, 0.5));
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
   opacity: 0.7;
 }

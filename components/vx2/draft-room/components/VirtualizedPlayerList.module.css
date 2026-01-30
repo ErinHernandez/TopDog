@@ -30,13 +30,13 @@
   border-radius: 8px;
   overflow: hidden;
   background-color: rgba(255, 255, 255, 0.05);
-  margin-top: 12px;
-  margin-bottom: 4px;
+  margin-top: var(--spacing-md);
+  margin-bottom: var(--spacing-xs);
 }
 
 .filterButton {
   flex: 1;
-  padding: 10px 12px;
+  padding: var(--spacing-sm) var(--spacing-md);
   font-weight: bold;
   transition: var(--transition-all);
   font-size: var(--search-font-size);
@@ -56,6 +56,32 @@
   color: #a0aec0;
 }
 
+/* Filter button position colors - border and active text color */
+.filterButton[data-position="qb"] {
+  border-bottom-color: var(--color-position-qb);
+}
+.filterButton[data-position="qb"].active {
+  color: var(--color-position-qb);
+}
+.filterButton[data-position="rb"] {
+  border-bottom-color: var(--color-position-rb);
+}
+.filterButton[data-position="rb"].active {
+  color: var(--color-position-rb);
+}
+.filterButton[data-position="wr"] {
+  border-bottom-color: var(--color-position-wr);
+}
+.filterButton[data-position="wr"].active {
+  color: var(--color-position-wr);
+}
+.filterButton[data-position="te"] {
+  border-bottom-color: var(--color-position-te);
+}
+.filterButton[data-position="te"].active {
+  color: var(--color-position-te);
+}
+
 /* ============================================================================
    SEARCH BAR
    ============================================================================ */
@@ -63,7 +89,7 @@
 .searchContainer {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--spacing-sm);
   margin-top: var(--search-margin-top);
   margin-left: var(--search-margin-x);
   margin-right: var(--search-margin-x);
@@ -76,11 +102,11 @@
   height: var(--search-height);
   background-color: var(--search-bg);
   border-radius: 8px;
-  padding: 0 12px;
+  padding: 0 var(--spacing-md);
 }
 
 .searchInputIcon {
-  margin-right: 8px;
+  margin-right: var(--spacing-sm);
   flex-shrink: 0;
   width: 18px;
   height: 18px;
@@ -156,7 +182,7 @@
 }
 
 .headerColumn.active .headerColumnLabel {
-  border-bottom-color: var(--gray-border);
+  border-bottom-color: var(--color-sort-indicator);
 }
 
 .headerColumnAdp {
@@ -199,21 +225,22 @@
 
 .virtualizedContent {
   position: relative;
+  height: var(--virtualized-height);
 }
 
 .virtualizedViewport {
   position: absolute;
-  top: 0;
+  top: var(--viewport-offset);
   left: 0;
   right: 0;
 }
 
 .nonVirtualizedContent {
-  padding-bottom: 24px;
+  padding-bottom: var(--spacing-xl);
 }
 
 .emptyState {
-  padding: 24px;
+  padding: var(--spacing-xl);
   text-align: center;
   color: var(--text-secondary, #9ca3af);
 }
@@ -237,7 +264,7 @@
 }
 
 .playerRow:focus-visible {
-  outline: 2px solid var(--blue-border);
+  outline: 2px solid var(--color-focus);
   outline-offset: -1px;
 }
 
@@ -277,7 +304,7 @@
 .playerMetadata {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--spacing-xs);
   margin-top: 2px;
 }
 
@@ -291,6 +318,8 @@
   font-size: var(--position-badge-font-size);
   font-weight: var(--position-badge-font-weight);
   flex-shrink: 0;
+  /* Background color is set via data-position attribute */
+  background-color: var(--position-color, #6B7280);
 }
 
 .playerTeam {
@@ -313,7 +342,7 @@
   width: var(--queue-button-size);
   height: var(--queue-button-size);
   border-radius: var(--queue-button-border-radius);
-  border: var(--queue-button-border-width) solid var(--gray-border);
+  border: var(--queue-button-border-width) solid var(--color-queue-border);
   background-color: transparent;
   cursor: pointer;
   display: flex;
@@ -324,13 +353,13 @@
 }
 
 .queueButton:hover {
-  border-color: var(--blue-border);
-  background-color: rgba(96, 165, 250, 0.15);
+  border-color: var(--color-queue-active);
+  background-color: var(--color-queue-hover-bg);
 }
 
 .queueButton.active {
-  border-color: var(--blue-border);
-  background-color: rgba(96, 165, 250, 0.2);
+  border-color: var(--color-queue-active);
+  background-color: var(--color-queue-active-bg);
 }
 
 .queueButtonSvg {
@@ -367,7 +396,7 @@
    ============================================================================ */
 
 .expandedCardContainer {
-  padding: 8px 4px;
+  padding: var(--spacing-sm) 4px;
 }
 
 /* ============================================================================

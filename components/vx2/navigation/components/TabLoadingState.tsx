@@ -9,8 +9,6 @@
 
 import React from 'react';
 import type { TabId } from '../../core/types';
-import { BG_COLORS, TEXT_COLORS } from '../../core/constants/colors';
-import { SPACING, RADIUS } from '../../core/constants/sizes';
 import { TAB_DISPLAY_NAMES } from '../../core/types/navigation';
 import { cn } from '@/lib/styles';
 import styles from './TabLoadingState.module.css';
@@ -40,17 +38,17 @@ interface SkeletonProps {
 function Skeleton({
   width = '100%',
   height = 16,
-  borderRadius = RADIUS.md,
+  borderRadius = 8,
   className = '',
 }: SkeletonProps): React.ReactElement {
   return (
     <div
       className={cn('animate-pulse', styles.skeleton, className)}
       style={{
-        width: typeof width === 'number' ? `${width}px` : width,
-        height: typeof height === 'number' ? `${height}px` : height,
-        borderRadius: `${borderRadius}px`,
-      }}
+        '--skeleton-width': typeof width === 'number' ? `${width}px` : width,
+        '--skeleton-height': typeof height === 'number' ? `${height}px` : height,
+        '--skeleton-radius': `${borderRadius}px`,
+      } as React.CSSProperties}
     />
   );
 }
@@ -65,10 +63,6 @@ function LobbyLoadingSkeleton(): React.ReactElement {
       {/* Tournament card skeleton */}
       <div
         className={cn('rounded-lg p-4', styles.skeletonCard)}
-        style={{
-          '--skeleton-card-bg': BG_COLORS.secondary,
-          borderRadius: `${RADIUS.lg}px`,
-        } as React.CSSProperties}
       >
         <Skeleton width={200} height={24} className="mb-4" />
         <Skeleton width="100%" height={120} className="mb-4" />
@@ -83,7 +77,6 @@ function LobbyLoadingSkeleton(): React.ReactElement {
         <div
           key={i}
           className={cn('rounded-lg p-4', styles.skeletonCard)}
-          style={{ '--skeleton-card-bg': BG_COLORS.secondary } as React.CSSProperties}
         >
           <Skeleton width={150} height={20} className="mb-3" />
           <Skeleton width="100%" height={16} className="mb-2" />
@@ -102,7 +95,6 @@ function LiveDraftsLoadingSkeleton(): React.ReactElement {
         <div
           key={i}
           className={cn('rounded-lg p-4', styles.skeletonCard)}
-          style={{ '--skeleton-card-bg': BG_COLORS.secondary } as React.CSSProperties}
         >
           <div className="flex justify-between mb-3">
             <Skeleton width={120} height={18} />
@@ -131,10 +123,9 @@ function MyTeamsLoadingSkeleton(): React.ReactElement {
           <div
             key={i}
             className={cn('rounded-lg p-4 flex justify-between items-center', styles.skeletonCard)}
-            style={{ '--skeleton-card-bg': BG_COLORS.secondary } as React.CSSProperties}
           >
             <Skeleton width={150} height={18} />
-            <Skeleton width={24} height={24} borderRadius={RADIUS.full} />
+            <Skeleton width={24} height={24} borderRadius={9999} />
           </div>
         ))}
       </div>
@@ -160,12 +151,8 @@ function ExposureLoadingSkeleton(): React.ReactElement {
           <div
             key={i}
             className={styles.playerRow}
-            style={{
-              '--skeleton-card-bg': BG_COLORS.secondary,
-              '--radius-md': `${RADIUS.md}px`,
-            } as React.CSSProperties}
           >
-            <Skeleton width={36} height={36} borderRadius={RADIUS.full} />
+            <Skeleton width={36} height={36} borderRadius={9999} />
             <div className="flex-1">
               <Skeleton width={120} height={14} className="mb-1" />
               <Skeleton width={80} height={12} />
@@ -183,7 +170,7 @@ function ProfileLoadingSkeleton(): React.ReactElement {
     <div className="p-4">
       {/* Avatar placeholder */}
       <div className="flex justify-center mb-6">
-        <Skeleton width={100} height={120} borderRadius={RADIUS.lg} />
+        <Skeleton width={100} height={120} borderRadius={12} />
       </div>
 
       {/* Menu items */}
@@ -193,7 +180,7 @@ function ProfileLoadingSkeleton(): React.ReactElement {
             key={i}
             width="100%"
             height={52}
-            borderRadius={RADIUS.md}
+            borderRadius={8}
           />
         ))}
       </div>
@@ -230,15 +217,11 @@ export default function TabLoadingState({
   return (
     <div
       className={styles.container}
-      style={{ '--loading-bg': BG_COLORS.primary } as React.CSSProperties}
       role="status"
       aria-label={`Loading ${TAB_DISPLAY_NAMES[tabId]}`}
     >
       {message && (
-        <div
-          className={styles.message}
-          style={{ '--message-color': TEXT_COLORS.secondary } as React.CSSProperties}
-        >
+        <div className={styles.message}>
           {message}
         </div>
       )}

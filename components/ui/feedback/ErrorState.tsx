@@ -14,8 +14,7 @@
  */
 
 import React from 'react';
-import { TEXT_COLORS, STATE_COLORS } from '../../vx2/core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY } from '../../vx2/core/constants/sizes';
+import styles from './ErrorState.module.css';
 
 // ============================================================================
 // TYPES
@@ -51,7 +50,7 @@ function DefaultErrorIcon(): React.ReactElement {
       height={32}
       viewBox="0 0 24 24"
       fill="none"
-      stroke={STATE_COLORS.error}
+      className={styles.errorIcon}
       strokeWidth={2}
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -77,83 +76,37 @@ export function ErrorState({
   compact = false,
   errorDetails,
 }: ErrorStateProps): React.ReactElement {
-  const padding = compact ? SPACING.lg : SPACING['2xl'];
   const isDev = process.env.NODE_ENV === 'development';
-  
+
   return (
     <div
-      className={`flex flex-col items-center justify-center text-center ${className}`}
-      style={{
-        padding: `${padding}px`,
-        minHeight: compact ? 'auto' : '200px',
-      }}
+      className={`${styles.container} ${className}`}
+      data-compact={compact}
       role="alert"
       aria-live="assertive"
     >
       {/* Icon */}
-      <div
-        className="flex items-center justify-center rounded-full mb-4"
-        style={{
-          width: compact ? '48px' : '64px',
-          height: compact ? '48px' : '64px',
-          backgroundColor: 'rgba(239, 68, 68, 0.1)',
-        }}
-      >
+      <div className={styles.iconContainer} data-compact={compact}>
         {icon || <DefaultErrorIcon />}
       </div>
 
       {/* Title */}
-      <h3
-        className="font-semibold"
-        style={{
-          color: TEXT_COLORS.primary,
-          fontSize: compact ? `${TYPOGRAPHY.fontSize.base}px` : `${TYPOGRAPHY.fontSize.lg}px`,
-          marginBottom: `${SPACING.sm}px`,
-        }}
-      >
+      <h3 className={styles.title} data-compact={compact}>
         {title}
       </h3>
 
       {/* Description */}
-      <p
-        style={{
-          color: TEXT_COLORS.secondary,
-          fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-          maxWidth: '280px',
-          marginBottom: onRetry ? `${SPACING.lg}px` : 0,
-        }}
-      >
+      <p className={styles.description} data-has-retry={!!onRetry}>
         {description}
       </p>
 
       {/* Error Details (dev only) */}
       {isDev && errorDetails && (
-        <details
-          className="w-full max-w-sm mb-4 text-left"
-          style={{
-            backgroundColor: 'rgba(239, 68, 68, 0.1)',
-            borderRadius: `${RADIUS.md}px`,
-            padding: `${SPACING.md}px`,
-          }}
-        >
-          <summary
-            className="cursor-pointer"
-            style={{
-              color: TEXT_COLORS.secondary,
-              fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-            }}
-          >
+        <details className={styles.details}>
+          <summary className={styles.detailsSummary}>
             Technical Details
           </summary>
-          <pre
-            className="mt-2 overflow-x-auto"
-            style={{
-              color: STATE_COLORS.error,
-              fontSize: `${TYPOGRAPHY.fontSize.xs}px`,
-              whiteSpace: 'pre-wrap',
-              wordBreak: 'break-word',
-            }}
-          >
+          <pre className={styles.detailsContent}>
             {errorDetails}
           </pre>
         </details>
@@ -161,22 +114,7 @@ export function ErrorState({
 
       {/* Retry Button */}
       {onRetry && (
-        <button
-          onClick={onRetry}
-          className="font-medium transition-colors hover:opacity-90"
-          style={{
-            backgroundColor: STATE_COLORS.active,
-            color: '#000000',
-            paddingLeft: `${SPACING.xl}px`,
-            paddingRight: `${SPACING.xl}px`,
-            paddingTop: `${SPACING.md}px`,
-            paddingBottom: `${SPACING.md}px`,
-            borderRadius: `${RADIUS.md}px`,
-            fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-            border: 'none',
-            cursor: 'pointer',
-          }}
-        >
+        <button onClick={onRetry} className={styles.retryButton}>
           {retryLabel}
         </button>
       )}

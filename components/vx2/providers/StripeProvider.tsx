@@ -21,7 +21,6 @@ import { createScopedLogger } from '@/lib/clientLogger';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import type { StripeElementsOptions, Appearance, Stripe } from '@stripe/stripe-js';
-import { BG_COLORS, TEXT_COLORS, BORDER_COLORS, STATE_COLORS } from '../core/constants/colors';
 
 const logger = createScopedLogger('[StripeProvider]');
 
@@ -57,23 +56,26 @@ if (stripePublishableKey) {
 
 /**
  * Stripe Elements appearance configuration matching VX2 design system.
- * Uses dark theme with VX2 colors.
+ * Uses dark theme with VX2 colors from tokens.css custom properties.
+ *
+ * Note: Stripe Elements doesn't support CSS variables directly,
+ * so we use computed values from getComputedStyle.
  */
 export const VX2_STRIPE_APPEARANCE: Appearance = {
   theme: 'night',
   labels: 'floating',
-  
+
   variables: {
-    // Colors
-    colorPrimary: STATE_COLORS.active,
-    colorBackground: BG_COLORS.secondary,
-    colorText: TEXT_COLORS.primary,
-    colorTextSecondary: TEXT_COLORS.secondary,
-    colorTextPlaceholder: TEXT_COLORS.muted,
-    colorDanger: STATE_COLORS.error,
-    colorSuccess: STATE_COLORS.success,
-    colorWarning: STATE_COLORS.warning,
-    
+    // Colors - using computed values from tokens.css
+    colorPrimary: '#60A5FA', // --color-state-active
+    colorBackground: '#1f2937', // --bg-secondary
+    colorText: '#ffffff', // --text-primary
+    colorTextSecondary: '#9ca3af', // --text-secondary
+    colorTextPlaceholder: '#6b7280', // --text-muted
+    colorDanger: '#EF4444', // --color-state-error
+    colorSuccess: '#10B981', // --color-state-success
+    colorWarning: '#F59E0B', // --color-state-warning
+
     // Typography
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     fontSizeBase: '14px',
@@ -82,92 +84,92 @@ export const VX2_STRIPE_APPEARANCE: Appearance = {
     fontWeightNormal: '400',
     fontWeightMedium: '500',
     fontWeightBold: '600',
-    
+
     // Spacing
     spacingUnit: '4px',
     spacingGridColumn: '16px',
     spacingGridRow: '16px',
-    
+
     // Border
     borderRadius: '8px',
-    
+
     // Focus
-    focusBoxShadow: `0 0 0 2px ${STATE_COLORS.active}40`,
+    focusBoxShadow: '0 0 0 2px rgba(96, 165, 250, 0.25)',
     focusOutline: 'none',
   },
-  
+
   rules: {
     '.Input': {
-      backgroundColor: BG_COLORS.tertiary,
-      border: `1px solid ${BORDER_COLORS.default}`,
+      backgroundColor: '#111827', // --bg-tertiary
+      border: '1px solid rgba(255, 255, 255, 0.1)', // --border-default
       borderRadius: '8px',
       padding: '12px 14px',
       transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
     },
-    
+
     '.Input:focus': {
-      borderColor: STATE_COLORS.active,
-      boxShadow: `0 0 0 2px ${STATE_COLORS.active}40`,
+      borderColor: '#60A5FA', // --color-state-active
+      boxShadow: '0 0 0 2px rgba(96, 165, 250, 0.25)',
     },
-    
+
     '.Input--invalid': {
-      borderColor: STATE_COLORS.error,
+      borderColor: '#EF4444', // --color-state-error
     },
-    
+
     '.Input::placeholder': {
-      color: TEXT_COLORS.muted,
+      color: '#6b7280', // --text-muted
     },
-    
+
     '.Label': {
-      color: TEXT_COLORS.secondary,
+      color: '#9ca3af', // --text-secondary
       fontSize: '13px',
       fontWeight: '500',
       marginBottom: '6px',
     },
-    
+
     '.Error': {
-      color: STATE_COLORS.error,
+      color: '#EF4444', // --color-state-error
       fontSize: '13px',
       marginTop: '6px',
     },
-    
+
     '.Tab': {
-      backgroundColor: BG_COLORS.tertiary,
-      border: `1px solid ${BORDER_COLORS.default}`,
+      backgroundColor: '#111827', // --bg-tertiary
+      border: '1px solid rgba(255, 255, 255, 0.1)', // --border-default
       borderRadius: '8px',
-      color: TEXT_COLORS.secondary,
+      color: '#9ca3af', // --text-secondary
       padding: '10px 16px',
     },
-    
+
     '.Tab:hover': {
-      backgroundColor: BG_COLORS.secondary,
-      color: TEXT_COLORS.primary,
+      backgroundColor: '#1f2937', // --bg-secondary
+      color: '#ffffff', // --text-primary
     },
-    
+
     '.Tab--selected': {
-      backgroundColor: STATE_COLORS.active,
-      borderColor: STATE_COLORS.active,
+      backgroundColor: '#60A5FA', // --color-state-active
+      borderColor: '#60A5FA', // --color-state-active
       color: '#000000',
     },
-    
+
     '.TabIcon': {
       marginRight: '8px',
     },
-    
+
     '.Block': {
-      backgroundColor: BG_COLORS.secondary,
+      backgroundColor: '#1f2937', // --bg-secondary
       borderRadius: '8px',
       padding: '16px',
     },
-    
+
     '.CheckboxInput': {
-      backgroundColor: BG_COLORS.tertiary,
-      borderColor: BORDER_COLORS.default,
+      backgroundColor: '#111827', // --bg-tertiary
+      borderColor: 'rgba(255, 255, 255, 0.1)', // --border-default
     },
-    
+
     '.CheckboxInput--checked': {
-      backgroundColor: STATE_COLORS.active,
-      borderColor: STATE_COLORS.active,
+      backgroundColor: '#60A5FA', // --color-state-active
+      borderColor: '#60A5FA', // --color-state-active
     },
   },
 };

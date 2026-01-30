@@ -9,7 +9,6 @@
 
 import React from 'react';
 import { cn } from '@/lib/styles';
-import { CARD_SPACING_V3 } from '../constants/cardSpacingV3';
 import styles from './TournamentBackground.module.css';
 
 export interface TournamentBackgroundProps {
@@ -27,27 +26,22 @@ export function TournamentBackground({
   image,
   placeholder,
   isLoaded,
-  borderRadius = CARD_SPACING_V3.borderRadius,
+  borderRadius = 8,
 }: TournamentBackgroundProps): React.ReactElement {
-  const transitionStyle = `opacity ${CARD_SPACING_V3.imageFadeDuration} ${CARD_SPACING_V3.imageFadeEasing}`;
   const backgroundImage = image.startsWith('url(') ? image : `url(${image})`;
 
   return (
     <div
       className={cn(styles.container)}
-      style={{
-        '--border-radius': `${borderRadius}px`,
-        '--transition': transitionStyle,
-      } as React.CSSProperties}
+      data-border-radius={borderRadius}
     >
       {/* Blur Placeholder Layer */}
       {placeholder && (
         <div
           className={cn(styles.placeholder)}
+          data-is-loaded={isLoaded ? '0' : '1'}
           style={{
             '--placeholder-image': `url(${placeholder})`,
-            '--is-loaded': isLoaded ? '0' : '1',
-            '--transition': transitionStyle,
           } as React.CSSProperties}
           aria-hidden="true"
         />
@@ -56,10 +50,9 @@ export function TournamentBackground({
       {/* Full Resolution Image Layer */}
       <div
         className={cn(styles.image)}
+        data-is-loaded={isLoaded ? '1' : '0'}
         style={{
           '--image': backgroundImage,
-          '--is-loaded': isLoaded ? '1' : '0',
-          '--transition': transitionStyle,
         } as React.CSSProperties}
       />
 

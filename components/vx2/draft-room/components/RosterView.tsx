@@ -17,8 +17,6 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import type { DraftPick, Participant, Position, DraftPlayer } from '../types';
-import { POSITION_COLORS } from '../constants';
-import { BG_COLORS, TEXT_COLORS } from '../../core/constants/colors';
 import PlayerExpandedCard from './PlayerExpandedCard';
 import { useImageShare } from '../hooks/useImageShare';
 import { Share } from '../../components/icons/actions/Share';
@@ -188,8 +186,6 @@ interface PositionBadgeProps {
 }
 
 const PositionBadge = React.memo(function PositionBadge({ position, size }: PositionBadgeProps): React.ReactElement {
-  const color = POSITION_COLORS[position as Position] || '#6B7280';
-
   const sizeClasses = {
     sm: styles.badgeSm,
     md: styles.badgeMd,
@@ -200,7 +196,7 @@ const PositionBadge = React.memo(function PositionBadge({ position, size }: Posi
   // Special three-color gradient for FLEX (RB green, WR yellow, TE purple)
   if (position === 'FLEX') {
     return (
-      <div className={cn(styles.badge, styles.flexBadge, sizeClasses[size])}>
+      <div className={cn(styles.badge, styles.flexBadge, sizeClasses[size])} data-position="flex">
         {/* Three-color background stripes */}
         <div className={styles.flexBadgeBackground}>
           <div className={cn(styles.flexBadgeStripe, styles.flexBadgeStripeRb)} />
@@ -216,7 +212,7 @@ const PositionBadge = React.memo(function PositionBadge({ position, size }: Posi
   return (
     <div
       className={cn(styles.badge, sizeClasses[size])}
-      style={{ backgroundColor: color }}
+      data-position={position.toLowerCase()}
     >
       {position}
     </div>
@@ -383,7 +379,7 @@ const TeamSelector = React.memo(function TeamSelector({
                             ? "M12 19V5M12 5L5 12M12 5L19 12" // Up arrow
                             : "M12 5V19M12 19L5 12M12 19L19 12" // Down arrow
                           }
-                          stroke={ROSTER_COLORS.arrowColor}
+                          stroke="var(--color-draft-arrow)"
                           strokeWidth={3}
                           strokeLinecap="round"
                           strokeLinejoin="round"

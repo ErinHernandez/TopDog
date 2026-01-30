@@ -10,11 +10,41 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  margin: var(--lobby-outline-margin);
-  border: var(--lobby-outline-thickness) solid var(--lobby-outline-color);
-  border-radius: var(--lobby-outline-radius);
+  margin: var(--lobby-outline-margin, 0px);
+  border-width: var(--lobby-outline-thickness, 0px);
+  border-style: solid;
+  border-color: var(--lobby-outline-color, #3B82F6);
+  border-radius: var(--lobby-outline-radius, 0px);
   box-sizing: border-box;
-  transform: translateY(var(--outline-translate-y));
+  transform: translateY(var(--outline-translate-y, 0px));
+}
+
+.contentArea[data-outline-thickness] {
+  --lobby-outline-thickness: calc(var(data-outline-thickness) * 1px);
+}
+
+.contentArea[data-outline-margin] {
+  --lobby-outline-margin: calc(var(data-outline-margin) * 1px);
+}
+
+.contentArea[data-outline-color] {
+  --lobby-outline-color: var(data-outline-color);
+}
+
+.contentArea[data-outline-radius] {
+  --lobby-outline-radius: calc(var(data-outline-radius) * 1px);
+}
+
+.contentArea[data-outline-translate-y] {
+  --outline-translate-y: calc(var(data-outline-translate-y) * 1px);
+}
+
+.contentArea[data-content-scale] {
+  --content-scale: var(data-content-scale);
+}
+
+.contentArea[data-safe-area-top] {
+  --safe-area-top: calc(var(data-safe-area-top) * 1px);
 }
 
 /* Inner padding and safe area */
@@ -104,8 +134,16 @@
 .heroBlock {
   display: flex;
   flex-direction: column;
-  padding: var(--outer-padding);
-  gap: var(--bottom-row-gap);
+  padding: var(--outer-padding, 0px);
+  gap: var(--bottom-row-gap, 0px);
+}
+
+.heroBlock[data-outer-padding] {
+  --outer-padding: calc(var(data-outer-padding) * 1px);
+}
+
+.heroBlock[data-bottom-row-gap] {
+  --bottom-row-gap: calc(var(data-bottom-row-gap) * 1px);
 }
 
 /* Logo and title container */
@@ -113,7 +151,15 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  transform: translate(var(--logo-title-translate-x), var(--logo-title-translate-y));
+  transform: translate(var(--logo-title-translate-x, 0px), var(--logo-title-translate-y, 0px));
+}
+
+.logoTitleContainer[data-translate-x] {
+  --logo-title-translate-x: calc(var(data-translate-x) * 1px);
+}
+
+.logoTitleContainer[data-translate-y] {
+  --logo-title-translate-y: calc(var(data-translate-y) * 1px);
 }
 
 .logoTitleInner {
@@ -123,7 +169,7 @@
 
 /* Globe container */
 .globeSlotContainer {
-  height: var(--globe-slot-height);
+  height: var(--globe-slot-height, 280px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -131,7 +177,19 @@
   flex-shrink: 0;
   margin-top: 24px;
   overflow: hidden;
-  transform: translateY(-24px) translate(var(--globe-translate-x), var(--globe-translate-y));
+  transform: translateY(-24px) translate(var(--globe-translate-x, 0px), var(--globe-translate-y, 0px));
+}
+
+.globeSlotContainer[data-globe-slot-height] {
+  --globe-slot-height: calc(var(data-globe-slot-height) * 1px);
+}
+
+.globeSlotContainer[data-translate-x] {
+  --globe-translate-x: calc(var(data-translate-x) * 1px);
+}
+
+.globeSlotContainer[data-translate-y] {
+  --globe-translate-y: calc(var(data-translate-y) * 1px);
 }
 
 .globeSlot {
@@ -141,24 +199,58 @@
   min-height: 0;
   max-width: 100%;
   flex-shrink: 0;
+  background-image: var(--globe-bg-image);
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
 }
 
+.globeSlot[data-globe-size] {
+  --globe-size: calc(var(data-globe-size) * 1px);
+}
+
+/*
+ * NOTE: Image URLs cannot use url(var(...)) in CSS Modules.
+ * Pass the image via TSX: style={{ '--globe-bg-image': `url(${imageUrl})` } as React.CSSProperties}
+ */
+
 /* Progress bar container */
 .progressBarContainer {
-  transform: translateY(-14px) translate(var(--progress-bar-translate-x), var(--progress-bar-translate-y));
+  transform: translateY(-14px) translate(var(--progress-bar-translate-x, 0px), var(--progress-bar-translate-y, 0px));
+}
+
+.progressBarContainer[data-translate-x] {
+  --progress-bar-translate-x: calc(var(data-translate-x) * 1px);
+}
+
+.progressBarContainer[data-translate-y] {
+  --progress-bar-translate-y: calc(var(data-translate-y) * 1px);
 }
 
 /* Join button container */
 .joinButtonContainer {
-  transform: translateY(-4px) translate(var(--join-button-translate-x), var(--join-button-translate-y));
+  transform: translateY(-4px) translate(var(--join-button-translate-x, 0px), var(--join-button-translate-y, 0px));
+}
+
+.joinButtonContainer[data-translate-x] {
+  --join-button-translate-x: calc(var(data-translate-x) * 1px);
+}
+
+.joinButtonContainer[data-translate-y] {
+  --join-button-translate-y: calc(var(data-translate-y) * 1px);
 }
 
 /* Stats container */
 .statsContainer {
-  transform: translate(var(--stats-translate-x), var(--stats-translate-y));
+  transform: translate(var(--stats-translate-x, 0px), var(--stats-translate-y, 0px));
+}
+
+.statsContainer[data-translate-x] {
+  --stats-translate-x: calc(var(data-translate-x) * 1px);
+}
+
+.statsContainer[data-translate-y] {
+  --stats-translate-y: calc(var(data-translate-y) * 1px);
 }
 
 /* Content wrapper */

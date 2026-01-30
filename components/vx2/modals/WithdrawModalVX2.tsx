@@ -18,8 +18,6 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { cn } from '@/lib/styles';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS } from '../core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY, Z_INDEX } from '../core/constants/sizes';
 import { Close, ChevronLeft, Plus } from '../components/icons';
 import { formatDollars } from '../utils/formatting';
 import {
@@ -96,7 +94,7 @@ function BankIcon(): React.ReactElement {
 
 function CheckIcon(): React.ReactElement {
   return (
-    <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke={STATE_COLORS.success} strokeWidth={2.5}>
+    <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="var(--color-state-success)" strokeWidth={2.5}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
     </svg>
   );
@@ -126,8 +124,8 @@ function AmountStep({ balance, amount, setAmount, selectedMethod, setSelectedMet
     <div className={styles.flexCol}>
       {/* Header */}
       <div className={styles.flexBetween}>
-        <h2 className="font-bold" style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}>Withdraw Funds</h2>
-        <button onClick={onClose} className="p-2" aria-label="Close"><Close size={24} color={TEXT_COLORS.muted} /></button>
+        <h2 className={styles.headerTitle}>Withdraw Funds</h2>
+        <button onClick={onClose} className={styles.headerCloseButton} aria-label="Close"><Close size={24} className={styles.headerCloseIcon} /></button>
       </div>
 
       {/* Content */}
@@ -153,10 +151,6 @@ function AmountStep({ balance, amount, setAmount, selectedMethod, setSelectedMet
                   styles.quickAmountButton,
                   parseFloat(amount) === qa && styles.quickAmountButtonActive
                 )}
-                style={{
-                  fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-                  color: parseFloat(amount) === qa ? '#000' : qa > balance ? TEXT_COLORS.disabled : TEXT_COLORS.primary,
-                }}
               >
                 ${qa}
               </button>
@@ -167,9 +161,6 @@ function AmountStep({ balance, amount, setAmount, selectedMethod, setSelectedMet
                 styles.quickAmountButton,
                 parseFloat(amount) === balance && styles.quickAmountButtonActive
               )}
-              style={{
-                fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-              }}
             >
               MAX
             </button>
@@ -187,7 +178,6 @@ function AmountStep({ balance, amount, setAmount, selectedMethod, setSelectedMet
               max={balance}
               step="0.01"
               className={styles.amountInput}
-              style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}
             />
           </div>
 
@@ -211,9 +201,6 @@ function AmountStep({ balance, amount, setAmount, selectedMethod, setSelectedMet
                   styles.methodButton,
                   selectedMethod?.id === method.id && styles.methodButtonActive
                 )}
-                style={{
-                  borderColor: selectedMethod?.id === method.id ? STATE_COLORS.active : 'transparent',
-                }}
               >
                 <div className={styles.methodIcon}>
                   {method.type === 'paypal' ? <PayPalIcon /> : <BankIcon />}
@@ -240,7 +227,7 @@ function AmountStep({ balance, amount, setAmount, selectedMethod, setSelectedMet
 
         {/* Free Notice */}
         <div className={styles.freeNotice}>
-          <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke={STATE_COLORS.success} strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+          <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="var(--color-state-success)" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
           <span>Free withdrawal - no fees</span>
         </div>
       </div>
@@ -254,10 +241,6 @@ function AmountStep({ balance, amount, setAmount, selectedMethod, setSelectedMet
             styles.continueButton,
             !canContinue && 'disabled'
           )}
-          style={{
-            fontSize: `${TYPOGRAPHY.fontSize.lg}px`,
-            backgroundColor: canContinue ? STATE_COLORS.active : BG_COLORS.tertiary,
-          }}
         >
           {canContinue ? `Withdraw ${formatDollars(numericAmount)}` : 'Enter amount to continue'}
         </button>
@@ -282,8 +265,8 @@ function ConfirmStep({ amount, method, onConfirm, onBack, isLoading }: ConfirmSt
   return (
     <div className={styles.flexCol}>
       <div className={styles.confirmHeader}>
-        <button onClick={onBack} className="p-2" aria-label="Back"><ChevronLeft size={24} color={TEXT_COLORS.muted} /></button>
-        <h2 className="font-bold" style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}>Confirm Withdrawal</h2>
+        <button onClick={onBack} className={styles.headerBackButton} aria-label="Back"><ChevronLeft size={24} className={styles.headerBackIcon} /></button>
+        <h2 className={styles.headerTitle}>Confirm Withdrawal</h2>
       </div>
 
       <div className={styles.confirmContent}>
@@ -299,8 +282,8 @@ function ConfirmStep({ amount, method, onConfirm, onBack, isLoading }: ConfirmSt
               {method.type === 'paypal' ? <PayPalIcon /> : <BankIcon />}
             </div>
             <div>
-              <div className="font-semibold" style={{ color: TEXT_COLORS.primary }}>{method.label}</div>
-              <div style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>{method.detail}</div>
+              <div className={styles.methodLabelConfirm}>{method.label}</div>
+              <div className={styles.methodDetailConfirm}>{method.detail}</div>
             </div>
           </div>
         </div>
@@ -328,7 +311,6 @@ function ConfirmStep({ amount, method, onConfirm, onBack, isLoading }: ConfirmSt
           onClick={onConfirm}
           disabled={isLoading}
           className={styles.confirmButton}
-          style={{ backgroundColor: STATE_COLORS.active, fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}
         >
           {isLoading ? (<><div className={styles.spinnerSmall} />Processing...</>) : 'Confirm Withdrawal'}
         </button>
@@ -353,7 +335,7 @@ function ProcessingStep({ amount, error, onRetry, onBack }: ProcessingStepProps)
     <div className={styles.processingContainer}>
       {error && (
         <div className={styles.processingBackButton}>
-          <button onClick={onBack} className="p-2" aria-label="Back"><ChevronLeft size={24} color={TEXT_COLORS.muted} /></button>
+          <button onClick={onBack} className="p-2" aria-label="Back"><ChevronLeft size={24} color="var(--text-muted)" /></button>
         </div>
       )}
 
@@ -361,7 +343,7 @@ function ProcessingStep({ amount, error, onRetry, onBack }: ProcessingStepProps)
         {error ? (
           <>
             <div className={cn(styles.statusIcon, styles.statusIconError)}>
-              <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke={STATE_COLORS.error} strokeWidth={2}>
+              <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="var(--color-state-error)" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </div>
@@ -370,7 +352,6 @@ function ProcessingStep({ amount, error, onRetry, onBack }: ProcessingStepProps)
             <button
               onClick={onRetry}
               className={styles.retryButton}
-              style={{ backgroundColor: STATE_COLORS.active, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}
             >
               Try Again
             </button>
@@ -378,7 +359,7 @@ function ProcessingStep({ amount, error, onRetry, onBack }: ProcessingStepProps)
         ) : (
           <>
             <div className={cn(styles.statusIcon, styles.statusIconProcessing)}>
-              <div className={styles.spinner} style={{ borderColor: `${STATE_COLORS.active} transparent transparent transparent` }} />
+              <div className={styles.spinner} />
             </div>
             <h3 className={styles.statusTitle}>Processing Withdrawal</h3>
             <p className={cn(styles.statusMessage, styles.statusMessageProcessing)}>
@@ -410,14 +391,14 @@ function BiometricStep({ isLoading, error, onRetry, onBack, onSkip }: BiometricS
     <div className={styles.biometricContainer}>
       <div className={styles.biometricBackButton}>
         <button onClick={onBack} className="p-2" aria-label="Back">
-          <ChevronLeft size={24} color={TEXT_COLORS.muted} />
+          <ChevronLeft size={24} color="var(--text-muted)" />
         </button>
       </div>
 
       <div className={styles.biometricContent}>
         {/* Security Badge */}
         <div className={styles.securityBadge}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.active} strokeWidth={2}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-state-active)" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
           </svg>
           <span>Security Check</span>
@@ -425,13 +406,13 @@ function BiometricStep({ isLoading, error, onRetry, onBack, onSkip }: BiometricS
 
         {/* Face ID Icon */}
         <div className={styles.biometricIcon}>
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.active} strokeWidth="1.5">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-state-active)" strokeWidth="1.5">
             <path d="M7 3H5C3.89543 3 3 3.89543 3 5V7" strokeLinecap="round"/>
             <path d="M17 3H19C20.1046 3 21 3.89543 21 5V7" strokeLinecap="round"/>
             <path d="M7 21H5C3.89543 21 3 20.1046 3 19V17" strokeLinecap="round"/>
             <path d="M17 21H19C20.1046 21 21 20.1046 21 19V17" strokeLinecap="round"/>
-            <circle cx="9" cy="10" r="1" fill={STATE_COLORS.active}/>
-            <circle cx="15" cy="10" r="1" fill={STATE_COLORS.active}/>
+            <circle cx="9" cy="10" r="1" fill="var(--color-state-active)"/>
+            <circle cx="15" cy="10" r="1" fill="var(--color-state-active)"/>
             <path d="M9 15C9 15 10.5 17 12 17C13.5 17 15 15 15 15" strokeLinecap="round"/>
           </svg>
         </div>
@@ -448,7 +429,7 @@ function BiometricStep({ isLoading, error, onRetry, onBack, onSkip }: BiometricS
 
         {isLoading && (
           <div className={styles.processingLoadingContainer}>
-            <div className={styles.spinnerSmallProcessing} style={{ borderColor: `${STATE_COLORS.active} transparent transparent transparent` }} />
+            <div className={styles.spinnerSmallProcessing} />
             <span className={styles.processingLoadingText}>Waiting for authentication...</span>
           </div>
         )}
@@ -461,7 +442,6 @@ function BiometricStep({ isLoading, error, onRetry, onBack, onSkip }: BiometricS
             <button
               onClick={onRetry}
               className={styles.biometricErrorButton}
-              style={{ backgroundColor: STATE_COLORS.active, fontSize: `${TYPOGRAPHY.fontSize.base}px` }}
             >
               Try Again
             </button>
@@ -512,7 +492,6 @@ function SuccessStep({ amount, method, onClose }: SuccessStepProps): React.React
       <button
         onClick={onClose}
         className={styles.successButton}
-        style={{ backgroundColor: STATE_COLORS.active, fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}
       >
         Done
       </button>

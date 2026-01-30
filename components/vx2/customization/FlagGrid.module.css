@@ -29,6 +29,7 @@
 }
 
 .flagButton:not(.flagButtonSelected) {
+  --unselected-border-color: #e5e7eb;
   border-color: var(--unselected-border-color);
 }
 

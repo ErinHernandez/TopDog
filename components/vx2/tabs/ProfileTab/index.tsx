@@ -5,26 +5,20 @@
  */
 
 import React from 'react';
-import { BG_COLORS, TEXT_COLORS } from '../../core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
+import { cn } from '@/lib/styles';
+import styles from './index.module.css';
 
 export default function ProfileTab(): React.ReactElement {
   return (
-    <div 
-      className="flex-1 flex flex-col"
-      style={{ backgroundColor: BG_COLORS.primary }}
+    <div
+      className={cn("flex-1 flex flex-col", styles.container)}
     >
       {/* Header */}
-      <div 
-        className="px-4 py-3"
-        style={{ borderBottom: `1px solid rgba(255,255,255,0.1)` }}
+      <div
+        className={cn("px-4 py-3", styles.header)}
       >
-        <h1 
-          className="font-bold"
-          style={{ 
-            color: TEXT_COLORS.primary,
-            fontSize: `${TYPOGRAPHY.fontSize.xl}px`,
-          }}
+        <h1
+          className={`${styles.title} font-bold`}
         >
           Profile
         </h1>
@@ -32,19 +26,17 @@ export default function ProfileTab(): React.ReactElement {
 
       {/* Profile Avatar */}
       <div className="p-6 flex flex-col items-center">
-        <div 
-          className="w-20 h-20 rounded-full flex items-center justify-center mb-3"
-          style={{ backgroundColor: BG_COLORS.secondary }}
+        <div
+          className={cn("w-20 h-20 rounded-full flex items-center justify-center mb-3", styles.avatarCircle)}
         >
-          <span style={{ color: TEXT_COLORS.primary, fontSize: 32 }}>U</span>
+          <span className={styles.avatarText}>U</span>
         </div>
-        <h2 
-          className="font-semibold"
-          style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.lg}px` }}
+        <h2
+          className={`${styles.username} font-semibold`}
         >
           Username
         </h2>
-        <p style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
+        <p className={styles.memberText}>
           Member since 2024
         </p>
       </div>
@@ -54,14 +46,10 @@ export default function ProfileTab(): React.ReactElement {
         {['Rankings', 'Autodraft Limits', 'Deposit History', 'Settings'].map((item) => (
           <div
             key={item}
-            className="mb-2 p-4 flex items-center justify-between"
-            style={{
-              backgroundColor: BG_COLORS.secondary,
-              borderRadius: `${RADIUS.lg}px`,
-            }}
+            className={styles.menuItem}
           >
-            <span style={{ color: TEXT_COLORS.primary }}>{item}</span>
-            <span style={{ color: TEXT_COLORS.secondary }}>{'>'}</span>
+            <span>{item}</span>
+            <span>{'>'}</span>
           </div>
         ))}
       </div>

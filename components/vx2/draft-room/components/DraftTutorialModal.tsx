@@ -12,7 +12,6 @@
 import React, { useState, useCallback } from 'react';
 import { cn } from '@/lib/styles';
 import styles from './DraftTutorialModal.module.css';
-import { POSITION_COLORS } from '../../core/constants/colors';
 
 // ============================================================================
 // CONSTANTS
@@ -74,25 +73,25 @@ function DraftCardsIllustration(): React.ReactElement {
           28
         </div>
         <div className={styles.userCardPositions}>
-          <div className={cn(styles.positionBar)} style={{ backgroundColor: POSITION_COLORS.QB }} />
-          <div className={cn(styles.positionBar)} style={{ backgroundColor: POSITION_COLORS.RB }} />
-          <div className={cn(styles.positionBar)} style={{ backgroundColor: POSITION_COLORS.WR }} />
-          <div className={cn(styles.positionBar)} style={{ backgroundColor: POSITION_COLORS.TE }} />
+          <div className={styles.positionBar} data-position="qb" />
+          <div className={styles.positionBar} data-position="rb" />
+          <div className={styles.positionBar} data-position="wr" />
+          <div className={styles.positionBar} data-position="te" />
         </div>
       </div>
 
       {/* Picked cards with players */}
       {[
-        { pos: 'WR', name: 'Chase', color: POSITION_COLORS.WR },
-        { pos: 'RB', name: 'Robinson', color: POSITION_COLORS.RB },
-        { pos: 'QB', name: 'Allen', color: POSITION_COLORS.QB },
+        { pos: 'WR', name: 'Chase' },
+        { pos: 'RB', name: 'Robinson' },
+        { pos: 'QB', name: 'Allen' },
       ].map((player, i) => (
         <div
           key={i}
           className={styles.playerCard}
-          style={{ borderColor: player.color }}
+          data-position={player.pos.toLowerCase()}
         >
-          <div className={styles.playerCardHeader} style={{ backgroundColor: player.color }}>
+          <div className={styles.playerCardHeader}>
             <span className={styles.playerCardHeaderLabel}>{player.pos}</span>
           </div>
           <div className={styles.playerCardContent}>
@@ -107,27 +106,27 @@ function DraftCardsIllustration(): React.ReactElement {
 
 function SnakeOrderIllustration(): React.ReactElement {
   const teams = [
-    { name: 'YOU', isUser: true, tracker: [POSITION_COLORS.QB, POSITION_COLORS.RB, POSITION_COLORS.WR] },
-    { name: 'TEAM 2', isUser: false, tracker: [POSITION_COLORS.RB, POSITION_COLORS.WR, POSITION_COLORS.TE] },
-    { name: 'TEAM 3', isUser: false, tracker: [POSITION_COLORS.WR, POSITION_COLORS.RB, POSITION_COLORS.QB] },
-    { name: 'TEAM 4', isUser: false, tracker: [POSITION_COLORS.RB, POSITION_COLORS.WR, POSITION_COLORS.WR] },
+    { name: 'YOU', isUser: true, tracker: ['qb', 'rb', 'wr'] },
+    { name: 'TEAM 2', isUser: false, tracker: ['rb', 'wr', 'te'] },
+    { name: 'TEAM 3', isUser: false, tracker: ['wr', 'rb', 'qb'] },
+    { name: 'TEAM 4', isUser: false, tracker: ['rb', 'wr', 'wr'] },
   ];
 
   // Pick data matching actual board style
   const picks = [
     // Round 1
     [
-      { pick: '1.01', first: 'Ja\'Marr', last: 'Chase', pos: 'WR', team: 'CIN', color: POSITION_COLORS.WR },
-      { pick: '1.02', first: 'Bijan', last: 'Robinson', pos: 'RB', team: 'ATL', color: POSITION_COLORS.RB },
-      { pick: '1.03', first: 'Jahmyr', last: 'Gibbs', pos: 'RB', team: 'DET', color: POSITION_COLORS.RB },
-      { pick: '1.04', first: 'CeeDee', last: 'Lamb', pos: 'WR', team: 'DAL', color: POSITION_COLORS.WR },
+      { pick: '1.01', first: 'Ja\'Marr', last: 'Chase', pos: 'WR', team: 'CIN' },
+      { pick: '1.02', first: 'Bijan', last: 'Robinson', pos: 'RB', team: 'ATL' },
+      { pick: '1.03', first: 'Jahmyr', last: 'Gibbs', pos: 'RB', team: 'DET' },
+      { pick: '1.04', first: 'CeeDee', last: 'Lamb', pos: 'WR', team: 'DAL' },
     ],
     // Round 2 - reversed
     [
-      { pick: '2.04', first: 'Josh', last: 'Allen', pos: 'QB', team: 'BUF', color: POSITION_COLORS.QB },
-      { pick: '2.03', first: 'Malik', last: 'Nabers', pos: 'WR', team: 'NYG', color: POSITION_COLORS.WR },
-      { pick: '2.02', first: 'Sam', last: 'LaPorta', pos: 'TE', team: 'DET', color: POSITION_COLORS.TE },
-      { pick: '2.01', first: 'Breece', last: 'Hall', pos: 'RB', team: 'NYJ', color: POSITION_COLORS.RB },
+      { pick: '2.04', first: 'Josh', last: 'Allen', pos: 'QB', team: 'BUF' },
+      { pick: '2.03', first: 'Malik', last: 'Nabers', pos: 'WR', team: 'NYG' },
+      { pick: '2.02', first: 'Sam', last: 'LaPorta', pos: 'TE', team: 'DET' },
+      { pick: '2.01', first: 'Breece', last: 'Hall', pos: 'RB', team: 'NYJ' },
     ],
   ];
 
@@ -156,8 +155,8 @@ function SnakeOrderIllustration(): React.ReactElement {
               {/* Position tracker */}
               <div className={styles.snakePositionTracker}>
                 <div className={styles.snakePositionBar}>
-                  {team.tracker.map((color, j) => (
-                    <div key={j} style={{ flex: 1, backgroundColor: color }} />
+                  {team.tracker.map((pos, j) => (
+                    <div key={j} className={styles.snakePositionSegment} data-position={pos} />
                   ))}
                 </div>
               </div>
@@ -172,10 +171,7 @@ function SnakeOrderIllustration(): React.ReactElement {
               <div
                 key={colIndex}
                 className={styles.snakePickCell}
-                style={{
-                  backgroundColor: `${cell.color}20`,
-                  borderColor: cell.color,
-                }}
+                data-position={cell.pos.toLowerCase()}
               >
                 {/* Pick number */}
                 <span className={styles.snakePickNumber}>
@@ -213,9 +209,9 @@ function SnakeOrderIllustration(): React.ReactElement {
 
 function QueueIllustration(): React.ReactElement {
   const players = [
-    { name: 'Ja\'Marr Chase', pos: 'WR', team: 'CIN', color: POSITION_COLORS.WR },
-    { name: 'Bijan Robinson', pos: 'RB', team: 'ATL', color: POSITION_COLORS.RB },
-    { name: 'Sam LaPorta', pos: 'TE', team: 'DET', color: POSITION_COLORS.TE },
+    { name: 'Ja\'Marr Chase', pos: 'WR', team: 'CIN' },
+    { name: 'Bijan Robinson', pos: 'RB', team: 'ATL' },
+    { name: 'Sam LaPorta', pos: 'TE', team: 'DET' },
   ];
 
   return (
@@ -240,7 +236,7 @@ function QueueIllustration(): React.ReactElement {
             </div>
 
             {/* Position badge */}
-            <div className={styles.positionBadge} style={{ backgroundColor: player.color }}>
+            <div className={styles.positionBadge} data-position={player.pos.toLowerCase()}>
               {player.pos}
             </div>
 
@@ -263,10 +259,10 @@ function QueueIllustration(): React.ReactElement {
 
 function BestBallIllustration(): React.ReactElement {
   const starters = [
-    { pos: 'QB', pts: 28.4, color: POSITION_COLORS.QB },
-    { pos: 'RB', pts: 22.1, color: POSITION_COLORS.RB },
-    { pos: 'WR', pts: 31.2, color: POSITION_COLORS.WR },
-    { pos: 'TE', pts: 18.6, color: POSITION_COLORS.TE },
+    { pos: 'QB', pts: 28.4 },
+    { pos: 'RB', pts: 22.1 },
+    { pos: 'WR', pts: 31.2 },
+    { pos: 'TE', pts: 18.6 },
   ];
 
   return (
@@ -284,12 +280,9 @@ function BestBallIllustration(): React.ReactElement {
             <div
               key={i}
               className={styles.starterCard}
-              style={{
-                backgroundColor: `${s.color}15`,
-                borderColor: `${s.color}40`,
-              }}
+              data-position={s.pos.toLowerCase()}
             >
-              <div className={styles.starterPosition} style={{ color: s.color }}>
+              <div className={styles.starterPosition}>
                 {s.pos}
               </div>
               <div className={styles.starterPoints}>

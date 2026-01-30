@@ -9,8 +9,6 @@
  */
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY, Z_INDEX } from '../core/constants/sizes';
 import { Close } from '../components/icons';
 import { createScopedLogger } from '../../../lib/clientLogger';
 import { cn } from '@/lib/styles';
@@ -55,8 +53,8 @@ const MAX_POLL_ATTEMPTS = 60; // 3 minutes max
 
 function BankIcon(): React.ReactElement {
   return (
-    <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke={STATE_COLORS.active}>
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} 
+    <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" color="var(--color-state-active, #60a5fa)">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
         d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
     </svg>
   );
@@ -97,16 +95,10 @@ function IntroStep({ onContinue }: { onContinue: () => void }): React.ReactEleme
   return (
     <div className={styles.introContainer}>
       <div className={styles.centerSection}>
-        <div
-          className={styles.iconCircle}
-          style={{ '--icon-bg-color': `${STATE_COLORS.active}20` } as React.CSSProperties}
-        >
+        <div className={styles.iconCircle}>
           <BankIcon />
         </div>
-        <h3
-          className={cn(styles.introTitle)}
-          style={{ '--intro-title-font-size': `${TYPOGRAPHY.fontSize.xl}px`, '--text-primary-color': TEXT_COLORS.primary } as React.CSSProperties}
-        >
+        <h3 className={cn(styles.introTitle)}>
           Set Up Withdrawals
         </h3>
         <p className={styles.textSecondary}>
@@ -115,61 +107,43 @@ function IntroStep({ onContinue }: { onContinue: () => void }): React.ReactEleme
       </div>
 
       <div className={styles.featuresList}>
-        <div
-          className={styles.featureItem}
-          style={{ '--feature-item-bg': BG_COLORS.tertiary } as React.CSSProperties}
-        >
-          <div className={styles.featureIcon} style={{ '--feature-icon-color': STATE_COLORS.success } as React.CSSProperties}>
+        <div className={styles.featureItem}>
+          <div className={styles.featureIcon}>
             <ShieldIcon />
           </div>
           <div className={styles.featureContent}>
-            <p className={cn(styles.featureTitle)} style={{ '--text-primary-color': TEXT_COLORS.primary } as React.CSSProperties}>
+            <p className={cn(styles.featureTitle)}>
               Secure & Private
             </p>
-            <p
-              className={cn(styles.featureDescription)}
-              style={{ '--small-font-size': `${TYPOGRAPHY.fontSize.sm}px`, '--text-muted-color': TEXT_COLORS.muted } as React.CSSProperties}
-            >
+            <p className={cn(styles.featureDescription)}>
               Bank details are encrypted and stored by Stripe
             </p>
           </div>
         </div>
 
-        <div
-          className={styles.featureItem}
-          style={{ '--feature-item-bg': BG_COLORS.tertiary } as React.CSSProperties}
-        >
-          <div className={styles.featureIcon} style={{ '--feature-icon-color': STATE_COLORS.active } as React.CSSProperties}>
+        <div className={styles.featureItem}>
+          <div className={styles.featureIcon}>
             <ClockIcon />
           </div>
           <div className={styles.featureContent}>
-            <p className={cn(styles.featureTitle)} style={{ '--text-primary-color': TEXT_COLORS.primary } as React.CSSProperties}>
+            <p className={cn(styles.featureTitle)}>
               Fast Payouts
             </p>
-            <p
-              className={cn(styles.featureDescription)}
-              style={{ '--small-font-size': `${TYPOGRAPHY.fontSize.sm}px`, '--text-muted-color': TEXT_COLORS.muted } as React.CSSProperties}
-            >
+            <p className={cn(styles.featureDescription)}>
               Receive funds within 1-2 business days
             </p>
           </div>
         </div>
 
-        <div
-          className={styles.featureItem}
-          style={{ '--feature-item-bg': BG_COLORS.tertiary } as React.CSSProperties}
-        >
-          <div className={styles.featureIcon} style={{ '--feature-icon-color': STATE_COLORS.warning } as React.CSSProperties}>
+        <div className={styles.featureItem}>
+          <div className={styles.featureIcon}>
             <LockIcon />
           </div>
           <div className={styles.featureContent}>
-            <p className={cn(styles.featureTitle)} style={{ '--text-primary-color': TEXT_COLORS.primary } as React.CSSProperties}>
+            <p className={cn(styles.featureTitle)}>
               One-Time Setup
             </p>
-            <p
-              className={cn(styles.featureDescription)}
-              style={{ '--small-font-size': `${TYPOGRAPHY.fontSize.sm}px`, '--text-muted-color': TEXT_COLORS.muted } as React.CSSProperties}
-            >
+            <p className={cn(styles.featureDescription)}>
               Complete verification once, withdraw anytime
             </p>
           </div>
@@ -179,15 +153,11 @@ function IntroStep({ onContinue }: { onContinue: () => void }): React.ReactEleme
       <button
         onClick={onContinue}
         className={styles.primaryButton}
-        style={{ '--button-bg-color': STATE_COLORS.active, '--button-text-color': '#000' } as React.CSSProperties}
       >
         Get Started
       </button>
 
-      <p
-        className={cn(styles.footer)}
-        style={{ '--footer-font-size': `${TYPOGRAPHY.fontSize.xs}px`, '--text-muted-color': TEXT_COLORS.muted } as React.CSSProperties}
-      >
+      <p className={cn(styles.footer)}>
         Powered by Stripe Connect. Takes about 5 minutes.
       </p>
     </div>
@@ -198,7 +168,7 @@ function LoadingStep({ message }: { message: string }): React.ReactElement {
   return (
     <div className={styles.loadingContainer}>
       <span className={styles.spinner} />
-      <p className={styles.loadingMessage} style={{ '--text-primary-color': TEXT_COLORS.primary } as React.CSSProperties}>
+      <p className={styles.loadingMessage}>
         {message}
       </p>
     </div>
@@ -212,11 +182,8 @@ function OnboardingStep({ onboardingUrl }: { onboardingUrl: string }): React.Rea
 
   return (
     <div className={styles.onboardingContainer}>
-      <div
-        className={styles.onboardingIconCircle}
-        style={{ '--onboarding-icon-bg': `${STATE_COLORS.active}20` } as React.CSSProperties}
-      >
-        <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke={STATE_COLORS.active}>
+      <div className={styles.onboardingIconCircle}>
+        <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" color="var(--color-state-active, #60a5fa)">
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -227,10 +194,7 @@ function OnboardingStep({ onboardingUrl }: { onboardingUrl: string }): React.Rea
       </div>
 
       <div>
-        <h3
-          className={cn(styles.onboardingTitle)}
-          style={{ '--onboarding-title-font-size': `${TYPOGRAPHY.fontSize.lg}px`, '--text-primary-color': TEXT_COLORS.primary } as React.CSSProperties}
-        >
+        <h3 className={cn(styles.onboardingTitle)}>
           Complete Verification
         </h3>
         <p className={styles.textSecondary}>
@@ -241,7 +205,6 @@ function OnboardingStep({ onboardingUrl }: { onboardingUrl: string }): React.Rea
       <button
         onClick={handleOpenOnboarding}
         className={styles.openPortalButton}
-        style={{ '--button-bg-color': STATE_COLORS.active, '--button-text-color': '#000' } as React.CSSProperties}
       >
         Open Verification Portal
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -249,14 +212,8 @@ function OnboardingStep({ onboardingUrl }: { onboardingUrl: string }): React.Rea
         </svg>
       </button>
 
-      <div
-        className={styles.infoBox}
-        style={{ '--info-box-bg': BG_COLORS.tertiary } as React.CSSProperties}
-      >
-        <p
-          className={cn(styles.infoBoxText)}
-          style={{ '--small-font-size': `${TYPOGRAPHY.fontSize.sm}px`, '--text-muted-color': TEXT_COLORS.muted } as React.CSSProperties}
-        >
+      <div className={styles.infoBox}>
+        <p className={cn(styles.infoBoxText)}>
           After completing verification in the new tab, return here. We'll automatically detect when you're done.
         </p>
       </div>
@@ -267,20 +224,14 @@ function OnboardingStep({ onboardingUrl }: { onboardingUrl: string }): React.Rea
 function CompleteStep({ onClose }: { onClose: () => void }): React.ReactElement {
   return (
     <div className={styles.completeContainer}>
-      <div
-        className={styles.successIconCircle}
-        style={{ '--success-icon-bg': `${STATE_COLORS.success}20` } as React.CSSProperties}
-      >
-        <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke={STATE_COLORS.success}>
+      <div className={styles.successIconCircle}>
+        <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" color="var(--color-state-success, #22c55e)">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
         </svg>
       </div>
 
       <div>
-        <h3
-          className={cn(styles.successTitle)}
-          style={{ '--success-title-font-size': `${TYPOGRAPHY.fontSize.xl}px`, '--success-color': STATE_COLORS.success } as React.CSSProperties}
-        >
+        <h3 className={cn(styles.successTitle)}>
           All Set!
         </h3>
         <p className={styles.textSecondary}>
@@ -291,7 +242,6 @@ function CompleteStep({ onClose }: { onClose: () => void }): React.ReactElement 
       <button
         onClick={onClose}
         className={styles.continueButton}
-        style={{ '--button-bg-color': STATE_COLORS.active, '--button-text-color': '#000' } as React.CSSProperties}
       >
         Continue to Withdraw
       </button>
@@ -308,20 +258,14 @@ function ErrorStep({
 }): React.ReactElement {
   return (
     <div className={styles.errorContainer}>
-      <div
-        className={styles.errorIconCircle}
-        style={{ '--error-icon-bg': `${STATE_COLORS.error}20` } as React.CSSProperties}
-      >
-        <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke={STATE_COLORS.error}>
+      <div className={styles.errorIconCircle}>
+        <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" color="var(--color-state-error, #ef4444)">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
         </svg>
       </div>
 
       <div>
-        <h3
-          className={cn(styles.errorTitle)}
-          style={{ '--error-title-font-size': `${TYPOGRAPHY.fontSize.lg}px`, '--error-color': STATE_COLORS.error } as React.CSSProperties}
-        >
+        <h3 className={cn(styles.errorTitle)}>
           Something went wrong
         </h3>
         <p className={styles.errorMessage}>{message}</p>
@@ -330,7 +274,6 @@ function ErrorStep({
       <button
         onClick={onRetry}
         className={styles.retryButton}
-        style={{ '--button-bg-color': STATE_COLORS.active, '--button-text-color': '#000' } as React.CSSProperties}
       >
         Try Again
       </button>
@@ -468,7 +411,6 @@ export function ConnectOnboardingModalVX2({
   return (
     <div
       className={styles.modalOverlay}
-      style={{ '--z-index': Z_INDEX.modal } as React.CSSProperties}
     >
       {/* Backdrop */}
       <div
@@ -477,26 +419,17 @@ export function ConnectOnboardingModalVX2({
       />
 
       {/* Modal */}
-      <div
-        className={styles.modal}
-        style={{ '--bg-color': BG_COLORS.secondary } as React.CSSProperties}
-      >
+      <div className={styles.modal}>
         {/* Header */}
-        <div
-          className={styles.header}
-          style={{ '--border-color': BORDER_COLORS.default } as React.CSSProperties}
-        >
-          <h2
-            className={cn(styles.headerTitle)}
-            style={{ '--title-font-size': `${TYPOGRAPHY.fontSize.lg}px`, '--text-primary-color': TEXT_COLORS.primary } as React.CSSProperties}
-          >
+        <div className={styles.header}>
+          <h2 className={cn(styles.headerTitle)}>
             Payout Setup
           </h2>
           <button
             onClick={handleClose}
             className={styles.closeButton}
           >
-            <span className={styles.closeIcon} style={{ color: TEXT_COLORS.muted }}>
+            <span className={styles.closeIcon}>
               <Close className="w-5 h-5" />
             </span>
           </button>

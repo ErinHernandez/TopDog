@@ -121,13 +121,24 @@
   justify-content: center;
   padding: var(--badge-padding-y, 1px) var(--badge-padding-x, 5px);
   border-radius: var(--badge-border-radius, 3px);
-  background-color: var(--position-bg-color, #9ca3af);
+  background-color: var(--position-color, #9ca3af);
   color: #000000;
   font-size: var(--badge-font-size, 10px);
   font-weight: 700;
   margin-right: var(--badge-margin-right, 6px);
   flex-shrink: 0;
 }
+
+/* Position-specific badge colors */
+.positionBadge[data-position="qb"] { --position-color: var(--color-position-qb); }
+.positionBadge[data-position="rb"] { --position-color: var(--color-position-rb); }
+.positionBadge[data-position="wr"] { --position-color: var(--color-position-wr); }
+.positionBadge[data-position="te"] { --position-color: var(--color-position-te); }
+.positionBadge[data-position="bn"] { --position-color: var(--color-position-bn); }
+.positionBadge[data-position="flex"] { --position-color: var(--color-position-wr); }
+.positionBadge[data-position="k"] { --position-color: var(--text-muted); }
+.positionBadge[data-position="dst"] { --position-color: var(--text-muted); }
+.positionBadge[data-position="def"] { --position-color: var(--text-muted); }
 
 /* ============================================================================
    ADP COLUMN

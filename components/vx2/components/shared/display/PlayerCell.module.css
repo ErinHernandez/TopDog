@@ -2,6 +2,7 @@
  * PlayerCell CSS Module
  *
  * Migrated from inline styles for CSP compliance.
+ * Uses CSS custom properties from tokens.css for colors.
  */
 
 /* ============================================================================
@@ -11,12 +12,15 @@
 .container {
   display: flex;
   align-items: center;
-  transition: all 150ms ease;
-  background-color: var(--cell-bg, rgba(255, 255, 255, 0.05));
-  border-left: var(--cell-border-left, 4px solid #60a5fa);
-  border-radius: var(--cell-radius, 12px);
-  padding: var(--cell-padding, 4px 12px);
-  gap: var(--cell-gap, 8px);
+  transition: opacity 150ms ease, background-color 150ms ease;
+  background-color: var(--bg-secondary);
+  /* Border uses --position-color from data-position attribute (set in utilities.css) */
+  border-left-width: 4px;
+  border-left-style: solid;
+  border-left-color: var(--position-color);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xs) var(--spacing-md);
+  gap: var(--spacing-sm);
   width: 100%;
   text-align: left;
 }
@@ -41,13 +45,13 @@
 .valueColumn {
   text-align: center;
   flex-shrink: 0;
-  width: var(--value-width, 28px);
+  width: 28px;
 }
 
 .valueText {
   font-weight: 700;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
-  font-size: var(--font-size-sm, 14px);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
 }
 
 /* ============================================================================
@@ -59,13 +63,13 @@
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: 0.375rem;
+  gap: 6px;
 }
 
 .playerName {
   font-weight: 600;
-  color: var(--text-primary, rgba(255, 255, 255, 0.9));
-  font-size: var(--font-size-sm, 14px);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -73,8 +77,8 @@
 
 .playerTeam {
   flex-shrink: 0;
-  color: var(--text-muted, rgba(255, 255, 255, 0.5));
-  font-size: var(--font-size-xs, 12px);
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
 }
 
 /* ============================================================================
@@ -84,18 +88,18 @@
 .projectionColumn {
   text-align: center;
   flex-shrink: 0;
-  margin-right: var(--proj-margin-right, 4px);
+  margin-right: 4px;
 }
 
 .projectionValue {
   font-weight: 600;
-  color: var(--text-primary, rgba(255, 255, 255, 0.9));
-  font-size: var(--font-size-xs, 12px);
+  color: var(--text-primary);
+  font-size: var(--font-size-xs);
 }
 
 .projectionLabel {
-  color: var(--text-muted, rgba(255, 255, 255, 0.5));
-  font-size: var(--font-size-xs, 12px);
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
 }
 
 /* ============================================================================
@@ -106,21 +110,32 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 150ms ease;
+  transition: opacity 150ms ease, background-color 150ms ease;
   flex-shrink: 0;
-  width: var(--action-size, 36px);
-  height: var(--action-size, 36px);
-  border-radius: var(--action-radius, 12px);
-  background-color: var(--action-bg, rgba(96, 165, 250, 0.15));
-  color: var(--action-color, #60a5fa);
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-lg);
   border: none;
   cursor: pointer;
 }
 
-.actionButton:hover {
+/* Add button (not active) */
+.actionButton[data-action="add"] {
+  background-color: rgba(96, 165, 250, 0.15);
+  color: var(--color-state-active);
+}
+
+/* Remove button (active) */
+.actionButton[data-action="remove"] {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: var(--color-state-error);
+}
+
+.actionButton:hover:not([data-disabled="true"]) {
   filter: brightness(1.2);
 }
 
-.actionButtonDisabled {
+.actionButton[data-disabled="true"] {
   cursor: not-allowed;
+  opacity: 0.5;
 }

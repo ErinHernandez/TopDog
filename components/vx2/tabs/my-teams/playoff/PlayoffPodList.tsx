@@ -8,8 +8,7 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { cn } from '@/lib/styles';
 import styles from './PlayoffPodList.module.css';
-import { BG_COLORS, TEXT_COLORS } from '../../../core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY } from '../../../core/constants/sizes';
+import { TYPOGRAPHY } from '../../../core/constants/sizes';
 import { SearchInput } from '../../../../ui';
 import { ChevronRight } from '../../../components/icons';
 import type { PlayoffPod, PlayoffTeam } from '../../../../../lib/mockData/playoffTeams';
@@ -60,7 +59,7 @@ function PodCard({ pod, onSelect, onTeamSelect }: PodCardProps): React.ReactElem
             {pod.room} - Top {advancementCount} advance
           </div>
         </div>
-        <ChevronRight size={18} color={TEXT_COLORS.muted} />
+        <ChevronRight size={18} />
       </button>
 
       {/* User Team Quick View */}

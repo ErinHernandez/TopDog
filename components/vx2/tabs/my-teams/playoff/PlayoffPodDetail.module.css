@@ -12,24 +12,24 @@
 /* Header */
 .header {
   background-color: var(--bg-secondary);
-  padding: 16px;
+  padding: var(--spacing-lg);
   border-bottom: 1px solid var(--border-light);
 }
 
 .headerTop {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--spacing-md);
 }
 
 .backButton {
   background: rgba(255, 255, 255, 0.05);
   border: none;
   cursor: pointer;
-  padding: 8px;
+  padding: var(--spacing-sm);
   display: flex;
   align-items: center;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   transition: background-color 0.15s ease;
 }
 
@@ -44,7 +44,7 @@
 .headerTitle {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--spacing-sm);
 }
 
 .podName {
@@ -54,9 +54,9 @@
 }
 
 .weekBadge {
-  padding: 3px 10px;
+  padding: calc(var(--spacing-xs) - 3px) calc(var(--spacing-sm) + 2px);
   background-color: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 11px;
   color: var(--text-secondary);
 }
@@ -71,10 +71,10 @@
 .statusSummary {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-top: 14px;
-  padding: 12px 14px;
-  border-radius: 10px;
+  gap: var(--spacing-lg);
+  margin-top: calc(var(--spacing-md) + 2px);
+  padding: var(--spacing-md) calc(var(--spacing-md) - 2px);
+  border-radius: var(--radius-md);
 }
 
 .statusSummaryAdvancing {
@@ -138,7 +138,7 @@
 .tableHeader {
   display: flex;
   align-items: center;
-  padding: 10px 14px;
+  padding: calc(var(--spacing-sm) + 2px) calc(var(--spacing-md) - 2px);
   background-color: var(--bg-tertiary);
   border-bottom: 1px solid var(--border-lighter);
 }
@@ -158,6 +158,7 @@
   justify-content: flex-end;
   gap: 4px;
   padding: 0;
+  width: var(--header-width, auto);
   background-color: transparent;
   border: none;
   cursor: pointer;
@@ -186,6 +187,12 @@
   width: 8px;
   height: 8px;
   stroke-width: 3;
+  transform: rotate(0deg);
+  transition: transform 0.15s ease;
+}
+
+.sortHeaderIconRotated {
+  transform: rotate(180deg);
 }
 
 .chevronSpacer {
@@ -209,7 +216,7 @@
   width: 100%;
   display: flex;
   align-items: center;
-  padding: 12px 14px;
+  padding: var(--spacing-md) calc(var(--spacing-md) - 2px);
   background-color: transparent;
   border: none;
   border-bottom: 1px solid var(--border-lightest);
@@ -255,14 +262,14 @@
 /* Team Info */
 .teamInfo {
   flex: 1;
-  margin-left: 12px;
+  margin-left: var(--spacing-md);
   min-width: 0;
 }
 
 .teamNameContainer {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--spacing-xs);
 }
 
 .teamName {
@@ -281,9 +288,9 @@
 }
 
 .youBadge {
-  padding: 1px 5px;
+  padding: calc(var(--spacing-xs) - 3px) calc(var(--spacing-xs) - 3px);
   background-color: var(--color-blue);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   font-size: 9px;
   font-weight: 700;
   color: #ffffff;
@@ -311,7 +318,7 @@
 .overlapColumn {
   width: 40px;
   text-align: center;
-  margin-left: 8px;
+  margin-left: var(--spacing-sm);
 }
 
 .overlapBadge {
@@ -334,10 +341,10 @@
 
 /* Chevron */
 .chevronColumn {
-  margin-left: 8px;
+  margin-left: var(--spacing-sm);
 }
 
 /* Bottom Padding */
 .bottomPadding {
-  height: 24px;
+  height: var(--spacing-2xl);
 }

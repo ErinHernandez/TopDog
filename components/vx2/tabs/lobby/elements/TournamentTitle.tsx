@@ -9,7 +9,6 @@
 
 import React from 'react';
 import { cn } from '@/lib/styles';
-import { CARD_SPACING_V3 } from '../constants/cardSpacingV3';
 import styles from './TournamentTitle.module.css';
 
 export interface TournamentTitleProps {
@@ -33,18 +32,13 @@ function titleLines(title: string): { line1: string; line2: string | null } {
 
 export function TournamentTitle({
   title,
-  fontSize = CARD_SPACING_V3.titleFontSize,
+  fontSize = 28,
 }: TournamentTitleProps): React.ReactElement {
   const { line1, line2 } = titleLines(title);
   return (
     <h2
       className={cn(styles.title)}
-      style={{
-        '--font-family': CARD_SPACING_V3.titleFontFamily,
-        '--font-size': `${fontSize}px`,
-        '--line-height': CARD_SPACING_V3.titleLineHeight,
-        '--margin-top': `${CARD_SPACING_V3.titleMarginTop}px`,
-      } as React.CSSProperties}
+      data-font-size={fontSize}
     >
       {line2 ? (
         <>

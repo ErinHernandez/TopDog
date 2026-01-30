@@ -1,0 +1,495 @@
+/**
+ * Utility Classes - Zero-Runtime CSS
+ *
+ * Data attribute selectors and utility classes that replace inline styles.
+ * Used in conjunction with tokens.css for full CSP compliance.
+ */
+
+/* ============================================================================
+   POSITION COLORS - Background
+   Usage: <div data-position="qb"> or <div data-position={player.position.toLowerCase()}>
+   ============================================================================ */
+[data-position="qb"] { background-color: var(--color-position-qb); }
+[data-position="rb"] { background-color: var(--color-position-rb); }
+[data-position="wr"] { background-color: var(--color-position-wr); }
+[data-position="te"] { background-color: var(--color-position-te); }
+[data-position="bn"] { background-color: var(--color-position-bn); }
+[data-position="flex"] { background: linear-gradient(135deg, var(--color-position-rb), var(--color-position-wr), var(--color-position-te)); }
+
+/* Position colors - Text */
+.text-position-qb { color: var(--color-position-qb); }
+.text-position-rb { color: var(--color-position-rb); }
+.text-position-wr { color: var(--color-position-wr); }
+.text-position-te { color: var(--color-position-te); }
+.text-position-bn { color: var(--color-position-bn); }
+
+/* Position colors - Border */
+.border-position-qb { border-color: var(--color-position-qb); }
+.border-position-rb { border-color: var(--color-position-rb); }
+.border-position-wr { border-color: var(--color-position-wr); }
+.border-position-te { border-color: var(--color-position-te); }
+.border-position-bn { border-color: var(--color-position-bn); }
+
+/* Position Badge - Filled variant (data-position + data-variant="filled")
+   Background = position color, Text = black */
+[data-variant="filled"][data-position="qb"] {
+  background-color: var(--color-position-qb);
+  color: #000000;
+  border: none;
+}
+[data-variant="filled"][data-position="rb"] {
+  background-color: var(--color-position-rb);
+  color: #000000;
+  border: none;
+}
+[data-variant="filled"][data-position="wr"] {
+  background-color: var(--color-position-wr);
+  color: #000000;
+  border: none;
+}
+[data-variant="filled"][data-position="te"] {
+  background-color: var(--color-position-te);
+  color: #000000;
+  border: none;
+}
+[data-variant="filled"][data-position="bn"] {
+  background-color: var(--color-position-bn);
+  color: #000000;
+  border: none;
+}
+[data-variant="filled"][data-position="flex"] {
+  background: var(--color-position-flex);
+  color: #000000;
+  border: none;
+}
+
+/* Position Badge - Outline variant (data-position + data-variant="outline")
+   Background = transparent, Text = position color, Border = position color */
+[data-variant="outline"][data-position="qb"] {
+  background-color: transparent;
+  color: var(--color-position-qb);
+  border: 2px solid var(--color-position-qb);
+}
+[data-variant="outline"][data-position="rb"] {
+  background-color: transparent;
+  color: var(--color-position-rb);
+  border: 2px solid var(--color-position-rb);
+}
+[data-variant="outline"][data-position="wr"] {
+  background-color: transparent;
+  color: var(--color-position-wr);
+  border: 2px solid var(--color-position-wr);
+}
+[data-variant="outline"][data-position="te"] {
+  background-color: transparent;
+  color: var(--color-position-te);
+  border: 2px solid var(--color-position-te);
+}
+[data-variant="outline"][data-position="bn"] {
+  background-color: transparent;
+  color: var(--color-position-bn);
+  border: 2px solid var(--color-position-bn);
+}
+[data-variant="outline"][data-position="flex"] {
+  background-color: transparent;
+  color: var(--color-position-wr);
+  border: 2px solid var(--color-position-wr);
+}
+
+/* ============================================================================
+   STATE COLORS
+   Usage: <span data-state="success"> or <span data-state={status}>
+   ============================================================================ */
+[data-state="success"] { color: var(--color-state-success); }
+[data-state="warning"] { color: var(--color-state-warning); }
+[data-state="error"] { color: var(--color-state-error); }
+[data-state="active"] { color: var(--color-state-active); }
+[data-state="info"] { color: var(--color-state-info); }
+[data-state="muted"] { color: var(--text-muted); }
+[data-state="disabled"] { color: var(--text-disabled); }
+
+/* State colors - Background variants */
+.bg-state-success { background-color: var(--color-state-success); }
+.bg-state-warning { background-color: var(--color-state-warning); }
+.bg-state-error { background-color: var(--color-state-error); }
+.bg-state-active { background-color: var(--color-state-active); }
+.bg-state-info { background-color: var(--color-state-info); }
+.bg-state-hover { background-color: var(--color-state-hover); }
+
+/* State colors - Text variants */
+.text-state-success { color: var(--color-state-success); }
+.text-state-warning { color: var(--color-state-warning); }
+.text-state-error { color: var(--color-state-error); }
+.text-state-active { color: var(--color-state-active); }
+.text-state-info { color: var(--color-state-info); }
+
+/* State colors - Border variants */
+.border-state-success { border-color: var(--color-state-success); }
+.border-state-warning { border-color: var(--color-state-warning); }
+.border-state-error { border-color: var(--color-state-error); }
+.border-state-active { border-color: var(--color-state-active); }
+.border-state-info { border-color: var(--color-state-info); }
+
+/* State colors - Stroke (for SVG icons) */
+.stroke-state-success { stroke: var(--color-state-success); }
+.stroke-state-warning { stroke: var(--color-state-warning); }
+.stroke-state-error { stroke: var(--color-state-error); }
+.stroke-state-active { stroke: var(--color-state-active); }
+.stroke-state-info { stroke: var(--color-state-info); }
+
+/* State colors - Fill (for SVG icons) */
+.fill-state-success { fill: var(--color-state-success); }
+.fill-state-warning { fill: var(--color-state-warning); }
+.fill-state-error { fill: var(--color-state-error); }
+.fill-state-active { fill: var(--color-state-active); }
+.fill-state-info { fill: var(--color-state-info); }
+
+/* State colors - Soft background (for badges, alerts) */
+.bg-state-success-soft { background-color: rgba(16, 185, 129, 0.2); }
+.bg-state-warning-soft { background-color: rgba(245, 158, 11, 0.2); }
+.bg-state-error-soft { background-color: rgba(239, 68, 68, 0.2); }
+.bg-state-active-soft { background-color: rgba(96, 165, 250, 0.2); }
+.bg-state-info-soft { background-color: rgba(59, 130, 246, 0.2); }
+
+/* Primary action button (blue with black text) */
+.btn-primary {
+  background-color: var(--color-state-active);
+  color: #000000;
+}
+.btn-primary:hover {
+  opacity: 0.9;
+}
+.btn-primary:disabled {
+  background-color: var(--bg-tertiary);
+  color: var(--text-disabled);
+  cursor: not-allowed;
+}
+
+/* ============================================================================
+   BACKGROUND COLORS
+   Usage: <div className="bg-primary">
+   ============================================================================ */
+.bg-primary { background-color: var(--bg-primary); }
+.bg-secondary { background-color: var(--bg-secondary); }
+.bg-tertiary { background-color: var(--bg-tertiary); }
+.bg-elevated { background-color: var(--bg-elevated); }
+.bg-card { background-color: var(--bg-card); }
+.bg-black { background-color: var(--bg-black); }
+
+/* ============================================================================
+   TEXT COLORS
+   Usage: <p className="text-primary">
+   ============================================================================ */
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+.text-disabled { color: var(--text-disabled); }
+
+/* Brand text colors */
+.text-brand-primary { color: var(--color-brand-primary); }
+.text-brand-accent { color: var(--color-brand-accent); }
+.text-navbar { color: var(--color-navbar-solid); }
+
+/* ============================================================================
+   TYPOGRAPHY - Font Sizes
+   Usage: <p className="text-lg">
+   ============================================================================ */
+.text-xs { font-size: var(--font-size-xs); }
+.text-sm { font-size: var(--font-size-sm); }
+.text-base { font-size: var(--font-size-base); }
+.text-lg { font-size: var(--font-size-lg); }
+.text-xl { font-size: var(--font-size-xl); }
+.text-2xl { font-size: var(--font-size-2xl); }
+.text-3xl { font-size: var(--font-size-3xl); }
+.text-4xl { font-size: var(--font-size-4xl); }
+.text-5xl { font-size: var(--font-size-5xl); }
+
+/* ============================================================================
+   TYPOGRAPHY - Font Weights
+   Usage: <span className="font-bold">
+   ============================================================================ */
+.font-normal { font-weight: var(--font-weight-normal); }
+.font-medium { font-weight: var(--font-weight-medium); }
+.font-semibold { font-weight: var(--font-weight-semibold); }
+.font-bold { font-weight: var(--font-weight-bold); }
+
+/* ============================================================================
+   TYPOGRAPHY - Line Heights
+   Usage: <p className="leading-tight">
+   ============================================================================ */
+.leading-tight { line-height: var(--line-height-tight); }
+.leading-snug { line-height: var(--line-height-snug); }
+.leading-normal { line-height: var(--line-height-normal); }
+.leading-relaxed { line-height: var(--line-height-relaxed); }
+
+/* ============================================================================
+   COMMON TEXT COMBINATIONS
+   Usage: <p className="text-primary-lg"> (color + size combo)
+   ============================================================================ */
+.text-primary-xs { color: var(--text-primary); font-size: var(--font-size-xs); }
+.text-primary-sm { color: var(--text-primary); font-size: var(--font-size-sm); }
+.text-primary-base { color: var(--text-primary); font-size: var(--font-size-base); }
+.text-primary-lg { color: var(--text-primary); font-size: var(--font-size-lg); }
+.text-primary-xl { color: var(--text-primary); font-size: var(--font-size-xl); }
+.text-primary-2xl { color: var(--text-primary); font-size: var(--font-size-2xl); }
+
+.text-secondary-xs { color: var(--text-secondary); font-size: var(--font-size-xs); }
+.text-secondary-sm { color: var(--text-secondary); font-size: var(--font-size-sm); }
+.text-secondary-base { color: var(--text-secondary); font-size: var(--font-size-base); }
+.text-secondary-lg { color: var(--text-secondary); font-size: var(--font-size-lg); }
+
+.text-muted-xs { color: var(--text-muted); font-size: var(--font-size-xs); }
+.text-muted-sm { color: var(--text-muted); font-size: var(--font-size-sm); }
+.text-muted-base { color: var(--text-muted); font-size: var(--font-size-base); }
+
+/* ============================================================================
+   BORDERS
+   Usage: <div className="border-default">
+   ============================================================================ */
+.border-default { border: 1px solid var(--border-default); }
+.border-light { border: 1px solid var(--border-light); }
+.border-subtle { border: 1px solid var(--border-subtle); }
+.border-focus { border: 1px solid var(--border-focus); }
+.border-error { border: 1px solid var(--border-error); }
+.border-success { border: 1px solid var(--border-success); }
+
+/* Border sides */
+.border-b-default { border-bottom: 1px solid var(--border-default); }
+.border-t-default { border-top: 1px solid var(--border-default); }
+.border-l-default { border-left: 1px solid var(--border-default); }
+.border-r-default { border-right: 1px solid var(--border-default); }
+
+/* ============================================================================
+   BORDER RADIUS
+   Usage: <div className="rounded-md">
+   ============================================================================ */
+.rounded-sm { border-radius: var(--radius-sm); }
+.rounded-md { border-radius: var(--radius-md); }
+.rounded-lg { border-radius: var(--radius-lg); }
+.rounded-xl { border-radius: var(--radius-xl); }
+.rounded-2xl { border-radius: var(--radius-2xl); }
+.rounded-full { border-radius: var(--radius-full); }
+
+/* ============================================================================
+   SPACING - Padding
+   Usage: <div className="p-md"> or <div className="px-lg py-sm">
+   ============================================================================ */
+.p-xs { padding: var(--spacing-xs); }
+.p-sm { padding: var(--spacing-sm); }
+.p-md { padding: var(--spacing-md); }
+.p-lg { padding: var(--spacing-lg); }
+.p-xl { padding: var(--spacing-xl); }
+.p-2xl { padding: var(--spacing-2xl); }
+
+.px-xs { padding-left: var(--spacing-xs); padding-right: var(--spacing-xs); }
+.px-sm { padding-left: var(--spacing-sm); padding-right: var(--spacing-sm); }
+.px-md { padding-left: var(--spacing-md); padding-right: var(--spacing-md); }
+.px-lg { padding-left: var(--spacing-lg); padding-right: var(--spacing-lg); }
+.px-xl { padding-left: var(--spacing-xl); padding-right: var(--spacing-xl); }
+
+.py-xs { padding-top: var(--spacing-xs); padding-bottom: var(--spacing-xs); }
+.py-sm { padding-top: var(--spacing-sm); padding-bottom: var(--spacing-sm); }
+.py-md { padding-top: var(--spacing-md); padding-bottom: var(--spacing-md); }
+.py-lg { padding-top: var(--spacing-lg); padding-bottom: var(--spacing-lg); }
+.py-xl { padding-top: var(--spacing-xl); padding-bottom: var(--spacing-xl); }
+
+/* ============================================================================
+   SPACING - Margin
+   Usage: <div className="m-md"> or <div className="mt-lg mb-sm">
+   ============================================================================ */
+.m-xs { margin: var(--spacing-xs); }
+.m-sm { margin: var(--spacing-sm); }
+.m-md { margin: var(--spacing-md); }
+.m-lg { margin: var(--spacing-lg); }
+.m-xl { margin: var(--spacing-xl); }
+
+.mx-auto { margin-left: auto; margin-right: auto; }
+.mt-xs { margin-top: var(--spacing-xs); }
+.mt-sm { margin-top: var(--spacing-sm); }
+.mt-md { margin-top: var(--spacing-md); }
+.mt-lg { margin-top: var(--spacing-lg); }
+.mt-xl { margin-top: var(--spacing-xl); }
+
+.mb-xs { margin-bottom: var(--spacing-xs); }
+.mb-sm { margin-bottom: var(--spacing-sm); }
+.mb-md { margin-bottom: var(--spacing-md); }
+.mb-lg { margin-bottom: var(--spacing-lg); }
+.mb-xl { margin-bottom: var(--spacing-xl); }
+
+/* ============================================================================
+   GAP (for flexbox/grid)
+   Usage: <div className="gap-md">
+   ============================================================================ */
+.gap-xs { gap: var(--spacing-xs); }
+.gap-sm { gap: var(--spacing-sm); }
+.gap-md { gap: var(--spacing-md); }
+.gap-lg { gap: var(--spacing-lg); }
+.gap-xl { gap: var(--spacing-xl); }
+
+/* ============================================================================
+   TILED BACKGROUND
+   Usage: <div className="bg-tiled"> or className={clsx(styles.btn, isYourTurn && 'bg-tiled')}
+   ============================================================================ */
+.bg-tiled {
+  background-image: var(--tiled-bg-image);
+  background-repeat: var(--tiled-bg-repeat);
+  background-size: var(--tiled-bg-size);
+  background-color: var(--tiled-bg-color);
+}
+
+/* ============================================================================
+   TRANSFORMS - Direction
+   Usage: <div data-direction="desc">
+   ============================================================================ */
+[data-direction="asc"] { transform: rotate(0deg); }
+[data-direction="desc"] { transform: rotate(180deg); }
+
+/* ============================================================================
+   TIMER STATES
+   Usage: <div data-timer-state="warning">
+   ============================================================================ */
+[data-timer-state="normal"] { color: var(--color-state-active); }
+[data-timer-state="warning"] { color: var(--color-state-warning); }
+[data-timer-state="critical"] { color: var(--color-state-error); }
+
+/* ============================================================================
+   Z-INDEX UTILITIES
+   Usage: <div className="z-modal">
+   ============================================================================ */
+.z-base { z-index: var(--z-base); }
+.z-elevated { z-index: var(--z-elevated); }
+.z-dropdown { z-index: var(--z-dropdown); }
+.z-header { z-index: var(--z-header); }
+.z-sticky { z-index: var(--z-sticky); }
+.z-fixed { z-index: var(--z-fixed); }
+.z-modal-backdrop { z-index: var(--z-modal-backdrop); }
+.z-modal { z-index: var(--z-modal); }
+.z-popover { z-index: var(--z-popover); }
+.z-tooltip { z-index: var(--z-tooltip); }
+.z-toast { z-index: var(--z-toast); }
+
+/* ============================================================================
+   LAYOUT UTILITIES
+   Usage: <div className="flex-center">
+   ============================================================================ */
+.flex { display: flex; }
+.flex-col { display: flex; flex-direction: column; }
+.flex-row { display: flex; flex-direction: row; }
+.flex-center { display: flex; align-items: center; justify-content: center; }
+.flex-between { display: flex; align-items: center; justify-content: space-between; }
+.flex-start { display: flex; align-items: center; justify-content: flex-start; }
+.flex-end { display: flex; align-items: center; justify-content: flex-end; }
+
+.flex-1 { flex: 1; }
+.flex-shrink-0 { flex-shrink: 0; }
+.flex-grow { flex-grow: 1; }
+
+.items-center { align-items: center; }
+.items-start { align-items: flex-start; }
+.items-end { align-items: flex-end; }
+
+.justify-center { justify-content: center; }
+.justify-start { justify-content: flex-start; }
+.justify-end { justify-content: flex-end; }
+.justify-between { justify-content: space-between; }
+
+/* ============================================================================
+   POSITION UTILITIES
+   ============================================================================ */
+.relative { position: relative; }
+.absolute { position: absolute; }
+.fixed { position: fixed; }
+.sticky { position: sticky; }
+
+.inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+.top-0 { top: 0; }
+.right-0 { right: 0; }
+.bottom-0 { bottom: 0; }
+.left-0 { left: 0; }
+
+/* ============================================================================
+   SIZE UTILITIES
+   ============================================================================ */
+.w-full { width: 100%; }
+.h-full { height: 100%; }
+.min-h-0 { min-height: 0; }
+.min-w-0 { min-width: 0; }
+
+/* Touch targets */
+.touch-target-min { min-height: var(--touch-target-min); min-width: var(--touch-target-min); }
+.touch-target-comfort { min-height: var(--touch-target-comfort); min-width: var(--touch-target-comfort); }
+.touch-target-large { min-height: var(--touch-target-large); min-width: var(--touch-target-large); }
+
+/* ============================================================================
+   OVERFLOW
+   ============================================================================ */
+.overflow-hidden { overflow: hidden; }
+.overflow-auto { overflow: auto; }
+.overflow-scroll { overflow: scroll; }
+.overflow-x-auto { overflow-x: auto; }
+.overflow-y-auto { overflow-y: auto; }
+
+/* ============================================================================
+   CURSOR
+   ============================================================================ */
+.cursor-pointer { cursor: pointer; }
+.cursor-default { cursor: default; }
+.cursor-not-allowed { cursor: not-allowed; }
+
+/* ============================================================================
+   VISIBILITY & OPACITY
+   ============================================================================ */
+.opacity-0 { opacity: 0; }
+.opacity-50 { opacity: 0.5; }
+.opacity-100 { opacity: 1; }
+.invisible { visibility: hidden; }
+.visible { visibility: visible; }
+
+/* ============================================================================
+   TEXT UTILITIES
+   ============================================================================ */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+.uppercase { text-transform: uppercase; }
+.lowercase { text-transform: lowercase; }
+.capitalize { text-transform: capitalize; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.whitespace-nowrap { white-space: nowrap; }
+.break-words { word-break: break-word; }
+
+/* ============================================================================
+   TRANSITIONS
+   ============================================================================ */
+.transition-fast { transition: all var(--duration-fast) ease; }
+.transition-normal { transition: all var(--duration-normal) ease; }
+.transition-slow { transition: all var(--duration-slow) ease; }
+.transition-colors { transition: color var(--duration-normal) ease, background-color var(--duration-normal) ease; }
+.transition-opacity { transition: opacity var(--duration-normal) ease; }
+.transition-transform { transition: transform var(--duration-normal) ease; }
+
+/* ============================================================================
+   POSITION COLOR VARIABLE
+   Usage: <div data-position="qb"> then use var(--position-color) for border, etc.
+   Sets --position-color CSS variable based on data-position attribute.
+   Components can then use border-left-color: var(--position-color);
+   ============================================================================ */
+[data-position] {
+  --position-color: var(--text-muted); /* fallback */
+}
+[data-position="qb"] { --position-color: var(--color-position-qb); }
+[data-position="rb"] { --position-color: var(--color-position-rb); }
+[data-position="wr"] { --position-color: var(--color-position-wr); }
+[data-position="te"] { --position-color: var(--color-position-te); }
+[data-position="bn"] { --position-color: var(--color-position-bn); }
+[data-position="flex"] { --position-color: var(--color-position-wr); }
+[data-position="k"] { --position-color: var(--text-muted); }
+[data-position="dst"] { --position-color: var(--text-muted); }
+[data-position="def"] { --position-color: var(--text-muted); }
+
+/* Position-colored left border utility */
+.border-l-position {
+  border-left-width: 4px;
+  border-left-style: solid;
+  border-left-color: var(--position-color);
+}

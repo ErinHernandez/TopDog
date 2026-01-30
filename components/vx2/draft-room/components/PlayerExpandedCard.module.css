@@ -14,6 +14,7 @@
   border-radius: 8px;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
   cursor: pointer;
+  background: var(--card-background);
 }
 
 /* ============================================================================
@@ -77,6 +78,7 @@
 
 .badgeLabel {
   font-size: var(--pec-badge-label-size);
+  color: var(--label-color);
 }
 
 .badgeValue {
@@ -191,6 +193,8 @@
   position: absolute;
   display: flex;
   align-items: center;
+  left: var(--column-left);
+  width: var(--column-width);
 }
 
 .statsHeaderColumn.first {
@@ -227,6 +231,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  left: var(--row-value-left);
+  width: var(--row-value-width);
 }
 
 /* ============================================================================

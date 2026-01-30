@@ -13,8 +13,6 @@
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { cn } from '@/lib/styles';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../../core/constants/colors';
-import { SPACING, Z_INDEX } from '../../core/constants/sizes';
 import { ChevronLeft } from '../../components/icons';
 import { UsernameInput } from './UsernameInput';
 import { useAuth } from '../hooks/useAuth';
@@ -78,7 +76,6 @@ function PasswordStrength({ password }: PasswordStrengthProps): React.ReactEleme
   else strength = 4;
 
   const strengthLabel = ['', 'Weak', 'Fair', 'Good', 'Strong'][strength];
-  const strengthColor = ['', STATE_COLORS.error, STATE_COLORS.warning, '#84cc16', STATE_COLORS.success][strength];
 
   return (
     <div className={cn(styles.strengthContainer, password && styles.visible)}>
@@ -86,15 +83,27 @@ function PasswordStrength({ password }: PasswordStrengthProps): React.ReactEleme
         {[1, 2, 3, 4].map((level) => (
           <div
             key={level}
-            className={cn(styles.strengthBar, strength >= level && styles.active)}
-            style={{
-              '--strength-color': strengthColor,
-            } as React.CSSProperties}
+            className={cn(
+              styles.strengthBar,
+              strength >= level && styles.active,
+              strength === 1 && styles.strengthError,
+              strength === 2 && styles.strengthWarning,
+              strength === 3 && styles.strengthGood,
+              strength === 4 && styles.strengthSuccess
+            )}
           />
         ))}
       </div>
       <div className={styles.strengthInfo}>
-        <span className={styles.strengthLabel} style={{ color: strengthColor }}>
+        <span
+          className={cn(
+            styles.strengthLabel,
+            strength === 1 && styles.strengthError,
+            strength === 2 && styles.strengthWarning,
+            strength === 3 && styles.strengthGood,
+            strength === 4 && styles.strengthSuccess
+          )}
+        >
           {strengthLabel || '\u00A0'}
         </span>
         <span className={cn(styles.strengthCharCount, authStyles.textMuted)}>
@@ -161,9 +170,6 @@ function Input({
             hasError && styles.error,
             rightElement && styles.inputFieldWithRight
           )}
-          style={{
-            '--input-border': hasError ? STATE_COLORS.error : BORDER_COLORS.default,
-          } as React.CSSProperties}
         />
         {rightElement && (
           <div className={styles.inputRightElement}>
@@ -174,7 +180,6 @@ function Input({
       {hasError && (
         <div
           className={styles.errorMessage}
-          style={{ color: STATE_COLORS.error }}
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={styles.errorIcon}>
             <circle cx="12" cy="12" r="10" />
@@ -244,10 +249,6 @@ function CredentialsStep({
   return (
     <div
       className={styles.container}
-      style={{
-        '--bg-primary': BG_COLORS.primary,
-        '--z-modal': Z_INDEX.modal,
-      } as React.CSSProperties}
       onKeyDown={handleKeyDown}
     >
       {/* Safe area with wr_blue background - covers dynamic island */}
@@ -258,7 +259,6 @@ function CredentialsStep({
       {/* Content */}
       <div
         className={styles.contentArea}
-        style={{ padding: `${SPACING.xl}px` }}
       >
         {/* Spacer */}
         <div className={styles.contentSpacer} />
@@ -277,11 +277,8 @@ function CredentialsStep({
         {error && (
           <div
             className={styles.errorBanner}
-            style={{
-              '--error-color': STATE_COLORS.error,
-            } as React.CSSProperties}
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.error} strokeWidth="2" className={styles.errorBannerIcon}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={styles.errorBannerIcon}>
               <circle cx="12" cy="12" r="10" />
               <line x1="12" y1="8" x2="12" y2="12" />
               <line x1="12" y1="16" x2="12.01" y2="16" />
@@ -321,7 +318,6 @@ function CredentialsStep({
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className={styles.toggleButton}
-                  style={{ color: TEXT_COLORS.muted }}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                   tabIndex={-1}
                 >
@@ -356,7 +352,6 @@ function CredentialsStep({
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 className={styles.toggleButton}
-                style={{ color: TEXT_COLORS.muted }}
                 aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
                 tabIndex={-1}
               >
@@ -398,9 +393,6 @@ function CredentialsStep({
                   styles.requirementItem,
                   req.check ? styles.requirementChecked : styles.requirementUnchecked
                 )}
-                style={{
-                  color: req.check ? STATE_COLORS.success : TEXT_COLORS.muted,
-                }}
               >
                 {req.check ? (
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className={styles.requirementIcon}>
@@ -421,10 +413,6 @@ function CredentialsStep({
       {/* Footer */}
       <div
         className={styles.footer}
-        style={{
-          '--bg-primary': BG_COLORS.primary,
-          '--border-default': BORDER_COLORS.default,
-        } as React.CSSProperties}
       >
         <div className={styles.footerContent}>
           <button
@@ -434,10 +422,6 @@ function CredentialsStep({
               styles.footerButton,
               canContinue ? styles.footerButtonEnabled : styles.footerButtonDisabled
             )}
-            style={{
-              '--bg-tertiary': BG_COLORS.tertiary,
-              '--text-disabled': TEXT_COLORS.disabled,
-            } as React.CSSProperties}
           >
             Continue
           </button>
@@ -446,9 +430,6 @@ function CredentialsStep({
           <div className={styles.divider} />
           <p
             className={styles.footerText}
-            style={{
-              color: TEXT_COLORS.muted,
-            }}
           >
             Already have an account?{' '}
             <button
@@ -496,10 +477,6 @@ function UsernameStep({
   return (
     <div
       className={styles.container}
-      style={{
-        '--bg-primary': BG_COLORS.primary,
-        '--z-modal': Z_INDEX.modal,
-      } as React.CSSProperties}
       onKeyDown={handleKeyDown}
     >
       {/* Safe area with wr_blue background - covers dynamic island */}
@@ -510,25 +487,23 @@ function UsernameStep({
       {/* Header with Back Button */}
       <div
         className={styles.header}
-        style={{ padding: `${SPACING.md}px ${SPACING.lg}px` }}
       >
         <button
           onClick={onBack}
           className={styles.backButton}
           aria-label="Back"
         >
-          <ChevronLeft size={24} color={TEXT_COLORS.muted} />
+          <ChevronLeft size={24} color="currentColor" />
         </button>
       </div>
 
       {/* Content */}
       <div
         className={styles.centeredContent}
-        style={{ padding: `0 ${SPACING.xl}px` }}
       >
         <div className={styles.centerSection}>
           <div className={styles.iconCircle}>
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" className={styles.iconCircleIcon}>
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={styles.iconCircleIcon}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
           </div>
@@ -573,9 +548,6 @@ function UsernameStep({
                   styles.requirementItem,
                   req.check ? styles.requirementChecked : styles.requirementUnchecked
                 )}
-                style={{
-                  color: req.check ? STATE_COLORS.success : TEXT_COLORS.muted,
-                }}
               >
                 {req.check ? (
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className={styles.requirementIcon}>
@@ -596,10 +568,6 @@ function UsernameStep({
       {/* Footer */}
       <div
         className={styles.footer}
-        style={{
-          '--bg-primary': BG_COLORS.primary,
-          '--border-default': BORDER_COLORS.default,
-        } as React.CSSProperties}
       >
         <div className={styles.footerContent}>
           <button
@@ -609,10 +577,6 @@ function UsernameStep({
               styles.footerButton,
               canContinue ? styles.footerButtonEnabled : styles.footerButtonDisabled
             )}
-            style={{
-              '--bg-tertiary': BG_COLORS.tertiary,
-              '--text-disabled': TEXT_COLORS.disabled,
-            } as React.CSSProperties}
           >
             Continue
           </button>
@@ -684,10 +648,6 @@ function EmailVerifyStep({
   return (
     <div
       className={styles.container}
-      style={{
-        '--bg-primary': BG_COLORS.primary,
-        '--z-modal': Z_INDEX.modal,
-      } as React.CSSProperties}
       onKeyDown={handleKeyDown}
     >
       {/* Safe area with wr_blue background - covers dynamic island */}
@@ -698,25 +658,23 @@ function EmailVerifyStep({
       {/* Header with Back Button */}
       <div
         className={styles.header}
-        style={{ padding: `${SPACING.md}px ${SPACING.lg}px` }}
       >
         <button
           onClick={onBack}
           className={styles.backButton}
           aria-label="Back"
         >
-          <ChevronLeft size={24} color={TEXT_COLORS.muted} />
+          <ChevronLeft size={24} color="currentColor" />
         </button>
       </div>
 
       {/* Content */}
       <div
         className={styles.centeredContent}
-        style={{ padding: `0 ${SPACING.xl}px` }}
       >
         <div className={styles.centerSection}>
           <div className={styles.iconCircle}>
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" className={styles.iconCircleIcon}>
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={styles.iconCircleIcon}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
           </div>
@@ -728,7 +686,7 @@ function EmailVerifyStep({
           <p className={cn(styles.centerSubtitle, authStyles.textSecondary)}>
             We sent a 6-digit code to
             <br />
-            <span className="font-medium" style={{ color: TEXT_COLORS.primary }}>{maskedEmail}</span>
+            <span className="font-medium">{maskedEmail}</span>
           </p>
         </div>
 
@@ -736,11 +694,8 @@ function EmailVerifyStep({
         {(error || verifyError) && (
           <div
             className={styles.errorBanner}
-            style={{
-              '--error-color': STATE_COLORS.error,
-            } as React.CSSProperties}
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.error} strokeWidth="2" className={styles.errorBannerIcon}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={styles.errorBannerIcon}>
               <circle cx="12" cy="12" r="10" />
               <line x1="12" y1="8" x2="12" y2="12" />
               <line x1="12" y1="16" x2="12.01" y2="16" />
@@ -761,14 +716,10 @@ function EmailVerifyStep({
           autoFocus
           disabled={isVerifying}
           className={styles.codeInput}
-          style={{
-            '--input-border': BORDER_COLORS.default,
-          } as React.CSSProperties}
         />
 
         <p
           className={styles.resendSection}
-          style={{ color: TEXT_COLORS.muted }}
         >
           Didn't receive it? Check your spam folder or{' '}
           {cooldownActive ? (
@@ -788,10 +739,6 @@ function EmailVerifyStep({
       {/* Footer */}
       <div
         className={styles.footer}
-        style={{
-          '--bg-primary': BG_COLORS.primary,
-          '--border-default': BORDER_COLORS.default,
-        } as React.CSSProperties}
       >
         <div className={styles.footerContent}>
           <button
@@ -802,10 +749,6 @@ function EmailVerifyStep({
               'flex items-center justify-center gap-2',
               canSubmit ? styles.footerButtonEnabled : styles.footerButtonDisabled
             )}
-            style={{
-              '--bg-tertiary': BG_COLORS.tertiary,
-              '--text-disabled': TEXT_COLORS.disabled,
-            } as React.CSSProperties}
           >
             {isVerifying ? (
               <>
@@ -838,13 +781,9 @@ function SuccessStep({ email, username, onComplete }: SuccessStepProps): React.R
   return (
     <div
       className={styles.successContainer}
-      style={{
-        '--bg-primary': BG_COLORS.primary,
-        '--z-modal': Z_INDEX.modal,
-      } as React.CSSProperties}
     >
       <div className={styles.successIconCircle}>
-        <svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke={STATE_COLORS.success} strokeWidth="2.5" className={styles.successIcon}>
+        <svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5" className={styles.successIcon}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
         </svg>
       </div>
@@ -867,7 +806,7 @@ function SuccessStep({ email, username, onComplete }: SuccessStepProps): React.R
         <p className={cn(styles.infoText, authStyles.textMuted)}>
           We sent a verification email to:
         </p>
-        <p className={styles.infoEmail} style={{ color: TEXT_COLORS.primary }}>
+        <p className={styles.infoEmail}>
           {email}
         </p>
         <p className={cn(styles.infoText, authStyles.textMuted)}>
@@ -878,11 +817,8 @@ function SuccessStep({ email, username, onComplete }: SuccessStepProps): React.R
       {/* Tax reminder */}
       <div
         className={styles.taxReminder}
-        style={{
-          '--text-muted': TEXT_COLORS.muted,
-        } as React.CSSProperties}
       >
-        <p className={styles.taxReminderText} style={{ color: TEXT_COLORS.muted }}>
+        <p className={styles.taxReminderText}>
           You are responsible for reporting and paying any applicable taxes on winnings in accordance with your local tax laws.
         </p>
       </div>

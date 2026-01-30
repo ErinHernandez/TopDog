@@ -149,9 +149,6 @@ function FlagItem({
       )}
       aria-label={`Select ${flag.name} flag`}
       aria-pressed={isSelected}
-      style={{
-        '--unselected-border-color': '#e5e7eb',
-      } as React.CSSProperties}
     >
       {imgError ? (
         <div className={styles.flagErrorContainer}>

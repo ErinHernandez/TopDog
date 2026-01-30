@@ -7,7 +7,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import { SPACING, TYPOGRAPHY, RADIUS } from '../../core/constants/sizes';
+import { TYPOGRAPHY } from '../../core/constants/sizes';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { createScopedLogger } from '../../../../lib/clientLogger';
 import styles from './NavigateAwayAlertsPromptModal.module.css';

@@ -29,8 +29,6 @@
  */
 
 import React from 'react';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS, POSITION_COLORS } from '../../../core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY } from '../../../core/constants/sizes';
 import { PositionBadge } from './PositionBadge';
 import { Plus, Minus } from '../../icons';
 import { cn } from '@/lib/styles';
@@ -71,16 +69,7 @@ export interface PlayerCellProps {
 // CONSTANTS
 // ============================================================================
 
-const CELL_PX = {
-  paddingY: SPACING.xs,    // 4px
-  paddingX: SPACING.md,    // 12px
-  gap: SPACING.sm,         // 8px
-  borderLeft: 4,
-  valueWidth: 28,
-  actionSize: 36,
-  actionIconSize: 20,
-  projMarginRight: 4,
-} as const;
+const ACTION_ICON_SIZE = 20;
 
 // ============================================================================
 // MAIN COMPONENT
@@ -98,8 +87,6 @@ export function PlayerCell({
   disabled = false,
   onClick,
 }: PlayerCellProps): React.ReactElement {
-  const posColor = POSITION_COLORS[player.position.toUpperCase() as keyof typeof POSITION_COLORS] || TEXT_COLORS.muted;
-
   // Format display values
   const leftValue = displayValue !== undefined
     ? (displayType === 'adp' && typeof displayValue === 'number' ? displayValue.toFixed(1) : displayValue)
@@ -107,28 +94,8 @@ export function PlayerCell({
 
   const projValue = typeof player.proj === 'number' ? Math.round(player.proj) : player.proj || '-';
 
-  // CSS custom properties for dynamic values
-  const containerStyle: React.CSSProperties = {
-    '--cell-bg': BG_COLORS.secondary,
-    '--cell-border-left': `${CELL_PX.borderLeft}px solid ${posColor}`,
-    '--cell-radius': `${RADIUS.lg}px`,
-    '--cell-padding': `${CELL_PX.paddingY}px ${CELL_PX.paddingX}px`,
-    '--cell-gap': `${CELL_PX.gap}px`,
-    '--value-width': `${CELL_PX.valueWidth}px`,
-    '--proj-margin-right': `${CELL_PX.projMarginRight}px`,
-    '--text-primary': TEXT_COLORS.primary,
-    '--text-secondary': TEXT_COLORS.secondary,
-    '--text-muted': TEXT_COLORS.muted,
-    '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
-    '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
-  } as React.CSSProperties;
-
-  const actionStyle: React.CSSProperties = {
-    '--action-size': `${CELL_PX.actionSize}px`,
-    '--action-radius': `${RADIUS.lg}px`,
-    '--action-bg': isActive ? 'rgba(239, 68, 68, 0.15)' : 'rgba(96, 165, 250, 0.15)',
-    '--action-color': isActive ? STATE_COLORS.error : STATE_COLORS.active,
-  } as React.CSSProperties;
+  // Position for data attribute (used by CSS for border color)
+  const positionLower = player.position.toLowerCase();
 
   const Container = onClick ? 'button' : 'div';
 
@@ -141,7 +108,7 @@ export function PlayerCell({
         onClick && styles.containerClickable,
         disabled && styles.containerDisabled
       )}
-      style={containerStyle}
+      data-position={positionLower}
     >
       {/* ADP / Rank Value */}
       <div className={styles.valueColumn}>
@@ -184,11 +151,12 @@ export function PlayerCell({
               onAction?.();
             }}
             disabled={disabled}
-            className={cn(styles.actionButton, disabled && styles.actionButtonDisabled)}
-            style={actionStyle}
+            className={styles.actionButton}
+            data-action={isActive ? 'remove' : 'add'}
+            data-disabled={disabled}
             aria-label={isActive ? `Remove ${player.name}` : `Add ${player.name}`}
           >
-            {isActive ? <Minus size={CELL_PX.actionIconSize} /> : <Plus size={CELL_PX.actionIconSize} />}
+            {isActive ? <Minus size={ACTION_ICON_SIZE} /> : <Plus size={ACTION_ICON_SIZE} />}
           </button>
         )
       )}

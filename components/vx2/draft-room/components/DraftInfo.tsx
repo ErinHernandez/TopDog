@@ -14,19 +14,12 @@ import React, { useRef, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/styles';
 import styles from './DraftInfo.module.css';
 import { DRAFT_DEFAULTS, POSITION_LIMITS } from '../constants';
-import { BG_COLORS, TEXT_COLORS, BORDER_COLORS } from '../../core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
 
 // ============================================================================
 // CONSTANTS
 // ============================================================================
 
-// CSS custom properties will use these values when defined in the CSS Module
-const INFO_PX = {
-  sectionGap: SPACING.lg,
-  itemGap: SPACING.sm,
-  padding: SPACING.md,
-} as const;
+// CSS custom properties are defined in the CSS Module using spacing tokens
 
 // ============================================================================
 // TYPES

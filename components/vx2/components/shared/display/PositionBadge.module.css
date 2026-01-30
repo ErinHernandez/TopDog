@@ -12,13 +12,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   width: var(--badge-width, 28px);
   height: var(--badge-height, 18px);
-  border-radius: var(--badge-radius, 4px);
+  border-radius: var(--badge-radius, var(--radius-sm));
   background-color: var(--badge-bg, transparent);
   color: var(--badge-color, #000);
-  font-size: var(--badge-font-size, 12px);
+  font-size: var(--badge-font-size, var(--font-size-xs));
   border: var(--badge-border, none);
   line-height: 1;
   letter-spacing: -0.02em;

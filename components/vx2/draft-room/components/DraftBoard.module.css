@@ -59,6 +59,7 @@
 .headersRow {
   display: flex;
   width: max-content;
+  min-width: var(--headers-row-min-width);
 }
 
 .teamHeader {
@@ -73,7 +74,7 @@
   overflow: hidden;
   border-width: var(--cell-border-width);
   border-style: solid;
-  /* border-color: set dynamically via style prop */
+  border-color: var(--team-header-border-color);
 }
 
 .teamHeaderUsername {
@@ -87,7 +88,7 @@
   color: var(--text-white);
   text-transform: uppercase;
   text-align: center;
-  /* background-color: set dynamically via style prop */
+  background-color: var(--team-header-username-bg);
 }
 
 .teamHeaderContent {
@@ -133,9 +134,17 @@
 
 .trackerSegment {
   height: 100%;
-  /* width: set dynamically via style prop */
-  /* background-color: set dynamically via style prop */
+  width: var(--tracker-segment-width);
+  /* Position color from data-position attribute */
+  background-color: var(--position-color, #6B7280);
 }
+
+/* Position-specific tracker segment colors */
+.trackerSegment[data-position="qb"] { --position-color: var(--color-position-qb); }
+.trackerSegment[data-position="rb"] { --position-color: var(--color-position-rb); }
+.trackerSegment[data-position="wr"] { --position-color: var(--color-position-wr); }
+.trackerSegment[data-position="te"] { --position-color: var(--color-position-te); }
+.trackerSegment[data-position="bn"] { --position-color: var(--color-position-bn); }
 
 .trackerSegmentFirst {
   border-radius: 1px 0 0 1px;
@@ -160,6 +169,7 @@
 .gridRow {
   display: flex;
   width: max-content;
+  min-width: var(--grid-row-min-width);
 }
 
 /* ============================================================================
@@ -193,9 +203,20 @@
 }
 
 .pickCellPicked {
-  /* border-color: set dynamically via style prop */
-  /* background-color: set dynamically via style prop (with opacity) */
+  /* Position color from data-position attribute */
+  border-color: var(--position-color, #6B7280);
+  background-color: color-mix(in srgb, var(--position-color, #6B7280) 12%, transparent);
 }
+
+/* Position-specific picked cell colors */
+.pickCellPicked[data-position="qb"] { --position-color: var(--color-position-qb); }
+.pickCellPicked[data-position="rb"] { --position-color: var(--color-position-rb); }
+.pickCellPicked[data-position="wr"] { --position-color: var(--color-position-wr); }
+.pickCellPicked[data-position="te"] { --position-color: var(--color-position-te); }
+.pickCellPicked[data-position="bn"] { --position-color: var(--color-position-bn); }
+.pickCellPicked[data-position="k"] { --position-color: var(--text-muted); }
+.pickCellPicked[data-position="dst"] { --position-color: var(--text-muted); }
+.pickCellPicked[data-position="def"] { --position-color: var(--text-muted); }
 
 .pickCellOverlay {
   position: absolute;

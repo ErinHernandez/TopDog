@@ -1,0 +1,142 @@
+/**
+ * PlayerCell CSS Module
+ *
+ * Migrated from inline styles for CSP compliance.
+ * Uses CSS custom properties from tokens.css for colors.
+ */
+
+/* ============================================================================
+   CONTAINER
+   ============================================================================ */
+
+.container {
+  display: flex;
+  align-items: center;
+  transition: opacity 150ms ease, background-color 150ms ease;
+  background-color: var(--bg-secondary);
+  /* Border uses --position-color from data-position attribute (set in utilities.css) */
+  border-left-width: 4px;
+  border-left-style: solid;
+  border-left-color: var(--position-color);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xs) var(--spacing-md);
+  gap: var(--spacing-sm);
+  width: 100%;
+  text-align: left;
+}
+
+.containerClickable {
+  cursor: pointer;
+  border: none;
+}
+
+.containerClickable:hover {
+  filter: brightness(1.1);
+}
+
+.containerDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================================================
+   VALUE COLUMN
+   ============================================================================ */
+
+.valueColumn {
+  text-align: center;
+  flex-shrink: 0;
+  width: 28px;
+}
+
+.valueText {
+  font-weight: 700;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+/* ============================================================================
+   NAME & TEAM
+   ============================================================================ */
+
+.nameTeamWrapper {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.playerName {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.playerTeam {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+}
+
+/* ============================================================================
+   PROJECTION COLUMN
+   ============================================================================ */
+
+.projectionColumn {
+  text-align: center;
+  flex-shrink: 0;
+  margin-right: 4px;
+}
+
+.projectionValue {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: var(--font-size-xs);
+}
+
+.projectionLabel {
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+}
+
+/* ============================================================================
+   ACTION BUTTON
+   ============================================================================ */
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 150ms ease, background-color 150ms ease;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-lg);
+  border: none;
+  cursor: pointer;
+}
+
+/* Add button (not active) */
+.actionButton[data-action="add"] {
+  background-color: rgba(96, 165, 250, 0.15);
+  color: var(--color-state-active);
+}
+
+/* Remove button (active) */
+.actionButton[data-action="remove"] {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: var(--color-state-error);
+}
+
+.actionButton:hover:not([data-disabled="true"]) {
+  filter: brightness(1.2);
+}
+
+.actionButton[data-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}

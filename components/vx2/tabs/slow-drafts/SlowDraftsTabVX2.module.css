@@ -11,7 +11,7 @@
   display: flex;
   flex-direction: column;
   flex: 1;
-  background-color: var(--bg-color-primary);
+  background-color: var(--bg-primary);
 }
 
 /* ============================================================================
@@ -19,9 +19,9 @@
  * ============================================================================ */
 
 .cardSkeletonContainer {
-  padding: var(--card-padding-x);
-  border-radius: var(--card-border-radius);
-  background-color: var(--bg-color-secondary);
+  padding: 16px;
+  border-radius: 12px;
+  background-color: var(--bg-secondary);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -50,10 +50,10 @@
 }
 
 .loadingStateContainer {
-  padding: var(--list-padding-y) var(--list-padding-x);
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: var(--card-gap);
+  gap: 12px;
 }
 
 /* ============================================================================
@@ -61,7 +61,7 @@
  * ============================================================================ */
 
 .filterSortAreaSkeleton {
-  padding: var(--spacing-sm) var(--list-padding-x);
+  padding: 8px 16px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -78,7 +78,7 @@
   display: flex;
   flex-direction: column;
   flex: 1;
-  background-color: var(--bg-color-primary);
+  background-color: var(--bg-primary);
 }
 
 .emptyStateContent {
@@ -86,7 +86,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-xl);
+  padding: 24px;
 }
 
 /* ============================================================================
@@ -99,8 +99,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: var(--bg-color-primary);
-  padding: var(--spacing-xl);
+  background-color: var(--bg-primary);
+  padding: 24px;
 }
 
 /* ============================================================================
@@ -111,10 +111,10 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding-left: var(--list-padding-x);
-  padding-right: var(--list-padding-x);
-  padding-top: var(--list-padding-y);
-  padding-bottom: var(--list-padding-y);
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 16px;
+  padding-bottom: 16px;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -126,11 +126,11 @@
 .draftsListInner {
   display: flex;
   flex-direction: column;
-  gap: var(--card-gap);
+  gap: 12px;
 }
 
 .bottomPadding {
-  height: var(--spacing-2xl);
+  height: 32px;
   flex-shrink: 0;
 }
 
@@ -139,7 +139,7 @@
  * ============================================================================ */
 
 .joinDraftContainer {
-  padding: var(--spacing-lg);
+  padding: 16px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -147,7 +147,7 @@
   width: 100%;
   height: 48px;
   border-radius: var(--radius-lg);
-  background-color: var(--state-color-active);
+  background-color: var(--color-state-active);
   color: #FFFFFF;
   font-size: 15px;
   font-weight: 600;

@@ -9,7 +9,11 @@
 ============================================================================ */
 .sectionLabel {
   margin-bottom: var(--section-label-margin-bottom);
-  /* Typography values applied via CSS variables from constants */
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
 }
 
 /* ============================================================================
@@ -73,23 +77,30 @@
 
 .drafterName {
   color: rgba(255, 255, 255, 0.7);
-  /* Typography applied via CSS variables */
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
 }
 
 .actionText {
   color: rgba(255, 255, 255, 0.5);
-  /* Typography applied via CSS variables */
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
 }
 
 .playerName {
   color: rgba(255, 255, 255, 0.95);
-  /* Typography applied via CSS variables */
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
 }
 
 .playerPosition {
   font-size: 11px;
   font-weight: 600;
   margin-left: 4px;
+  color: var(--position-color);
+}
+
+.playerPosition {
   color: var(--position-color);
 }
 
@@ -145,4 +156,26 @@
 
 .showMoreButton:active {
   opacity: 0.7;
+}
+
+/* ============================================================================
+   Dynamic CSS Custom Properties
+============================================================================ */
+
+.eventButton {
+  --event-bg-color: rgba(255, 255, 255, 0.04);
+  --event-border-color: rgba(255, 255, 255, 0.1);
+}
+
+.playerPosition {
+  --position-color: inherit;
+}
+
+.typeBadge {
+  --event-color: inherit;
+  --event-badge-bg: rgba(255, 255, 255, 0.1);
+}
+
+.adpDelta {
+  --event-color: inherit;
 }

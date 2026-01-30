@@ -14,7 +14,6 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { cn } from '@/lib/styles';
-import { TILED_BG_STYLE } from '../constants';
 import { createScopedLogger } from '../../../../lib/clientLogger';
 import { DRAFT_TIMER } from '../../core/constants/timing';
 import styles from './DraftNavbar.module.css';

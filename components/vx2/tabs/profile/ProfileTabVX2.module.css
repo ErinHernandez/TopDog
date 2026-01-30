@@ -9,10 +9,10 @@
   flex-direction: column;
   flex: 1;
   overflow-y: auto;
-  padding-left: var(--profile-padding-x);
-  padding-right: var(--profile-padding-x);
-  padding-top: var(--profile-padding-y);
-  padding-bottom: var(--profile-padding-y);
+  padding-left: var(--spacing-lg);
+  padding-right: var(--spacing-lg);
+  padding-top: var(--spacing-xl);
+  padding-bottom: var(--spacing-xl);
   background-color: var(--bg-primary);
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -37,17 +37,17 @@
   border-color: var(--box-border-color);
   border-top-width: var(--box-top-border-width);
   background-color: var(--box-bg);
-  border-radius: var(--box-border-radius);
+  border-radius: var(--radius-lg);
 }
 
 .avatarBoxUsername {
   position: absolute;
   left: 0;
   right: 0;
-  font-weight: bold;
+  font-weight: var(--font-weight-bold);
   text-align: center;
   text-transform: uppercase;
-  font-size: var(--username-font-size);
+  font-size: var(--font-size-xs);
   color: var(--username-color);
   top: var(--username-top);
   transform: translateY(-50%);
@@ -60,6 +60,7 @@
 
 .avatarBoxBlack {
   color: #000000;
+  --username-color: #000000;
 }
 
 .avatarBoxWhite {
@@ -77,6 +78,7 @@
   padding-top: var(--spacing-lg);
   padding-bottom: var(--spacing-lg);
   margin-bottom: var(--spacing-lg);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .playerCardButton {
@@ -87,7 +89,7 @@
   border-color: var(--box-border-color);
   border-top-width: var(--box-top-border-width);
   background-color: var(--player-card-bg);
-  border-radius: var(--box-border-radius);
+  border-radius: var(--radius-lg);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -105,9 +107,9 @@
   position: absolute;
   left: 0;
   right: 0;
-  font-size: var(--username-font-size);
+  font-size: var(--font-size-xs);
   color: #FFFFFF;
-  font-weight: bold;
+  font-weight: var(--font-weight-bold);
   text-align: center;
   text-transform: uppercase;
   top: var(--username-top);
@@ -127,7 +129,7 @@
 }
 
 .playerCardCustomizeText {
-  font-size: var(--username-font-size);
+  font-size: var(--font-size-xs);
   color: var(--text-muted);
   text-align: center;
   font-style: italic;
@@ -145,14 +147,14 @@
 }
 
 .accountBalanceLabel {
-  font-size: var(--typography-xs);
+  font-size: var(--font-size-xs);
   color: var(--text-muted);
   margin-bottom: var(--spacing-xs);
 }
 
 .accountBalanceValue {
-  font-weight: bold;
-  font-size: var(--typography-2xl);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-2xl);
   color: var(--text-primary);
 }
 
@@ -165,21 +167,25 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
+  font-weight: var(--font-weight-bold);
   border: none;
-  border-radius: var(--deposit-border-radius);
-  padding-top: var(--deposit-padding-y);
-  padding-bottom: var(--deposit-padding-y);
-  padding-left: var(--deposit-padding-x);
-  padding-right: var(--deposit-padding-x);
-  font-size: var(--deposit-font-size);
-  cursor: var(--deposit-cursor);
-  margin-bottom: var(--deposit-margin-bottom);
-  gap: var(--deposit-gap);
+  border-radius: var(--radius-lg);
+  padding-top: var(--spacing-md);
+  padding-bottom: var(--spacing-md);
+  padding-left: var(--spacing-xl);
+  padding-right: var(--spacing-xl);
+  font-size: var(--font-size-base);
+  cursor: pointer;
+  margin-bottom: var(--spacing-lg);
+  gap: var(--spacing-sm);
   transition: opacity 0.15s ease;
-  color: var(--deposit-text-color);
-  background: var(--deposit-background);
-  opacity: var(--deposit-opacity);
+  color: #FFFFFF;
+  opacity: 1;
+}
+
+.depositButton:not(:disabled) {
+  background: url(/wr_blue.png) no-repeat center center;
+  background-size: cover;
 }
 
 .depositButton:disabled {
@@ -189,9 +195,8 @@
   cursor: not-allowed;
 }
 
-.depositButton:not(:disabled) {
-  background: url(/wr_blue.png) no-repeat center center;
-  background-size: cover;
+.depositButton svg {
+  color: currentColor;
 }
 
 /* ============================================================================
@@ -201,7 +206,7 @@
 .menuNav {
   display: flex;
   flex-direction: column;
-  gap: var(--menu-gap);
+  gap: var(--spacing-md);
 }
 
 .menuNavFirst {
@@ -213,26 +218,30 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-weight: 600;
-  background-color: var(--menu-item-bg);
+  font-weight: var(--font-weight-semibold);
+  background-color: var(--bg-secondary);
   color: var(--text-primary);
-  padding-top: var(--menu-item-padding-y);
-  padding-bottom: var(--menu-item-padding-y);
-  padding-left: var(--menu-item-padding-x);
-  padding-right: var(--menu-item-padding-x);
-  border-radius: var(--menu-item-border-radius);
-  font-size: var(--menu-item-font-size);
+  padding-top: var(--spacing-md);
+  padding-bottom: var(--spacing-md);
+  padding-left: var(--spacing-lg);
+  padding-right: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
   border: none;
   cursor: pointer;
   transition: background-color 0.15s ease, transform 0.1s ease;
 }
 
 .menuItemButton:hover {
-  background-color: var(--menu-item-hover);
+  background-color: rgba(75, 85, 99, 1);
 }
 
 .menuItemButton:active {
   transform: scale(0.98);
+}
+
+.menuItemButton svg {
+  color: var(--text-muted);
 }
 
 .menuItemIcon {
@@ -264,7 +273,7 @@
 .menuSkeleton {
   display: flex;
   flex-direction: column;
-  gap: var(--menu-gap);
+  gap: var(--spacing-md);
 }
 
 /* ============================================================================

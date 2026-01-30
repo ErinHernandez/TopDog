@@ -8,7 +8,6 @@
 
 import React from 'react';
 import { cn } from '@/lib/styles';
-import { CARD_SPACING_V3 } from '../constants/cardSpacingV3';
 import styles from './TournamentJoinButton.module.css';
 
 export interface TournamentJoinButtonProps {
@@ -46,16 +45,8 @@ export function TournamentJoinButton({
       className={cn(styles.button)}
       onClick={onClick}
       disabled={disabled}
-      style={{
-        '--height': `${CARD_SPACING_V3.buttonHeight}px`,
-        '--font-size': `${CARD_SPACING_V3.buttonFontSize}px`,
-        '--font-weight': CARD_SPACING_V3.buttonFontWeight,
-        '--border-radius': `${CARD_SPACING_V3.buttonBorderRadius}px`,
-        '--background-image': backgroundImage,
-        '--background-color': backgroundColor,
-        '--background-size': '200px',
-        '--background-repeat': 'repeat',
-      } as React.CSSProperties}
+      data-background-image={backgroundImage}
+      data-background-color={backgroundColor}
     >
       {label}
     </button>

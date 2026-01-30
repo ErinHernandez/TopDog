@@ -14,8 +14,6 @@ import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 import { useRouter } from 'next/router';
 import { useMyTeams, type MyTeam, type TeamPlayer } from '../../hooks/data';
 import { useAuth } from '../../auth/hooks/useAuth';
-import { BG_COLORS, TEXT_COLORS, POSITION_COLORS } from '../../core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
 import { useHeader, useTabNavigation } from '../../core';
 import { useTemporaryState } from '../../hooks/ui/useTemporaryState';
 import { cn } from '@/lib/styles';
@@ -58,14 +56,7 @@ import {
 // CONSTANTS
 // ============================================================================
 
-const MYTEAMS_PX = {
-  listPadding: SPACING.lg,
-  cardPadding: SPACING.sm,
-  cardGap: SPACING.md,
-  headerPadding: SPACING.lg,
-  rowPaddingX: SPACING.lg,
-  rowPaddingY: SPACING.xs,
-} as const;
+// Spacing constants removed - now using CSS custom properties in module.css
 
 const POSITION_MAXIMUMS = {
   QB: 3,
@@ -194,9 +185,6 @@ function TeamCard({
         isDragOver && styles.teamCardDragOver,
         isCustomSort && styles.teamCardDraggable
       )}
-      style={{
-        '--card-padding': `${MYTEAMS_PX.cardPadding}px`,
-      } as React.CSSProperties}
       aria-label={`View ${team.name}`}
     >
       <div className={styles.teamCardContent}>
@@ -242,7 +230,7 @@ function TeamCard({
               className={cn(styles.moveButton, styles.moveButtonActive)}
               aria-label="Move up"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={TEXT_COLORS.muted} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="18 15 12 9 6 15" />
               </svg>
             </button>
@@ -256,7 +244,7 @@ function TeamCard({
               className={cn(styles.moveButton, styles.moveButtonActive)}
               aria-label="Move down"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={TEXT_COLORS.muted} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="6 9 12 15 18 9" />
               </svg>
             </button>
@@ -264,7 +252,7 @@ function TeamCard({
         </div>
       ) : (
         <div className={styles.chevronContainer}>
-          <ChevronRight size={20} color={TEXT_COLORS.muted} />
+          <ChevronRight size={20} />
         </div>
       )}
     </div>
@@ -273,12 +261,7 @@ function TeamCard({
 
 function TeamCardSkeleton(): React.ReactElement {
   return (
-    <div
-      className={styles.teamCard}
-      style={{
-        '--card-padding': `${MYTEAMS_PX.cardPadding}px`,
-      } as React.CSSProperties}
-    >
+    <div className={styles.teamCard}>
       <Skeleton width={150} height={18} />
     </div>
   );
@@ -895,7 +878,7 @@ function TeamListView({ teams, isLoading, onSelect, sortState, onSortChange }: T
                   className={styles.selectedItemRemoveButton}
                   aria-label={`Remove ${item.name}`}
                 >
-                  <Close size={12} color={TEXT_COLORS.muted} />
+                  <Close size={12} />
                 </button>
               </div>
             ))}
@@ -933,7 +916,7 @@ function TeamListView({ teams, isLoading, onSelect, sortState, onSortChange }: T
                   <Check size={14} color="#fff" strokeWidth={3} />
                 ) : (
                   <>
-                    <Save size={12} color={hasOrderChanged ? '#fff' : TEXT_COLORS.secondary} />
+                    <Save size={12} color={hasOrderChanged ? '#fff' : '#9ca3af'} />
                     Save
                   </>
                 )}
@@ -949,7 +932,7 @@ function TeamListView({ teams, isLoading, onSelect, sortState, onSortChange }: T
                 )}
                 aria-label={`Undo last move (${orderHistory.length} moves in history)`}
               >
-                <Undo size={12} color={orderHistory.length > 0 ? TEXT_COLORS.secondary : TEXT_COLORS.muted} />
+                <Undo size={12} />
               </button>
             </>
           )}
@@ -1080,8 +1063,8 @@ function PlayerRow({ player, onClick, isExpanded, isLastInGroup, isFirstInGroup 
         !isLastInGroup && styles.playerRowWithGap
       )}
       style={{
-        borderLeftColor: style.bg,
-      }}
+        '--position-border-color': style.bg,
+      } as React.CSSProperties}
     >
       <div className={styles.playerRowContent}>
         {/* Position Badge - refined with better contrast */}
@@ -1266,7 +1249,7 @@ function TeamDetailsView({ team, onBack, onViewDraftBoard }: TeamDetailsViewProp
               className={styles.backButton}
               aria-label="Back to teams"
             >
-              <ChevronLeft size={14} color={TEXT_COLORS.muted} />
+              <ChevronLeft size={14} />
             </button>
             <button
               className={styles.editButton}
@@ -1294,7 +1277,7 @@ function TeamDetailsView({ team, onBack, onViewDraftBoard }: TeamDetailsViewProp
               className={styles.draftBoardButton}
               aria-label="View draft board"
             >
-              <Grid size={14} color={TEXT_COLORS.muted} />
+              <Grid size={14} />
             </button>
           </div>
         </div>
@@ -1307,34 +1290,34 @@ function TeamDetailsView({ team, onBack, onViewDraftBoard }: TeamDetailsViewProp
                 <div
                   className={cn(styles.positionSegment, styles.positionSegmentQB)}
                   style={{
-                    width: `${(positionCounts.QB / team.players.length) * 100}%`,
-                    minWidth: positionCounts.QB > 0 ? '2px' : '0',
-                  }}
+                    '--segment-width': `${(positionCounts.QB / team.players.length) * 100}%`,
+                    '--segment-min-width': positionCounts.QB > 0 ? '2px' : '0',
+                  } as React.CSSProperties}
                 />
                 <div
                   className={cn(styles.positionSegment, styles.positionSegmentRB)}
                   style={{
-                    width: `${(positionCounts.RB / team.players.length) * 100}%`,
-                    minWidth: positionCounts.RB > 0 ? '2px' : '0',
-                  }}
+                    '--segment-width': `${(positionCounts.RB / team.players.length) * 100}%`,
+                    '--segment-min-width': positionCounts.RB > 0 ? '2px' : '0',
+                  } as React.CSSProperties}
                 />
                 <div
                   className={cn(styles.positionSegment, styles.positionSegmentWR)}
                   style={{
-                    width: `${(positionCounts.WR / team.players.length) * 100}%`,
-                    minWidth: positionCounts.WR > 0 ? '2px' : '0',
-                  }}
+                    '--segment-width': `${(positionCounts.WR / team.players.length) * 100}%`,
+                    '--segment-min-width': positionCounts.WR > 0 ? '2px' : '0',
+                  } as React.CSSProperties}
                 />
                 <div
                   className={cn(styles.positionSegment, styles.positionSegmentTE)}
                   style={{
-                    width: `${(positionCounts.TE / team.players.length) * 100}%`,
-                    minWidth: positionCounts.TE > 0 ? '2px' : '0',
-                  }}
+                    '--segment-width': `${(positionCounts.TE / team.players.length) * 100}%`,
+                    '--segment-min-width': positionCounts.TE > 0 ? '2px' : '0',
+                  } as React.CSSProperties}
                 />
               </>
             ) : (
-              <div className={cn(styles.positionSegment, styles.positionSegmentEmpty)} style={{ width: '100%' }} />
+              <div className={cn(styles.positionSegment, styles.positionSegmentEmpty)} style={{ '--segment-width': '100%' } as React.CSSProperties} />
             )}
           </div>
         </div>
@@ -1508,11 +1491,10 @@ export default function MyTeamsTabVX2({
   // Error state
   if (error) {
     return (
-      <div 
+      <div
         className="flex-1 flex items-center justify-center"
-        style={{ backgroundColor: BG_COLORS.primary, padding: SPACING.xl }}
       >
-        <ErrorState 
+        <ErrorState
           title="Failed to load teams"
           description={error || undefined}
           onRetry={refetch}

@@ -18,8 +18,6 @@
  */
 
 import React from 'react';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../core/constants/colors';
-import { TYPOGRAPHY } from '../core/constants/sizes';
 import { formatSmallestUnit } from '../utils/formatting';
 import { cn } from '@/lib/styles';
 import styles from './VoucherStep.module.css';
@@ -174,13 +172,11 @@ export function VoucherStep({
         </div>
         <h3
           className={styles.title}
-          style={{ '--text-primary': TEXT_COLORS.primary } as React.CSSProperties}
         >
           {config.title}
         </h3>
         <p
           className={styles.subtitle}
-          style={{ '--text-secondary': TEXT_COLORS.secondary } as React.CSSProperties}
         >
           {config.subtitle}
         </p>
@@ -189,21 +185,14 @@ export function VoucherStep({
       {/* Amount */}
       <div
         className={styles.amountBox}
-        style={{
-          '--bg-tertiary': BG_COLORS.tertiary,
-          '--state-success': STATE_COLORS.success,
-          '--text-muted': TEXT_COLORS.muted,
-        } as React.CSSProperties}
       >
         <p
           className={styles.amountValue}
-          style={{ '--state-success': STATE_COLORS.success } as React.CSSProperties}
         >
           {formatSmallestUnit(voucherInfo.amount, { currency: voucherInfo.currency })}
         </p>
         <p
           className={styles.amountLabel}
-          style={{ '--text-muted': TEXT_COLORS.muted } as React.CSSProperties}
         >
           Amount to pay
         </p>
@@ -215,21 +204,10 @@ export function VoucherStep({
           [styles.expiring]: expiringSoon,
           [styles.warning]: !expiringSoon,
         })}
-        style={{
-          '--text-primary': TEXT_COLORS.primary,
-          '--text-muted': TEXT_COLORS.muted,
-          '--state-error': STATE_COLORS.error,
-          '--state-error-light': `${STATE_COLORS.error}15`,
-          '--state-error-border': `${STATE_COLORS.error}40`,
-          '--state-warning': STATE_COLORS.warning,
-          '--state-warning-light': `${STATE_COLORS.warning}15`,
-          '--state-warning-border': `${STATE_COLORS.warning}40`,
-        } as React.CSSProperties}
       >
         <div className={styles.expirationHeader}>
           <span
             className={styles.expirationLabel}
-            style={{ '--text-primary': TEXT_COLORS.primary } as React.CSSProperties}
           >
             Expires in:
           </span>
@@ -238,17 +216,12 @@ export function VoucherStep({
               [styles.expiring]: expiringSoon,
               [styles.warning]: !expiringSoon,
             })}
-            style={{
-              '--state-error': STATE_COLORS.error,
-              '--state-warning': STATE_COLORS.warning,
-            } as React.CSSProperties}
           >
             {timeRemaining}
           </span>
         </div>
         <p
           className={styles.expirationDate}
-          style={{ '--text-muted': TEXT_COLORS.muted } as React.CSSProperties}
         >
           {expiresDate.toLocaleString()}
         </p>
@@ -257,33 +230,22 @@ export function VoucherStep({
       {/* Instructions */}
       <div
         className={styles.instructionsBox}
-        style={{
-          '--bg-tertiary': BG_COLORS.tertiary,
-          '--text-primary': TEXT_COLORS.primary,
-          '--text-secondary': TEXT_COLORS.secondary,
-          '--state-active': STATE_COLORS.active,
-          '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
-        } as React.CSSProperties}
       >
         <p
           className={styles.instructionsTitle}
-          style={{ '--text-primary': TEXT_COLORS.primary } as React.CSSProperties}
         >
           How to complete your payment:
         </p>
         <ol
           className={styles.instructionsList}
-          style={{ '--text-secondary': TEXT_COLORS.secondary } as React.CSSProperties}
         >
           {config.instructions.map((instruction, index) => (
             <li
               key={index}
               className={styles.instructionItem}
-              style={{ '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px` } as React.CSSProperties}
             >
               <span
                 className={styles.instructionNumber}
-                style={{ '--state-active': STATE_COLORS.active } as React.CSSProperties}
               >
                 {index + 1}
               </span>
@@ -298,9 +260,6 @@ export function VoucherStep({
         <button
           onClick={handleViewVoucher}
           className={styles.primaryButton}
-          style={{
-            '--state-success': STATE_COLORS.success,
-          } as React.CSSProperties}
         >
           <svg
             className={styles.buttonIcon}
@@ -321,23 +280,14 @@ export function VoucherStep({
         <button
           onClick={onClose}
           className={styles.secondaryButton}
-          style={{
-            '--bg-tertiary': BG_COLORS.tertiary,
-            '--text-secondary': TEXT_COLORS.secondary,
-            '--border-default': BORDER_COLORS.default,
-          } as React.CSSProperties}
         >
           I'll Pay Later
         </button>
       </div>
-      
+
       {/* Confirmation Note */}
       <p
         className={styles.confirmationNote}
-        style={{
-          '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
-          '--text-muted': TEXT_COLORS.muted,
-        } as React.CSSProperties}
       >
         {config.confirmationNote}
       </p>

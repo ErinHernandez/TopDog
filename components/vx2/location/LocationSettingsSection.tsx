@@ -6,8 +6,6 @@
  */
 
 import { useState } from 'react';
-import { BG_COLORS, TEXT_COLORS, BORDER_COLORS, STATE_COLORS } from '@/components/vx2/core/constants/colors';
-import { SPACING, RADIUS } from '@/components/vx2/core/constants/sizes';
 import { useLocationConsent } from './hooks/useLocationConsent';
 import { useLocationTracking } from './hooks/useLocationTracking';
 import { LocationConsentModal } from './LocationConsentModal';
@@ -36,18 +34,10 @@ export function LocationSettingsSection() {
   return (
     <div
       className={styles.container}
-      style={{
-        '--bg-color': BG_COLORS.tertiary,
-        '--radius-lg': `${RADIUS.lg}px`,
-        '--border-color': BORDER_COLORS.light,
-      } as React.CSSProperties}
     >
       {/* Header */}
       <div
         className={styles.header}
-        style={{
-          '--spacing-lg': `${SPACING.lg}px`,
-        } as React.CSSProperties}
       >
         <div className={styles.headerContent}>
           <div className={styles.iconContainer}>
@@ -78,9 +68,6 @@ export function LocationSettingsSection() {
             onClick={handleRevoke}
             disabled={isRevoking}
             className={`${styles.buttonBase} ${styles.buttonDisable} ${isRevoking ? styles.buttonDisableLoading : ''}`}
-            style={{
-              '--error-color': STATE_COLORS.error,
-            } as React.CSSProperties}
           >
             {isRevoking ? 'Disabling...' : 'Disable'}
           </button>
@@ -88,9 +75,6 @@ export function LocationSettingsSection() {
           <button
             onClick={() => setShowConsentModal(true)}
             className={`${styles.buttonBase} ${styles.buttonEnable}`}
-            style={{
-              '--success-color': STATE_COLORS.success,
-            } as React.CSSProperties}
           >
             Enable
           </button>
@@ -98,11 +82,7 @@ export function LocationSettingsSection() {
       </div>
 
       {/* Content */}
-      <div className={styles.content}
-        style={{
-          '--spacing-lg': `${SPACING.lg}px`,
-        } as React.CSSProperties}
-      >
+      <div className={styles.content}>
         {isGranted ? (
           <>
             {/* Stats */}
@@ -111,11 +91,6 @@ export function LocationSettingsSection() {
             >
               <div
                 className={styles.statCard}
-                style={{
-                  '--bg-secondary': BG_COLORS.secondary,
-                  '--text-primary': TEXT_COLORS.primary,
-                  '--text-secondary': TEXT_COLORS.secondary,
-                } as React.CSSProperties}
               >
                 <div className={styles.statValue}>
                   {userLocations.countries.length}
@@ -126,11 +101,6 @@ export function LocationSettingsSection() {
               </div>
               <div
                 className={styles.statCard}
-                style={{
-                  '--bg-secondary': BG_COLORS.secondary,
-                  '--text-primary': TEXT_COLORS.primary,
-                  '--text-secondary': TEXT_COLORS.secondary,
-                } as React.CSSProperties}
               >
                 <div className={styles.statValue}>
                   {userLocations.states.length}
@@ -145,9 +115,6 @@ export function LocationSettingsSection() {
             <div>
               <h4
                 className={styles.sectionTitle}
-                style={{
-                  '--text-primary': TEXT_COLORS.primary,
-                } as React.CSSProperties}
               >
                 Known Locations
               </h4>
@@ -155,9 +122,6 @@ export function LocationSettingsSection() {
               {knownLocations.length === 0 ? (
                 <p
                   className={styles.emptyState}
-                  style={{
-                    '--text-muted': TEXT_COLORS.muted,
-                  } as React.CSSProperties}
                 >
                   No locations recorded yet
                 </p>
@@ -167,9 +131,6 @@ export function LocationSettingsSection() {
                     <div
                       key={loc.code}
                       className={styles.locationItem}
-                      style={{
-                        '--bg-secondary': BG_COLORS.secondary,
-                      } as React.CSSProperties}
                     >
                       <div className={styles.locationItemContent}>
                         <img
@@ -182,18 +143,12 @@ export function LocationSettingsSection() {
                         />
                         <span
                           className={styles.locationName}
-                          style={{
-                            '--text-primary': TEXT_COLORS.primary,
-                          } as React.CSSProperties}
                         >
                           {getFlagDisplayName(loc.code)}
                         </span>
                         {loc.isTrusted && (
                           <span
                             className={styles.trustedBadge}
-                            style={{
-                              '--success-color': STATE_COLORS.success,
-                            } as React.CSSProperties}
                           >
                             Trusted
                           </span>
@@ -202,10 +157,7 @@ export function LocationSettingsSection() {
 
                       <button
                         onClick={() => loc.isTrusted ? removeTrust(loc.code) : trustLocation(loc.code)}
-                        className={styles.trustButton}
-                        style={{
-                          '--button-text-color': loc.isTrusted ? TEXT_COLORS.muted : STATE_COLORS.success,
-                        } as React.CSSProperties}
+                        className={`${styles.trustButton} ${loc.isTrusted ? styles.trustButtonRemove : styles.trustButtonAdd}`}
                       >
                         {loc.isTrusted ? 'Remove Trust' : 'Trust'}
                       </button>
@@ -218,9 +170,6 @@ export function LocationSettingsSection() {
             {/* Privacy info */}
             <p
               className={styles.privacyNote}
-              style={{
-                '--text-muted': TEXT_COLORS.muted,
-              } as React.CSSProperties}
             >
               Location data is used for account security and customization features.
               Only country/state level is tracked, never precise coordinates.
@@ -230,17 +179,11 @@ export function LocationSettingsSection() {
           <div className={styles.disabledContent}>
             <p
               className={styles.disabledText}
-              style={{
-                '--text-secondary': TEXT_COLORS.secondary,
-              } as React.CSSProperties}
             >
               Enable location tracking to unlock flag customizations and improve account security.
             </p>
             <ul
               className={styles.benefitsList}
-              style={{
-                '--text-muted': TEXT_COLORS.muted,
-              } as React.CSSProperties}
             >
               <li className={styles.benefitItem}>
                 <svg

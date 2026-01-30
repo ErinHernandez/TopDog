@@ -16,9 +16,7 @@
 import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { VariableSizeList as List } from 'react-window';
 import type { DraftPlayer, Position, PlayerSortOption } from '../types';
-import { POSITION_COLORS } from '../constants';
-import { BG_COLORS, TEXT_COLORS } from '../../core/constants/colors';
-import { TOUCH_TARGETS, SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
+import { TOUCH_TARGETS, TYPOGRAPHY } from '../../core/constants/sizes';
 import { cn } from '@/lib/utils';
 import styles from './PlayerList.module.css';
 import PlayerExpandedCard from './PlayerExpandedCard';
@@ -139,8 +137,6 @@ interface FilterButtonProps {
 }
 
 const FilterButton = React.memo(function FilterButton({ position, count, isActive, onToggle }: FilterButtonProps): React.ReactElement {
-  const color = POSITION_COLORS[position];
-
   return (
     <button
       onClick={onToggle}
@@ -150,10 +146,7 @@ const FilterButton = React.memo(function FilterButton({ position, count, isActiv
         styles.filterButton,
         isActive ? styles.filterButtonActive : styles.filterButtonInactive
       )}
-      style={{
-        color: isActive ? color : undefined,
-        borderBottomColor: color,
-      }}
+      data-position={position.toLowerCase()}
     >
       <span>{position}</span>
       <span className={styles.filterCount}>{count}</span>
@@ -180,7 +173,6 @@ const SearchBar = React.memo(function SearchBar({ value, onChange, onClear }: Se
           fill="none"
           stroke="currentColor"
           strokeWidth="2"
-          style={{ color: PLAYER_LIST_COLORS.searchPlaceholder }}
         >
           <circle cx="11" cy="11" r="8" />
           <path d="M21 21l-4.35-4.35" />
@@ -328,7 +320,7 @@ const VirtualizedPlayerList = React.memo(function VirtualizedPlayerList({
   }, [players, expandedPlayerId, isQueued, isMyTurn, onToggleQueue, onRowClick, onDraft, onExpandedClose]);
 
   return (
-    <div ref={containerRef} style={{ flex: 1, minHeight: 0 }}>
+    <div ref={containerRef} className={styles.listContainer}>
       {/* Sticky Header */}
       <div className={styles.headerRow}>
         <div
@@ -381,7 +373,7 @@ const VirtualizedPlayerList = React.memo(function VirtualizedPlayerList({
         initialScrollOffset={initialScrollOffset}
         onScroll={handleScroll}
         overscanCount={5}
-        style={{ scrollbarWidth: 'none' }}
+        className={styles.virtualizedList}
       >
         {Row}
       </List>
@@ -405,8 +397,6 @@ const PlayerRowDiv = React.memo(function PlayerRowDiv({
   onToggleQueue,
   onRowClick,
 }: PlayerRowDivProps): React.ReactElement {
-  const positionColor = POSITION_COLORS[player.position];
-
   return (
     <div
       onClick={onRowClick}
@@ -424,7 +414,7 @@ const PlayerRowDiv = React.memo(function PlayerRowDiv({
             {player.name}
           </div>
           <div className={styles.playerPositionTeam}>
-            <span className={styles.playerPosition} style={{ color: positionColor }}>
+            <span className={styles.playerPosition} data-position={player.position.toLowerCase()}>
               {player.position}
             </span>
             <span>{player.team}</span>
@@ -542,7 +532,7 @@ const PlayerList = React.memo(function PlayerList({
       </div>
 
       {/* Search Bar */}
-      <div style={{ flexShrink: 0 }}>
+      <div className={styles.searchBarWrapper}>
         <SearchBar
           value={searchQuery}
           onChange={onSearchChange}

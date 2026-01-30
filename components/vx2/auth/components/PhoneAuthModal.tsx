@@ -16,8 +16,6 @@
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { cn } from '@/lib/styles';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS, NAVBAR_BLUE } from '../../core/constants/colors';
-import { SPACING, TYPOGRAPHY, Z_INDEX } from '../../core/constants/sizes';
 import { Close, ChevronLeft } from '../../components/icons';
 import { useAuth } from '../hooks/useAuth';
 import { useCountdown } from '../../hooks/ui/useCountdown';
@@ -135,13 +133,9 @@ function PhoneStep({
       {/* Header */}
       <div
         className={authStyles.header}
-        style={{
-          '--header-padding': `${SPACING.md}px ${SPACING.lg}px`,
-        } as React.CSSProperties}
       >
         <h2
           className={authStyles.headerTitle}
-          style={{ '--header-font-size': `${TYPOGRAPHY.fontSize.lg}px` } as React.CSSProperties}
         >
           Sign in with Phone
         </h2>
@@ -150,14 +144,13 @@ function PhoneStep({
           className={authStyles.closeButton}
           aria-label="Close"
         >
-          <Close size={24} color={TEXT_COLORS.muted} />
+          <Close size={24} color="currentColor" />
         </button>
       </div>
       
       {/* Content */}
       <div
         className={authStyles.contentArea}
-        style={{ '--content-padding': `${SPACING.lg}px` } as React.CSSProperties}
       >
         <div className={styles.introSection}>
           <div
@@ -170,11 +163,10 @@ function PhoneStep({
           </div>
           <h3
             className={styles.introTitle}
-            style={{ '--font-size-xl': `${TYPOGRAPHY.fontSize.xl}px` } as React.CSSProperties}
           >
             Enter your phone number
           </h3>
-          <p className={styles.introDescription} style={{ '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px` } as React.CSSProperties}>
+          <p className={styles.introDescription}>
             We&apos;ll send you a verification code
           </p>
         </div>
@@ -184,7 +176,7 @@ function PhoneStep({
           <div
             className={authStyles.errorBanner}
           >
-            <div className={authStyles.errorBannerText} style={{ '--error-color': STATE_COLORS.error } as React.CSSProperties}>
+            <div className={authStyles.errorBannerText}>
               {error}
             </div>
           </div>
@@ -194,7 +186,6 @@ function PhoneStep({
         <div className={styles.phoneInputSection}>
           <label
             className={styles.phoneInputLabel}
-            style={{ '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px` } as React.CSSProperties}
           >
             Phone Number
           </label>
@@ -204,16 +195,12 @@ function PhoneStep({
             <button
               onClick={() => setShowCountryPicker(!showCountryPicker)}
               className={styles.countrySelector}
-              style={{
-                '--border-default': BORDER_COLORS.default,
-                '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
-              } as React.CSSProperties}
             >
               <span className={styles.countrySelectorFlag}>{selectedCountry.flag}</span>
               <span className={styles.countrySelectorCode}>
                 {selectedCountry.dialCode}
               </span>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={TEXT_COLORS.muted} strokeWidth="2" className={styles.countrySelectorChevron}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={styles.countrySelectorChevron}>
                 <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </button>
@@ -226,13 +213,7 @@ function PhoneStep({
               placeholder="(555) 123-4567"
               autoComplete="tel"
               disabled={isLoading}
-              className={styles.phoneNumberInput}
-              style={{
-                '--text-primary': TEXT_COLORS.primary,
-                '--border-default': BORDER_COLORS.default,
-                '--font-size-base': `${TYPOGRAPHY.fontSize.base}px`,
-                opacity: isLoading ? 0.5 : 1,
-              } as React.CSSProperties}
+              className={cn(styles.phoneNumberInput, isLoading && styles.phoneInputLoading)}
             />
           </div>
         </div>
@@ -241,22 +222,14 @@ function PhoneStep({
         {showCountryPicker && (
           <div
             className={styles.countryPickerDropdown}
-            style={{
-              '--bg-secondary': BG_COLORS.tertiary,
-              '--border-default': BORDER_COLORS.default,
-            } as React.CSSProperties}
           >
-            <div className={styles.countrySearchBox} style={{ '--spacing-sm': `${SPACING.sm}px` } as React.CSSProperties}>
+            <div className={styles.countrySearchBox}>
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search countries..."
                 className={styles.countrySearchInput}
-                style={{
-                  '--text-primary': TEXT_COLORS.primary,
-                  '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
-                } as React.CSSProperties}
               />
             </div>
             <div
@@ -271,11 +244,6 @@ function PhoneStep({
                     setSearchQuery('');
                   }}
                   className={cn(styles.countryItem, countryCode === country.code && styles.countryItemSelected)}
-                  style={{
-                    '--text-primary': TEXT_COLORS.primary,
-                    '--text-muted': TEXT_COLORS.muted,
-                    '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
-                  } as React.CSSProperties}
                 >
                   <span className={styles.countryItemFlag}>{country.flag}</span>
                   <span
@@ -296,12 +264,12 @@ function PhoneStep({
         <div
           className={styles.infoBox}
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={TEXT_COLORS.muted} strokeWidth="2" className={styles.infoIcon}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={styles.infoIcon}>
             <circle cx="12" cy="12" r="10" strokeLinecap="round" strokeLinejoin="round"/>
             <line x1="12" y1="16" x2="12" y2="12" strokeLinecap="round" strokeLinejoin="round"/>
             <line x1="12" y1="8" x2="12.01" y2="8" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
-          <p className={styles.infoText} style={{ '--text-muted': TEXT_COLORS.muted, '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px` } as React.CSSProperties}>
+          <p className={styles.infoText}>
             Message and data rates may apply. By continuing, you agree to receive SMS messages for verification.
           </p>
         </div>
@@ -310,7 +278,6 @@ function PhoneStep({
       {/* Footer */}
       <div
         className={cn(authStyles.footer, authStyles.footerWithBorder)}
-        style={{ '--footer-padding': `${SPACING.lg}px`, '--border-default': BORDER_COLORS.default } as React.CSSProperties}
       >
         <button
           onClick={onContinue}
@@ -320,9 +287,6 @@ function PhoneStep({
             canContinue ? styles.actionButtonEnabled : styles.actionButtonDisabled,
             isLoading && styles.actionButtonLoading
           )}
-          style={{
-            '--font-size-lg': `${TYPOGRAPHY.fontSize.lg}px`,
-          } as React.CSSProperties}
         >
           {isLoading ? (
             <>
@@ -342,7 +306,6 @@ function PhoneStep({
           >
             <p
               className={styles.switchAuthText}
-              style={{ '--text-muted': TEXT_COLORS.muted, '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px` } as React.CSSProperties}
             >
               Prefer email?{' '}
               <button
@@ -444,16 +407,12 @@ function VerifyStep({
       {/* Header */}
       <div
         className={authStyles.header}
-        style={{
-          '--header-padding': `${SPACING.md}px ${SPACING.lg}px`,
-        } as React.CSSProperties}
       >
         <button onClick={onBack} className={authStyles.backButton} aria-label="Back">
-          <ChevronLeft size={24} color={TEXT_COLORS.muted} />
+          <ChevronLeft size={24} color="currentColor" />
         </button>
         <h2
           className={authStyles.headerTitle}
-          style={{ '--header-font-size': `${TYPOGRAPHY.fontSize.lg}px` } as React.CSSProperties}
         >
           Verify Phone
         </h2>
@@ -471,16 +430,14 @@ function VerifyStep({
 
         <h3
           className={styles.verifyTitle}
-          style={{ '--font-size-xl': `${TYPOGRAPHY.fontSize.xl}px` } as React.CSSProperties}
         >
           Enter verification code
         </h3>
         <p
           className={styles.verifyDescription}
-          style={{ '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px` } as React.CSSProperties}
         >
           We sent a 6-digit code to<br />
-          <span className={styles.verifyMaskedPhone} style={{ '--text-primary': TEXT_COLORS.primary } as React.CSSProperties}>{maskedPhone}</span>
+          <span className={styles.verifyMaskedPhone}>{maskedPhone}</span>
         </p>
         
         {/* OTP Input */}
@@ -503,13 +460,6 @@ function VerifyStep({
                 digit && styles.otpInputFilled,
                 error && styles.otpInputError
               )}
-              style={{
-                '--font-size-2xl': `${TYPOGRAPHY.fontSize['2xl']}px`,
-                '--text-primary': TEXT_COLORS.primary,
-                '--focus-border': NAVBAR_BLUE.solid,
-                '--error-color': STATE_COLORS.error,
-                '--border-default': BORDER_COLORS.default,
-              } as React.CSSProperties}
             />
           ))}
         </div>
@@ -519,7 +469,7 @@ function VerifyStep({
           <div
             className={authStyles.errorBanner}
           >
-            <div className={authStyles.errorBannerText} style={{ '--error-color': STATE_COLORS.error } as React.CSSProperties}>
+            <div className={authStyles.errorBannerText}>
               {error}
             </div>
           </div>
@@ -530,26 +480,24 @@ function VerifyStep({
           <div className={styles.loadingIndicator}>
             <div
               className={styles.spinner}
-              style={{ '--focus-border': NAVBAR_BLUE.solid } as React.CSSProperties}
             />
-            <span className={styles.loadingText} style={{ '--text-secondary': TEXT_COLORS.secondary } as React.CSSProperties}>Verifying...</span>
+            <span className={styles.loadingText}>Verifying...</span>
           </div>
         )}
         
         {/* Resend */}
         <div className={styles.resendSection}>
-          <p className={styles.resendLabel} style={{ '--text-muted': TEXT_COLORS.muted, '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px` } as React.CSSProperties}>
+          <p className={styles.resendLabel}>
             Didn&apos;t receive it?
           </p>
           {cooldownActive ? (
-            <p className={styles.resendCooldown} style={{ '--text-secondary': TEXT_COLORS.secondary, '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px` } as React.CSSProperties}>
+            <p className={styles.resendCooldown}>
               Resend in {resendCooldown}s
             </p>
           ) : (
             <button
               onClick={handleResend}
               className={styles.resendButton}
-              style={{ '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px` } as React.CSSProperties}
             >
               Resend Code
             </button>
@@ -574,21 +522,19 @@ function SuccessStep({ onClose }: SuccessStepProps): React.ReactElement {
       <div
         className={authStyles.iconCircleSuccess}
       >
-        <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke={STATE_COLORS.success} strokeWidth="2.5">
+        <svg width="40" height="40" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" className={styles.successCheckmark}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
         </svg>
       </div>
 
       <h2
         className={styles.successTitle}
-        style={{ '--font-size-2xl': `${TYPOGRAPHY.fontSize['2xl']}px` } as React.CSSProperties}
       >
         Phone Verified!
       </h2>
 
       <p
         className={styles.successDescription}
-        style={{ '--font-size-lg': `${TYPOGRAPHY.fontSize.lg}px` } as React.CSSProperties}
       >
         You&apos;re all set
       </p>
@@ -596,9 +542,6 @@ function SuccessStep({ onClose }: SuccessStepProps): React.ReactElement {
       <button
         onClick={onClose}
         className={styles.successButton}
-        style={{
-          '--font-size-lg': `${TYPOGRAPHY.fontSize.lg}px`,
-        } as React.CSSProperties}
       >
         Continue
       </button>
@@ -708,7 +651,6 @@ export function PhoneAuthModal({
       className={styles.modalRoot}
       style={{
         '--content-top-inset': '60px',
-        '--modal-bg': BG_COLORS.secondary,
         '--z-modal': Z_INDEX.modal,
       } as React.CSSProperties}
     >

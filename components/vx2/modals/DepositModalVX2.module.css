@@ -14,8 +14,27 @@
   border-radius: 0.375rem;
   font-size: 0.75rem;
   font-weight: bold;
-  background-color: var(--brand-color);
   color: #fff;
+}
+
+.brand-visa {
+  background-color: #1A1F71;
+}
+
+.brand-mastercard {
+  background-color: #EB001B;
+}
+
+.brand-amex {
+  background-color: #006FCF;
+}
+
+.brand-discover {
+  background-color: #FF6000;
+}
+
+.brand-default {
+  background-color: var(--text-muted);
 }
 
 /* ============================================================================
@@ -120,14 +139,19 @@
   gap: 0.75rem;
   padding: 0.75rem;
   border-radius: 0.5rem;
-  border: 1px solid var(--method-border);
-  background-color: var(--method-bg);
+  border: 1px solid var(--border-default);
+  background-color: var(--bg-tertiary);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .methodButton:hover {
   opacity: 0.95;
+}
+
+.methodButtonSelected {
+  background-color: rgba(0, 208, 132, 0.2);
+  border-color: var(--color-state-active, #00d084);
 }
 
 .methodButtonContent {
@@ -149,9 +173,13 @@
   padding: 0.125rem 0.5rem;
   border-radius: 0.25rem;
   font-size: 0.75rem;
-  background-color: var(--state-active);
+  background-color: var(--color-state-active, #00d084);
   color: #000;
   white-space: nowrap;
+}
+
+.defaultBadge[data-default] {
+  display: inline-block;
 }
 
 .addPaymentButton {
@@ -161,14 +189,19 @@
   gap: 0.75rem;
   padding: 0.75rem;
   border-radius: 0.5rem;
-  border: 1px solid var(--add-payment-border);
-  background-color: var(--add-payment-bg);
+  border: 1px solid var(--border-default);
+  background-color: var(--bg-tertiary);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .addPaymentButton:hover {
   opacity: 0.95;
+}
+
+.addPaymentButtonActive {
+  background-color: rgba(0, 208, 132, 0.2);
+  border-color: var(--color-state-active, #00d084);
 }
 
 .addPaymentIcon {
@@ -178,7 +211,7 @@
   width: 2rem;
   height: 1.25rem;
   border-radius: 0.375rem;
-  background-color: var(--state-active);
+  background-color: var(--color-state-active, #00d084);
   color: #000;
 }
 
@@ -210,7 +243,7 @@
   width: 1rem;
   height: 1rem;
   border-radius: 0.25rem;
-  accent-color: var(--state-active);
+  accent-color: var(--color-state-active, #00d084);
 }
 
 .saveCardText {
@@ -301,6 +334,16 @@
   color: var(--text-primary);
 }
 
+.summaryPaymentMethod {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.summaryConversionFree {
+  font-weight: 600;
+  color: var(--color-state-success, #10b981);
+}
+
 .summaryDivider {
   border-top: 1px solid var(--border-default);
   padding-top: 0.75rem;
@@ -314,7 +357,7 @@
 .totalValue {
   font-weight: bold;
   font-size: 1.125rem;
-  color: var(--state-success);
+  color: var(--color-state-success, #10b981);
 }
 
 .conversionNote {
@@ -374,6 +417,11 @@
   cursor: not-allowed;
 }
 
+.depositButtonProcessing {
+  background-color: var(--bg-tertiary);
+  color: var(--text-muted);
+}
+
 .processingSpinner {
   display: inline-block;
   width: 1rem;
@@ -410,19 +458,39 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--result-icon-bg);
 }
 
-.resultIcon svg {
+.resultIconSuccess {
+  background-color: rgba(16, 185, 129, 0.2);
+}
+
+.resultIconSuccess svg {
   width: 2rem;
   height: 2rem;
-  color: var(--result-icon-color);
+  color: var(--color-state-success, #10b981);
+}
+
+.resultIconError {
+  background-color: rgba(239, 68, 68, 0.2);
+}
+
+.resultIconError svg {
+  width: 2rem;
+  height: 2rem;
+  color: var(--color-state-error, #ef4444);
 }
 
 .resultTitle {
   font-size: var(--font-xl, 1.25rem);
   font-weight: 600;
-  color: var(--result-title-color);
+}
+
+.resultTitleSuccess {
+  color: var(--color-state-success, #10b981);
+}
+
+.resultTitleError {
+  color: var(--color-state-error, #ef4444);
 }
 
 .resultMessage {
@@ -449,7 +517,7 @@
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
-  background-color: var(--state-active);
+  background-color: var(--color-state-active, #00d084);
   color: #000;
 }
 
@@ -595,7 +663,7 @@
 }
 
 .errorIconContent {
-  color: var(--state-error);
+  color: var(--color-state-error, #ef4444);
   font-size: 1.5rem;
 }
 
@@ -634,7 +702,7 @@
 .errorRetryButton {
   padding: 0.5rem 1rem;
   border-radius: 0.5rem;
-  background-color: var(--state-info);
+  background-color: var(--color-state-info, #3b82f6);
   border: none;
   color: white;
   cursor: pointer;

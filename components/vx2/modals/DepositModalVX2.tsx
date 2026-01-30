@@ -19,8 +19,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useStripe, useElements, PaymentElement, ExpressCheckoutElement } from '@stripe/react-stripe-js';
 import type { StripeExpressCheckoutElementConfirmEvent, AvailablePaymentMethods } from '@stripe/stripe-js';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY, Z_INDEX } from '../core/constants/sizes';
 import { Close, ChevronLeft, Plus } from '../components/icons';
 import { formatSmallestUnit, toSmallestUnit, toDisplayAmount } from '../utils/formatting';
 import { StripeProvider } from '../providers/StripeProvider';
@@ -83,20 +81,17 @@ const MAX_AMOUNT = 10000;
 // ============================================================================
 
 function CardBrandIcon({ brand }: { brand: string }): React.ReactElement {
-  const brandColors: Record<string, string> = {
-    visa: '#1A1F71',
-    mastercard: '#EB001B',
-    amex: '#006FCF',
-    discover: '#FF6000',
+  const brandMap: Record<string, string> = {
+    visa: 'visa',
+    mastercard: 'mastercard',
+    amex: 'amex',
+    discover: 'discover',
   };
 
-  const color = brandColors[brand.toLowerCase()] || TEXT_COLORS.muted;
+  const brandKey = brandMap[brand.toLowerCase()] || 'default';
 
   return (
-    <div
-      className={styles.cardBrandIcon}
-      style={{ '--brand-color': color } as React.CSSProperties}
-    >
+    <div className={cn(styles.cardBrandIcon, styles[`brand-${brandKey}`])}>
       {brand.slice(0, 4).toUpperCase()}
     </div>
   );
@@ -161,13 +156,7 @@ function AmountStep({
 
       {/* Currency Exchange Notice for non-USD deposits */}
       {showCurrencyExchangeNotice && !showFXWarning && (
-        <div
-          className={styles.currencyNotice}
-          style={{
-            '--info-bg': `${STATE_COLORS.info}15`,
-            '--info-border': `${STATE_COLORS.info}40`,
-          } as React.CSSProperties}
-        >
+        <div className={styles.currencyNotice}>
           <p className={styles.currencyNoticeTitle}>
             Your deposit will be converted to USD at no extra cost to you.
             Your account balance is always kept in USD.
@@ -193,12 +182,7 @@ function AmountStep({
       <button
         onClick={onContinue}
         disabled={!isValid}
-        className={cn(styles.continueButton, isValid && 'opacity-100')}
-        style={{
-          '--btn-bg': isValid ? STATE_COLORS.active : BG_COLORS.tertiary,
-          '--btn-text': isValid ? '#000' : TEXT_COLORS.muted,
-          '--btn-opacity': isValid ? '1' : '0.5',
-        } as React.CSSProperties}
+        className={styles.continueButton}
       >
         Continue with ${amountUSD}
       </button>
@@ -282,9 +266,9 @@ function MethodStep({
         {/* Divider - only show if wallets are available */}
         {hasWallets && (
           <div className={styles.dividerContainer}>
-            <div className={styles.dividerLine} style={{ '--border-default': BORDER_COLORS.default } as React.CSSProperties} />
+            <div className={styles.dividerLine} />
             <span className={styles.dividerText}>or pay with</span>
-            <div className={styles.dividerLine} style={{ '--border-default': BORDER_COLORS.default } as React.CSSProperties} />
+            <div className={styles.dividerLine} />
           </div>
         )}
 
@@ -298,15 +282,10 @@ function MethodStep({
               <button
                 key={method.id}
                 onClick={() => onSelectMethod(method.id)}
-                className={styles.methodButton}
-                style={{
-                  '--method-bg': selectedMethodId === method.id
-                    ? `${STATE_COLORS.active}20`
-                    : BG_COLORS.tertiary,
-                  '--method-border': selectedMethodId === method.id
-                    ? STATE_COLORS.active
-                    : BORDER_COLORS.default,
-                } as React.CSSProperties}
+                className={cn(
+                  styles.methodButton,
+                  selectedMethodId === method.id && styles.methodButtonSelected
+                )}
               >
                 <CardBrandIcon brand={method.card.brand} />
                 <div className={styles.methodButtonContent}>
@@ -318,7 +297,7 @@ function MethodStep({
                   </p>
                 </div>
                 {method.isDefault && (
-                  <span className={styles.defaultBadge}>
+                  <span className={styles.defaultBadge} data-default>
                     Default
                   </span>
                 )}
@@ -330,16 +309,12 @@ function MethodStep({
         {/* Add New Payment Method */}
         <button
           onClick={onUseNewCard}
-          className={styles.addPaymentButton}
-          style={{
-            '--add-payment-bg': useNewCard ? `${STATE_COLORS.active}20` : BG_COLORS.tertiary,
-            '--add-payment-border': useNewCard ? STATE_COLORS.active : BORDER_COLORS.default,
-          } as React.CSSProperties}
+          className={cn(
+            styles.addPaymentButton,
+            useNewCard && styles.addPaymentButtonActive
+          )}
         >
-          <div
-            className={styles.addPaymentIcon}
-            style={{ '--state-active': STATE_COLORS.active } as React.CSSProperties}
-          >
+          <div className={styles.addPaymentIcon}>
             <span>
               <Plus className="w-3 h-3" />
             </span>
@@ -349,10 +324,7 @@ function MethodStep({
 
         {useNewCard && (
           <div className={styles.newCardSection}>
-            <div
-              className={styles.paymentElementContainer}
-              style={{ '--bg-tertiary': BG_COLORS.tertiary } as React.CSSProperties}
-            >
+            <div className={styles.paymentElementContainer}>
               {/* PaymentElement shows Card, PayPal, Link tabs based on what's enabled */}
               <PaymentElement
                 options={{
@@ -373,7 +345,6 @@ function MethodStep({
                 checked={saveNewCard}
                 onChange={onToggleSaveCard}
                 className={styles.saveCardCheckbox}
-                style={{ '--state-active': STATE_COLORS.active } as React.CSSProperties}
               />
               <span className={styles.saveCardText}>
                 Save this payment method for future deposits
@@ -387,11 +358,6 @@ function MethodStep({
         <button
           onClick={onBack}
           className={styles.backButton}
-          style={{
-            '--bg-tertiary': BG_COLORS.tertiary,
-            '--text-primary': TEXT_COLORS.primary,
-            '--border-default': BORDER_COLORS.default,
-          } as React.CSSProperties}
         >
           Back
         </button>
@@ -399,11 +365,6 @@ function MethodStep({
           onClick={onContinue}
           disabled={!canContinue || isLoading}
           className={styles.nextButton}
-          style={{
-            '--next-btn-bg': canContinue && !isLoading ? STATE_COLORS.active : BG_COLORS.tertiary,
-            '--next-btn-text': canContinue && !isLoading ? '#000' : TEXT_COLORS.muted,
-            '--next-btn-opacity': canContinue && !isLoading ? '1' : '0.5',
-          } as React.CSSProperties}
         >
           {isLoading ? 'Loading...' : 'Continue'}
         </button>
@@ -440,10 +401,7 @@ function ConfirmStep({
           Confirm Deposit
         </h3>
 
-        <div
-          className={styles.summaryCard}
-          style={{ '--bg-tertiary': BG_COLORS.tertiary } as React.CSSProperties}
-        >
+        <div className={styles.summaryCard}>
           <div className={styles.summaryRow}>
             <span className={styles.summaryLabel}>Amount</span>
             <span className={styles.summaryValue}>
@@ -452,18 +410,15 @@ function ConfirmStep({
           </div>
           <div className={styles.summaryRow}>
             <span className={styles.summaryLabel}>Payment Method</span>
-            <span style={{ color: TEXT_COLORS.primary }}>{paymentMethod}</span>
+            <span className={styles.summaryPaymentMethod}>{paymentMethod}</span>
           </div>
           {isNonUSD && (
             <div className={styles.summaryRow}>
               <span className={styles.summaryLabel}>Currency Conversion</span>
-              <span style={{ color: STATE_COLORS.success }}>Free</span>
+              <span className={styles.summaryConversionFree}>Free</span>
             </div>
           )}
-          <div
-            className={cn(styles.summaryDivider, styles.summaryRow)}
-            style={{ '--border-default': BORDER_COLORS.default } as React.CSSProperties}
-          >
+          <div className={cn(styles.summaryDivider, styles.summaryRow)}>
             <span className={styles.totalLabel}>Total</span>
             <span className={styles.totalValue}>
               {formatSmallestUnit(amount, { currency })}
@@ -482,23 +437,16 @@ function ConfirmStep({
           onClick={onBack}
           disabled={isProcessing}
           className={styles.confirmBackButton}
-          style={{
-            '--bg-tertiary': BG_COLORS.tertiary,
-            '--text-primary': TEXT_COLORS.primary,
-            '--border-default': BORDER_COLORS.default,
-            '--confirm-btn-opacity': isProcessing ? '0.5' : '1',
-          } as React.CSSProperties}
         >
           Back
         </button>
         <button
           onClick={onConfirm}
           disabled={isProcessing}
-          className={styles.depositButton}
-          style={{
-            '--deposit-btn-bg': isProcessing ? BG_COLORS.tertiary : STATE_COLORS.success,
-            '--deposit-btn-text': isProcessing ? TEXT_COLORS.muted : '#fff',
-          } as React.CSSProperties}
+          className={cn(
+            styles.depositButton,
+            isProcessing && styles.depositButtonProcessing
+          )}
         >
           {isProcessing ? (
             <>
@@ -533,13 +481,10 @@ function ResultStep({
 }: ResultStepProps): React.ReactElement {
   return (
     <div className={styles.resultContainer}>
-      <div
-        className={styles.resultIcon}
-        style={{
-          '--result-icon-bg': success ? `${STATE_COLORS.success}20` : `${STATE_COLORS.error}20`,
-          '--result-icon-color': success ? STATE_COLORS.success : STATE_COLORS.error,
-        } as React.CSSProperties}
-      >
+      <div className={cn(
+        styles.resultIcon,
+        success ? styles.resultIconSuccess : styles.resultIconError
+      )}>
         {success ? (
           <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -552,12 +497,10 @@ function ResultStep({
       </div>
 
       <div>
-        <h3
-          className={styles.resultTitle}
-          style={{
-            '--result-title-color': success ? STATE_COLORS.success : STATE_COLORS.error,
-          } as React.CSSProperties}
-        >
+        <h3 className={cn(
+          styles.resultTitle,
+          success ? styles.resultTitleSuccess : styles.resultTitleError
+        )}>
           {success ? 'Deposit Successful!' : 'Deposit Failed'}
         </h3>
 
@@ -588,7 +531,6 @@ function ResultStep({
       <button
         onClick={onClose}
         className={styles.resultButton}
-        style={{ '--state-active': STATE_COLORS.active } as React.CSSProperties}
       >
         {success ? 'Done' : 'Try Again'}
       </button>
@@ -920,10 +862,7 @@ function DepositModalContent({
   if (!isOpen) return null;
 
   return (
-    <div
-      className={styles.modalOverlay}
-      style={{ '--z-modal': Z_INDEX.modal } as React.CSSProperties}
-    >
+    <div className={styles.modalOverlay}>
       {/* Backdrop */}
       <div
         className={styles.backdrop}
@@ -931,15 +870,9 @@ function DepositModalContent({
       />
 
       {/* Modal */}
-      <div
-        className={styles.modalContent}
-        style={{ '--bg-secondary': BG_COLORS.secondary } as React.CSSProperties}
-      >
+      <div className={styles.modalContent}>
         {/* Header */}
-        <div
-          className={styles.modalHeader}
-          style={{ '--border-default': BORDER_COLORS.default } as React.CSSProperties}
-        >
+        <div className={styles.modalHeader}>
           <div className={styles.headerLeft}>
             {step !== 'amount' && step !== 'success' && step !== 'error' && (
               <button
@@ -1171,21 +1104,12 @@ export function DepositModalVX2(props: DepositModalVX2Props): React.ReactElement
   // Show loading or error state
   if (!clientSecret || isCreatingIntent || error) {
     return (
-      <div
-        className={styles.loadingOverlay}
-        style={{ '--z-modal': Z_INDEX.modal } as React.CSSProperties}
-      >
+      <div className={styles.loadingOverlay}>
         <div className={styles.loadingBackdrop} onClick={onClose} />
-        <div
-          className={styles.loadingBox}
-          style={{ '--bg-secondary': BG_COLORS.secondary } as React.CSSProperties}
-        >
+        <div className={styles.loadingBox}>
           {error ? (
             <div className={styles.errorContainer}>
-              <div
-                className={styles.errorIcon}
-                style={{ '--error-bg': STATE_COLORS.error + '20' } as React.CSSProperties}
-              >
+              <div className={styles.errorIcon}>
                 <span className={styles.errorIconContent}>!</span>
               </div>
               <div>
@@ -1196,14 +1120,12 @@ export function DepositModalVX2(props: DepositModalVX2Props): React.ReactElement
                 <button
                   onClick={onClose}
                   className={styles.errorCancelButton}
-                  style={{ '--border-subtle': BORDER_COLORS.subtle } as React.CSSProperties}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleRetry}
                   className={styles.errorRetryButton}
-                  style={{ '--state-info': STATE_COLORS.info } as React.CSSProperties}
                 >
                   Try Again
                 </button>

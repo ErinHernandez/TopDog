@@ -5,7 +5,6 @@
  *
  * Architecture:
  * - Solid card background (no full-bleed image)
- * - TournamentCardLogo: Logo image inside card (not background)
  * - TournamentTitle: Title display with typography
  * - TournamentProgressBar: Entry progress indicator
  * - TournamentJoinButton: Primary action button
@@ -29,7 +28,6 @@ import { useInPhoneFrame } from '../../../../lib/inPhoneFrameContext';
 
 // Atomic components
 import {
-  TournamentCardLogo,
   TournamentTitle,
   TournamentProgressBar,
   TournamentJoinButton,
@@ -41,10 +39,8 @@ import LobbyTabSandboxContent from './LobbyTabSandboxContent';
 import { EmptyState, ErrorState } from '../../../ui';
 
 // Constants
-import { CARD_SPACING_V3 } from './constants/cardSpacingV3';
 import { LOBBY_TAB_SANDBOX_SPEC, LOBBY_TAB_CURRENT_ITERATION } from './constants/lobbyTabSandboxSpec';
 import { useWorkingLobbyConfig } from './workingLobbyConfig';
-import { BG_COLORS } from '../../core/constants/colors';
 
 // Modal
 import JoinTournamentModal from './JoinTournamentModal';
@@ -70,8 +66,6 @@ const SPEC = LOBBY_TAB_SANDBOX_SPEC;
  * Card visual constants
  */
 const CARD_VISUALS = {
-  /** Logo image path (public) — used as logo inside card, not background */
-  logoImage: '/tournament_card_background.png',
   /** Card background (solid color only; no full-bleed image) */
   backgroundFallback: '#0a0a1a',
   /** Default border color */
@@ -387,7 +381,6 @@ export default function LobbyTabVX2({
               className={styles.contentPadding}
             >
               <div className={styles.logoSection}>
-                <TournamentCardLogo src={CARD_VISUALS.logoImage} alt="Tournament logo" maxHeight={60} />
                 <div className={styles.titleWrapper}>
                   <TournamentTitle title={featuredTournament.title} fontSize={38} />
                 </div>

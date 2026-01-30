@@ -18,8 +18,6 @@
 
 import React, { useRef, useEffect, useMemo, useCallback, useState } from 'react';
 import type { DraftPick, Participant, Position } from '../types';
-import { POSITION_COLORS } from '../constants';
-import { BG_COLORS, TEXT_COLORS } from '../../core/constants/colors';
 import { useImageShare } from '../hooks/useImageShare';
 import { Share } from '../../components/icons/actions/Share';
 import ShareOptionsModal from './ShareOptionsModal';
@@ -130,10 +128,6 @@ interface PickSlot {
 // HELPER FUNCTIONS
 // ============================================================================
 
-function getPositionColor(position: string): string {
-  return POSITION_COLORS[position as Position] || '#6b7280';
-}
-
 function formatPickNumber(pickNumber: number, teamCount: number): string {
   // Guard against division by zero
   if (teamCount < 1) {
@@ -165,7 +159,6 @@ const TeamHeader = React.memo(function TeamHeader({
   positionCounts,
   isOnTheClock,
 }: TeamHeaderProps): React.ReactElement {
-  const borderColor = isUser ? userBorderColor : (isOnTheClock ? '#6B7280' : '#6B7280');
   const totalPicks = Object.values(positionCounts).reduce((sum, count) => sum + count, 0);
   const displayName = participant.name?.length > BOARD_PX.headerMaxChars
     ? participant.name.substring(0, BOARD_PX.headerMaxChars)
@@ -175,15 +168,15 @@ const TeamHeader = React.memo(function TeamHeader({
     <div
       className={styles.teamHeader}
       style={{
-        borderColor: borderColor,
-      }}
+        '--team-header-border-color': userBorderColor,
+      } as React.CSSProperties & { '--team-header-border-color': string }}
     >
       {/* Username Header */}
       <div
         className={styles.teamHeaderUsername}
         style={{
-          backgroundColor: borderColor,
-        }}
+          '--team-header-username-bg': userBorderColor,
+        } as React.CSSProperties & { '--team-header-username-bg': string }}
       >
         {displayName}
       </div>
@@ -214,10 +207,10 @@ const TeamHeader = React.memo(function TeamHeader({
                       idx === arr.length - 1 && styles.trackerSegmentLast,
                       idx > 0 && idx < arr.length - 1 && styles.trackerSegmentMiddle,
                     )}
+                    data-position={position.toLowerCase()}
                     style={{
-                      width: `${(positionCounts[position] / totalPicks) * 100}%`,
-                      backgroundColor: getPositionColor(position),
-                    }}
+                      '--tracker-segment-width': `${(positionCounts[position] / totalPicks) * 100}%`,
+                    } as React.CSSProperties & { '--tracker-segment-width': string }}
                   />
                 ))}
             </div>
@@ -250,15 +243,11 @@ const PickCell = React.memo(function PickCell({
   const { pick, isUserPick, isCurrentPick, pickNumber, round } = pickData;
   const { preferences } = useCustomizationPreferences();
 
-  // Determine cell styling
+  // Determine cell styling (only for non-position-based styles)
   const getCellStyle = (): React.CSSProperties => {
+    // Picked cells use CSS data-position for position colors
     if (pick) {
-      const posColor = getPositionColor(pick.player.position);
-      // All picked cells use position color border
-      return {
-        borderColor: posColor,
-        backgroundColor: `${posColor}20`,
-      };
+      return {};
     }
 
     if (isUserPick) {
@@ -291,7 +280,11 @@ const PickCell = React.memo(function PickCell({
   );
 
   return (
-    <div className={cellClassName} style={getCellStyle()}>
+    <div
+      className={cellClassName}
+      style={getCellStyle()}
+      data-position={pick ? pick.player.position.toLowerCase() : undefined}
+    >
       {/* Overlay layer for user's unpicked cells */}
       {isUserPick && !pick && preferences?.overlayEnabled && (
         <div
@@ -517,8 +510,8 @@ const DraftBoard = React.memo(function DraftBoard({
             <div
               className={styles.headersRow}
               style={{
-                minWidth: gridMinWidth,
-              }}
+                '--headers-row-min-width': `${gridMinWidth}px`,
+              } as React.CSSProperties & { '--headers-row-min-width': string }}
             >
               {participants.map((participant, index) => (
                 <TeamHeader
@@ -542,8 +535,8 @@ const DraftBoard = React.memo(function DraftBoard({
                 data-round={roundData.round}
                 className={styles.gridRow}
                 style={{
-                  minWidth: gridMinWidth,
-                }}
+                  '--grid-row-min-width': `${gridMinWidth}px`,
+                } as React.CSSProperties & { '--grid-row-min-width': string }}
               >
                 {roundData.picks.map((pickData) => (
                   <PickCell

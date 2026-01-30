@@ -10,12 +10,10 @@
  * - Exchange rate transparency notice
  * - Explanation of $25 increment recommendation
  *
- * Migrated to CSS Modules for CSP compliance.
+ * Migrated to Zero-Runtime CSS for CSP compliance.
  */
 
 import React, { useCallback, useMemo } from 'react';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY, TOUCH_TARGETS } from '../core/constants/sizes';
 import { Plus, Minus } from './icons';
 import { cn } from '@/lib/styles';
 import styles from './AmountStepper.module.css';
@@ -132,24 +130,8 @@ export function AmountStepper({
     onChange(usdAmount);
   }, [disabled, onChange]);
 
-  // CSS custom properties for dynamic values
-  const containerStyle: React.CSSProperties = {
-    '--info-bg': `${STATE_COLORS.info}12`,
-    '--info-border': `${STATE_COLORS.info}30`,
-    '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
-    '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
-    '--amount-font-size': `${TYPOGRAPHY.fontSize['3xl']}px`,
-    '--text-primary': TEXT_COLORS.primary,
-    '--text-secondary': TEXT_COLORS.secondary,
-    '--text-muted': TEXT_COLORS.muted,
-    '--button-size': `${TOUCH_TARGETS.comfort}px`,
-    '--active-color': STATE_COLORS.active,
-    '--border-default': BORDER_COLORS.default,
-    '--border-light': BORDER_COLORS.light,
-  } as React.CSSProperties;
-
   return (
-    <div className={styles.container} style={containerStyle}>
+    <div className={styles.container}>
       {/* Explanation Banner */}
       <div className={styles.explanationBanner}>
         <p className={styles.explanationText}>
@@ -169,18 +151,9 @@ export function AmountStepper({
               styles.stepperButton,
               isAtMin && styles.stepperButtonDisabled
             )}
-            style={{
-              '--button-bg': isAtMin
-                ? 'rgba(255, 255, 255, 0.05)'
-                : 'rgba(255, 255, 255, 0.1)',
-              '--button-border': isAtMin ? BORDER_COLORS.light : BORDER_COLORS.default,
-            } as React.CSSProperties}
             aria-label="Decrease amount by $25"
           >
-            <Minus
-              size={24}
-              color={isAtMin ? TEXT_COLORS.muted : TEXT_COLORS.primary}
-            />
+            <Minus size={24} />
           </button>
 
           {/* Amount Display */}
@@ -211,18 +184,9 @@ export function AmountStepper({
               !isAtMax && styles.stepperButtonIncrement,
               isAtMax && styles.stepperButtonDisabled
             )}
-            style={{
-              '--button-bg': isAtMax
-                ? 'rgba(255, 255, 255, 0.05)'
-                : STATE_COLORS.active,
-              '--button-border': isAtMax ? BORDER_COLORS.light : STATE_COLORS.active,
-            } as React.CSSProperties}
             aria-label="Increase amount by $25"
           >
-            <Plus
-              size={24}
-              color={isAtMax ? TEXT_COLORS.muted : '#000'}
-            />
+            <Plus size={24} />
           </button>
         </div>
 
@@ -257,13 +221,6 @@ export function AmountStepper({
                   styles.quickSelectChip,
                   isSelected && styles.quickSelectChipSelected
                 )}
-                style={{
-                  '--chip-bg': isSelected
-                    ? STATE_COLORS.active
-                    : 'rgba(255, 255, 255, 0.05)',
-                  '--chip-color': isSelected ? '#000' : TEXT_COLORS.primary,
-                  '--chip-border': isSelected ? STATE_COLORS.active : BORDER_COLORS.default,
-                } as React.CSSProperties}
               >
                 ${usd}
               </button>

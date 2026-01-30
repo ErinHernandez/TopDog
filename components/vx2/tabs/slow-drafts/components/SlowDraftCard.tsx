@@ -7,6 +7,8 @@
  * - Quick actions without entering draft room
  *
  * Supports collapsed (compact) and expanded (full detail) states.
+ *
+ * Migrated to CSS Modules for CSP compliance.
  */
 
 import React from 'react';
@@ -14,13 +16,9 @@ import type { SlowDraftCardProps, SlowDraft } from '../types';
 import {
   SLOW_DRAFT_LAYOUT,
   SLOW_DRAFT_COLORS,
-  SLOW_DRAFT_TYPOGRAPHY,
   SLOW_DRAFT_THRESHOLDS,
   SLOW_DRAFT_ANIMATIONS,
 } from '../constants';
-import { TILED_BG_STYLE } from '../../../draft-room/constants';
-import { RADIUS } from '../../../core/constants/sizes';
-import { TEXT_COLORS, STATE_COLORS } from '../../../core/constants/colors';
 import { cn } from '@/lib/styles';
 import styles from './SlowDraftCard.module.css';
 
@@ -77,17 +75,12 @@ interface DraftProgressBarProps {
 
 function DraftProgressBar({ currentRound, totalRounds, isYourTurn }: DraftProgressBarProps): React.ReactElement {
   const progress = (currentRound / totalRounds) * 100;
-  const progressColor = isYourTurn ? '#FFFFFF' : STATE_COLORS.active;
 
   return (
     <div
       className={styles.progressBar}
-      style={
-        {
-          '--progress-color': progressColor,
-          '--progress-width': `${progress}%`,
-        } as React.CSSProperties
-      }
+      data-your-turn={isYourTurn}
+      style={{ '--progress-width': `${progress}%` } as React.CSSProperties}
     >
       {/* Track */}
       <div className={styles.progressTrack}>
@@ -110,24 +103,8 @@ function DraftProgressBar({ currentRound, totalRounds, isYourTurn }: DraftProgre
 // ============================================================================
 
 function OnTheClockBadge(): React.ReactElement {
-  const badgeStyle = TILED_BG_STYLE as React.CSSProperties & {
-    backgroundImage?: string;
-    backgroundSize?: string;
-    backgroundPosition?: string;
-  };
-
   return (
-    <span
-      className={cn(
-        'inline-flex flex-col items-center font-bold uppercase tracking-wider',
-        styles.badge
-      )}
-      style={{
-        '--badge-bg-image': badgeStyle.backgroundImage || '',
-        '--badge-bg-size': badgeStyle.backgroundSize || '',
-        '--badge-bg-position': badgeStyle.backgroundPosition || '',
-      } as React.CSSProperties}
-    >
+    <span className={cn(styles.badge, 'bg-tiled')}>
       <span>YOUR</span>
       <span>TURN</span>
     </span>
@@ -162,12 +139,6 @@ function QuickActions({ draft, onEnterDraft, onQuickPick }: QuickActionsProps): 
       <button
         onClick={onEnterDraft}
         className={cn(styles.actionButton, styles.enterDraftButton)}
-        style={
-          {
-            '--text-color': TEXT_COLORS.primary,
-            '--button-radius': `${RADIUS.lg}px`,
-          } as React.CSSProperties
-        }
       >
         Enter Draft
       </button>
@@ -177,12 +148,6 @@ function QuickActions({ draft, onEnterDraft, onQuickPick }: QuickActionsProps): 
         <button
           onClick={() => onQuickPick(recommendedPlayer.id)}
           className={cn(styles.actionButton, styles.quickPickButton)}
-          style={
-            {
-              '--quick-pick-bg': STATE_COLORS.active,
-              '--button-radius': `${RADIUS.lg}px`,
-            } as React.CSSProperties
-          }
         >
           Quick Pick: {recommendedPlayer.name.split(' ').pop()}
         </button>
@@ -228,21 +193,7 @@ export default function SlowDraftCard({
           '--bg-color': cardBg,
           '--border': cardBorder,
           '--shadow': cardShadow,
-          '--border-radius': `${SLOW_DRAFT_LAYOUT.cardBorderRadius}px`,
-          '--padding-x': `${SLOW_DRAFT_LAYOUT.cardPaddingX}px`,
-          '--tournament-name-size': `${SLOW_DRAFT_TYPOGRAPHY.tournamentName.fontSize}px`,
-          '--tournament-name-weight': SLOW_DRAFT_TYPOGRAPHY.tournamentName.fontWeight,
-          '--tournament-name-letter-spacing': SLOW_DRAFT_TYPOGRAPHY.tournamentName.letterSpacing,
-          '--pick-info-size': `${SLOW_DRAFT_TYPOGRAPHY.pickInfo.fontSize}px`,
-          '--pick-info-weight': SLOW_DRAFT_TYPOGRAPHY.pickInfo.fontWeight,
-          '--pick-info-color': SLOW_DRAFT_TYPOGRAPHY.pickInfo.color,
-          '--section-label-size': `${SLOW_DRAFT_TYPOGRAPHY.sectionLabel.fontSize}px`,
-          '--section-label-weight': SLOW_DRAFT_TYPOGRAPHY.sectionLabel.fontWeight,
-          '--section-label-letter-spacing': SLOW_DRAFT_TYPOGRAPHY.sectionLabel.letterSpacing,
-          '--section-gap': `${SLOW_DRAFT_LAYOUT.sectionGap}px`,
           '--timer-color': timerColor,
-          '--expand-duration': `${SLOW_DRAFT_ANIMATIONS.expandDuration}ms`,
-          '--expand-easing': SLOW_DRAFT_ANIMATIONS.expandEasing,
         } as React.CSSProperties
       }
     >

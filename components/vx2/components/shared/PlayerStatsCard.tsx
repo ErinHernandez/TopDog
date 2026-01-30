@@ -17,7 +17,6 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { TEXT_COLORS } from '../../core/constants/colors';
 import { createTeamGradient } from '@/lib/gradientUtils';
 import { BYE_WEEKS } from '@/lib/nflConstants';
 import { generatePlayerId } from '../../draft-room/utils';
@@ -264,11 +263,9 @@ interface BadgeProps {
 
 function Badge({ label, value, minWidth, labelColor }: BadgeProps): React.ReactElement {
   return (
-    <div className={styles.badge} style={{ '--badge-min-width': `${minWidth}px` } as React.CSSProperties}>
-      <div className={styles.badgeLabel} style={{ '--label-color': labelColor } as React.CSSProperties}>{label}</div>
-      <div className={styles.badgeValue} style={{ '--badge-value-color': TEXT_COLORS.primary } as React.CSSProperties}>
-        {value}
-      </div>
+    <div className={styles.badge} style={{ '--badge-min-width': `${minWidth}px`, '--label-color': labelColor } as React.CSSProperties}>
+      <div className={styles.badgeLabel}>{label}</div>
+      <div className={styles.badgeValue}>{value}</div>
     </div>
   );
 }
@@ -325,7 +322,6 @@ function StatsRow({ label, values, columns }: StatsRowProps): React.ReactElement
       className={styles.statsRow}
       style={{
         '--row-height': `${PX.rowHeight}px`,
-        '--row-text-color': TEXT_COLORS.primary,
       } as React.CSSProperties}
     >
       {/* Year label */}
@@ -348,6 +344,7 @@ function StatsRow({ label, values, columns }: StatsRowProps): React.ReactElement
             '--value-left': `${dataColumns[i]?.left ?? 0}px`,
             '--value-width': `${dataColumns[i]?.width ?? 30}px`,
           } as React.CSSProperties}
+          data-index={i}
         >
           {val}
         </div>

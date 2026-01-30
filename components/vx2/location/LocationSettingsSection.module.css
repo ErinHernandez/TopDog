@@ -1,7 +1,7 @@
 .container {
-  background-color: var(--bg-color);
+  background-color: var(--bg-tertiary);
   border-radius: var(--radius-lg);
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border-light);
 }
 
 .header {
@@ -9,7 +9,7 @@
   align-items: center;
   justify-content: space-between;
   padding: var(--spacing-lg);
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-light);
 }
 
 .headerContent {
@@ -60,7 +60,7 @@
 
 .buttonDisable {
   background-color: rgba(239, 68, 68, 0.2);
-  color: var(--error-color);
+  color: var(--color-state-error);
 }
 
 .buttonDisableLoading {
@@ -68,7 +68,7 @@
 }
 
 .buttonEnable {
-  background-color: var(--success-color);
+  background-color: var(--color-state-success);
   color: #ffffff;
 }
 
@@ -151,7 +151,7 @@
   font-size: 0.75rem;
   border-radius: 9999px;
   background-color: rgba(16, 185, 129, 0.2);
-  color: var(--success-color);
+  color: var(--color-state-success);
 }
 
 .trustButton {
@@ -162,7 +162,14 @@
   border: none;
   background: none;
   cursor: pointer;
-  color: var(--button-text-color);
+}
+
+.trustButtonAdd {
+  color: var(--color-state-success);
+}
+
+.trustButtonRemove {
+  color: var(--text-muted);
 }
 
 .privacyNote {

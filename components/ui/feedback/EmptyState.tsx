@@ -1,8 +1,9 @@
 /**
  * EmptyState - Display when there's no data to show
- * 
+ *
  * Provides a consistent empty state UI across the app.
- * 
+ * Migrated to CSS Modules for CSP compliance.
+ *
  * @example
  * ```tsx
  * <EmptyState
@@ -14,8 +15,8 @@
  */
 
 import React from 'react';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS } from '../../vx2/core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY } from '../../vx2/core/constants/sizes';
+import { cn } from '@/lib/styles';
+import styles from './EmptyState.module.css';
 
 // ============================================================================
 // TYPES
@@ -57,11 +58,7 @@ function DefaultEmptyIcon(): React.ReactElement {
       width={48}
       height={48}
       viewBox="0 0 24 24"
-      fill="none"
-      stroke={TEXT_COLORS.muted}
-      strokeWidth={1.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      className={styles.emptyIcon}
     >
       <path d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
     </svg>
@@ -81,100 +78,51 @@ export function EmptyState({
   className = '',
   compact = false,
 }: EmptyStateProps): React.ReactElement {
-  const padding = compact ? SPACING.lg : SPACING['2xl'];
-  
   return (
     <div
-      className={`flex flex-col items-center justify-center text-center ${className}`}
-      style={{
-        padding: `${padding}px`,
-        minHeight: compact ? 'auto' : '200px',
-      }}
+      className={cn(styles.container, className)}
+      data-compact={compact}
       role="status"
       aria-label={title}
     >
       {/* Icon */}
-      <div
-        className="flex items-center justify-center rounded-full mb-4"
-        style={{
-          width: compact ? '48px' : '64px',
-          height: compact ? '48px' : '64px',
-          backgroundColor: 'rgba(255, 255, 255, 0.05)',
-        }}
-      >
+      <div className={styles.iconContainer} data-compact={compact}>
         {icon || <DefaultEmptyIcon />}
       </div>
 
       {/* Title */}
       <h3
-        className="font-semibold"
-        style={{
-          color: TEXT_COLORS.primary,
-          fontSize: compact ? `${TYPOGRAPHY.fontSize.base}px` : `${TYPOGRAPHY.fontSize.lg}px`,
-          marginBottom: description ? `${SPACING.sm}px` : 0,
-        }}
+        className={styles.title}
+        data-compact={compact}
+        data-has-description={!!description}
       >
         {title}
       </h3>
 
       {/* Description */}
       {description && (
-        <p
-          style={{
-            color: TEXT_COLORS.secondary,
-            fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-            maxWidth: '280px',
-            marginBottom: action ? `${SPACING.lg}px` : 0,
-          }}
-        >
+        <p className={styles.description} data-has-action={!!action}>
           {description}
         </p>
       )}
 
       {/* Actions */}
       {(action || secondaryAction) && (
-        <div
-          className="flex items-center"
-          style={{ gap: `${SPACING.md}px` }}
-        >
+        <div className={styles.actions}>
           {action && (
             <button
               onClick={action.onClick}
-              className="font-medium transition-colors"
-              style={{
-                backgroundColor: action.variant === 'secondary' 
-                  ? 'rgba(255, 255, 255, 0.1)' 
-                  : STATE_COLORS.active,
-                color: action.variant === 'secondary' 
-                  ? TEXT_COLORS.primary 
-                  : '#000000',
-                paddingLeft: `${SPACING.lg}px`,
-                paddingRight: `${SPACING.lg}px`,
-                paddingTop: `${SPACING.md}px`,
-                paddingBottom: `${SPACING.md}px`,
-                borderRadius: `${RADIUS.md}px`,
-                fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-                border: 'none',
-                cursor: 'pointer',
-              }}
+              className={styles.primaryButton}
+              data-variant={action.variant || 'primary'}
             >
               {action.label}
             </button>
           )}
-          
+
           {secondaryAction && (
             <button
               onClick={secondaryAction.onClick}
-              className="font-medium transition-colors"
-              style={{
-                backgroundColor: 'transparent',
-                color: TEXT_COLORS.secondary,
-                padding: `${SPACING.md}px`,
-                fontSize: `${TYPOGRAPHY.fontSize.sm}px`,
-                border: 'none',
-                cursor: 'pointer',
-                textDecoration: 'underline',
-              }}
+              className={styles.secondaryButton}
             >
               {secondaryAction.label}
             </button>

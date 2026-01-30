@@ -111,6 +111,14 @@
   color: var(--text-secondary);
 }
 
+/* ============================================================================
+ * SEARCH BAR WRAPPER
+ * ============================================================================ */
+
+.searchBarWrapper {
+  flex-shrink: 0;
+}
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -128,7 +136,7 @@
   justify-content: center;
   height: 100vh;
   background-color: var(--bg-primary);
-  padding: var(--spacing-xl);
+  padding: var(--spacing-lg);
   text-align: center;
 }
 
@@ -152,7 +160,7 @@
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
   color: var(--text-primary);
-  margin-bottom: var(--spacing-sm);
+  margin-bottom: var(--spacing-xs);
 }
 
 .errorMessage {
@@ -162,7 +170,7 @@
 }
 
 .errorButton {
-  padding: var(--spacing-sm) var(--spacing-lg);
+  padding: var(--spacing-xs) var(--spacing-lg);
   background-color: var(--color-blue);
   color: #FFFFFF;
   font-size: var(--font-size-sm);

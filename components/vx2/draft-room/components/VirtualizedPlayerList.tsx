@@ -18,9 +18,7 @@
 
 import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import type { DraftPlayer, Position, PlayerSortOption } from '../types';
-import { POSITION_COLORS } from '../constants';
-import { BG_COLORS, TEXT_COLORS } from '../../core/constants/colors';
-import { SPACING, TYPOGRAPHY } from '../../core/constants/sizes';
+import { TYPOGRAPHY } from '../../core/constants/sizes';
 import { useDeviceCapabilities, useBatchSize } from '../../hooks/ui/useDeviceCapabilities';
 import { cn } from '@/lib/styles';
 import styles from './VirtualizedPlayerList.module.css';
@@ -179,18 +177,13 @@ const FilterButton = React.memo(function FilterButton({
   isActive,
   onToggle
 }: FilterButtonProps): React.ReactElement {
-  const color = POSITION_COLORS[position];
-
   return (
     <button
       onClick={onToggle}
       aria-label={`Filter by ${position}, ${count} drafted`}
       aria-pressed={isActive}
       className={cn(styles.filterButton, isActive && styles.active)}
-      style={{
-        borderBottomColor: color,
-        color: isActive ? color : undefined,
-      }}
+      data-position={position.toLowerCase()}
     >
       {position} {count}
     </button>
@@ -255,8 +248,6 @@ const VirtualPlayerRow = React.memo(function VirtualPlayerRow({
   onRowClick,
   style,
 }: VirtualPlayerRowProps): React.ReactElement {
-  const positionColor = POSITION_COLORS[player.position];
-
   return (
     <div
       onClick={onRowClick}
@@ -284,7 +275,7 @@ const VirtualPlayerRow = React.memo(function VirtualPlayerRow({
         <div className={styles.playerMetadata}>
           <span
             className={styles.positionBadge}
-            style={{ backgroundColor: positionColor }}
+            data-position={player.position.toLowerCase()}
           >
             {player.position}
           </span>
@@ -303,9 +294,6 @@ const VirtualPlayerRow = React.memo(function VirtualPlayerRow({
           }}
           aria-label={isQueued ? `Remove ${player.name} from queue` : `Add ${player.name} to queue`}
           className={cn(styles.queueButton, isQueued && styles.active)}
-          style={{
-            borderColor: isQueued ? '#60a5fa' : undefined,
-          }}
         >
           <svg className={styles.queueButtonSvg} viewBox="0 0 12 12">
             {isQueued ? (
@@ -528,14 +516,14 @@ export function VirtualizedPlayerList({
           <div
             className={styles.virtualizedContent}
             style={{
-              height: totalHeight,
-            }}
+              '--virtualized-height': `${totalHeight}px`,
+            } as React.CSSProperties & { '--virtualized-height': string }}
           >
             <div
               className={styles.virtualizedViewport}
               style={{
-                top: offsetY,
-              }}
+                '--viewport-offset': `${offsetY}px`,
+              } as React.CSSProperties & { '--viewport-offset': string }}
             >
               {visiblePlayers.map((player, idx) => {
                 const actualIndex = visibleRange.start + idx;
@@ -549,7 +537,7 @@ export function VirtualizedPlayerList({
                       isQueued={isQueued(player.id)}
                       onToggleQueue={() => onToggleQueue(player)}
                       onRowClick={() => handleRowClick(player.id)}
-                      style={{}}
+                      style={undefined}
                     />
                     {isExpanded && (
                       <div className={styles.expandedCardContainer}>
@@ -587,7 +575,7 @@ export function VirtualizedPlayerList({
                   isQueued={isQueued(player.id)}
                   onToggleQueue={() => onToggleQueue(player)}
                   onRowClick={() => handleRowClick(player.id)}
-                  style={{}}
+                  style={undefined}
                 />
                 {expandedPlayerId === player.id && (
                   <div className={styles.expandedCardContainer}>

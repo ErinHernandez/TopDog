@@ -23,15 +23,13 @@ import React, { useState } from 'react';
 import { cn } from '@/lib/styles';
 import styles from './JoinTournamentModal.module.css';
 import { type Tournament, useUser } from '../../hooks/data';
-import { BG_COLORS, TEXT_COLORS } from '../../core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY, Z_INDEX } from '../../core/constants/sizes';
+import { TYPOGRAPHY } from '../../core/constants/sizes';
 import { Close, Plus } from '../../components/icons';
 import { Switch } from '../../../ui';
 import TournamentRulesModal from '../../../mobile/modals/TournamentRulesModal';
 import { formatCents } from '../../utils/formatting';
 import { useModals } from '../../shell/AppShellVX2';
 import { ProgressBar } from '../../../ui';
-import { TILED_BG_STYLE } from '../../draft-room/constants';
 
 // ============================================================================
 // CONSTANTS
@@ -41,6 +39,7 @@ const MAX_ENTRIES = 150;
 const WR_BLUE_BG = 'url(/wr_blue.png) center center / cover no-repeat';
 
 // Bottom section constants (matching TournamentCardBottomSectionV2)
+// Uses CSS custom properties (--spacing-lg, --spacing-xl) for spacing
 const ROW_HEIGHTS = {
   progress: 8,
   button: 57,
@@ -48,8 +47,8 @@ const ROW_HEIGHTS = {
 } as const;
 
 const BOTTOM_SECTION_SPACING = {
-  rowGap: 16,
-  statsGap: 24,
+  rowGap: 16, // --spacing-lg
+  statsGap: 24, // --spacing-xl
 } as const;
 
 const BOTTOM_SECTION_TYPOGRAPHY = {

@@ -12,7 +12,7 @@
 
 import React, { useCallback } from 'react';
 import { useTabNavigation } from '../../core';
-import { TAB_BAR, Z_INDEX, SAFE_AREA } from '../../core/constants';
+import { TAB_BAR, SAFE_AREA } from '../../core/constants';
 import { TAB_BAR_COLORS } from '../../core/constants/colors';
 import type { TabId, TabConfig } from '../../core/types';
 import { cn } from '@/lib/styles';
@@ -88,7 +88,6 @@ function TabButton({
           <div
             className={styles.activeIcon}
             style={{
-              '--tab-icon-size': `${TAB_BAR.iconSize}px`,
               WebkitMaskImage: maskDataUri,
               maskImage: maskDataUri,
             } as React.CSSProperties}
@@ -115,12 +114,6 @@ function TabButton({
           styles.label,
           isActive ? styles.labelActive : styles.labelInactive
         )}
-        style={{
-          '--tab-label-font-size': `${TAB_BAR.labelFontSize}px`,
-          '--tab-label-line-height': `${TAB_BAR.labelLineHeight}px`,
-          '--tab-label-margin-top': `${TAB_BAR.labelMarginTop}px`,
-          '--tab-label-inactive': TAB_BAR_COLORS.labelInactive,
-        } as React.CSSProperties}
       >
         {tab.displayName}
       </span>
@@ -244,16 +237,13 @@ export default function TabBarVX2({
     newTabButton?.focus();
   }, [tabs, navigateToTab]);
 
-  const navStyle: React.CSSProperties = {
-    '--tab-bar-bg': TAB_BAR_COLORS.background,
-    '--tab-bar-border': TAB_BAR_COLORS.border,
-    '--tab-bar-z-index': Z_INDEX.tabBar,
-  } as React.CSSProperties;
-
   return (
     <nav
       className={cn('vx2-tab-bar', styles.nav, className)}
-      style={navStyle}
+      style={{
+        '--tab-bar-bg': TAB_BAR_COLORS.background,
+        '--tab-bar-border': TAB_BAR_COLORS.border,
+      } as React.CSSProperties}
       role="tablist"
       aria-label="Main navigation"
     >

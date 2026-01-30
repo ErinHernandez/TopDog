@@ -13,10 +13,8 @@ import React, { useState, useEffect } from 'react';
 import { createScopedLogger } from '@/lib/clientLogger';
 import { cn } from '@/lib/styles';
 import styles from './TournamentCard.module.css';
-import { BG_COLORS, TEXT_COLORS, BRAND_COLORS, STATE_COLORS } from '../../core/constants/colors';
 
 const logger = createScopedLogger('[TournamentCard]');
-import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
 import type { Tournament } from '../../hooks/data';
 import { TournamentCardBottomSection } from './TournamentCardBottomSection';
 
@@ -27,44 +25,10 @@ const BLUR_PLACEHOLDER = 'data:image/webp;base64,UklGRlQAAABXRUJQVlA4IEgAAABwAwC
 // CONSTANTS
 // ============================================================================
 
-const CARD_PX = {
-  // Main card - increased by 10% more, reduced padding by 10px to reduce height
-  padding: 21,
-  borderRadius: RADIUS.xl,
-  
-  // Title
-  titleFontSize: TYPOGRAPHY.fontSize.xl,
-  titleMarginBottom: SPACING.xl,
-  
-  // Logo - reduced by 20px to help reduce overall height
-  logoSize: 233,
-  logoMarginBottom: SPACING.xl,
-  
-  // Progress
-  progressMarginBottom: SPACING.xl,
-  progressLabelFontSize: TYPOGRAPHY.fontSize.sm,
-  progressLabelMarginBottom: SPACING.sm,
-  
-  // Button
-  buttonHeight: 57,
-  buttonFontSize: TYPOGRAPHY.fontSize.sm,
-  buttonMarginBottom: SPACING.xl,
-  
-  // Stats
-  statsGap: SPACING.xl,
-  statsValueFontSize: TYPOGRAPHY.fontSize.lg,
-  statsLabelFontSize: TYPOGRAPHY.fontSize.xs,
-} as const;
-
 const CARD_COLORS = {
   background: 'url(/tournament_card_background.png)',
   backgroundFallbackPng: 'url(/tournament_card_background.png)', // PNG fallback for iOS/older browsers
   backgroundFallback: '#0a0a1a',
-  border: 'rgba(75, 85, 99, 0.5)',
-  text: TEXT_COLORS.primary,
-  textMuted: TEXT_COLORS.secondary,
-  accent: '#1E3A5F',  // Matches tiled background base color
-  accentHover: BRAND_COLORS.accent,
   progressBg: 'rgba(55, 65, 81, 0.5)',
 } as const;
 
@@ -198,39 +162,16 @@ export function TournamentCard({
       setImageLoaded(true);
     }
   }, [bgUrl]);
-    
+
   const colors = {
     background: resolvedBackground,
     backgroundFallback: styleOverrides.backgroundFallback ?? CARD_COLORS.backgroundFallback,
-    border: styleOverrides.border ?? CARD_COLORS.border,
-    borderWidth: styleOverrides.borderWidth ?? (featured ? 3 : 1),
-    accent: styleOverrides.accent ?? CARD_COLORS.accent,
     progressBg: styleOverrides.progressBg ?? CARD_COLORS.progressBg,
   };
-  
-  const sizes = {
-    padding: styleOverrides.padding ?? CARD_PX.padding,
-    borderRadius: styleOverrides.borderRadius ?? CARD_PX.borderRadius,
-  };
-  
-  // Determine border color based on featured and overrides
-  const borderColor = featured ? colors.accent : colors.border;
   
   return (
     <div
       className={cn(styles.card, { [styles.featured]: featured }, className)}
-      style={{
-        '--card-bg-fallback': colors.backgroundFallback,
-        '--card-border-color': borderColor,
-        '--card-border-width': `${colors.borderWidth}px`,
-        '--card-padding': `${sizes.padding}px`,
-        '--card-border-radius': `${sizes.borderRadius}px`,
-        '--card-background': useFallback && bgUrl && (bgUrl.endsWith('.webp') || bgUrl.includes('.webp'))
-          ? CARD_COLORS.backgroundFallbackPng
-          : colors.background,
-        '--blur-border-radius': `${sizes.borderRadius - 1}px`,
-        '--progress-bg': colors.progressBg,
-      } as React.CSSProperties}
       role="article"
       aria-label={`${tournament.title} tournament`}
     >
@@ -279,14 +220,6 @@ export function TournamentCardSkeleton(): React.ReactElement {
   return (
     <div
       className={styles.skeleton}
-      style={{
-        '--card-bg-fallback': CARD_COLORS.backgroundFallback,
-        '--card-border-color': CARD_COLORS.border,
-        '--card-border-width': '1px',
-        '--card-padding': `${CARD_PX.padding}px`,
-        '--card-border-radius': `${CARD_PX.borderRadius}px`,
-        '--title-margin-bottom': `${CARD_PX.titleMarginBottom}px`,
-      } as React.CSSProperties}
       aria-hidden="true"
     >
       {/* Title skeleton */}
@@ -296,7 +229,7 @@ export function TournamentCardSkeleton(): React.ReactElement {
       <div className={styles.skeletonProgress}>
         <div className={styles.skeletonProgressLabels}>
           <div className={styles.skeletonProgressLabel} />
-          <div className={styles.skeletonProgressLabel} style={{ width: '60px' }} />
+          <div className={cn(styles.skeletonProgressLabel, styles.skeletonProgressLabelLarge)} />
         </div>
         <div className={styles.skeletonProgressBar} />
       </div>

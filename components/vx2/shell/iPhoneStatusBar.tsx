@@ -123,7 +123,7 @@ export default function IPhoneStatusBar({
                 styles.signalBar,
                 bar <= signalLevel ? styles.signalBarActive : styles.signalBarInactive
               )}
-              style={{ height: `${3 + (bar - 1) * 2}px` }}
+              style={{ '--signal-bar-height': `${3 + (bar - 1) * 2}px` } as React.CSSProperties}
               aria-hidden="true"
             />
           ))}

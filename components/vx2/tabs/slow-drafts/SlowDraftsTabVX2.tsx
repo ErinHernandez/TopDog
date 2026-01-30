@@ -28,8 +28,6 @@ import styles from './SlowDraftsTabVX2.module.css';
 
 const logger = createScopedLogger('[SlowDraftsTabVX2]');
 import { SLOW_DRAFT_LAYOUT } from './constants';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS } from '../../core/constants/colors';
-import { SPACING, RADIUS } from '../../core/constants/sizes';
 import { Skeleton, EmptyState, ErrorState } from '../../../ui';
 
 import {
@@ -46,13 +44,6 @@ function CardSkeleton(): React.ReactElement {
   return (
     <div
       className={styles.cardSkeletonContainer}
-      style={
-        {
-          '--card-padding-x': SLOW_DRAFT_LAYOUT.cardPaddingX,
-          '--card-border-radius': SLOW_DRAFT_LAYOUT.cardBorderRadius,
-          '--bg-color-secondary': BG_COLORS.secondary,
-        } as React.CSSProperties
-      }
     >
       {/* Header */}
       <div className="flex justify-between items-start mb-4">
@@ -94,13 +85,6 @@ function LoadingState(): React.ReactElement {
   return (
     <div
       className={styles.loadingStateContainer}
-      style={
-        {
-          '--list-padding-y': SLOW_DRAFT_LAYOUT.listPaddingY,
-          '--list-padding-x': SLOW_DRAFT_LAYOUT.listPaddingX,
-          '--card-gap': SLOW_DRAFT_LAYOUT.cardGap,
-        } as React.CSSProperties
-      }
     >
       <CardSkeleton />
       <CardSkeleton />
@@ -121,21 +105,10 @@ function JoinDraftButton({ onClick }: JoinDraftButtonProps): React.ReactElement 
   return (
     <div
       className={styles.joinDraftContainer}
-      style={
-        {
-          '--spacing-lg': SPACING.lg,
-        } as React.CSSProperties
-      }
     >
       <button
         onClick={onClick}
         className={cn(styles.joinDraftButton, 'w-full font-semibold')}
-        style={
-          {
-            '--radius-lg': RADIUS.lg,
-            '--state-color-active': STATE_COLORS.active,
-          } as React.CSSProperties
-        }
       >
         Join New Slow Draft
       </button>
@@ -219,12 +192,6 @@ export default function SlowDraftsTabVX2({
     return (
       <div
         className={cn(styles.errorStateContainer, 'flex-1 flex flex-col items-center justify-center')}
-        style={
-          {
-            '--bg-color-primary': BG_COLORS.primary,
-            '--spacing-xl': SPACING.xl,
-          } as React.CSSProperties
-        }
       >
         <ErrorState
           title="Failed to load drafts"
@@ -242,21 +209,10 @@ export default function SlowDraftsTabVX2({
     return (
       <div
         className={cn(styles.emptyStateWrapper, 'flex-1 flex flex-col')}
-        style={
-          {
-            '--bg-color-primary': BG_COLORS.primary,
-          } as React.CSSProperties
-        }
       >
         {/* Filter/Sort bar skeleton */}
         <div
           className={styles.filterSortAreaSkeleton}
-          style={
-            {
-              '--spacing-sm': SPACING.sm,
-              '--list-padding-x': SLOW_DRAFT_LAYOUT.listPaddingX,
-            } as React.CSSProperties
-          }
         >
           <div className={cn('flex gap-2', styles.filterSortSkeletonFlex)}>
             <Skeleton width={60} height={32} borderRadius={12} />
@@ -279,22 +235,12 @@ export default function SlowDraftsTabVX2({
     return (
       <div
         className={cn(styles.emptyStateWrapper, 'flex-1 flex flex-col')}
-        style={
-          {
-            '--bg-color-primary': BG_COLORS.primary,
-          } as React.CSSProperties
-        }
       >
         {/* Filter/Sort bar */}
         <FilterSortBar sortBy={sortBy} onSortChange={setSortBy} />
 
         <div
           className={cn(styles.emptyStateContent, 'flex-1 flex items-center justify-center')}
-          style={
-            {
-              '--spacing-xl': SPACING.xl,
-            } as React.CSSProperties
-          }
         >
           <EmptyState
             title={isFiltered ? 'No Matching Drafts' : 'No Active Slow Drafts'}
@@ -328,11 +274,6 @@ export default function SlowDraftsTabVX2({
   return (
     <div
       className={cn(styles.mainContainer, 'flex-1 flex flex-col')}
-      style={
-        {
-          '--bg-color-primary': BG_COLORS.primary,
-        } as React.CSSProperties
-      }
       role="main"
       aria-label="Slow drafts"
     >
@@ -342,12 +283,6 @@ export default function SlowDraftsTabVX2({
       {/* Drafts list */}
       <div
         className={cn(styles.draftsList, 'flex-1 min-h-0 overflow-y-auto')}
-        style={
-          {
-            '--list-padding-x': SLOW_DRAFT_LAYOUT.listPaddingX,
-            '--list-padding-y': SLOW_DRAFT_LAYOUT.listPaddingY,
-          } as React.CSSProperties
-        }
       >
         <div className={styles.draftsListInner}>
           {sortedFilteredDrafts.map((draft) => (
@@ -369,11 +304,6 @@ export default function SlowDraftsTabVX2({
         {/* Bottom padding */}
         <div
           className={styles.bottomPadding}
-          style={
-            {
-              '--spacing-2xl': SPACING['2xl'],
-            } as React.CSSProperties
-          }
         />
       </div>
 

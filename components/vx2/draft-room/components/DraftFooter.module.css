@@ -118,3 +118,14 @@
   border-radius: var(--footer-home-indicator-height);
   margin: var(--footer-home-indicator-margin-top) auto var(--footer-home-indicator-margin-bottom);
 }
+
+/* ============================================================================
+   Icon color styles - used by footer icon SVGs
+   ============================================================================ */
+svg.icon-active {
+  color: var(--footer-active-color);
+}
+
+svg.icon-inactive {
+  color: var(--footer-inactive-color);
+}

@@ -11,7 +11,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { cn } from '@/lib/styles';
-import { TILED_BG_STYLE } from '../constants';
 import { DRAFT_TIMER } from '../../core/constants/timing';
 import { createScopedLogger } from '../../../../lib/clientLogger';
 import styles from './DraftStatusBar.module.css';
@@ -102,17 +101,16 @@ const DraftStatusBar = React.memo(function DraftStatusBar({
     if (timerSeconds <= 9) {
       return { ...baseStyles, '--bg-color': '#DC2626' } as any; // Red-600 - urgent
     }
-    return {
-      ...baseStyles,
-      '--bg-image': TILED_BG_STYLE.backgroundImage,
-      '--bg-repeat': TILED_BG_STYLE.backgroundRepeat,
-      '--bg-size': 'cover',
-      '--bg-position': 'center center',
-      '--bg-color': TILED_BG_STYLE.backgroundColor,
-    } as any;
+    // User's turn with timer > 9: use bg-tiled class (no inline styles needed)
+    return baseStyles;
   };
 
   const containerStyles = getContainerStyles();
+
+  // Determine if we should show tiled background (user's turn, timer > 9, not pre-draft)
+  const showTiledBg = isUserTurn &&
+    timerSeconds > 9 &&
+    !(draftStatus === 'waiting' && preDraftCountdown != null && preDraftCountdown > 0);
 
   // Handle click anywhere in safe area to leave draft
   const handleSafeAreaClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -134,6 +132,7 @@ const DraftStatusBar = React.memo(function DraftStatusBar({
         onLeave && styles.clickable,
         !onLeave && styles.notClickable,
         shouldShake && styles.shaking,
+        showTiledBg && 'bg-tiled',
       )}
       style={containerStyles}
       role="banner"

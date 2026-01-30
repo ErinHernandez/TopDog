@@ -16,10 +16,12 @@
 
 .bottomSection[data-has-progress="true"] {
   grid-template-rows: var(--progress-height) var(--button-height) var(--stats-height);
+  gap: var(--spacing-lg);
 }
 
 .bottomSection[data-has-progress="false"] {
   grid-template-rows: var(--button-height) var(--stats-height);
+  gap: var(--spacing-lg);
 }
 
 /* ============================================================================
@@ -45,10 +47,10 @@
   padding: 0;
   border: none;
   cursor: pointer;
-  font-weight: 600;
-  border-radius: var(--button-border-radius);
-  color: var(--text-primary);
-  font-size: var(--button-font-size);
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-md);
+  color: var(--text-primary, #FFFFFF);
+  font-size: var(--font-size-sm);
   transition: background-color 0.2s ease;
   contain: layout style;
 }
@@ -64,6 +66,14 @@
   background-color: var(--button-bg-color);
 }
 
+.button[data-button-bg-image] {
+  --button-bg-image: attr(data-button-bg-image);
+}
+
+.button[data-button-bg-color] {
+  --button-bg-color: attr(data-button-bg-color);
+}
+
 /* Interaction states */
 .button:active {
   transform: scale(0.98);
@@ -76,7 +86,7 @@
 .statsGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--stats-gap);
+  gap: var(--spacing-xl);
   height: var(--stats-height);
   align-content: center;
   contain: layout;
@@ -94,24 +104,34 @@
 }
 
 .statValue {
-  font-weight: bold;
-  font-size: var(--stats-value-font-size);
-  color: var(--text-primary);
-  background-color: var(--stat-bg);
-  padding: var(--stat-value-padding);
-  border-radius: var(--stat-value-border-radius);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-lg);
+  color: var(--text-primary, #FFFFFF);
+  background-color: var(--stat-bg, #000000);
+  padding: var(--stat-value-padding, 2px 6px);
+  border-radius: var(--stat-value-border-radius, var(--radius-sm));
 }
 
 .statLabel {
-  font-size: var(--stats-label-font-size);
-  color: var(--text-secondary);
-  background-color: var(--stat-bg);
-  padding: var(--stat-label-padding);
-  border-radius: var(--stat-label-border-radius);
-  margin-top: var(--stat-label-margin-top);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-normal);
+  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+  background-color: var(--stat-bg, #000000);
+  padding: var(--stat-label-padding, 1px 4px);
+  border-radius: var(--stat-label-border-radius, var(--radius-sm));
+  margin-top: var(--stat-label-margin-top, 2px);
 }
 
 /* ============================================================================
-   CSS CUSTOM PROPERTIES - Default values (V1)
+   CSS CUSTOM PROPERTIES - Uses spacing tokens from tokens.css
+
+   Spacing values:
+   - --spacing-xs: 4px
+   - --spacing-sm: 8px
+   - --spacing-md: 12px
+   - --spacing-lg: 16px (row gap)
+   - --spacing-xl: 24px (stats gap)
+   - --spacing-2xl: 32px
+   - --spacing-3xl: 48px
    ============================================================================ */
 

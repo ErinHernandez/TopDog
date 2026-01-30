@@ -1,7 +1,8 @@
 /**
  * TabErrorBoundary CSS Module
  *
- * Migrated from inline styles for CSP compliance.
+ * Zero-runtime CSS for CSP compliance.
+ * Uses tokens.css variables for all colors.
  */
 
 /* ============================================================================
@@ -14,8 +15,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-lg, 1.5rem);
-  background-color: var(--fallback-bg, #0a0a0a);
+  padding: var(--spacing-lg);
+  background-color: var(--bg-primary);
 }
 
 /* ============================================================================
@@ -27,10 +28,11 @@
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  margin-bottom: var(--spacing-md, 1rem);
+  margin-bottom: var(--spacing-md);
   width: 64px;
   height: 64px;
   background-color: rgba(239, 68, 68, 0.1);
+  color: var(--color-state-error);
 }
 
 /* ============================================================================
@@ -40,16 +42,16 @@
 .title {
   font-weight: 600;
   text-align: center;
-  margin-bottom: var(--spacing-xs, 0.5rem);
-  color: var(--title-color, rgba(255, 255, 255, 0.9));
-  font-size: var(--title-font-size, 18px);
+  margin-bottom: var(--spacing-xs);
+  color: var(--text-primary);
+  font-size: var(--font-size-lg);
 }
 
 .description {
   text-align: center;
-  margin-bottom: var(--spacing-lg, 1.5rem);
-  color: var(--description-color, rgba(255, 255, 255, 0.6));
-  font-size: var(--description-font-size, 16px);
+  margin-bottom: var(--spacing-lg);
+  color: var(--text-secondary);
+  font-size: var(--font-size-base);
   max-width: 280px;
 }
 
@@ -60,24 +62,24 @@
 .details {
   width: 100%;
   max-width: 24rem;
-  margin-bottom: var(--spacing-lg, 1.5rem);
+  margin-bottom: var(--spacing-lg);
   text-align: left;
-  background-color: var(--details-bg, #1c1c1c);
-  border-radius: var(--radius-md, 8px);
-  padding: var(--spacing-md, 1rem);
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
 }
 
 .detailsSummary {
   cursor: pointer;
-  color: var(--summary-color, rgba(255, 255, 255, 0.6));
-  font-size: var(--summary-font-size, 14px);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
 }
 
 .detailsContent {
-  margin-top: var(--spacing-xs, 0.5rem);
+  margin-top: var(--spacing-xs);
   overflow-x: auto;
-  color: var(--error-color, #ef4444);
-  font-size: var(--error-font-size, 12px);
+  color: var(--color-state-error);
+  font-size: var(--font-size-xs);
   white-space: pre-wrap;
   word-break: break-word;
 }
@@ -89,11 +91,11 @@
 .retryButton {
   font-weight: 500;
   transition: background-color 0.15s ease;
-  background-color: var(--button-bg, #3b82f6);
-  color: var(--button-color, rgba(255, 255, 255, 0.9));
-  padding: var(--spacing-md, 1rem) var(--spacing-xl, 1.5rem);
-  border-radius: var(--radius-md, 8px);
-  font-size: var(--button-font-size, 16px);
+  background-color: var(--color-state-active);
+  color: var(--text-primary);
+  padding: var(--spacing-md) var(--spacing-xl);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
   border: none;
   cursor: pointer;
 }

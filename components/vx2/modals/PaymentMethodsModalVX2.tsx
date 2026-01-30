@@ -10,8 +10,6 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY, Z_INDEX } from '../core/constants/sizes';
 import { Close, Plus } from '../components/icons';
 import { StripeProvider } from '../providers/StripeProvider';
 import { createScopedLogger } from '../../../lib/clientLogger';
@@ -51,17 +49,17 @@ interface PaymentMethod {
 const CARD_ELEMENT_OPTIONS = {
   style: {
     base: {
-      color: TEXT_COLORS.primary,
+      color: 'var(--text-primary)',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-      fontSize: '14px',
+      fontSize: 'var(--font-size-sm)',
       fontSmoothing: 'antialiased',
       '::placeholder': {
-        color: TEXT_COLORS.muted,
+        color: 'var(--text-muted)',
       },
     },
     invalid: {
-      color: STATE_COLORS.error,
-      iconColor: STATE_COLORS.error,
+      color: 'var(--color-state-error)',
+      iconColor: 'var(--color-state-error)',
     },
   },
   hidePostalCode: false,
@@ -79,11 +77,12 @@ function CardBrandIcon({ brand }: { brand: string }): React.ReactElement {
     discover: '#FF6000',
   };
 
-  const color = brandColors[brand.toLowerCase()] || TEXT_COLORS.muted;
+  const color = brandColors[brand.toLowerCase()] || 'var(--text-muted)';
 
   return (
     <div
       className={styles.cardBrandIcon}
+      data-brand={brand.toLowerCase()}
       style={{ '--brand-color': color } as React.CSSProperties}
     >
       {brand.slice(0, 4).toUpperCase()}
@@ -243,7 +242,6 @@ function ModalContent({
   return (
     <div
       className={styles.modalContainer}
-      style={{ '--z-index': Z_INDEX.modal } as React.CSSProperties}
     >
       {/* Backdrop */}
       <div
@@ -254,19 +252,13 @@ function ModalContent({
       {/* Modal */}
       <div
         className={styles.modal}
-        style={{ '--bg-color': BG_COLORS.secondary } as React.CSSProperties}
       >
         {/* Header */}
         <div
           className={styles.header}
-          style={{ '--border-color': BORDER_COLORS.default } as React.CSSProperties}
         >
           <h2
             className={styles.headerTitle}
-            style={{
-              '--font-size': `${TYPOGRAPHY.fontSize.lg}px`,
-              '--text-color': TEXT_COLORS.primary,
-            } as React.CSSProperties}
           >
             Payment Methods
           </h2>
@@ -274,7 +266,7 @@ function ModalContent({
             onClick={onClose}
             className={styles.closeButton}
           >
-            <span className={styles.closeIcon} style={{ '--text-muted-color': TEXT_COLORS.muted } as React.CSSProperties}>
+            <span className={styles.closeIcon}>
               <Close className="w-5 h-5" />
             </span>
           </button>
@@ -291,34 +283,25 @@ function ModalContent({
               {/* Payment methods list */}
               {paymentMethods.length === 0 && !showAddForm && (
                 <div className={styles.emptyState}>
-                  <p style={{ '--text-muted-color': TEXT_COLORS.muted } as React.CSSProperties}>No saved payment methods</p>
+                  <p>No saved payment methods</p>
                 </div>
               )}
               
               {paymentMethods.map(method => (
                 <div
                   key={method.id}
-                  className={styles.methodCard}
-                  style={{
-                    '--bg-tertiary-color': BG_COLORS.tertiary,
-                    '--border-method-color': method.isDefault ? STATE_COLORS.active : BORDER_COLORS.default,
-                  } as React.CSSProperties}
+                  className={cn(styles.methodCard, method.isDefault && styles.methodCardDefault)}
                 >
                   <CardBrandIcon brand={method.card.brand} />
 
                   <div className={styles.methodCardInfo}>
                     <p
                       className={styles.methodCardBrand}
-                      style={{ '--text-color': TEXT_COLORS.primary } as React.CSSProperties}
                     >
                       {method.card.brand.charAt(0).toUpperCase() + method.card.brand.slice(1)} ****{method.card.last4}
                     </p>
                     <p
                       className={styles.methodCardExpiry}
-                      style={{
-                        '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
-                        '--text-muted-color': TEXT_COLORS.muted,
-                      } as React.CSSProperties}
                     >
                       Expires {method.card.expMonth}/{method.card.expYear}
                     </p>
@@ -328,7 +311,6 @@ function ModalContent({
                     {method.isDefault ? (
                       <span
                         className={styles.defaultBadge}
-                        style={{ '--state-active-color': STATE_COLORS.active } as React.CSSProperties}
                       >
                         Default
                       </span>
@@ -336,10 +318,6 @@ function ModalContent({
                       <button
                         onClick={() => handleSetDefault(method.id)}
                         className={styles.setDefaultButton}
-                        style={{
-                          '--border-color': BORDER_COLORS.default,
-                          '--text-secondary-color': TEXT_COLORS.secondary,
-                        } as React.CSSProperties}
                       >
                         Set Default
                       </button>
@@ -349,7 +327,6 @@ function ModalContent({
                       onClick={() => handleDelete(method.id)}
                       disabled={deletingId === method.id}
                       className={styles.deleteButton}
-                      style={{ '--state-error-color': STATE_COLORS.error } as React.CSSProperties}
                     >
                       {deletingId === method.id ? (
                         <span className={styles.deleteSpinner} />
@@ -365,14 +342,9 @@ function ModalContent({
               {showAddForm ? (
                 <div
                   className={styles.addCardForm}
-                  style={{ '--bg-tertiary-color': BG_COLORS.tertiary } as React.CSSProperties}
                 >
                   <div
                     className={styles.cardInputContainer}
-                    style={{
-                      '--bg-primary-color': BG_COLORS.primary,
-                      '--border-color': BORDER_COLORS.default,
-                    } as React.CSSProperties}
                   >
                     <CardElement options={CARD_ELEMENT_OPTIONS} />
                   </div>
@@ -380,10 +352,6 @@ function ModalContent({
                   {error && (
                     <p
                       className={styles.errorMessage}
-                      style={{
-                        '--state-error-color': STATE_COLORS.error,
-                        '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
-                      } as React.CSSProperties}
                     >
                       {error}
                     </p>
@@ -396,18 +364,13 @@ function ModalContent({
                         setError(null);
                       }}
                       className={styles.cancelButton}
-                      style={{ '--border-color': BORDER_COLORS.default, '--text-color': TEXT_COLORS.primary } as React.CSSProperties}
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleAddCard}
                       disabled={isAdding}
-                      className={styles.addButton}
-                      style={{
-                        '--add-button-bg': isAdding ? BG_COLORS.tertiary : STATE_COLORS.active,
-                        '--add-button-text': isAdding ? TEXT_COLORS.muted : '#000',
-                      } as React.CSSProperties}
+                      className={cn(styles.addButton, isAdding && styles.addButtonLoading)}
                     >
                       {isAdding ? (
                         <>
@@ -424,11 +387,6 @@ function ModalContent({
                 <button
                   onClick={() => setShowAddForm(true)}
                   className={styles.addNewCardButton}
-                  style={{
-                    '--bg-tertiary-color': BG_COLORS.tertiary,
-                    '--border-color': BORDER_COLORS.default,
-                    '--text-secondary-color': TEXT_COLORS.secondary,
-                  } as React.CSSProperties}
                 >
                   <Plus className={styles.addIcon} />
                   Add New Card

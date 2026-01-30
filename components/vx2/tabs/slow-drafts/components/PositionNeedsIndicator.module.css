@@ -14,7 +14,7 @@
 .header {
   font-size: 12px;
   font-weight: 600;
-  color: var(--header-color);
+  color: var(--text-secondary);
   margin-bottom: 4px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -47,10 +47,10 @@
 
 /* Count text inside pill */
 .pillCount {
-  font-size: var(--needs-text-font-size, 11px);
-  font-weight: var(--needs-text-font-weight, 600);
-  line-height: var(--needs-text-line-height, 1);
-  letter-spacing: var(--needs-text-letter-spacing, 0);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+  letter-spacing: 0;
   color: var(--count-color);
 }
 
@@ -106,4 +106,23 @@
   font-size: 12px;
   font-weight: 600;
   color: var(--urgency-color);
+}
+
+/* ============================================================================
+   Dynamic CSS Custom Properties
+============================================================================ */
+
+.pill {
+  --pill-bg: rgba(255, 255, 255, 0.06);
+  --pill-border: rgba(255, 255, 255, 0.1);
+  --position-color: inherit;
+  --position-text-color: #fff;
+  --count-color: rgba(255, 255, 255, 0.8);
+}
+
+.row {
+  --position-color: inherit;
+  --position-text-color: #fff;
+  --urgency-color: inherit;
+  --progress-width: 0%;
 }

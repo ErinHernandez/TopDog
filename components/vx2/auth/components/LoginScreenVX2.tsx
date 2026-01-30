@@ -16,8 +16,6 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { cn } from '@/lib/styles';
 import styles from './LoginScreenVX2.module.css';
 import authStyles from './auth-shared.module.css';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../../core/constants/colors';
-import { SPACING, Z_INDEX } from '../../core/constants/sizes';
 import { useAuth } from '../hooks/useAuth';
 import { useTemporaryState } from '../../hooks/ui/useTemporaryState';
 import {
@@ -60,6 +58,7 @@ function TopDogLogo({ loaded }: { loaded: boolean }): React.ReactElement {
         style={{
           '--logo-opacity': loaded ? 1 : 0,
         } as React.CSSProperties}
+        data-loaded={loaded}
       />
     </div>
   );
@@ -169,9 +168,6 @@ function Input({
             rightElement && authStyles.inputWithRight,
             hasError && authStyles.inputError
           )}
-          style={{
-            '--error-color': STATE_COLORS.error,
-          } as React.CSSProperties}
         />
         {rightElement && (
           <div className={authStyles.inputRightElement}>
@@ -435,10 +431,6 @@ export function LoginScreenVX2({
   return (
     <div
       className={styles.container}
-      style={{
-        '--bg-primary': BG_COLORS.primary,
-        '--z-modal': Z_INDEX.modal,
-      } as React.CSSProperties}
     >
       {/* Blur placeholder layer - shows instantly */}
       <div
@@ -446,16 +438,14 @@ export function LoginScreenVX2({
         className={styles.safeAreaBackgroundPlaceholder}
         style={{
           '--blur-placeholder-bg': `url(${BLUR_PLACEHOLDER})`,
-          '--z-placeholder': 1,
         } as React.CSSProperties}
       />
       {/* Full image layer - fades in when loaded */}
       <div
         aria-hidden="true"
-        className={styles.safeAreaBackground}
+        className={cn(styles.safeAreaBackground, imagesLoaded && styles.safeAreaBackgroundLoaded)}
         style={{
           '--safe-area-bg-image': 'url(/wr_blue.png)',
-          opacity: imagesLoaded ? 1 : 0,
         } as React.CSSProperties}
       />
       {/* Spacer for safe area */}
@@ -466,7 +456,6 @@ export function LoginScreenVX2({
         ref={formRef}
         className={cn(styles.content, shakeError && styles.shakeAnimation)}
         style={{
-          '--content-padding': `${SPACING.xl}px`,
           '--content-opacity': imagesLoaded ? 1 : 0,
         } as React.CSSProperties}
         onKeyDown={handleKeyDown}
@@ -500,11 +489,8 @@ export function LoginScreenVX2({
         {error && (
           <div
             className={authStyles.errorBanner}
-            style={{
-              '--error-color': STATE_COLORS.error,
-            } as React.CSSProperties}
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.error} strokeWidth="2">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={authStyles.errorIcon}>
               <circle cx="12" cy="12" r="10" />
               <line x1="12" y1="8" x2="12" y2="12" />
               <line x1="12" y1="16" x2="12.01" y2="16" />
@@ -597,9 +583,6 @@ export function LoginScreenVX2({
                       styles.rememberMeCheckbox,
                       rememberMe ? styles.checkboxChecked : styles.checkboxUnchecked
                     )}
-                    style={{
-                      '--border-default': BORDER_COLORS.default,
-                    } as React.CSSProperties}
                   >
                     {rememberMe && (
                       <svg width="12" height="10" viewBox="0 0 12 10" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -639,10 +622,7 @@ export function LoginScreenVX2({
               autoComplete="one-time-code"
               disabled={isLoading}
               autoFocus
-              className={authStyles.codeInput}
-              style={{
-                opacity: isLoading ? 0.5 : 1,
-              }}
+              className={cn(authStyles.codeInput, isLoading && styles.codeInputLoading)}
             />
 
             <button
@@ -666,8 +646,6 @@ export function LoginScreenVX2({
       <div
         className={styles.footer}
         style={{
-          '--border-default': BORDER_COLORS.default,
-          '--bg-primary': BG_COLORS.primary,
           '--footer-opacity': imagesLoaded ? 1 : 0,
         } as React.CSSProperties}
       >
@@ -679,10 +657,6 @@ export function LoginScreenVX2({
               styles.footerButton,
               canSignIn ? styles.footerButtonEnabled : styles.footerButtonDisabled
             )}
-            style={{
-              '--bg-tertiary': BG_COLORS.tertiary,
-              '--text-disabled': TEXT_COLORS.disabled,
-            } as React.CSSProperties}
           >
             <div className={styles.footerButtonInner}>
               {isLoading ? (
@@ -707,10 +681,6 @@ export function LoginScreenVX2({
               styles.footerButton,
               phoneCode.length === 6 && !isLoading ? styles.footerButtonEnabled : styles.footerButtonDisabled
             )}
-            style={{
-              '--bg-tertiary': BG_COLORS.tertiary,
-              '--text-disabled': TEXT_COLORS.disabled,
-            } as React.CSSProperties}
           >
             <div className={styles.footerButtonInner}>
               {isLoading ? (

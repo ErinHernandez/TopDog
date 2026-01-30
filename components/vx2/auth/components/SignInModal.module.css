@@ -383,3 +383,39 @@
 .togglePasswordButton:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
+
+/* ============================================================================
+   ERROR ICON
+   ============================================================================ */
+
+.errorIcon {
+  color: var(--error-color, #ef4444);
+}
+
+/* ============================================================================
+   INLINE STYLE MIGRATIONS
+   ============================================================================ */
+
+.phoneCodeMessageText {
+  font-size: 17px;
+}
+
+.helperText {
+  font-size: 13px;
+}
+
+.checkboxLabel {
+  font-size: 15px;
+}
+
+.forgotPasswordButton {
+  font-size: 15px;
+}
+
+.codeInstructionText {
+  font-size: 15px;
+}
+
+.alternateNumberButton {
+  font-size: 15px;
+}

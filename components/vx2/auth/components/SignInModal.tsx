@@ -17,8 +17,6 @@
  */
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../../core/constants/colors';
-import { SPACING, TYPOGRAPHY, Z_INDEX } from '../../core/constants/sizes';
 import { useAuth } from '../hooks/useAuth';
 import { useTemporaryState } from '../../hooks/ui/useTemporaryState';
 import {
@@ -92,13 +90,8 @@ function BiometricButton({ onClick, disabled, label }: { onClick: () => void; di
 // ============================================================================
 
 function Divider(): React.ReactElement {
-  const dividerStyle: React.CSSProperties = {
-    '--border-default': BORDER_COLORS.default,
-    '--text-muted': TEXT_COLORS.muted,
-  } as React.CSSProperties;
-
   return (
-    <div className={cn(styles.divider, "flex items-center gap-4 my-6")} style={dividerStyle}>
+    <div className={cn(styles.divider, "flex items-center gap-4 my-6")}>
       <div className={cn(styles.dividerLine, "flex-1 h-px")} />
       <span className={styles.dividerText}>or sign in with email</span>
       <div className={cn(styles.dividerLine, "flex-1 h-px")} />
@@ -141,14 +134,8 @@ function Input({
 }: InputProps): React.ReactElement {
   const hasError = touched && error;
 
-  const inputStyle: React.CSSProperties = {
-    '--text-primary': TEXT_COLORS.primary,
-    '--input-border': hasError ? STATE_COLORS.error : BORDER_COLORS.default,
-    '--error-color': STATE_COLORS.error,
-  } as React.CSSProperties;
-
   return (
-    <div style={inputStyle}>
+    <div>
       <div className={styles.inputWrapper}>
         <input
           ref={inputRef}
@@ -424,24 +411,8 @@ export function SignInModal({
   
   if (!isOpen) return null;
 
-  const containerStyle: React.CSSProperties = {
-    '--content-top-inset': `${contentTopInset}px`,
-    '--modal-bg': BG_COLORS.secondary,
-    '--z-modal': Z_INDEX.modal,
-    '--content-padding': `40px ${SPACING.xl}px 20px`,
-    '--footer-padding': `12px ${SPACING.xl}px 16px`,
-    '--text-primary': TEXT_COLORS.primary,
-    '--text-secondary': TEXT_COLORS.secondary,
-    '--text-muted': TEXT_COLORS.muted,
-    '--text-disabled': TEXT_COLORS.disabled,
-    '--border-default': BORDER_COLORS.default,
-    '--bg-tertiary': BG_COLORS.tertiary,
-    '--error-color': STATE_COLORS.error,
-    '--focus-border': `${STATE_COLORS.active}80`,
-  } as React.CSSProperties;
-
   return (
-    <div className={styles.modalContainer} style={containerStyle}>
+    <div className={styles.modalContainer} style={{ '--content-top-inset': `${contentTopInset}px` } as React.CSSProperties} data-inset={contentTopInset}>
       {/* Blue outline wrapper - auth modal branding */}
       <div className={styles.blueOutline} aria-hidden="true" />
 
@@ -454,7 +425,7 @@ export function SignInModal({
         {/* Phone Code Message */}
         {step === 'phoneCode' && (
           <div className="text-center mb-6 mt-10">
-            <p className={styles.textSecondary} style={{ fontSize: 17 }}>
+            <p className={cn(styles.textSecondary, styles.phoneCodeMessageText)}>
               Verify your phone
             </p>
           </div>
@@ -477,7 +448,7 @@ export function SignInModal({
           {/* Error Message */}
           {error && (
             <div className={styles.errorBanner}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.error} strokeWidth="2">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={styles.errorIcon}>
                 <circle cx="12" cy="12" r="10" />
                 <line x1="12" y1="8" x2="12" y2="12" />
                 <line x1="12" y1="16" x2="12.01" y2="16" />
@@ -510,7 +481,7 @@ export function SignInModal({
               
               {/* Input type indicator - only show for phone */}
               {identifier && inputType === 'phone' && !identifierError && (
-                <p className={cn(styles.textMuted, "px-1 -mt-2")} style={{ fontSize: 13 }}>
+                <p className={cn(styles.textMuted, "px-1 -mt-2", styles.helperText)}>
                   We'll send you a verification code
                 </p>
               )}
@@ -573,7 +544,7 @@ export function SignInModal({
                         </svg>
                       )}
                     </div>
-                    <span className={styles.textSecondary} style={{ fontSize: 15 }}>
+                    <span className={cn(styles.textSecondary, styles.checkboxLabel)}>
                       Remember me
                     </span>
                   </button>
@@ -581,8 +552,7 @@ export function SignInModal({
                   {onForgotPassword && (
                     <button
                       onClick={onForgotPassword}
-                      className={cn(styles.textSecondary, "font-medium")}
-                      style={{ fontSize: 15 }}
+                      className={cn(styles.textSecondary, "font-medium", styles.forgotPasswordButton)}
                     >
                       Forgot password?
                     </button>
@@ -595,7 +565,7 @@ export function SignInModal({
           {/* Phone Code Step */}
           {step === 'phoneCode' && (
             <div className="text-center">
-              <p className={cn(styles.textSecondary, "mb-6")} style={{ fontSize: 15 }}>
+              <p className={cn(styles.textSecondary, "mb-6", styles.codeInstructionText)}>
                 Enter the 6-digit code sent to<br />
                 <span className={cn(styles.textPrimary, "font-medium")}>{identifier}</span>
               </p>
@@ -617,8 +587,7 @@ export function SignInModal({
                   setPhoneCode('');
                   setError(null);
                 }}
-                className={cn(styles.gradientText, "mt-6 font-medium")}
-                style={{ fontSize: 15 }}
+                className={cn(styles.gradientText, "mt-6 font-medium", styles.alternateNumberButton)}
               >
                 Use a different number
               </button>

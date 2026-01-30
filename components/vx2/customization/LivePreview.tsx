@@ -42,6 +42,7 @@ export function LivePreview({ preferences }: LivePreviewProps) {
       <div
         className={styles.cellPreview}
         style={{ '--border-color': borderColor } as React.CSSProperties}
+        data-border={borderColor}
       >
         {/* Username banner */}
         <div className={styles.usernameBanner}>

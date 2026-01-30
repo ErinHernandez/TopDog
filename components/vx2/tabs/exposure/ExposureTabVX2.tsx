@@ -13,8 +13,6 @@
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useExposure, type ExposurePlayer } from '../../hooks/data';
-import { BG_COLORS, TEXT_COLORS, POSITION_COLORS } from '../../core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
 import {
   PositionBadge,
   Skeleton,
@@ -32,11 +30,6 @@ import styles from './ExposureTabVX2.module.css';
 // ============================================================================
 
 const EXPOSURE_PX = {
-  headerPaddingX: SPACING.lg,
-  headerPaddingY: SPACING.md,
-  filterGap: SPACING.sm,
-  filterButtonPadding: SPACING.sm,
-  rowPaddingX: SPACING.md,
   rowPaddingY: 4,
   rowMinHeight: 36,
 } as const;
@@ -74,27 +67,17 @@ function PositionFilters({ selected, onChange }: PositionFiltersProps): React.Re
   return (
     <div
       className={styles.positionFiltersWrapper}
-      style={{
-        '--filter-margin-top': `${SPACING.md}px`,
-        '--filter-margin-bottom': `${SPACING.xs}px`,
-      } as React.CSSProperties}
     >
       {positions.map(pos => {
         const isSelected = selected.includes(pos);
-        const color = POSITION_COLORS[pos.toUpperCase() as keyof typeof POSITION_COLORS] || TEXT_COLORS.muted;
 
         return (
           <button
             key={pos}
             onClick={() => handleClick(pos)}
             className={styles.positionButton}
-            style={{
-              '--button-bg': isSelected ? 'rgba(255,255,255,0.1)' : 'transparent',
-              '--button-color': isSelected ? color : TEXT_COLORS.muted,
-              '--button-border-color': color,
-              '--button-opacity': isSelected ? '1' : '0.4',
-              '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
-            } as React.CSSProperties}
+            data-position={pos.toLowerCase()}
+            data-selected={isSelected}
           >
             {pos}
           </button>
@@ -112,11 +95,6 @@ interface SortHeaderProps {
 function SortHeader({ sortOrder, onToggle }: SortHeaderProps): React.ReactElement {
   return (
     <div className={styles.sortHeader}
-      style={{
-        '--sort-padding-y': `${SPACING.xs}px`,
-        '--text-secondary': TEXT_COLORS.secondary,
-        '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
-      } as React.CSSProperties}
     >
       <button
         onClick={onToggle}
@@ -150,7 +128,6 @@ function ExposureRow({ player, isFirst = false }: ExposureRowProps): React.React
       <div className={styles.playerInfo}>
         <h3
           className={styles.playerName}
-          style={{ '--text-primary': TEXT_COLORS.primary, '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px` } as React.CSSProperties}
         >
           {player.name}
         </h3>
@@ -158,7 +135,6 @@ function ExposureRow({ player, isFirst = false }: ExposureRowProps): React.React
           <PositionBadge position={player.position} size="sm" />
           <span
             className={styles.playerTeam}
-            style={{ '--text-muted': TEXT_COLORS.muted, '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px` } as React.CSSProperties}
           >
             {player.team}
           </span>
@@ -169,10 +145,6 @@ function ExposureRow({ player, isFirst = false }: ExposureRowProps): React.React
       <button
         onClick={() => setShowShares(!showShares)}
         className={styles.exposureValue}
-        style={{
-          '--text-primary': TEXT_COLORS.primary,
-          '--font-size-base': `${TYPOGRAPHY.fontSize.base}px`,
-        } as React.CSSProperties}
       >
         {showShares ? `${player.teams} shares` : `${exposurePercent}%`}
       </button>
@@ -185,7 +157,6 @@ function ExposureRowSkeleton(): React.ReactElement {
     <div
       className={styles.skeletonRow}
       style={{
-        '--row-padding-x': `${EXPOSURE_PX.rowPaddingX}px`,
         '--row-padding-y': `${EXPOSURE_PX.rowPaddingY}px`,
         '--row-min-height': `${EXPOSURE_PX.rowMinHeight}px`,
       } as React.CSSProperties}
@@ -258,7 +229,6 @@ export default function ExposureTabVX2(_props: ExposureTabVX2Props): React.React
     return (
       <div
         className={styles.errorStateContainer}
-        style={{ '--bg-primary': BG_COLORS.primary, '--error-padding': `${SPACING.xl}px` } as React.CSSProperties}
       >
         <ErrorState
           title="Failed to load exposure"
@@ -272,17 +242,12 @@ export default function ExposureTabVX2(_props: ExposureTabVX2Props): React.React
   return (
     <div
       className={styles.mainContainer}
-      style={{ '--bg-primary': BG_COLORS.primary } as React.CSSProperties}
       role="main"
       aria-label="Player exposure report"
     >
       {/* Header */}
       <div
         className={styles.header}
-        style={{
-          '--header-padding-x': `${EXPOSURE_PX.headerPaddingX}px`,
-          '--header-padding-y': `${EXPOSURE_PX.headerPaddingY}px`,
-        } as React.CSSProperties}
       >
         <div className={styles.headerSearchWrapper}>
           <SearchInput
@@ -318,7 +283,6 @@ export default function ExposureTabVX2(_props: ExposureTabVX2Props): React.React
           // Empty state
           <div
             className={styles.emptyStateContainer}
-            style={{ '--empty-padding': `${SPACING.xl}px` } as React.CSSProperties}
           >
             <EmptyState
               title="No Players Found"
@@ -334,7 +298,6 @@ export default function ExposureTabVX2(_props: ExposureTabVX2Props): React.React
             {/* Bottom padding */}
             <div
               className={styles.listBottomPadding}
-              style={{ '--bottom-padding-height': `${SPACING['2xl']}px` } as React.CSSProperties}
             />
           </>
         )}

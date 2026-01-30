@@ -28,8 +28,6 @@
  */
 
 import React from 'react';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS, POSITION_COLORS } from '../../../core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY } from '../../../core/constants/sizes';
 import { PositionBadge } from './PositionBadge';
 import { Plus, Minus, ChevronUp, ChevronDown } from '../../icons';
 import { cn } from '@/lib/styles';
@@ -77,25 +75,9 @@ export interface PlayerCardProps {
 // CONSTANTS
 // ============================================================================
 
-const CARD_PX = {
-  sm: {
-    paddingY: SPACING.xs,
-    paddingX: SPACING.md,
-    gap: SPACING.sm,
-    borderLeft: 4,
-    adpWidth: 28,
-    actionSize: 32,
-    actionIconSize: 18,
-  },
-  md: {
-    paddingY: SPACING.sm,
-    paddingX: SPACING.md,
-    gap: SPACING.sm,
-    borderLeft: 4,
-    adpWidth: 32,
-    actionSize: 36,
-    actionIconSize: 20,
-  },
+const ICON_SIZES = {
+  sm: 18,
+  md: 20,
 } as const;
 
 // ============================================================================
@@ -110,7 +92,7 @@ interface ActionButtonProps {
 }
 
 function ActionButton({ action, playerName, size, disabled }: ActionButtonProps): React.ReactElement | null {
-  const px = CARD_PX[size];
+  const iconSize = ICON_SIZES[size];
 
   if (action.type === 'none') return null;
 
@@ -119,71 +101,46 @@ function ActionButton({ action, playerName, size, disabled }: ActionButtonProps)
   }
 
   if (action.type === 'toggle') {
-    const buttonStyle: React.CSSProperties = {
-      '--action-size': `${px.actionSize}px`,
-      '--action-radius': `${RADIUS.lg}px`,
-      '--action-bg': action.isActive ? 'rgba(239, 68, 68, 0.15)' : 'rgba(96, 165, 250, 0.15)',
-      '--action-color': action.isActive ? STATE_COLORS.error : STATE_COLORS.active,
-    } as React.CSSProperties;
-
     return (
       <button
         onClick={action.onToggle}
         disabled={disabled}
-        className={cn(styles.actionButton, disabled && styles.actionButtonDisabled)}
-        style={buttonStyle}
+        className={styles.actionButton}
+        data-size={size}
+        data-action={action.isActive ? 'remove' : 'add'}
+        data-disabled={disabled}
         aria-label={action.isActive ? `Remove ${playerName}` : `Add ${playerName}`}
       >
-        {action.isActive ? <Minus size={px.actionIconSize} /> : <Plus size={px.actionIconSize} />}
+        {action.isActive ? <Minus size={iconSize} /> : <Plus size={iconSize} />}
       </button>
     );
   }
 
   if (action.type === 'remove') {
-    const buttonStyle: React.CSSProperties = {
-      '--action-size': `${px.actionSize}px`,
-      '--action-radius': `${RADIUS.lg}px`,
-      '--action-bg': 'rgba(239, 68, 68, 0.15)',
-      '--action-color': STATE_COLORS.error,
-    } as React.CSSProperties;
-
     return (
       <button
         onClick={action.onRemove}
         disabled={disabled}
-        className={cn(styles.actionButton, disabled && styles.actionButtonDisabled)}
-        style={buttonStyle}
+        className={styles.actionButton}
+        data-size={size}
+        data-action="remove"
+        data-disabled={disabled}
         aria-label={`Remove ${playerName}`}
       >
-        <Minus size={px.actionIconSize} />
+        <Minus size={iconSize} />
       </button>
     );
   }
 
   if (action.type === 'reorder') {
-    const upStyle: React.CSSProperties = {
-      '--action-size': `${px.actionSize}px`,
-      '--reorder-height': `${px.actionSize / 2}px`,
-      '--reorder-radius': `${RADIUS.sm}px`,
-      '--reorder-bg': action.isFirst ? 'transparent' : 'rgba(255, 255, 255, 0.1)',
-      '--reorder-color': action.isFirst ? TEXT_COLORS.disabled : TEXT_COLORS.primary,
-    } as React.CSSProperties;
-
-    const downStyle: React.CSSProperties = {
-      '--action-size': `${px.actionSize}px`,
-      '--reorder-height': `${px.actionSize / 2}px`,
-      '--reorder-radius': `${RADIUS.sm}px`,
-      '--reorder-bg': action.isLast ? 'transparent' : 'rgba(255, 255, 255, 0.1)',
-      '--reorder-color': action.isLast ? TEXT_COLORS.disabled : TEXT_COLORS.primary,
-    } as React.CSSProperties;
-
     return (
       <div className={styles.reorderWrapper}>
         <button
           onClick={action.onMoveUp}
           disabled={disabled || action.isFirst}
-          className={cn(styles.reorderButton, (disabled || action.isFirst) && styles.reorderButtonDisabled)}
-          style={upStyle}
+          className={styles.reorderButton}
+          data-size={size}
+          data-disabled={disabled || action.isFirst}
           aria-label={`Move ${playerName} up`}
         >
           <ChevronUp size={14} />
@@ -191,8 +148,9 @@ function ActionButton({ action, playerName, size, disabled }: ActionButtonProps)
         <button
           onClick={action.onMoveDown}
           disabled={disabled || action.isLast}
-          className={cn(styles.reorderButton, (disabled || action.isLast) && styles.reorderButtonDisabled)}
-          style={downStyle}
+          className={styles.reorderButton}
+          data-size={size}
+          data-disabled={disabled || action.isLast}
           aria-label={`Move ${playerName} down`}
         >
           <ChevronDown size={14} />
@@ -220,28 +178,13 @@ export function PlayerCard({
   disabled = false,
   className = '',
 }: PlayerCardProps): React.ReactElement {
-  const px = CARD_PX[size];
-  const posColor = POSITION_COLORS[player.position.toUpperCase() as keyof typeof POSITION_COLORS] || TEXT_COLORS.muted;
+  // Position for data attribute (used by CSS for border color)
+  const positionLower = player.position.toLowerCase();
 
   // Format values
   const adpDisplay = typeof player.adp === 'number' ? player.adp.toFixed(1) : player.adp || '-';
   const projDisplay = typeof player.proj === 'number' ? Math.round(player.proj) : player.proj || '-';
   const rankDisplay = showRank && rank ? rank : null;
-
-  // CSS custom properties for dynamic values
-  const containerStyle: React.CSSProperties = {
-    '--card-bg': BG_COLORS.secondary,
-    '--card-border-left': `${px.borderLeft}px solid ${posColor}`,
-    '--card-radius': `${RADIUS.lg}px`,
-    '--card-padding': `${px.paddingY}px ${px.paddingX}px`,
-    '--card-gap': `${px.gap}px`,
-    '--value-width': `${px.adpWidth}px`,
-    '--text-primary': TEXT_COLORS.primary,
-    '--text-secondary': TEXT_COLORS.secondary,
-    '--text-muted': TEXT_COLORS.muted,
-    '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
-    '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
-  } as React.CSSProperties;
 
   const Container = onClick ? 'button' : 'div';
 
@@ -255,11 +198,12 @@ export function PlayerCard({
         disabled && styles.containerDisabled,
         className
       )}
-      style={containerStyle}
+      data-position={positionLower}
+      data-size={size}
     >
       {/* ADP or Rank */}
       {(showAdp || showRank) && (
-        <div className={styles.valueColumn}>
+        <div className={styles.valueColumn} data-size={size}>
           <div className={styles.valueText}>
             {rankDisplay ?? adpDisplay}
           </div>

@@ -11,7 +11,7 @@
 .badge {
   display: inline-flex;
   align-items: center;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   background-color: var(--badge-bg, rgba(156, 163, 175, 0.2));
@@ -20,9 +20,35 @@
   padding-right: var(--badge-padding-x, 8px);
   padding-top: var(--badge-padding-y, 2px);
   padding-bottom: var(--badge-padding-y, 2px);
-  border-radius: var(--badge-radius, 4px);
-  font-size: var(--badge-font-size, 11px);
+  border-radius: var(--radius-sm);
+  font-size: var(--badge-font-size, var(--font-size-xs));
   line-height: 1.2;
+}
+
+/* Status-specific colors using data attributes */
+.badge[data-status="success"] {
+  --badge-bg: rgba(16, 185, 129, 0.2);
+  --badge-color: var(--color-state-success);
+}
+
+.badge[data-status="warning"] {
+  --badge-bg: rgba(245, 158, 11, 0.2);
+  --badge-color: var(--color-state-warning);
+}
+
+.badge[data-status="error"] {
+  --badge-bg: rgba(239, 68, 68, 0.2);
+  --badge-color: var(--color-state-error);
+}
+
+.badge[data-status="info"] {
+  --badge-bg: rgba(96, 165, 250, 0.2);
+  --badge-color: var(--color-state-active);
+}
+
+.badge[data-status="neutral"] {
+  --badge-bg: rgba(156, 163, 175, 0.2);
+  --badge-color: var(--color-text-secondary);
 }
 
 .badgePulse {

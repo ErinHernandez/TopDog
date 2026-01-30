@@ -1,3 +1,7 @@
 .container {
   max-height: var(--max-height, 72px);
 }
+
+.container[data-max-height] {
+  --max-height: calc(var(data-max-height) * 1px);
+}

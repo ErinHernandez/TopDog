@@ -31,7 +31,7 @@
   max-width: 24rem;
   margin-left: var(--spacing-md, 1rem);
   margin-right: var(--spacing-md, 1rem);
-  background-color: var(--loading-modal-bg, #1c1c1c);
+  background-color: var(--bg-secondary);
 }
 
 .loadingContent {
@@ -56,7 +56,7 @@
 }
 
 .loadingText {
-  color: var(--loading-text-color, rgba(255, 255, 255, 0.9));
+  color: var(--text-primary);
 }
 
 /* ============================================================================
@@ -68,7 +68,7 @@
   flex-direction: column;
   height: 100%;
   width: 100%;
-  background-color: var(--shell-bg, #0a0a0a);
+  background-color: var(--bg-primary);
   overflow: hidden;
 }
 

@@ -1,22 +1,22 @@
 /**
  * PendingPayments - Display pending async payments (OXXO, Boleto, Pix)
- * 
+ *
  * Shows user their pending payments awaiting completion:
  * - OXXO vouchers (Mexico) - pay at store
  * - Boleto bank slips (Brazil) - pay at bank
  * - Pix QR codes (Brazil) - scan to pay
- * 
+ *
  * Features:
  * - Expiration countdown
  * - View voucher/QR code
  * - Cancel pending payment
  * - Refresh status
+ *
+ * Migrated to Zero-Runtime CSS for CSP compliance.
  */
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { cn } from '@/lib/styles';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../core/constants/colors';
-import { TYPOGRAPHY, RADIUS, SPACING } from '../core/constants/sizes';
 import { formatSmallestUnit } from '../utils/formatting';
 import { createScopedLogger } from '../../../lib/clientLogger';
 import styles from './PendingPayments.module.css';
@@ -80,24 +80,24 @@ function formatTimeRemaining(expiresAt: string): { text: string; isExpiringSoon:
   const now = new Date();
   const expires = new Date(expiresAt);
   const diff = expires.getTime() - now.getTime();
-  
+
   if (diff <= 0) {
     return { text: 'Expired', isExpiringSoon: false, isExpired: true };
   }
-  
+
   const hours = Math.floor(diff / (1000 * 60 * 60));
   const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
   const isExpiringSoon = hours < 6;
-  
+
   if (hours >= 48) {
     const days = Math.floor(hours / 24);
     return { text: `${days} day${days > 1 ? 's' : ''}`, isExpiringSoon: false, isExpired: false };
   }
-  
+
   if (hours > 0) {
     return { text: `${hours}h ${minutes}m`, isExpiringSoon, isExpired: false };
   }
-  
+
   return { text: `${minutes} min`, isExpiringSoon: true, isExpired: false };
 }
 
@@ -132,9 +132,7 @@ function PaymentCard({
   const isDisabled = timeInfo.isExpired || payment.status !== 'pending';
 
   return (
-    <div
-      className={cn(styles.card, isDisabled && styles.disabled)}
-    >
+    <div className={cn(styles.card, isDisabled && styles.disabled)}>
       <div className={styles.cardContent}>
         {/* Icon */}
         <div
@@ -171,16 +169,6 @@ function PaymentCard({
                   styles.expirationBadge,
                   timeInfo.isExpiringSoon && styles.expiringSoon
                 )}
-                style={{
-                  '--expiration-bg': timeInfo.isExpiringSoon
-                    ? `${STATE_COLORS.error}20`
-                    : `${STATE_COLORS.warning}20`,
-                  '--expiration-text': timeInfo.isExpiringSoon
-                    ? STATE_COLORS.error
-                    : STATE_COLORS.warning,
-                  '--expiration-bg-soon': `${STATE_COLORS.error}20`,
-                  '--expiration-text-soon': STATE_COLORS.error,
-                } as React.CSSProperties}
               >
                 {timeInfo.text}
               </span>
@@ -193,10 +181,6 @@ function PaymentCard({
               onClick={() => onViewVoucher(payment)}
               disabled={isDisabled}
               className={styles.viewButton}
-              style={{
-                '--button-bg': isDisabled ? BG_COLORS.elevated : STATE_COLORS.success,
-                '--button-text': isDisabled ? TEXT_COLORS.muted : '#fff',
-              } as React.CSSProperties}
             >
               View {payment.type === 'pix' ? 'QR Code' : 'Voucher'}
             </button>
@@ -230,18 +214,18 @@ export function PendingPayments({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [cancellingId, setCancellingId] = useState<string | null>(null);
-  
+
   // Ref to prevent race conditions in cancel handler
   const cancellingRef = useRef<string | null>(null);
-  
+
   // Fetch pending payments
   const fetchPayments = useCallback(async () => {
     if (!userId) return;
-    
+
     try {
       const response = await fetch(`/api/stripe/pending-payments?userId=${userId}`);
       const data = await response.json();
-      
+
       if (data.ok && data.data?.payments) {
         setPayments(data.data.payments);
       } else {
@@ -254,44 +238,40 @@ export function PendingPayments({
       setIsLoading(false);
     }
   }, [userId]);
-  
+
   // Initial fetch
   useEffect(() => {
     fetchPayments();
   }, [fetchPayments]);
-  
+
   // Auto-refresh every minute
   useEffect(() => {
     const interval = setInterval(fetchPayments, 60000);
     return () => clearInterval(interval);
   }, [fetchPayments]);
-  
+
   // View voucher
   const handleViewVoucher = useCallback((payment: PendingPayment) => {
     window.open(payment.voucherUrl, '_blank', 'noopener,noreferrer');
   }, []);
-  
+
   // Cancel payment
-  // Uses ref to prevent race conditions from stale closures
   const handleCancel = useCallback(async (paymentId: string) => {
-    // Use ref for guard check to avoid stale closure issues
     if (cancellingRef.current) return;
-    
-    // Set both ref and state atomically
+
     cancellingRef.current = paymentId;
     setCancellingId(paymentId);
-    
+
     try {
       const response = await fetch('/api/stripe/cancel-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paymentIntentId: paymentId, userId }),
       });
-      
+
       const data = await response.json();
-      
+
       if (data.ok) {
-        // Remove from local state
         setPayments(prev => prev.filter(p => p.id !== paymentId));
         logger.debug('Payment cancelled', { paymentId });
       } else {
@@ -305,54 +285,31 @@ export function PendingPayments({
       setCancellingId(null);
     }
   }, [userId]);
-  
+
   // Filter to only show pending/active payments
-  const activePayments = payments.filter(p => 
+  const activePayments = payments.filter(p =>
     p.status === 'pending' && new Date(p.expiresAt) > new Date()
   );
-  
+
   // Don't render if no pending payments
   if (!isLoading && activePayments.length === 0) {
     return null;
   }
-  
+
   return (
-    <div
-      className={styles.container}
-      style={{
-        '--bg-secondary': BG_COLORS.secondary,
-      } as React.CSSProperties}
-    >
+    <div className={styles.container}>
       {/* Header */}
       <div className={styles.header}>
         <div className={styles.headerContent}>
           <div className={styles.headerText}>
-            <h3
-              style={{
-                '--typography-lg': `${TYPOGRAPHY.fontSize.lg}px`,
-                '--text-primary': TEXT_COLORS.primary,
-                '--border-default': BORDER_COLORS.default,
-              } as React.CSSProperties}
-            >
-              Pending Deposits
-            </h3>
-            <p
-              style={{
-                '--text-secondary': TEXT_COLORS.secondary,
-              } as React.CSSProperties}
-            >
-              Complete these payments to add funds
-            </p>
+            <h3>Pending Deposits</h3>
+            <p>Complete these payments to add funds</p>
           </div>
 
           <button
             onClick={fetchPayments}
             disabled={isLoading}
             className={styles.refreshButton}
-            style={{
-              '--bg-tertiary': BG_COLORS.tertiary,
-              '--text-secondary': TEXT_COLORS.secondary,
-            } as React.CSSProperties}
             aria-label="Refresh"
           >
             <svg
@@ -376,20 +333,10 @@ export function PendingPayments({
       <div className={styles.content}>
         {isLoading ? (
           <div className={styles.loadingContainer}>
-            <span
-              className={styles.spinner}
-              style={{
-                '--state-active': STATE_COLORS.active,
-              } as React.CSSProperties}
-            />
+            <span className={styles.spinner} />
           </div>
         ) : error ? (
-          <div
-            className={styles.errorMessage}
-            style={{
-              '--state-error': STATE_COLORS.error,
-            } as React.CSSProperties}
-          >
+          <div className={styles.errorMessage}>
             {error}
           </div>
         ) : (
@@ -409,4 +356,3 @@ export function PendingPayments({
 }
 
 export default PendingPayments;
-

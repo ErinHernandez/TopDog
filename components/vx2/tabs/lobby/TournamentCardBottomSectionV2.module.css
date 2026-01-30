@@ -1,6 +1,13 @@
 /**
  * TournamentCardBottomSectionV2 - Version 2 specific styles
- * Extends base styles with V2-specific custom properties
+ * Uses hardcoded V2 dimensions for layout stability
+ *
+ * Fixed V2 dimensions:
+ * - Progress bar: 8px
+ * - Button: 57px
+ * - Stats: 48px
+ * - Row gap: 16px
+ * - Stats gap: 24px
  */
 
 @import './TournamentCardBottomSection.module.css';
@@ -13,13 +20,53 @@
 }
 
 .bottomSectionV2[data-has-progress="true"] {
-  grid-template-rows: var(--progress-height) var(--button-height) var(--stats-height);
+  grid-template-rows: 8px 57px 48px;
+  gap: 16px;
 }
 
 .bottomSectionV2[data-has-progress="false"] {
-  grid-template-rows: var(--button-height) var(--stats-height);
+  grid-template-rows: 57px 48px;
+  gap: 16px;
 }
 
+/* ============================================================================
+   CSS CUSTOM PROPERTIES - Text Colors
+   ============================================================================ */
+
 .bottomSectionV2 {
-  gap: var(--row-gap);
+  --text-primary: #FFFFFF;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+}
+
+/* ============================================================================
+   TYPOGRAPHY - Button
+   ============================================================================ */
+
+.bottomSectionV2 .button {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.bottomSectionV2 .button[data-button-bg-image] {
+  --button-bg-image: attr(data-button-bg-image);
+}
+
+.bottomSectionV2 .button[data-button-bg-color] {
+  --button-bg-color: attr(data-button-bg-color);
+}
+
+/* ============================================================================
+   TYPOGRAPHY - Stats
+   ============================================================================ */
+
+.bottomSectionV2 .statValue {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.bottomSectionV2 .statLabel {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-secondary);
 }

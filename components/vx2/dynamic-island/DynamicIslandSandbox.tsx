@@ -214,13 +214,6 @@ export default function DynamicIslandSandbox({
                 ? undefined // Styles will be applied via CSS variables
                 : undefined
             )}
-            style={{
-              '--button-bg-active': '#2563eb',
-              '--button-text-active': '#fff',
-              '--button-bg-inactive': '#e5e7eb',
-              '--button-text-inactive': '#374151',
-              '--button-bg-inactive-hover': '#d1d5db',
-            } as React.CSSProperties}
             data-active={currentState === s}
           >
             {s.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
@@ -502,10 +495,11 @@ function DynamicIslandVisualization({
         '--island-bg-color': '#1E3A5F',
       } as React.CSSProperties;
     }
+    const bgColor = content.urgency === 'critical' ? '#ef4444' :
+                    content.urgency === 'warning' ? '#f97316' :
+                    '#000';
     return {
-      '--island-bg-color': content.urgency === 'critical' ? '#ef4444' :
-                          content.urgency === 'warning' ? '#f97316' :
-                          '#000',
+      '--island-bg-color': bgColor,
     } as React.CSSProperties;
   };
 

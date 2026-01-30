@@ -7,8 +7,8 @@
 
 /* Main Container */
 .container {
-  padding: var(--info-padding);
-  padding-bottom: 24px;
+  padding: var(--spacing-md);
+  padding-bottom: var(--spacing-xl);
   background-color: var(--info-bg-primary);
   height: 100%;
   overflow-y: auto;
@@ -30,7 +30,7 @@
 .actionsBar {
   display: flex;
   justify-content: space-between;
-  margin-bottom: var(--info-section-gap);
+  margin-bottom: var(--spacing-lg);
 }
 
 .actionButton {
@@ -53,14 +53,14 @@
 
 /* Section Styling */
 .section {
-  margin-bottom: var(--info-section-gap);
+  margin-bottom: var(--spacing-lg);
 }
 
 .sectionTitle {
   font-size: var(--info-font-size-base);
   font-weight: var(--info-font-weight-semibold);
   color: var(--info-text-primary);
-  margin-bottom: var(--info-item-gap);
+  margin-bottom: var(--spacing-sm);
   padding: 0;
   margin-top: 0;
 }
@@ -73,7 +73,7 @@
 
 .sectionContent p {
   margin: 0;
-  margin-bottom: var(--info-item-gap);
+  margin-bottom: var(--spacing-sm);
 }
 
 .sectionContent p:last-child {
@@ -81,7 +81,7 @@
 }
 
 .sectionContent ul {
-  margin: var(--info-item-gap) 0;
+  margin: var(--spacing-sm) 0;
   padding-left: 20px;
 }
 
@@ -90,7 +90,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--info-item-gap) 0;
+  padding: var(--spacing-sm) 0;
   border-bottom: 1px solid var(--info-border-light);
 }
 

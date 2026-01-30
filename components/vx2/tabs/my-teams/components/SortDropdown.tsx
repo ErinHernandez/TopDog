@@ -7,8 +7,6 @@
  */
 
 import React, { useState, useRef, useEffect } from 'react';
-import { BG_COLORS, TEXT_COLORS } from '../../../core/constants/colors';
-import { RADIUS, TYPOGRAPHY } from '../../../core/constants/sizes';
 import {
   getNextTeamSortState,
   TEAM_SORT_LABELS,
@@ -70,18 +68,10 @@ export function SortDropdown({ currentSort, onSortChange }: SortDropdownProps): 
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={styles.dropdownButton}
-        style={{
-          '--bg-color': BG_COLORS.secondary,
-          '--border': '1px solid rgba(255,255,255,0.1)',
-          '--border-radius': `${RADIUS.md}px`,
-          '--text-color': TEXT_COLORS.secondary,
-          '--font-size': `${TYPOGRAPHY.fontSize.xs}px`,
-          '--bg-hover': 'rgba(255,255,255,0.08)',
-        } as React.CSSProperties}
         aria-label={`Sort by ${TEAM_SORT_LABELS[currentSort.primary]}, ${currentSort.direction === 'asc' ? 'ascending' : 'descending'}`}
       >
-        <span className={styles.sortLabel} style={{ '--label-color': TEXT_COLORS.muted } as React.CSSProperties}>Sort:</span>
-        <span className={styles.sortValue} style={{ '--value-color': TEXT_COLORS.primary } as React.CSSProperties}>
+        <span className={styles.sortLabel}>Sort:</span>
+        <span className={styles.sortValue}>
           {TEAM_SORT_LABELS[currentSort.primary]}
         </span>
         <svg
@@ -98,15 +88,7 @@ export function SortDropdown({ currentSort, onSortChange }: SortDropdownProps): 
       </button>
 
       {isOpen && (
-        <div
-          className={styles.dropdownMenu}
-          style={{
-            '--menu-bg': BG_COLORS.secondary,
-            '--menu-border': '1px solid rgba(255,255,255,0.1)',
-            '--menu-border-radius': `${RADIUS.lg}px`,
-            '--menu-shadow': '0 4px 12px rgba(0,0,0,0.3)',
-          } as React.CSSProperties}
-        >
+        <div className={styles.dropdownMenu}>
           {sortOptions.map((option) => {
             const isActive = currentSort.primary === option;
             return (
@@ -114,15 +96,6 @@ export function SortDropdown({ currentSort, onSortChange }: SortDropdownProps): 
                 key={option}
                 onClick={() => handleOptionClick(option)}
                 className={cn(styles.menuOption, isActive && styles.active)}
-                style={{
-                  '--option-bg': isActive ? 'rgba(255,255,255,0.05)' : 'transparent',
-                  '--option-border': '1px solid rgba(255,255,255,0.05)',
-                  '--option-text-color': isActive ? TEXT_COLORS.primary : TEXT_COLORS.secondary,
-                  '--option-font-size': `${TYPOGRAPHY.fontSize.sm}px`,
-                  '--option-hover-bg': 'rgba(255,255,255,0.08)',
-                  '--option-active-bg': 'rgba(255,255,255,0.05)',
-                  '--option-active-color': TEXT_COLORS.primary,
-                } as React.CSSProperties}
               >
                 <span className={styles.optionText}>{TEAM_SORT_LABELS[option]}</span>
                 {isActive && (

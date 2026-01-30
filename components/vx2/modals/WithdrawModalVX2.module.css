@@ -55,21 +55,21 @@
    ============================================================================ */
 
 .balanceCard {
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 24px;
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
   background-color: rgba(16, 185, 129, 0.1);
 }
 
 .balanceLabel {
-  color: var(--text-secondary, #b3b3b3);
-  font-size: var(--font-xs, 12px);
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
 }
 
 .balanceAmount {
-  font-weight: 700;
-  color: var(--state-success, #10b981);
-  font-size: var(--font-2xl, 28px);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-state-success);
+  font-size: var(--font-size-2xl);
 }
 
 .amountInputSection {
@@ -78,10 +78,10 @@
 
 .sectionLabel {
   display: block;
-  font-weight: 500;
-  margin-bottom: 12px;
-  color: var(--text-primary, #ffffff);
-  font-size: var(--font-sm, 14px);
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--spacing-md);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
 }
 
 .quickAmountsGrid {
@@ -92,25 +92,25 @@
 }
 
 .quickAmountButton {
-  padding: 12px 0;
-  border-radius: 8px;
-  font-weight: 600;
+  padding: var(--spacing-md) 0;
+  border-radius: var(--radius-md);
+  font-weight: var(--font-weight-semibold);
   transition: all 0.2s ease;
-  font-size: var(--font-sm, 14px);
+  font-size: var(--font-size-sm);
   border: none;
   cursor: pointer;
   background-color: rgba(255, 255, 255, 0.05);
-  color: var(--text-primary, #ffffff);
+  color: var(--text-primary);
 }
 
 .quickAmountButton:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  color: var(--text-disabled, #666666);
+  color: var(--text-disabled);
 }
 
 .quickAmountButtonActive {
-  background-color: var(--state-active, #60a5fa);
+  background-color: var(--color-state-active);
   color: #000;
 }
 
@@ -120,27 +120,27 @@
 
 .currencySymbol {
   position: absolute;
-  left: 16px;
+  left: var(--spacing-lg);
   top: 50%;
   transform: translateY(-50%);
-  font-weight: 600;
-  color: var(--text-secondary, #b3b3b3);
-  font-size: var(--font-lg, 18px);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-secondary);
+  font-size: var(--font-size-lg);
 }
 
 .amountInput {
   width: 100%;
   padding-left: 32px;
-  padding-right: 16px;
-  padding-top: 16px;
-  padding-bottom: 16px;
-  border-radius: 12px;
-  font-weight: 600;
+  padding-right: var(--spacing-lg);
+  padding-top: var(--spacing-lg);
+  padding-bottom: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-weight-semibold);
   outline: none;
   background-color: rgba(255, 255, 255, 0.05);
-  color: var(--text-primary, #ffffff);
+  color: var(--text-primary);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  font-size: var(--font-lg, 18px);
+  font-size: var(--font-size-lg);
 }
 
 .amountInput::placeholder {
@@ -149,9 +149,9 @@
 }
 
 .errorText {
-  margin-top: 8px;
-  color: var(--state-error, #ef4444);
-  font-size: var(--font-sm, 14px);
+  margin-top: var(--spacing-sm);
+  color: var(--color-state-error);
+  font-size: var(--font-size-sm);
 }
 
 .payoutMethodsSection {
@@ -168,9 +168,9 @@
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 16px;
-  border-radius: 12px;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-lg);
   transition: all 0.2s ease;
   background-color: rgba(255, 255, 255, 0.03);
   border: 2px solid transparent;
@@ -179,18 +179,18 @@
 
 .methodButtonActive {
   background-color: rgba(96, 165, 250, 0.15);
-  border-color: var(--state-active, #60a5fa);
+  border-color: var(--color-state-active);
 }
 
 .methodIcon {
   width: 40px;
   height: 40px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: rgba(255, 255, 255, 0.1);
-  color: var(--text-primary, #ffffff);
+  color: var(--text-primary);
 }
 
 .methodInfo {
@@ -199,31 +199,31 @@
 }
 
 .methodLabel {
-  font-weight: 600;
-  color: var(--text-primary, #ffffff);
-  font-size: var(--font-sm, 14px);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
 }
 
 .methodDetail {
-  color: var(--text-muted, #808080);
-  font-size: var(--font-xs, 12px);
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
 }
 
 .defaultBadge {
-  padding: 4px 8px;
-  border-radius: 9999px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-full);
   background-color: rgba(255, 255, 255, 0.1);
-  color: var(--text-secondary, #b3b3b3);
-  font-size: var(--font-xs, 12px);
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
 }
 
 .addMethodButton {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 16px;
-  border-radius: 12px;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-lg);
   background-color: rgba(255, 255, 255, 0.03);
   border: 2px dashed rgba(255, 255, 255, 0.1);
   cursor: pointer;
@@ -232,50 +232,92 @@
 .addMethodIcon {
   width: 40px;
   height: 40px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: rgba(255, 255, 255, 0.05);
-  color: var(--text-muted, #808080);
+  color: var(--text-muted);
 }
 
 .addMethodText {
-  font-weight: 500;
-  color: var(--text-secondary, #b3b3b3);
-  font-size: var(--font-sm, 14px);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
 }
 
 .freeNotice {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px;
-  border-radius: 8px;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
   background-color: rgba(16, 185, 129, 0.1);
-  color: var(--state-success, #10b981);
-  font-size: var(--font-sm, 14px);
+  color: var(--color-state-success);
+  font-size: var(--font-size-sm);
 }
 
 .continueButton {
   width: 100%;
-  padding-top: 16px;
-  padding-bottom: 16px;
-  border-radius: 12px;
-  font-weight: 700;
+  padding-top: var(--spacing-lg);
+  padding-bottom: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-weight-bold);
   transition: all 0.2s ease;
-  font-size: var(--font-lg, 18px);
+  font-size: var(--font-size-lg);
   border: none;
   cursor: pointer;
-  background-color: var(--state-active, #60a5fa);
+  background-color: var(--color-state-active);
   color: #000;
 }
 
 .continueButton:disabled {
-  background-color: var(--bg-tertiary, #2a2a2a);
-  color: var(--text-disabled, #666666);
+  background-color: var(--bg-tertiary);
+  color: var(--text-disabled);
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* ============================================================================
+   HEADER STYLES
+   ============================================================================ */
+
+.headerTitle {
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  font-size: var(--font-size-lg);
+}
+
+.headerCloseButton {
+  padding: 0.5rem;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.headerCloseIcon {
+  color: var(--text-muted);
+}
+
+.headerBackButton {
+  padding: 0.5rem;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.headerBackIcon {
+  color: var(--text-muted);
+}
+
+.methodLabelConfirm {
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+.methodDetailConfirm {
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
 }
 
 /* ============================================================================
@@ -306,27 +348,27 @@
 }
 
 .amountLabel {
-  color: var(--text-secondary, #b3b3b3);
-  font-size: var(--font-sm, 14px);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
 }
 
 .amountLarge {
-  font-weight: 700;
-  color: var(--text-primary, #ffffff);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
   font-size: 36px;
 }
 
 .infoCard {
   width: 100%;
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 24px;
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
   background-color: rgba(255, 255, 255, 0.03);
 }
 
 .infoCardLabel {
-  color: var(--text-muted, #808080);
-  font-size: var(--font-xs, 12px);
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
 }
 
 .infoCardContent {
@@ -338,8 +380,8 @@
 
 .summaryCard {
   width: 100%;
-  border-radius: 12px;
-  padding: 16px;
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
   background-color: rgba(255, 255, 255, 0.03);
 }
 
@@ -351,17 +393,17 @@
 }
 
 .summaryLabel {
-  color: var(--text-secondary, #b3b3b3);
+  color: var(--text-secondary);
 }
 
 .summaryValue {
-  font-weight: 600;
-  color: var(--text-primary, #ffffff);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
 }
 
 .summaryValueSuccess {
-  font-weight: 600;
-  color: var(--state-success, #10b981);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-state-success);
 }
 
 .summaryDivider {
@@ -371,31 +413,31 @@
 }
 
 .summaryTotal {
-  font-weight: 700;
-  color: var(--text-primary, #ffffff);
-  font-size: var(--font-lg, 18px);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  font-size: var(--font-size-lg);
 }
 
 .timelineNotice {
   text-align: center;
-  margin-top: 24px;
-  color: var(--text-muted, #808080);
-  font-size: var(--font-sm, 14px);
+  margin-top: var(--spacing-xl);
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
 }
 
 .confirmButton {
   width: 100%;
-  padding-top: 16px;
-  padding-bottom: 16px;
-  border-radius: 12px;
-  font-weight: 700;
+  padding-top: var(--spacing-lg);
+  padding-bottom: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-weight-bold);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  background-color: var(--state-active, #60a5fa);
+  gap: var(--spacing-sm);
+  background-color: var(--color-state-active);
   color: #000;
-  font-size: var(--font-lg, 18px);
+  font-size: var(--font-size-lg);
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -449,7 +491,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 24px;
+  margin-bottom: var(--spacing-xl);
 }
 
 .statusIconError {
@@ -461,32 +503,32 @@
 }
 
 .statusTitle {
-  font-weight: 700;
-  margin-bottom: 8px;
-  color: var(--text-primary, #ffffff);
-  font-size: var(--font-xl, 20px);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--spacing-sm);
+  color: var(--text-primary);
+  font-size: var(--font-size-xl);
 }
 
 .statusMessage {
   text-align: center;
-  margin-bottom: 24px;
-  color: var(--state-error, #ef4444);
-  font-size: var(--font-sm, 14px);
+  margin-bottom: var(--spacing-xl);
+  color: var(--color-state-error);
+  font-size: var(--font-size-sm);
 }
 
 .statusMessageProcessing {
-  color: var(--text-secondary, #b3b3b3);
+  color: var(--text-secondary);
 }
 
 .retryButton {
   width: 100%;
-  padding-top: 16px;
-  padding-bottom: 16px;
-  border-radius: 12px;
-  font-weight: 700;
-  background-color: var(--state-active, #60a5fa);
+  padding-top: var(--spacing-lg);
+  padding-bottom: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-weight-bold);
+  background-color: var(--color-state-active);
   color: #000;
-  font-size: var(--font-base);
+  font-size: var(--font-size-base);
   border: none;
   cursor: pointer;
 }
@@ -496,7 +538,7 @@
   height: 32px;
   border-radius: 50%;
   border: 3px solid transparent;
-  border-color: var(--state-active) transparent transparent transparent;
+  border-color: var(--color-state-active) transparent transparent transparent;
   animation: spin 1s linear infinite;
 }
 
@@ -505,19 +547,19 @@
   height: 24px;
   border: 2px solid;
   border-radius: 50%;
-  border-color: var(--state-active) transparent transparent transparent;
+  border-color: var(--color-state-active) transparent transparent transparent;
   animation: spin 1s linear infinite;
 }
 
 .processingLoadingContainer {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 24px;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
 }
 
 .processingLoadingText {
-  color: var(--text-secondary, #b3b3b3);
+  color: var(--text-secondary);
 }
 
 /* ============================================================================
@@ -550,17 +592,17 @@
 .securityBadge {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
-  padding-left: 12px;
-  padding-right: 12px;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+  padding-left: var(--spacing-md);
+  padding-right: var(--spacing-md);
   padding-top: 6px;
   padding-bottom: 6px;
-  border-radius: 9999px;
+  border-radius: var(--radius-full);
   background-color: rgba(96, 165, 250, 0.1);
-  color: var(--state-active);
-  font-size: var(--font-xs, 12px);
-  font-weight: 500;
+  color: var(--color-state-active);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
 }
 
 .biometricIcon {
@@ -570,70 +612,70 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 24px;
+  margin-bottom: var(--spacing-xl);
   background-color: rgba(96, 165, 250, 0.15);
 }
 
 .biometricTitle {
-  font-weight: 700;
-  margin-bottom: 8px;
-  color: var(--text-primary, #ffffff);
-  font-size: var(--font-xl, 20px);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--spacing-sm);
+  color: var(--text-primary);
+  font-size: var(--font-size-xl);
 }
 
 .biometricDescription {
   text-align: center;
-  margin-bottom: 24px;
-  color: var(--text-secondary, #b3b3b3);
-  font-size: var(--font-sm, 14px);
+  margin-bottom: var(--spacing-xl);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
 }
 
 .biometricError {
   width: 100%;
-  margin-bottom: 24px;
+  margin-bottom: var(--spacing-xl);
 }
 
 .biometricErrorBox {
   text-align: center;
-  padding: 12px 16px;
-  margin-bottom: 16px;
-  border-radius: 8px;
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  border-radius: var(--radius-md);
   background-color: rgba(239, 68, 68, 0.1);
-  color: var(--state-error, #ef4444);
-  font-size: var(--font-sm, 14px);
+  color: var(--color-state-error);
+  font-size: var(--font-size-sm);
 }
 
 .biometricErrorButton {
   width: 100%;
-  padding-top: 16px;
-  padding-bottom: 16px;
-  border-radius: 12px;
-  font-weight: 700;
+  padding-top: var(--spacing-lg);
+  padding-bottom: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-weight-bold);
   transition: all 0.2s ease;
-  background-color: var(--state-active, #60a5fa);
+  background-color: var(--color-state-active);
   color: #000;
-  font-size: var(--font-base);
+  font-size: var(--font-size-base);
   border: none;
   cursor: pointer;
 }
 
 .biometricNote {
   text-align: center;
-  color: var(--text-muted, #808080);
-  font-size: var(--font-xs, 12px);
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
 }
 
 .biometricFooter {
   flex-shrink: 0;
-  padding-bottom: 24px;
+  padding-bottom: var(--spacing-xl);
   text-align: center;
 }
 
 .skipButton {
   background: none;
   border: none;
-  color: var(--text-muted, #808080);
-  font-size: var(--font-sm, 14px);
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
   cursor: pointer;
   text-decoration: underline;
 }
@@ -658,43 +700,43 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 24px;
+  margin-bottom: var(--spacing-xl);
   background-color: rgba(16, 185, 129, 0.15);
 }
 
 .successTitle {
-  font-weight: 700;
-  margin-bottom: 8px;
-  color: var(--text-primary, #ffffff);
-  font-size: var(--font-2xl, 28px);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--spacing-sm);
+  color: var(--text-primary);
+  font-size: var(--font-size-2xl);
 }
 
 .successMessage {
   text-align: center;
-  margin-bottom: 24px;
-  color: var(--text-secondary, #b3b3b3);
-  font-size: var(--font-lg, 18px);
+  margin-bottom: var(--spacing-xl);
+  color: var(--text-secondary);
+  font-size: var(--font-size-lg);
 }
 
 .successDetail {
   text-align: center;
-  margin-bottom: 32px;
-  padding: 12px 16px;
-  border-radius: 8px;
+  margin-bottom: var(--spacing-2xl);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-md);
   background-color: rgba(255, 255, 255, 0.03);
-  color: var(--text-muted, #808080);
-  font-size: var(--font-sm, 14px);
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
 }
 
 .successButton {
   width: 100%;
-  padding-top: 16px;
-  padding-bottom: 16px;
-  border-radius: 12px;
-  font-weight: 700;
-  background-color: var(--state-active, #60a5fa);
+  padding-top: var(--spacing-lg);
+  padding-bottom: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-weight-bold);
+  background-color: var(--color-state-active);
   color: #000;
-  font-size: var(--font-lg, 18px);
+  font-size: var(--font-size-lg);
   border: none;
   cursor: pointer;
 }
@@ -728,8 +770,8 @@
 }
 
 .loadingText {
-  margin-top: 16px;
-  color: var(--text-secondary, #b3b3b3);
+  margin-top: var(--spacing-lg);
+  color: var(--text-secondary);
 }
 
 .mainContainer {

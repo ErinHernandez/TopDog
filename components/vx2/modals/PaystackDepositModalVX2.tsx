@@ -20,8 +20,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { cn } from '@/lib/styles';
 import styles from './PaystackDepositModalVX2.module.css';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY, Z_INDEX } from '../core/constants/sizes';
 import { Close, ChevronLeft, ChevronRight } from '../components/icons';
 import {
   formatPaystackAmount,
@@ -282,7 +280,7 @@ function AmountStep({
       <button
         onClick={onContinue}
         disabled={!isValid}
-        className={cn(styles.continueButton, !isValid && styles.opacity50)}
+        className={styles.continueButton}
       >
         Continue with ${amountUSD}
       </button>
@@ -382,8 +380,7 @@ function MethodStep({
           disabled={!selectedMethod}
           className={cn(
             styles.actionButton,
-            selectedMethod && styles.primaryActionButton,
-            !selectedMethod && styles.opacity50
+            selectedMethod && styles.primaryActionButton
           )}
         >
           Continue
@@ -486,8 +483,7 @@ function UssdStep({
           disabled={isChecking}
           className={cn(
             styles.actionButton,
-            styles.primaryActionButton,
-            isChecking && styles.opacity50
+            styles.primaryActionButton
           )}
         >
           {isChecking ? (
@@ -630,8 +626,7 @@ function MobileMoneyStep({
                 disabled={!isValid || isProcessing}
                 className={cn(
                   styles.actionButton,
-                  isValid && !isProcessing && styles.primaryActionButton,
-                  (!isValid || isProcessing) && styles.opacity50
+                  isValid && !isProcessing && styles.primaryActionButton
                 )}
               >
                 {isProcessing ? (
@@ -783,8 +778,7 @@ function UssdBankSelector({
           disabled={!selectedBank || isLoading}
           className={cn(
             styles.actionButton,
-            selectedBank && !isLoading && styles.primaryActionButton,
-            (!selectedBank || isLoading) && styles.opacity50
+            selectedBank && !isLoading && styles.primaryActionButton
           )}
         >
           {isLoading ? (

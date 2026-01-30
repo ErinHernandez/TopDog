@@ -23,7 +23,6 @@ import React, { useCallback, useState, useEffect, createContext, useContext } fr
 import dynamic from 'next/dynamic';
 import { TabNavigationProvider, HeaderProvider } from '../core';
 import type { TabId } from '../core/types';
-import { BG_COLORS, TEXT_COLORS } from '../core/constants/colors';
 import { TabBarVX2, TabContentVX2 } from '../navigation';
 import { useInPhoneFrame } from '../../../lib/inPhoneFrameContext';
 // Light modals - static imports
@@ -45,13 +44,7 @@ import styles from './AppShellVX2.module.css';
 
 // Loading placeholder for payment modals - matches app visual style
 const PaymentModalLoadingPlaceholder = () => (
-  <div
-    className={styles.loadingOverlay}
-    style={{
-      '--loading-modal-bg': BG_COLORS.secondary,
-      '--loading-text-color': TEXT_COLORS.primary,
-    } as React.CSSProperties}
-  >
+  <div className={styles.loadingOverlay}>
     <div className={styles.loadingBackdrop} />
     <div className={styles.loadingModal}>
       <div className={styles.loadingContent}>
@@ -165,12 +158,7 @@ function InnerShell({ badgeOverrides }: InnerShellProps): React.ReactElement {
 
   return (
     <ModalContext.Provider value={modalContext}>
-      <div
-        className={styles.shellContainer}
-        style={{
-          '--shell-bg': BG_COLORS.primary,
-        } as React.CSSProperties}
-      >
+      <div className={styles.shellContainer}>
         {/* Main content - flex so TabContentVX2 gets defined height. In phone frame, no marginBottom so content sits flush with tab bar (goal). */}
         <main className={styles.mainContent}>
           <TabContentVX2 />

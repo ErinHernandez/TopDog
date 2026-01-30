@@ -1,25 +1,27 @@
 /**
  * PlayerCell Component
- * 
+ *
  * The standard player list item template used across the app.
  * Displays: ADP/Rank | Position Badge | Name Team | Projection | Action Button
- * 
+ *
+ * Migrated to CSS Modules for CSP compliance.
+ *
  * @example
  * // Basic display only
  * <PlayerCell player={player} />
- * 
+ *
  * @example
  * // With add/remove toggle
- * <PlayerCell 
- *   player={player} 
+ * <PlayerCell
+ *   player={player}
  *   showAction={true}
  *   isActive={isSelected}
  *   onAction={() => handleToggle(player)}
  * />
- * 
+ *
  * @example
  * // With rank instead of ADP
- * <PlayerCell 
+ * <PlayerCell
  *   player={player}
  *   displayValue={1}
  *   displayType="rank"
@@ -27,8 +29,8 @@
  */
 
 import React from 'react';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS, POSITION_COLORS } from '../../vx2/core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY } from '../../vx2/core/constants/sizes';
+import { cn } from '@/lib/styles';
+import styles from './PlayerCell.module.css';
 import { PositionBadge } from './PositionBadge';
 import { Plus, Minus } from '../../vx2/components/icons';
 import type { Position, PlayerData } from './types';
@@ -67,16 +69,7 @@ export interface PlayerCellProps {
 // CONSTANTS
 // ============================================================================
 
-const CELL_PX = {
-  paddingY: SPACING.xs,    // 4px
-  paddingX: SPACING.md,    // 12px
-  gap: SPACING.sm,         // 8px
-  borderLeft: 4,
-  valueWidth: 28,
-  actionSize: 36,
-  actionIconSize: 20,
-  projMarginRight: 4,
-} as const;
+const ACTION_ICON_SIZE = 20;
 
 // ============================================================================
 // MAIN COMPONENT
@@ -94,13 +87,14 @@ export function PlayerCell({
   disabled = false,
   onClick,
 }: PlayerCellProps): React.ReactElement {
-  const posColor = POSITION_COLORS[player.position.toUpperCase() as keyof typeof POSITION_COLORS] || TEXT_COLORS.muted;
-  
+  // Position for data attribute (used by CSS for border color via utilities.css)
+  const positionLower = player.position.toLowerCase();
+
   // Format display values
-  const leftValue = displayValue !== undefined 
+  const leftValue = displayValue !== undefined
     ? (displayType === 'adp' && typeof displayValue === 'number' ? displayValue.toFixed(1) : displayValue)
     : (typeof player.adp === 'number' ? player.adp.toFixed(1) : player.adp || '-');
-  
+
   const projValue = typeof player.proj === 'number' ? Math.round(player.proj) : player.proj || '-';
 
   const Container = onClick ? 'button' : 'div';
@@ -109,29 +103,16 @@ export function PlayerCell({
     <Container
       onClick={onClick}
       disabled={disabled}
-      className="flex items-center transition-all"
-      style={{ 
-        backgroundColor: BG_COLORS.secondary,
-        borderLeft: `${CELL_PX.borderLeft}px solid ${posColor}`,
-        borderRadius: `${RADIUS.lg}px`,
-        padding: `${CELL_PX.paddingY}px ${CELL_PX.paddingX}px`,
-        gap: `${CELL_PX.gap}px`,
-        width: '100%',
-        border: onClick ? 'none' : undefined,
-        textAlign: 'left',
-        cursor: onClick ? 'pointer' : 'default',
-        opacity: disabled ? 0.5 : 1,
-      }}
+      className={cn(
+        styles.container,
+        onClick && styles.containerClickable,
+        disabled && styles.containerDisabled
+      )}
+      data-position={positionLower}
     >
       {/* ADP / Rank Value */}
-      <div className="text-center flex-shrink-0" style={{ width: `${CELL_PX.valueWidth}px` }}>
-        <div 
-          className="font-bold" 
-          style={{ 
-            color: TEXT_COLORS.secondary, 
-            fontSize: `${TYPOGRAPHY.fontSize.sm}px` 
-          }}
-        >
+      <div className={styles.valueColumn}>
+        <div className={styles.valueText}>
           {leftValue}
         </div>
       </div>
@@ -140,48 +121,22 @@ export function PlayerCell({
       <PositionBadge position={player.position as Position} size="sm" />
 
       {/* Name & Team */}
-      <div className="flex-1 min-w-0 flex items-center gap-1.5">
-        <span 
-          className="font-semibold truncate" 
-          style={{ 
-            color: TEXT_COLORS.primary, 
-            fontSize: `${TYPOGRAPHY.fontSize.sm}px` 
-          }}
-        >
+      <div className={styles.nameTeamWrapper}>
+        <span className={styles.playerName}>
           {player.name}
         </span>
-        <span 
-          className="flex-shrink-0" 
-          style={{ 
-            color: TEXT_COLORS.muted, 
-            fontSize: `${TYPOGRAPHY.fontSize.xs}px` 
-          }}
-        >
+        <span className={styles.playerTeam}>
           {player.team}
         </span>
       </div>
 
       {/* Projection */}
       {showProjection && player.proj !== undefined && (
-        <div 
-          className="text-center flex-shrink-0" 
-          style={{ marginRight: `${CELL_PX.projMarginRight}px` }}
-        >
-          <div 
-            className="font-semibold" 
-            style={{ 
-              color: TEXT_COLORS.primary, 
-              fontSize: `${TYPOGRAPHY.fontSize.xs}px` 
-            }}
-          >
+        <div className={styles.projectionColumn}>
+          <div className={styles.projectionValue}>
             {projValue}
           </div>
-          <div 
-            style={{ 
-              color: TEXT_COLORS.muted, 
-              fontSize: `${TYPOGRAPHY.fontSize.xs}px` 
-            }}
-          >
+          <div className={styles.projectionLabel}>
             Proj
           </div>
         </div>
@@ -196,19 +151,12 @@ export function PlayerCell({
               onAction?.();
             }}
             disabled={disabled}
-            className="flex items-center justify-center transition-all flex-shrink-0"
-            style={{ 
-              width: `${CELL_PX.actionSize}px`,
-              height: `${CELL_PX.actionSize}px`,
-              borderRadius: `${RADIUS.lg}px`,
-              backgroundColor: isActive ? 'rgba(239, 68, 68, 0.15)' : 'rgba(96, 165, 250, 0.15)', 
-              color: isActive ? STATE_COLORS.error : STATE_COLORS.active,
-              border: 'none',
-              cursor: disabled ? 'not-allowed' : 'pointer',
-            }}
+            className={styles.actionButton}
+            data-action={isActive ? 'remove' : 'add'}
+            data-disabled={disabled}
             aria-label={isActive ? `Remove ${player.name}` : `Add ${player.name}`}
           >
-            {isActive ? <Minus size={CELL_PX.actionIconSize} /> : <Plus size={CELL_PX.actionIconSize} />}
+            {isActive ? <Minus size={ACTION_ICON_SIZE} /> : <Plus size={ACTION_ICON_SIZE} />}
           </button>
         )
       )}
@@ -217,4 +165,3 @@ export function PlayerCell({
 }
 
 export default PlayerCell;
-

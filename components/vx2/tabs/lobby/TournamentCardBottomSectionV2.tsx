@@ -22,44 +22,14 @@ import { cn } from '@/lib/styles';
 // ============================================================================
 
 import { ProgressBar } from '../../../ui';
-import { TILED_BG_STYLE } from '../../draft-room/constants';
 import type { Tournament } from '../../hooks/data';
-import { CARD_SPACING, BOTTOM_SECTION_GRID_TEMPLATE } from './constants/cardSpacing';
 import styles from './TournamentCardBottomSectionV2.module.css';
 
 // ============================================================================
 // CONSTANTS - DO NOT MODIFY THESE VALUES
 // ============================================================================
 
-/**
- * Fixed pixel heights for each row
- * Uses centralized CARD_SPACING for consistency
- */
-const ROW_HEIGHTS = {
-  progress: CARD_SPACING.progressHeight,
-  button: CARD_SPACING.buttonHeight,
-  stats: CARD_SPACING.statsHeight,
-} as const;
 
-/**
- * Spacing constants for the bottom section
- * Uses centralized CARD_SPACING for consistency
- */
-const SPACING = {
-  rowGap: CARD_SPACING.bottomRowGap,
-  statsGap: CARD_SPACING.bottomStatsGap,
-} as const;
-
-const TYPOGRAPHY = {
-  // Button font size
-  buttonFontSize: 14,
-  
-  // Stats value font size
-  statsValueFontSize: 18,
-  
-  // Stats label font size  
-  statsLabelFontSize: 12,
-} as const;
 
 const COLORS = {
   // Text colors
@@ -114,10 +84,6 @@ function StatItem({ value, label }: StatItemProps): React.ReactElement {
       {/* Value */}
       <span
         className={cn(styles.statValue, 'vx2-tournament-stat-value')}
-        style={{
-          '--stats-value-font-size': `${TYPOGRAPHY.statsValueFontSize}px`,
-          '--text-primary': COLORS.textPrimary,
-        } as React.CSSProperties}
       >
         {value}
       </span>
@@ -125,10 +91,6 @@ function StatItem({ value, label }: StatItemProps): React.ReactElement {
       {/* Label */}
       <span
         className={cn(styles.statLabel, 'vx2-tournament-stat-label')}
-        style={{
-          '--stats-label-font-size': `${TYPOGRAPHY.statsLabelFontSize}px`,
-          '--text-secondary': COLORS.textSecondary,
-        } as React.CSSProperties}
       >
         {label}
       </span>
@@ -178,18 +140,6 @@ export function BottomSectionV2({
     <div
       className={cn(styles.bottomSectionV2, 'vx2-tournament-bottom-section-v2')}
       data-has-progress={hasProgress}
-      style={{
-        '--progress-height': `${ROW_HEIGHTS.progress}px`,
-        '--button-height': `${ROW_HEIGHTS.button}px`,
-        '--stats-height': `${ROW_HEIGHTS.stats}px`,
-        '--button-font-size': `${TYPOGRAPHY.buttonFontSize}px`,
-        '--stats-value-font-size': `${TYPOGRAPHY.statsValueFontSize}px`,
-        '--stats-label-font-size': `${TYPOGRAPHY.statsLabelFontSize}px`,
-        '--row-gap': `${SPACING.rowGap}px`,
-        '--stats-gap': `${SPACING.statsGap}px`,
-        '--text-primary': COLORS.textPrimary,
-        '--text-secondary': COLORS.textSecondary,
-      } as React.CSSProperties}
     >
       {/* ========================================
           Row 1: Progress Bar (conditional)
@@ -217,21 +167,11 @@ export function BottomSectionV2({
         className={cn(
           styles.button,
           !styleOverrides.buttonBackgroundColor && 'vx2-tournament-button',
-          styleOverrides.buttonBackgroundColor && styles.buttonCustom
+          styleOverrides.buttonBackgroundColor && styles.buttonCustom,
+          !styleOverrides.buttonBackground && 'bg-tiled'
         )}
-        style={{
-          ...(styleOverrides.buttonBackground ? {} : TILED_BG_STYLE),
-          ...(styleOverrides.buttonBackground
-            ? {
-                '--button-bg-image': styleOverrides.buttonBackground,
-              }
-            : {}),
-          ...(styleOverrides.buttonBackgroundColor
-            ? {
-                '--button-bg-color': styleOverrides.buttonBackgroundColor,
-              }
-            : {}),
-        } as React.CSSProperties}
+        data-button-bg-image={styleOverrides.buttonBackground}
+        data-button-bg-color={styleOverrides.buttonBackgroundColor}
         aria-label={`Join ${tournament.title} for ${tournament.entryFee}`}
       >
         Join Tournament

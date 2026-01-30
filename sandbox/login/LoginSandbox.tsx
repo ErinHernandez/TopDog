@@ -21,8 +21,8 @@ import {
   SignUpScreenVX2,
   useAuth,
 } from '../../components/vx2/auth';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS } from '../../components/vx2/core/constants/colors';
 import MobilePhoneFrame from '../../components/vx2/shell/MobilePhoneFrame';
+import styles from './LoginSandbox.module.css';
 
 export type LoginSandboxMode = 'modals' | 'screens';
 
@@ -44,59 +44,49 @@ function AuthStatus(): JSX.Element {
 
   if (isLoading) {
     return (
-      <div className="p-3 rounded-xl" style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}>
-        <p className="text-sm" style={{ color: TEXT_COLORS.muted }}>Loading...</p>
+      <div className={styles.authStatusLoading}>
+        <p className={styles.authStatusLoadingText}>Loading...</p>
       </div>
     );
   }
 
   if (!isAuthenticated || !user) {
     return (
-      <div className="p-3 rounded-xl" style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}>
-        <p className="text-sm" style={{ color: TEXT_COLORS.secondary }}>Not signed in</p>
+      <div className={styles.authStatusNotSignedIn}>
+        <p className={styles.authStatusNotSignedInText}>Not signed in</p>
       </div>
     );
   }
 
   return (
-    <div
-      className="p-3 rounded-xl space-y-2"
-      style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)' }}
-    >
+    <div className={styles.authStatusSignedIn}>
       <div className="flex items-center gap-2">
-        <div
-          className="w-10 h-10 rounded-full flex items-center justify-center text-base font-bold flex-shrink-0"
-          style={{ backgroundColor: STATE_COLORS.success, color: '#000' }}
-        >
+        <div className={styles.authStatusAvatar}>
           {profile?.username?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || '?'}
         </div>
-        <div className="min-w-0 flex-1">
-          <p className="font-semibold text-sm truncate" style={{ color: TEXT_COLORS.primary }}>
+        <div className={styles.authStatusUserInfo}>
+          <p className={styles.authStatusUsername}>
             @{profile?.username || 'No username'}
           </p>
-          <p className="text-xs truncate" style={{ color: TEXT_COLORS.secondary }}>
+          <p className={styles.authStatusEmail}>
             {user.email || 'No email'}
           </p>
         </div>
       </div>
-      <div className="pt-2 border-t border-white/10 space-y-0.5 text-xs">
-        <p className="truncate" style={{ color: TEXT_COLORS.muted }}>
-          UID: <span style={{ color: TEXT_COLORS.secondary }}>{user.uid}</span>
+      <div className={styles.authStatusDetails}>
+        <p className={styles.authStatusDetailRow}>
+          UID: <span className={styles.authStatusDetailValue}>{user.uid}</span>
         </p>
-        <p style={{ color: TEXT_COLORS.muted }}>
+        <p className={styles.authStatusDetailRow}>
           Email verified:{' '}
-          <span style={{ color: user.emailVerified ? STATE_COLORS.success : STATE_COLORS.warning }}>
+          <span style={{ color: user.emailVerified ? 'var(--color-state-success)' : 'var(--color-state-warning)' }}>
             {user.emailVerified ? 'Yes' : 'No'}
           </span>
         </p>
       </div>
       <button
         onClick={() => signOut()}
-        className="w-full py-2 rounded-lg font-medium text-sm"
-        style={{
-          backgroundColor: 'rgba(239, 68, 68, 0.2)',
-          color: STATE_COLORS.error,
-        }}
+        className={styles.authStatusSignOutButton}
       >
         Sign Out
       </button>
@@ -118,25 +108,15 @@ function ModalsModeContent({
   onCloseModal: () => void;
 }): JSX.Element {
   return (
-    <div
-      className="relative w-full h-full overflow-hidden"
-      style={{ backgroundColor: BG_COLORS.primary }}
-    >
+    <div className={styles.modalsContainer}>
       {!activeModal && (
-        <div
-          className="absolute inset-0 flex flex-col items-center justify-center p-6"
-          style={{ paddingTop: '60px' }}
-        >
-          <div
-            className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
-            style={{ backgroundColor: 'rgba(96, 165, 250, 0.15)' }}
-          >
+        <div className={styles.modalsEmptyState}>
+          <div className={styles.modalsIcon}>
             <svg
-              width="32"
-              height="32"
+              className={styles.modalsIconSvg}
               viewBox="0 0 24 24"
               fill="none"
-              stroke={STATE_COLORS.active}
+              stroke="var(--color-state-active)"
               strokeWidth="2"
             >
               <path
@@ -146,10 +126,10 @@ function ModalsModeContent({
               />
             </svg>
           </div>
-          <h2 className="text-lg font-bold mb-2 text-center" style={{ color: TEXT_COLORS.primary }}>
+          <h2 className={styles.modalsTitle}>
             Auth Modals
           </h2>
-          <p className="text-sm text-center" style={{ color: TEXT_COLORS.secondary }}>
+          <p className={styles.modalsDescription}>
             Use the controls panel to open Sign In, Sign Up, Forgot Password, or Profile
           </p>
         </div>
@@ -198,7 +178,7 @@ function ScreensModeContent({
 }): JSX.Element {
   if (currentView === 'signup') {
     return (
-      <div className="w-full h-full overflow-auto" style={{ backgroundColor: BG_COLORS.primary }}>
+      <div className={styles.screensContainer}>
         <SignUpScreenVX2
           onSwitchToLogin={onSwitchToLogin}
           onSuccess={onSuccess}
@@ -207,7 +187,7 @@ function ScreensModeContent({
     );
   }
   return (
-    <div className="w-full h-full overflow-auto" style={{ backgroundColor: BG_COLORS.primary }}>
+    <div className={styles.screensContainer}>
       <LoginScreenVX2
         onSwitchToSignUp={onSwitchToSignUp}
         onSuccess={onSuccess}
@@ -233,11 +213,8 @@ function LoginSandboxInner({
   const closeModal = useCallback(() => setActiveModal(null), []);
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center gap-8 p-8"
-      style={{ backgroundColor: '#1a1a2e' }}
-    >
-      <div className="flex flex-col items-center gap-3">
+    <div className={styles.mainSandbox}>
+      <div className={styles.phoneWrapper}>
         <MobilePhoneFrame>
           {mode === 'modals' ? (
             <ModalsModeContent
@@ -255,47 +232,40 @@ function LoginSandboxInner({
           )}
         </MobilePhoneFrame>
         {label && (
-          <span className="text-sm" style={{ color: TEXT_COLORS.muted }}>
+          <span className={styles.phoneLabel}>
             {label}
           </span>
         )}
       </div>
 
-      <div className="w-80 space-y-4" style={{ color: TEXT_COLORS.primary }}>
-        <div>
-          <h1 className="text-xl font-bold mb-1" style={{ color: TEXT_COLORS.primary }}>
+      <div className={styles.controlsPanel}>
+        <div className={styles.controlsHeader}>
+          <h1 className={styles.controlsTitle}>
             Login System Sandbox
           </h1>
-          <p className="text-sm" style={{ color: TEXT_COLORS.secondary }}>
+          <p className={styles.controlsSubtitle}>
             VX2 auth: modals or full-screen flows
           </p>
         </div>
 
-        <div>
-          <h2
-            className="text-sm font-semibold mb-2 uppercase tracking-wide"
-            style={{ color: TEXT_COLORS.muted }}
-          >
+        <div className={styles.controlsSection}>
+          <h2 className={styles.controlsSectionTitle}>
             Mode
           </h2>
-          <div className="flex gap-2">
+          <div className={styles.modeButtonsContainer}>
             <button
               onClick={() => setMode('modals')}
-              className="flex-1 py-2 rounded-lg font-semibold text-sm"
-              style={{
-                backgroundColor: mode === 'modals' ? STATE_COLORS.active : 'rgba(255,255,255,0.08)',
-                color: mode === 'modals' ? '#000' : TEXT_COLORS.primary,
-              }}
+              className={`${styles.modeButton} ${
+                mode === 'modals' ? styles.modeButtonActive : styles.modeButtonInactive
+              }`}
             >
               Modals
             </button>
             <button
               onClick={() => setMode('screens')}
-              className="flex-1 py-2 rounded-lg font-semibold text-sm"
-              style={{
-                backgroundColor: mode === 'screens' ? STATE_COLORS.active : 'rgba(255,255,255,0.08)',
-                color: mode === 'screens' ? '#000' : TEXT_COLORS.primary,
-              }}
+              className={`${styles.modeButton} ${
+                mode === 'screens' ? styles.modeButtonActive : styles.modeButtonInactive
+              }`}
             >
               Full-screen
             </button>
@@ -303,33 +273,24 @@ function LoginSandboxInner({
         </div>
 
         {mode === 'screens' && (
-          <div>
-            <h2
-              className="text-sm font-semibold mb-2 uppercase tracking-wide"
-              style={{ color: TEXT_COLORS.muted }}
-            >
+          <div className={styles.controlsSection}>
+            <h2 className={styles.controlsSectionTitle}>
               Screen
             </h2>
-            <div className="flex gap-2">
+            <div className={styles.screenButtonsContainer}>
               <button
                 onClick={() => setScreenView('login')}
-                className="flex-1 py-2 rounded-lg font-semibold text-sm"
-                style={{
-                  backgroundColor:
-                    screenView === 'login' ? STATE_COLORS.active : 'rgba(255,255,255,0.08)',
-                  color: screenView === 'login' ? '#000' : TEXT_COLORS.primary,
-                }}
+                className={`${styles.screenButton} ${
+                  screenView === 'login' ? styles.screenButtonActive : styles.screenButtonInactive
+                }`}
               >
                 Login
               </button>
               <button
                 onClick={() => setScreenView('signup')}
-                className="flex-1 py-2 rounded-lg font-semibold text-sm"
-                style={{
-                  backgroundColor:
-                    screenView === 'signup' ? STATE_COLORS.active : 'rgba(255,255,255,0.08)',
-                  color: screenView === 'signup' ? '#000' : TEXT_COLORS.primary,
-                }}
+                className={`${styles.screenButton} ${
+                  screenView === 'signup' ? styles.screenButtonActive : styles.screenButtonInactive
+                }`}
               >
                 Sign Up
               </button>
@@ -338,23 +299,18 @@ function LoginSandboxInner({
         )}
 
         {mode === 'modals' && (
-          <div>
-            <h2
-              className="text-sm font-semibold mb-2 uppercase tracking-wide"
-              style={{ color: TEXT_COLORS.muted }}
-            >
+          <div className={styles.controlsSection}>
+            <h2 className={styles.controlsSectionTitle}>
               Open modal
             </h2>
-            <div className="space-y-2">
+            <div className={styles.modalButtonsContainer}>
               {(['signin', 'signup', 'forgot', 'profile'] as const).map((m) => (
                 <button
                   key={m}
                   onClick={() => openModal(m)}
-                  className="w-full py-2.5 rounded-lg font-semibold text-sm capitalize"
-                  style={{
-                    backgroundColor: activeModal === m ? STATE_COLORS.active : 'rgba(255,255,255,0.08)',
-                    color: activeModal === m ? '#000' : TEXT_COLORS.primary,
-                  }}
+                  className={`${styles.modalButton} ${
+                    activeModal === m ? styles.modalButtonActive : styles.modalButtonInactive
+                  }`}
                 >
                   {m === 'signin' ? 'Sign In' : m === 'signup' ? 'Sign Up' : m === 'forgot' ? 'Forgot Password' : 'Profile'}
                 </button>
@@ -363,34 +319,22 @@ function LoginSandboxInner({
           </div>
         )}
 
-        <div>
-          <h2
-            className="text-sm font-semibold mb-2 uppercase tracking-wide"
-            style={{ color: TEXT_COLORS.muted }}
-          >
+        <div className={styles.controlsSection}>
+          <h2 className={styles.controlsSectionTitle}>
             Auth status
           </h2>
           <AuthStatus />
         </div>
 
-        <div
-          className="p-3 rounded-lg"
-          style={{
-            backgroundColor: 'rgba(255,255,255,0.03)',
-            border: '1px solid rgba(255,255,255,0.08)',
-          }}
-        >
-          <h3
-            className="font-semibold mb-2 text-xs uppercase tracking-wide"
-            style={{ color: TEXT_COLORS.muted }}
-          >
+        <div className={styles.notesBox}>
+          <h3 className={styles.notesTitle}>
             Notes
           </h3>
-          <ul className="space-y-1 text-xs" style={{ color: TEXT_COLORS.secondary }}>
-            <li>Firebase must be configured in .env.local</li>
-            <li>Password: 8+ chars, upper, lower, number</li>
-            <li>Username: 3–18 chars, starts with letter</li>
-            <li>Modals = overlay; Screens = gate-style login/signup</li>
+          <ul className={styles.notesList}>
+            <li className={styles.notesItem}>Firebase must be configured in .env.local</li>
+            <li className={styles.notesItem}>Password: 8+ chars, upper, lower, number</li>
+            <li className={styles.notesItem}>Username: 3–18 chars, starts with letter</li>
+            <li className={styles.notesItem}>Modals = overlay; Screens = gate-style login/signup</li>
           </ul>
         </div>
       </div>

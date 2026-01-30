@@ -2,7 +2,15 @@
  * JoinTournamentModal - CSS Module for CSP Compliance
  *
  * Migrated from inline styles to CSS Modules for Content Security Policy compliance.
- * Uses CSS custom properties for dynamic values from constants.
+ * Uses CSS custom properties for dynamic values and spacing tokens.
+ *
+ * Spacing tokens used from tokens.css:
+ * - --spacing-xs (4px): Small gaps and padding
+ * - --spacing-sm (8px): Small gaps and padding
+ * - --spacing-md (12px): Medium padding and gaps
+ * - --spacing-lg (16px): Standard padding and row gaps
+ * - --spacing-xl (24px): Large gaps between sections
+ * - --spacing-2xl (32px): Extra-large spacing
  *
  * @module JoinTournamentModal.module.css
  */
@@ -22,7 +30,7 @@
   align-items: center;
   justify-content: center;
   background-color: var(--color-bg-overlay);
-  z-index: var(--z-modal);
+  z-index: var(--z-modal, 1000);
 }
 
 .overlay.hidden {
@@ -454,7 +462,7 @@
   font-size: var(--font-size-sm);
   font-weight: 600;
   width: 100%;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   border: none;
   cursor: pointer;
   transition: background-color 0.2s ease;
@@ -508,7 +516,7 @@
   color: var(--color-text-primary);
   background-color: var(--color-stat-bg);
   padding: 2px 6px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 .statItemLabel {
@@ -516,7 +524,7 @@
   color: var(--color-text-secondary);
   background-color: var(--color-stat-bg);
   padding: 1px 4px;
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
   margin-top: 2px;
 }
 
@@ -534,7 +542,7 @@
   color: var(--color-text-primary);
   background-color: var(--color-stat-bg);
   padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   text-align: center;
   border: 1px solid rgba(255, 255, 255, 0.3);
   outline: none;

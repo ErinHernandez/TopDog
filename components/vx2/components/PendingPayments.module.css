@@ -1,13 +1,18 @@
-/* PendingPayments.module.css - CSS Module for CSP-compliant styling */
+/**
+ * PendingPayments CSS Module
+ *
+ * Zero-runtime CSS for CSP compliance.
+ * Uses tokens.css variables for all colors.
+ */
 
 /* ============================================================================
    CONTAINER STYLES
    ============================================================================ */
 
 .container {
-  border-radius: 0.75rem;
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  background-color: var(--bg-secondary, #f5f5f5);
+  background-color: var(--bg-secondary);
 }
 
 /* ============================================================================
@@ -15,8 +20,8 @@
    ============================================================================ */
 
 .header {
-  padding: 1rem;
-  border-bottom: 1px solid var(--border-default, #e0e0e0);
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--border-default);
 }
 
 .headerContent {
@@ -27,23 +32,23 @@
 
 .headerText h3 {
   font-weight: 600;
-  font-size: var(--typography-lg, 1.125rem);
+  font-size: var(--font-size-lg);
   color: var(--text-primary);
   margin: 0;
 }
 
 .headerText p {
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   margin-top: 0.125rem;
   margin-bottom: 0;
   color: var(--text-secondary);
 }
 
 .refreshButton {
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  background-color: var(--bg-tertiary, #ffffff);
-  color: var(--text-secondary, #666666);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -64,12 +69,8 @@
 }
 
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 /* ============================================================================
@@ -77,7 +78,7 @@
    ============================================================================ */
 
 .content {
-  padding: 1rem;
+  padding: var(--spacing-md);
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
@@ -93,17 +94,16 @@
 .spinner {
   width: 1.5rem;
   height: 1.5rem;
-  border: 2px solid currentColor;
+  border: 2px solid var(--color-state-active);
   border-top-color: transparent;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  color: var(--state-active, #3b82f6);
 }
 
 .errorMessage {
   text-align: center;
   padding: 1.5rem 0;
-  color: var(--state-error, #dc2626);
+  color: var(--color-state-error);
 }
 
 /* ============================================================================
@@ -111,22 +111,21 @@
    ============================================================================ */
 
 .card {
-  padding: 1rem;
-  border-radius: 0.5rem;
-  background-color: var(--bg-tertiary, #ffffff);
-  border: 1px solid var(--border-default, #e0e0e0);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-default);
   transition: opacity 0.2s ease;
 }
 
 .card.disabled {
   opacity: 0.6;
-  border-color: var(--border-default, #e0e0e0);
 }
 
 .cardContent {
   display: flex;
   align-items: flex-start;
-  gap: 1rem;
+  gap: var(--spacing-md);
 }
 
 .paymentIcon {
@@ -139,12 +138,11 @@
   min-width: 0;
 }
 
-/* Header row: Title and Amount */
 .cardHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
+  gap: var(--spacing-sm);
   margin-bottom: 0.25rem;
 }
 
@@ -153,73 +151,78 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: var(--text-primary, #000000);
+  color: var(--text-primary);
   margin: 0;
 }
 
 .cardAmount {
   font-weight: 700;
   flex-shrink: 0;
-  color: var(--state-success, #10b981);
+  color: var(--color-state-success);
 }
 
-/* Description */
 .cardDescription {
-  font-size: 0.875rem;
-  margin-bottom: 0.5rem;
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-sm);
   margin-top: 0;
-  color: var(--text-secondary, #666666);
+  color: var(--text-secondary);
 }
 
-/* Expiration status */
+/* ============================================================================
+   EXPIRATION STATUS
+   ============================================================================ */
+
 .expirationContainer {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--spacing-sm);
   margin-bottom: 0.75rem;
 }
 
 .expirationLabel {
-  font-size: 0.75rem;
-  color: var(--text-muted, #999999);
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
 }
 
 .expirationBadge {
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   font-weight: 500;
   padding: 0.125rem 0.5rem;
-  border-radius: 0.25rem;
-  background-color: var(--expiration-bg, #fef3c720);
-  color: var(--expiration-text, #f59e0b);
+  border-radius: var(--radius-sm);
+  background-color: rgba(245, 158, 11, 0.12);
+  color: var(--color-state-warning);
 }
 
 .expirationBadge.expiringSoon {
-  background-color: var(--expiration-bg-soon, #fee2e220);
-  color: var(--expiration-text-soon, #ef4444);
+  background-color: rgba(239, 68, 68, 0.12);
+  color: var(--color-state-error);
 }
 
-/* Actions row */
+/* ============================================================================
+   ACTION BUTTONS
+   ============================================================================ */
+
 .actions {
   display: flex;
-  gap: 0.5rem;
+  gap: var(--spacing-sm);
 }
 
 .viewButton {
   flex: 1;
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
+  padding: var(--spacing-sm) 0.75rem;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
   font-weight: 500;
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
-  background-color: var(--button-bg, #10b981);
-  color: var(--button-text, #ffffff);
+  background-color: var(--color-state-success);
+  color: #fff;
 }
 
 .viewButton:disabled {
-  background-color: var(--button-disabled-bg, #f3f4f6);
-  color: var(--button-disabled-text, #999999);
+  background-color: var(--bg-elevated);
+  color: var(--text-muted);
   cursor: not-allowed;
 }
 
@@ -228,13 +231,13 @@
 }
 
 .cancelButton {
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
+  padding: var(--spacing-sm) 0.75rem;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
   font-weight: 500;
-  border: 1px solid var(--border-default, #e0e0e0);
-  background-color: var(--bg-tertiary, #ffffff);
-  color: var(--text-secondary, #666666);
+  border: 1px solid var(--border-default);
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.2s ease;
 }

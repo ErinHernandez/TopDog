@@ -12,8 +12,6 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/styles';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS, POSITION_COLORS } from '../core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY, Z_INDEX } from '../core/constants/sizes';
 import { Close, Plus, Minus } from '../components/icons';
 import type { Position, PositionLimits } from '../draft-logic';
 import { POSITIONS } from '../draft-logic';
@@ -27,9 +25,9 @@ const logger = createScopedLogger('[AutodraftLimitsModal]');
 // ============================================================================
 
 const MODAL_PX = {
-  padding: SPACING.lg,
-  headerPadding: SPACING.lg,
-  rowGap: SPACING.md,
+  padding: 16,        // was SPACING.lg
+  headerPadding: 16,  // was SPACING.lg
+  rowGap: 12,         // was SPACING.md
   buttonHeight: 48,
 } as const;
 
@@ -71,23 +69,17 @@ interface PositionRowProps {
 }
 
 function PositionRow({ position, value, maxValue, onChange, disabled }: PositionRowProps): React.ReactElement {
-  const color = POSITION_COLORS[position as keyof typeof POSITION_COLORS] || '#6B7280';
   const atMin = value <= 0;
   const atMax = value >= maxValue;
 
   return (
     <div
       className={styles.positionRow}
-      style={{
-        '--position-color': color,
-      } as React.CSSProperties}
+      data-position={position.toLowerCase()}
     >
       {/* Position info */}
       <div className={styles.positionInfo}>
-        <div
-          className={styles.positionLabel}
-          style={{ '--position-color': color } as React.CSSProperties}
-        >
+        <div className={styles.positionLabel}>
           {position}
         </div>
         <div className={styles.positionSubLabel}>
@@ -129,12 +121,7 @@ function PositionRow({ position, value, maxValue, onChange, disabled }: Position
 function LoadingSpinner(): React.ReactElement {
   return (
     <div className={styles.loadingSpinner}>
-      <div
-        className={styles.spinnerCircle}
-        style={{
-          '--spinner-color': STATE_COLORS.active,
-        } as React.CSSProperties}
-      />
+      <div className={styles.spinnerCircle} />
     </div>
   );
 }
@@ -241,10 +228,6 @@ export default function AutodraftLimitsModalVX2({
   return (
     <div
       className={styles.modalContainer}
-      style={{
-        '--z-modal': Z_INDEX.modal,
-        '--title-font-size': `${TYPOGRAPHY.fontSize.lg}px`,
-      } as React.CSSProperties}
       role="dialog"
       aria-modal="true"
       aria-labelledby="autodraft-modal-title"
@@ -269,13 +252,6 @@ export default function AutodraftLimitsModalVX2({
       {/* Content */}
       <div
         className={styles.contentArea}
-        style={{
-          '--content-padding': `${MODAL_PX.padding}px`,
-          '--description-font-size': `${TYPOGRAPHY.fontSize.sm}px`,
-          '--row-gap': `${MODAL_PX.rowGap}px`,
-          '--rows-margin-bottom': `${SPACING.xl}px`,
-          '--error-font-size': `${TYPOGRAPHY.fontSize.sm}px`,
-        } as React.CSSProperties}
       >
         {/* Description */}
         <p className={styles.description}>
@@ -303,12 +279,7 @@ export default function AutodraftLimitsModalVX2({
 
             {/* Error message */}
             {error && (
-              <div
-                className={styles.errorMessage}
-                style={{
-                  '--error-color': STATE_COLORS.error,
-                } as React.CSSProperties}
-              >
+              <div className={styles.errorMessage}>
                 {error}
               </div>
             )}
@@ -320,12 +291,6 @@ export default function AutodraftLimitsModalVX2({
       {!isLoading && (
         <div
           className={styles.footer}
-          style={{
-            '--footer-padding': `${MODAL_PX.padding}px`,
-            '--button-height': `${MODAL_PX.buttonHeight}px`,
-            '--button-radius': `${RADIUS.lg}px`,
-            '--save-bg': STATE_COLORS.active,
-          } as React.CSSProperties}
         >
           <button
             onClick={handleReset}

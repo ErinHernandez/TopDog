@@ -23,9 +23,9 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import type { SlowDraftsTabProps, SlowDraft } from './types';
 import { SLOW_DRAFT_LAYOUT } from './constants';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS } from './deps/core/constants/colors';
 import { SPACING, RADIUS } from './deps/core/constants/sizes';
 import { Skeleton, EmptyState, ErrorState } from './deps/components/shared';
+import styles from './SlowDraftsTabVX2.module.css';
 
 import {
   SlowDraftCard,
@@ -43,7 +43,7 @@ function CardSkeleton(): React.ReactElement {
       style={{
         padding: SLOW_DRAFT_LAYOUT.cardPaddingX,
         borderRadius: SLOW_DRAFT_LAYOUT.cardBorderRadius,
-        backgroundColor: BG_COLORS.secondary,
+        backgroundColor: 'var(--bg-secondary)',
         border: '1px solid rgba(255, 255, 255, 0.08)',
       }}
     >
@@ -110,22 +110,10 @@ interface JoinDraftButtonProps {
 
 function JoinDraftButton({ onClick }: JoinDraftButtonProps): React.ReactElement {
   return (
-    <div
-      style={{
-        padding: SPACING.lg,
-        borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-      }}
-    >
+    <div className={styles.joinDraftButtonContainer}>
       <button
         onClick={onClick}
-        className="w-full font-semibold transition-all active:scale-[0.98]"
-        style={{
-          height: 48,
-          borderRadius: RADIUS.lg,
-          backgroundColor: STATE_COLORS.active,
-          color: '#FFFFFF',
-          fontSize: 15,
-        }}
+        className={styles.joinDraftButton}
       >
         Join New Slow Draft
       </button>
@@ -191,10 +179,7 @@ export default function SlowDraftsTabVX2({
   // ============================================================
   if (error) {
     return (
-      <div
-        className="flex-1 flex flex-col items-center justify-center"
-        style={{ backgroundColor: BG_COLORS.primary, padding: SPACING.xl }}
-      >
+      <div className={styles.errorContainer}>
         <ErrorState
           title="Failed to load drafts"
           description={error}
@@ -209,18 +194,10 @@ export default function SlowDraftsTabVX2({
   // ============================================================
   if (isLoading && sortedFilteredDrafts.length === 0) {
     return (
-      <div
-        className="flex-1 flex flex-col"
-        style={{ backgroundColor: BG_COLORS.primary }}
-      >
+      <div className={styles.loadingContainer}>
         {/* Filter/Sort bar skeleton */}
-        <div
-          style={{
-            padding: `${SPACING.sm}px ${SLOW_DRAFT_LAYOUT.listPaddingX}px`,
-            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-          }}
-        >
-          <div className="flex gap-2">
+        <div className={styles.skeletonBar}>
+          <div className={styles.skeletonBarContent}>
             <Skeleton width={60} height={32} borderRadius={12} />
             <Skeleton width={80} height={32} borderRadius={12} />
             <Skeleton width={120} height={32} borderRadius={12} />
@@ -239,17 +216,11 @@ export default function SlowDraftsTabVX2({
     const isFiltered = filterBy !== 'all';
 
     return (
-      <div
-        className="flex-1 flex flex-col"
-        style={{ backgroundColor: BG_COLORS.primary }}
-      >
+      <div className={styles.emptyContainer}>
         {/* Filter/Sort bar */}
         <FilterSortBar sortBy={sortBy} onSortChange={setSortBy} />
 
-        <div
-          className="flex-1 flex items-center justify-center"
-          style={{ padding: SPACING.xl }}
-        >
+        <div className={styles.emptyContentWrapper}>
           <EmptyState
             title={isFiltered ? 'No Matching Drafts' : 'No Active Slow Drafts'}
             description={
@@ -281,8 +252,7 @@ export default function SlowDraftsTabVX2({
   // ============================================================
   return (
     <div
-      className="flex-1 flex flex-col"
-      style={{ backgroundColor: BG_COLORS.primary }}
+      className={styles.mainContainer}
       role="main"
       aria-label="Slow drafts"
     >
@@ -297,20 +267,17 @@ export default function SlowDraftsTabVX2({
 
       {/* Drafts list */}
       <div
-        className="flex-1 min-h-0 overflow-y-auto"
+        className={styles.draftsList}
         style={{
           paddingLeft: SLOW_DRAFT_LAYOUT.listPaddingX,
           paddingRight: SLOW_DRAFT_LAYOUT.listPaddingX,
           paddingTop: SLOW_DRAFT_LAYOUT.listPaddingY,
           paddingBottom: SLOW_DRAFT_LAYOUT.listPaddingY,
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
         }}
       >
         <div
+          className={styles.draftsListContent}
           style={{
-            display: 'flex',
-            flexDirection: 'column',
             gap: SLOW_DRAFT_LAYOUT.cardGap,
           }}
         >
@@ -331,7 +298,7 @@ export default function SlowDraftsTabVX2({
         </div>
 
         {/* Bottom padding */}
-        <div style={{ height: SPACING['2xl'], flexShrink: 0 }} />
+        <div className={styles.bottomPadding} />
       </div>
 
       {/* Join button */}

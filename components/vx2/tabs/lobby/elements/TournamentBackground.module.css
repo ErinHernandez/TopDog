@@ -1,9 +1,13 @@
 .container {
   position: absolute;
   inset: 0;
-  z-index: 0;
+  z-index: var(--z-base);
   border-radius: var(--border-radius, 0px);
   overflow: hidden;
+}
+
+.container[data-border-radius] {
+  --border-radius: calc(var(data-border-radius) * 1px);
 }
 
 .placeholder {
@@ -13,7 +17,11 @@
   background-size: cover;
   background-position: center;
   opacity: var(--is-loaded, 0);
-  transition: var(--transition);
+  transition: opacity var(--duration-slow) ease-out;
+}
+
+.placeholder[data-is-loaded] {
+  --is-loaded: var(data-is-loaded);
 }
 
 .image {
@@ -23,7 +31,11 @@
   background-size: cover;
   background-position: center;
   opacity: var(--is-loaded, 0);
-  transition: var(--transition);
+  transition: opacity var(--duration-slow) ease-out;
+}
+
+.image[data-is-loaded] {
+  --is-loaded: var(data-is-loaded);
 }
 
 .overlay {

@@ -8,7 +8,6 @@
 
 import React from 'react';
 import { cn } from '@/lib/styles';
-import { CARD_SPACING_V3 } from '../constants/cardSpacingV3';
 import styles from './TournamentStats.module.css';
 
 export interface TournamentStatsProps {
@@ -29,10 +28,6 @@ function StatItem({ label, value }: StatItemProps): React.ReactElement {
   return (
     <div
       className={cn(styles.statItem)}
-      style={{
-        '--value-font-size': `${CARD_SPACING_V3.statsValueFontSize}px`,
-        '--label-font-size': `${CARD_SPACING_V3.statsLabelFontSize}px`,
-      } as React.CSSProperties}
     >
       <span className={cn(styles.statValue)}>
         {value}
@@ -53,10 +48,6 @@ export function TournamentStats({
   return (
     <div
       className={cn(styles.container)}
-      style={{
-        '--gap': `${CARD_SPACING_V3.bottomStatsGap}px`,
-        '--height': `${CARD_SPACING_V3.statsHeight}px`,
-      } as React.CSSProperties}
     >
       <StatItem label="Entry" value={entryFee} />
       <StatItem label="Entries" value={entries} />

@@ -14,9 +14,8 @@
 import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS } from '../../../components/vx2/core/constants/colors';
-import { TYPOGRAPHY } from '../../../components/vx2/core/constants/sizes';
 import { formatPaystackAmount } from '../../../lib/paystack/currencyConfig';
+import styles from './callback.module.css';
 
 // ============================================================================
 // TYPES
@@ -85,165 +84,119 @@ export default function PaystackCallbackPage(): React.ReactElement {
       <Head>
         <title>Payment {result?.status === 'success' ? 'Successful' : 'Processing'} | TopDog</title>
       </Head>
-      
-      <div 
-        className="min-h-screen flex items-center justify-center p-6"
-        style={{ backgroundColor: BG_COLORS.primary }}
-      >
-        <div 
-          className="w-full max-w-md rounded-2xl p-8 text-center"
-          style={{ backgroundColor: BG_COLORS.secondary }}
-        >
+
+      <div className={styles.pageContainer}>
+        <div className={styles.card}>
           {isVerifying ? (
             <>
-              <div className="animate-spin w-16 h-16 border-4 border-white/20 border-t-white rounded-full mx-auto mb-6" />
-              <h1 
-                className="font-bold mb-2"
-                style={{ color: TEXT_COLORS.primary, fontSize: `${TYPOGRAPHY.fontSize.xl}px` }}
-              >
+              <div className={styles.spinner} />
+              <h1 className={`${styles.title} ${styles.titleDefault}`}>
                 Verifying Payment
               </h1>
-              <p style={{ color: TEXT_COLORS.secondary }}>
+              <p className={styles.message}>
                 Please wait while we confirm your payment...
               </p>
             </>
           ) : error ? (
             <>
-              <div 
-                className="w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-6"
-                style={{ backgroundColor: `${STATE_COLORS.error}20` }}
-              >
-                <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke={STATE_COLORS.error}>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <div className={`${styles.iconContainer} ${styles.iconContainerError}`}>
+                <svg
+                  className={`${styles.icon} ${styles.iconError}`}
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </div>
-              <h1 
-                className="font-bold mb-2"
-                style={{ color: STATE_COLORS.error, fontSize: `${TYPOGRAPHY.fontSize.xl}px` }}
-              >
+              <h1 className={`${styles.title} ${styles.titleError}`}>
                 Verification Failed
               </h1>
-              <p className="mb-6" style={{ color: TEXT_COLORS.secondary }}>
-                {error}
-              </p>
+              <p className={styles.message}>{error}</p>
               <button
                 onClick={handleTryAgain}
-                className="w-full py-3 rounded-xl font-semibold"
-                style={{ backgroundColor: STATE_COLORS.active, color: '#000' }}
+                className={styles.buttonPrimary}
               >
                 Try Again
               </button>
             </>
           ) : result?.status === 'success' ? (
             <>
-              <div 
-                className="w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-6"
-                style={{ backgroundColor: `${STATE_COLORS.success}20` }}
-              >
-                <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke={STATE_COLORS.success}>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              <div className={`${styles.iconContainer} ${styles.iconContainerSuccess}`}>
+                <svg
+                  className={`${styles.icon} ${styles.iconSuccess}`}
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h1 
-                className="font-bold mb-2"
-                style={{ color: STATE_COLORS.success, fontSize: `${TYPOGRAPHY.fontSize.xl}px` }}
-              >
+              <h1 className={`${styles.title} ${styles.titleSuccess}`}>
                 Payment Successful!
               </h1>
-              <p className="mb-2" style={{ color: TEXT_COLORS.secondary }}>
+              <p className={styles.subtitle}>
                 {result.amountFormatted} has been added to your balance
               </p>
-              <p 
-                className="mb-6"
-                style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}
-              >
-                Reference: {result.reference}
-              </p>
+              <p className={styles.reference}>Reference: {result.reference}</p>
               <button
                 onClick={handleGoHome}
-                className="w-full py-3 rounded-xl font-semibold"
-                style={{ backgroundColor: STATE_COLORS.active, color: '#000' }}
+                className={styles.buttonPrimary}
               >
                 Continue to TopDog
               </button>
             </>
           ) : result?.status === 'pending' || result?.status === 'processing' ? (
             <>
-              <div 
-                className="w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-6"
-                style={{ backgroundColor: `${STATE_COLORS.warning}20` }}
-              >
-                <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke={STATE_COLORS.warning}>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <div className={`${styles.iconContainer} ${styles.iconContainerWarning}`}>
+                <svg
+                  className={`${styles.icon} ${styles.iconWarning}`}
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h1 
-                className="font-bold mb-2"
-                style={{ color: STATE_COLORS.warning, fontSize: `${TYPOGRAPHY.fontSize.xl}px` }}
-              >
+              <h1 className={`${styles.title} ${styles.titleWarning}`}>
                 Payment Pending
               </h1>
-              <p className="mb-2" style={{ color: TEXT_COLORS.secondary }}>
+              <p className={styles.subtitle}>
                 Your payment of {result.amountFormatted} is being processed
               </p>
-              <p 
-                className="mb-6"
-                style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}
-              >
-                {result.status === 'processing' 
+              <p className={styles.message}>
+                {result.status === 'processing'
                   ? 'Please complete the payment on your phone or bank app'
-                  : 'This may take a few moments. Your balance will be updated once confirmed.'
-                }
+                  : 'This may take a few moments. Your balance will be updated once confirmed.'}
               </p>
               <button
                 onClick={handleGoHome}
-                className="w-full py-3 rounded-xl font-semibold"
-                style={{ backgroundColor: STATE_COLORS.active, color: '#000' }}
+                className={styles.buttonPrimary}
               >
                 Continue to TopDog
               </button>
             </>
           ) : (
             <>
-              <div 
-                className="w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-6"
-                style={{ backgroundColor: `${STATE_COLORS.error}20` }}
-              >
-                <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke={STATE_COLORS.error}>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <div className={`${styles.iconContainer} ${styles.iconContainerError}`}>
+                <svg
+                  className={`${styles.icon} ${styles.iconError}`}
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </div>
-              <h1 
-                className="font-bold mb-2"
-                style={{ color: STATE_COLORS.error, fontSize: `${TYPOGRAPHY.fontSize.xl}px` }}
-              >
+              <h1 className={`${styles.title} ${styles.titleError}`}>
                 Payment Failed
               </h1>
-              <p className="mb-2" style={{ color: TEXT_COLORS.secondary }}>
+              <p className={styles.subtitle}>
                 {result?.gatewayResponse || 'The payment could not be completed'}
               </p>
-              <p 
-                className="mb-6"
-                style={{ color: TEXT_COLORS.muted, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}
-              >
-                Reference: {result?.reference}
-              </p>
-              <div className="space-y-3">
+              <p className={styles.reference}>Reference: {result?.reference}</p>
+              <div className={styles.buttonGroup}>
                 <button
                   onClick={handleTryAgain}
-                  className="w-full py-3 rounded-xl font-semibold"
-                  style={{ backgroundColor: STATE_COLORS.active, color: '#000' }}
+                  className={styles.buttonPrimary}
                 >
                   Try Again
                 </button>
                 <button
                   onClick={handleGoHome}
-                  className="w-full py-3 rounded-xl font-semibold"
-                  style={{ 
-                    backgroundColor: 'transparent', 
-                    color: TEXT_COLORS.secondary,
-                    border: `1px solid ${TEXT_COLORS.muted}`,
-                  }}
+                  className={styles.buttonSecondary}
                 >
                   Go Home
                 </button>

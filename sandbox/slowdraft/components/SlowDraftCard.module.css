@@ -1,0 +1,218 @@
+.card {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.cardDefault {
+  background-color: #1f2833;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.cardYourTurn {
+  background-color: #1f2833;
+  border: 1px solid rgba(96, 165, 250, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.contentWrapper {
+  position: relative;
+  z-index: 10;
+}
+
+.headerButton {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.headerContainer {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.titleSection {
+  flex: 1;
+  min-width: 0;
+}
+
+.tournamentName {
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 18px;
+  font-weight: var(--font-weight-semibold);
+}
+
+.pickInfo {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 13px;
+}
+
+.statusContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.picksAwayText {
+  font-size: 13px;
+  font-weight: var(--font-weight-semibold);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.timerText {
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.expandedSection {
+  margin-top: 20px;
+}
+
+.sectionGap {
+  margin-bottom: 20px;
+}
+
+.progressBar {
+  position: relative;
+  margin-top: 12px;
+}
+
+.progressTrack {
+  height: 4px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.progressFillYourTurn {
+  background-color: var(--text-primary);
+}
+
+.progressFillDefault {
+  background-color: var(--color-state-active);
+}
+
+.roundIndicator {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 6px;
+}
+
+.roundLabel {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: var(--font-weight-medium);
+}
+
+.collapsedView {
+  margin-top: 20px;
+}
+
+.rosterSection {
+  margin-bottom: 10px;
+}
+
+.sectionLabel {
+  font-size: 11px;
+  font-weight: var(--font-weight-bold);
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.expandedContent {
+  margin-top: 20px;
+}
+
+.expandIcon {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.expandIconSvg {
+  color: rgba(255, 255, 255, 0.3);
+  transition: transform 0.2s ease;
+}
+
+.expandIconOpen {
+  transform: rotate(180deg);
+}
+
+.quickActions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.actionButton {
+  flex: 1;
+  height: 44px;
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-weight-semibold);
+  font-size: 14px;
+  transition: all 0.1s ease;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.actionButtonDefault {
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text-primary);
+}
+
+.actionButtonDefault:active {
+  transform: scale(0.98);
+}
+
+.actionButtonActive {
+  background-color: var(--color-state-active);
+  color: var(--text-primary);
+}
+
+.actionButtonActive:active {
+  transform: scale(0.98);
+}
+
+.onTheClockBadge {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-primary);
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-radius: 8px;
+  font-size: 10px;
+  line-height: 1.2;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  background: url('/wr_blue.png') no-repeat center center;
+  background-size: 60px 60px;
+  background-color: #1E3A5F;
+}

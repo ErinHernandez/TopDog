@@ -11,9 +11,6 @@
  */
 
 import React, { useEffect, useRef } from 'react';
-import { cn } from '@/lib/styles';
-import { SPACING } from '../../core/constants/sizes';
-import { POSITION_COLORS } from '../../core/constants/colors';
 import { DRAFT_DEFAULTS } from '../constants';
 import styles from './DraftInfoModal.module.css';
 
@@ -43,19 +40,17 @@ export interface DraftInfoModalProps {
 // ============================================================================
 
 function KeyItem({
-  color,
+  position,
   label
 }: {
-  color: string;
+  position: string;
   label: string;
 }): React.ReactElement {
   return (
     <div className={styles.keyItem}>
       <div
         className={styles.keyDot}
-        style={{
-          backgroundColor: color,
-        }}
+        data-position={position.toLowerCase()}
       />
       <span className={styles.keyLabel}>
         {label}
@@ -144,9 +139,6 @@ export default function DraftInfoModal({
       aria-modal="true"
       aria-labelledby="info-modal-title"
       className={styles.backdrop}
-      style={{
-        '--spacing-md': `${SPACING.md}px`,
-      } as React.CSSProperties}
       onClick={onClose}
     >
       {/* Modal Content */}
@@ -180,10 +172,10 @@ export default function DraftInfoModal({
           {/* Position Key */}
           <SectionTitle>Position Key</SectionTitle>
           <div className={styles.keyGrid}>
-            <KeyItem color={POSITION_COLORS.QB} label="Quarterback (QB)" />
-            <KeyItem color={POSITION_COLORS.RB} label="Running Back (RB)" />
-            <KeyItem color={POSITION_COLORS.WR} label="Wide Receiver (WR)" />
-            <KeyItem color={POSITION_COLORS.TE} label="Tight End (TE)" />
+            <KeyItem position="QB" label="Quarterback (QB)" />
+            <KeyItem position="RB" label="Running Back (RB)" />
+            <KeyItem position="WR" label="Wide Receiver (WR)" />
+            <KeyItem position="TE" label="Tight End (TE)" />
           </div>
           
           <Divider />

@@ -3,10 +3,18 @@
  *
  * All dynamic values are passed via CSS custom properties (--var-name)
  * This enables Content Security Policy (CSP) compliance by removing inline styles.
+ *
+ * Fixed V2 dimensions:
+ * - Outer padding: 21px
+ * - Border radius: 16px
+ * - Min height: 700px
+ * - Title margin top: 12px
+ * - Spacer height: 24px
  */
 
 /* ============================================================================
-   CSS CUSTOM PROPERTIES - Set by component via cssVars()
+   NOTE: Global tokens (--bg-primary, --text-primary, etc.) are defined in
+   /styles/tokens.css and available globally. Do NOT use :root in CSS Modules.
    ============================================================================ */
 
 /* ============================================================================
@@ -19,17 +27,17 @@
   gap: 0;
 
   width: 100%;
-  height: var(--card-min-height);
-  min-height: var(--card-min-height);
-  max-height: var(--card-min-height);
-  padding: var(--card-padding);
+  height: 500px;
+  min-height: 500px;
+  max-height: 500px;
+  padding: 21px;
   box-sizing: border-box;
   flex-shrink: 0;
   margin-top: auto;
 
-  background-color: var(--card-bg-fallback);
-  border-radius: var(--card-border-radius);
-  border: var(--card-border-width) solid var(--card-border-color);
+  background-color: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-default);
 
   position: relative;
   overflow: hidden;
@@ -38,9 +46,10 @@
   isolation: isolate;
 }
 
-/* Featured card variant - darker border */
+/* Featured card variant - uses state color border */
 .cardContainer.featured {
-  --card-border-color: #1e3a5f;
+  border-color: var(--color-state-active);
+  border-width: 3px;
 }
 
 /* ============================================================================
@@ -113,7 +122,7 @@
 }
 
 .title {
-  font-size: var(--title-font-size);
+  font-size: 46px;
   font-family: 'Anton SC', sans-serif;
   font-weight: bold;
   text-transform: uppercase;
@@ -121,7 +130,7 @@
   line-height: 1.1;
   text-align: center;
 
-  color: var(--card-text-primary);
+  color: var(--text-primary);
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 
   margin: 0;
@@ -160,11 +169,11 @@
   grid-template-rows: auto 24px 1fr;
   gap: 0;
   width: 100%;
-  min-height: var(--card-min-height);
-  padding: var(--card-padding);
-  background-color: var(--card-bg-fallback);
-  border-radius: var(--card-border-radius);
-  border: 1px solid var(--card-border-color);
+  min-height: 500px;
+  padding: 21px;
+  background-color: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-default);
 }
 
 .skeletonContainer.pulse {

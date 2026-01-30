@@ -1,6 +1,8 @@
 /**
  * ProgressBar - Visual progress indicator
- * 
+ *
+ * Migrated to CSS Modules for CSP compliance.
+ *
  * @example
  * ```tsx
  * <ProgressBar value={75} />
@@ -9,8 +11,8 @@
  */
 
 import React from 'react';
-import { STATE_COLORS } from '../../vx2/core/constants/colors';
-import { RADIUS } from '../../vx2/core/constants/sizes';
+import { cn } from '@/lib/styles';
+import styles from './ProgressBar.module.css';
 
 // ============================================================================
 // TYPES
@@ -38,24 +40,14 @@ export interface ProgressBarProps {
 }
 
 // ============================================================================
-// SIZE CONFIG
-// ============================================================================
-
-const SIZE_CONFIG = {
-  sm: { height: 4, borderRadius: 2 },
-  md: { height: 8, borderRadius: 4 },
-  lg: { height: 12, borderRadius: 6 },
-} as const;
-
-// ============================================================================
 // COMPONENT
 // ============================================================================
 
 export function ProgressBar({
   value,
-  color = STATE_COLORS.active,
+  color,
   fillBackgroundImage,
-  backgroundColor = 'rgba(255, 255, 255, 0.1)',
+  backgroundColor,
   size = 'md',
   showLabel = false,
   labelPosition = 'right',
@@ -64,70 +56,64 @@ export function ProgressBar({
 }: ProgressBarProps): React.ReactElement {
   // Clamp value between 0 and 100
   const clampedValue = Math.max(0, Math.min(100, value));
-  const config = SIZE_CONFIG[size];
-  
-  // Build fill style - use background image if provided, otherwise solid color
+
+  // Build CSS custom properties for dynamic values
+  const containerStyle: React.CSSProperties = {};
+  if (backgroundColor) {
+    containerStyle['--progress-bg' as keyof React.CSSProperties] = backgroundColor;
+  }
+
+  // Build fill style - use background image if provided, otherwise custom property
   const fillStyle: React.CSSProperties = {
     width: `${clampedValue}%`,
-    borderRadius: `${config.borderRadius}px`,
   };
-  
+
   if (fillBackgroundImage) {
     fillStyle.backgroundImage = fillBackgroundImage;
     fillStyle.backgroundSize = 'cover';
     fillStyle.backgroundPosition = 'center';
-  } else {
-    fillStyle.backgroundColor = color;
+  } else if (color) {
+    fillStyle['--progress-color' as keyof React.CSSProperties] = color;
   }
-  
+
   const progressBar = (
     <div
-      className={`relative overflow-hidden ${className}`}
-      style={{
-        height: `${config.height}px`,
-        borderRadius: `${config.borderRadius}px`,
-        backgroundColor,
-        flex: 1,
-      }}
+      className={cn(styles.container, className)}
+      data-size={size}
+      style={containerStyle}
       role="progressbar"
       aria-valuenow={clampedValue}
       aria-valuemin={0}
       aria-valuemax={100}
       aria-label={ariaLabel || `Progress: ${Math.round(clampedValue)}%`}
     >
+      {/* Track background */}
+      <div className={styles.track} />
+
       {/* Progress fill */}
-      <div
-        className="absolute inset-y-0 left-0 transition-all duration-300 ease-out"
-        style={fillStyle}
-      />
-      
+      <div className={styles.fill} style={fillStyle} />
+
       {/* Inside label */}
       {showLabel && labelPosition === 'inside' && size === 'lg' && (
-        <span
-          className="absolute inset-0 flex items-center justify-center text-xs font-medium"
-          style={{ color: clampedValue > 50 ? '#000' : '#fff' }}
-        >
+        <span className={styles.insideLabel} data-invert={clampedValue > 50}>
           {Math.round(clampedValue)}%
         </span>
       )}
     </div>
   );
-  
+
   // With right label
   if (showLabel && labelPosition === 'right') {
     return (
-      <div className="flex items-center gap-2">
+      <div className={styles.withLabel}>
         {progressBar}
-        <span
-          className="text-xs font-medium flex-shrink-0"
-          style={{ color: 'rgba(255, 255, 255, 0.7)', minWidth: '36px' }}
-        >
+        <span className={styles.rightLabel}>
           {Math.round(clampedValue)}%
         </span>
       </div>
     );
   }
-  
+
   return progressBar;
 }
 

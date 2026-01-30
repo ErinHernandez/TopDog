@@ -157,7 +157,7 @@
 
 .warningBannerTitle {
   font-weight: 500;
-  color: var(--color-warning, #f59e0b);
+  color: var(--color-state-warning, #f59e0b);
   margin-bottom: var(--spacing-2, 8px);
 }
 
@@ -202,7 +202,7 @@
   border: none;
   cursor: pointer;
   transition: all 0.2s;
-  background-color: var(--color-active, #00d084);
+  background-color: var(--color-state-active, #00d084);
   color: #000;
 }
 
@@ -263,12 +263,12 @@
 }
 
 .methodButton:hover {
-  border-color: var(--color-active, #00d084);
+  border-color: var(--color-state-active, #00d084);
 }
 
 .methodButtonSelected {
   background-color: rgba(0, 208, 132, 0.125);
-  border-color: var(--color-active, #00d084);
+  border-color: var(--color-state-active, #00d084);
 }
 
 .methodIcon {
@@ -279,11 +279,11 @@
   align-items: center;
   justify-content: center;
   background-color: rgba(0, 208, 132, 0.2);
-  color: var(--color-active, #00d084);
+  color: var(--color-state-active, #00d084);
 }
 
 .methodIconSelected {
-  background-color: var(--color-active, #00d084);
+  background-color: var(--color-state-active, #00d084);
   color: #000;
 }
 
@@ -309,7 +309,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--color-active, #00d084);
+  background-color: var(--color-state-active, #00d084);
   color: #000;
 }
 
@@ -335,10 +335,10 @@
 }
 
 .primaryActionButton {
-  background-color: var(--color-active, #00d084);
+  background-color: var(--color-state-active, #00d084);
   color: #000;
   font-weight: 600;
-  border-color: var(--color-active, #00d084);
+  border-color: var(--color-state-active, #00d084);
 }
 
 .primaryActionButton:disabled {
@@ -373,17 +373,17 @@
   align-items: center;
   justify-content: center;
   background-color: rgba(0, 208, 132, 0.125);
-  color: var(--color-active, #00d084);
+  color: var(--color-state-active, #00d084);
 }
 
 .iconCircleSuccess {
   background-color: rgba(16, 185, 129, 0.125);
-  color: var(--color-success, #10b981);
+  color: var(--color-state-success, #10b981);
 }
 
 .iconCircleError {
   background-color: rgba(239, 68, 68, 0.125);
-  color: var(--color-error, #ef4444);
+  color: var(--color-state-error, #ef4444);
 }
 
 .sectionTitle {
@@ -420,7 +420,7 @@
   font-size: 1.5rem;
   font-family: 'Courier New', monospace;
   font-weight: bold;
-  color: var(--color-active, #00d084);
+  color: var(--color-state-active, #00d084);
 }
 
 .copyButton {
@@ -441,7 +441,7 @@
 }
 
 .copyButtonCopied {
-  color: var(--color-success, #10b981);
+  color: var(--color-state-success, #10b981);
 }
 
 .ussdAmount {
@@ -477,6 +477,7 @@
   align-items: center;
   justify-content: center;
   background-color: rgba(0, 208, 132, 0.125);
+  color: var(--color-state-active, #00d084);
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
@@ -549,13 +550,13 @@
 }
 
 .providerButton:hover {
-  border-color: var(--color-active, #00d084);
+  border-color: var(--color-state-active, #00d084);
 }
 
 .providerButtonSelected {
-  background-color: var(--color-active, #00d084);
+  background-color: var(--color-state-active, #00d084);
   color: #000;
-  border-color: var(--color-active, #00d084);
+  border-color: var(--color-state-active, #00d084);
 }
 
 .phoneInput {
@@ -575,7 +576,7 @@
 
 .phoneInput:focus {
   outline: none;
-  border-color: var(--color-active, #00d084);
+  border-color: var(--color-state-active, #00d084);
   box-shadow: 0 0 0 2px rgba(0, 208, 132, 0.2);
 }
 
@@ -630,12 +631,12 @@
 }
 
 .bankButton:hover {
-  border-color: var(--color-active, #00d084);
+  border-color: var(--color-state-active, #00d084);
 }
 
 .bankButtonSelected {
   background-color: rgba(0, 208, 132, 0.125);
-  border-color: var(--color-active, #00d084);
+  border-color: var(--color-state-active, #00d084);
 }
 
 .bankName {
@@ -666,11 +667,11 @@
 }
 
 .resultTitleSuccess {
-  color: var(--color-success, #10b981);
+  color: var(--color-state-success, #10b981);
 }
 
 .resultTitleError {
-  color: var(--color-error, #ef4444);
+  color: var(--color-state-error, #ef4444);
 }
 
 .resultMessage {
@@ -857,15 +858,15 @@
 }
 
 .textSuccess {
-  color: var(--color-success, #10b981);
+  color: var(--color-state-success, #10b981);
 }
 
 .textError {
-  color: var(--color-error, #ef4444);
+  color: var(--color-state-error, #ef4444);
 }
 
 .textWarning {
-  color: var(--color-warning, #f59e0b);
+  color: var(--color-state-warning, #f59e0b);
 }
 
 .bgTertiary {
@@ -873,7 +874,7 @@
 }
 
 .bgActive {
-  background-color: var(--color-active, #00d084);
+  background-color: var(--color-state-active, #00d084);
 }
 
 .borderDefault {

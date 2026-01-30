@@ -1,0 +1,72 @@
+/**
+ * StatusBadge CSS Module
+ *
+ * Provides status-specific styling for CSP compliance.
+ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background-color: var(--badge-bg, rgba(156, 163, 175, 0.2));
+  color: var(--badge-color, rgba(255, 255, 255, 0.7));
+  padding: var(--badge-py, 2px) var(--badge-px, 8px);
+  border-radius: var(--radius-sm);
+  font-size: var(--badge-font-size, 11px);
+  line-height: 1.2;
+}
+
+/* Size variants */
+.badge[data-size="sm"] {
+  --badge-px: var(--spacing-sm);
+  --badge-py: 2px;
+  --badge-font-size: 11px;
+}
+
+.badge[data-size="md"] {
+  --badge-px: var(--spacing-md);
+  --badge-py: var(--spacing-xs);
+  --badge-font-size: var(--font-size-xs);
+}
+
+/* Status-specific colors */
+.badge[data-status="success"] {
+  --badge-bg: rgba(16, 185, 129, 0.2);
+  --badge-color: var(--color-state-success);
+}
+
+.badge[data-status="warning"] {
+  --badge-bg: rgba(245, 158, 11, 0.2);
+  --badge-color: var(--color-state-warning);
+}
+
+.badge[data-status="error"] {
+  --badge-bg: rgba(239, 68, 68, 0.2);
+  --badge-color: var(--color-state-error);
+}
+
+.badge[data-status="info"] {
+  --badge-bg: rgba(96, 165, 250, 0.2);
+  --badge-color: var(--color-state-active);
+}
+
+.badge[data-status="neutral"] {
+  --badge-bg: rgba(156, 163, 175, 0.2);
+  --badge-color: var(--text-secondary);
+}
+
+/* Pulse animation */
+.badgePulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

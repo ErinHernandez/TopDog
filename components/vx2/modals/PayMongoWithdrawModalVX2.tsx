@@ -320,10 +320,7 @@ export function PayMongoWithdrawModalVX2({
               <button
                 onClick={handleContinueToBank}
                 disabled={!canProceedToBank}
-                className={styles.continueButton}
-                style={{
-                  '--btn-opacity': canProceedToBank ? '1' : '0.5',
-                } as React.CSSProperties}
+                className={cn(styles.continueButton, !canProceedToBank && styles.continueButtonDisabled)}
               >
                 Continue
               </button>
@@ -452,10 +449,7 @@ export function PayMongoWithdrawModalVX2({
               <button
                 onClick={handleContinueToConfirm}
                 disabled={!canProceedToConfirm}
-                className={styles.continueButton}
-                style={{
-                  '--btn-opacity': canProceedToConfirm ? '1' : '0.5',
-                } as React.CSSProperties}
+                className={cn(styles.continueButton, !canProceedToConfirm && styles.continueButtonDisabled)}
               >
                 Continue
               </button>

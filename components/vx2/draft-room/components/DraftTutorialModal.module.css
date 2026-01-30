@@ -161,7 +161,15 @@
 .positionBar {
   flex: 1;
   border-radius: 1px;
+  /* Position color from data-position attribute */
+  background-color: var(--position-color, #6B7280);
 }
+
+/* Position-specific bar colors */
+.positionBar[data-position="qb"] { --position-color: var(--color-position-qb); }
+.positionBar[data-position="rb"] { --position-color: var(--color-position-rb); }
+.positionBar[data-position="wr"] { --position-color: var(--color-position-wr); }
+.positionBar[data-position="te"] { --position-color: var(--color-position-te); }
 
 .playerCard {
   width: 64px;
@@ -172,10 +180,20 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  /* Position color from data-position attribute */
+  border-color: var(--position-color, #6B7280);
 }
+
+/* Position-specific player card border colors */
+.playerCard[data-position="qb"] { --position-color: var(--color-position-qb); }
+.playerCard[data-position="rb"] { --position-color: var(--color-position-rb); }
+.playerCard[data-position="wr"] { --position-color: var(--color-position-wr); }
+.playerCard[data-position="te"] { --position-color: var(--color-position-te); }
 
 .playerCardHeader {
   padding: 2px 4px;
+  /* Position color inherited from parent */
+  background-color: var(--position-color, #6B7280);
 }
 
 .playerCardHeaderLabel {
@@ -283,6 +301,18 @@
   overflow: hidden;
 }
 
+.snakePositionSegment {
+  flex: 1;
+  /* Position color from data-position attribute */
+  background-color: var(--position-color, #6B7280);
+}
+
+/* Position-specific segment colors */
+.snakePositionSegment[data-position="qb"] { --position-color: var(--color-position-qb); }
+.snakePositionSegment[data-position="rb"] { --position-color: var(--color-position-rb); }
+.snakePositionSegment[data-position="wr"] { --position-color: var(--color-position-wr); }
+.snakePositionSegment[data-position="te"] { --position-color: var(--color-position-te); }
+
 .snakePickRow {
   display: flex;
   gap: 2px;
@@ -297,7 +327,16 @@
   display: flex;
   flex-direction: column;
   padding: 2px 3px;
+  /* Position color from data-position attribute */
+  border-color: var(--position-color, #6B7280);
+  background-color: color-mix(in srgb, var(--position-color, #6B7280) 12%, transparent);
 }
+
+/* Position-specific pick cell colors */
+.snakePickCell[data-position="qb"] { --position-color: var(--color-position-qb); }
+.snakePickCell[data-position="rb"] { --position-color: var(--color-position-rb); }
+.snakePickCell[data-position="wr"] { --position-color: var(--color-position-wr); }
+.snakePickCell[data-position="te"] { --position-color: var(--color-position-te); }
 
 .snakePickNumber {
   color: #fff;
@@ -419,7 +458,15 @@
   font-size: 10px;
   font-weight: 700;
   color: #000;
+  /* Position color from data-position attribute */
+  background-color: var(--position-color, #6B7280);
 }
+
+/* Position-specific badge colors */
+.positionBadge[data-position="qb"] { --position-color: var(--color-position-qb); }
+.positionBadge[data-position="rb"] { --position-color: var(--color-position-rb); }
+.positionBadge[data-position="wr"] { --position-color: var(--color-position-wr); }
+.positionBadge[data-position="te"] { --position-color: var(--color-position-te); }
 
 .queuePlayerInfo {
   flex: 1;
@@ -495,12 +542,23 @@
   padding: 8px;
   text-align: center;
   border: 1px solid;
+  /* Position color from data-position attribute */
+  background-color: color-mix(in srgb, var(--position-color, #6B7280) 8%, transparent);
+  border-color: color-mix(in srgb, var(--position-color, #6B7280) 25%, transparent);
 }
+
+/* Position-specific starter card colors */
+.starterCard[data-position="qb"] { --position-color: var(--color-position-qb); }
+.starterCard[data-position="rb"] { --position-color: var(--color-position-rb); }
+.starterCard[data-position="wr"] { --position-color: var(--color-position-wr); }
+.starterCard[data-position="te"] { --position-color: var(--color-position-te); }
 
 .starterPosition {
   font-size: 9px;
   font-weight: 700;
   margin-bottom: 4px;
+  /* Position color inherited from parent */
+  color: var(--position-color, #6B7280);
 }
 
 .starterPoints {

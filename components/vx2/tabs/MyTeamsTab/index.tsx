@@ -5,8 +5,8 @@
  */
 
 import React from 'react';
-import { BG_COLORS, TEXT_COLORS } from '../../core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
+import { cn } from '@/lib/styles';
+import styles from './index.module.css';
 
 const MOCK_TEAMS = [
   { id: '1', name: 'Team Alpha', tournament: 'Best Ball Mania V', rank: 12, players: 18 },
@@ -16,24 +16,10 @@ const MOCK_TEAMS = [
 
 export default function MyTeamsTab(): React.ReactElement {
   return (
-    <div 
-      className="flex-1 flex flex-col"
-      style={{ backgroundColor: BG_COLORS.primary }}
-    >
+    <div className={cn("flex-1 flex flex-col", styles.container)}>
       {/* Header */}
-      <div 
-        className="px-4 py-3"
-        style={{ borderBottom: `1px solid rgba(255,255,255,0.1)` }}
-      >
-        <h1 
-          className="font-bold"
-          style={{ 
-            color: TEXT_COLORS.primary,
-            fontSize: `${TYPOGRAPHY.fontSize.xl}px`,
-          }}
-        >
-          Teams
-        </h1>
+      <div className={`px-4 py-3 ${styles.header}`}>
+        <h1 className={styles.title}>Teams</h1>
       </div>
 
       {/* Search */}
@@ -41,48 +27,21 @@ export default function MyTeamsTab(): React.ReactElement {
         <input
           type="text"
           placeholder="Search teams..."
-          className="w-full px-4 py-3 rounded-lg"
-          style={{
-            backgroundColor: BG_COLORS.secondary,
-            color: TEXT_COLORS.primary,
-            border: 'none',
-            outline: 'none',
-          }}
+          className={styles.searchInput}
         />
       </div>
 
       {/* Teams List */}
       <div className="flex-1 overflow-y-auto px-4">
         {MOCK_TEAMS.map((team) => (
-          <div
-            key={team.id}
-            className="mb-3 p-4 flex items-center justify-between"
-            style={{
-              backgroundColor: BG_COLORS.secondary,
-              borderRadius: `${RADIUS.lg}px`,
-            }}
-          >
+          <div key={team.id} className={styles.teamCard}>
             <div>
-              <h3 
-                className="font-semibold"
-                style={{ color: TEXT_COLORS.primary }}
-              >
-                {team.name}
-              </h3>
-              <p style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.sm}px` }}>
-                {team.tournament}
-              </p>
+              <h3 className={styles.teamName}>{team.name}</h3>
+              <p className={styles.tournament}>{team.tournament}</p>
             </div>
             <div className="text-right">
-              <div 
-                className="font-bold"
-                style={{ color: TEXT_COLORS.primary }}
-              >
-                #{team.rank}
-              </div>
-              <div style={{ color: TEXT_COLORS.secondary, fontSize: `${TYPOGRAPHY.fontSize.xs}px` }}>
-                {team.players} players
-              </div>
+              <div className={styles.rank}>#{team.rank}</div>
+              <div className={styles.playerCount}>{team.players} players</div>
             </div>
           </div>
         ))}

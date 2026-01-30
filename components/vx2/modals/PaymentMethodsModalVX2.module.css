@@ -20,7 +20,7 @@
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  z-index: var(--z-index, 1000);
+  z-index: var(--z-modal, 1000);
 }
 
 .modal {
@@ -29,7 +29,7 @@
   max-width: 28rem;
   border-radius: 0.75rem;
   overflow: hidden;
-  background-color: var(--bg-color);
+  background-color: var(--bg-secondary);
 }
 
 /* Modal Header */
@@ -38,13 +38,13 @@
   align-items: center;
   justify-content: space-between;
   padding: 1rem;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-default);
 }
 
 .headerTitle {
-  font-weight: 600;
-  font-size: var(--font-size, 18px);
-  color: var(--text-color);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-lg);
+  color: var(--text-primary);
 }
 
 .closeButton {
@@ -57,7 +57,7 @@
 }
 
 .closeIcon {
-  color: var(--text-muted-color);
+  color: var(--text-muted);
   display: inline-block;
 }
 
@@ -104,7 +104,7 @@
   text-align: center;
   padding-top: 2rem;
   padding-bottom: 2rem;
-  color: var(--text-muted-color);
+  color: var(--text-muted);
 }
 
 /* Payment Method Card */
@@ -114,8 +114,12 @@
   gap: 0.75rem;
   padding: 0.75rem;
   border-radius: 0.5rem;
-  background-color: var(--bg-tertiary-color);
-  border: 1px solid var(--border-method-color);
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-default);
+}
+
+.methodCardDefault {
+  border-color: var(--color-state-active);
 }
 
 .cardBrandIcon {
@@ -136,13 +140,13 @@
 }
 
 .methodCardBrand {
-  color: var(--text-color);
+  color: var(--text-primary);
   margin: 0;
 }
 
 .methodCardExpiry {
-  font-size: var(--font-size-xs, 12px);
-  color: var(--text-muted-color);
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
   margin: 0;
 }
 
@@ -156,8 +160,8 @@
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
   font-size: 0.75rem;
-  font-weight: 500;
-  background-color: var(--state-active-color);
+  font-weight: var(--font-weight-medium);
+  background-color: var(--color-state-active);
   color: #000;
 }
 
@@ -166,8 +170,8 @@
   border-radius: 0.25rem;
   font-size: 0.75rem;
   background-color: transparent;
-  border: 1px solid var(--border-color);
-  color: var(--text-secondary-color);
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
   cursor: pointer;
 }
 
@@ -180,7 +184,7 @@
   border-radius: 0;
   background-color: transparent;
   border: none;
-  color: var(--state-error-color);
+  color: var(--color-state-error);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -212,19 +216,19 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  background-color: var(--bg-tertiary-color);
+  background-color: var(--bg-tertiary);
 }
 
 .cardInputContainer {
   padding: 0.75rem;
   border-radius: 0.5rem;
-  background-color: var(--bg-primary-color);
-  border: 1px solid var(--border-color);
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-default);
 }
 
 .errorMessage {
-  color: var(--state-error-color);
-  font-size: var(--font-size-sm, 14px);
+  color: var(--color-state-error);
+  font-size: var(--font-size-sm);
   margin: 0;
 }
 
@@ -238,9 +242,9 @@
   padding: 0.5rem;
   border-radius: 0.5rem;
   background-color: transparent;
-  border: 1px solid var(--border-color);
-  color: var(--text-color);
-  font-weight: 500;
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
 }
 
@@ -252,9 +256,9 @@
   flex: 1;
   padding: 0.5rem;
   border-radius: 0.5rem;
-  background-color: var(--add-button-bg);
-  color: var(--add-button-text);
-  font-weight: 500;
+  background-color: var(--color-state-active);
+  color: #000;
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -266,6 +270,11 @@
 .addButton:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.addButtonLoading {
+  background-color: var(--bg-tertiary);
+  color: var(--text-muted);
 }
 
 .addButtonSpinner {
@@ -286,9 +295,9 @@
   gap: 0.5rem;
   padding: 0.75rem;
   border-radius: 0.5rem;
-  background-color: var(--bg-tertiary-color);
-  border: 1px dashed var(--border-color);
-  color: var(--text-secondary-color);
+  background-color: var(--bg-tertiary);
+  border: 1px dashed var(--border-default);
+  color: var(--text-secondary-color, var(--text-secondary));
   cursor: pointer;
 }
 

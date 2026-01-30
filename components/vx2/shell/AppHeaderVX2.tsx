@@ -12,8 +12,7 @@
 import React, { useContext } from 'react';
 import { useRouter } from 'next/router';
 import { TabNavigationContext } from '../core/context/TabNavigationContext';
-import { HEADER, Z_INDEX } from '../core/constants';
-import { HEADER_COLORS, STATE_COLORS } from '../core/constants/colors';
+import { HEADER } from '../core/constants';
 import { createScopedLogger } from '../../../lib/clientLogger';
 import { cn } from '@/lib/styles';
 import styles from './AppHeaderVX2.module.css';
@@ -126,22 +125,6 @@ export default function AppHeaderVX2({
     }
   };
 
-  // CSS custom properties for dynamic values
-  const headerStyle: React.CSSProperties = {
-    '--header-z-index': Z_INDEX.header,
-    '--urgent-bg': STATE_COLORS.onTheClock,
-    '--success-bg': STATE_COLORS.success,
-  } as React.CSSProperties;
-
-  const innerStyle: React.CSSProperties = {
-    '--header-height': `${HEADER.height}px`,
-    '--header-padding-x': `${HEADER.paddingX}px`,
-  } as React.CSSProperties;
-
-  const buttonStyle: React.CSSProperties = {
-    '--button-size': `${HEADER.buttonSize}px`,
-  } as React.CSSProperties;
-
   // Handle logo click - navigate to Lobby
   // Use tab navigation if available, otherwise use router
   const handleLogoClick = () => {
@@ -163,27 +146,25 @@ export default function AppHeaderVX2({
   return (
     <header
       className={cn(styles.header, getHeaderClass())}
-      style={headerStyle}
       role="banner"
     >
       {/* Inner content container with fixed height */}
-      <div className={styles.innerContent} style={innerStyle}>
+      <div className={styles.innerContent}>
         {/* LEFT SECTION - Back button or custom content */}
-        <div className={styles.leftSection} style={buttonStyle}>
+        <div className={styles.leftSection}>
           {leftContent ? (
             leftContent
           ) : showBackButton ? (
             <button
               onClick={handleBackClick}
               className={styles.iconButton}
-              style={buttonStyle}
               aria-label="Go back"
             >
               <BackIcon />
             </button>
           ) : (
             // Empty spacer for layout balance
-            <div className={styles.spacer} style={buttonStyle} />
+            <div className={styles.spacer} />
           )}
         </div>
       </div>

@@ -13,11 +13,9 @@ import type { MyRosterStripProps, MyPick, Position } from '../types';
 import {
   SLOW_DRAFT_LAYOUT,
   SLOW_DRAFT_COLORS,
-  SLOW_DRAFT_TYPOGRAPHY,
   SLOW_DRAFT_THRESHOLDS,
   ROSTER_SIZE,
 } from '../constants';
-import { SPACING } from '../../../core/constants/sizes';
 import styles from './MyRosterStrip.module.css';
 
 // ============================================================================
@@ -40,9 +38,7 @@ function RosterSquare({ pick, index, size }: RosterSquareProps): React.ReactElem
     <div
       className={styles.rosterSquare}
       style={{
-        width: size,
-        height: size,
-        '--roster-square-border-radius': `${SLOW_DRAFT_LAYOUT.rosterSquareBorderRadius}px`,
+        '--roster-square-size': `${size}px`,
         '--roster-square-bg-color': bgColor,
         '--roster-square-border': isEmpty
           ? `1px solid ${SLOW_DRAFT_COLORS.positions.emptyBorder}`
@@ -81,8 +77,6 @@ function PlayerMiniCard({ pick, onTap }: PlayerMiniCardProps): React.ReactElemen
       onClick={onTap}
       className={styles.playerMiniCard}
       style={{
-        '--player-card-width': `${SLOW_DRAFT_LAYOUT.expandedPlayerCardWidth}px`,
-        '--player-card-height': `${SLOW_DRAFT_LAYOUT.expandedPlayerCardHeight}px`,
         '--player-card-border-color': positionColor,
       } as React.CSSProperties}
     >
@@ -100,9 +94,6 @@ function PlayerMiniCard({ pick, onTap }: PlayerMiniCardProps): React.ReactElemen
       {/* Player name */}
       <span
         className={styles.playerName}
-        style={{
-          ...SLOW_DRAFT_TYPOGRAPHY.playerName,
-        }}
       >
         {truncatedName}
       </span>
@@ -110,9 +101,6 @@ function PlayerMiniCard({ pick, onTap }: PlayerMiniCardProps): React.ReactElemen
       {/* Team */}
       <span
         className={styles.playerTeam}
-        style={{
-          ...SLOW_DRAFT_TYPOGRAPHY.playerPosition,
-        }}
       >
         {pick.player.team}
       </span>
@@ -134,10 +122,6 @@ function MoreIndicator({ count, onTap }: MoreIndicatorProps): React.ReactElement
     <button
       onClick={onTap}
       className={styles.moreIndicator}
-      style={{
-        '--player-card-width': `${SLOW_DRAFT_LAYOUT.expandedPlayerCardWidth}px`,
-        '--player-card-height': `${SLOW_DRAFT_LAYOUT.expandedPlayerCardHeight}px`,
-      } as React.CSSProperties}
     >
       <span className={styles.moreIndicatorText}>
         +{count} more
@@ -170,9 +154,6 @@ export default function MyRosterStrip({
     return (
       <div
         className={styles.compactContainer}
-        style={{
-          '--roster-square-gap': `${SLOW_DRAFT_LAYOUT.rosterSquareGap}px`,
-        } as React.CSSProperties}
       >
         {Array.from({ length: rosterSize }, (_, index) => (
           <RosterSquare
@@ -195,10 +176,6 @@ export default function MyRosterStrip({
       {/* Section label */}
       <div
         className={styles.sectionLabel}
-        style={{
-          ...SLOW_DRAFT_TYPOGRAPHY.sectionLabel,
-          '--section-label-margin-bottom': `${SLOW_DRAFT_LAYOUT.sectionLabelMarginBottom}px`,
-        } as React.CSSProperties}
       >
         MY ROSTER ({picks.length} picks)
       </div>
@@ -206,9 +183,6 @@ export default function MyRosterStrip({
       {/* Player cards row */}
       <div
         className={styles.expandedCardsRow}
-        style={{
-          '--expanded-player-card-gap': `${SLOW_DRAFT_LAYOUT.expandedPlayerCardGap}px`,
-        } as React.CSSProperties}
       >
         {visiblePicks.map((pick) => (
           <PlayerMiniCard

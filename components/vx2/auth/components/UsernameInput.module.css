@@ -53,9 +53,9 @@
   padding-left: var(--input-padding-x, 12px);
   padding-right: var(--input-padding-right, calc(var(--input-height, 44px) + var(--input-padding-x, 12px)));
   font-size: var(--input-font-size, 16px);
-  background-color: var(--bg-secondary, rgba(255, 255, 255, 0.05));
-  color: var(--text-primary, rgba(255, 255, 255, 0.9));
-  border: 2px solid var(--input-border-color, rgba(255, 255, 255, 0.1));
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 2px solid var(--input-border-color);
 }
 
 .input:focus {
@@ -63,7 +63,7 @@
 }
 
 .input::placeholder {
-  color: var(--text-muted, rgba(255, 255, 255, 0.5));
+  color: var(--text-muted);
 }
 
 .input:disabled {
@@ -72,11 +72,11 @@
 }
 
 .inputError {
-  border-color: var(--error-color, #ef4444) !important;
+  border-color: var(--color-state-error) !important;
 }
 
 .inputSuccess {
-  border-color: var(--success-color, #10b981) !important;
+  border-color: var(--color-state-success) !important;
 }
 
 /* ============================================================================
@@ -124,8 +124,8 @@
    ============================================================================ */
 
 .errorMessage {
-  color: var(--error-color, #ef4444);
-  font-size: var(--font-size-xs, 12px);
+  color: var(--color-state-error);
+  font-size: var(--font-size-xs);
 }
 
 /* ============================================================================
@@ -133,8 +133,8 @@
    ============================================================================ */
 
 .requirementsText {
-  color: var(--text-muted, rgba(255, 255, 255, 0.5));
-  font-size: var(--font-size-xs, 12px);
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
 }
 
 /* ============================================================================
@@ -146,8 +146,8 @@
 }
 
 .suggestionsLabel {
-  color: var(--text-muted, rgba(255, 255, 255, 0.5));
-  font-size: var(--font-size-xs, 12px);
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
   margin-bottom: 4px;
 }
 
@@ -159,18 +159,18 @@
 
 .suggestionButton {
   padding: 8px 12px;
-  border-radius: var(--radius-md, 8px);
+  border-radius: var(--radius-md);
   transition: background-color 150ms ease;
-  background-color: var(--bg-tertiary, rgba(255, 255, 255, 0.08));
-  color: var(--text-primary, rgba(255, 255, 255, 0.9));
-  border: 1px solid var(--border-light, rgba(255, 255, 255, 0.1));
-  font-size: var(--font-size-xs, 12px);
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-light);
+  font-size: var(--font-size-xs);
   cursor: pointer;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
 }
 
 .suggestionButton:hover {
-  background-color: var(--bg-secondary, rgba(255, 255, 255, 0.1));
+  background-color: var(--bg-secondary);
 }
 
 .suggestionButton:active {
@@ -191,8 +191,8 @@
 }
 
 .warningMessage {
-  color: var(--warning-color, #f59e0b);
-  font-size: var(--font-size-xs, 12px);
+  color: var(--color-state-warning);
+  font-size: var(--font-size-xs);
   margin-bottom: 4px;
 }
 
@@ -207,9 +207,9 @@
 .requirementsPanel {
   margin-top: 8px;
   padding: 12px;
-  border-radius: var(--radius-md, 8px);
-  background-color: var(--bg-tertiary, rgba(255, 255, 255, 0.05));
-  border: 1px solid var(--border-light, rgba(255, 255, 255, 0.1));
+  border-radius: var(--radius-md);
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-light);
 }
 
 .requirementsList {
@@ -225,15 +225,15 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: var(--font-size-xs, 12px);
+  font-size: var(--font-size-xs);
 }
 
 .requirementItemPassed {
-  color: var(--success-color, #10b981);
+  color: var(--color-state-success);
 }
 
 .requirementItemPending {
-  color: var(--text-muted, rgba(255, 255, 255, 0.5));
+  color: var(--text-muted);
 }
 
 .requirementIcon {

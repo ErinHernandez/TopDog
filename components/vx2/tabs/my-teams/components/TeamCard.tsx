@@ -9,21 +9,11 @@
 
 import React, { useMemo, useCallback } from 'react';
 import type { MyTeam } from '../../../hooks/data';
-import { BG_COLORS, TEXT_COLORS } from '../../../core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY } from '../../../core/constants/sizes';
 import { ChevronRight } from '../../../components/icons';
 import { Skeleton } from '../../../../ui';
 import { isNFLSeasonActive } from '../../../../../lib/tournament/seasonUtils';
 import { cn } from '@/lib/styles';
 import styles from './TeamCard.module.css';
-
-// ============================================================================
-// CONSTANTS
-// ============================================================================
-
-const MYTEAMS_PX = {
-  cardPadding: SPACING.sm,
-} as const;
 
 // ============================================================================
 // TYPES
@@ -138,70 +128,30 @@ export function TeamCard({
       onDragOver={isCustomSort ? onDragOver : undefined}
       onDragEnd={isCustomSort ? onDragEnd : undefined}
       onDrop={isCustomSort ? onDrop : undefined}
-      className={cn(styles.cardContainer, isCustomSort && styles.customSort)}
-      style={{
-        '--card-padding-top': `${MYTEAMS_PX.cardPadding + 6}px`,
-        '--card-padding-bottom': `${MYTEAMS_PX.cardPadding + 6}px`,
-        '--card-padding-left': `${MYTEAMS_PX.cardPadding + 4}px`,
-        '--card-padding-right': `${MYTEAMS_PX.cardPadding + 4}px`,
-        '--bg-color': BG_COLORS.secondary,
-        '--border-radius': `${RADIUS.lg}px`,
-        '--border': '1px solid rgba(255,255,255,0.1)',
-        '--opacity': isDragging ? '0.5' : '1',
-        '--border-top': isDragOver ? '2px solid rgba(59, 130, 246, 0.6)' : '1px solid rgba(255,255,255,0.1)',
-      } as React.CSSProperties}
+      className={cn(styles.cardContainer, isCustomSort && styles.customSort, isDragging && styles.isDragging, isDragOver && styles.isDragOver)}
       aria-label={`View ${team.name}`}
     >
       <div className={styles.contentArea}>
         {/* Standing - only shown when season has started and rank is available */}
         {seasonStarted && team.rank && team.rank >= 1 && team.rank <= 12 && (
-          <div
-            className={styles.rankBadge}
-            style={{
-              '--rank-border-radius': `${RADIUS.md}px`,
-            } as React.CSSProperties}
-          >
-            <span
-              className={styles.rankText}
-              style={{
-                '--rank-font-size': `${TYPOGRAPHY.fontSize.xs}px`,
-                '--rank-text-color': TEXT_COLORS.primary,
-              } as React.CSSProperties}
-            >
+          <div className={styles.rankBadge}>
+            <span className={styles.rankText}>
               {formatRank(team.rank)}
             </span>
           </div>
         )}
         <div className={styles.textContent}>
           <div className={styles.teamNameRow}>
-            <h3
-              className={styles.teamName}
-              style={{
-                '--team-name-color': TEXT_COLORS.primary,
-                '--team-name-font-size': `${TYPOGRAPHY.fontSize.sm}px`,
-              } as React.CSSProperties}
-            >
+            <h3 className={styles.teamName}>
               {formattedName}
             </h3>
             {sortMethod === 'draftedAt' && team.draftedAt && (
-              <span
-                className={styles.draftDateText}
-                style={{
-                  '--draft-date-font-size': `${TYPOGRAPHY.fontSize.xs}px`,
-                  '--draft-date-color': TEXT_COLORS.muted,
-                } as React.CSSProperties}
-              >
+              <span className={styles.draftDateText}>
                 {formatDraftDate(team.draftedAt)}
               </span>
             )}
             {showPointsDiff && ((pointsBack ?? null) !== null || (pointsAhead ?? null) !== null) && (
-              <div
-                className={styles.pointsDiffContainer}
-                style={{
-                  '--points-diff-font-size': `${TYPOGRAPHY.fontSize.xs}px`,
-                  '--points-diff-color': TEXT_COLORS.muted,
-                } as React.CSSProperties}
-              >
+              <div className={styles.pointsDiffContainer}>
                 {(pointsBack ?? null) !== null && (pointsBack ?? 0) > 0 && (
                   <span className={styles.pointsDiffText}>{(pointsBack ?? 0).toFixed(1)} pts back</span>
                 )}
@@ -223,17 +173,13 @@ export function TeamCard({
               }}
               className={styles.moveButton}
               aria-label="Move up"
-              style={{
-                '--move-button-radius': `${RADIUS.sm}px`,
-                '--move-button-bg': 'rgba(255,255,255,0.05)',
-              } as React.CSSProperties}
             >
               <svg
                 width="16"
                 height="16"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke={TEXT_COLORS.muted}
+                stroke="currentColor"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -250,17 +196,13 @@ export function TeamCard({
               }}
               className={styles.moveButton}
               aria-label="Move down"
-              style={{
-                '--move-button-radius': `${RADIUS.sm}px`,
-                '--move-button-bg': 'rgba(255,255,255,0.05)',
-              } as React.CSSProperties}
             >
               <svg
                 width="16"
                 height="16"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke={TEXT_COLORS.muted}
+                stroke="currentColor"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -271,8 +213,8 @@ export function TeamCard({
           )}
         </div>
       ) : (
-        <div className={styles.controlsContainer + ' ' + styles.noCustomSort} style={{ '--controls-padding': `${SPACING.sm}px` } as React.CSSProperties}>
-          <ChevronRight size={20} color={TEXT_COLORS.muted} />
+        <div className={styles.controlsContainer + ' ' + styles.noCustomSort}>
+          <ChevronRight size={20} />
         </div>
       )}
     </div>
@@ -285,17 +227,7 @@ export function TeamCard({
 
 export function TeamCardSkeleton(): React.ReactElement {
   return (
-    <div
-      className={styles.skeletonContainer}
-      style={{
-        '--skeleton-padding-top': `${MYTEAMS_PX.cardPadding + 6}px`,
-        '--skeleton-padding-bottom': `${MYTEAMS_PX.cardPadding + 6}px`,
-        '--skeleton-padding-left': `${MYTEAMS_PX.cardPadding + 4}px`,
-        '--skeleton-padding-right': `${MYTEAMS_PX.cardPadding + 4}px`,
-        '--skeleton-bg': BG_COLORS.secondary,
-        '--skeleton-radius': `${RADIUS.lg}px`,
-      } as React.CSSProperties}
-    >
+    <div className={styles.skeletonContainer}>
       <Skeleton width={150} height={18} />
     </div>
   );

@@ -16,7 +16,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { cn } from '@/lib/styles';
 import styles from './ForgotPasswordModal.module.css';
 import authStyles from './auth-shared.module.css';
-import { SPACING, TYPOGRAPHY, Z_INDEX } from '../../core/constants/sizes';
+import { TYPOGRAPHY } from '../../core/constants/sizes';
 import { Close, ChevronLeft } from '../../components/icons';
 import { useAuth } from '../hooks/useAuth';
 import { useCountdown } from '../../hooks/ui/useCountdown';
@@ -108,9 +108,6 @@ function InputStep({
       {/* Header — close only; "Forgot your password?" is in content below */}
       <div
         className={styles.stepHeader}
-        style={{
-          padding: `${SPACING.md + 8}px ${SPACING.lg}px ${SPACING.md}px`
-        }}
       >
         <button
           onClick={onClose}
@@ -222,7 +219,6 @@ function InputStep({
       {/* Footer */}
       <div
         className={styles.stepFooter}
-        style={{ padding: `12px ${SPACING.xl}px 16px` }}
       >
         <button
           onClick={onSubmit}
@@ -297,9 +293,6 @@ function CodeStep({
       {/* Header — same top padding as Sign In/Sign Up so X height consistent when present */}
       <div
         className={cn(styles.stepHeader, styles.stepHeaderWithBack)}
-        style={{
-          padding: `${SPACING.md + 8}px ${SPACING.lg}px ${SPACING.md}px`
-        }}
       >
         <button onClick={onBack} className="p-2" aria-label="Back">
           <ChevronLeft size={24} color="rgba(255, 255, 255, 0.5)" />
@@ -372,7 +365,6 @@ function CodeStep({
       {/* Footer */}
       <div
         className={styles.stepFooter}
-        style={{ padding: SPACING.sm }}
       >
         <button
           onClick={() => onVerify(code)}
@@ -424,11 +416,7 @@ function NewPasswordStep({
     <div className="flex flex-col h-full">
       {/* Header — same top padding as Sign In/Sign Up so X height is consistent */}
       <div
-        className={cn(styles.stepHeader, styles.stepHeaderWithBack)}
-        style={{
-          padding: `${SPACING.md + 8}px ${SPACING.lg}px ${SPACING.md}px`,
-          justifyContent: 'space-between'
-        }}
+        className={cn(styles.stepHeader, styles.stepHeaderWithBack, styles.stepHeaderSpaceBetween)}
       >
         <h2 className={styles.stepHeaderTitle}>
           Create New Password
@@ -532,7 +520,6 @@ function NewPasswordStep({
       {/* Footer */}
       <div
         className={styles.stepFooter}
-        style={{ padding: SPACING.sm }}
       >
         <button
           onClick={() => onSubmit(password)}

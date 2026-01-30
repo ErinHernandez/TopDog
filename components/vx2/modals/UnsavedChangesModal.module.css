@@ -8,15 +8,15 @@
 /* Overlay backdrop */
 .overlay {
   background-color: rgba(0, 0, 0, 0.7);
-  z-index: var(--z-index-modal, 1000);
+  z-index: var(--z-modal, 1000);
 }
 
 /* Modal card container */
 .modalCard {
-  background-color: var(--bg-color-card, #1a1f2e);
-  border-radius: var(--radius-lg, 12px);
-  padding: var(--spacing-lg, 16px);
-  margin: var(--spacing-md, 12px);
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  margin: var(--spacing-md);
   max-width: 320px;
   width: 100%;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
@@ -26,18 +26,18 @@
 
 /* Modal title */
 .title {
-  color: var(--text-color-primary, #fff);
-  font-size: var(--font-size-lg, 18px);
-  font-weight: var(--font-weight-semibold, 600);
-  margin-bottom: var(--spacing-sm, 8px);
+  color: var(--text-primary);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--spacing-sm);
 }
 
 /* Modal message */
 .message {
-  color: var(--text-color-secondary, #a0a0a0);
-  font-size: var(--font-size-sm, 14px);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
   line-height: 1.5;
-  margin-bottom: var(--spacing-lg, 16px);
+  margin-bottom: var(--spacing-lg);
 }
 
 /* Actions container */
@@ -52,8 +52,9 @@
 .buttonBase {
   width: 100%;
   height: 48px;
-  border-radius: var(--radius-md, 8px);
-  font-size: var(--font-size-base, 16px);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
   transition: all 0.2s ease-in-out;
 }
@@ -64,7 +65,7 @@
   background: url(/wr_blue.png) no-repeat center center;
   background-size: cover;
   color: #fff;
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   border: none;
 }
 
@@ -79,7 +80,7 @@
   background-color: rgba(239, 68, 68, 0.15);
   color: #EF4444;
   border: 1px solid rgba(239, 68, 68, 0.3);
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
 }
 
 .discardButton:hover {
@@ -91,9 +92,9 @@
 .cancelButton {
   composes: buttonBase;
   background-color: transparent;
-  color: var(--text-color-secondary, #a0a0a0);
+  color: var(--text-secondary);
   border: none;
-  font-weight: 500;
+  font-weight: var(--font-weight-normal);
 }
 
 .cancelButton:hover {

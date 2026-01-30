@@ -7,26 +7,26 @@
   align-items: center;
   gap: 6px;
   padding: 8px 12px;
-  background-color: var(--bg-color);
-  border: var(--border);
-  border-radius: var(--border-radius);
-  color: var(--text-color);
-  font-size: var(--font-size);
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .dropdownButton:hover {
-  background-color: var(--bg-hover);
+  background-color: rgba(255, 255, 255, 0.08);
 }
 
 .sortLabel {
-  color: var(--label-color);
+  color: var(--text-muted);
 }
 
 .sortValue {
-  color: var(--value-color);
-  font-weight: 500;
+  color: var(--text-primary);
+  font-weight: var(--font-weight-medium);
 }
 
 .sortIcon {
@@ -44,12 +44,12 @@
   top: 100%;
   right: 0;
   margin-top: 4px;
-  background-color: var(--menu-bg);
-  border: var(--menu-border);
-  border-radius: var(--menu-border-radius);
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
   overflow: hidden;
   z-index: 1000;
-  box-shadow: var(--menu-shadow);
+  box-shadow: var(--shadow-large);
   min-width: 160px;
 }
 
@@ -59,23 +59,23 @@
   justify-content: space-between;
   width: 100%;
   padding: 10px 14px;
-  background-color: var(--option-bg);
+  background-color: transparent;
   border: none;
-  border-bottom: var(--option-border);
-  color: var(--option-text-color);
-  font-size: var(--option-font-size);
+  border-bottom: 1px solid var(--color-border-light);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
   cursor: pointer;
   text-align: left;
   transition: background-color 0.15s ease;
 }
 
 .menuOption:hover {
-  background-color: var(--option-hover-bg);
+  background-color: rgba(255, 255, 255, 0.08);
 }
 
 .menuOption.active {
-  background-color: var(--option-active-bg);
-  color: var(--option-active-color);
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
 }
 
 .menuOption:last-child {

@@ -18,7 +18,6 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { TEXT_COLORS } from '../../core/constants/colors';
 import { createTeamGradient } from '@/lib/gradientUtils';
 import { BYE_WEEKS } from '@/lib/nflConstants';
 import { generatePlayerId } from '../utils';
@@ -268,8 +267,8 @@ function Badge({ label, value, labelColor, badgeType }: BadgeProps): React.React
     : styles.projBadge;
 
   return (
-    <div className={cn(styles.badge, badgeClass)} style={{ '--label-color': labelColor } as React.CSSProperties}>
-      <div className={styles.badgeLabel} style={{ color: labelColor }}>{label}</div>
+    <div className={cn(styles.badge, badgeClass)} style={{ '--label-color': labelColor } as React.CSSProperties & { '--label-color': string }}>
+      <div className={styles.badgeLabel}>{label}</div>
       <div className={styles.badgeValue}>
         {value}
       </div>
@@ -301,9 +300,9 @@ function StatsHeader({ columns, isLightBg }: StatsHeaderProps): React.ReactEleme
             i === 0 ? styles.first : styles.other
           )}
           style={{
-            left: `${col.left}px`,
-            width: `${col.width}px`,
-          }}
+            '--column-left': `${col.left}px`,
+            '--column-width': `${col.width}px`,
+          } as React.CSSProperties & { '--column-left': string; '--column-width': string }}
         >
           {col.label}
         </div>
@@ -335,9 +334,9 @@ function StatsRow({ label, values, columns }: StatsRowProps): React.ReactElement
           key={i}
           className={styles.statsRowValue}
           style={{
-            left: `${dataColumns[i]?.left ?? 0}px`,
-            width: `${dataColumns[i]?.width ?? 30}px`,
-          }}
+            '--row-value-left': `${dataColumns[i]?.left ?? 0}px`,
+            '--row-value-width': `${dataColumns[i]?.width ?? 30}px`,
+          } as React.CSSProperties & { '--row-value-left': string; '--row-value-width': string }}
         >
           {val}
         </div>
@@ -474,7 +473,7 @@ export default function PlayerExpandedCard({
     <div
       onClick={handleCardClick}
       className={styles.container}
-      style={{ background: teamGradient.firstGradient }}
+      style={{ '--card-background': teamGradient.firstGradient } as React.CSSProperties & { '--card-background': string }}
     >
       {/* Header: Logo + Badges + Draft Button */}
       <div className={styles.header}>

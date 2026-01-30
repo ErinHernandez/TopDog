@@ -16,9 +16,6 @@
 import React from 'react';
 import { cn } from '@/lib/styles';
 import { ProgressBar } from '../../../ui';
-import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
-import { TEXT_COLORS } from '../../core/constants/colors';
-import { TILED_BG_STYLE } from '../../draft-room/constants';
 import type { Tournament } from '../../hooks/data';
 import styles from './TournamentCardBottomSection.module.css';
 
@@ -27,22 +24,18 @@ import styles from './TournamentCardBottomSection.module.css';
 // ============================================================================
 
 const BOTTOM_SECTION_PX = {
-  // Grid gap between rows
-  rowGap: SPACING.lg, // 16px
-  
+  // Grid gap between rows (uses CSS custom property: --spacing-lg)
+  rowGap: 16, // 16px
+
   // Progress section
   progressHeight: 8, // md size from ProgressBar
   progressMarginBottom: 0, // Use grid gap instead
-  
+
   // Button
   buttonHeight: 57,
-  buttonFontSize: TYPOGRAPHY.fontSize.sm, // 14px
-  buttonBorderRadius: RADIUS.md, // 8px
-  
-  // Stats
-  statsGap: SPACING.xl, // 24px
-  statsValueFontSize: TYPOGRAPHY.fontSize.lg, // 18px
-  statsLabelFontSize: TYPOGRAPHY.fontSize.xs, // 12px
+
+  // Stats (uses CSS custom property: --spacing-xl)
+  statsGap: 24, // 24px
 } as const;
 
 // ============================================================================
@@ -73,19 +66,11 @@ function StatItem({ value, label }: StatItemProps): React.ReactElement {
     <div className={styles.statItem}>
       <span
         className={cn(styles.statValue, 'vx2-tournament-stat-value')}
-        style={{
-          '--stats-value-font-size': `${BOTTOM_SECTION_PX.statsValueFontSize}px`,
-          '--text-primary': TEXT_COLORS.primary,
-        } as React.CSSProperties}
       >
         {value}
       </span>
       <span
         className={cn(styles.statLabel, 'vx2-tournament-stat-label')}
-        style={{
-          '--stats-label-font-size': `${BOTTOM_SECTION_PX.statsLabelFontSize}px`,
-          '--text-secondary': TEXT_COLORS.secondary,
-        } as React.CSSProperties}
       >
         {label}
       </span>
@@ -122,14 +107,10 @@ export function TournamentCardBottomSection({
         '--progress-height': `${BOTTOM_SECTION_PX.progressHeight}px`,
         '--button-height': `${BOTTOM_SECTION_PX.buttonHeight}px`,
         '--stats-height': '48px',
-        '--button-font-size': `${BOTTOM_SECTION_PX.buttonFontSize}px`,
-        '--stats-value-font-size': `${BOTTOM_SECTION_PX.statsValueFontSize}px`,
-        '--stats-label-font-size': `${BOTTOM_SECTION_PX.statsLabelFontSize}px`,
         '--row-gap': `${BOTTOM_SECTION_PX.rowGap}px`,
         '--stats-gap': `${BOTTOM_SECTION_PX.statsGap}px`,
-        '--text-primary': '#FFFFFF',
-        '--button-border-radius': `${BOTTOM_SECTION_PX.buttonBorderRadius}px`,
       } as React.CSSProperties}
+      data-bottom-section-props="true"
     >
       {/* Progress Bar Row */}
       {hasProgress && (
@@ -152,21 +133,11 @@ export function TournamentCardBottomSection({
           styles.button,
           !styleOverrides.buttonBackgroundColor && 'vx2-tournament-button',
           styleOverrides.buttonBackgroundColor && styles.buttonCustom,
+          !styleOverrides.buttonBackground && 'bg-tiled',
           'w-full font-semibold transition-colors duration-200 active:scale-[0.98]'
         )}
-        style={{
-          ...(styleOverrides.buttonBackground ? {} : TILED_BG_STYLE),
-          ...(styleOverrides.buttonBackground
-            ? {
-                '--button-bg-image': styleOverrides.buttonBackground,
-              }
-            : {}),
-          ...(styleOverrides.buttonBackgroundColor
-            ? {
-                '--button-bg-color': styleOverrides.buttonBackgroundColor,
-              }
-            : {}),
-        } as React.CSSProperties}
+        data-button-bg-image={styleOverrides.buttonBackground}
+        data-button-bg-color={styleOverrides.buttonBackgroundColor}
         aria-label={`Join ${tournament.title} for ${tournament.entryFee}`}
       >
         Join Tournament

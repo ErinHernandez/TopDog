@@ -13,9 +13,7 @@
 import React from 'react';
 import { cn } from '@/lib/styles';
 import { ProgressBar } from '../../../ui';
-import { TILED_BG_STYLE } from '../../draft-room/constants';
 import type { Tournament } from '../../hooks/data';
-import { CARD_SPACING_V3, BOTTOM_GRID_V3 } from './constants/cardSpacingV3';
 import styles from './TournamentCardBottomSectionV3.module.css';
 
 // ============================================================================
@@ -55,9 +53,6 @@ function StatItem({ value, label }: StatItemProps): React.ReactElement {
       {/* Value */}
       <span
         className={cn(styles.statValue, 'vx2-tournament-stat-value-v3')}
-        style={{
-          '--stats-value-font-size': `${CARD_SPACING_V3.statsValueFontSize}px`,
-        } as React.CSSProperties}
       >
         {value}
       </span>
@@ -65,9 +60,6 @@ function StatItem({ value, label }: StatItemProps): React.ReactElement {
       {/* Label */}
       <span
         className={cn(styles.statLabel, 'vx2-tournament-stat-label-v3')}
-        style={{
-          '--stats-label-font-size': `${CARD_SPACING_V3.statsLabelFontSize}px`,
-        } as React.CSSProperties}
       >
         {label}
       </span>
@@ -115,17 +107,6 @@ export function BottomSectionV3({
     <div
       className={cn(styles.bottomSectionV3, 'vx2-tournament-bottom-section-v3')}
       data-has-progress={hasProgress}
-      style={{
-        '--progress-height': `${CARD_SPACING_V3.progressHeight}px`,
-        '--button-height': `${CARD_SPACING_V3.buttonHeight}px`,
-        '--stats-height': `${CARD_SPACING_V3.statsHeight}px`,
-        '--button-font-size': `${CARD_SPACING_V3.buttonFontSize}px`,
-        '--stats-value-font-size': `${CARD_SPACING_V3.statsValueFontSize}px`,
-        '--stats-label-font-size': `${CARD_SPACING_V3.statsLabelFontSize}px`,
-        '--row-gap': `${CARD_SPACING_V3.bottomRowGap}px`,
-        '--stats-gap': `${CARD_SPACING_V3.bottomStatsGap}px`,
-        '--button-border-radius': `${CARD_SPACING_V3.buttonBorderRadius}px`,
-      } as React.CSSProperties}
     >
       {/* ========================================
           Row 1: Progress Bar (conditional)
@@ -153,21 +134,11 @@ export function BottomSectionV3({
         className={cn(
           styles.button,
           !styleOverrides.buttonBackgroundColor && 'vx2-tournament-button-v3',
-          styleOverrides.buttonBackgroundColor && styles.buttonCustom
+          styleOverrides.buttonBackgroundColor && styles.buttonCustom,
+          !styleOverrides.buttonBackground && 'bg-tiled'
         )}
-        style={{
-          ...(styleOverrides.buttonBackground ? {} : TILED_BG_STYLE),
-          ...(styleOverrides.buttonBackground
-            ? {
-                '--button-bg-image': styleOverrides.buttonBackground,
-              }
-            : {}),
-          ...(styleOverrides.buttonBackgroundColor
-            ? {
-                '--button-bg-color': styleOverrides.buttonBackgroundColor,
-              }
-            : {}),
-        } as React.CSSProperties}
+        data-button-bg-image={styleOverrides.buttonBackground}
+        data-button-bg-color={styleOverrides.buttonBackgroundColor}
         aria-label={`Join ${tournament.title} for ${tournament.entryFee}`}
       >
         Join Tournament

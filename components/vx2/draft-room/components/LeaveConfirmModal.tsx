@@ -14,7 +14,7 @@
 
 import React, { useEffect, useRef, useMemo } from 'react';
 import type { DraftStatus } from '../types';
-import { SPACING, TYPOGRAPHY, RADIUS } from '../../core/constants/sizes';
+import { TYPOGRAPHY } from '../../core/constants/sizes';
 import { createScopedLogger } from '../../../../lib/clientLogger';
 import { cn, cssVars } from '@/lib/styles';
 import styles from './LeaveConfirmModal.module.css';

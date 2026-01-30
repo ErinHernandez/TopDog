@@ -13,11 +13,11 @@ import type { MyRosterStripProps, MyPick, Position } from '../types';
 import {
   SLOW_DRAFT_LAYOUT,
   SLOW_DRAFT_COLORS,
-  SLOW_DRAFT_TYPOGRAPHY,
   SLOW_DRAFT_THRESHOLDS,
   ROSTER_SIZE,
 } from '../constants';
 import { SPACING } from '../deps/core/constants/sizes';
+import styles from './MyRosterStrip.module.css';
 
 // ============================================================================
 // COMPACT ROSTER SQUARE
@@ -91,11 +91,10 @@ function PlayerMiniCard({ pick, onTap }: PlayerMiniCardProps): React.ReactElemen
     >
       {/* Position badge */}
       <div
+        className={styles.positionBadge}
         style={{
           backgroundColor: positionColor,
           color: pick.player.position === 'WR' ? '#000' : '#fff',
-          fontSize: 10,
-          fontWeight: 700,
           padding: '2px 6px',
           borderRadius: 4,
           marginBottom: 4,
@@ -106,8 +105,8 @@ function PlayerMiniCard({ pick, onTap }: PlayerMiniCardProps): React.ReactElemen
 
       {/* Player name */}
       <span
+        className={styles.playerName}
         style={{
-          ...SLOW_DRAFT_TYPOGRAPHY.playerName,
           textAlign: 'center',
           lineHeight: 1.2,
           overflow: 'hidden',
@@ -121,8 +120,8 @@ function PlayerMiniCard({ pick, onTap }: PlayerMiniCardProps): React.ReactElemen
 
       {/* Team */}
       <span
+        className={styles.playerTeam}
         style={{
-          ...SLOW_DRAFT_TYPOGRAPHY.playerPosition,
           marginTop: 'auto',
         }}
       >
@@ -155,11 +154,7 @@ function MoreIndicator({ count, onTap }: MoreIndicatorProps): React.ReactElement
       }}
     >
       <span
-        style={{
-          fontSize: 13,
-          fontWeight: 600,
-          color: 'rgba(255, 255, 255, 0.6)',
-        }}
+        className={styles.moreIndicator}
       >
         +{count} more
       </span>
@@ -215,8 +210,8 @@ export default function MyRosterStrip({
     <div>
       {/* Section label */}
       <div
+        className={styles.sectionLabel}
         style={{
-          ...SLOW_DRAFT_TYPOGRAPHY.sectionLabel,
           marginBottom: SLOW_DRAFT_LAYOUT.sectionLabelMarginBottom,
         }}
       >
@@ -251,11 +246,7 @@ export default function MyRosterStrip({
         {/* Empty state */}
         {picks.length === 0 && (
           <div
-            style={{
-              color: 'rgba(255, 255, 255, 0.4)',
-              fontSize: 13,
-              fontStyle: 'italic',
-            }}
+            className={styles.emptyState}
           >
             No picks yet
           </div>

@@ -1,6 +1,6 @@
 .root {
   min-height: 100vh;
-  background-color: var(--bg-color-primary);
+  background-color: var(--bg-primary, #1a1f2e);
 }
 
 .container {
@@ -25,7 +25,7 @@
 
 .tabsHeader {
   display: flex;
-  border-bottom: 1px solid var(--border-color-light);
+  border-bottom: 1px solid var(--border-light, #334155);
 }
 
 .tabButton {
@@ -51,13 +51,13 @@
 }
 
 .tabButton.active {
-  border-bottom-color: var(--state-color-info);
-  color: var(--state-color-info);
+  border-bottom-color: var(--color-state-info, #3b82f6);
+  color: var(--color-state-info, #3b82f6);
 }
 
 .tabButton:not(.active) {
   border-bottom-color: transparent;
-  color: var(--text-color-secondary);
+  color: var(--text-secondary, #64748b);
 }
 
 .contentSection {
@@ -76,7 +76,7 @@
   font-size: 14px;
   font-weight: 500;
   margin-bottom: 8px;
-  color: var(--text-color-secondary);
+  color: var(--text-secondary, #64748b);
 }
 
 .backgroundTypeContainer {
@@ -92,19 +92,19 @@
   text-transform: capitalize;
   transition: all 0.2s ease;
   cursor: pointer;
-  border: 1px solid var(--border-color-default);
+  border: 1px solid var(--border-default, #334155);
   min-height: 48px;
   font-weight: 500;
 }
 
 .backgroundTypeButton.active {
-  background-color: var(--state-color-info);
+  background-color: var(--color-state-info, #3b82f6);
   color: #ffffff;
 }
 
 .backgroundTypeButton:not(.active) {
-  background-color: var(--bg-color-tertiary);
-  color: var(--text-color-secondary);
+  background-color: var(--bg-tertiary, #334155);
+  color: var(--text-secondary, #64748b);
 }
 
 .colorPickerContainer {
@@ -117,14 +117,14 @@
   width: 64px;
   height: 40px;
   border-radius: 4px;
-  border: 1px solid var(--border-color-default);
+  border: 1px solid var(--border-default, #334155);
   cursor: pointer;
 }
 
 .colorValue {
   font-size: 14px;
   font-family: monospace;
-  color: var(--text-color-muted);
+  color: var(--text-muted, #475569);
 }
 
 .overlayCheckbox {
@@ -139,14 +139,14 @@
   width: 24px;
   height: 24px;
   border-radius: 4px;
-  accent-color: var(--state-color-info);
+  accent-color: var(--color-state-info, #3b82f6);
   cursor: pointer;
 }
 
 .checkboxLabel {
   font-size: 14px;
   font-weight: 500;
-  color: var(--text-color-primary);
+  color: var(--text-primary, #f1f5f9);
   cursor: pointer;
 }
 
@@ -161,17 +161,17 @@
   border: 2px solid;
   transition: all 0.2s ease;
   cursor: pointer;
-  background-color: var(--bg-color-tertiary);
+  background-color: var(--bg-tertiary, #334155);
 }
 
 .imageButton.active {
-  border-color: var(--state-color-info);
+  border-color: var(--color-state-info, #3b82f6);
   background-color: rgba(59, 130, 246, 0.1);
 }
 
 .imageButton:not(.active) {
-  border-color: var(--border-color-light);
-  background-color: var(--bg-color-tertiary);
+  border-color: var(--border-light, #475569);
+  background-color: var(--bg-tertiary, #334155);
 }
 
 .imageIcon {
@@ -184,7 +184,7 @@
   flex-direction: column;
   gap: 12px;
   padding-top: 16px;
-  border-top: 1px solid var(--border-color-light);
+  border-top: 1px solid var(--border-light, #334155);
   margin-top: 0;
 }
 
@@ -200,7 +200,7 @@
 }
 
 .saveButton {
-  background-color: var(--state-color-info);
+  background-color: var(--color-state-info, #3b82f6);
   color: #ffffff;
 }
 
@@ -210,8 +210,8 @@
 }
 
 .resetButton {
-  background-color: var(--bg-color-tertiary);
-  color: var(--text-color-secondary);
+  background-color: var(--bg-tertiary, #334155);
+  color: var(--text-secondary, #64748b);
 }
 
 .resetButton:disabled {

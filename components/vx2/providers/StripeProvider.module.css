@@ -1,0 +1,90 @@
+/**
+ * Stripe Provider Styles
+ *
+ * CSS module for StripeProvider component.
+ * All colors use tokens.css custom properties.
+ */
+
+/* NOTE: Do NOT use :root in CSS Modules. Global tokens are in /styles/tokens.css */
+
+/*
+ * Note: Stripe Elements styling is handled via the Appearance API
+ * in StripeProvider.tsx using CSS custom properties from tokens.css
+ * This module serves as documentation for the token usage pattern.
+ */
+
+.stripeContainer {
+  color: var(--text-primary);
+}
+
+.stripeInput {
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  transition: border-color var(--duration-normal) ease,
+              box-shadow var(--duration-normal) ease;
+}
+
+.stripeInput:focus {
+  border-color: var(--color-state-active);
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.25);
+}
+
+.stripeInputInvalid {
+  border-color: var(--color-state-error);
+}
+
+.stripeLabel {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  margin-bottom: 6px;
+}
+
+.stripeError {
+  color: var(--color-state-error);
+  font-size: var(--font-size-sm);
+  margin-top: 6px;
+}
+
+.stripeTab {
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  padding: 10px 16px;
+  transition: background-color var(--duration-normal) ease,
+              color var(--duration-normal) ease;
+}
+
+.stripeTab:hover {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.stripeTabSelected {
+  background-color: var(--color-state-active);
+  border-color: var(--color-state-active);
+  color: #000000;
+}
+
+.stripeTabIcon {
+  margin-right: 8px;
+}
+
+.stripeBlock {
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  padding: 16px;
+}
+
+.stripeCheckbox {
+  background-color: var(--bg-tertiary);
+  border-color: var(--border-default);
+}
+
+.stripeCheckboxChecked {
+  background-color: var(--color-state-active);
+  border-color: var(--color-state-active);
+}

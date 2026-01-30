@@ -11,8 +11,7 @@
 import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { cn } from '@/lib/styles';
 import styles from './MatchupDetailView.module.css';
-import { BG_COLORS, TEXT_COLORS } from '../../../core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY } from '../../../core/constants/sizes';
+import { TYPOGRAPHY } from '../../../core/constants/sizes';
 import { ChevronLeft, ChevronRight } from '../../../components/icons';
 import type { PlayoffPod, PlayoffTeam, PlayoffPlayer } from '../../../../../lib/mockData/playoffTeams';
 
@@ -31,19 +30,10 @@ interface MatchupDetailViewProps {
 // CONSTANTS
 // ============================================================================
 
-const POSITION_COLORS: Record<string, string> = {
-  QB: '#F472B6',
-  RB: '#0fba80',
-  WR: '#FBBF25',
-  TE: '#7C3AED',
-};
+// Note: Position colors are handled via CSS classes (.positionLabelQB, etc.)
+// that reference CSS custom properties (--position-qb, etc.) from tokens.css
 
-const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
-  out: { bg: 'rgba(239, 68, 68, 0.2)', text: '#ef4444' },
-  doubtful: { bg: 'rgba(239, 68, 68, 0.15)', text: '#f87171' },
-  questionable: { bg: 'rgba(251, 191, 37, 0.2)', text: '#fbbf24' },
-  active: { bg: 'transparent', text: 'transparent' },
-};
+// Note: Status colors are handled via CSS classes (.statusOut, .statusDoubtful, etc.)
 
 // ============================================================================
 // HELPER FUNCTIONS
@@ -276,7 +266,7 @@ export function MatchupDetailView({
             className={styles.backButton}
             aria-label="Back to pod"
           >
-            <ChevronLeft size={16} color={TEXT_COLORS.muted} />
+            <ChevronLeft size={16} color="#6b7280" />
           </button>
 
           <div className={styles.headerTitle}>

@@ -195,7 +195,7 @@ export const TAB_REGISTRY: Record<TabId, TabConfig> = {
     icon: {
       component: ExposureIcon,
     },
-    lazyComponent: () => import('../../tabs/ExposureTab'),
+    lazyComponent: () => import('../../tabs/exposure').then((m) => ({ default: m.ExposureTabVX2 })),
     preloadPriority: 4,
     requiresAuth: true,
     preserveState: true,

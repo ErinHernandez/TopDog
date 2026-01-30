@@ -34,9 +34,7 @@ export function TournamentCardLogo({
   return (
     <div
       className={cn(styles.container, className)}
-      style={{
-        '--max-height': `${maxHeight}px`,
-      } as React.CSSProperties}
+      data-max-height={maxHeight}
     >
       <img src={src} alt={alt} />
     </div>

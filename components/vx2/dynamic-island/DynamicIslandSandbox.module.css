@@ -43,6 +43,14 @@
   transition-duration: 150ms;
 }
 
+.stateButton {
+  --button-bg-active: #2563eb;
+  --button-text-active: #fff;
+  --button-bg-inactive: #e5e7eb;
+  --button-text-inactive: #374151;
+  --button-bg-inactive-hover: #d1d5db;
+}
+
 .stateButton:active {
   background-color: var(--button-bg-active);
   color: var(--button-text-active);

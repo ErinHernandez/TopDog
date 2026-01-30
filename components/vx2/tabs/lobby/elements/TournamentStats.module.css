@@ -1,8 +1,8 @@
 .container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--gap, 16px);
-  height: var(--height, 60px);
+  gap: var(--spacing-lg);
+  height: 60px;
   align-content: center;
 }
 
@@ -11,18 +11,18 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: var(--spacing-xs);
 }
 
 .statValue {
-  font-size: var(--value-font-size, 18px);
-  font-weight: bold;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
   color: #ffffff;
   line-height: 1;
 }
 
 .statLabel {
-  font-size: var(--label-font-size, 12px);
+  font-size: var(--font-size-xs);
   color: rgba(255, 255, 255, 0.7);
   line-height: 1;
   text-transform: uppercase;

@@ -13,7 +13,7 @@
 
 import React, { useRef, useCallback } from 'react';
 import { BG_COLORS, TEXT_COLORS, BORDER_COLORS } from '../../vx2/core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY } from '../../vx2/core/constants/sizes';
+import { SPACING, RADIUS } from '../../vx2/core/constants/sizes';
 import { Search, Close } from '../../vx2/components/icons';
 
 // ============================================================================
@@ -53,19 +53,19 @@ const SIZE_CONFIG = {
   sm: {
     height: 36,
     paddingX: SPACING.md,
-    fontSize: TYPOGRAPHY.fontSize.sm,
+    fontSizeToken: 'var(--font-size-sm)',
     iconSize: 16,
   },
   md: {
     height: 44,
     paddingX: SPACING.md,
-    fontSize: TYPOGRAPHY.fontSize.base,
+    fontSizeToken: 'var(--font-size-base)',
     iconSize: 18,
   },
   lg: {
     height: 52,
     paddingX: SPACING.lg,
-    fontSize: TYPOGRAPHY.fontSize.lg,
+    fontSizeToken: 'var(--font-size-lg)',
     iconSize: 20,
   },
 } as const;
@@ -146,7 +146,8 @@ export function SearchInput({
           borderRadius: `${RADIUS.md}px`,
           paddingLeft: `${config.height}px`,
           paddingRight: showClear && value ? `${config.height}px` : `${config.paddingX}px`,
-          fontSize: `${config.fontSize}px`,
+          fontSize: config.fontSizeToken,
+          fontWeight: 'var(--font-weight-normal)',
         }}
         aria-label={ariaLabel}
       />

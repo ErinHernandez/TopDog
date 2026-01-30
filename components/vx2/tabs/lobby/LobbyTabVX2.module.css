@@ -2,13 +2,18 @@
  * LobbyTabVX2 - CSS Module for CSP Compliance
  *
  * Migrated from inline styles to CSS Modules for Content Security Policy compliance.
- * Uses CSS custom properties for dynamic values from constants.
+ * Uses CSS custom properties for dynamic values and spacing tokens from tokens.css.
+ *
+ * Spacing tokens used:
+ * - --spacing-sm (8px): Small gaps
+ * - --spacing-lg (16px): Standard padding and margins
+ * - --spacing-xl (24px): Large gaps between sections
  *
  * @module LobbyTabVX2.module.css
  */
 
 /* ============================================================================
-   CSS CUSTOM PROPERTIES - CONSTANTS FROM cardSpacingV3 and colors
+   CSS CUSTOM PROPERTIES - CONSTANTS FROM colors and spacing tokens
    ============================================================================ */
 
 /* ============================================================================

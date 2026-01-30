@@ -14,8 +14,6 @@ import { PatternPicker } from './PatternPicker';
 import { OverlayControls } from './OverlayControls';
 import { LivePreview } from './LivePreview';
 import AppHeaderVX2 from '@/components/vx2/shell/AppHeaderVX2';
-import { BG_COLORS, TEXT_COLORS, BORDER_COLORS, STATE_COLORS } from '@/components/vx2/core/constants/colors';
-import { SPACING, RADIUS } from '@/components/vx2/core/constants/sizes';
 
 // Icons
 function MapPinIcon({ className }: { className?: string }) {
@@ -99,10 +97,7 @@ export function ProfileCustomizationPage() {
   // The draft object always has valid default values, so we can render immediately
 
   return (
-    <div
-      className={styles.root}
-      style={{ '--bg-color-primary': BG_COLORS.primary } as React.CSSProperties}
-    >
+    <div className={styles.root}>
       <AppHeaderVX2 title="Customization" />
 
       <div className={styles.container}>
@@ -111,17 +106,10 @@ export function ProfileCustomizationPage() {
         </div>
 
         <div className={styles.sectionsContainer}>
-          <div
-            className={styles.tabsHeader}
-            style={{ '--border-color-light': BORDER_COLORS.light } as React.CSSProperties}
-          >
+          <div className={styles.tabsHeader}>
             <button
               onClick={() => setActiveSection('background')}
               className={cn(styles.tabButton, activeSection === 'background' && styles.active)}
-              style={{
-                '--state-color-info': STATE_COLORS.info,
-                '--text-color-secondary': TEXT_COLORS.secondary,
-              } as React.CSSProperties}
             >
               <PaletteIcon className="w-4 h-4" />
               <span className="inline">Background</span>
@@ -129,10 +117,6 @@ export function ProfileCustomizationPage() {
             <button
               onClick={() => setActiveSection('overlay')}
               className={cn(styles.tabButton, activeSection === 'overlay' && styles.active)}
-              style={{
-                '--state-color-info': STATE_COLORS.info,
-                '--text-color-secondary': TEXT_COLORS.secondary,
-              } as React.CSSProperties}
             >
               <LayersIcon className="w-4 h-4" />
               <span className="inline">Overlay</span>
@@ -143,10 +127,7 @@ export function ProfileCustomizationPage() {
             <div className={styles.contentSection}>
               {/* Background type selector */}
               <div className={styles.fieldGroup}>
-                <label
-                  className={styles.label}
-                  style={{ '--text-color-secondary': TEXT_COLORS.secondary } as React.CSSProperties}
-                >
+                <label className={styles.label}>
                   Background Type
                 </label>
                 <div className={styles.backgroundTypeContainer}>
@@ -158,12 +139,6 @@ export function ProfileCustomizationPage() {
                         styles.backgroundTypeButton,
                         draft.backgroundType === type && styles.active
                       )}
-                      style={{
-                        '--state-color-info': STATE_COLORS.info,
-                        '--bg-color-tertiary': BG_COLORS.tertiary,
-                        '--text-color-secondary': TEXT_COLORS.secondary,
-                        '--border-color-default': BORDER_COLORS.default,
-                      } as React.CSSProperties}
                     >
                       {type}
                     </button>
@@ -186,10 +161,7 @@ export function ProfileCustomizationPage() {
               {/* Solid color picker */}
               {draft.backgroundType === 'solid' && (
                 <div className={styles.fieldGroup}>
-                  <label
-                    className={styles.label}
-                    style={{ '--text-color-secondary': TEXT_COLORS.secondary } as React.CSSProperties}
-                  >
+                  <label className={styles.label}>
                     Background Color
                   </label>
                   <div className={styles.colorPickerContainer}>
@@ -198,12 +170,8 @@ export function ProfileCustomizationPage() {
                       value={draft.backgroundSolidColor || '#ffffff'}
                       onChange={(e) => updateDraft({ backgroundSolidColor: e.target.value })}
                       className={styles.colorInput}
-                      style={{ '--border-color-default': BORDER_COLORS.default } as React.CSSProperties}
                     />
-                    <span
-                      className={styles.colorValue}
-                      style={{ '--text-color-muted': TEXT_COLORS.muted } as React.CSSProperties}
-                    >
+                    <span className={styles.colorValue}>
                       {draft.backgroundSolidColor || '#ffffff'}
                     </span>
                   </div>
@@ -220,12 +188,8 @@ export function ProfileCustomizationPage() {
                   checked={draft.overlayEnabled}
                   onChange={(e) => updateDraft({ overlayEnabled: e.target.checked })}
                   className={styles.checkboxInput}
-                  style={{ '--state-color-info': STATE_COLORS.info } as React.CSSProperties}
                 />
-                <span
-                  className={styles.checkboxLabel}
-                  style={{ '--text-color-primary': TEXT_COLORS.primary } as React.CSSProperties}
-                >
+                <span className={styles.checkboxLabel}>
                   Enable overlay
                 </span>
               </label>
@@ -234,10 +198,7 @@ export function ProfileCustomizationPage() {
                 <>
                   {/* Image selector */}
                   <div className={styles.fieldGroup}>
-                    <label
-                      className={styles.label}
-                      style={{ '--text-color-secondary': TEXT_COLORS.secondary } as React.CSSProperties}
-                    >
+                    <label className={styles.label}>
                       Image
                     </label>
                     <div className={styles.imageSelector}>
@@ -247,11 +208,6 @@ export function ProfileCustomizationPage() {
                           draft.overlayImageId === 'hotdog' && styles.active
                         )}
                         onClick={() => updateDraft({ overlayImageId: 'hotdog' })}
-                        style={{
-                          '--state-color-info': STATE_COLORS.info,
-                          '--border-color-light': BORDER_COLORS.light,
-                          '--bg-color-tertiary': BG_COLORS.tertiary,
-                        } as React.CSSProperties}
                       >
                         <img
                           src="/customization/images/hotdog.svg"
@@ -265,10 +221,7 @@ export function ProfileCustomizationPage() {
 
                   {/* Pattern picker */}
                   <div className={styles.fieldGroup}>
-                    <label
-                      className={styles.label}
-                      style={{ '--text-color-secondary': TEXT_COLORS.secondary } as React.CSSProperties}
-                    >
+                    <label className={styles.label}>
                       Pattern
                     </label>
                     <PatternPicker
@@ -294,17 +247,11 @@ export function ProfileCustomizationPage() {
           )}
 
           {/* Save/Reset buttons */}
-          <div
-            className={styles.actionsContainer}
-            style={{ '--border-color-light': BORDER_COLORS.light } as React.CSSProperties}
-          >
+          <div className={styles.actionsContainer}>
             <button
               onClick={save}
               disabled={!isDirty || isSaving}
               className={cn(styles.actionButton, styles.saveButton)}
-              style={{
-                '--state-color-info': STATE_COLORS.info,
-              } as React.CSSProperties}
             >
               {isSaving ? 'Saving...' : 'Save Changes'}
             </button>
@@ -312,10 +259,6 @@ export function ProfileCustomizationPage() {
               onClick={reset}
               disabled={!isDirty}
               className={cn(styles.actionButton, styles.resetButton)}
-              style={{
-                '--bg-color-tertiary': BG_COLORS.tertiary,
-                '--text-color-secondary': TEXT_COLORS.secondary,
-              } as React.CSSProperties}
             >
               Reset
             </button>

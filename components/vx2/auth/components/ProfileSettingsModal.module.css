@@ -269,6 +269,10 @@
   font-size: var(--typography-sm, 14px);
 }
 
+.statValueSuccess {
+  color: var(--color-state-success, #10b981);
+}
+
 .deleteAccountSection {
   display: flex;
   align-items: center;
@@ -785,4 +789,15 @@
 
 .wFull {
   width: 100%;
+}
+
+/* Tab label with proper z-index for indicator */
+.tabLabel {
+  position: relative;
+  z-index: 1;
+}
+
+/* Icon color styling */
+.closingIcon {
+  color: var(--text-muted, rgba(255, 255, 255, 0.5));
 }

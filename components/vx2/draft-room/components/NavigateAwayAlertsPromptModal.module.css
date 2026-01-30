@@ -10,7 +10,7 @@
   justify-content: center;
   background-color: var(--modal-backdrop);
   z-index: 9999;
-  padding: var(--modal-spacing-lg);
+  padding: var(--spacing-lg);
   pointer-events: auto;
 }
 
@@ -18,8 +18,8 @@
   width: 100%;
   max-width: 340px;
   background-color: var(--modal-background);
-  border-radius: var(--modal-radius-xl);
-  padding: var(--modal-padding-lg);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-xl);
   position: relative;
   z-index: 10001;
   pointer-events: auto;
@@ -38,22 +38,22 @@
   color: var(--modal-description);
   text-align: center;
   line-height: 1.5;
-  margin-bottom: var(--modal-spacing-lg);
+  margin-bottom: var(--spacing-lg);
 }
 
 .checkboxContainer {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: var(--modal-spacing-lg);
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
 }
 
 .checkboxLabel {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: var(--modal-spacing-md);
-  border-radius: var(--modal-radius-lg);
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-lg);
   border: 1px solid var(--modal-border);
   cursor: pointer;
 }
@@ -72,13 +72,13 @@
 .buttonContainer {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--spacing-sm);
 }
 
 .primaryButton {
   width: 100%;
-  padding: 14px 20px;
-  border-radius: var(--modal-radius-lg);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-lg);
   border: none;
   background-color: var(--modal-primary-button);
   color: var(--modal-primary-text);
@@ -95,8 +95,8 @@
 
 .secondaryButton {
   width: 100%;
-  padding: 14px 20px;
-  border-radius: var(--modal-radius-lg);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-lg);
   border: none;
   background-color: var(--modal-secondary-button);
   color: var(--modal-secondary-text);

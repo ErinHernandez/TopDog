@@ -1,7 +1,8 @@
 /**
  * CurrencySelector CSS Module
  *
- * Migrated from inline styles for CSP compliance.
+ * Zero-runtime CSS for CSP compliance.
+ * Uses tokens.css variables for all colors.
  */
 
 /* ============================================================================
@@ -19,9 +20,9 @@
 .label {
   display: block;
   font-weight: 500;
-  margin-bottom: 0.5rem;
-  font-size: var(--font-size-sm, 14px);
-  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+  margin-bottom: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
 }
 
 /* ============================================================================
@@ -34,17 +35,17 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  border-radius: 0.75rem;
+  padding: 0.75rem var(--spacing-md);
+  border-radius: var(--radius-lg);
   transition: all 150ms ease;
   background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--trigger-border, rgba(255, 255, 255, 0.1));
-  color: var(--text-primary, rgba(255, 255, 255, 0.9));
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
   cursor: pointer;
 }
 
 .triggerButtonOpen {
-  border-color: var(--active-color, #60a5fa);
+  border-color: var(--color-state-active);
 }
 
 .triggerButtonDisabled {
@@ -65,7 +66,7 @@
 .iconWrapper {
   width: 2.5rem;
   height: 2.5rem;
-  border-radius: 0.5rem;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -78,12 +79,13 @@
 
 .currencyCode {
   font-weight: 600;
-  font-size: var(--font-size-base, 16px);
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
 }
 
 .currencyName {
-  font-size: var(--font-size-xs, 12px);
-  color: var(--text-muted, rgba(255, 255, 255, 0.5));
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
 }
 
 /* ============================================================================
@@ -93,6 +95,7 @@
 .chevron {
   display: inline-block;
   transition: transform 150ms ease;
+  color: var(--text-muted);
 }
 
 .chevronOpen {
@@ -107,12 +110,12 @@
   position: absolute;
   left: 0;
   right: 0;
-  margin-top: 0.5rem;
-  border-radius: 0.75rem;
+  margin-top: var(--spacing-sm);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  background-color: var(--dropdown-bg, #1c1c1c);
-  border: 1px solid var(--border-default, rgba(255, 255, 255, 0.1));
-  z-index: var(--z-dropdown, 100);
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  z-index: var(--z-dropdown);
   max-height: 300px;
   overflow-y: auto;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
@@ -127,11 +130,11 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.75rem 1rem;
+  padding: 0.75rem var(--spacing-md);
   transition: all 150ms ease;
   background-color: transparent;
   border: none;
-  border-bottom: 1px solid var(--border-light, rgba(255, 255, 255, 0.05));
+  border-bottom: 1px solid var(--border-light);
   cursor: pointer;
   text-align: left;
 }
@@ -155,12 +158,12 @@
 .optionIconWrapper {
   width: 2rem;
   height: 2rem;
-  border-radius: 0.5rem;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  background-color: var(--option-icon-bg, rgba(255, 255, 255, 0.1));
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .optionIconWrapperSelected {
@@ -175,27 +178,27 @@
 .optionCodeRow {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--spacing-sm);
   font-weight: 600;
-  font-size: var(--font-size-sm, 14px);
-  color: var(--text-primary, rgba(255, 255, 255, 0.9));
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
 }
 
 .optionCodeRowSelected {
-  color: var(--active-color, #60a5fa);
+  color: var(--color-state-active);
 }
 
 .recommendedBadge {
-  padding: 0.125rem 0.5rem;
+  padding: 0.125rem var(--spacing-sm);
   border-radius: 9999px;
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   background-color: rgba(16, 185, 129, 0.2);
-  color: var(--success-color, #10b981);
+  color: var(--color-state-success);
 }
 
 .optionName {
-  font-size: var(--font-size-xs, 12px);
-  color: var(--text-muted, rgba(255, 255, 255, 0.5));
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
 }
 
 /* ============================================================================
@@ -204,4 +207,5 @@
 
 .checkmark {
   flex-shrink: 0;
+  color: var(--color-state-active);
 }

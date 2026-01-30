@@ -11,8 +11,6 @@ import styles from './CompletedDraftBoardModal.module.css';
 import DraftBoard from '../../draft-room/components/DraftBoard';
 import type { DraftPick, Participant } from '../../draft-room/types';
 import type { MyTeam, TeamPlayer } from '../../hooks/data/useMyTeams';
-import { BG_COLORS, TEXT_COLORS } from '../../core/constants/colors';
-import { SPACING, RADIUS, Z_INDEX } from '../../core/constants/sizes';
 import { Close } from '../../components/icons';
 
 // ============================================================================
@@ -130,29 +128,18 @@ export default function CompletedDraftBoardModal({
   return (
     <div
       className={styles.container}
-      style={{
-        '--bg-color-primary': BG_COLORS.primary,
-        '--z-index-modal': Z_INDEX.modal,
-      } as React.CSSProperties}
     >
       {/* Header */}
       <div
         className={styles.header}
-        style={{
-          '--padding-vertical': `${SPACING.md}px`,
-          '--padding-horizontal': `${SPACING.lg}px`,
-        } as React.CSSProperties}
       >
         <h2 className={styles.title}>Draft Board</h2>
         <button
           onClick={onClose}
           className={styles.closeButton}
-          style={{
-            '--border-radius-md': `${RADIUS.md}px`,
-          } as React.CSSProperties}
           aria-label="Close draft board"
         >
-          <Close size={20} color={TEXT_COLORS.secondary} />
+          <Close size={20} />
         </button>
       </div>
 

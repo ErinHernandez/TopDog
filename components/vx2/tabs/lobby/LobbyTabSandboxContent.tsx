@@ -15,7 +15,6 @@
 import React, { useState, useMemo } from 'react';
 import type { Tournament } from '../../hooks/data';
 import {
-  TournamentCardLogo,
   TournamentTitle,
   TournamentProgressBar,
   TournamentJoinButton,
@@ -25,7 +24,6 @@ import { LOBBY_TAB_SANDBOX_SPEC } from './constants/lobbyTabSandboxSpec';
 import styles from './LobbyTabSandboxContent.module.css';
 
 const SPEC = LOBBY_TAB_SANDBOX_SPEC;
-const LOGO_IMAGE = '/tournament_card_background.png';
 const GLOBE_IMAGE_PRIMARY = '/!!_GLOBE_NOBACKGROUND.webp';
 const GLOBE_IMAGE_FALLBACK = '/!!_GLOBE_NOBACKGROUND.webp';
 /** Fixed height for the globe area so resizing the globe does not shift other lobby content. Sized so all lobby objects fit in the content area (731px). */
@@ -146,20 +144,15 @@ export function LobbyTabSandboxContent({
     const heroBlock = (
       <div
         className={styles.heroBlock}
-        style={{
-          '--outer-padding': `${SPEC.lobby.outer_padding_px}px`,
-          '--bottom-row-gap': `${SPEC.lobby.bottom_row_gap_px}px`,
-        } as React.CSSProperties}
+        data-outer-padding={SPEC.lobby.outer_padding_px}
+        data-bottom-row-gap={SPEC.lobby.bottom_row_gap_px}
       >
         {objectsInPhone.logoTitle && (
           <div
             className={styles.logoTitleContainer}
-            style={{
-              '--logo-title-translate-x': `${positionOverrides?.logoTitle?.x ?? 0}px`,
-              '--logo-title-translate-y': `${positionOverrides?.logoTitle?.y ?? 0}px`,
-            } as React.CSSProperties}
+            data-translate-x={positionOverrides?.logoTitle?.x ?? 0}
+            data-translate-y={positionOverrides?.logoTitle?.y ?? 0}
           >
-            <TournamentCardLogo src={LOGO_IMAGE} alt="Tournament logo" maxHeight={60} />
             <div className={styles.logoTitleInner}>
               <TournamentTitle title={tournament.title} fontSize={38} />
             </div>
@@ -168,20 +161,19 @@ export function LobbyTabSandboxContent({
         {objectsInPhone.globe && (
           <div
             className={styles.globeSlotContainer}
-            style={{
-              '--globe-slot-height': `${GLOBE_SLOT_HEIGHT_PX}px`,
-              '--globe-translate-x': `${positionOverrides?.globe?.x ?? 0}px`,
-              '--globe-translate-y': `${positionOverrides?.globe?.y ?? 0}px`,
-            } as React.CSSProperties}
+            data-globe-slot-height={GLOBE_SLOT_HEIGHT_PX}
+            data-translate-x={positionOverrides?.globe?.x ?? 0}
+            data-translate-y={positionOverrides?.globe?.y ?? 0}
           >
             <div
               data-globe-slot
               role="img"
               aria-label="Globe"
               className={styles.globeSlot}
+              data-globe-size={globeSizePx}
+              data-globe-image={globeUrl}
               style={{
-                '--globe-size': `${globeSizePx}px`,
-                backgroundImage: `url(${globeUrl})`,
+                '--globe-bg-image': `url(${globeUrl})`,
               } as React.CSSProperties}
             />
           </div>
@@ -189,10 +181,8 @@ export function LobbyTabSandboxContent({
         {objectsInPhone.progressBar && (
           <div
             className={styles.progressBarContainer}
-            style={{
-              '--progress-bar-translate-x': `${positionOverrides?.progressBar?.x ?? 0}px`,
-              '--progress-bar-translate-y': `${positionOverrides?.progressBar?.y ?? 0}px`,
-            } as React.CSSProperties}
+            data-translate-x={positionOverrides?.progressBar?.x ?? 0}
+            data-translate-y={positionOverrides?.progressBar?.y ?? 0}
           >
             <TournamentProgressBar
               currentEntries={tournament.currentEntries}
@@ -203,10 +193,8 @@ export function LobbyTabSandboxContent({
         {objectsInPhone.joinButton && (
           <div
             className={styles.joinButtonContainer}
-            style={{
-              '--join-button-translate-x': `${positionOverrides?.joinButton?.x ?? 0}px`,
-              '--join-button-translate-y': `${positionOverrides?.joinButton?.y ?? 0}px`,
-            } as React.CSSProperties}
+            data-translate-x={positionOverrides?.joinButton?.x ?? 0}
+            data-translate-y={positionOverrides?.joinButton?.y ?? 0}
           >
             <TournamentJoinButton onClick={() => onJoinClick(tournament.id)} label="Join Tournament" />
           </div>
@@ -214,10 +202,8 @@ export function LobbyTabSandboxContent({
         {objectsInPhone.stats && (
           <div
             className={styles.statsContainer}
-            style={{
-              '--stats-translate-x': `${positionOverrides?.stats?.x ?? 0}px`,
-              '--stats-translate-y': `${positionOverrides?.stats?.y ?? 0}px`,
-            } as React.CSSProperties}
+            data-translate-x={positionOverrides?.stats?.x ?? 0}
+            data-translate-y={positionOverrides?.stats?.y ?? 0}
           >
             <TournamentStats
               entryFee={tournament.entryFee}
@@ -243,15 +229,13 @@ export function LobbyTabSandboxContent({
       <div
         data-outline-debug={dataOutlineDebug}
         className={styles.contentArea}
-        style={{
-          '--lobby-outline-thickness': outlineOn ? `${outlineThickness}px` : '0px',
-          '--lobby-outline-margin': `${marginFromEdge}px`,
-          '--lobby-outline-color': outlineColor,
-          '--lobby-outline-radius': `${outlineRadius}px`,
-          '--outline-translate-y': `${outlineY}px`,
-          '--content-scale': contentScale.toString(),
-          '--safe-area-top': `${SPEC.safe_area_top_px}px`,
-        } as React.CSSProperties}
+        data-outline-thickness={outlineOn ? outlineThickness : 0}
+        data-outline-margin={marginFromEdge}
+        data-outline-color={outlineColor}
+        data-outline-radius={outlineRadius}
+        data-outline-translate-y={outlineY}
+        data-content-scale={contentScale.toString()}
+        data-safe-area-top={SPEC.safe_area_top_px}
       >
         <div className={styles.safeAreaWrapper}>
           <div className={styles.scaleWrapper}>

@@ -14,8 +14,6 @@
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import type { DraftTab } from '../types';
 import { DRAFT_LAYOUT, DRAFT_DEFAULTS } from '../constants';
-import { BG_COLORS, TEXT_COLORS } from '../../core/constants/colors';
-import { SPACING, TYPOGRAPHY, RADIUS } from '../../core/constants/sizes';
 import { createScopedLogger } from '../../../../lib/clientLogger';
 import { cn } from '@/lib/styles';
 import styles from './DraftRoomVX2.module.css';

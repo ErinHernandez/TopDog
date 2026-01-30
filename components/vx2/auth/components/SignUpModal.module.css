@@ -429,3 +429,112 @@
   color: var(--text-primary, rgba(255, 255, 255, 0.9));
   font-size: 15px;
 }
+
+/* ============================================================================
+   REQUIREMENT ITEMS
+   ============================================================================ */
+
+.requirementItemSuccess {
+  color: var(--color-state-success, #10b981);
+}
+
+.requirementItemPending {
+  color: var(--text-muted, rgba(255, 255, 255, 0.5));
+}
+
+/* ============================================================================
+   ERROR ICON & SUCCESS CHECKMARK
+   ============================================================================ */
+
+.errorIcon {
+  color: var(--error-color, #ef4444);
+}
+
+.successCheckmark {
+  color: var(--color-state-success, #10b981);
+}
+
+/* ============================================================================
+   STRENGTH LABEL COLOR
+   ============================================================================ */
+
+.strengthLabelColor {
+  color: var(--strength-color, var(--text-muted, rgba(255, 255, 255, 0.5)));
+}
+
+.strengthContainer[data-has-password="false"] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.strengthContainer[data-has-password="true"] {
+  opacity: 1;
+  transition: opacity 0.2s;
+}
+
+/* ============================================================================
+   INLINE STYLE MIGRATIONS
+   ============================================================================ */
+
+.welcomeText {
+  font-size: 17px;
+}
+
+.formBlock {
+  width: 311px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.stepContentPadded {
+  padding: 0 var(--spacing-xl);
+}
+
+.usernamePromptTitle {
+  font-size: 24px;
+}
+
+.usernamePromptText {
+  font-size: 15px;
+}
+
+.emailPromptTitle {
+  font-size: 24px;
+}
+
+.emailPromptText {
+  font-size: 15px;
+}
+
+.resendHintText {
+  font-size: 14px;
+}
+
+.successStepPadding {
+  padding: 0 24px;
+}
+
+.successTitle {
+  font-size: 28px;
+}
+
+.successSubtitle {
+  font-size: 17px;
+}
+
+.verificationHintLabel {
+  font-size: 14px;
+}
+
+.emailDisplay {
+  font-weight: 500;
+  font-size: 15px;
+}
+
+.verificationHintNote {
+  font-size: 14px;
+}
+
+.taxReminderText {
+  font-size: 13px;
+}

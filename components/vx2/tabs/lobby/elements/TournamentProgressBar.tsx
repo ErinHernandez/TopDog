@@ -8,7 +8,6 @@
 
 import React from 'react';
 import { cn } from '@/lib/styles';
-import { CARD_SPACING_V3 } from '../constants/cardSpacingV3';
 import styles from './TournamentProgressBar.module.css';
 
 export interface TournamentProgressBarProps {
@@ -36,11 +35,6 @@ export function TournamentProgressBar({
   return (
     <div
       className={cn(styles.container)}
-      style={{
-        '--height': `${CARD_SPACING_V3.progressHeight}px`,
-        '--background-color': CARD_SPACING_V3.progressBackgroundColor,
-        '--border-radius': `${CARD_SPACING_V3.progressBorderRadius}px`,
-      } as React.CSSProperties}
       role="progressbar"
       aria-valuenow={percentage}
       aria-valuemin={0}
@@ -49,13 +43,12 @@ export function TournamentProgressBar({
     >
       <div
         className={cn(styles.fill)}
+        data-percentage={percentage}
+        data-has-fill-style={hasFillStyle}
         style={{
           '--percentage': `${percentage}%`,
           '--background-image': hasFillStyle ? fillStyle : 'url(/wr_blue.png)',
           '--background-color': hasFillStyle ? 'transparent' : '#1e40af',
-          '--background-size': '200px',
-          '--background-repeat': 'repeat',
-          '--border-radius': `${CARD_SPACING_V3.progressBorderRadius}px`,
         } as React.CSSProperties}
       />
     </div>

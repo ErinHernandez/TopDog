@@ -1,0 +1,22 @@
+/**
+ * PositionNeedsIndicator - Typography styles
+ */
+
+.needsText {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.positionBadge {
+  font-size: 9px;
+  font-weight: var(--font-weight-bold);
+}
+
+.countText {
+  font-size: 12px;
+  font-weight: var(--font-weight-semibold);
+}
+
+.remainingText {
+  font-size: 12px;
+}

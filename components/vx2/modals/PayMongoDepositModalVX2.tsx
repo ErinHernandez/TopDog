@@ -12,8 +12,6 @@
 
 import React, { useState, useCallback, useMemo } from 'react';
 import { cn } from '@/lib/styles';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY } from '../core/constants/sizes';
 import { Close, ChevronLeft } from '../components/icons';
 import {
   formatPhpAmount,

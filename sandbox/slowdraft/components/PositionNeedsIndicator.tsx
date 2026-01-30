@@ -10,9 +10,9 @@ import React from 'react';
 import type { PositionNeedsIndicatorProps, PositionNeed, Position } from '../types';
 import {
   SLOW_DRAFT_COLORS,
-  SLOW_DRAFT_TYPOGRAPHY,
   SLOW_DRAFT_LAYOUT,
 } from '../constants';
+import styles from './PositionNeedsIndicator.module.css';
 
 // ============================================================================
 // URGENCY HELPERS
@@ -71,11 +71,10 @@ function NeedPill({ need }: NeedPillProps): React.ReactElement {
     >
       {/* Position badge */}
       <span
+        className={styles.positionBadge}
         style={{
           backgroundColor: positionColor,
           color: need.position === 'WR' ? '#000' : '#fff',
-          fontSize: 9,
-          fontWeight: 700,
           padding: '1px 4px',
           borderRadius: 3,
         }}
@@ -85,8 +84,8 @@ function NeedPill({ need }: NeedPillProps): React.ReactElement {
 
       {/* Count needed */}
       <span
+        className={styles.needsText}
         style={{
-          ...SLOW_DRAFT_TYPOGRAPHY.needsText,
           color: isUrgent ? urgencyColor : 'rgba(255, 255, 255, 0.8)',
         }}
       >
@@ -151,11 +150,10 @@ function PositionRow({ need }: PositionRowProps): React.ReactElement {
 
       {/* Count */}
       <div
+        className={styles.countText}
         style={{
           minWidth: 50,
           textAlign: 'right',
-          fontSize: 12,
-          fontWeight: 600,
           color: urgencyColor,
         }}
       >
@@ -204,9 +202,9 @@ export default function PositionNeedsIndicator({
       {/* Flex remaining */}
       {flexRemaining > 0 && (
         <div
+          className={styles.remainingText}
           style={{
             marginTop: 8,
-            fontSize: 12,
             color: 'rgba(255, 255, 255, 0.5)',
           }}
         >

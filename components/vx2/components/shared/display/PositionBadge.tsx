@@ -3,7 +3,9 @@
  *
  * Consistent position badge used throughout the app.
  *
- * Migrated to CSS Modules for CSP compliance.
+ * Migrated to CSS Modules + data attributes for CSP compliance.
+ * Colors are now applied via data-position and data-variant attributes
+ * defined in utilities.css.
  *
  * @example
  * ```tsx
@@ -13,8 +15,6 @@
  */
 
 import React from 'react';
-import { POSITION_COLORS } from '../../../core/constants/colors';
-import { RADIUS, TYPOGRAPHY } from '../../../core/constants/sizes';
 import type { Position } from '../../../hooks/data';
 import { cn } from '@/lib/styles';
 import styles from './PositionBadge.module.css';
@@ -42,17 +42,17 @@ const SIZE_CONFIG = {
   sm: {
     width: 22,
     height: 14,
-    fontSize: TYPOGRAPHY.fontSize.xs - 2,
+    fontSizeToken: 'var(--font-size-xs)',
   },
   md: {
     width: 28,
     height: 18,
-    fontSize: TYPOGRAPHY.fontSize.xs,
+    fontSizeToken: 'var(--font-size-xs)',
   },
   lg: {
     width: 36,
     height: 22,
-    fontSize: TYPOGRAPHY.fontSize.sm,
+    fontSizeToken: 'var(--font-size-sm)',
   },
 } as const;
 
@@ -66,27 +66,24 @@ export function PositionBadge({
   className = '',
   variant = 'filled',
 }: PositionBadgeProps): React.ReactElement {
-  const positionUpper = position.toUpperCase() as keyof typeof POSITION_COLORS;
-  const color = POSITION_COLORS[positionUpper] || POSITION_COLORS.BN;
+  const positionLower = position.toLowerCase();
+  const positionUpper = position.toUpperCase();
   const config = SIZE_CONFIG[size];
 
-  const isFilled = variant === 'filled';
-
-  // CSS custom properties for dynamic values
+  // CSS custom properties for size values (colors handled by data attributes)
   const badgeStyle: React.CSSProperties = {
     '--badge-width': `${config.width}px`,
     '--badge-height': `${config.height}px`,
-    '--badge-radius': `${RADIUS.sm}px`,
-    '--badge-bg': isFilled ? color : 'transparent',
-    '--badge-color': isFilled ? '#000000' : color,
-    '--badge-font-size': `${config.fontSize}px`,
-    '--badge-border': isFilled ? 'none' : `2px solid ${color}`,
+    '--badge-radius': 'var(--radius-sm)',
+    '--badge-font-size': config.fontSizeToken,
   } as React.CSSProperties;
 
   return (
     <span
       className={cn(styles.badge, className)}
       style={badgeStyle}
+      data-position={positionLower}
+      data-variant={variant}
       role="img"
       aria-label={`Position: ${position}`}
     >

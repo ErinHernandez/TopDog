@@ -21,15 +21,15 @@
 }
 
 .introTitle {
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   margin-bottom: 8px;
-  color: var(--text-primary, rgba(255, 255, 255, 0.9));
-  font-size: var(--font-size-xl, 20px);
+  color: var(--text-primary);
+  font-size: var(--font-size-xl);
 }
 
 .introDescription {
-  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
-  font-size: var(--font-size-sm, 14px);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
 }
 
 /* ============================================================================
@@ -42,10 +42,10 @@
 
 .phoneInputLabel {
   display: block;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   margin-bottom: 8px;
-  color: var(--text-primary, rgba(255, 255, 255, 0.9));
-  font-size: var(--font-size-sm, 14px);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
 }
 
 .phoneInputGroup {
@@ -60,13 +60,13 @@
   padding: 12px;
   border-radius: 12px;
   background-color: rgba(255, 255, 255, 0.05);
-  border: 2px solid var(--border-default, rgba(255, 255, 255, 0.1));
+  border: 2px solid var(--border-default);
   min-width: 100px;
   cursor: pointer;
   transition: all 150ms ease;
   background: none;
-  color: var(--text-primary, rgba(255, 255, 255, 0.9));
-  font-size: var(--font-size-sm, 14px);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
 }
 
 .countrySelector:hover {
@@ -78,8 +78,8 @@
 }
 
 .countrySelectorCode {
-  color: var(--text-primary, rgba(255, 255, 255, 0.9));
-  font-size: var(--font-size-sm, 14px);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
 }
 
 .countrySelectorChevron {
@@ -92,9 +92,9 @@
   border-radius: 12px;
   outline: none;
   background-color: rgba(255, 255, 255, 0.05);
-  color: var(--text-primary, rgba(255, 255, 255, 0.9));
-  border: 2px solid var(--border-default, rgba(255, 255, 255, 0.1));
-  font-size: var(--font-size-base, 16px);
+  color: var(--text-primary);
+  border: 2px solid var(--border-default);
+  font-size: var(--font-size-base);
   transition: all 150ms ease;
 }
 
@@ -103,7 +103,7 @@
 }
 
 .phoneNumberInput::placeholder {
-  color: var(--text-muted, rgba(255, 255, 255, 0.5));
+  color: var(--text-muted);
 }
 
 .phoneNumberInput:disabled {
@@ -119,8 +119,8 @@
   margin-bottom: 16px;
   border-radius: 12px;
   overflow: hidden;
-  background-color: var(--bg-secondary, #1a1f2e);
-  border: 1px solid var(--border-default, rgba(255, 255, 255, 0.1));
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-default);
 }
 
 .countrySearchBox {
@@ -133,9 +133,9 @@
   border-radius: 8px;
   outline: none;
   background-color: rgba(255, 255, 255, 0.05);
-  color: var(--text-primary, rgba(255, 255, 255, 0.9));
+  color: var(--text-primary);
   border: 1px solid transparent;
-  font-size: var(--font-size-sm, 14px);
+  font-size: var(--font-size-sm);
   transition: all 150ms ease;
 }
 
@@ -144,7 +144,7 @@
 }
 
 .countrySearchInput::placeholder {
-  color: var(--text-muted, rgba(255, 255, 255, 0.5));
+  color: var(--text-muted);
 }
 
 .countryList {
@@ -185,13 +185,13 @@
 
 .countryItemName {
   flex: 1;
-  color: var(--text-primary, rgba(255, 255, 255, 0.9));
-  font-size: var(--font-size-sm, 14px);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
 }
 
 .countryItemCode {
-  color: var(--text-muted, rgba(255, 255, 255, 0.5));
-  font-size: var(--font-size-sm, 14px);
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
   flex-shrink: 0;
 }
 
@@ -214,9 +214,9 @@
 }
 
 .infoText {
-  color: var(--text-muted, rgba(255, 255, 255, 0.5));
-  font-size: var(--font-size-xs, 12px);
-  line-height: 1.5;
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-normal);
 }
 
 /* ============================================================================
@@ -239,22 +239,22 @@
 }
 
 .verifyTitle {
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   margin-bottom: 8px;
-  color: var(--text-primary, rgba(255, 255, 255, 0.9));
-  font-size: var(--font-size-xl, 20px);
+  color: var(--text-primary);
+  font-size: var(--font-size-xl);
 }
 
 .verifyDescription {
   text-align: center;
   margin-bottom: 32px;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
-  font-size: var(--font-size-sm, 14px);
-  line-height: 1.5;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
 }
 
 .verifyMaskedPhone {
-  color: var(--text-primary, rgba(255, 255, 255, 0.9));
+  color: var(--text-primary);
 }
 
 /* ============================================================================
@@ -271,13 +271,13 @@
   width: 48px;
   height: 56px;
   text-align: center;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   border-radius: 8px;
   outline: none;
   background-color: rgba(255, 255, 255, 0.05);
-  color: var(--text-primary, rgba(255, 255, 255, 0.9));
-  border: 2px solid var(--border-default, rgba(255, 255, 255, 0.1));
-  font-size: var(--font-size-2xl, 24px);
+  color: var(--text-primary);
+  border: 2px solid var(--border-default);
+  font-size: var(--font-size-2xl);
   transition: all 150ms ease;
 }
 
@@ -295,7 +295,7 @@
 }
 
 .otpInputError {
-  border-color: var(--error-color, #ef4444) !important;
+  border-color: var(--color-state-error) !important;
 }
 
 /* ============================================================================
@@ -324,8 +324,8 @@
 }
 
 .loadingText {
-  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
-  font-size: var(--font-size-sm, 14px);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
 }
 
 /* ============================================================================
@@ -337,25 +337,25 @@
 }
 
 .resendLabel {
-  color: var(--text-muted, rgba(255, 255, 255, 0.5));
-  font-size: var(--font-size-sm, 14px);
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
   margin-bottom: 4px;
 }
 
 .resendCooldown {
-  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
-  font-size: var(--font-size-sm, 14px);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
 }
 
 .resendButton {
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   background: url(/wr_blue.png) no-repeat center center;
   background-size: cover;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
-  font-size: var(--font-size-sm, 14px);
+  font-size: var(--font-size-sm);
   border: none;
   padding: 0;
   cursor: pointer;
@@ -391,29 +391,29 @@
 }
 
 .successTitle {
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   margin-bottom: 8px;
-  color: var(--text-primary, rgba(255, 255, 255, 0.9));
-  font-size: var(--font-size-2xl, 24px);
+  color: var(--text-primary);
+  font-size: var(--font-size-2xl);
 }
 
 .successDescription {
   text-align: center;
   margin-bottom: 32px;
-  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
-  font-size: var(--font-size-lg, 18px);
+  color: var(--text-secondary);
+  font-size: var(--font-size-lg);
 }
 
 .successButton {
   width: 100%;
   padding: 16px;
   border-radius: 12px;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   background: url(/wr_blue.png) no-repeat center center;
   background-size: cover;
   color: #000;
   border: none;
-  font-size: var(--font-size-lg, 18px);
+  font-size: var(--font-size-lg);
   cursor: pointer;
   transition: all 150ms ease;
 }
@@ -434,13 +434,13 @@
   width: 100%;
   padding: 16px;
   border-radius: 12px;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   transition: all 150ms ease;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  font-size: var(--font-size-lg, 18px);
+  font-size: var(--font-size-lg);
   border: none;
   cursor: pointer;
 }
@@ -456,8 +456,8 @@
 }
 
 .actionButtonDisabled {
-  background-color: var(--bg-tertiary, rgba(255, 255, 255, 0.1));
-  color: var(--text-disabled, rgba(255, 255, 255, 0.3));
+  background-color: var(--bg-tertiary);
+  color: var(--text-disabled);
   opacity: 0.5;
   cursor: not-allowed;
 }
@@ -476,13 +476,13 @@
 }
 
 .switchAuthText {
-  color: var(--text-muted, rgba(255, 255, 255, 0.5));
-  font-size: var(--font-size-sm, 14px);
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
   margin-bottom: 4px;
 }
 
 .switchAuthButton {
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   background: url(/wr_blue.png) no-repeat center center;
   background-size: cover;
   -webkit-background-clip: text;
@@ -492,7 +492,7 @@
   border: none;
   padding: 0;
   cursor: pointer;
-  font-size: var(--font-size-sm, 14px);
+  font-size: var(--font-size-sm);
   transition: opacity 150ms ease;
 }
 
@@ -512,8 +512,8 @@
   display: flex;
   flex-direction: column;
   top: var(--content-top-inset, 60px);
-  background-color: var(--modal-bg, #1a1f2e);
-  z-index: var(--z-modal, 100);
+  background-color: var(--modal-bg);
+  z-index: var(--z-modal);
 }
 
 /* ============================================================================
@@ -522,4 +522,12 @@
 
 .recaptchaContainer {
   display: none;
+}
+
+/* ============================================================================
+   INLINE STYLE MIGRATIONS
+   ============================================================================ */
+
+.phoneInputLoading {
+  opacity: 0.5;
 }

@@ -11,8 +11,6 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../../core/constants/colors';
-import { SPACING, TYPOGRAPHY, Z_INDEX } from '../../core/constants/sizes';
 import { Close, ChevronLeft, Edit } from '../../components/icons';
 import { UsernameInput } from './UsernameInput';
 import { DeleteAccountModal } from './DeleteAccountModal';
@@ -65,17 +63,17 @@ function ProfileTabContent({ onEditName, onAddEmail, onAddPhone, onOpenDeleteMod
     }
   };
 
-  const displayName = profile?.firstName && profile?.lastName 
+  const displayName = profile?.firstName && profile?.lastName
     ? `${profile.firstName} ${profile.lastName}`
     : profile?.displayName || null;
-  
+
   // Get inner cell background color from user preferences (default to dark gray)
   // Borders are fixed and not customizable
-  const innerCellColor = profile?.preferences?.cellBackgroundColor || BG_COLORS.tertiary;
-  
+  const innerCellColor = profile?.preferences?.cellBackgroundColor || '#374151';
+
   // Fixed border color (not customizable) - matches unpicked player card border in horizontal scrolling pick bar
   const fixedBorderColor = '#6B7280'; // Gray for unpicked cards (CARD_COLORS.otherPick from PicksBar)
-  
+
   return (
     <div className="space-y-6">
       {/* Customization Section */}
@@ -184,8 +182,7 @@ function ProfileTabContent({ onEditName, onAddEmail, onAddPhone, onOpenDeleteMod
         </div>
         <div className={styles.statCard}>
           <span
-            className={cn(styles.statValue, 'block font-bold text-xl')}
-            style={{ color: STATE_COLORS.success }}
+            className={cn(styles.statValue, 'block font-bold text-xl', styles.statValueSuccess)}
           >
             ${(profile?.totalWinnings || 0).toLocaleString()}
           </span>
@@ -547,7 +544,7 @@ function ChangeUsernameModal({ isOpen, onClose, currentUsername }: ChangeUsernam
             Change Username
           </h3>
           <button onClick={onClose} className={styles.modalCloseButton}>
-            <Close size={20} color={TEXT_COLORS.muted} />
+            <Close size={20} className={styles.closingIcon} />
           </button>
         </div>
 
@@ -730,7 +727,7 @@ function AddContactModal({ isOpen, onClose, type }: AddContactModalProps): React
             Add {label}
           </h3>
           <button onClick={onClose} className={styles.modalCloseButton}>
-            <Close size={20} color={TEXT_COLORS.muted} />
+            <Close size={20} className={styles.closingIcon} />
           </button>
         </div>
 
@@ -875,7 +872,7 @@ function EditNameModal({ isOpen, onClose, currentFirstName, currentLastName }: E
             {currentFirstName ? 'Edit Name' : 'Add Name'}
           </h3>
           <button onClick={onClose} className={styles.modalCloseButton}>
-            <Close size={20} color={TEXT_COLORS.muted} />
+            <Close size={20} className={styles.closingIcon} />
           </button>
         </div>
 
@@ -989,6 +986,7 @@ export function ProfileSettingsModal({
       style={{
         '--content-top-inset': `${contentTopInset}px`,
       } as React.CSSProperties}
+      data-inset={contentTopInset}
     >
       {/* Header — same top padding as Sign In/Sign Up/Forgot Password so X height is consistent */}
       <div className={styles.header}>
@@ -1000,7 +998,7 @@ export function ProfileSettingsModal({
           className={sharedStyles.closeButton}
           aria-label="Close"
         >
-          <Close size={24} color={TEXT_COLORS.muted} />
+          <Close size={24} className={styles.closingIcon} />
         </button>
       </div>
 
@@ -1013,7 +1011,7 @@ export function ProfileSettingsModal({
             className={styles.tab}
             aria-selected={activeTab === tab.id}
           >
-            <span style={{ position: 'relative', zIndex: 1 }}>{tab.label}</span>
+            <span className={styles.tabLabel}>{tab.label}</span>
             {activeTab === tab.id && (
               <div className={styles.tabIndicator} />
             )}

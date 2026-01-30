@@ -2,11 +2,19 @@
  * TournamentCardV3 - CSS Module for CSP Compliance
  *
  * Migrated from inline styles to CSS Modules to support Content Security Policy.
- * Uses CSS custom properties for dynamic values.
+ * Uses CSS custom properties for dynamic values and spacing tokens.
+ *
+ * Fixed V3 dimensions:
+ * - Outer padding: 21px
+ * - Border radius: 16px
+ * - Min height: 650px
+ * - Title margin top: 12px
+ * - Spacer min height: 24px
  */
 
 /* ============================================================================
-   CSS CUSTOM PROPERTIES - Dynamic Values
+   NOTE: Global tokens (--bg-primary, --text-primary, etc.) are defined in
+   /styles/tokens.css and available globally. Do NOT use :root in CSS Modules.
    ============================================================================ */
 
 /* ============================================================================
@@ -80,6 +88,10 @@
   margin-top: var(--title-margin-top);
   text-align: center;
   contain: layout style;
+}
+
+.titleWrapper[data-title-font-size] {
+  --title-font-size: calc(var(data-title-font-size) * 1px);
 }
 
 .title {
@@ -168,6 +180,12 @@
   flex-direction: column;
   justify-content: flex-end;
   padding-bottom: 0;
+}
+
+.skeletonBottomGrid {
+  display: grid;
+  grid-template-rows: var(--button-height) var(--stats-height);
+  gap: var(--bottom-row-gap);
 }
 
 .skeletonGrid {

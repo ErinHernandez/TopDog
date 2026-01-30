@@ -4,13 +4,11 @@
  * Catches errors in tab components and displays a fallback UI.
  * Prevents one broken tab from crashing the entire app.
  *
- * Migrated to CSS Modules for CSP compliance.
+ * Migrated to Zero-Runtime CSS for CSP compliance.
  */
 
 import React, { Component, ErrorInfo } from 'react';
 import type { TabId } from '../../core/types';
-import { TEXT_COLORS, BG_COLORS, STATE_COLORS } from '../../core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
 import { createScopedLogger } from '../../../../lib/clientLogger';
 import { captureReactError } from '../../../../lib/errorTracking';
 import styles from './TabErrorBoundary.module.css';
@@ -49,48 +47,8 @@ interface ErrorFallbackProps {
 }
 
 function ErrorFallback({ tabId, error, onRetry }: ErrorFallbackProps): React.ReactElement {
-  const containerStyle: React.CSSProperties = {
-    '--fallback-bg': BG_COLORS.primary,
-  } as React.CSSProperties;
-
-  const titleStyle: React.CSSProperties = {
-    '--title-color': TEXT_COLORS.primary,
-    '--title-font-size': `${TYPOGRAPHY.fontSize.lg}px`,
-  } as React.CSSProperties;
-
-  const descriptionStyle: React.CSSProperties = {
-    '--description-color': TEXT_COLORS.secondary,
-    '--description-font-size': `${TYPOGRAPHY.fontSize.base}px`,
-  } as React.CSSProperties;
-
-  const detailsStyle: React.CSSProperties = {
-    '--details-bg': BG_COLORS.secondary,
-    '--radius-md': `${RADIUS.md}px`,
-    '--spacing-md': `${SPACING.md}px`,
-  } as React.CSSProperties;
-
-  const summaryStyle: React.CSSProperties = {
-    '--summary-color': TEXT_COLORS.secondary,
-    '--summary-font-size': `${TYPOGRAPHY.fontSize.sm}px`,
-  } as React.CSSProperties;
-
-  const errorStyle: React.CSSProperties = {
-    '--error-color': STATE_COLORS.error,
-    '--error-font-size': `${TYPOGRAPHY.fontSize.xs}px`,
-    '--spacing-xs': `${SPACING.xs}px`,
-  } as React.CSSProperties;
-
-  const buttonStyle: React.CSSProperties = {
-    '--button-bg': STATE_COLORS.active,
-    '--button-color': TEXT_COLORS.primary,
-    '--spacing-md': `${SPACING.md}px`,
-    '--spacing-xl': `${SPACING.xl}px`,
-    '--radius-md': `${RADIUS.md}px`,
-    '--button-font-size': `${TYPOGRAPHY.fontSize.base}px`,
-  } as React.CSSProperties;
-
   return (
-    <div className={styles.container} style={containerStyle}>
+    <div className={styles.container}>
       {/* Error Icon */}
       <div className={styles.iconWrapper}>
         <svg
@@ -98,7 +56,7 @@ function ErrorFallback({ tabId, error, onRetry }: ErrorFallbackProps): React.Rea
           height="32"
           viewBox="0 0 24 24"
           fill="none"
-          stroke={STATE_COLORS.error}
+          stroke="currentColor"
           strokeWidth="2"
         >
           <circle cx="12" cy="12" r="10" />
@@ -108,21 +66,21 @@ function ErrorFallback({ tabId, error, onRetry }: ErrorFallbackProps): React.Rea
       </div>
 
       {/* Error Message */}
-      <h2 className={styles.title} style={titleStyle}>
+      <h2 className={styles.title}>
         Something went wrong
       </h2>
 
-      <p className={styles.description} style={descriptionStyle}>
+      <p className={styles.description}>
         We had trouble loading this section. Please try again.
       </p>
 
       {/* Error Details (collapsed by default in production) */}
       {typeof window !== 'undefined' && process.env.NODE_ENV === 'development' && error && (
-        <details className={styles.details} style={detailsStyle}>
-          <summary className={styles.detailsSummary} style={summaryStyle}>
+        <details className={styles.details}>
+          <summary className={styles.detailsSummary}>
             Technical Details
           </summary>
-          <pre className={styles.detailsContent} style={errorStyle}>
+          <pre className={styles.detailsContent}>
             {error.message}
             {'\n\n'}
             Tab: {tabId}
@@ -135,7 +93,6 @@ function ErrorFallback({ tabId, error, onRetry }: ErrorFallbackProps): React.Rea
         <button
           onClick={onRetry}
           className={styles.retryButton}
-          style={buttonStyle}
         >
           Try Again
         </button>

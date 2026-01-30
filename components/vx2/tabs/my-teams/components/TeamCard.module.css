@@ -5,17 +5,23 @@
   justify-content: space-between;
   transition: all 0.2s ease;
   cursor: pointer;
-  padding-top: var(--card-padding-top);
-  padding-bottom: var(--card-padding-bottom);
-  padding-left: var(--card-padding-left);
-  padding-right: var(--card-padding-right);
-  background-color: var(--bg-color);
-  border-radius: var(--border-radius);
-  border: var(--border);
-  border-top: var(--border-top);
-  opacity: var(--opacity);
+  padding-top: calc(var(--spacing-sm) + 6px);
+  padding-bottom: calc(var(--spacing-sm) + 6px);
+  padding-left: calc(var(--spacing-sm) + 4px);
+  padding-right: calc(var(--spacing-sm) + 4px);
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
   min-height: 54px;
   height: 54px;
+}
+
+.cardContainer.isDragging {
+  opacity: 0.5;
+}
+
+.cardContainer.isDragOver {
+  border-top: 2px solid var(--color-drag-indicator);
 }
 
 .cardContainer:active {
@@ -28,19 +34,19 @@
 
 .rankBadge {
   padding: 4px;
-  margin-right: 8px;
+  margin-right: var(--spacing-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--rank-border-radius);
+  border-radius: var(--radius-md);
   min-width: 28px;
   height: 28px;
 }
 
 .rankText {
-  font-size: var(--rank-font-size);
-  color: var(--rank-text-color);
-  font-weight: 600;
+  font-size: var(--font-size-xs);
+  color: var(--text-primary);
+  font-weight: var(--font-weight-semibold);
 }
 
 .contentArea {
@@ -59,21 +65,21 @@
 .teamNameRow {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--spacing-md);
   min-width: 0;
   flex: 1;
 }
 
 .teamName {
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   flex-shrink: 0;
-  color: var(--team-name-color);
-  font-size: var(--team-name-font-size);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
 }
 
 .draftDateText {
-  font-size: var(--draft-date-font-size);
-  color: var(--draft-date-color);
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
   margin-left: auto;
   white-space: nowrap;
 }
@@ -81,8 +87,8 @@
 .pointsDiffContainer {
   display: flex;
   flex-direction: column;
-  font-size: var(--points-diff-font-size);
-  color: var(--points-diff-color);
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
   margin-left: auto;
   text-align: right;
 }
@@ -98,7 +104,7 @@
 }
 
 .controlsContainer.noCustomSort {
-  padding-left: var(--controls-padding);
+  padding-left: var(--spacing-sm);
 }
 
 .moveButton {
@@ -107,25 +113,22 @@
   align-items: center;
   justify-content: center;
   transition: all 0.15s ease;
-  border-radius: var(--move-button-radius);
-  background-color: var(--move-button-bg);
+  border-radius: var(--radius-sm);
+  background-color: rgba(255, 255, 255, 0.05);
   border: none;
   cursor: pointer;
+  color: var(--text-muted);
 }
 
 .moveButton:active {
   scale: 0.95;
 }
 
-.chevronIcon {
-  color: var(--chevron-color);
-}
-
 .skeletonContainer {
-  padding-top: var(--skeleton-padding-top);
-  padding-bottom: var(--skeleton-padding-bottom);
-  padding-left: var(--skeleton-padding-left);
-  padding-right: var(--skeleton-padding-right);
-  background-color: var(--skeleton-bg);
-  border-radius: var(--skeleton-radius);
+  padding-top: calc(var(--spacing-sm) + 6px);
+  padding-bottom: calc(var(--spacing-sm) + 6px);
+  padding-left: calc(var(--spacing-sm) + 4px);
+  padding-right: calc(var(--spacing-sm) + 4px);
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-lg);
 }

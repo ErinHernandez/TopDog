@@ -14,8 +14,6 @@
  */
 
 import React, { useRef, useCallback } from 'react';
-import { BG_COLORS, TEXT_COLORS, BORDER_COLORS, STATE_COLORS } from '../../../core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY } from '../../../core/constants/sizes';
 import { Search, Close } from '../../icons';
 import { cn } from '@/lib/styles';
 import styles from './SearchInput.module.css';
@@ -56,20 +54,20 @@ export interface SearchInputProps {
 const SIZE_CONFIG = {
   sm: {
     height: 36,
-    paddingX: SPACING.md,
-    fontSize: TYPOGRAPHY.fontSize.sm,
+    paddingX: 'var(--spacing-md)',
+    fontSizeToken: 'var(--font-size-sm)',
     iconSize: 16,
   },
   md: {
     height: 44,
-    paddingX: SPACING.md,
-    fontSize: TYPOGRAPHY.fontSize.base,
+    paddingX: 'var(--spacing-md)',
+    fontSizeToken: 'var(--font-size-base)',
     iconSize: 18,
   },
   lg: {
     height: 52,
-    paddingX: SPACING.lg,
-    fontSize: TYPOGRAPHY.fontSize.lg,
+    paddingX: 'var(--spacing-lg)',
+    fontSizeToken: 'var(--font-size-lg)',
     iconSize: 20,
   },
 } as const;
@@ -111,17 +109,11 @@ export function SearchInput({
     }
   }, [value, onSubmit, onCancel, handleClear]);
 
-  // CSS custom properties for dynamic values
+  // CSS custom properties for size-related values only (colors from tokens.css)
   const containerStyle: React.CSSProperties = {
     '--input-height': `${config.height}px`,
-    '--input-bg': BG_COLORS.secondary,
-    '--text-primary': TEXT_COLORS.primary,
-    '--text-muted': TEXT_COLORS.muted,
-    '--border-default': BORDER_COLORS.default,
-    '--border-radius': `${RADIUS.md}px`,
-    '--font-size': `${config.fontSize}px`,
-    '--input-padding-right': showClear && value ? `${config.height}px` : `${config.paddingX}px`,
-    '--focus-border': `${STATE_COLORS.active}80`,
+    '--input-font-size': config.fontSizeToken,
+    '--input-padding-right': showClear && value ? `${config.height}px` : config.paddingX,
   } as React.CSSProperties;
 
   return (
@@ -130,7 +122,7 @@ export function SearchInput({
       <div className={styles.searchIcon}>
         <Search
           size={config.iconSize}
-          color={TEXT_COLORS.muted}
+          color="currentColor"
         />
       </div>
 
@@ -158,7 +150,7 @@ export function SearchInput({
         >
           <Close
             size={config.iconSize}
-            color={TEXT_COLORS.muted}
+            color="currentColor"
           />
         </button>
       )}

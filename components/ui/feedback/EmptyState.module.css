@@ -1,0 +1,146 @@
+/**
+ * EmptyState CSS Module
+ *
+ * Migrated from inline styles for CSP compliance.
+ * Uses CSS custom properties from tokens.css for colors.
+ */
+
+/* ============================================================================
+   CONTAINER
+   ============================================================================ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--spacing-2xl);
+  min-height: 200px;
+}
+
+.container[data-compact="true"] {
+  padding: var(--spacing-lg);
+  min-height: auto;
+}
+
+/* ============================================================================
+   ICON CONTAINER
+   ============================================================================ */
+
+.iconContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin-bottom: var(--spacing-md);
+  width: 64px;
+  height: 64px;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.iconContainer[data-compact="true"] {
+  width: 48px;
+  height: 48px;
+}
+
+/* ============================================================================
+   DEFAULT ICON
+   ============================================================================ */
+
+.emptyIcon {
+  stroke: var(--text-muted);
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ============================================================================
+   TITLE
+   ============================================================================ */
+
+.title {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: var(--font-size-lg);
+  margin: 0;
+}
+
+.title[data-compact="true"] {
+  font-size: var(--font-size-base);
+}
+
+.title[data-has-description="true"] {
+  margin-bottom: var(--spacing-sm);
+}
+
+/* ============================================================================
+   DESCRIPTION
+   ============================================================================ */
+
+.description {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  max-width: 280px;
+  margin: 0;
+}
+
+.description[data-has-action="true"] {
+  margin-bottom: var(--spacing-lg);
+}
+
+/* ============================================================================
+   ACTIONS
+   ============================================================================ */
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+/* ============================================================================
+   PRIMARY BUTTON
+   ============================================================================ */
+
+.primaryButton {
+  font-weight: 500;
+  transition: opacity 150ms ease;
+  background-color: var(--color-state-active);
+  color: #000000;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  border: none;
+  cursor: pointer;
+}
+
+.primaryButton:hover {
+  opacity: 0.9;
+}
+
+.primaryButton[data-variant="secondary"] {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+/* ============================================================================
+   SECONDARY BUTTON
+   ============================================================================ */
+
+.secondaryButton {
+  font-weight: 500;
+  transition: opacity 150ms ease;
+  background-color: transparent;
+  color: var(--text-secondary);
+  padding: var(--spacing-md);
+  font-size: var(--font-size-sm);
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.secondaryButton:hover {
+  opacity: 0.8;
+}

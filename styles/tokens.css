@@ -1,0 +1,264 @@
+/**
+ * Design Tokens - CSS Custom Properties
+ *
+ * Zero-Runtime CSS foundation. These tokens mirror the JS constants
+ * in components/vx2/core/constants/ for CSP compliance.
+ *
+ * Source of truth: This file + JS constants should stay in sync.
+ */
+
+:root {
+  /* ============================================================================
+     POSITION COLORS (from POSITION_COLORS)
+     ============================================================================ */
+  --color-position-qb: #F472B6;
+  --color-position-rb: #0fba80;
+  --color-position-wr: #FBBF25;
+  --color-position-te: #7C3AED;
+  --color-position-bn: #6B7280;
+  /* FLEX uses gradient - defined in utilities.css */
+
+  /* ============================================================================
+     BRAND COLORS (from BRAND_COLORS)
+     ============================================================================ */
+  --color-brand-primary: #2DE2C5;
+  --color-brand-secondary: #59c5bf;
+  --color-brand-accent: #04FBB9;
+
+  /* ============================================================================
+     NAVBAR BLUE (from NAVBAR_BLUE)
+     ============================================================================ */
+  --color-navbar-solid: #1DA1F2;
+  --color-navbar-light: #4DB5F5;
+  --color-navbar-dark: #1A91DA;
+
+  /* ============================================================================
+     BACKGROUND COLORS (from BG_COLORS)
+     ============================================================================ */
+  --bg-primary: #101927;
+  --bg-secondary: #1f2937;
+  --bg-tertiary: #111827;
+  --bg-elevated: rgba(255, 255, 255, 0.1);
+  --bg-card: #1f2833;
+  --bg-black: #000000;
+
+  /* ============================================================================
+     TEXT COLORS (from TEXT_COLORS)
+     ============================================================================ */
+  --text-primary: #ffffff;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+  --text-disabled: #4b5563;
+
+  /* ============================================================================
+     BORDER COLORS (from BORDER_COLORS)
+     ============================================================================ */
+  --border-default: rgba(255, 255, 255, 0.1);
+  --border-light: rgba(255, 255, 255, 0.05);
+  --border-subtle: rgba(255, 255, 255, 0.15);
+  --border-focus: #59c5bf;
+  --border-error: #ef4444;
+  --border-success: #10b981;
+
+  /* ============================================================================
+     STATE COLORS (from STATE_COLORS)
+     ============================================================================ */
+  --color-state-on-the-clock: #EF4444;
+  --color-state-my-turn: #EF4444;
+  --color-state-active: #60A5FA;
+  --color-state-active-light: #3B82F6;
+  --color-state-user-highlight: #3B82F6;
+  --color-state-selected: #2DE2C5;
+  --color-state-hover: rgba(255, 255, 255, 0.1);
+  --color-state-success: #10B981;
+  --color-state-warning: #F59E0B;
+  --color-state-error: #EF4444;
+  --color-state-info: #3B82F6;
+
+  /* ============================================================================
+     TAB BAR COLORS (from TAB_BAR_COLORS)
+     ============================================================================ */
+  --tab-bar-bg: #000000;
+  --tab-bar-border: #374151;
+  --tab-bar-icon-active: #1DA1F2;
+  --tab-bar-icon-inactive: #9CA3AF;
+  --tab-bar-label-active: #1DA1F2;
+  --tab-bar-label-inactive: #9CA3AF;
+  --tab-bar-badge-bg: #1DA1F2;
+  --tab-bar-badge-text: #FFFFFF;
+
+  /* ============================================================================
+     TYPOGRAPHY - FONT SIZES (from TYPOGRAPHY.fontSize)
+     ============================================================================ */
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 26px;
+  --font-size-3xl: 32px;
+  --font-size-4xl: 40px;
+  --font-size-5xl: 52px;
+
+  /* ============================================================================
+     TYPOGRAPHY - LINE HEIGHTS (from TYPOGRAPHY.lineHeight)
+     ============================================================================ */
+  --line-height-tight: 1.1;
+  --line-height-snug: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* ============================================================================
+     TYPOGRAPHY - FONT WEIGHTS (from TYPOGRAPHY.fontWeight)
+     ============================================================================ */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* ============================================================================
+     SPACING (from SPACING)
+     ============================================================================ */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 24px;
+  --spacing-2xl: 32px;
+  --spacing-3xl: 48px;
+
+  /* ============================================================================
+     BORDER RADIUS (from RADIUS)
+     ============================================================================ */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+
+  /* ============================================================================
+     Z-INDEX (from Z_INDEX)
+     ============================================================================ */
+  --z-base: 0;
+  --z-elevated: 10;
+  --z-sticky-content: 20;
+  --z-dropdown: 100;
+  --z-header: 150;
+  --z-tab-bar: 150;
+  --z-sticky: 200;
+  --z-fixed: 300;
+  --z-modal-backdrop: 400;
+  --z-modal: 500;
+  --z-popover: 600;
+  --z-tooltip: 700;
+  --z-toast: 800;
+  --z-max: 9999;
+
+  /* ============================================================================
+     TOUCH TARGETS (from TOUCH_TARGETS)
+     ============================================================================ */
+  --touch-target-min: 44px;
+  --touch-target-comfort: 48px;
+  --touch-target-large: 56px;
+
+  /* ============================================================================
+     ANIMATION DURATIONS (from DURATION)
+     ============================================================================ */
+  --duration-fast: 75ms;
+  --duration-normal: 150ms;
+  --duration-slow: 300ms;
+  --duration-page: 200ms;
+
+  /* ============================================================================
+     COMPONENT-SPECIFIC COLORS (from draft-room components)
+     ============================================================================ */
+  --color-queue-border: #6B7280;
+  --color-queue-active: #60A5FA;
+  --color-queue-active-bg: rgba(96, 165, 250, 0.2);
+  --color-queue-hover-bg: rgba(96, 165, 250, 0.15);
+  --color-sort-indicator: #9ca3af;
+  --color-focus: #60A5FA;
+  --color-dropdown-bg: #374151;
+  --color-dropdown-hover: #4b5563;
+  --color-dropdown-border: #1f2833;
+  --color-draft-arrow: #3B82F6;
+  --color-share-button: #3b82f6;
+  --badge-text: #000000;
+  --text-white: #ffffff;
+  --text-gray: #9ca3af;
+  --gray-text: #a0aec0;
+  --gray-border: #9ca3af;
+  --blue-border: #3B82F6;
+  --row-height: 40px;
+  --row-bg: #1f2833;
+  --row-border: rgba(255, 255, 255, 0.1);
+  --search-bg: #1F2937;
+  --search-placeholder: #6B7280;
+  --search-height: 44px;
+  --search-font-size: 14px;
+  --search-clear-button-width: calc(22.5% - 6px);
+  --filter-height: 44px;
+  --filter-bg: transparent;
+  --filter-active-bg: currentColor;
+  --filter-font-size: 14px;
+  --filter-count-font-size: 13px;
+  --stat-font-size: 13px;
+  --player-name-font-size: 13px;
+  --player-team-font-size: 11px;
+  --player-rank-font-size: 13px;
+  --queue-button-size: 28px;
+  --queue-button-border-radius: 50%;
+  --queue-button-border-width: 2px;
+  --adp-column-width: 48px;
+  --proj-column-width: 48px;
+  --rank-column-width: 48px;
+  --queue-button-container-width: 36px;
+  --info-bg-primary: var(--bg-primary);
+  --info-text-primary: var(--text-primary);
+  --info-text-secondary: var(--text-secondary);
+  --info-link-color: var(--color-brand-accent);
+  --info-font-size-base: 16px;
+  --info-font-size-sm: 14px;
+  --info-font-weight-medium: 500;
+  --info-font-weight-semibold: 600;
+  --info-border-light: rgba(255, 255, 255, 0.1);
+  --board-background: #101927;
+  --header-bg-gray: #374151;
+  --header-height: 20px;
+  --header-font-size: 10px;
+  --cell-margin: 1px;
+  --cell-width: 92px;
+  --cell-height: 62px;
+  --cell-bg-default: transparent;
+  --cell-border-default: rgba(255, 255, 255, 0.1);
+  --cell-border-radius: 6px;
+  --cell-border-width: 4px;
+  --pick-number-font-size: 8px;
+  --pick-number-margin-top: 2px;
+  --pick-number-margin-left: 1px;
+  --player-first-name-font-size: 10px;
+  --player-last-name-font-size: 11px;
+  --player-pos-team-font-size: 9px;
+  --player-pos-team-margin-top: 6px;
+  --away-font-size: 12px;
+  --away-margin-top: -4px;
+  --first-row-margin-top: 7px;
+  --tracker-height: 9px;
+  --tracker-width: 78px;
+  --tracker-empty-width: 79px;
+  --tracker-margin-top: 2px;
+  --tracker-border-radius: 1px;
+  --tracker-empty: #6B7280;
+  --content-min-height: 70px;
+  --content-padding-bottom: 8px;
+  --transition-all: all 0.2s ease;
+
+  /* ============================================================================
+     TILED BACKGROUND (from TILED_BG_STYLE)
+     ============================================================================ */
+  --tiled-bg-image: url('/wr_blue.png');
+  --tiled-bg-repeat: repeat;
+  --tiled-bg-size: 60px 60px;
+  --tiled-bg-color: #1E3A5F;
+}

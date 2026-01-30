@@ -17,8 +17,6 @@
 
 import React, { useCallback, useRef, useEffect } from 'react';
 import type { QueuedPlayer, Position } from '../types';
-import { POSITION_COLORS } from '../constants';
-import { BG_COLORS, TEXT_COLORS } from '../../core/constants/colors';
 import { cn } from '@/lib/styles';
 import styles from './QueueView.module.css';
 
@@ -123,14 +121,10 @@ interface PositionBadgeProps {
 }
 
 const PositionBadge = React.memo(function PositionBadge({ position }: PositionBadgeProps): React.ReactElement {
-  const color = POSITION_COLORS[position] || QUEUE_COLORS.textSecondary;
-
   return (
     <span
       className={styles.positionBadge}
-      style={{
-        '--position-bg-color': color,
-      } as React.CSSProperties}
+      data-position={position.toLowerCase()}
     >
       {position}
     </span>

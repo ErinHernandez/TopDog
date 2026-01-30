@@ -17,8 +17,8 @@
   overflow: hidden;
   background-color: rgba(255, 255, 255, 0.05);
   position: relative;
-  margin-top: var(--filter-margin-top);
-  margin-bottom: var(--filter-margin);
+  margin-top: var(--spacing-xs);
+  margin-bottom: var(--spacing-xs);
   width: 100%;
   flex-shrink: 0;
 }
@@ -71,6 +71,43 @@
   display: inline;
 }
 
+/* Position-specific filter button colors */
+.filterButton[data-position="qb"] {
+  border-bottom: 3px solid var(--color-position-qb);
+}
+.filterButton[data-position="qb"].filterButtonActive {
+  color: var(--color-position-qb);
+}
+
+.filterButton[data-position="rb"] {
+  border-bottom: 3px solid var(--color-position-rb);
+}
+.filterButton[data-position="rb"].filterButtonActive {
+  color: var(--color-position-rb);
+}
+
+.filterButton[data-position="wr"] {
+  border-bottom: 3px solid var(--color-position-wr);
+}
+.filterButton[data-position="wr"].filterButtonActive {
+  color: var(--color-position-wr);
+}
+
+.filterButton[data-position="te"] {
+  border-bottom: 3px solid var(--color-position-te);
+}
+.filterButton[data-position="te"].filterButtonActive {
+  color: var(--color-position-te);
+}
+
+/* ============================================================================
+ * SEARCH BAR WRAPPER
+ * ============================================================================ */
+
+.searchBarWrapper {
+  flex-shrink: 0;
+}
+
 /* ============================================================================
  * SEARCH BAR CONTAINER
  * ============================================================================ */
@@ -78,10 +115,10 @@
 .searchContainer {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-top: var(--search-margin-top);
-  margin-left: var(--search-margin-x);
-  margin-right: var(--search-margin-x);
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+  margin-left: var(--spacing-sm);
+  margin-right: var(--spacing-sm);
   flex-shrink: 0;
 }
 
@@ -95,13 +132,13 @@
   align-items: center;
   height: var(--search-height);
   background-color: var(--search-bg);
-  border-radius: 8px;
-  padding-left: 12px;
-  padding-right: 12px;
+  border-radius: var(--radius-md);
+  padding-left: var(--spacing-md);
+  padding-right: var(--spacing-md);
 }
 
 .searchIcon {
-  margin-right: 8px;
+  margin-right: var(--spacing-sm);
   flex-shrink: 0;
   width: 18px;
   height: 18px;
@@ -131,7 +168,7 @@
   height: var(--search-height);
   background-color: var(--search-bg);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   color: var(--text-primary);
   font-size: 14px;
   font-weight: 500;
@@ -159,7 +196,7 @@
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  padding-bottom: 24px;
+  padding-bottom: var(--spacing-xl);
 }
 
 .listContainer::-webkit-scrollbar {
@@ -171,7 +208,7 @@
  * ============================================================================ */
 
 .emptyState {
-  padding: 24px;
+  padding: var(--spacing-xl);
   text-align: center;
   color: var(--text-secondary);
   font-size: 14px;
@@ -197,7 +234,7 @@
   align-items: center;
   height: 40px;
   border-bottom: 1px solid var(--row-border);
-  background-color: #101927;
+  background-color: var(--bg-primary);
   padding-left: 4px;
   padding-right: 4px;
   flex-shrink: 0;
@@ -223,7 +260,7 @@
 }
 
 .headerColumnSortIndicator {
-  border-bottom: 2px solid var(--sort-indicator);
+  border-bottom: 2px solid var(--color-sort-indicator);
   padding-bottom: 2px;
   display: inline-block;
 }
@@ -289,7 +326,7 @@
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--spacing-sm);
   padding-left: 6px;
   min-width: 0;
 }
@@ -314,14 +351,25 @@
   color: var(--text-secondary);
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--spacing-xs);
   margin-top: 2px;
 }
 
 .playerPosition {
   font-weight: 600;
   display: inline;
+  /* Position color from data-position attribute */
+  color: var(--position-color, var(--text-secondary));
 }
+
+/* Position-specific text colors */
+.playerPosition[data-position="qb"] { --position-color: var(--color-position-qb); }
+.playerPosition[data-position="rb"] { --position-color: var(--color-position-rb); }
+.playerPosition[data-position="wr"] { --position-color: var(--color-position-wr); }
+.playerPosition[data-position="te"] { --position-color: var(--color-position-te); }
+.playerPosition[data-position="k"] { --position-color: var(--text-muted); }
+.playerPosition[data-position="dst"] { --position-color: var(--text-muted); }
+.playerPosition[data-position="def"] { --position-color: var(--text-muted); }
 
 /* ============================================================================
  * PLAYER ROW - QUEUE BUTTON
@@ -338,7 +386,7 @@
   width: var(--queue-button-size);
   height: var(--queue-button-size);
   border-radius: 50%;
-  border: 2px solid var(--queue-button-border);
+  border: 2px solid var(--color-queue-border);
   background-color: transparent;
   cursor: pointer;
   display: flex;
@@ -347,7 +395,7 @@
   transition: all 0.2s ease;
   padding: 0;
   font-size: 16px;
-  color: var(--queue-button-border);
+  color: var(--color-queue-border);
 }
 
 .queueButton:hover {
@@ -359,15 +407,15 @@
 }
 
 .queueButtonActive {
-  border-color: var(--queue-button-active-border);
-  background-color: var(--queue-button-active-bg);
-  color: var(--queue-button-active-border);
+  border-color: var(--color-queue-active);
+  background-color: var(--color-queue-active-bg);
+  color: var(--color-queue-active);
 }
 
 .queueButtonInactive {
-  border-color: var(--queue-button-border);
+  border-color: var(--color-queue-border);
   background-color: transparent;
-  color: var(--queue-button-border);
+  color: var(--color-queue-border);
 }
 
 /* ============================================================================
@@ -400,7 +448,7 @@
  * ============================================================================ */
 
 .expandedCardContainer {
-  padding: 8px 4px;
+  padding: var(--spacing-sm) 4px;
 }
 
 /* ============================================================================
@@ -412,8 +460,23 @@
   flex-direction: column;
   height: 100%;
   min-height: 0;
-  background-color: #101927;
+  background-color: var(--bg-primary);
   padding-top: 0;
   padding-left: 4px;
   padding-right: 4px;
+}
+
+/* Container wrapper for flex layout */
+.listContainer {
+  flex: 1;
+  min-height: 0;
+}
+
+/* Hide scrollbar on virtualized list */
+.virtualizedList {
+  scrollbar-width: none;
+}
+
+.virtualizedList::-webkit-scrollbar {
+  display: none;
 }

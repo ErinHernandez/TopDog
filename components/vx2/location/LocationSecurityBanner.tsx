@@ -3,10 +3,10 @@
  *
  * Displays security warnings for new/suspicious locations.
  * Shows contextual messages and actions.
+ *
+ * Migrated to Zero-Runtime CSS for CSP compliance.
  */
 
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS } from '@/components/vx2/core/constants/colors';
-import { SPACING, RADIUS } from '@/components/vx2/core/constants/sizes';
 import type { SecurityCheck } from '@/lib/location/types';
 import styles from './LocationSecurityBanner.module.css';
 
@@ -16,6 +16,14 @@ interface LocationSecurityBannerProps {
   onDismiss?: () => void;
   onTrustLocation?: () => void;
   onVerify?: () => void;
+}
+
+type BannerSeverity = 'error' | 'warning' | 'info';
+
+interface BannerConfig {
+  severity: BannerSeverity;
+  title: string;
+  message: string;
 }
 
 export function LocationSecurityBanner({
@@ -29,14 +37,12 @@ export function LocationSecurityBanner({
   if (securityCheck.action === 'allow' && !securityCheck.isNewLocation) {
     return null;
   }
-  
+
   // Determine banner style based on severity
-  const getBannerConfig = () => {
+  const getBannerConfig = (): BannerConfig | null => {
     if (securityCheck.action === 'block') {
       return {
-        bgColor: 'rgba(239, 68, 68, 0.15)',
-        borderColor: STATE_COLORS.error,
-        iconColor: STATE_COLORS.error,
+        severity: 'error',
         title: 'Access Blocked',
         message: 'Suspicious activity detected from this location. Please contact support.',
       };
@@ -44,9 +50,7 @@ export function LocationSecurityBanner({
 
     if (securityCheck.action === 'verify') {
       return {
-        bgColor: 'rgba(245, 158, 11, 0.15)',
-        borderColor: STATE_COLORS.warning,
-        iconColor: STATE_COLORS.warning,
+        severity: 'warning',
         title: 'Verification Required',
         message: 'Please verify your identity to continue from this new location.',
       };
@@ -54,9 +58,7 @@ export function LocationSecurityBanner({
 
     if (securityCheck.action === 'warn' || securityCheck.isNewLocation) {
       return {
-        bgColor: 'rgba(59, 130, 246, 0.15)',
-        borderColor: STATE_COLORS.info,
-        iconColor: STATE_COLORS.info,
+        severity: 'info',
         title: 'New Location Detected',
         message: locationName
           ? `You're accessing from ${locationName}. Mark as trusted?`
@@ -69,16 +71,11 @@ export function LocationSecurityBanner({
 
   const bannerConfig = getBannerConfig();
   if (!bannerConfig) return null;
-  
+
   return (
     <div
       className={styles.container}
-      style={{
-        '--bg-color': bannerConfig.bgColor,
-        '--border-color': bannerConfig.borderColor,
-        '--border-radius': `${RADIUS.lg}px`,
-        '--padding': `${SPACING.lg}px`,
-      } as React.CSSProperties}
+      data-severity={bannerConfig.severity}
     >
       {/* Dismiss button */}
       {onDismiss && securityCheck.action !== 'block' && (
@@ -95,12 +92,7 @@ export function LocationSecurityBanner({
 
       <div className={styles.contentWrapper}>
         {/* Icon */}
-        <div
-          className={styles.iconContainer}
-          style={{
-            '--icon-color': bannerConfig.iconColor,
-          } as React.CSSProperties}
-        >
+        <div className={styles.iconContainer}>
           {securityCheck.action === 'block' ? (
             <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
               <circle cx="12" cy="12" r="10" />
@@ -123,20 +115,10 @@ export function LocationSecurityBanner({
 
         {/* Content */}
         <div className={styles.content}>
-          <h4
-            className={styles.title}
-            style={{
-              '--text-primary-color': TEXT_COLORS.primary,
-            } as React.CSSProperties}
-          >
+          <h4 className={styles.title}>
             {bannerConfig.title}
           </h4>
-          <p
-            className={styles.message}
-            style={{
-              '--text-secondary-color': TEXT_COLORS.secondary,
-            } as React.CSSProperties}
-          >
+          <p className={styles.message}>
             {bannerConfig.message}
           </p>
 
@@ -147,9 +129,7 @@ export function LocationSecurityBanner({
                 <button
                   onClick={onTrustLocation}
                   className={styles.actionButton}
-                  style={{
-                    '--button-bg-color': STATE_COLORS.success,
-                  } as React.CSSProperties}
+                  data-action="trust"
                 >
                   Trust This Location
                 </button>
@@ -158,9 +138,7 @@ export function LocationSecurityBanner({
                 <button
                   onClick={onVerify}
                   className={styles.actionButton}
-                  style={{
-                    '--button-bg-color': STATE_COLORS.info,
-                  } as React.CSSProperties}
+                  data-action="verify"
                 >
                   Verify Identity
                 </button>

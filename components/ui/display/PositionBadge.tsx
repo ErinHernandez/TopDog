@@ -1,8 +1,12 @@
 /**
  * PositionBadge - Display player position with color coding
- * 
+ *
  * Consistent position badge used throughout the app.
- * 
+ *
+ * Migrated to use data attributes for position colors (CSP compliance).
+ * Colors are applied via data-position and data-variant attributes
+ * defined in utilities.css.
+ *
  * @example
  * ```tsx
  * <PositionBadge position="WR" />
@@ -11,8 +15,7 @@
  */
 
 import React from 'react';
-import { POSITION_COLORS } from '../../vx2/core/constants/colors';
-import { RADIUS, TYPOGRAPHY } from '../../vx2/core/constants/sizes';
+import { RADIUS } from '../../vx2/core/constants/sizes';
 import type { Position } from './types';
 
 // ============================================================================
@@ -38,17 +41,17 @@ const SIZE_CONFIG = {
   sm: {
     width: 22,
     height: 14,
-    fontSize: TYPOGRAPHY.fontSize.xs - 2,
+    fontSizeToken: 'var(--font-size-xs)',
   },
   md: {
     width: 28,
     height: 18,
-    fontSize: TYPOGRAPHY.fontSize.xs,
+    fontSizeToken: 'var(--font-size-xs)',
   },
   lg: {
     width: 36,
     height: 22,
-    fontSize: TYPOGRAPHY.fontSize.sm,
+    fontSizeToken: 'var(--font-size-sm)',
   },
 } as const;
 
@@ -62,26 +65,24 @@ export function PositionBadge({
   className = '',
   variant = 'filled',
 }: PositionBadgeProps): React.ReactElement {
-  const positionUpper = position.toUpperCase() as keyof typeof POSITION_COLORS;
-  const color = POSITION_COLORS[positionUpper] || POSITION_COLORS.BN;
+  const positionLower = position.toLowerCase();
+  const positionUpper = position.toUpperCase();
   const config = SIZE_CONFIG[size];
-  
-  const isFilled = variant === 'filled';
-  
+
   return (
     <span
-      className={`inline-flex items-center justify-center font-bold ${className}`}
+      className={`inline-flex items-center justify-center ${className}`}
       style={{
         width: `${config.width}px`,
         height: `${config.height}px`,
         borderRadius: `${RADIUS.sm}px`,
-        backgroundColor: isFilled ? color : 'transparent',
-        color: isFilled ? '#000000' : color,
-        fontSize: `${config.fontSize}px`,
-        border: isFilled ? 'none' : `2px solid ${color}`,
+        fontSize: config.fontSizeToken,
+        fontWeight: 'var(--font-weight-bold)',
         lineHeight: 1,
         letterSpacing: '-0.02em',
       }}
+      data-position={positionLower}
+      data-variant={variant}
       role="img"
       aria-label={`Position: ${position}`}
     >

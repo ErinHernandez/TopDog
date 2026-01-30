@@ -10,10 +10,8 @@ import React from 'react';
 import type { PositionNeedsIndicatorProps, PositionNeed, Position } from '../types';
 import {
   SLOW_DRAFT_COLORS,
-  SLOW_DRAFT_TYPOGRAPHY,
   SLOW_DRAFT_LAYOUT,
 } from '../constants';
-import { TEXT_COLORS } from '../../../core/constants/colors';
 import styles from './PositionNeedsIndicator.module.css';
 
 // ============================================================================
@@ -46,17 +44,19 @@ function NeedPill({ need }: NeedPillProps): React.ReactElement {
   const urgencyColor = getUrgencyColor(need.urgency);
   const isUrgent = need.urgency === 'critical' || need.urgency === 'warning';
 
+  const bgColor = isUrgent ? `${urgencyColor}20` : 'rgba(255, 255, 255, 0.06)';
+  const borderColor = isUrgent ? urgencyColor : 'rgba(255, 255, 255, 0.1)';
+  const countColor = isUrgent ? urgencyColor : 'rgba(255, 255, 255, 0.8)';
+
   return (
     <span
       className={styles.pill}
       style={{
-        '--pill-bg': isUrgent ? `${urgencyColor}20` : 'rgba(255, 255, 255, 0.06)',
-        '--pill-border': isUrgent ? urgencyColor : 'rgba(255, 255, 255, 0.1)',
+        '--pill-bg': bgColor,
+        '--pill-border': borderColor,
         '--position-color': positionColor,
         '--position-text-color': need.position === 'WR' ? '#000' : '#fff',
-        '--count-color': isUrgent ? urgencyColor : 'rgba(255, 255, 255, 0.8)',
-        '--needs-text-font-size': `${SLOW_DRAFT_TYPOGRAPHY.needsText.fontSize}px`,
-        '--needs-text-font-weight': SLOW_DRAFT_TYPOGRAPHY.needsText.fontWeight,
+        '--count-color': countColor,
       } as React.CSSProperties}
     >
       {/* Position badge */}
@@ -84,13 +84,14 @@ function PositionRow({ need }: PositionRowProps): React.ReactElement {
   const positionColor = SLOW_DRAFT_COLORS.positions[need.position];
   const urgencyColor = getUrgencyColor(need.urgency);
   const progress = Math.min(100, (need.current / need.recommended) * 100);
+  const textColor = need.position === 'WR' ? '#000' : '#fff';
 
   return (
     <div
       className={styles.row}
       style={{
         '--position-color': positionColor,
-        '--position-text-color': need.position === 'WR' ? '#000' : '#fff',
+        '--position-text-color': textColor,
         '--urgency-color': urgencyColor,
         '--progress-width': `${progress}%`,
       } as React.CSSProperties}
@@ -140,12 +141,7 @@ export default function PositionNeedsIndicator({
 
   // Expanded mode: Show position rows without checkmarks
   return (
-    <div
-      className={styles.container}
-      style={{
-        '--header-color': TEXT_COLORS.secondary,
-      } as React.CSSProperties}
-    >
+    <div className={styles.container}>
       <div className={styles.header}>
         POSITION NEEDS
       </div>

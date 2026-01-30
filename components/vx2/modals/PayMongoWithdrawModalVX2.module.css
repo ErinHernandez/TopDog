@@ -241,6 +241,10 @@
   opacity: 0.5;
 }
 
+.continueButtonDisabled {
+  opacity: 0.5;
+}
+
 .confirmButton {
   width: 100%;
   padding: 0.75rem;

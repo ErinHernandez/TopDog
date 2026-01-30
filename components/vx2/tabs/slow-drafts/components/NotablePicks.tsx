@@ -8,7 +8,6 @@ import React, { useState, useEffect } from 'react';
 import type { NotablePicksProps, NotableEvent, NotableEventType } from '../types';
 import {
   SLOW_DRAFT_COLORS,
-  SLOW_DRAFT_TYPOGRAPHY,
   SLOW_DRAFT_LAYOUT,
   SLOW_DRAFT_THRESHOLDS,
 } from '../constants';
@@ -149,19 +148,16 @@ function EventItem({ event, onTap }: EventItemProps): React.ReactElement {
         <div className={styles.mainLine}>
           <span
             className={styles.drafterName}
-            style={SLOW_DRAFT_TYPOGRAPHY.eventDescription}
           >
             {event.drafter?.name || 'Someone'}
           </span>
           <span
             className={styles.actionText}
-            style={SLOW_DRAFT_TYPOGRAPHY.eventDescription}
           >
             {' '}took{' '}
           </span>
           <span
             className={styles.playerName}
-            style={SLOW_DRAFT_TYPOGRAPHY.eventHighlight}
           >
             {event.player?.name || 'Unknown'}
           </span>
@@ -169,7 +165,7 @@ function EventItem({ event, onTap }: EventItemProps): React.ReactElement {
             <span
               className={styles.playerPosition}
               style={{
-                color: SLOW_DRAFT_COLORS.positions[event.player.position],
+                '--position-color': SLOW_DRAFT_COLORS.positions[event.player.position],
               } as React.CSSProperties}
             >
               ({event.player.position})
@@ -231,10 +227,6 @@ export default function NotablePicks({
       <div className={styles.emptyContainer}>
         <div
           className={styles.sectionLabel}
-          style={{
-            ...SLOW_DRAFT_TYPOGRAPHY.sectionLabel,
-            '--section-label-margin-bottom': `${SLOW_DRAFT_LAYOUT.sectionLabelMarginBottom}px`,
-          } as React.CSSProperties}
         >
           NOTABLE ACTIVITY
         </div>
@@ -249,10 +241,6 @@ export default function NotablePicks({
     <div>
       <div
         className={styles.sectionLabel}
-        style={{
-          ...SLOW_DRAFT_TYPOGRAPHY.sectionLabel,
-          '--section-label-margin-bottom': `${SLOW_DRAFT_LAYOUT.sectionLabelMarginBottom}px`,
-        } as React.CSSProperties}
       >
         NOTABLE ACTIVITY
       </div>

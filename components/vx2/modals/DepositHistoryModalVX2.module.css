@@ -11,8 +11,8 @@
   top: 60px;
   display: flex;
   flex-direction: column;
-  background-color: var(--bg-color);
-  z-index: var(--z-index);
+  background-color: var(--bg-secondary);
+  z-index: var(--z-modal);
 }
 
 /* Header Section */
@@ -125,7 +125,15 @@
   padding: 1rem;
   transition: all 0.2s ease;
   background-color: rgba(255, 255, 255, 0.03);
-  border-left: 3px solid var(--card-border-color);
+  border-left: 3px solid var(--card-border-color, #64748b);
+}
+
+.transactionCard[data-amount-type="deposit"] {
+  --card-border-color: #22c55e;
+}
+
+.transactionCard[data-amount-type="withdrawal"] {
+  --card-border-color: #ef4444;
 }
 
 .transactionCardContent {
@@ -221,7 +229,14 @@
 .transactionCardAmount {
   font-weight: bold;
   font-size: var(--font-size-lg);
-  color: var(--amount-color);
+}
+
+.amountDeposit {
+  color: #22c55e;
+}
+
+.amountWithdrawal {
+  color: #ef4444;
 }
 
 .transactionCardPaymentMethod {

@@ -26,8 +26,8 @@
  */
 
 import React from 'react';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS, POSITION_COLORS } from '../../vx2/core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY } from '../../vx2/core/constants/sizes';
+import { cn } from '@/lib/styles';
+import styles from './PlayerCard.module.css';
 import { PositionBadge } from './PositionBadge';
 import { Plus, Minus, ChevronUp, ChevronDown } from '../../vx2/components/icons';
 import type { Position, PlayerData } from './types';
@@ -39,7 +39,7 @@ import type { Position, PlayerData } from './types';
 // Re-export shared types for convenience
 export type { Position, PlayerData };
 
-export type ActionType = 
+export type ActionType =
   | { type: 'toggle'; isActive: boolean; onToggle: () => void }
   | { type: 'reorder'; onMoveUp?: () => void; onMoveDown?: () => void; isFirst?: boolean; isLast?: boolean }
   | { type: 'remove'; onRemove: () => void }
@@ -73,25 +73,9 @@ export interface PlayerCardProps {
 // CONSTANTS
 // ============================================================================
 
-const CARD_PX = {
-  sm: {
-    paddingY: SPACING.xs,
-    paddingX: SPACING.md,
-    gap: SPACING.sm,
-    borderLeft: 4,
-    adpWidth: 28,
-    actionSize: 32,
-    actionIconSize: 18,
-  },
-  md: {
-    paddingY: SPACING.sm,
-    paddingX: SPACING.md,
-    gap: SPACING.sm,
-    borderLeft: 4,
-    adpWidth: 32,
-    actionSize: 36,
-    actionIconSize: 20,
-  },
+const ICON_SIZES = {
+  sm: 18,
+  md: 20,
 } as const;
 
 // ============================================================================
@@ -106,77 +90,55 @@ interface ActionButtonProps {
 }
 
 function ActionButton({ action, playerName, size, disabled }: ActionButtonProps): React.ReactElement | null {
-  const px = CARD_PX[size];
-  
+  const iconSize = ICON_SIZES[size];
+
   if (action.type === 'none') return null;
-  
+
   if (action.type === 'custom') {
     return <>{action.render()}</>;
   }
-  
+
   if (action.type === 'toggle') {
     return (
       <button
         onClick={action.onToggle}
         disabled={disabled}
-        className="flex items-center justify-center transition-all flex-shrink-0"
-        style={{ 
-          width: `${px.actionSize}px`,
-          height: `${px.actionSize}px`,
-          borderRadius: `${RADIUS.lg}px`,
-          backgroundColor: action.isActive ? 'rgba(239, 68, 68, 0.15)' : 'rgba(96, 165, 250, 0.15)', 
-          color: action.isActive ? STATE_COLORS.error : STATE_COLORS.active,
-          border: 'none',
-          cursor: disabled ? 'not-allowed' : 'pointer',
-          opacity: disabled ? 0.5 : 1,
-        }}
+        className={styles.actionButton}
+        data-size={size}
+        data-action={action.isActive ? 'remove' : 'add'}
+        data-disabled={disabled}
         aria-label={action.isActive ? `Remove ${playerName}` : `Add ${playerName}`}
       >
-        {action.isActive ? <Minus size={px.actionIconSize} /> : <Plus size={px.actionIconSize} />}
+        {action.isActive ? <Minus size={iconSize} /> : <Plus size={iconSize} />}
       </button>
     );
   }
-  
+
   if (action.type === 'remove') {
     return (
       <button
         onClick={action.onRemove}
         disabled={disabled}
-        className="flex items-center justify-center transition-all flex-shrink-0"
-        style={{ 
-          width: `${px.actionSize}px`,
-          height: `${px.actionSize}px`,
-          borderRadius: `${RADIUS.lg}px`,
-          backgroundColor: 'rgba(239, 68, 68, 0.15)', 
-          color: STATE_COLORS.error,
-          border: 'none',
-          cursor: disabled ? 'not-allowed' : 'pointer',
-          opacity: disabled ? 0.5 : 1,
-        }}
+        className={styles.actionButton}
+        data-size={size}
+        data-action="remove"
+        data-disabled={disabled}
         aria-label={`Remove ${playerName}`}
       >
-        <Minus size={px.actionIconSize} />
+        <Minus size={iconSize} />
       </button>
     );
   }
-  
+
   if (action.type === 'reorder') {
     return (
-      <div className="flex flex-col gap-0.5 flex-shrink-0">
+      <div className={styles.reorderContainer}>
         <button
           onClick={action.onMoveUp}
           disabled={disabled || action.isFirst}
-          className="flex items-center justify-center transition-all"
-          style={{ 
-            width: `${px.actionSize}px`,
-            height: `${px.actionSize / 2}px`,
-            borderRadius: `${RADIUS.sm}px`,
-            backgroundColor: action.isFirst ? 'transparent' : 'rgba(255, 255, 255, 0.1)', 
-            color: action.isFirst ? TEXT_COLORS.disabled : TEXT_COLORS.primary,
-            border: 'none',
-            cursor: (disabled || action.isFirst) ? 'not-allowed' : 'pointer',
-            opacity: action.isFirst ? 0.3 : 1,
-          }}
+          className={styles.reorderButton}
+          data-size={size}
+          data-disabled={disabled || action.isFirst}
           aria-label={`Move ${playerName} up`}
         >
           <ChevronUp size={14} />
@@ -184,17 +146,9 @@ function ActionButton({ action, playerName, size, disabled }: ActionButtonProps)
         <button
           onClick={action.onMoveDown}
           disabled={disabled || action.isLast}
-          className="flex items-center justify-center transition-all"
-          style={{ 
-            width: `${px.actionSize}px`,
-            height: `${px.actionSize / 2}px`,
-            borderRadius: `${RADIUS.sm}px`,
-            backgroundColor: action.isLast ? 'transparent' : 'rgba(255, 255, 255, 0.1)', 
-            color: action.isLast ? TEXT_COLORS.disabled : TEXT_COLORS.primary,
-            border: 'none',
-            cursor: (disabled || action.isLast) ? 'not-allowed' : 'pointer',
-            opacity: action.isLast ? 0.3 : 1,
-          }}
+          className={styles.reorderButton}
+          data-size={size}
+          data-disabled={disabled || action.isLast}
           aria-label={`Move ${playerName} down`}
         >
           <ChevronDown size={14} />
@@ -202,7 +156,7 @@ function ActionButton({ action, playerName, size, disabled }: ActionButtonProps)
       </div>
     );
   }
-  
+
   return null;
 }
 
@@ -222,103 +176,66 @@ export function PlayerCard({
   disabled = false,
   className = '',
 }: PlayerCardProps): React.ReactElement {
-  const px = CARD_PX[size];
-  const posColor = POSITION_COLORS[player.position.toUpperCase() as keyof typeof POSITION_COLORS] || TEXT_COLORS.muted;
-  
+  // Position for data attribute (used by CSS for border color via utilities.css)
+  const positionLower = player.position.toLowerCase();
+
   // Format values
   const adpDisplay = typeof player.adp === 'number' ? player.adp.toFixed(1) : player.adp || '-';
   const projDisplay = typeof player.proj === 'number' ? Math.round(player.proj) : player.proj || '-';
   const rankDisplay = showRank && rank ? rank : null;
-  
+
   const Container = onClick ? 'button' : 'div';
-  
+
   return (
     <Container
       onClick={onClick}
       disabled={disabled}
-      className={`flex items-center transition-all ${className}`}
-      style={{ 
-        backgroundColor: BG_COLORS.secondary,
-        borderLeft: `${px.borderLeft}px solid ${posColor}`,
-        borderRadius: `${RADIUS.lg}px`,
-        padding: `${px.paddingY}px ${px.paddingX}px`,
-        gap: `${px.gap}px`,
-        cursor: onClick ? 'pointer' : 'default',
-        opacity: disabled ? 0.5 : 1,
-        width: '100%',
-        border: onClick ? 'none' : undefined,
-        textAlign: 'left',
-      }}
+      className={cn(styles.card, className)}
+      data-position={positionLower}
+      data-size={size}
+      data-disabled={disabled}
+      data-clickable={!!onClick}
     >
       {/* ADP or Rank */}
       {(showAdp || showRank) && (
-        <div className="text-center flex-shrink-0" style={{ width: `${px.adpWidth}px` }}>
-          <div 
-            className="font-bold" 
-            style={{ 
-              color: TEXT_COLORS.secondary, 
-              fontSize: `${TYPOGRAPHY.fontSize.sm}px` 
-            }}
-          >
+        <div className={styles.adpColumn} data-size={size}>
+          <div className={styles.adpValue}>
             {rankDisplay ?? adpDisplay}
           </div>
         </div>
       )}
-      
+
       {/* Position Badge */}
       <PositionBadge position={player.position as Position} size="sm" />
-      
+
       {/* Name & Team */}
-      <div className="flex-1 min-w-0 flex items-center gap-1.5">
-        <span 
-          className="font-semibold truncate" 
-          style={{ 
-            color: TEXT_COLORS.primary, 
-            fontSize: `${TYPOGRAPHY.fontSize.sm}px` 
-          }}
-        >
+      <div className={styles.playerInfo}>
+        <span className={styles.playerName}>
           {player.name}
         </span>
-        <span 
-          className="flex-shrink-0" 
-          style={{ 
-            color: TEXT_COLORS.muted, 
-            fontSize: `${TYPOGRAPHY.fontSize.xs}px` 
-          }}
-        >
+        <span className={styles.playerTeam}>
           {player.team}
         </span>
       </div>
-      
+
       {/* Projection */}
       {showProjection && player.proj !== undefined && (
-        <div className="text-center flex-shrink-0">
-          <div 
-            className="font-semibold" 
-            style={{ 
-              color: TEXT_COLORS.primary, 
-              fontSize: `${TYPOGRAPHY.fontSize.xs}px` 
-            }}
-          >
+        <div className={styles.projColumn}>
+          <div className={styles.projValue}>
             {projDisplay}
           </div>
-          <div 
-            style={{ 
-              color: TEXT_COLORS.muted, 
-              fontSize: `${TYPOGRAPHY.fontSize.xs}px` 
-            }}
-          >
+          <div className={styles.projLabel}>
             Proj
           </div>
         </div>
       )}
-      
+
       {/* Action Button */}
-      <ActionButton 
-        action={action} 
-        playerName={player.name} 
-        size={size} 
-        disabled={disabled} 
+      <ActionButton
+        action={action}
+        playerName={player.name}
+        size={size}
+        disabled={disabled}
       />
     </Container>
   );

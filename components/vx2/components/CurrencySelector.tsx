@@ -4,12 +4,10 @@
  * Dropdown selector for deposit/withdrawal currency.
  * Shows all available currencies with the geolocated currency marked as recommended.
  *
- * Migrated to CSS Modules for CSP compliance.
+ * Migrated to Zero-Runtime CSS for CSP compliance.
  */
 
 import React, { useState, useRef, useEffect } from 'react';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS, BORDER_COLORS } from '../core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY, Z_INDEX } from '../core/constants/sizes';
 import { ChevronDown } from './icons';
 import { CurrencyIcon } from './CurrencyIcon';
 import { getCurrencyOptions } from '../../../lib/stripe/currencyConfig';
@@ -84,24 +82,8 @@ export function CurrencySelector({
     setIsOpen(false);
   };
 
-  // CSS custom properties for dynamic values
-  const containerStyle: React.CSSProperties = {
-    '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
-    '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
-    '--font-size-base': `${TYPOGRAPHY.fontSize.base}px`,
-    '--text-secondary': TEXT_COLORS.secondary,
-    '--text-primary': TEXT_COLORS.primary,
-    '--text-muted': TEXT_COLORS.muted,
-    '--active-color': STATE_COLORS.active,
-    '--success-color': STATE_COLORS.success,
-    '--border-default': BORDER_COLORS.default,
-    '--border-light': BORDER_COLORS.light,
-    '--dropdown-bg': BG_COLORS.secondary,
-    '--z-dropdown': Z_INDEX.dropdown,
-  } as React.CSSProperties;
-
   return (
-    <div className={styles.container} ref={dropdownRef} style={containerStyle}>
+    <div className={styles.container} ref={dropdownRef}>
       {/* Label */}
       {label && (
         <label className={styles.label}>
@@ -119,17 +101,13 @@ export function CurrencySelector({
           isOpen && styles.triggerButtonOpen,
           disabled && styles.triggerButtonDisabled
         )}
-        style={{
-          '--trigger-border': isOpen ? STATE_COLORS.active : BORDER_COLORS.default,
-        } as React.CSSProperties}
       >
         <div className={styles.triggerContent}>
           {/* Currency Icon */}
           <div className={styles.iconWrapper}>
             <CurrencyIcon
               currency={selectedCurrency}
-              size={TYPOGRAPHY.fontSize.lg}
-              color={TEXT_COLORS.primary}
+              size={18}
               showFallback={true}
               aria-label={`${selectedOption?.value || 'USD'} currency`}
               aria-hidden={false}
@@ -149,10 +127,7 @@ export function CurrencySelector({
 
         {/* Chevron */}
         <span className={cn(styles.chevron, isOpen && styles.chevronOpen)}>
-          <ChevronDown
-            size={20}
-            color={TEXT_COLORS.muted}
-          />
+          <ChevronDown size={20} />
         </span>
       </button>
 
@@ -179,16 +154,10 @@ export function CurrencySelector({
                     styles.optionIconWrapper,
                     isSelected && styles.optionIconWrapperSelected
                   )}
-                  style={{
-                    '--option-icon-bg': isSelected
-                      ? 'rgba(96, 165, 250, 0.2)'
-                      : 'rgba(255, 255, 255, 0.1)',
-                  } as React.CSSProperties}
                 >
                   <CurrencyIcon
                     currency={option.value}
-                    size={TYPOGRAPHY.fontSize.sm * 1.5}
-                    color={isSelected ? STATE_COLORS.active : TEXT_COLORS.primary}
+                    size={21}
                     showFallback={true}
                     aria-label={`${option.value} currency`}
                     aria-hidden={false}
@@ -223,7 +192,7 @@ export function CurrencySelector({
                     height="20"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke={STATE_COLORS.active}
+                    stroke="currentColor"
                     strokeWidth="2.5"
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />

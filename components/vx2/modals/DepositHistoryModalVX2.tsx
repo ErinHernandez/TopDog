@@ -15,8 +15,6 @@ import React, { useState, useMemo } from 'react';
 import { cn } from '@/lib/styles';
 import styles from './DepositHistoryModalVX2.module.css';
 import { useTransactionHistory, type Transaction } from '../hooks/data';
-import { BG_COLORS, TEXT_COLORS, STATE_COLORS } from '../core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY, Z_INDEX } from '../core/constants/sizes';
 import { Close } from '../components/icons';
 import { Skeleton, EmptyState } from '../components/shared';
 import { formatDollars, formatDate } from '../utils/formatting';
@@ -26,15 +24,15 @@ import { formatDollars, formatDate } from '../utils/formatting';
 // ============================================================================
 
 const MODAL_PX = {
-  padding: SPACING.lg,
-  headerPadding: SPACING.lg,
+  padding: 16,        // was SPACING.lg
+  headerPadding: 16,  // was SPACING.lg
 } as const;
 
 const STATUS_COLORS: Record<string, string> = {
-  completed: STATE_COLORS.success,
-  pending: STATE_COLORS.warning,
-  failed: STATE_COLORS.error,
-  cancelled: STATE_COLORS.error,
+  completed: 'var(--color-state-success)',
+  pending: 'var(--color-state-warning)',
+  failed: 'var(--color-state-error)',
+  cancelled: 'var(--color-state-error)',
 } as const;
 
 type FilterType = 'all' | 'deposits' | 'withdrawals';
@@ -68,9 +66,6 @@ function FilterTabBar({ activeFilter, onFilterChange, counts }: FilterTabBarProp
   return (
     <div
       className={styles.filterTabBar}
-      style={{
-        '--tab-bar-bg': BG_COLORS.tertiary,
-      } as React.CSSProperties}
       role="tablist"
     >
       {tabs.map(tab => (
@@ -78,13 +73,6 @@ function FilterTabBar({ activeFilter, onFilterChange, counts }: FilterTabBarProp
           key={tab.id}
           onClick={() => onFilterChange(tab.id)}
           className={cn(styles.filterTab, activeFilter === tab.id && styles.active)}
-          style={{
-            '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
-            '--active-color': STATE_COLORS.active,
-            '--text-color-secondary': TEXT_COLORS.secondary,
-            '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
-            '--text-color-muted': TEXT_COLORS.muted,
-          } as React.CSSProperties}
           role="tab"
           aria-selected={activeFilter === tab.id}
         >
@@ -105,23 +93,18 @@ interface TransactionCardProps {
 function TransactionCard({ transaction }: TransactionCardProps): React.ReactElement {
   const isDeposit = transaction.type === 'deposit';
   const statusColor = STATUS_COLORS[transaction.status];
-  const amountColor = isDeposit ? STATE_COLORS.success : STATE_COLORS.error;
+  const amountColor = isDeposit ? 'var(--color-state-success)' : 'var(--color-state-error)';
 
   return (
     <div
       className={styles.transactionCard}
-      style={{
-        '--card-border-color': amountColor,
-      } as React.CSSProperties}
+      data-amount-type={isDeposit ? 'deposit' : 'withdrawal'}
     >
       <div className={styles.transactionCardContent}>
         <div className={styles.transactionCardLeft}>
           {/* Icon */}
           <div
             className={styles.transactionCardIcon}
-            style={{
-              '--text-color-secondary': TEXT_COLORS.secondary,
-            } as React.CSSProperties}
           >
             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
@@ -133,10 +116,6 @@ function TransactionCard({ transaction }: TransactionCardProps): React.ReactElem
             <div className={styles.transactionCardHeader}>
               <span
                 className={styles.transactionCardType}
-                style={{
-                  '--text-color-primary': TEXT_COLORS.primary,
-                  '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
-                } as React.CSSProperties}
               >
                 {transaction.type}
               </span>
@@ -145,28 +124,17 @@ function TransactionCard({ transaction }: TransactionCardProps): React.ReactElem
                   styles.transactionCardStatus,
                   styles[transaction.status]
                 )}
-                style={{
-                  '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
-                } as React.CSSProperties}
               >
                 {transaction.status}
               </span>
             </div>
             <p
               className={styles.transactionCardDescription}
-              style={{
-                '--text-color-secondary': TEXT_COLORS.secondary,
-                '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
-              } as React.CSSProperties}
             >
               {transaction.description}
             </p>
             <p
               className={styles.transactionCardDate}
-              style={{
-                '--text-color-muted': TEXT_COLORS.muted,
-                '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
-              } as React.CSSProperties}
             >
               {formatDate(transaction.createdAt)}
             </p>
@@ -176,20 +144,15 @@ function TransactionCard({ transaction }: TransactionCardProps): React.ReactElem
         {/* Amount */}
         <div className={styles.transactionCardRight}>
           <div
-            className={styles.transactionCardAmount}
-            style={{
-              '--amount-color': amountColor,
-              '--font-size-lg': `${TYPOGRAPHY.fontSize.lg}px`,
-            } as React.CSSProperties}
+            className={cn(
+              styles.transactionCardAmount,
+              isDeposit ? styles.amountDeposit : styles.amountWithdrawal
+            )}
           >
             {transaction.amountFormatted}
           </div>
           <div
             className={styles.transactionCardPaymentMethod}
-            style={{
-              '--text-color-muted': TEXT_COLORS.muted,
-              '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
-            } as React.CSSProperties}
           >
             {transaction.paymentMethod || '-'}
           </div>
@@ -203,12 +166,6 @@ function BalanceHeader({ balance }: { balance: number }): React.ReactElement {
   return (
     <div
       className={styles.balanceHeader}
-      style={{
-        '--text-color-secondary': TEXT_COLORS.secondary,
-        '--font-size-xs': `${TYPOGRAPHY.fontSize.xs}px`,
-        '--active-color': STATE_COLORS.active,
-        '--font-size-2xl': `${TYPOGRAPHY.fontSize['2xl']}px`,
-      } as React.CSSProperties}
     >
       <div className={styles.balanceLabel}>
         Current Balance
@@ -231,51 +188,29 @@ function TransactionSummary({ transactions }: { transactions: Transaction[] }): 
   return (
     <div
       className={styles.summaryFooter}
-      style={{
-        '--summary-bg': BG_COLORS.tertiary,
-      } as React.CSSProperties}
     >
       <div
         className={styles.summaryRow}
-        style={{
-          '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
-          '--text-color-secondary': TEXT_COLORS.secondary,
-          '--text-color-primary': TEXT_COLORS.primary,
-        } as React.CSSProperties}
       >
         <span className={styles.summaryLabel}>Transactions:</span>
         <span className={styles.summaryValue}>{stats.count}</span>
       </div>
       <div
         className={styles.summaryRow}
-        style={{
-          '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
-          '--text-color-secondary': TEXT_COLORS.secondary,
-        } as React.CSSProperties}
       >
         <span className={styles.summaryLabel}>Total Deposits:</span>
         <span
           className={cn(styles.summaryValue, styles.deposits)}
-          style={{
-            color: STATE_COLORS.success,
-          }}
         >
           +{formatDollars(stats.totalDeposits)}
         </span>
       </div>
       <div
         className={styles.summaryRow}
-        style={{
-          '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
-          '--text-color-secondary': TEXT_COLORS.secondary,
-        } as React.CSSProperties}
       >
         <span className={styles.summaryLabel}>Total Withdrawals:</span>
         <span
           className={cn(styles.summaryValue, styles.withdrawals)}
-          style={{
-            color: STATE_COLORS.error,
-          }}
         >
           -{formatDollars(stats.totalWithdrawals)}
         </span>
@@ -287,10 +222,10 @@ function TransactionSummary({ transactions }: { transactions: Transaction[] }): 
 function LoadingSkeleton(): React.ReactElement {
   return (
     <div className="space-y-3">
-      <Skeleton height={80} borderRadius={RADIUS.lg} />
-      <Skeleton height={100} borderRadius={RADIUS.lg} />
-      <Skeleton height={100} borderRadius={RADIUS.lg} />
-      <Skeleton height={100} borderRadius={RADIUS.lg} />
+      <Skeleton height={80} borderRadius={12} />
+      <Skeleton height={100} borderRadius={12} />
+      <Skeleton height={100} borderRadius={12} />
+      <Skeleton height={100} borderRadius={12} />
     </div>
   );
 }
@@ -324,10 +259,6 @@ export default function DepositHistoryModalVX2({
   return (
     <div
       className={styles.container}
-      style={{
-        '--bg-color': BG_COLORS.secondary,
-        '--z-index': Z_INDEX.modal,
-      } as React.CSSProperties}
       role="dialog"
       aria-modal="true"
       aria-labelledby="history-modal-title"
@@ -335,26 +266,16 @@ export default function DepositHistoryModalVX2({
       {/* Header */}
       <div
         className={styles.header}
-        style={{
-          '--header-padding': `${MODAL_PX.headerPadding}px`,
-        } as React.CSSProperties}
       >
         <h2
           id="history-modal-title"
           className={styles.headerTitle}
-          style={{
-            '--text-color-primary': TEXT_COLORS.primary,
-            '--font-size-lg': `${TYPOGRAPHY.fontSize.lg}px`,
-          } as React.CSSProperties}
         >
           Transaction History
         </h2>
         <button
           onClick={onClose}
           className={styles.closeButton}
-          style={{
-            '--text-color-secondary': TEXT_COLORS.secondary,
-          } as React.CSSProperties}
           aria-label="Close"
         >
           <Close size={24} />

@@ -8,10 +8,10 @@ import React, { useState, useEffect } from 'react';
 import type { NotablePicksProps, NotableEvent, NotableEventType } from '../types';
 import {
   SLOW_DRAFT_COLORS,
-  SLOW_DRAFT_TYPOGRAPHY,
   SLOW_DRAFT_LAYOUT,
   SLOW_DRAFT_THRESHOLDS,
 } from '../constants';
+import styles from './NotablePicks.module.css';
 
 // ============================================================================
 // EVENT STYLING
@@ -143,10 +143,9 @@ function EventItem({ event, onTap }: EventItemProps): React.ReactElement {
     >
       {/* Pick number column */}
       <div
+        className={styles.pickNumber}
         style={{
           minWidth: 36,
-          fontSize: 11,
-          fontWeight: 600,
           color: 'rgba(255, 255, 255, 0.5)',
           paddingTop: 2,
         }}
@@ -159,24 +158,24 @@ function EventItem({ event, onTap }: EventItemProps): React.ReactElement {
         {/* Main line: Drafter took Player (Position) */}
         <div style={{ marginBottom: 4 }}>
           <span
+            className={styles.eventDescription}
             style={{
-              ...SLOW_DRAFT_TYPOGRAPHY.eventDescription,
               color: 'rgba(255, 255, 255, 0.7)',
             }}
           >
             {event.drafter?.name || 'Someone'}
           </span>
           <span
+            className={styles.eventDescription}
             style={{
-              ...SLOW_DRAFT_TYPOGRAPHY.eventDescription,
               color: 'rgba(255, 255, 255, 0.5)',
             }}
           >
             {' '}took{' '}
           </span>
           <span
+            className={styles.eventHighlight}
             style={{
-              ...SLOW_DRAFT_TYPOGRAPHY.eventHighlight,
               color: 'rgba(255, 255, 255, 0.95)',
             }}
           >
@@ -200,12 +199,11 @@ function EventItem({ event, onTap }: EventItemProps): React.ReactElement {
         <div className="flex items-center gap-2">
           {/* Type badge */}
           <span
+            className={styles.eventTypeLabel}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: 3,
-              fontSize: 10,
-              fontWeight: 700,
               color: style.color,
               backgroundColor: `${style.color}20`,
               padding: '2px 6px',
@@ -218,10 +216,9 @@ function EventItem({ event, onTap }: EventItemProps): React.ReactElement {
           {/* ADP delta */}
           {event.adpDelta !== undefined && Math.abs(event.adpDelta) > 0 && (
             <span
+              className={styles.adpDelta}
               style={{
-                fontSize: 11,
                 color: style.color,
-                fontWeight: 500,
               }}
             >
               {formatAdpDelta(event.adpDelta)}
@@ -232,8 +229,8 @@ function EventItem({ event, onTap }: EventItemProps): React.ReactElement {
 
       {/* Timestamp */}
       <div
+        className={styles.timestamp}
         style={{
-          fontSize: 10,
           color: 'rgba(255, 255, 255, 0.35)',
           paddingTop: 2,
         }}
@@ -262,18 +259,17 @@ export default function NotablePicks({
     return (
       <div>
         <div
+          className={styles.sectionLabel}
           style={{
-            ...SLOW_DRAFT_TYPOGRAPHY.sectionLabel,
             marginBottom: SLOW_DRAFT_LAYOUT.sectionLabelMarginBottom,
           }}
         >
           NOTABLE ACTIVITY
         </div>
         <div
+          className={styles.emptyState}
           style={{
             color: 'rgba(255, 255, 255, 0.4)',
-            fontSize: 13,
-            fontStyle: 'italic',
             padding: '8px 0',
           }}
         >
@@ -286,8 +282,8 @@ export default function NotablePicks({
   return (
     <div>
       <div
+        className={styles.sectionLabel}
         style={{
-          ...SLOW_DRAFT_TYPOGRAPHY.sectionLabel,
           marginBottom: SLOW_DRAFT_LAYOUT.sectionLabelMarginBottom,
         }}
       >
@@ -309,12 +305,12 @@ export default function NotablePicks({
         <button
           className="w-full mt-2 py-2 text-center transition-all active:opacity-70"
           style={{
-            fontSize: 12,
-            fontWeight: 500,
             color: 'rgba(255, 255, 255, 0.5)',
           }}
         >
-          +{hiddenCount} more event{hiddenCount !== 1 ? 's' : ''}
+          <span className={styles.moreButton}>
+            +{hiddenCount} more event{hiddenCount !== 1 ? 's' : ''}
+          </span>
         </button>
       )}
     </div>

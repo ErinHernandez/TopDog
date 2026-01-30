@@ -1,0 +1,316 @@
+.authStatusLoading {
+  padding: var(--spacing-md);
+  border-radius: var(--radius-xl);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.authStatusLoadingText {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+.authStatusNotSignedIn {
+  padding: var(--spacing-md);
+  border-radius: var(--radius-xl);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.authStatusNotSignedInText {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.authStatusSignedIn {
+  padding: var(--spacing-md);
+  border-radius: var(--radius-xl);
+  background-color: rgba(16, 185, 129, 0.1);
+  space: 8px;
+}
+
+.authStatusAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: var(--font-weight-bold);
+  flex-shrink: 0;
+  background-color: var(--color-state-success);
+  color: var(--text-primary);
+}
+
+.authStatusUserInfo {
+  min-width: 0;
+  flex: 1;
+}
+
+.authStatusUsername {
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-primary);
+}
+
+.authStatusEmail {
+  font-size: var(--font-size-xs);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-secondary);
+}
+
+.authStatusDetails {
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: var(--font-size-xs);
+}
+
+.authStatusDetailRow {
+  color: var(--text-muted);
+}
+
+.authStatusDetailValue {
+  color: var(--text-secondary);
+}
+
+.authStatusSignOutButton {
+  width: 100%;
+  padding: 8px 0;
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-sm);
+  background-color: rgba(239, 68, 68, 0.2);
+  color: var(--color-state-error);
+  border: none;
+  cursor: pointer;
+}
+
+.modalsContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-primary);
+}
+
+.modalsEmptyState {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  padding-top: 60px;
+}
+
+.modalsIcon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  background-color: rgba(96, 165, 250, 0.15);
+}
+
+.modalsIconSvg {
+  width: 32px;
+  height: 32px;
+}
+
+.modalsTitle {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: 8px;
+  text-align: center;
+  color: var(--text-primary);
+}
+
+.modalsDescription {
+  font-size: var(--font-size-sm);
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.screensContainer {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: var(--bg-primary);
+}
+
+.mainSandbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  padding: 32px;
+  background-color: #1a1a2e;
+  min-height: 100vh;
+}
+
+.phoneWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.phoneLabel {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+.controlsPanel {
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: var(--text-primary);
+}
+
+.controlsHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.controlsTitle {
+  font-size: 20px;
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+}
+
+.controlsSubtitle {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.controlsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.controlsSectionTitle {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.modeButtonsContainer {
+  display: flex;
+  gap: 8px;
+}
+
+.modeButton {
+  flex: 1;
+  padding: 8px 0;
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  border: none;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.modeButtonActive {
+  background-color: var(--color-state-active);
+  color: #000;
+}
+
+.modeButtonInactive {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+}
+
+.screenButtonsContainer {
+  display: flex;
+  gap: 8px;
+}
+
+.screenButton {
+  flex: 1;
+  padding: 8px 0;
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  border: none;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.screenButtonActive {
+  background-color: var(--color-state-active);
+  color: #000;
+}
+
+.screenButtonInactive {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+}
+
+.modalButtonsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modalButton {
+  width: 100%;
+  padding: 10px 0;
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  border: none;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  text-transform: capitalize;
+}
+
+.modalButtonActive {
+  background-color: var(--color-state-active);
+  color: #000;
+}
+
+.modalButtonInactive {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+}
+
+.notesBox {
+  padding: var(--spacing-md);
+  border-radius: var(--radius-lg);
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.notesTitle {
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: 8px;
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.notesList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+.notesItem {
+  list-style: none;
+}

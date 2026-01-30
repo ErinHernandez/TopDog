@@ -10,8 +10,6 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import { BG_COLORS, TEXT_COLORS } from '../../core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
 import { cn } from '@/lib/styles';
 import styles from './DraftsTabVX2.module.css';
 import type { LiveDraft } from '../../hooks/data';
@@ -56,12 +54,6 @@ function TabSwitcher({ selected, onSelect }: TabSwitcherProps): React.ReactEleme
         onClick={() => onSelect('fast')}
         className={cn(styles.tabButton)}
         data-active={selected === 'fast'}
-        style={{
-          '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
-          '--text-color-primary': TEXT_COLORS.primary,
-          '--text-color-muted': TEXT_COLORS.muted,
-          '--border-radius-md': `${RADIUS.md}px`,
-        } as React.CSSProperties}
       >
         Fast Drafts (30 Sec)
       </button>
@@ -69,12 +61,6 @@ function TabSwitcher({ selected, onSelect }: TabSwitcherProps): React.ReactEleme
         onClick={() => onSelect('slow')}
         className={cn(styles.tabButton)}
         data-active={selected === 'slow'}
-        style={{
-          '--font-size-sm': `${TYPOGRAPHY.fontSize.sm}px`,
-          '--text-color-primary': TEXT_COLORS.primary,
-          '--text-color-muted': TEXT_COLORS.muted,
-          '--border-radius-md': `${RADIUS.md}px`,
-        } as React.CSSProperties}
       >
         Slow Drafts
       </button>
@@ -113,18 +99,10 @@ export default function DraftsTabVX2({
   return (
     <div
       className={styles.container}
-      style={{
-        '--bg-color-primary': BG_COLORS.primary,
-      } as React.CSSProperties}
     >
       {/* Tab Switcher Header */}
       <div
         className={styles.header}
-        style={{
-          '--bg-color-primary': BG_COLORS.primary,
-          '--spacing-lg': SPACING.lg,
-          '--spacing-md': SPACING.md,
-        } as React.CSSProperties}
       >
         <TabSwitcher selected={mode} onSelect={setMode} />
       </div>

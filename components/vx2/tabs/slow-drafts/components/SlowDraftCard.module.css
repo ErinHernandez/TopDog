@@ -2,7 +2,7 @@
  * SlowDraftCard Styles - CSS Module for CSP compliance
  *
  * All styles extracted from inline style={{}} attributes
- * Dynamic values use CSS custom properties
+ * Uses CSS custom properties from tokens.css where applicable
  */
 
 /* ===================================================================== */
@@ -33,6 +33,10 @@
   width: 100%;
   text-align: left;
   cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
 }
 
 .headerContent {
@@ -48,23 +52,23 @@
 }
 
 .tournamentName {
-  color: #ffffff;
+  color: var(--text-primary);
   margin-bottom: 4px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: var(--tournament-name-size, 16px);
-  font-weight: var(--tournament-name-weight, 600);
-  line-height: var(--tournament-name-line-height, 1.2);
-  letter-spacing: var(--tournament-name-letter-spacing, 0px);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.2;
+  letter-spacing: 0px;
 }
 
 .pickInfo {
-  font-size: var(--pick-info-size, 12px);
-  font-weight: var(--pick-info-weight, 500);
-  line-height: var(--pick-info-line-height, 1.4);
-  letter-spacing: var(--pick-info-letter-spacing, 0px);
-  color: var(--pick-info-color);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.4;
+  letter-spacing: 0px;
+  color: var(--text-muted);
 }
 
 .rightSection {
@@ -97,7 +101,7 @@
 .picksAwayText {
   font-size: 13px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-muted);
   display: block;
 }
 
@@ -118,6 +122,10 @@
   text-align: left;
   cursor: pointer;
   margin-top: var(--section-gap, 12px);
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
 }
 
 .rosterSection {
@@ -125,11 +133,11 @@
 }
 
 .sectionLabel {
-  font-size: var(--section-label-size, 11px);
-  font-weight: var(--section-label-weight, 700);
-  letter-spacing: var(--section-label-letter-spacing, 0.5px);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.5px;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-secondary);
   margin-bottom: 6px;
 }
 
@@ -172,7 +180,7 @@
 }
 
 .expandIcon {
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-disabled);
   transition: transform 0.2s ease;
   width: 20px;
   height: 20px;
@@ -200,10 +208,15 @@
 
 .progressFill {
   height: 100%;
-  background-color: var(--progress-color);
+  background-color: var(--progress-color, var(--color-state-active));
   border-radius: 2px;
   transition: width 0.3s ease;
   width: var(--progress-width, 0%);
+}
+
+/* Your turn variant */
+.progressBar[data-your-turn="true"] .progressFill {
+  background-color: #FFFFFF;
 }
 
 .progressLabel {
@@ -215,7 +228,7 @@
 
 .progressText {
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-muted);
   font-weight: 500;
 }
 
@@ -236,9 +249,6 @@
   font-size: 10px;
   line-height: 1.2;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  background-image: var(--badge-bg-image);
-  background-size: var(--badge-bg-size);
-  background-position: var(--badge-bg-position);
 }
 
 /* ===================================================================== */
@@ -255,11 +265,12 @@
   flex: 1;
   font-weight: 600;
   transition: all 0.2s ease;
-  border-radius: var(--button-radius, 12px);
+  border-radius: var(--radius-lg);
   height: 44px;
   border: none;
   cursor: pointer;
   font-size: 14px;
+  font-family: inherit;
 }
 
 .actionButton:active {
@@ -269,10 +280,30 @@
 .enterDraftButton {
   background-color: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  color: var(--text-color);
+  color: var(--text-primary);
 }
 
 .quickPickButton {
-  background-color: var(--quick-pick-bg);
+  background-color: var(--color-state-active);
   color: #ffffff;
+}
+
+/* ============================================================================
+   Dynamic CSS Custom Properties
+============================================================================ */
+
+.card {
+  --bg-color: rgba(255, 255, 255, 0.04);
+  --border: 1px solid rgba(255, 255, 255, 0.08);
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  --border-radius: 12px;
+  --padding-x: 16px;
+  --section-gap: 12px;
+  --timer-color: inherit;
+  --expand-duration: 300ms;
+  --expand-easing: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.progressBar {
+  --progress-width: 0%;
 }

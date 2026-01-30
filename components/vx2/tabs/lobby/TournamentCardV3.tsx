@@ -16,7 +16,6 @@
 import React from 'react';
 import { cn } from '@/lib/styles';
 import styles from './TournamentCardV3.module.css';
-import { CARD_SPACING_V3, CARD_GRID_V3 } from './constants/cardSpacingV3';
 import { BottomSectionV3 } from './TournamentCardBottomSectionV3';
 import { TournamentCardLogo } from './elements';
 import type { Tournament } from '../../hooks/data';
@@ -108,16 +107,10 @@ function TitleSection({
 }: {
   titleFontSize?: number
 }): React.ReactElement {
-  const fontSize = titleFontSize ?? CARD_SPACING_V3.titleFontSize;
-
   return (
     <div
       className={styles.titleWrapper}
-      style={
-        titleFontSize
-          ? { '--title-font-size': `${fontSize}px` } as React.CSSProperties
-          : undefined
-      }
+      data-title-font-size={titleFontSize}
     >
       <h2
         className={cn('vx2-tournament-title-v3', styles.title)}
@@ -158,9 +151,9 @@ export function TournamentCardV3({
   };
 
   const finalSizes = {
-    padding: styleOverrides.padding ?? CARD_SPACING_V3.outerPadding,
-    borderRadius: styleOverrides.borderRadius ?? CARD_SPACING_V3.borderRadius,
-    minHeight: styleOverrides.minHeight ?? CARD_SPACING_V3.minHeight,
+    padding: styleOverrides.padding,
+    borderRadius: styleOverrides.borderRadius,
+    minHeight: styleOverrides.minHeight,
   };
 
   // Build CSS custom properties for dynamic overrides
@@ -262,13 +255,7 @@ export function TournamentCardSkeletonV3(): React.ReactElement {
 
         {/* Bottom section skeleton */}
         <div className={styles.skeletonBottomSection}>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateRows: `var(--button-height) var(--stats-height)`,
-              gap: 'var(--bottom-row-gap)',
-            }}
-          >
+          <div className={styles.skeletonBottomGrid}>
             {/* Button skeleton */}
             <div className={styles.skeletonButton} />
 

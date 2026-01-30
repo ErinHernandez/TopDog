@@ -8,8 +8,8 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { cn } from '@/lib/styles';
 import styles from './PlayoffPodDetail.module.css';
-import { BG_COLORS, TEXT_COLORS } from '../../../core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY } from '../../../core/constants/sizes';
+import { TEXT_COLORS } from '../../../core/constants/colors';
+import { TYPOGRAPHY } from '../../../core/constants/sizes';
 import { ChevronLeft, ChevronRight } from '../../../components/icons';
 import type { PlayoffPod, PlayoffTeam, PlayoffPlayer } from '../../../../../lib/mockData/playoffTeams';
 
@@ -109,7 +109,7 @@ function TeamRow({ team, rank, isUserTeam, isInAdvancementZone, overlapCount, on
       {/* Chevron for opponents */}
       {!isUserTeam && (
         <div className={styles.chevronColumn}>
-          <ChevronRight size={14} color={TEXT_COLORS.muted} />
+          <ChevronRight size={14} />
         </div>
       )}
     </button>
@@ -132,7 +132,7 @@ function SortHeader({ label, sortKey, currentSort, direction, onClick, width, al
   return (
     <button
       onClick={() => onClick(sortKey)}
-      style={{ width }}
+      style={{ '--header-width': width } as React.CSSProperties}
       className={cn(
         styles.sortHeader,
         isActive && styles.sortHeaderActive,
@@ -148,8 +148,7 @@ function SortHeader({ label, sortKey, currentSort, direction, onClick, width, al
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          className={styles.sortHeaderIcon}
-          style={{ transform: direction === 'desc' ? 'rotate(180deg)' : 'rotate(0deg)' }}
+          className={cn(styles.sortHeaderIcon, direction === 'desc' && styles.sortHeaderIconRotated)}
         >
           <polyline points="18 15 12 9 6 15" />
         </svg>
@@ -236,7 +235,7 @@ export function PlayoffPodDetail({
             className={styles.backButton}
             aria-label="Back to pods"
           >
-            <ChevronLeft size={16} color={TEXT_COLORS.muted} />
+            <ChevronLeft size={16} color="#6b7280" />
           </button>
 
           <div className={styles.headerInfo}>

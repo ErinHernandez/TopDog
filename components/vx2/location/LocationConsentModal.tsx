@@ -7,8 +7,6 @@
 
 import React, { useState } from 'react';
 import { createScopedLogger } from '@/lib/clientLogger';
-import { BG_COLORS, TEXT_COLORS, BORDER_COLORS, STATE_COLORS } from '@/components/vx2/core/constants/colors';
-import { SPACING, RADIUS } from '@/components/vx2/core/constants/sizes';
 import { useLocationConsent } from './hooks/useLocationConsent';
 import type { ConsentModalContext } from '@/lib/location/types';
 import { CONSENT_MODAL_CONFIGS } from '@/lib/location/types';
@@ -103,20 +101,10 @@ export function LocationConsentModal({
     >
       <div
         className={styles.modal}
-        style={{
-          '--bg-secondary': BG_COLORS.secondary,
-          '--radius-xl': `${RADIUS.xl}px`,
-          '--border-subtle': BORDER_COLORS.subtle,
-        } as React.CSSProperties}
       >
         {/* Header */}
         <div
           className={styles.header}
-          style={{
-            '--spacing-xl': `${SPACING.xl}px`,
-            '--spacing-lg': `${SPACING.lg}px`,
-            '--border-light': BORDER_COLORS.light,
-          } as React.CSSProperties}
         >
           <div className={styles.headerContent}>
             <div className={styles.iconContainer}>
@@ -136,13 +124,11 @@ export function LocationConsentModal({
             <div>
               <h2
                 className={styles.title}
-                style={{ '--text-primary': TEXT_COLORS.primary } as React.CSSProperties}
               >
                 {config.title}
               </h2>
               <p
                 className={styles.subtitle}
-                style={{ '--text-secondary': TEXT_COLORS.secondary } as React.CSSProperties}
               >
                 {config.subtitle}
               </p>
@@ -153,14 +139,6 @@ export function LocationConsentModal({
         {/* Body */}
         <div
           className={styles.body}
-          style={{
-            '--spacing-xl': `${SPACING.xl}px`,
-            '--text-primary': TEXT_COLORS.primary,
-            '--text-secondary': TEXT_COLORS.secondary,
-            '--text-muted': TEXT_COLORS.muted,
-            '--state-success': STATE_COLORS.success,
-            '--state-info': STATE_COLORS.info,
-          } as React.CSSProperties}
         >
           {/* Benefits list */}
           <div className={styles.benefitsList}>
@@ -200,14 +178,6 @@ export function LocationConsentModal({
         {/* Footer */}
         <div
           className={styles.footer}
-          style={{
-            '--spacing-xl': `${SPACING.xl}px`,
-            '--spacing-lg': `${SPACING.lg}px`,
-            '--border-light': BORDER_COLORS.light,
-            '--bg-tertiary': BG_COLORS.tertiary,
-            '--text-secondary': TEXT_COLORS.secondary,
-            '--state-success': STATE_COLORS.success,
-          } as React.CSSProperties}
         >
           <button
             onClick={handleDeny}

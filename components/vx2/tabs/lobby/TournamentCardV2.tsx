@@ -17,22 +17,14 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { cn, cssVars } from '@/lib/styles';
+import { cn } from '@/lib/styles';
 import styles from './TournamentCardV2.module.css';
 
 // ============================================================================
-// IMPORTS - Verify these paths match your project structure
+// IMPORTS
 // ============================================================================
 
-// If these imports fail, check the actual paths in your project:
-// - colors.ts should export BG_COLORS, TEXT_COLORS, BRAND_COLORS, STATE_COLORS
-// - sizes.ts should export SPACING, RADIUS, TYPOGRAPHY
-// - data.ts should export Tournament type
-
-import { BG_COLORS, TEXT_COLORS, BRAND_COLORS, STATE_COLORS } from '../../core/constants/colors';
-import { SPACING, RADIUS, TYPOGRAPHY } from '../../core/constants/sizes';
 import type { Tournament } from '../../hooks/data';
-import { CARD_SPACING, CARD_GRID_TEMPLATE } from './constants/cardSpacing';
 import { BottomSectionV2 } from './TournamentCardBottomSectionV2';
 
 // ============================================================================
@@ -47,22 +39,11 @@ const BLUR_PLACEHOLDER = 'data:image/webp;base64,UklGRlQAAABXRUJQVlA4IEgAAABwAwC
 
 /**
  * Card dimension constants
- * Uses centralized CARD_SPACING for consistency
  */
 const CARD_DIMENSIONS = {
-  // Use centralized spacing constant
-  padding: CARD_SPACING.outerPadding,
-  
-  // Border radius for the card container
-  borderRadius: CARD_SPACING.borderRadius,
-  
   // Title section
   titleFontSize: 46,
-  titleMarginTop: CARD_SPACING.titleMarginTop,
   titleLineHeight: 1.1,
-  
-  // Minimum card height prevents collapse during loading
-  minHeight: CARD_SPACING.minHeight,
 } as const;
 
 /**
@@ -73,31 +54,14 @@ const CARD_COLORS = {
   // Background image URL (public/tournament_card_background.png)
   backgroundImage: 'url(/tournament_card_background.png)',
   backgroundImagePng: 'url(/tournament_card_background.png)',
-  
+
   // Solid color fallback if images fail
   backgroundFallback: '#0a0a1a',
-  
-  // Border colors
-  borderDefault: 'rgba(75, 85, 99, 0.5)',
-  borderFeatured: '#1E3A5F',
-  
-  // Text colors
-  textPrimary: '#FFFFFF',
-  textSecondary: 'rgba(255, 255, 255, 0.7)',
-  
+
   // Progress bar background
   progressBackground: 'rgba(55, 65, 81, 0.5)',
 } as const;
 
-/**
- * Grid row definitions
- * Uses centralized CARD_GRID_TEMPLATE for consistency
- */
-const GRID_TEMPLATE = {
-  titleRow: CARD_GRID_TEMPLATE.titleRow,
-  spacerRow: CARD_GRID_TEMPLATE.spacerRow,
-  bottomRow: CARD_GRID_TEMPLATE.bottomRow,
-} as const;
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -201,18 +165,12 @@ function BackgroundLayers({
       <div
         aria-hidden="true"
         className={styles.blurLayer}
-        style={cssVars({
-          'blur-placeholder': `url(${blurPlaceholder})`,
-        })}
       />
 
       {/* Layer 2: Full image - fades in when loaded */}
       <div
         aria-hidden="true"
         className={cn(styles.imageLayer, imageLoaded && styles.loaded)}
-        style={cssVars({
-          'card-bg-image-display': displayImageUrl,
-        })}
       />
     </>
   );
@@ -228,16 +186,11 @@ function BackgroundLayers({
  * The title uses CSS containment to isolate its layout.
  * This prevents any potential shifts from affecting other elements.
  */
-function TitleSection({ titleFontSize }: { titleFontSize?: number }): React.ReactElement {
-  const fontSize = titleFontSize ?? CARD_DIMENSIONS.titleFontSize;
-
+function TitleSection(): React.ReactElement {
   return (
     <div className={styles.titleSectionWrapper}>
       <h2
         className={cn('vx2-tournament-title', styles.title)}
-        style={cssVars({
-          'title-font-size': `${fontSize}px`,
-        })}
       >
         The TopDog<br />
         International
@@ -337,19 +290,13 @@ export function TournamentCardV2({
   const finalColors = {
     background: resolvedBackground,
     backgroundFallback: styleOverrides.backgroundFallback ?? CARD_COLORS.backgroundFallback,
-    border: styleOverrides.border ?? CARD_COLORS.borderDefault,
-    borderWidth: styleOverrides.borderWidth ?? (featured ? 3 : 1),
-    accent: styleOverrides.accent ?? CARD_COLORS.borderFeatured,
     progressBg: styleOverrides.progressBg ?? CARD_COLORS.progressBackground,
   };
 
   const finalSizes = {
-    padding: styleOverrides.padding ?? CARD_DIMENSIONS.padding,
-    borderRadius: styleOverrides.borderRadius ?? CARD_DIMENSIONS.borderRadius,
-    minHeight: styleOverrides.minHeight ?? CARD_DIMENSIONS.minHeight,
+    borderRadius: styleOverrides.borderRadius,
+    minHeight: styleOverrides.minHeight,
   };
-
-  const borderColor = featured ? finalColors.accent : finalColors.border;
 
   // ----------------------------------------
   // Render
@@ -357,15 +304,6 @@ export function TournamentCardV2({
   return (
     <div
       className={cn(styles.cardContainer, featured && styles.featured, className)}
-      style={cssVars({
-        'card-padding': `${finalSizes.padding}px`,
-        'card-border-radius': `${finalSizes.borderRadius}px`,
-        'card-min-height': `${finalSizes.minHeight}px`,
-        'card-border-width': `${finalColors.borderWidth}px`,
-        'card-bg-fallback': finalColors.backgroundFallback,
-        'card-border-color': borderColor,
-        'card-bg-image': resolvedBackground,
-      })}
       role="article"
       aria-label={`${tournament.title} tournament`}
     >
@@ -382,7 +320,7 @@ export function TournamentCardV2({
       {/* Content Container - Positioned above backgrounds */}
       <div className={styles.contentContainer}>
         {/* Grid Row 1: Title Section */}
-        <TitleSection titleFontSize={styleOverrides.titleFontSize} />
+        <TitleSection />
 
         {/* Grid Row 2: Flexible Spacer - expands to fill space */}
         <div
@@ -421,13 +359,6 @@ export function TournamentCardSkeleton(): React.ReactElement {
   return (
     <div
       className={cn(styles.skeletonContainer, styles.pulse)}
-      style={cssVars({
-        'card-padding': `${CARD_DIMENSIONS.padding}px`,
-        'card-border-radius': `${CARD_DIMENSIONS.borderRadius}px`,
-        'card-min-height': `${CARD_DIMENSIONS.minHeight}px`,
-        'card-bg-fallback': CARD_COLORS.backgroundFallback,
-        'card-border-color': CARD_COLORS.borderDefault,
-      })}
       aria-hidden="true"
       aria-label="Loading tournament card"
     >

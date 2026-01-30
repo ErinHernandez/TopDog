@@ -19,7 +19,6 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { BG_COLORS, TEXT_COLORS, NAVBAR_BLUE } from '../../core/constants/colors';
 import { LoginScreenVX2 } from './LoginScreenVX2';
 import { SignUpScreenVX2 } from './SignUpScreenVX2';
 import { useIsMobileDevice } from '../../../../hooks/useIsMobileDevice';
@@ -48,14 +47,8 @@ type DevAuthOverride = 'logged-in' | 'logged-out' | null;
 // ============================================================================
 
 function LoadingSpinner(): React.ReactElement {
-  const containerStyle: React.CSSProperties = {
-    '--loading-bg': BG_COLORS.primary,
-    '--spinner-color': NAVBAR_BLUE.solid,
-    '--loading-text-color': TEXT_COLORS.muted,
-  } as React.CSSProperties;
-
   return (
-    <div className={styles.loadingContainer} style={containerStyle}>
+    <div className={styles.loadingContainer}>
       {/* TopDog Logo */}
       <img
         src="/logo.png"

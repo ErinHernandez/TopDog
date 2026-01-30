@@ -64,6 +64,8 @@
 .badge {
   text-align: center;
   min-width: var(--badge-min-width);
+  --badge-label-size: 12px;
+  --badge-value-size: 14px;
 }
 
 .badgeLabel {
@@ -74,7 +76,7 @@
 .badgeValue {
   font-size: var(--badge-value-size);
   font-weight: 500;
-  color: var(--badge-value-color);
+  color: var(--text-primary);
 }
 
 /* ============================================================================
@@ -150,7 +152,7 @@
   position: relative;
   height: var(--row-height);
   padding: 4px 0;
-  color: var(--row-text-color);
+  color: var(--text-primary);
   font-size: 14px;
 }
 
