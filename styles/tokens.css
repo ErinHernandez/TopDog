@@ -312,4 +312,33 @@
   --transition-fast: var(--duration-fast) ease;
   --transition-normal: var(--duration-normal) ease;
   --transition-slow: var(--duration-slow) ease;
+
+  /* ============================================================================
+     LOBBY TAB CARD VARIABLES
+     These support LobbyTabVX2 card styling.
+     ============================================================================ */
+
+  /* Card dimensions and positioning */
+  --card-min-height: 400px;
+  --card-max-width: 420px;
+  --card-border-radius: 16px;
+  --card-x-center: translateX(-50%);
+  --card-outer-padding: 16px;
+
+  /* Card colors */
+  --card-bg-fallback: #0a0a1a;
+  --card-border-default: rgba(75, 85, 99, 0.5);
+  --card-border-featured: #1E3A5F;
+  --card-border-width-featured: 3px;
+
+  /* Loading state */
+  --loading-bg: rgba(75, 85, 99, 0.3);
+
+  /* Lobby layout */
+  --globe-size: 160px;
+  --spec-padding: 16px;
+  --spec-gap: 12px;
+  --bottom-row-gap: 12px;
+  --progress-bar-y-offset: -8px;
+  --join-button-y-offset: -4px;
 }
