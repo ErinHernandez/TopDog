@@ -261,4 +261,55 @@
   --tiled-bg-repeat: repeat;
   --tiled-bg-size: 60px 60px;
   --tiled-bg-color: #1E3A5F;
+
+  /* ============================================================================
+     CSS MODULE ALIASES
+     These aliases support CSS modules that use --color- prefixed variable names.
+     Keep these in sync with the base tokens above.
+     ============================================================================ */
+
+  /* Background color aliases */
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --color-bg-tertiary: var(--bg-tertiary);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-bg-card: var(--bg-card);
+  --color-bg-black: var(--bg-black);
+
+  /* Text color aliases */
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-text-disabled: var(--text-disabled);
+
+  /* Border color aliases */
+  --color-border: var(--border-default);
+  --color-border-light: var(--border-light);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-focus: var(--border-focus);
+  --color-border-error: var(--border-error);
+  --color-border-success: var(--border-success);
+
+  /* Button colors */
+  --color-button-bg: rgba(255, 255, 255, 0.05);
+  --color-button-hover: rgba(255, 255, 255, 0.08);
+  --color-button-active: rgba(255, 255, 255, 0.12);
+
+  /* Blue accent colors */
+  --color-blue-bg: #1DA1F2;
+  --color-blue-border: #4DB5F5;
+  --color-blue-accent: #4DB5F5;
+
+  /* Drag & drop indicator */
+  --color-drag-indicator: #3B82F6;
+
+  /* Shadows */
+  --shadow-small: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-large: 0 8px 24px rgba(0, 0, 0, 0.5);
+
+  /* Transitions */
+  --transition-fast: var(--duration-fast) ease;
+  --transition-normal: var(--duration-normal) ease;
+  --transition-slow: var(--duration-slow) ease;
 }

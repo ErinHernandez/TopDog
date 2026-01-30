@@ -144,7 +144,7 @@ export function useUser(): UseUserResult {
       setBalanceError(null);
       return;
     }
-    
+
     // Dev user gets synthetic $10,000 balance (no Firestore doc)
     if (authUser.uid === DEV_USER_UID) {
       setBalanceCents(DEV_BALANCE_CENTS);
@@ -152,7 +152,7 @@ export function useUser(): UseUserResult {
       setBalanceError(null);
       return;
     }
-    
+
     const db = getFirestoreInstance();
     if (!db) {
       // Firebase not available - use 0 balance
@@ -160,15 +160,31 @@ export function useUser(): UseUserResult {
       setBalanceLoading(false);
       return;
     }
-    
+
     setBalanceLoading(true);
     setBalanceError(null);
-    
+
+    // Track if listener has fired
+    let hasReceivedData = false;
+
+    // Timeout to prevent infinite loading if Firestore listener doesn't fire
+    // (e.g., network issues, permissions problems, offline mode)
+    const timeoutId = setTimeout(() => {
+      if (!hasReceivedData) {
+        logger.warn('Balance listener timeout - using default balance');
+        setBalanceCents(0);
+        setBalanceLoading(false);
+      }
+    }, 5000); // 5 second timeout
+
     // Listen to user document for balance changes
     const userDocRef = doc(db, 'users', authUser.uid);
     const unsubscribe = onSnapshot(
       userDocRef,
       (snapshot) => {
+        hasReceivedData = true;
+        clearTimeout(timeoutId);
+
         if (snapshot.exists()) {
           const data = snapshot.data();
           // Balance is stored in dollars, convert to cents
@@ -186,14 +202,17 @@ export function useUser(): UseUserResult {
         setBalanceLoading(false);
       },
       (error) => {
+        hasReceivedData = true;
+        clearTimeout(timeoutId);
         logger.warn(`Balance fetch error: ${error.message}`);
         setBalanceError('Failed to load balance');
         setBalanceCents(0);
         setBalanceLoading(false);
       }
     );
-    
+
     return () => {
+      clearTimeout(timeoutId);
       unsubscribe();
     };
   }, [authUser?.uid, authUser?.isAnonymous]);
