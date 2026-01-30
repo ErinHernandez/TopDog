@@ -919,4 +919,16 @@
   --island-height: 37px;
   --island-bg-color: #000000;
   --island-bg-image: none;
+
+  /* ============================================================================
+     TAILWIND RING UTILITIES (Zero-Runtime replacements)
+     These replace Tailwind's base ring variables for CSP compliance.
+     Used by FlagGrid.module.css and any components with ring effects.
+     ============================================================================ */
+  --tw-ring-inset: ;
+  --tw-ring-offset-width: 0px;
+  --tw-ring-offset-color: #fff;
+  --tw-ring-color: rgb(59 130 246 / 0.5);
+  --tw-ring-offset-shadow: 0 0 #0000;
+  --tw-ring-shadow: 0 0 #0000;
 }
