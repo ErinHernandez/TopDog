@@ -745,7 +745,7 @@
   /* Image placeholders */
   --image: none;
   --placeholder-image: none;
-  --globe-bg-image: url('/!!_GLOBE_NOBACKGROUND.webp');
+  --globe-bg-image: none; /* Set inline via style prop - CSS url() breaks webpack */
 
   /* Knob position (for toggles) */
   --knob-position: 0;
