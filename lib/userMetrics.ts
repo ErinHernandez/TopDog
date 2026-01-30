@@ -1282,7 +1282,8 @@ class UserMetrics {
 // Create singleton instance
 const userMetrics = new UserMetrics();
 
-export default userMetrics;
+// Named export for explicit imports
+export { userMetrics };
 
-// CommonJS exports for backward compatibility
-module.exports = { userMetrics, default: userMetrics };
+// Default export for backward compatibility
+export default userMetrics;

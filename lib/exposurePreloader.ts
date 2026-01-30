@@ -3,8 +3,7 @@
  * Preloads and caches exposure data in the background for faster page loads
  */
 
- 
-const userMetrics = require('./userMetrics').default || require('./userMetrics').userMetrics;
+import userMetrics from './userMetrics';
 import { createScopedLogger } from './clientLogger';
 
 const logger = createScopedLogger('[ExposurePreloader]');
