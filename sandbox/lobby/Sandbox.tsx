@@ -12,6 +12,7 @@ import { TabNavigationProvider } from '../../components/vx2/core';
 import { TabBarVX2 } from '../../components/vx2/navigation';
 import { LobbyTabVX2 } from '../../components/vx2/tabs/lobby';
 import MobilePhoneFrame from '../../components/vx2/shell/MobilePhoneFrame';
+import { InPhoneFrameProvider } from '../../lib/inPhoneFrameContext';
 import { BG_COLORS } from '../../components/vx2/core/constants';
 import type { DevicePresetId } from '../../components/vx2/core/constants';
 
@@ -32,20 +33,22 @@ export default function LobbySandbox({
   return (
     <TabNavigationProvider initialTab="lobby">
       <MobilePhoneFrame>
-        <div
-          style={{
-            height: '100%',
-            backgroundColor: BG_COLORS.primary,
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-          }}
-        >
-          <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
-            <LobbyTabVX2 onJoinClick={onJoinClick} />
+        <InPhoneFrameProvider value={true}>
+          <div
+            style={{
+              height: '100%',
+              backgroundColor: BG_COLORS.primary,
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+            }}
+          >
+            <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
+              <LobbyTabVX2 onJoinClick={onJoinClick} />
+            </div>
+            <TabBarVX2 />
           </div>
-          <TabBarVX2 />
-        </div>
+        </InPhoneFrameProvider>
       </MobilePhoneFrame>
     </TabNavigationProvider>
   );

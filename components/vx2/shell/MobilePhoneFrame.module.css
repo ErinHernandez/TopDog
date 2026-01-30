@@ -94,3 +94,19 @@
 .contentContainerNoSafeArea {
   padding-top: 0;
 }
+
+/* ============================================================================
+   MODAL ROOT - Portal target for full-frame modals
+   ============================================================================ */
+
+.modalRoot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: var(--modal-root-bottom-inset, 0); /* excludes tab bar (81px) */
+  z-index: 1001; /* above safe area (z-index: 1) and content */
+  pointer-events: none; /* passthrough when empty */
+  border-radius: inherit; /* match innerScreen radius */
+  overflow: hidden;
+}

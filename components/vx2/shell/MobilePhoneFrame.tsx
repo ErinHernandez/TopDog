@@ -21,6 +21,9 @@ const INNER_HEIGHT_PX = 812;
 /** Top safe area: from screen top to bottom of island (8 + 20). Safe area ends at bottom of island. */
 export const SAFE_AREA_TOP_TO_ISLAND_BOTTOM_PX = 28;
 
+/** Tab bar height: minHeight(44) + paddingTop(10) + paddingBottom(10) + homeIndicator(5+8+4) = 81px */
+const TAB_BAR_HEIGHT_PX = 81;
+
 export interface MobilePhoneFrameProps {
   children: React.ReactNode;
   /** When true, content starts at 0 so modals can go over safe area. Default false. */
@@ -42,6 +45,10 @@ export function MobilePhoneFrame({ children, contentOverSafeArea = false }: Mobi
     '--inner-bg': '#101927',
     '--safe-area-height': `${contentTop}px`,
     '--content-top': `${contentTop}px`,
+  } as React.CSSProperties;
+
+  const modalRootStyle: React.CSSProperties = {
+    '--modal-root-bottom-inset': `${TAB_BAR_HEIGHT_PX}px`,
   } as React.CSSProperties;
 
   return (
@@ -76,6 +83,8 @@ export function MobilePhoneFrame({ children, contentOverSafeArea = false }: Mobi
           >
             {children}
           </div>
+          {/* Portal root for full-frame modals - covers safe area + content, excludes tab bar */}
+          <div id="phone-frame-modal-root" className={styles.modalRoot} style={modalRootStyle} />
         </div>
       </div>
     </div>

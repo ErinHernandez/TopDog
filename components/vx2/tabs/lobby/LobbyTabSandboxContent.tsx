@@ -141,49 +141,64 @@ export function LobbyTabSandboxContent({
       objectsInPhone.progressBar ||
       objectsInPhone.joinButton ||
       objectsInPhone.stats;
+    // CSS custom property styles for each element
+    const heroBlockStyle = {
+      '--outer-padding': `${SPEC.lobby.outer_padding_px}px`,
+      '--bottom-row-gap': `${SPEC.lobby.bottom_row_gap_px}px`,
+    } as React.CSSProperties;
+
+    const logoTitleStyle = {
+      '--logo-title-translate-x': `${positionOverrides?.logoTitle?.x ?? 0}px`,
+      '--logo-title-translate-y': `${positionOverrides?.logoTitle?.y ?? 0}px`,
+    } as React.CSSProperties;
+
+    const globeContainerStyle = {
+      '--globe-slot-height': `${GLOBE_SLOT_HEIGHT_PX}px`,
+      '--globe-translate-x': `${positionOverrides?.globe?.x ?? 0}px`,
+      '--globe-translate-y': `${positionOverrides?.globe?.y ?? 0}px`,
+    } as React.CSSProperties;
+
+    const globeSlotStyle = {
+      '--globe-size': `${globeSizePx}px`,
+      '--globe-bg-image': `url(${globeUrl})`,
+    } as React.CSSProperties;
+
+    const progressBarStyle = {
+      '--progress-bar-translate-x': `${positionOverrides?.progressBar?.x ?? 0}px`,
+      '--progress-bar-translate-y': `${positionOverrides?.progressBar?.y ?? 0}px`,
+    } as React.CSSProperties;
+
+    const joinButtonStyle = {
+      '--join-button-translate-x': `${positionOverrides?.joinButton?.x ?? 0}px`,
+      '--join-button-translate-y': `${positionOverrides?.joinButton?.y ?? 0}px`,
+    } as React.CSSProperties;
+
+    const statsStyle = {
+      '--stats-translate-x': `${positionOverrides?.stats?.x ?? 0}px`,
+      '--stats-translate-y': `${positionOverrides?.stats?.y ?? 0}px`,
+    } as React.CSSProperties;
+
     const heroBlock = (
-      <div
-        className={styles.heroBlock}
-        data-outer-padding={SPEC.lobby.outer_padding_px}
-        data-bottom-row-gap={SPEC.lobby.bottom_row_gap_px}
-      >
+      <div className={styles.heroBlock} style={heroBlockStyle}>
         {objectsInPhone.logoTitle && (
-          <div
-            className={styles.logoTitleContainer}
-            data-translate-x={positionOverrides?.logoTitle?.x ?? 0}
-            data-translate-y={positionOverrides?.logoTitle?.y ?? 0}
-          >
+          <div className={styles.logoTitleContainer} style={logoTitleStyle}>
             <div className={styles.logoTitleInner}>
               <TournamentTitle title={tournament.title} fontSize={38} />
             </div>
           </div>
         )}
         {objectsInPhone.globe && (
-          <div
-            className={styles.globeSlotContainer}
-            data-globe-slot-height={GLOBE_SLOT_HEIGHT_PX}
-            data-translate-x={positionOverrides?.globe?.x ?? 0}
-            data-translate-y={positionOverrides?.globe?.y ?? 0}
-          >
+          <div className={styles.globeSlotContainer} style={globeContainerStyle}>
             <div
-              data-globe-slot
               role="img"
               aria-label="Globe"
               className={styles.globeSlot}
-              data-globe-size={globeSizePx}
-              data-globe-image={globeUrl}
-              style={{
-                '--globe-bg-image': `url(${globeUrl})`,
-              } as React.CSSProperties}
+              style={globeSlotStyle}
             />
           </div>
         )}
         {objectsInPhone.progressBar && (
-          <div
-            className={styles.progressBarContainer}
-            data-translate-x={positionOverrides?.progressBar?.x ?? 0}
-            data-translate-y={positionOverrides?.progressBar?.y ?? 0}
-          >
+          <div className={styles.progressBarContainer} style={progressBarStyle}>
             <TournamentProgressBar
               currentEntries={tournament.currentEntries}
               maxEntries={tournament.maxEntries}
@@ -191,20 +206,12 @@ export function LobbyTabSandboxContent({
           </div>
         )}
         {objectsInPhone.joinButton && (
-          <div
-            className={styles.joinButtonContainer}
-            data-translate-x={positionOverrides?.joinButton?.x ?? 0}
-            data-translate-y={positionOverrides?.joinButton?.y ?? 0}
-          >
+          <div className={styles.joinButtonContainer} style={joinButtonStyle}>
             <TournamentJoinButton onClick={() => onJoinClick(tournament.id)} label="Join Tournament" />
           </div>
         )}
         {objectsInPhone.stats && (
-          <div
-            className={styles.statsContainer}
-            data-translate-x={positionOverrides?.stats?.x ?? 0}
-            data-translate-y={positionOverrides?.stats?.y ?? 0}
-          >
+          <div className={styles.statsContainer} style={statsStyle}>
             <TournamentStats
               entryFee={tournament.entryFee}
               entries={tournament.totalEntries}
@@ -224,18 +231,23 @@ export function LobbyTabSandboxContent({
   const bottomStrip = null;
 
   const outlineY = positionOverrides?.outline?.y ?? 0;
+
+  // Pass CSS custom properties via inline style for CSP compliance
+  const contentAreaStyle = {
+    '--lobby-outline-thickness': outlineOn ? `${outlineThickness}px` : '0px',
+    '--lobby-outline-margin': `${marginFromEdge}px`,
+    '--lobby-outline-radius': `${outlineRadius}px`,
+    '--outline-translate-y': `${outlineY}px`,
+    '--content-scale': contentScale.toString(),
+    '--safe-area-top': `${SPEC.safe_area_top_px}px`,
+  } as React.CSSProperties;
+
   return (
     <>
       <div
         data-outline-debug={dataOutlineDebug}
-        className={styles.contentArea}
-        data-outline-thickness={outlineOn ? outlineThickness : 0}
-        data-outline-margin={marginFromEdge}
-        data-outline-color={outlineColor}
-        data-outline-radius={outlineRadius}
-        data-outline-translate-y={outlineY}
-        data-content-scale={contentScale.toString()}
-        data-safe-area-top={SPEC.safe_area_top_px}
+        className={`${styles.contentArea} ${outlineOn ? styles.outlineEnabled : ''}`}
+        style={contentAreaStyle}
       >
         <div className={styles.safeAreaWrapper}>
           <div className={styles.scaleWrapper}>

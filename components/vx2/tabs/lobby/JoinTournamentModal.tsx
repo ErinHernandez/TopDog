@@ -20,6 +20,7 @@
  */
 
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { cn } from '@/lib/styles';
 import styles from './JoinTournamentModal.module.css';
 import { type Tournament, useUser } from '../../hooks/data';
@@ -30,6 +31,7 @@ import TournamentRulesModal from '../../../mobile/modals/TournamentRulesModal';
 import { formatCents } from '../../utils/formatting';
 import { useModals } from '../../shell/AppShellVX2';
 import { ProgressBar } from '../../../ui';
+import { usePhoneFramePortal } from '@/lib/usePhoneFramePortal';
 
 // ============================================================================
 // CONSTANTS
@@ -116,6 +118,7 @@ export default function JoinTournamentModal({
   // Hooks
   const { user } = useUser();
   const modals = useModals();
+  const { portalRoot } = usePhoneFramePortal();
   
   // State
   const [numberOfEntries, setNumberOfEntries] = useState(1);
@@ -147,7 +150,7 @@ export default function JoinTournamentModal({
     onConfirm({ entries: numberOfEntries, autopilot: autopilotEnabled });
   };
 
-  return (
+  const modalContent = (
     <>
       <div
         className={styles.overlay}
@@ -159,9 +162,6 @@ export default function JoinTournamentModal({
         >
           {/* Header */}
           <div className={styles.header}>
-            <h2 className={styles.headerTitle}>
-              Join Tournament
-            </h2>
             <button
               onClick={onClose}
               className={styles.closeButton}
@@ -439,5 +439,13 @@ export default function JoinTournamentModal({
       )}
     </>
   );
+
+  // Portal into frame's modal root when in phone frame (covers safe area)
+  if (portalRoot) {
+    return createPortal(modalContent, portalRoot);
+  }
+
+  // Normal rendering when outside phone frame
+  return modalContent;
 }
 
