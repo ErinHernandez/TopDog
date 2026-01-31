@@ -31,17 +31,7 @@ interface NavigationItem {
   href: string;
 }
 
-interface LinkStyles {
-  fontSize: string;
-  WebkitTextStroke: string;
-  background: string;
-  backgroundSize: string;
-  WebkitBackgroundClip: string;
-  backgroundClip: string;
-  WebkitTextFillColor: string;
-  borderBottom: string;
-  paddingBottom: string;
-}
+type LinkStyles = React.CSSProperties;
 
 // ============================================================================
 // COMPONENT
