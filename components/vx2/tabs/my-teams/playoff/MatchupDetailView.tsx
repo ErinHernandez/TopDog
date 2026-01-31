@@ -33,7 +33,14 @@ interface MatchupDetailViewProps {
 // Note: Position colors are handled via CSS classes (.positionLabelQB, etc.)
 // that reference CSS custom properties (--position-qb, etc.) from tokens.css
 
-// Note: Status colors are handled via CSS classes (.statusOut, .statusDoubtful, etc.)
+// Status colors for player availability
+const STATUS_COLORS: Record<string, string> = {
+  active: 'var(--color-state-success)',
+  questionable: 'var(--color-state-warning)',
+  doubtful: 'var(--color-state-warning)',
+  out: 'var(--color-state-error)',
+  injured: 'var(--color-state-error)',
+};
 
 // ============================================================================
 // HELPER FUNCTIONS

@@ -261,10 +261,36 @@ export function useUser(): UseUserResult {
   // Combined loading state
   // For anonymous users, don't wait for auth profile loading since they don't have profiles
   // This prevents the infinite loading state when Firestore profile fetch times out
-  const isLoading = authUser?.isAnonymous 
+  const [forceLoadingComplete, setForceLoadingComplete] = useState(false);
+
+  const rawIsLoading = authUser?.isAnonymous
     ? false  // Anonymous users: never show loading
     : (authIsLoading || balanceLoading);
-  
+
+  // Global safety net: Force loading to complete after 15 seconds
+  // This prevents the Profile tab from getting stuck on skeleton loaders indefinitely
+  useEffect(() => {
+    if (!rawIsLoading) {
+      setForceLoadingComplete(false);
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      logger.warn('[useUser] Loading state stuck for 15s - forcing completion', {
+        authIsLoading,
+        balanceLoading,
+        hasUser: !!authUser,
+        isAnonymous: authUser?.isAnonymous,
+      });
+      setForceLoadingComplete(true);
+    }, 15000);
+
+    return () => clearTimeout(timeoutId);
+  }, [rawIsLoading, authIsLoading, balanceLoading, authUser]);
+
+  // Final loading state: false if forced complete OR naturally done
+  const isLoading = forceLoadingComplete ? false : rawIsLoading;
+
   // Combined error (balance error takes precedence if auth is fine)
   const error = balanceError;
   

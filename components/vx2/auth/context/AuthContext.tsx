@@ -113,6 +113,26 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number, errorMessage: st
 }
 
 /**
+ * Safely convert Firestore timestamp to Date
+ * Prevents crashes from corrupt or malformed timestamp data
+ */
+function safeToDate(timestamp: unknown, fallback: Date): Date {
+  try {
+    if (timestamp && typeof timestamp === 'object' && 'toDate' in timestamp) {
+      return (timestamp as { toDate: () => Date }).toDate();
+    }
+    if (timestamp instanceof Date) return timestamp;
+    if (typeof timestamp === 'string' || typeof timestamp === 'number') {
+      const parsed = new Date(timestamp);
+      if (!isNaN(parsed.getTime())) return parsed;
+    }
+    return fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+/**
  * Convert Firebase User to AuthUser
  */
 function firebaseUserToAuthUser(user: FirebaseUser): AuthUser {
@@ -326,13 +346,23 @@ export function AuthProvider({
       dispatch({ type: 'INITIALIZATION_COMPLETE' });
       return;
     }
-    
+
+    // Race condition prevention: ignore flag prevents stale updates
+    // when auth state changes before profile loading completes
+    let ignore = false;
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      // Check ignore flag before any state updates
+      if (ignore) {
+        logger.debug('[AuthContext] Ignoring stale auth state change');
+        return;
+      }
+
       if (firebaseUser) {
         const authUser = firebaseUserToAuthUser(firebaseUser);
         dispatch({ type: 'AUTH_STATE_CHANGED', payload: { user: authUser } });
         onAuthStateChange?.(authUser);
-        
+
         // Load profile with timeout to prevent indefinite hanging
         if (db) {
           try {
@@ -344,41 +374,57 @@ export function AuthProvider({
               logger.warn(`Profile load failed or timed out: ${error.message}`);
               return null; // Return null to continue with defaults
             });
-            
+
+            // Check ignore flag after async operation
+            if (ignore) {
+              logger.debug('[AuthContext] Ignoring stale profile load result');
+              return;
+            }
+
             if (profileDoc && profileDoc.exists()) {
-              const profileData = profileDoc.data();
-              const profile: UserProfile = {
-                uid: firebaseUser.uid,
-                username: profileData.username || '',
-                email: profileData.email || null,
-                countryCode: profileData.countryCode || 'US',
-                displayName: profileData.displayName || '',
-                createdAt: profileData.createdAt?.toDate() || new Date(),
-                updatedAt: profileData.updatedAt?.toDate() || new Date(),
-                isActive: profileData.isActive ?? true,
-                profileComplete: profileData.profileComplete ?? false,
-                tournamentsEntered: profileData.tournamentsEntered || 0,
-                tournamentsWon: profileData.tournamentsWon || 0,
-                totalWinnings: profileData.totalWinnings || 0,
-                bestFinish: profileData.bestFinish || null,
-                lastLogin: profileData.lastLogin?.toDate() || new Date(),
-                preferences: {
-                  notifications: profileData.preferences?.notifications ?? true,
-                  emailUpdates: profileData.preferences?.emailUpdates ?? true,
-                  publicProfile: profileData.preferences?.publicProfile ?? true,
-                  borderColor: profileData.preferences?.borderColor || '#4285F4',
-                },
-                isVIP: profileData.isVIP || false,
-                vipTier: profileData.vipTier,
-                reservedUsername: profileData.reservedUsername,
-              };
-              dispatch({ type: 'PROFILE_LOADED', payload: { profile } });
+              // Wrap profile extraction in try-catch to prevent loading state getting stuck
+              // if profile data is corrupt or malformed
+              try {
+                const profileData = profileDoc.data();
+                const now = new Date();
+                const profile: UserProfile = {
+                  uid: firebaseUser.uid,
+                  username: profileData.username || '',
+                  email: profileData.email || null,
+                  countryCode: profileData.countryCode || 'US',
+                  displayName: profileData.displayName || '',
+                  createdAt: safeToDate(profileData.createdAt, now),
+                  updatedAt: safeToDate(profileData.updatedAt, now),
+                  isActive: profileData.isActive ?? true,
+                  profileComplete: profileData.profileComplete ?? false,
+                  tournamentsEntered: profileData.tournamentsEntered || 0,
+                  tournamentsWon: profileData.tournamentsWon || 0,
+                  totalWinnings: profileData.totalWinnings || 0,
+                  bestFinish: profileData.bestFinish || null,
+                  lastLogin: safeToDate(profileData.lastLogin, now),
+                  preferences: {
+                    notifications: profileData.preferences?.notifications ?? true,
+                    emailUpdates: profileData.preferences?.emailUpdates ?? true,
+                    publicProfile: profileData.preferences?.publicProfile ?? true,
+                    borderColor: profileData.preferences?.borderColor || '#4285F4',
+                  },
+                  isVIP: profileData.isVIP || false,
+                  vipTier: profileData.vipTier,
+                  reservedUsername: profileData.reservedUsername,
+                };
+                dispatch({ type: 'PROFILE_LOADED', payload: { profile } });
+              } catch (parseError) {
+                // Profile data parsing failed - log and continue with defaults
+                logger.error('Error parsing profile data', parseError instanceof Error ? parseError : new Error(String(parseError)));
+                dispatch({ type: 'INITIALIZATION_COMPLETE' });
+              }
             } else {
               // Profile doesn't exist or load failed - use defaults
               logger.debug('[AuthContext] Using default profile');
               dispatch({ type: 'INITIALIZATION_COMPLETE' });
             }
           } catch (error) {
+            if (ignore) return;
             logger.error('Error loading profile', error instanceof Error ? error : new Error(String(error)));
             dispatch({ type: 'INITIALIZATION_COMPLETE' });
           }
@@ -391,10 +437,30 @@ export function AuthProvider({
         onAuthStateChange?.(null);
       }
     });
-    
-    return () => unsubscribe();
+
+    return () => {
+      ignore = true; // Mark as stale on cleanup
+      unsubscribe();
+    };
   }, [auth, db, onAuthStateChange, useSafeDefaults]);
-  
+
+  // ========== Fallback Initialization Timeout ==========
+  // Handle edge case where Firebase never initializes or auth state listener never fires
+  // This ensures the app doesn't get stuck on loading screens indefinitely
+  useEffect(() => {
+    // Only run if we're mounted but still initializing after 10 seconds
+    if (!isMounted || !state.isInitializing) return;
+
+    const timeoutId = setTimeout(() => {
+      if (state.isInitializing) {
+        logger.warn('[AuthContext] Auth never initialized after 10s - forcing INITIALIZATION_COMPLETE');
+        dispatch({ type: 'INITIALIZATION_COMPLETE' });
+      }
+    }, 10000);
+
+    return () => clearTimeout(timeoutId);
+  }, [isMounted, state.isInitializing]);
+
   // ========== Email/Password Auth ==========
   
   const signUpWithEmail = useCallback(async (data: EmailSignUpData): Promise<SignUpResult> => {
@@ -886,30 +952,35 @@ export function AuthProvider({
       });
 
       if (profileDoc && profileDoc.exists()) {
-        const profileData = profileDoc.data();
-        const profile: UserProfile = {
-          uid: state.user.uid,
-          username: profileData.username || '',
-          email: profileData.email || null,
-          countryCode: profileData.countryCode || 'US',
-          displayName: profileData.displayName || '',
-          createdAt: profileData.createdAt?.toDate() || new Date(),
-          updatedAt: profileData.updatedAt?.toDate() || new Date(),
-          isActive: profileData.isActive ?? true,
-          profileComplete: profileData.profileComplete ?? false,
-          tournamentsEntered: profileData.tournamentsEntered || 0,
-          tournamentsWon: profileData.tournamentsWon || 0,
-          totalWinnings: profileData.totalWinnings || 0,
-          bestFinish: profileData.bestFinish || null,
-          lastLogin: profileData.lastLogin?.toDate() || new Date(),
-          preferences: {
-            notifications: profileData.preferences?.notifications ?? true,
-            emailUpdates: profileData.preferences?.emailUpdates ?? true,
-            publicProfile: profileData.preferences?.publicProfile ?? true,
-            borderColor: profileData.preferences?.borderColor || '#4285F4',
-          },
-        };
-        dispatch({ type: 'PROFILE_LOADED', payload: { profile } });
+        try {
+          const profileData = profileDoc.data();
+          const now = new Date();
+          const profile: UserProfile = {
+            uid: state.user.uid,
+            username: profileData.username || '',
+            email: profileData.email || null,
+            countryCode: profileData.countryCode || 'US',
+            displayName: profileData.displayName || '',
+            createdAt: safeToDate(profileData.createdAt, now),
+            updatedAt: safeToDate(profileData.updatedAt, now),
+            isActive: profileData.isActive ?? true,
+            profileComplete: profileData.profileComplete ?? false,
+            tournamentsEntered: profileData.tournamentsEntered || 0,
+            tournamentsWon: profileData.tournamentsWon || 0,
+            totalWinnings: profileData.totalWinnings || 0,
+            bestFinish: profileData.bestFinish || null,
+            lastLogin: safeToDate(profileData.lastLogin, now),
+            preferences: {
+              notifications: profileData.preferences?.notifications ?? true,
+              emailUpdates: profileData.preferences?.emailUpdates ?? true,
+              publicProfile: profileData.preferences?.publicProfile ?? true,
+              borderColor: profileData.preferences?.borderColor || '#4285F4',
+            },
+          };
+          dispatch({ type: 'PROFILE_LOADED', payload: { profile } });
+        } catch (parseError) {
+          logger.error('Error parsing profile data during refresh', parseError instanceof Error ? parseError : new Error(String(parseError)));
+        }
       }
     } catch (error) {
       logger.error('Error refreshing profile', error instanceof Error ? error : new Error(String(error)));

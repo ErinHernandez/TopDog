@@ -18,6 +18,7 @@ export function useIsMobileDevice(): boolean | null {
       return mobileRegex.test(userAgent) || isNarrowScreen;
     };
 
+    // Set immediately after mount
     setIsMobile(checkMobile());
 
     const handleResize = () => setIsMobile(checkMobile());

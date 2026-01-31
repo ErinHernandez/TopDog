@@ -338,7 +338,7 @@ export default function LobbyTabSandboxPage(): React.ReactElement {
   }, []);
 
   const handleConfirmJoin = useCallback(
-    (options: { entries: number; autopilot: boolean }) => {
+    (options: { entries: number; draftSpeed: 'fast' | 'slow' }) => {
       void options; // Acknowledge options for sandbox testing
       setIsJoining(true);
       setTimeout(() => {

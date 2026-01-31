@@ -20,6 +20,31 @@
    ============================================================================ */
 
 /* ============================================================================
+   BLUE OUTLINE - MODAL BRANDING BORDER
+   ============================================================================ */
+
+.blueOutline {
+  position: absolute;
+  inset: 0;
+  border: 4px solid;
+  border-image: url(/square_background.png) 1 fill;
+  border-radius: 2.125rem; /* Match phone innerScreen radius */
+  pointer-events: none;
+  z-index: 10;
+  /* Use clip-path to create the border effect with rounded corners */
+  background: url(/square_background.png) center/cover;
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  padding: 4px;
+}
+
+/* ============================================================================
    MODAL OVERLAY
    ============================================================================ */
 
@@ -43,38 +68,36 @@
    ============================================================================ */
 
 .modalContainer {
+  position: relative; /* for absolute positioned close button */
   width: 100%;
   height: 100%;
   margin: 0;
+  padding: 12px; /* Space for blue outline border */
   background-color: var(--color-bg-secondary);
-  border-radius: 0;
+  border-radius: 2.125rem; /* Match phone edge */
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
 }
 
 /* ============================================================================
-   MODAL HEADER
+   CLOSE BUTTON - Absolute positioned in top-right
    ============================================================================ */
 
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  flex-shrink: 0;
-  padding: var(--spacing-md) var(--spacing-lg);
-  border-bottom: 1px solid var(--color-border-light);
-}
-
 .closeButton {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 20; /* Above the blue outline */
   display: flex;
   align-items: center;
   justify-content: center;
   width: 32px;
   height: 32px;
-  border-radius: var(--radius-md);
-  background-color: rgba(255, 255, 255, 0.1);
-  color: var(--color-text-muted);
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -91,7 +114,7 @@
 .scrollableContent {
   flex: 1;
   overflow-y: auto;
-  padding: var(--spacing-lg);
+  padding: var(--spacing-2xl) var(--spacing-lg) var(--spacing-lg); /* more top padding */
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -256,15 +279,76 @@
   color: var(--color-text-muted);
 }
 
-.autopilotRow {
+/* ============================================================================
+   DRAFT SPEED SELECTOR
+   ============================================================================ */
+
+.draftSpeedRow {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: var(--spacing-md);
 }
 
-.autopilotLabel {
+.draftSpeedLabel {
   font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.draftSpeedButtons {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.draftSpeedButton {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-lighter);
+  background-color: transparent;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.draftSpeedButton:hover {
+  border-color: rgba(255, 255, 255, 0.4);
   color: var(--color-text-primary);
+}
+
+.draftSpeedButtonActive {
+  background: url(/square_background.png) center/cover;
+  border: none;
+  border-radius: var(--radius-md);
+  color: #fff;
+  font-weight: 600;
+  position: relative;
+  overflow: hidden;
+}
+
+.draftSpeedButtonActive::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  background-color: var(--color-bg-secondary, #1a1a2e);
+  border-radius: calc(var(--radius-md) - 2px);
+  z-index: 0;
+}
+
+.draftSpeedButtonActive > * {
+  position: relative;
+  z-index: 1;
+}
+
+.draftSpeedTime {
+  opacity: 0.7;
+  font-weight: 400;
+  margin-left: 4px;
 }
 
 /* ============================================================================
@@ -323,7 +407,7 @@
 
 .detailsSection {
   background-color: var(--color-bg-panel-lighter);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md); /* Match rulesButton */
   padding: var(--spacing-md);
   margin-bottom: var(--spacing-md);
 }
@@ -419,8 +503,15 @@
    ============================================================================ */
 
 .bottomSection {
+  /* Row height definitions */
+  --row-height-progress: 8px;
+  --row-height-button: 48px;
+  --row-height-stats: 56px;
+  --row-height-text-boxes: 48px;
+  --bottom-row-gap: 12px;
+  
   display: grid;
-  padding: var(--spacing-lg);
+  padding: var(--spacing-lg); /* padding on all sides including bottom */
   border-top: 1px solid var(--color-border-light);
   background-color: rgba(255, 255, 255, 0.02);
   flex-shrink: 0;
@@ -453,6 +544,7 @@
   height: var(--row-height-button);
   min-height: var(--row-height-button);
   max-height: var(--row-height-button);
+  margin-top: 8px;
   color: var(--color-text-primary);
   font-size: var(--font-size-sm);
   font-weight: 600;
@@ -509,17 +601,11 @@
   font-size: 18px;
   font-weight: bold;
   color: var(--color-text-primary);
-  background-color: var(--color-stat-bg);
-  padding: 2px 6px;
-  border-radius: var(--radius-sm);
 }
 
 .statItemLabel {
   font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
-  background-color: var(--color-stat-bg);
-  padding: 1px 4px;
-  border-radius: var(--radius-sm);
   margin-top: 2px;
 }
 

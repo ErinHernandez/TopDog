@@ -237,7 +237,7 @@ interface VirtualPlayerRowProps {
   isQueued: boolean;
   onToggleQueue: () => void;
   onRowClick: () => void;
-  style: React.CSSProperties;
+  style?: React.CSSProperties;
 }
 
 const VirtualPlayerRow = React.memo(function VirtualPlayerRow({
@@ -537,7 +537,6 @@ export function VirtualizedPlayerList({
                       isQueued={isQueued(player.id)}
                       onToggleQueue={() => onToggleQueue(player)}
                       onRowClick={() => handleRowClick(player.id)}
-                      style={undefined}
                     />
                     {isExpanded && (
                       <div className={styles.expandedCardContainer}>
@@ -575,7 +574,6 @@ export function VirtualizedPlayerList({
                   isQueued={isQueued(player.id)}
                   onToggleQueue={() => onToggleQueue(player)}
                   onRowClick={() => handleRowClick(player.id)}
-                  style={undefined}
                 />
                 {expandedPlayerId === player.id && (
                   <div className={styles.expandedCardContainer}>

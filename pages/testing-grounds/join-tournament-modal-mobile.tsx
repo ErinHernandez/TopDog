@@ -57,11 +57,11 @@ function JoinTournamentModalMobilePage(): JSX.Element {
     setTimeout(() => setIsModalOpen(true), 100); // Reopen for demo
   }, []);
 
-  const handleConfirm = useCallback((options: { entries: number; autopilot: boolean }): void => {
+  const handleConfirm = useCallback((options: { entries: number; draftSpeed: 'fast' | 'slow' }): void => {
     setIsJoining(true);
     setTimeout(() => {
       setIsJoining(false);
-      alert(`Joined with ${options.entries} entries, autopilot: ${options.autopilot}`);
+      alert(`Joined with ${options.entries} entries, draftSpeed: ${options.draftSpeed}`);
     }, 1500);
   }, []);
 

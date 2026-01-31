@@ -38,7 +38,7 @@ import { usePhoneFramePortal } from '@/lib/usePhoneFramePortal';
 // ============================================================================
 
 const MAX_ENTRIES = 150;
-const WR_BLUE_BG = 'url(/wr_blue.png) center center / cover no-repeat';
+const WR_BLUE_BG = 'url(/square_background.png) center center / cover no-repeat';
 
 // Bottom section constants (matching TournamentCardBottomSectionV2)
 // Uses CSS custom properties (--spacing-lg, --spacing-xl) for spacing
@@ -75,7 +75,7 @@ export interface JoinTournamentModalProps {
   /** Close modal handler */
   onClose: () => void;
   /** Confirm join handler with entry options */
-  onConfirm: (options: { entries: number; autopilot: boolean }) => void;
+  onConfirm: (options: { entries: number; draftSpeed: 'fast' | 'slow' }) => void;
   /** Whether join is in progress */
   isJoining: boolean;
   /** Custom text boxes to display at the bottom of the modal */
@@ -122,7 +122,7 @@ export default function JoinTournamentModal({
   
   // State
   const [numberOfEntries, setNumberOfEntries] = useState(1);
-  const [autopilotEnabled, setAutopilotEnabled] = useState(false);
+  const [draftSpeed, setDraftSpeed] = useState<'fast' | 'slow'>('fast');
   const [showRulesModal, setShowRulesModal] = useState(false);
 
   // Calculated values
@@ -147,7 +147,7 @@ export default function JoinTournamentModal({
   };
 
   const handleConfirm = () => {
-    onConfirm({ entries: numberOfEntries, autopilot: autopilotEnabled });
+    onConfirm({ entries: numberOfEntries, draftSpeed });
   };
 
   const modalContent = (
@@ -160,51 +160,37 @@ export default function JoinTournamentModal({
           className={styles.modalContainer}
           onClick={e => e.stopPropagation()}
         >
-          {/* Header */}
-          <div className={styles.header}>
-            <button
-              onClick={onClose}
-              className={styles.closeButton}
-              aria-label="Close modal"
-            >
-              <Close size={16} />
-            </button>
-          </div>
+          {/* Blue outline wrapper - auth modal branding */}
+          <div className={styles.blueOutline} aria-hidden="true" />
+
+          {/* Close button - absolute positioned */}
+          <button
+            onClick={onClose}
+            className={styles.closeButton}
+            aria-label="Close modal"
+          >
+            <Close size={16} />
+          </button>
 
           {/* Scrollable Content */}
           <div className={styles.scrollableContent}>
-            {/* Tournament Title */}
+            {/* Tournament Title - Split last word to second line */}
             <h3 className={styles.tournamentTitle}>
-              {tournament.title}
+              {(() => {
+                const words = tournament.title.split(' ');
+                if (words.length > 1) {
+                  const lastWord = words.pop();
+                  return (
+                    <>
+                      <span>{words.join(' ')}</span>
+                      <br />
+                      <span>{lastWord}</span>
+                    </>
+                  );
+                }
+                return tournament.title;
+              })()}
             </h3>
-            
-            {/* Statistics Bar - 3 columns */}
-            <div className={styles.statsBar}>
-              <div className={styles.statColumn}>
-                <div className={styles.statValue}>
-                  {tournament.entryFee}
-                </div>
-                <div className={styles.statLabel}>
-                  Entry
-                </div>
-              </div>
-              <div className={styles.statColumn}>
-                <div className={styles.statValue}>
-                  {tournament.totalEntries}
-                </div>
-                <div className={styles.statLabel}>
-                  Entrants
-                </div>
-              </div>
-              <div className={styles.statColumn}>
-                <div className={styles.statValue}>
-                  {tournament.firstPlacePrize}
-                </div>
-                <div className={styles.statLabel}>
-                  1st Place
-                </div>
-              </div>
-            </div>
 
           {/* Account Balance Section */}
           {/* Note: Mobile app requires authentication, so user will always exist */}
@@ -268,25 +254,29 @@ export default function JoinTournamentModal({
                 </div>
               </div>
 
-              {/* Autopilot Row */}
-              <div className={styles.autopilotRow}>
-                <span className={styles.autopilotLabel}>
-                  Autopilot
-                </span>
-                <Switch
-                  checked={autopilotEnabled}
-                  onChange={setAutopilotEnabled}
-                  size="sm"
-                />
-              </div>
             </div>
 
-            {/* Total Cost */}
-            <div className={styles.totalCostSection}>
-              <span className={styles.totalCostLabel}>Total: </span>
-              <span className={styles.totalCostAmount}>
-                {formatCents(totalCostCents, { showCents: false })}
-              </span>
+            {/* Draft Speed Row */}
+            <div className={styles.draftSpeedRow}>
+              <div className={styles.draftSpeedButtons}>
+                <button
+                  type="button"
+                  className={`${styles.draftSpeedButton} ${draftSpeed === 'fast' ? styles.draftSpeedButtonActive : ''}`}
+                  onClick={() => setDraftSpeed('fast')}
+                >
+                  Fast <span className={styles.draftSpeedTime}>30s</span>
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.draftSpeedButton} ${draftSpeed === 'slow' ? styles.draftSpeedButtonActive : ''}`}
+                  onClick={() => setDraftSpeed('slow')}
+                >
+                  Slow <span className={styles.draftSpeedTime}>12hrs</span>
+                </button>
+              </div>
+              <label className={styles.draftSpeedLabel}>
+                Draft Speed
+              </label>
             </div>
 
             {/* Deposit Button */}
@@ -341,11 +331,6 @@ export default function JoinTournamentModal({
               </div>
             </div>
 
-            {/* Info Message */}
-            <p className={styles.infoMessage}>
-              You will be placed in a draft room once enough players have joined.
-            </p>
-
             {/* Buttons */}
             <div className={styles.buttonsSection}>
               <button
@@ -372,7 +357,7 @@ export default function JoinTournamentModal({
               <div className={styles.progressSection}>
                 <ProgressBar
                   value={fillPercentage}
-                  fillBackgroundImage="url(/wr_blue.png)"
+                  fillBackgroundImage="url(/square_background.png)"
                   backgroundColor="rgba(55, 65, 81, 0.5)"
                   size="md"
                 />

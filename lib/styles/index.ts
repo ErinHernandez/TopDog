@@ -14,20 +14,6 @@ export { default as classNames } from './classNames';
 
 // CSS variable utilities
 export {
-  // Token types
-  type SpacingToken,
-  type ColorToken,
-  type BgToken,
-  type TextToken,
-  type BorderToken,
-  type FontSizeToken,
-  type FontWeightToken,
-  type LineHeightToken,
-  type RadiusToken,
-  type ZIndexToken,
-  type PositionCode,
-  type GrayToken,
-  type CSSVariableStyle,
   // Token functions
   spacing,
   color,
@@ -55,6 +41,9 @@ export {
   ease,
 } from './cssVariables';
 
+// Re-export types from cssVariables that aren't in types.ts
+export type { ColorToken, PositionCode } from './cssVariables';
+
 // Token utilities (new - for static CSS class patterns)
 export {
   // Position class helpers
@@ -81,15 +70,6 @@ export {
   NFL_TEAM_COLORS,
   getPositionColor,
   getTeamColors,
-  // Types
-  type Position,
-  type ColoredPosition,
-  type NFLTeam,
-  type TouchTargetToken,
-  type DurationToken,
-  type EasingToken,
-  type TransitionToken,
-  type ShadowToken,
 } from './tokens';
 
 // Lazy loading utilities (for performance optimization)

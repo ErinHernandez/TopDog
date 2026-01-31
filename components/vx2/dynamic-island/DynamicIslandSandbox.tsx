@@ -510,7 +510,7 @@ function DynamicIslandVisualization({
     }
   };
 
-  const timerProgress = content.totalSeconds ? (content.timerSeconds / content.totalSeconds) * 100 : 0;
+  const timerProgress = content.totalSeconds && content.timerSeconds ? (content.timerSeconds / content.totalSeconds) * 100 : 0;
 
   return (
     <div className={styles.islandContainer}>

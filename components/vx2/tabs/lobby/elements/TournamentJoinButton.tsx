@@ -24,7 +24,7 @@ export interface TournamentJoinButtonProps {
 /**
  * Default tiled background properties
  */
-const DEFAULT_BACKGROUND_IMAGE = 'url(/wr_blue.png)';
+const DEFAULT_BACKGROUND_IMAGE = 'url(/blue_bg_4096_solid.png)';
 const DEFAULT_BACKGROUND_COLOR = '#1e40af';
 
 export function TournamentJoinButton({

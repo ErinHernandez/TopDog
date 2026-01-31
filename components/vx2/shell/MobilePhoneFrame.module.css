@@ -104,9 +104,9 @@
   top: 0;
   left: 0;
   right: 0;
-  bottom: var(--modal-root-bottom-inset, 0); /* excludes tab bar (81px) */
+  bottom: 0; /* covers entire screen including tab bar */
   z-index: 1001; /* above safe area (z-index: 1) and content */
   pointer-events: none; /* passthrough when empty */
-  border-radius: inherit; /* match innerScreen radius */
+  border-radius: inherit; /* match innerScreen radius on all corners */
   overflow: hidden;
 }

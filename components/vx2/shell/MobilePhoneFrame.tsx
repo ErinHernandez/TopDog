@@ -21,8 +21,8 @@ const INNER_HEIGHT_PX = 812;
 /** Top safe area: from screen top to bottom of island (8 + 20). Safe area ends at bottom of island. */
 export const SAFE_AREA_TOP_TO_ISLAND_BOTTOM_PX = 28;
 
-/** Tab bar height: minHeight(44) + paddingTop(10) + paddingBottom(10) + homeIndicator(5+8+4) = 81px */
-const TAB_BAR_HEIGHT_PX = 81;
+/** Tab bar height: minHeight(44) + homeIndicator(8+5+4) = 61px (no top/bottom padding in CSS) */
+const TAB_BAR_HEIGHT_PX = 61;
 
 export interface MobilePhoneFrameProps {
   children: React.ReactNode;

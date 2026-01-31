@@ -1,5 +1,5 @@
 .button {
-  background-image: var(--background-image, url(/wr_blue.png));
+  background-image: var(--background-image, url(/square_background.png));
   background-size: 200px;
   background-repeat: repeat;
   background-color: var(--background-color, #1e40af);

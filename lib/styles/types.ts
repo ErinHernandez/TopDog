@@ -297,7 +297,7 @@ export type WithCSSVariables<T extends Record<string, unknown>> = {
 export type TokenName<T extends string> = T;
 
 /** CSS property with optional !important */
-export type CSSValue<T> = T | `${T} !important`;
+export type CSSValue<T extends string | number> = T | `${T} !important`;
 
 // ============================================================================
 // TYPE GUARDS

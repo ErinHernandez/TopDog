@@ -58,7 +58,7 @@ const logger = createScopedLogger('[LobbyTab]');
 // ============================================================================
 
 /** Globe image (no background); used in lobby layout */
-const GLOBE_IMAGE = '/!!_GLOBE_NOBACKGROUND.webp';
+const GLOBE_IMAGE = '/globe_optimized.jpeg';
 /** When in phone frame: use LOBBY_TAB_SANDBOX_SPEC for px-per-px match with sandbox. */
 const SPEC = LOBBY_TAB_SANDBOX_SPEC;
 
@@ -165,7 +165,7 @@ export default function LobbyTabVX2({
     onJoinClick?.(tournamentId);
   }, [tournaments, onJoinClick]);
 
-  const handleConfirmJoin = useCallback(async (options: { entries: number; autopilot: boolean }) => {
+  const handleConfirmJoin = useCallback(async (options: { entries: number; draftSpeed: 'fast' | 'slow' }) => {
     if (!selectedTournament) return;
 
     setIsJoining(true);
@@ -176,7 +176,7 @@ export default function LobbyTabVX2({
       // Store join state for draft room
       sessionStorage.setItem('topdog_joined_draft', 'true');
       sessionStorage.setItem('topdog_entry_count', options.entries.toString());
-      sessionStorage.setItem('topdog_autopilot', options.autopilot.toString());
+      sessionStorage.setItem('topdog_draft_speed', options.draftSpeed);
 
       // Navigate to draft room
       router.push('/testing-grounds/vx2-draft-room');

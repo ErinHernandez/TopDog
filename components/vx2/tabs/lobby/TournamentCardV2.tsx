@@ -294,7 +294,7 @@ export function TournamentCardV2({
   };
 
   const finalSizes = {
-    borderRadius: styleOverrides.borderRadius,
+    borderRadius: styleOverrides.borderRadius ?? 12,
     minHeight: styleOverrides.minHeight,
   };
 

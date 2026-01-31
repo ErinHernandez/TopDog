@@ -17,15 +17,15 @@
  */
 
 import dynamic from 'next/dynamic';
-import type { ComponentType } from 'react';
+import type { ComponentType, ReactNode } from 'react';
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
 export interface LazyComponentOptions {
-  /** Show loading fallback */
-  loading?: ComponentType | null;
+  /** Show loading fallback - function that returns a ReactNode */
+  loading?: (() => ReactNode) | null;
   /** Whether to SSR the component */
   ssr?: boolean;
 }

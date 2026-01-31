@@ -18,12 +18,13 @@ import type { RuntimeCaching } from 'serwist';
 
 // Extend the global scope for Serwist
 declare global {
-  interface WorkerGlobalScope extends SerwistGlobalConfig {
+  interface ServiceWorkerGlobalScope extends SerwistGlobalConfig {
     __SW_MANIFEST: (PrecacheEntry | string)[] | undefined;
   }
 }
 
-declare const self: ServiceWorkerGlobalScope;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+declare const self: any;
 
 // Custom runtime caching strategies (migrated from next-pwa config)
 const customRuntimeCaching: RuntimeCaching[] = [
@@ -136,13 +137,15 @@ const customRuntimeCaching: RuntimeCaching[] = [
 
 // Notification click handler (migrated from sw-custom.js)
 // This handles draft alert notification clicks
-self.addEventListener('notificationclick', (event) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+self.addEventListener('notificationclick', (event: any) => {
   event.notification.close();
 
   const data = event.notification.data;
   if (data?.url) {
     event.waitUntil(
-      self.clients.matchAll({ type: 'window' }).then((clientList) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      self.clients.matchAll({ type: 'window' }).then((clientList: any[]) => {
         // Focus existing window if open
         for (const client of clientList) {
           if (client.url.includes(data.roomId) && 'focus' in client) {

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { SWRConfig } from 'swr';
@@ -16,7 +16,6 @@ import exposurePreloader from '../lib/exposurePreloader';
 import { GlobalErrorBoundary } from '../components/ui';
 import { MobilePhoneFrame } from '../components/vx2/shell/MobilePhoneFrame';
 import { InPhoneFrameProvider } from '../lib/inPhoneFrameContext';
-import { useIsMobileDevice } from '../hooks/useIsMobileDevice';
 import { createScopedLogger } from '@/lib/clientLogger';
 
 const logger = createScopedLogger('[App]');
@@ -30,13 +29,43 @@ const SANDBOX_ROUTES_OUTSIDE_PHONE = [
   '/testing-grounds/vx2-auth-test', // Page shows phone + auth outside it; mobile access blocked
 ];
 
+/**
+ * Hydration-safe mobile device detection.
+ * IMPORTANT: Inline implementation to avoid import causing module reload issues.
+ */
+function useIsMobileDeviceStable(): boolean | null {
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      const userAgent =
+        navigator.userAgent || navigator.vendor || (window as Window & { opera?: string }).opera || '';
+      const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+      const isNarrowScreen = window.innerWidth < 768;
+      return mobileRegex.test(userAgent) || isNarrowScreen;
+    };
+
+    setIsMobile(checkMobile());
+
+    const handleResize = () => setIsMobile(checkMobile());
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return isMobile;
+}
+
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
-  const isMobile = useIsMobileDevice();
-
+  const isMobile = useIsMobileDeviceStable();
+  
+  // Determine layout mode
+  const isDesktop = isMobile === false;
+  const showPhoneFrame = isDesktop && !SANDBOX_ROUTES_OUTSIDE_PHONE.some((r) => router.pathname === r);
+  
   const showDevNav =
     DEV_NAV_ROUTES.some((route) => router.pathname.startsWith(route)) &&
-    isMobile === false;
+    isDesktop;
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -63,7 +92,6 @@ function MyApp({ Component, pageProps }: AppProps) {
     const init = () => {
       if (typeof window === 'undefined') return;
       try {
-        // Check if recordPageVisit exists before calling (handles webpack bundling issues)
         if (userMetrics && typeof userMetrics.recordPageVisit === 'function') {
           userMetrics.recordPageVisit(window.location.pathname, document.referrer);
         }
@@ -75,11 +103,11 @@ function MyApp({ Component, pageProps }: AppProps) {
     setTimeout(init, 500);
   }, []);
 
-  // Render the page content
-  const pageContent = <Component {...pageProps} />;
-
-  // Wrap with providers
-  const withProviders = (content: React.ReactNode) => (
+  // CRITICAL FIX: Always render the SAME component tree structure.
+  // Use CSS to control visibility instead of conditional rendering.
+  // This prevents React from remounting components when isMobile changes,
+  // which was causing Fast Refresh to do full reloads in a loop.
+  return (
     <SWRConfig value={swrConfig}>
       <Head>
         <meta
@@ -89,50 +117,37 @@ function MyApp({ Component, pageProps }: AppProps) {
       </Head>
       <UserProvider>
         <PlayerDataProvider>
-          <GlobalErrorBoundary>{content}</GlobalErrorBoundary>
+          <GlobalErrorBoundary>
+            <InPhoneFrameProvider value={showPhoneFrame}>
+              {/* Wrapper div - always rendered, styling changes based on mode */}
+              <div 
+                className={showPhoneFrame ? "min-h-screen bg-gray-900 flex items-center justify-center p-4" : ""}
+                style={{ minHeight: showPhoneFrame ? undefined : '100vh' }}
+              >
+                {/* DevNav - only visible on desktop for dev routes */}
+                {showDevNav && (
+                  <div
+                    className="fixed top-4 left-4"
+                    style={{ zIndex: 99999, width: 220, minHeight: 500, pointerEvents: 'auto' }}
+                  >
+                    <DevNav />
+                  </div>
+                )}
+                
+                {/* Content wrapper - phone frame only on desktop */}
+                {showPhoneFrame ? (
+                  <MobilePhoneFrame>
+                    <Component {...pageProps} />
+                  </MobilePhoneFrame>
+                ) : (
+                  <Component {...pageProps} />
+                )}
+              </div>
+            </InPhoneFrameProvider>
+          </GlobalErrorBoundary>
         </PlayerDataProvider>
       </UserProvider>
     </SWRConfig>
-  );
-
-  // SSR/Hydration: Render without frame to avoid mismatch
-  // Frame appears after client-side hydration
-  if (isMobile === null) {
-    return withProviders(pageContent);
-  }
-
-  // Mobile: Fullscreen, no frame
-  if (isMobile) {
-    return withProviders(pageContent);
-  }
-
-  // Sandbox pages with their own phone + dev controls: render raw so DevNav and in-page dev UI stay outside the phone
-  const sandboxDevOutsidePhone = SANDBOX_ROUTES_OUTSIDE_PHONE.some((r) => router.pathname === r);
-
-  // Desktop: Centered phone frame (or raw content for sandboxes that provide their own phone)
-  return withProviders(
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-      {/* DevNav for testing routes - always outside phone. Wrapper has explicit size and high z-index so it receives clicks (avoids 0x0 collapse from absolute child). */}
-      {showDevNav && (
-        <div
-          className="fixed top-4 left-4"
-          style={{ zIndex: 99999, width: 220, minHeight: 500, pointerEvents: 'auto' }}
-        >
-          <DevNav />
-        </div>
-      )}
-
-      {/* Phone frame with page content; skip frame for sandbox routes so dev controls always render outside phone */}
-      {sandboxDevOutsidePhone ? (
-        pageContent
-      ) : (
-        <InPhoneFrameProvider value={true}>
-          <MobilePhoneFrame>
-            {pageContent}
-          </MobilePhoneFrame>
-        </InPhoneFrameProvider>
-      )}
-    </div>
   );
 }
 

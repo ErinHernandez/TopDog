@@ -24,8 +24,8 @@ import { LOBBY_TAB_SANDBOX_SPEC } from '../../components/vx2/tabs/lobby/constant
 
 const SPEC = LOBBY_TAB_SANDBOX_SPEC;
 const LOGO_IMAGE = '/tournament_card_background.png';
-const GLOBE_IMAGE_PRIMARY = '/globe_tournament_III.svg';
-const GLOBE_IMAGE_FALLBACK = '/!!_GLOBE_NOBACKGROUND.webp';
+const GLOBE_IMAGE_PRIMARY = '/globe_optimized.jpeg';
+const GLOBE_IMAGE_FALLBACK = '/globe_optimized.jpeg';
 
 export type LobbyObjectId = 'logoTitle' | 'progressBar' | 'joinButton' | 'stats' | 'globe';
 
