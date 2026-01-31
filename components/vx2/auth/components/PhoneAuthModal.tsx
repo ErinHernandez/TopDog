@@ -20,6 +20,7 @@ import { Close, ChevronLeft } from '../../components/icons';
 import { useAuth } from '../hooks/useAuth';
 import { useCountdown } from '../../hooks/ui/useCountdown';
 import { PHONE_CONSTRAINTS } from '../constants';
+import { Z_INDEX } from '../../core/constants/sizes';
 import { getApprovedCountriesSorted } from '../../../../lib/localeCharacters';
 import styles from './PhoneAuthModal.module.css';
 import authStyles from './auth-shared.module.css';
