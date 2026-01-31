@@ -58,13 +58,13 @@ export function ProgressBar({
   const clampedValue = Math.max(0, Math.min(100, value));
 
   // Build CSS custom properties for dynamic values
-  const containerStyle: React.CSSProperties = {};
+  const containerStyle: React.CSSProperties & Record<string, string | undefined> = {};
   if (backgroundColor) {
-    containerStyle['--progress-bg' as keyof React.CSSProperties] = backgroundColor;
+    containerStyle['--progress-bg'] = backgroundColor;
   }
 
   // Build fill style - use background image if provided, otherwise custom property
-  const fillStyle: React.CSSProperties = {
+  const fillStyle: React.CSSProperties & Record<string, string | number | undefined> = {
     width: `${clampedValue}%`,
   };
 
@@ -72,8 +72,9 @@ export function ProgressBar({
     fillStyle.backgroundImage = fillBackgroundImage;
     fillStyle.backgroundSize = 'cover';
     fillStyle.backgroundPosition = 'center';
+    fillStyle.backgroundColor = 'transparent'; // Override CSS default
   } else if (color) {
-    fillStyle['--progress-color' as keyof React.CSSProperties] = color;
+    fillStyle['--progress-color'] = color;
   }
 
   const progressBar = (
