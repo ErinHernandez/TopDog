@@ -30,10 +30,7 @@ export interface LoadingStateProps {
   className?: string;
 }
 
-interface SizeStyles {
-  width: string;
-  height: string;
-}
+type SizeStyles = React.CSSProperties;
 
 // ============================================================================
 // COMPONENT
