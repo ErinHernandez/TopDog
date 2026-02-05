@@ -1,10 +1,10 @@
+/* Zero-Runtime CSS Foundation - imports must come first */
+@import './tokens.css';
+@import './utilities.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Zero-Runtime CSS Foundation */
-@import './tokens.css';
-@import './utilities.css';
 
 /* Monocraft Font */
 @font-face {

@@ -2,6 +2,4 @@
   max-height: var(--max-height, 72px);
 }
 
-.container[data-max-height] {
-  --max-height: calc(var(data-max-height) * 1px);
-}
+/* Note: To set max-height, use inline style with --max-height CSS variable */

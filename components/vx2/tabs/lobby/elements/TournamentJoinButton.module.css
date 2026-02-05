@@ -17,13 +17,7 @@
   padding: 0;
 }
 
-.button[data-background-image] {
-  --background-image: var(data-background-image);
-}
-
-.button[data-background-color] {
-  --background-color: var(data-background-color);
-}
+/* Note: To override background-image/color, use inline styles or set CSS variables via JS */
 
 .button:disabled {
   cursor: not-allowed;

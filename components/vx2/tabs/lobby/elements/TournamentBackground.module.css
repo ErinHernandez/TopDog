@@ -6,9 +6,7 @@
   overflow: hidden;
 }
 
-.container[data-border-radius] {
-  --border-radius: calc(var(data-border-radius) * 1px);
-}
+/* Note: To set border-radius, use inline style with --border-radius CSS variable */
 
 .placeholder {
   position: absolute;
@@ -20,9 +18,7 @@
   transition: opacity var(--duration-slow) ease-out;
 }
 
-.placeholder[data-is-loaded] {
-  --is-loaded: var(data-is-loaded);
-}
+/* Note: To set is-loaded, use inline style with --is-loaded CSS variable */
 
 .image {
   position: absolute;
@@ -34,9 +30,7 @@
   transition: opacity var(--duration-slow) ease-out;
 }
 
-.image[data-is-loaded] {
-  --is-loaded: var(data-is-loaded);
-}
+/* Note: To set is-loaded, use inline style with --is-loaded CSS variable */
 
 .overlay {
   position: absolute;

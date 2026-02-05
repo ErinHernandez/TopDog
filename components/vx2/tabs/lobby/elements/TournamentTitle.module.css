@@ -13,6 +13,4 @@
   overflow-wrap: normal;
 }
 
-.title[data-font-size] {
-  --font-size: calc(var(data-font-size) * 1px);
-}
+/* Note: To override font-size, use inline styles or set --font-size CSS variable via JS */

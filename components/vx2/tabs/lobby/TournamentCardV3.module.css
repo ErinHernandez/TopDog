@@ -90,9 +90,7 @@
   contain: layout style;
 }
 
-.titleWrapper[data-title-font-size] {
-  --title-font-size: calc(var(data-title-font-size) * 1px);
-}
+/* Note: To set title font size, use inline style with --title-font-size CSS variable */
 
 .title {
   font-size: var(--title-font-size);

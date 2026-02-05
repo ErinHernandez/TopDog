@@ -501,8 +501,8 @@ export default function LobbyTabSandboxPage(): React.ReactElement {
       </Head>
       <AuthProvider>
       <div
-        className="min-h-screen flex items-center justify-center p-8"
-        style={{ backgroundColor: PAGE_BG }}
+        className="min-h-screen"
+        style={{ backgroundColor: PAGE_BG, padding: '24px 16px' }}
       >
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: 32, flexWrap: 'wrap' }}>
           {/* Left: Device/state controls + phone (footer only by default) */}
