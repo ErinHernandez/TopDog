@@ -1,0 +1,244 @@
+/**
+ * UsernameInput CSS Module
+ *
+ * Styles for the UsernameInput component including:
+ * - Input field sizing and theming
+ * - Status icons styling
+ * - Suggestions and warnings
+ * - Requirements panel
+ */
+
+/* ============================================================================
+   SIZE CONFIGURATION (using CSS custom properties)
+   ============================================================================ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================================================
+   INPUT CONTAINER
+   ============================================================================ */
+
+.inputContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: var(--input-height, 44px);
+}
+
+.inputContainerSmall {
+  --input-height: 36px;
+}
+
+.inputContainerMedium {
+  --input-height: 44px;
+}
+
+.inputContainerLarge {
+  --input-height: 52px;
+}
+
+/* ============================================================================
+   INPUT FIELD
+   ============================================================================ */
+
+.input {
+  width: 100%;
+  height: 100%;
+  outline: none;
+  transition: border-color 200ms ease;
+  border-radius: var(--input-radius, 8px);
+  padding-left: var(--input-padding-x, 12px);
+  padding-right: var(--input-padding-right, calc(var(--input-height, 44px) + var(--input-padding-x, 12px)));
+  font-size: var(--input-font-size, 16px);
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 2px solid var(--input-border-color);
+}
+
+.input:focus {
+  border-color: var(--focus-border-color, rgba(96, 165, 250, 0.5));
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+.input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.inputError {
+  border-color: var(--color-state-error) !important;
+}
+
+.inputSuccess {
+  border-color: var(--color-state-success) !important;
+}
+
+/* ============================================================================
+   STATUS ICON CONTAINER
+   ============================================================================ */
+
+.statusIconContainer {
+  position: absolute;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--input-height, 44px);
+  height: var(--input-height, 44px);
+}
+
+/* ============================================================================
+   STATUS ICON
+   ============================================================================ */
+
+.statusIconLoading {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================================================
+   HELPER ROW
+   ============================================================================ */
+
+.helperRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 20px;
+  margin-top: 4px;
+  padding: 0 4px;
+}
+
+/* ============================================================================
+   ERROR MESSAGE
+   ============================================================================ */
+
+.errorMessage {
+  color: var(--color-state-error);
+  font-size: var(--font-size-xs);
+}
+
+/* ============================================================================
+   REQUIREMENTS TEXT
+   ============================================================================ */
+
+.requirementsText {
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+}
+
+/* ============================================================================
+   SUGGESTIONS SECTION
+   ============================================================================ */
+
+.suggestionsSection {
+  margin-top: 8px;
+}
+
+.suggestionsLabel {
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  margin-bottom: 4px;
+}
+
+.suggestionsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.suggestionButton {
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  transition: background-color 150ms ease;
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-light);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  font-weight: var(--font-weight-medium);
+}
+
+.suggestionButton:hover {
+  background-color: var(--bg-secondary);
+}
+
+.suggestionButton:active {
+  transform: scale(0.98);
+}
+
+.suggestionButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================================================
+   WARNINGS SECTION
+   ============================================================================ */
+
+.warningsSection {
+  margin-top: 8px;
+}
+
+.warningMessage {
+  color: var(--color-state-warning);
+  font-size: var(--font-size-xs);
+  margin-bottom: 4px;
+}
+
+.warningMessage:last-child {
+  margin-bottom: 0;
+}
+
+/* ============================================================================
+   REQUIREMENTS PANEL
+   ============================================================================ */
+
+.requirementsPanel {
+  margin-top: 8px;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-light);
+}
+
+.requirementsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.requirementItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--font-size-xs);
+}
+
+.requirementItemPassed {
+  color: var(--color-state-success);
+}
+
+.requirementItemPending {
+  color: var(--text-muted);
+}
+
+.requirementIcon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

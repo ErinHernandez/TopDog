@@ -1,0 +1,461 @@
+import { serverLogger } from './logger/serverLogger';
+
+// ============================================================================
+// LOCALE CHARACTER CONFIGURATION
+// ============================================================================
+//
+// This file controls what characters are accepted for usernames by country.
+// It is the SINGLE SOURCE OF TRUTH for approved locations.
+//
+// RULES:
+// 1. Everyone can use standard Western alphabet and numbers (a-z, A-Z, 0-9)
+// 2. Countries can use additional characters from their local dialect
+// 3. Spaces are NEVER allowed in usernames
+//
+// CURRENT STATUS: 7 approved countries (Last Updated: January 2026)
+// NOTE: United States is handled separately due to state-by-state regulations
+//
+// ============================================================================
+// HOW TO ADD A NEW COUNTRY
+// ============================================================================
+//
+// 1. Add entry to `localeCharacters` object below with:
+//    - ISO 3166-1 alpha-2 country code as key (e.g., 'BR' for Brazil)
+//    - additionalChars: string of extra characters (use CHARACTER_SETS below)
+//    - description: human-readable description
+//
+// 2. Add entry to `approvedCountries` array with:
+//    - code: same ISO code
+//    - name: full country name
+//    - region: geographic region for grouping
+//
+// 3. Run validation: node -e "require('./lib/localeCharacters').validateConfiguration()"
+//
+// EXAMPLE - Adding Brazil:
+//
+//   // In localeCharacters:
+//   'BR': {
+//     additionalChars: CHARACTER_SETS.PORTUGUESE,
+//     description: 'Brazil - Western alphabet + Portuguese accents'
+//   },
+//
+//   // In approvedCountries:
+//   { code: 'BR', name: 'Brazil', region: 'South America' },
+//
+// ============================================================================
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+export interface LocaleConfig {
+  additionalChars: string;
+  description: string;
+}
+
+export interface ApprovedCountry {
+  code: string;
+  name: string;
+  region: string;
+}
+
+export interface ConfigurationStats {
+  totalCountries: number;
+  byRegion: Record<string, number>;
+  countriesWithStandardLatinOnly: number;
+  countriesWithAdditionalChars: number;
+}
+
+export interface CountryEntry {
+  localeEntry: string;
+  approvedEntry: string;
+}
+
+// ============================================================================
+// PRE-DEFINED CHARACTER SETS (Use these for consistency)
+// ============================================================================
+export const CHARACTER_SETS = {
+  // No additional characters (English, etc.)
+  STANDARD_LATIN: '',
+  
+  // Romance Languages
+  SPANISH: 'áéíóúñü',
+  PORTUGUESE: 'ãõáéíóúâêôç',
+  FRENCH: 'éèêëàâäôöùûüçîïœæ',
+  ITALIAN: 'àèéìíîòóùú',
+  
+  // Germanic Languages
+  GERMAN: 'äöüß',
+  DUTCH: 'éèëïóòö',
+  
+  // Scandinavian
+  DANISH_NORWEGIAN: 'æøå',
+  SWEDISH: 'åäö',
+  FINNISH: 'äöå',
+  ICELANDIC: 'áéíóúýþæö',
+  
+  // Eastern European
+  POLISH: 'ąćęłńóśźż',
+  CZECH: 'áčďéěíňóřšťúůýž',
+  SLOVAK: 'áäčďéíĺľňóôŕšťúýž',
+  HUNGARIAN: 'áéíóöőúüű',
+  ROMANIAN: 'ăâîșț',
+  CROATIAN: 'čćđšž',
+  SLOVENIAN: 'čšž',
+  ESTONIAN: 'äöõü',
+  LATVIAN: 'āčēģīķļņšūž',
+  LITHUANIAN: 'ąčęėįšųūž',
+  
+  // Cyrillic
+  RUSSIAN_CYRILLIC: 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя',
+  BULGARIAN_CYRILLIC: 'абвгдежзийклмнопрстуфхцчшщъьюя',
+  
+  // Asian (Latin-based)
+  TURKISH: 'çğıöşü',
+  VIETNAMESE: 'àáảãạăằắẳẵặâầấẩẫậèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵđ',
+  
+  // CJK (Chinese, Japanese, Korean) and Tamil
+  // Chinese: Common CJK unified ideographs (subset for usernames)
+  // Note: Full Chinese support would require Unicode CJK Unified Ideographs ranges (U+4E00-U+9FFF)
+  // This is a representative subset of common characters
+  CHINESE_COMMON: '一中人大国个工上为子会动时分年发要作生多长出开加新现向明面天知什全十正三样理成外此从几最意做实事怎方法如现直金本平已真长自做己行可东路各形',
+  
+  // Japanese: Hiragana and Katakana syllabaries
+  JAPANESE: 'あいうえおかがきぎくぐけげこごさざしじすずせぜそぞただちぢつづてでとどなにぬねのはばぱひびぴふぶぷへべぺほぼぽまみむめもやゆよらりるれろわをんアイウエオカガキギクグケゲコゴサザシジスズセゼソゾタダチヂツヅテデトドナニヌネノハバパヒビピフブプヘベペホボポマミムメモヤユヨラリルレロワヲン',
+  
+  // Korean: Hangul (consonants, vowels, and syllables)
+  KOREAN: 'ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅌㅍㅎㅏㅑㅓㅕㅗㅛㅜㅠㅡㅣ가나다라마바사아자차카타파하거너더러머버서어저처커터퍼허고노도로모보소오조초코토포호구누두루무부수우주추쿠투푸후그느드르므브스으즈츠크트프흐기니디리미비시이지치키티피히',
+  
+  // Tamil script (Tamil language - complete alphabet)
+  TAMIL: 'அஆஇஈஉஊஎஏஐஒஓஔகஙசஞடணதநபமயரலவழளறனஷஸஹாிீுூெேைொோௌ',
+  
+  // Celtic
+  IRISH: 'áéíóú',
+  SCOTTISH_GAELIC: 'àèìòùáéíóúÀÈÌÒÙÁÉÍÓÚ',
+  
+  // Polynesian/Māori (Macrons/Tohutō)
+  MAORI: 'āēīōūĀĒĪŌŪ',
+  
+  // Other
+  PAPIAMENTO: 'éèëïóòö', // Aruba, Curacao
+} as const;
+
+// ============================================================================
+// REGION DEFINITIONS (for organizing countries)
+// ============================================================================
+export const REGIONS = {
+  NORTH_AMERICA: 'North America',
+  CARIBBEAN: 'Caribbean',
+  CENTRAL_AMERICA: 'Central America',
+  SOUTH_AMERICA: 'South America',
+  WESTERN_EUROPE: 'Western Europe',
+  NORTHERN_EUROPE: 'Northern Europe',
+  SOUTHERN_EUROPE: 'Southern Europe',
+  EASTERN_EUROPE: 'Eastern Europe',
+  ASIA: 'Asia',
+  OCEANIA: 'Oceania',
+  AFRICA: 'Africa',
+  MIDDLE_EAST: 'Middle East',
+} as const;
+
+// ============================================================================
+// LOCALE CHARACTER MAPPINGS
+// ============================================================================
+
+export const localeCharacters: Record<string, LocaleConfig> = {
+  // ============================================================================
+  // WESTERN EUROPE
+  // ============================================================================
+  'IE': {
+    additionalChars: CHARACTER_SETS.IRISH + CHARACTER_SETS.SCOTTISH_GAELIC,
+    description: 'Ireland - Western alphabet + Irish and Scottish Gaelic accents'
+  },
+  'IM': {
+    additionalChars: CHARACTER_SETS.IRISH + CHARACTER_SETS.SCOTTISH_GAELIC,
+    description: 'Isle of Man - Western alphabet + Irish and Scottish Gaelic accents (supports Manx Gaelic)'
+  },
+  'GB': {
+    additionalChars: CHARACTER_SETS.IRISH + CHARACTER_SETS.SCOTTISH_GAELIC,
+    description: 'United Kingdom - Western alphabet + Gaeilge (Irish) and Gàidhlig (Scottish Gaelic) accents'
+  },
+  'DE': {
+    additionalChars: CHARACTER_SETS.GERMAN,
+    description: 'Germany - Western alphabet + German umlauts'
+  },
+
+  // ============================================================================
+  // NORTH AMERICA
+  // ============================================================================
+  'MX': {
+    additionalChars: CHARACTER_SETS.SPANISH,
+    description: 'Mexico - Western alphabet + Spanish accents'
+  },
+
+  // ============================================================================
+  // SOUTH AMERICA
+  // ============================================================================
+  'BR': {
+    additionalChars: CHARACTER_SETS.PORTUGUESE,
+    description: 'Brazil - Western alphabet + Portuguese accents'
+  },
+
+  // ============================================================================
+  // ASIA
+  // ============================================================================
+  'SG': {
+    additionalChars: CHARACTER_SETS.CHINESE_COMMON + CHARACTER_SETS.JAPANESE + CHARACTER_SETS.KOREAN + CHARACTER_SETS.TAMIL,
+    description: 'Singapore - Western alphabet + Chinese, Japanese, Korean, and Tamil characters (supports English, Malay, Mandarin Chinese, and Tamil)'
+  },
+
+  // ============================================================================
+  // OCEANIA
+  // ============================================================================
+  'NZ': {
+    additionalChars: CHARACTER_SETS.MAORI,
+    description: 'New Zealand - Western alphabet + Māori macrons (Tohutō)'
+  },
+};
+
+// Default fallback for countries not in the list
+export const defaultLocale: LocaleConfig = {
+  additionalChars: '',
+  description: 'Standard Western alphabet only'
+};
+
+// ============================================================================
+// APPROVED COUNTRIES LIST (for dropdowns, validation, etc.)
+// ============================================================================
+export const approvedCountries: ApprovedCountry[] = [
+  // ============================================================================
+  // WESTERN EUROPE
+  // ============================================================================
+  { code: 'IE', name: 'Ireland', region: 'Western Europe' },
+  { code: 'IM', name: 'Isle of Man', region: 'Western Europe' },
+  { code: 'GB', name: 'United Kingdom', region: 'Western Europe' },
+  { code: 'DE', name: 'Germany', region: 'Western Europe' },
+  
+  // ============================================================================
+  // NORTH AMERICA
+  // ============================================================================
+  { code: 'MX', name: 'Mexico', region: 'North America' },
+  
+  // ============================================================================
+  // SOUTH AMERICA
+  // ============================================================================
+  { code: 'BR', name: 'Brazil', region: 'South America' },
+  
+  // ============================================================================
+  // ASIA
+  // ============================================================================
+  { code: 'SG', name: 'Singapore', region: 'Asia' },
+  
+  // ============================================================================
+  // OCEANIA
+  // ============================================================================
+  { code: 'NZ', name: 'New Zealand', region: 'Oceania' },
+];
+
+// Get approved country codes as a Set for quick lookup
+export const approvedCountryCodes = new Set(approvedCountries.map(c => c.code));
+
+// Check if a country is approved
+export function isApprovedCountry(countryCode: string): boolean {
+  return approvedCountryCodes.has(countryCode);
+}
+
+// Get countries sorted alphabetically by name
+export function getApprovedCountriesSorted(): ApprovedCountry[] {
+  return [...approvedCountries].sort((a, b) => a.name.localeCompare(b.name));
+}
+
+// Get countries grouped by region
+export function getApprovedCountriesByRegion(): Record<string, ApprovedCountry[]> {
+  const grouped: Record<string, ApprovedCountry[]> = {};
+  approvedCountries.forEach(country => {
+    if (!grouped[country.region]) {
+      grouped[country.region] = [];
+    }
+    grouped[country.region]!.push(country);
+  });
+  return grouped;
+}
+
+// Function to get allowed characters for a country
+// Always lists standard Western alphabet characters AFTER country-specific characters
+// Note: Spaces are explicitly excluded from all character sets
+export function getAllowedCharacters(countryCode: string): string {
+  const locale = localeCharacters[countryCode] || defaultLocale;
+  const standardChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  
+  // Return country-specific characters first, then standard Western alphabet
+  // Spaces are not included in any character set
+  return locale.additionalChars + standardChars;
+}
+
+// Function to get locale description
+export function getLocaleDescription(countryCode: string): string {
+  const locale = localeCharacters[countryCode] || defaultLocale;
+  return locale.description;
+}
+
+// ============================================================================
+// VALIDATION & UTILITIES (for maintaining data integrity)
+// ============================================================================
+
+/**
+ * Validate that all approved countries have character mappings and vice versa.
+ * Run this after adding new countries to ensure consistency.
+ * 
+ * Usage: node -e "require('./lib/localeCharacters').validateConfiguration()"
+ */
+export function validateConfiguration(): boolean {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  
+  // Check all approved countries have locale entries
+  approvedCountries.forEach(country => {
+    if (!localeCharacters[country.code]) {
+      errors.push(`MISSING: Country '${country.code}' (${country.name}) is in approvedCountries but not in localeCharacters`);
+    }
+  });
+  
+  // Check all locale entries are in approved countries
+  Object.keys(localeCharacters).forEach(code => {
+    if (!approvedCountryCodes.has(code)) {
+      warnings.push(`ORPHAN: Country '${code}' is in localeCharacters but not in approvedCountries`);
+    }
+  });
+  
+  // Check for duplicate country codes
+  const seenCodes = new Set<string>();
+  approvedCountries.forEach(country => {
+    if (seenCodes.has(country.code)) {
+      errors.push(`DUPLICATE: Country code '${country.code}' appears multiple times in approvedCountries`);
+    }
+    seenCodes.add(country.code);
+  });
+  
+  // Report results
+  if (errors.length === 0 && warnings.length === 0) {
+    serverLogger.info('Configuration is valid. All countries are properly configured', { totalCountries: approvedCountries.length });
+    return true;
+  }
+
+  if (errors.length > 0) {
+    serverLogger.error('Configuration errors found', new Error('Locale configuration errors'), { errors });
+  }
+
+  if (warnings.length > 0) {
+    serverLogger.warn('Configuration warnings found');
+  }
+
+  return errors.length === 0;
+}
+
+/**
+ * Get statistics about the current configuration
+ */
+export function getConfigurationStats(): ConfigurationStats {
+  const byRegion = getApprovedCountriesByRegion();
+  const regionCounts: Record<string, number> = {};
+  Object.entries(byRegion).forEach(([region, countries]) => {
+    regionCounts[region] = countries.length;
+  });
+  
+  const charSetUsage: Record<string, number> = {};
+  Object.values(localeCharacters).forEach(locale => {
+    const chars = locale.additionalChars || '(none)';
+    charSetUsage[chars] = (charSetUsage[chars] || 0) + 1;
+  });
+  
+  return {
+    totalCountries: approvedCountries.length,
+    byRegion: regionCounts,
+    countriesWithStandardLatinOnly: Object.values(localeCharacters).filter(l => l.additionalChars === '').length,
+    countriesWithAdditionalChars: Object.values(localeCharacters).filter(l => l.additionalChars !== '').length,
+  };
+}
+
+/**
+ * Helper to add a new country (for scripting)
+ * Returns the code to add - does not modify the file
+ */
+export function generateCountryEntry(
+  code: string,
+  name: string,
+  region: string,
+  characterSet: keyof typeof CHARACTER_SETS = 'STANDARD_LATIN'
+): CountryEntry {
+  const chars = CHARACTER_SETS[characterSet] || '';
+  const charSetName = characterSet === 'STANDARD_LATIN' ? 'Standard Western alphabet only' : `Western alphabet + ${characterSet.toLowerCase().replace(/_/g, ' ')}`;
+  
+  return {
+    localeEntry: `  '${code}': {
+    additionalChars: '${chars}',
+    description: '${name} - ${charSetName}'
+  },`,
+    approvedEntry: `  { code: '${code}', name: '${name}', region: '${region}' },`,
+  };
+}
+
+/**
+ * Check if a country code is valid ISO 3166-1 alpha-2 format
+ */
+export function isValidCountryCode(code: string): boolean {
+  return typeof code === 'string' && /^[A-Z]{2}$/.test(code);
+}
+
+/**
+ * Get all countries that use a specific character set
+ */
+export function getCountriesByCharacterSet(characterSet: keyof typeof CHARACTER_SETS): ApprovedCountry[] {
+  const targetChars = CHARACTER_SETS[characterSet];
+  if (targetChars === undefined) {
+    return [];
+  }
+  
+  return approvedCountries.filter(country => {
+    const locale = localeCharacters[country.code];
+    return locale && locale.additionalChars === targetChars;
+  });
+}
+
+/**
+ * Suggest a character set for a new country based on language/region
+ */
+export function suggestCharacterSet(language: string): keyof typeof CHARACTER_SETS {
+  const suggestions: Record<string, keyof typeof CHARACTER_SETS> = {
+    'english': 'STANDARD_LATIN',
+    'spanish': 'SPANISH',
+    'portuguese': 'PORTUGUESE',
+    'french': 'FRENCH',
+    'german': 'GERMAN',
+    'dutch': 'DUTCH',
+    'italian': 'ITALIAN',
+    'polish': 'POLISH',
+    'czech': 'CZECH',
+    'hungarian': 'HUNGARIAN',
+    'romanian': 'ROMANIAN',
+    'russian': 'RUSSIAN_CYRILLIC',
+    'turkish': 'TURKISH',
+    'swedish': 'SWEDISH',
+    'norwegian': 'DANISH_NORWEGIAN',
+    'danish': 'DANISH_NORWEGIAN',
+    'finnish': 'FINNISH',
+    'icelandic': 'ICELANDIC',
+    'maori': 'MAORI',
+    'māori': 'MAORI',
+    'chinese': 'CHINESE_COMMON',
+    'mandarin': 'CHINESE_COMMON',
+    'japanese': 'JAPANESE',
+    'korean': 'KOREAN',
+    'tamil': 'TAMIL',
+    'malay': 'STANDARD_LATIN', // Malay uses standard Latin alphabet
+    'irish': 'IRISH',
+    'gaelic': 'SCOTTISH_GAELIC',
+    'scottish gaelic': 'SCOTTISH_GAELIC',
+    'scottish': 'SCOTTISH_GAELIC',
+  };
+  
+  return suggestions[language.toLowerCase()] || 'STANDARD_LATIN';
+}

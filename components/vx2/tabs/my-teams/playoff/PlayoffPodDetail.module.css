@@ -1,0 +1,350 @@
+/* PlayoffPodDetail.module.css */
+
+/* Container */
+.container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background-color: var(--bg-primary);
+}
+
+/* Header */
+.header {
+  background-color: var(--bg-secondary);
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.headerTop {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.backButton {
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  cursor: pointer;
+  padding: var(--spacing-sm);
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-md);
+  transition: background-color 0.15s ease;
+}
+
+.backButton:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.headerInfo {
+  flex: 1;
+}
+
+.headerTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.podName {
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.weekBadge {
+  padding: calc(var(--spacing-xs) - 3px) calc(var(--spacing-sm) + 2px);
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.headerDescription {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* User Status Summary */
+.statusSummary {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  margin-top: calc(var(--spacing-md) + 2px);
+  padding: var(--spacing-md) calc(var(--spacing-md) - 2px);
+  border-radius: var(--radius-md);
+}
+
+.statusSummaryAdvancing {
+  composes: statusSummary;
+  background-color: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.statusSummaryEliminated {
+  composes: statusSummary;
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.statusItem {
+  display: flex;
+  flex-direction: column;
+}
+
+.statusLabel {
+  color: var(--text-muted);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.statusValue {
+  font-size: 24px;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.statusValueAdvancing {
+  composes: statusValue;
+  color: var(--color-green);
+}
+
+.statusValueEliminated {
+  composes: statusValue;
+  color: var(--color-red);
+}
+
+.statusValueNeutral {
+  composes: statusValue;
+  color: var(--text-primary);
+}
+
+.statusValueSecondary {
+  composes: statusValue;
+  font-size: 18px;
+  color: var(--text-secondary);
+}
+
+.statusDivider {
+  width: 1px;
+  height: 36px;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Standings Table Header */
+.tableHeader {
+  display: flex;
+  align-items: center;
+  padding: calc(var(--spacing-sm) + 2px) calc(var(--spacing-md) - 2px);
+  background-color: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-lighter);
+}
+
+.rankColumnSpacer {
+  width: 28px;
+}
+
+.teamColumn {
+  flex: 1;
+  margin-left: 12px;
+}
+
+.sortHeader {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  padding: 0;
+  width: var(--header-width, auto);
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: color 0.15s ease;
+}
+
+.sortHeaderActive {
+  composes: sortHeader;
+  color: var(--color-blue-light);
+}
+
+.sortHeaderLeft {
+  justify-content: flex-start;
+}
+
+.sortHeaderCenter {
+  justify-content: center;
+}
+
+.sortHeaderIcon {
+  width: 8px;
+  height: 8px;
+  stroke-width: 3;
+  transform: rotate(0deg);
+  transition: transform 0.15s ease;
+}
+
+.sortHeaderIconRotated {
+  transform: rotate(180deg);
+}
+
+.chevronSpacer {
+  width: 22px;
+}
+
+/* Standings List */
+.standings {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.standings::-webkit-scrollbar {
+  display: none;
+}
+
+/* Team Row */
+.teamRow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-md) calc(var(--spacing-md) - 2px);
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border-lightest);
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.15s ease;
+}
+
+.teamRowUserTeam {
+  composes: teamRow;
+  background-color: rgba(59, 130, 246, 0.12);
+  cursor: default;
+}
+
+.teamRowOpponent:hover {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+/* Rank Badge */
+.rankBadge {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.rankBadgeAdvancing {
+  composes: rankBadge;
+  background-color: var(--color-green);
+}
+
+.rankBadgeEliminated {
+  composes: rankBadge;
+  background-color: #374151;
+}
+
+/* Team Info */
+.teamInfo {
+  flex: 1;
+  margin-left: var(--spacing-md);
+  min-width: 0;
+}
+
+.teamNameContainer {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.teamName {
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.teamNameUserTeam {
+  composes: teamName;
+  color: var(--color-blue-light);
+  font-weight: 600;
+}
+
+.youBadge {
+  padding: calc(var(--spacing-xs) - 3px) calc(var(--spacing-xs) - 3px);
+  background-color: var(--color-blue);
+  border-radius: var(--radius-sm);
+  font-size: 9px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+/* Points Display */
+.currentPoints {
+  width: 65px;
+  text-align: right;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.bestCasePoints {
+  width: 65px;
+  text-align: right;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Overlap Badge */
+.overlapColumn {
+  width: 40px;
+  text-align: center;
+  margin-left: var(--spacing-sm);
+}
+
+.overlapBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background-color: rgba(251, 191, 37, 0.2);
+  color: var(--color-yellow);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.overlapEmpty {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+/* Chevron */
+.chevronColumn {
+  margin-left: var(--spacing-sm);
+}
+
+/* Bottom Padding */
+.bottomPadding {
+  height: var(--spacing-2xl);
+}

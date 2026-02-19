@@ -1,0 +1,227 @@
+{{- if .Values.vllm.enabled }}
+---
+# vLLM Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "topdog-studio.fullname" . }}-vllm
+  labels:
+    {{- include "topdog-studio.labels" . | nindent 4 }}
+    app.kubernetes.io/component: vllm
+spec:
+  replicas: {{ .Values.vllm.replicas }}
+  selector:
+    matchLabels:
+      {{- include "topdog-studio.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: vllm
+  template:
+    metadata:
+      labels:
+        {{- include "topdog-studio.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: vllm
+    spec:
+      restartPolicy: Always
+      serviceAccountName: {{ include "topdog-studio.serviceAccountName" . }}
+
+      # GPU scheduling
+      {{- if .Values.vllm.gpu.enabled }}
+      nodeSelector:
+        accelerator: nvidia-gpu
+      {{- end }}
+
+      containers:
+      - name: vllm
+        image: "{{ .Values.vllm.image.repository }}:{{ .Values.vllm.image.tag }}"
+        imagePullPolicy: {{ .Values.vllm.image.pullPolicy }}
+
+        ports:
+        - name: http
+          containerPort: {{ .Values.vllm.service.targetPort }}
+          protocol: TCP
+
+        # Environment variables
+        env:
+        - name: MODEL_NAME
+          value: {{ .Values.model.repository }}
+        - name: HF_REVISION
+          value: {{ .Values.model.revision }}
+        - name: QUANTIZATION
+          value: {{ .Values.model.quantization }}
+        - name: DTYPE
+          value: {{ .Values.model.dtype }}
+        - name: MAX_MODEL_LEN
+          value: "{{ .Values.model.maxModelLen }}"
+        - name: GPU_MEMORY_UTILIZATION
+          value: "{{ .Values.model.gpuMemoryUtilization }}"
+        - name: MAX_BATCH_SIZE
+          value: "{{ .Values.model.maxBatchSize }}"
+        - name: LOAD_FORMAT
+          value: {{ .Values.model.loadFormat }}
+        - name: TOKENIZER_MODE
+          value: "auto"
+        - name: TRUST_REMOTE_CODE
+          value: "true"
+
+        # Resource requests and limits
+        resources:
+          {{- toYaml .Values.vllm.resources | nindent 12 }}
+
+        # GPU resource specification
+        {{- if .Values.vllm.gpu.enabled }}
+          limits:
+            nvidia.com/gpu: {{ .Values.vllm.gpu.count }}
+        {{- end }}
+
+        # Startup probe
+        {{- with .Values.vllm.startupProbe }}
+        startupProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: {{ .initialDelaySeconds }}
+          periodSeconds: {{ .periodSeconds }}
+          timeoutSeconds: {{ .timeoutSeconds }}
+          failureThreshold: {{ .failureThreshold }}
+        {{- end }}
+
+        # Liveness probe
+        {{- with .Values.vllm.livenessProbe }}
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: {{ .initialDelaySeconds }}
+          periodSeconds: {{ .periodSeconds }}
+          timeoutSeconds: {{ .timeoutSeconds }}
+          failureThreshold: {{ .failureThreshold }}
+        {{- end }}
+
+        # Volume mounts
+        volumeMounts:
+        - name: models
+          mountPath: /models
+        - name: cache
+          mountPath: /cache
+        - name: huggingface-cache
+          mountPath: /root/.cache/huggingface
+
+      # LiteLLM Sidecar Container
+      {{- if .Values.litellm.enabled }}
+      - name: litellm-proxy
+        image: "{{ .Values.litellm.image.repository }}:{{ .Values.litellm.image.tag }}"
+        imagePullPolicy: {{ .Values.litellm.image.pullPolicy }}
+
+        ports:
+        - name: litellm-http
+          containerPort: {{ .Values.litellm.service.targetPort }}
+          protocol: TCP
+
+        env:
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.security.secrets.liteLLMKey.name }}
+              key: {{ .Values.security.secrets.liteLLMKey.key }}
+        - name: LITELLM_LOG
+          value: "DEBUG"
+
+        resources:
+          {{- toYaml .Values.litellm.resources | nindent 12 }}
+
+        volumeMounts:
+        - name: litellm-config
+          mountPath: /app/config
+
+      {{- end }}
+
+      # Prometheus monitoring sidecar (optional)
+      {{- if .Values.monitoring.prometheus.enabled }}
+      - name: prometheus-proxy
+        image: prometheuscommunity/prom-label-proxy:v0.5.0
+        ports:
+        - name: metrics
+          containerPort: 8080
+
+        args:
+        - --upstream=http://localhost:{{ .Values.vllm.service.targetPort }}
+        - --upstream-header=X-Prometheus-Scrape-Timeout
+        - --label=instance=vllm
+        - --listen-address=0.0.0.0:8080
+
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "200m"
+      {{- end }}
+
+      # Volumes
+      volumes:
+      - name: models
+        persistentVolumeClaim:
+          claimName: {{ include "topdog-studio.fullname" . }}-models
+      - name: cache
+        persistentVolumeClaim:
+          claimName: {{ include "topdog-studio.fullname" . }}-cache
+      - name: huggingface-cache
+        emptyDir: {}
+      {{- if .Values.litellm.enabled }}
+      - name: litellm-config
+        configMap:
+          name: {{ include "topdog-studio.fullname" . }}-litellm-config
+      {{- end }}
+
+---
+# vLLM Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "topdog-studio.fullname" . }}-vllm
+  labels:
+    {{- include "topdog-studio.labels" . | nindent 4 }}
+    app.kubernetes.io/component: vllm
+spec:
+  type: {{ .Values.vllm.service.type }}
+  ports:
+  - port: {{ .Values.vllm.service.port }}
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    {{- include "topdog-studio.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: vllm
+
+---
+# Persistent Volume Claims
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "topdog-studio.fullname" . }}-models
+  labels:
+    {{- include "topdog-studio.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: {{ .Values.storage.class }}
+  resources:
+    requests:
+      storage: {{ .Values.storage.models.size }}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "topdog-studio.fullname" . }}-cache
+  labels:
+    {{- include "topdog-studio.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: {{ .Values.storage.class }}
+  resources:
+    requests:
+      storage: {{ .Values.storage.cache.size }}
+
+{{- end }}

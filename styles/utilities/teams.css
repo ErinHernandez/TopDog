@@ -1,0 +1,233 @@
+/**
+ * NFL Team Color Utility Classes
+ *
+ * Static CSS classes for all 32 NFL teams.
+ * Use data-team attribute for dynamic team styling.
+ *
+ * @example
+ * // BEFORE (violates static CSS directive)
+ * <div style={{ backgroundColor: NFL_TEAM_COLORS[team][0] }}>
+ *
+ * // AFTER (compliant) - Option A: Direct class
+ * <div className="bg-team-kc-primary">
+ *
+ * // AFTER (compliant) - Option B: Data attribute (for dynamic teams)
+ * <div className="bg-team-primary" data-team="KC">
+ */
+
+/* ============================================================================
+   DATA ATTRIBUTE SELECTORS (for dynamic team assignment)
+   Use: <div className="bg-team-primary" data-team="KC">
+   ============================================================================ */
+[data-team="ARI"] { --team-primary: var(--team-ari-primary); --team-secondary: var(--team-ari-secondary); }
+[data-team="ATL"] { --team-primary: var(--team-atl-primary); --team-secondary: var(--team-atl-secondary); }
+[data-team="BAL"] { --team-primary: var(--team-bal-primary); --team-secondary: var(--team-bal-secondary); }
+[data-team="BUF"] { --team-primary: var(--team-buf-primary); --team-secondary: var(--team-buf-secondary); }
+[data-team="CAR"] { --team-primary: var(--team-car-primary); --team-secondary: var(--team-car-secondary); }
+[data-team="CHI"] { --team-primary: var(--team-chi-primary); --team-secondary: var(--team-chi-secondary); }
+[data-team="CIN"] { --team-primary: var(--team-cin-primary); --team-secondary: var(--team-cin-secondary); }
+[data-team="CLE"] { --team-primary: var(--team-cle-primary); --team-secondary: var(--team-cle-secondary); }
+[data-team="DAL"] { --team-primary: var(--team-dal-primary); --team-secondary: var(--team-dal-secondary); }
+[data-team="DEN"] { --team-primary: var(--team-den-primary); --team-secondary: var(--team-den-secondary); }
+[data-team="DET"] { --team-primary: var(--team-det-primary); --team-secondary: var(--team-det-secondary); }
+[data-team="GB"] { --team-primary: var(--team-gb-primary); --team-secondary: var(--team-gb-secondary); }
+[data-team="HOU"] { --team-primary: var(--team-hou-primary); --team-secondary: var(--team-hou-secondary); }
+[data-team="IND"] { --team-primary: var(--team-ind-primary); --team-secondary: var(--team-ind-secondary); }
+[data-team="JAX"] { --team-primary: var(--team-jax-primary); --team-secondary: var(--team-jax-secondary); }
+[data-team="KC"] { --team-primary: var(--team-kc-primary); --team-secondary: var(--team-kc-secondary); }
+[data-team="LV"] { --team-primary: var(--team-lv-primary); --team-secondary: var(--team-lv-secondary); }
+[data-team="LAC"] { --team-primary: var(--team-lac-primary); --team-secondary: var(--team-lac-secondary); }
+[data-team="LAR"] { --team-primary: var(--team-lar-primary); --team-secondary: var(--team-lar-secondary); }
+[data-team="MIA"] { --team-primary: var(--team-mia-primary); --team-secondary: var(--team-mia-secondary); }
+[data-team="MIN"] { --team-primary: var(--team-min-primary); --team-secondary: var(--team-min-secondary); }
+[data-team="NE"] { --team-primary: var(--team-ne-primary); --team-secondary: var(--team-ne-secondary); }
+[data-team="NO"] { --team-primary: var(--team-no-primary); --team-secondary: var(--team-no-secondary); }
+[data-team="NYG"] { --team-primary: var(--team-nyg-primary); --team-secondary: var(--team-nyg-secondary); }
+[data-team="NYJ"] { --team-primary: var(--team-nyj-primary); --team-secondary: var(--team-nyj-secondary); }
+[data-team="PHI"] { --team-primary: var(--team-phi-primary); --team-secondary: var(--team-phi-secondary); }
+[data-team="PIT"] { --team-primary: var(--team-pit-primary); --team-secondary: var(--team-pit-secondary); }
+[data-team="SF"] { --team-primary: var(--team-sf-primary); --team-secondary: var(--team-sf-secondary); }
+[data-team="SEA"] { --team-primary: var(--team-sea-primary); --team-secondary: var(--team-sea-secondary); }
+[data-team="TB"] { --team-primary: var(--team-tb-primary); --team-secondary: var(--team-tb-secondary); }
+[data-team="TEN"] { --team-primary: var(--team-ten-primary); --team-secondary: var(--team-ten-secondary); }
+[data-team="WAS"] { --team-primary: var(--team-was-primary); --team-secondary: var(--team-was-secondary); }
+
+/* Generic team color classes (use with data-team attribute) */
+.bg-team-primary { background-color: var(--team-primary); }
+.bg-team-secondary { background-color: var(--team-secondary); }
+.text-team-primary { color: var(--team-primary); }
+.text-team-secondary { color: var(--team-secondary); }
+.border-team-primary { border-color: var(--team-primary); }
+.border-team-secondary { border-color: var(--team-secondary); }
+
+/* Team gradient (primary to secondary) */
+.gradient-team {
+  background: linear-gradient(135deg, var(--team-primary) 0%, var(--team-secondary) 100%);
+}
+.gradient-team-vertical {
+  background: linear-gradient(180deg, var(--team-primary) 0%, var(--team-secondary) 100%);
+}
+
+/* ============================================================================
+   DIRECT TEAM CLASSES (when team is known at build time)
+   ============================================================================ */
+
+/* Arizona Cardinals */
+.bg-team-ari-primary { background-color: var(--team-ari-primary); }
+.bg-team-ari-secondary { background-color: var(--team-ari-secondary); }
+.text-team-ari { color: var(--team-ari-primary); }
+
+/* Atlanta Falcons */
+.bg-team-atl-primary { background-color: var(--team-atl-primary); }
+.bg-team-atl-secondary { background-color: var(--team-atl-secondary); }
+.text-team-atl { color: var(--team-atl-primary); }
+
+/* Baltimore Ravens */
+.bg-team-bal-primary { background-color: var(--team-bal-primary); }
+.bg-team-bal-secondary { background-color: var(--team-bal-secondary); }
+.text-team-bal { color: var(--team-bal-primary); }
+
+/* Buffalo Bills */
+.bg-team-buf-primary { background-color: var(--team-buf-primary); }
+.bg-team-buf-secondary { background-color: var(--team-buf-secondary); }
+.text-team-buf { color: var(--team-buf-primary); }
+
+/* Carolina Panthers */
+.bg-team-car-primary { background-color: var(--team-car-primary); }
+.bg-team-car-secondary { background-color: var(--team-car-secondary); }
+.text-team-car { color: var(--team-car-primary); }
+
+/* Chicago Bears */
+.bg-team-chi-primary { background-color: var(--team-chi-primary); }
+.bg-team-chi-secondary { background-color: var(--team-chi-secondary); }
+.text-team-chi { color: var(--team-chi-primary); }
+
+/* Cincinnati Bengals */
+.bg-team-cin-primary { background-color: var(--team-cin-primary); }
+.bg-team-cin-secondary { background-color: var(--team-cin-secondary); }
+.text-team-cin { color: var(--team-cin-primary); }
+
+/* Cleveland Browns */
+.bg-team-cle-primary { background-color: var(--team-cle-primary); }
+.bg-team-cle-secondary { background-color: var(--team-cle-secondary); }
+.text-team-cle { color: var(--team-cle-primary); }
+
+/* Dallas Cowboys */
+.bg-team-dal-primary { background-color: var(--team-dal-primary); }
+.bg-team-dal-secondary { background-color: var(--team-dal-secondary); }
+.text-team-dal { color: var(--team-dal-primary); }
+
+/* Denver Broncos */
+.bg-team-den-primary { background-color: var(--team-den-primary); }
+.bg-team-den-secondary { background-color: var(--team-den-secondary); }
+.text-team-den { color: var(--team-den-primary); }
+
+/* Detroit Lions */
+.bg-team-det-primary { background-color: var(--team-det-primary); }
+.bg-team-det-secondary { background-color: var(--team-det-secondary); }
+.text-team-det { color: var(--team-det-primary); }
+
+/* Green Bay Packers */
+.bg-team-gb-primary { background-color: var(--team-gb-primary); }
+.bg-team-gb-secondary { background-color: var(--team-gb-secondary); }
+.text-team-gb { color: var(--team-gb-primary); }
+
+/* Houston Texans */
+.bg-team-hou-primary { background-color: var(--team-hou-primary); }
+.bg-team-hou-secondary { background-color: var(--team-hou-secondary); }
+.text-team-hou { color: var(--team-hou-primary); }
+
+/* Indianapolis Colts */
+.bg-team-ind-primary { background-color: var(--team-ind-primary); }
+.bg-team-ind-secondary { background-color: var(--team-ind-secondary); }
+.text-team-ind { color: var(--team-ind-primary); }
+
+/* Jacksonville Jaguars */
+.bg-team-jax-primary { background-color: var(--team-jax-primary); }
+.bg-team-jax-secondary { background-color: var(--team-jax-secondary); }
+.text-team-jax { color: var(--team-jax-primary); }
+
+/* Kansas City Chiefs */
+.bg-team-kc-primary { background-color: var(--team-kc-primary); }
+.bg-team-kc-secondary { background-color: var(--team-kc-secondary); }
+.text-team-kc { color: var(--team-kc-primary); }
+
+/* Las Vegas Raiders */
+.bg-team-lv-primary { background-color: var(--team-lv-primary); }
+.bg-team-lv-secondary { background-color: var(--team-lv-secondary); }
+.text-team-lv { color: var(--team-lv-primary); }
+
+/* Los Angeles Chargers */
+.bg-team-lac-primary { background-color: var(--team-lac-primary); }
+.bg-team-lac-secondary { background-color: var(--team-lac-secondary); }
+.text-team-lac { color: var(--team-lac-primary); }
+
+/* Los Angeles Rams */
+.bg-team-lar-primary { background-color: var(--team-lar-primary); }
+.bg-team-lar-secondary { background-color: var(--team-lar-secondary); }
+.text-team-lar { color: var(--team-lar-primary); }
+
+/* Miami Dolphins */
+.bg-team-mia-primary { background-color: var(--team-mia-primary); }
+.bg-team-mia-secondary { background-color: var(--team-mia-secondary); }
+.text-team-mia { color: var(--team-mia-primary); }
+
+/* Minnesota Vikings */
+.bg-team-min-primary { background-color: var(--team-min-primary); }
+.bg-team-min-secondary { background-color: var(--team-min-secondary); }
+.text-team-min { color: var(--team-min-primary); }
+
+/* New England Patriots */
+.bg-team-ne-primary { background-color: var(--team-ne-primary); }
+.bg-team-ne-secondary { background-color: var(--team-ne-secondary); }
+.text-team-ne { color: var(--team-ne-primary); }
+
+/* New Orleans Saints */
+.bg-team-no-primary { background-color: var(--team-no-primary); }
+.bg-team-no-secondary { background-color: var(--team-no-secondary); }
+.text-team-no { color: var(--team-no-primary); }
+
+/* New York Giants */
+.bg-team-nyg-primary { background-color: var(--team-nyg-primary); }
+.bg-team-nyg-secondary { background-color: var(--team-nyg-secondary); }
+.text-team-nyg { color: var(--team-nyg-primary); }
+
+/* New York Jets */
+.bg-team-nyj-primary { background-color: var(--team-nyj-primary); }
+.bg-team-nyj-secondary { background-color: var(--team-nyj-secondary); }
+.text-team-nyj { color: var(--team-nyj-primary); }
+
+/* Philadelphia Eagles */
+.bg-team-phi-primary { background-color: var(--team-phi-primary); }
+.bg-team-phi-secondary { background-color: var(--team-phi-secondary); }
+.text-team-phi { color: var(--team-phi-primary); }
+
+/* Pittsburgh Steelers */
+.bg-team-pit-primary { background-color: var(--team-pit-primary); }
+.bg-team-pit-secondary { background-color: var(--team-pit-secondary); }
+.text-team-pit { color: var(--team-pit-primary); }
+
+/* San Francisco 49ers */
+.bg-team-sf-primary { background-color: var(--team-sf-primary); }
+.bg-team-sf-secondary { background-color: var(--team-sf-secondary); }
+.text-team-sf { color: var(--team-sf-primary); }
+
+/* Seattle Seahawks */
+.bg-team-sea-primary { background-color: var(--team-sea-primary); }
+.bg-team-sea-secondary { background-color: var(--team-sea-secondary); }
+.text-team-sea { color: var(--team-sea-primary); }
+
+/* Tampa Bay Buccaneers */
+.bg-team-tb-primary { background-color: var(--team-tb-primary); }
+.bg-team-tb-secondary { background-color: var(--team-tb-secondary); }
+.text-team-tb { color: var(--team-tb-primary); }
+
+/* Tennessee Titans */
+.bg-team-ten-primary { background-color: var(--team-ten-primary); }
+.bg-team-ten-secondary { background-color: var(--team-ten-secondary); }
+.text-team-ten { color: var(--team-ten-primary); }
+
+/* Washington Commanders */
+.bg-team-was-primary { background-color: var(--team-was-primary); }
+.bg-team-was-secondary { background-color: var(--team-was-secondary); }
+.text-team-was { color: var(--team-was-primary); }

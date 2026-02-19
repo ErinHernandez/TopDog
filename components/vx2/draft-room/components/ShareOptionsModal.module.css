@@ -1,0 +1,232 @@
+/**
+ * ShareOptionsModal - iOS-style share sheet styles
+ * CSP-compliant styling using CSS Modules and CSS custom properties
+ */
+
+/* ============================================================================
+   CUSTOM PROPERTIES - iOS Share Sheet Colors
+   ============================================================================ */
+
+/* ============================================================================
+   MODAL BACKDROP
+   ============================================================================ */
+
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background-color: var(--ios-backdrop);
+  z-index: 9999;
+  pointer-events: auto;
+}
+
+/* ============================================================================
+   BOTTOM SHEET
+   ============================================================================ */
+
+.sheet {
+  width: 100%;
+  max-width: 428px;
+  background-color: var(--ios-sheet-bg);
+  border-top-left-radius: 14px;
+  border-top-right-radius: 14px;
+  padding-bottom: max(env(safe-area-inset-bottom), 20px);
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  pointer-events: auto;
+}
+
+.sheet.animating {
+  transform: translateY(0);
+}
+
+.sheet.hidden {
+  transform: translateY(100%);
+}
+
+/* ============================================================================
+   DRAG HANDLE
+   ============================================================================ */
+
+.handleContainer {
+  display: flex;
+  justify-content: center;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.handle {
+  width: 36px;
+  height: 5px;
+  background-color: var(--ios-handle-bar);
+  border-radius: 2.5px;
+}
+
+/* ============================================================================
+   HEADER
+   ============================================================================ */
+
+.header {
+  padding: 8px 16px 16px;
+  border-bottom: 0.5px solid var(--ios-header-border);
+}
+
+.headerTitle {
+  font-size: 13px;
+  color: var(--ios-subtitle);
+  text-align: center;
+  margin: 0;
+}
+
+/* ============================================================================
+   APP ICONS ROW
+   ============================================================================ */
+
+.appIconsRow {
+  display: flex;
+  gap: 16px;
+  padding: 20px 20px 24px;
+  justify-content: center;
+  border-bottom: 0.5px solid var(--ios-header-border);
+}
+
+/* App Icon Button */
+
+.appIconButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  min-width: 60px;
+  opacity: 1;
+  transition: opacity 0.2s;
+}
+
+.appIconButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Icon Circle Container */
+
+.iconCircle {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.iconCircle.messagesIcon {
+  background-color: var(--ios-app-icon-messages);
+}
+
+.iconCircle.mailIcon {
+  background-color: var(--ios-app-icon-mail);
+}
+
+.iconCircle.copyIcon {
+  background-color: var(--ios-app-icon-copy);
+}
+
+.iconCircle.imageIcon {
+  background-color: var(--ios-app-icon-image);
+}
+
+.iconCircle.moreIcon {
+  background-color: var(--ios-app-icon-more);
+}
+
+.iconCircle.successIcon {
+  background-color: var(--ios-success-check);
+}
+
+/* Icon Label */
+
+.iconLabel {
+  font-size: 11px;
+  color: var(--ios-title);
+  text-align: center;
+  line-height: 1.2;
+  max-width: 60px;
+}
+
+/* ============================================================================
+   ACTIONS LIST
+   ============================================================================ */
+
+.actionsList {
+  padding: 12px 12px 8px;
+}
+
+.actionRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 14px 16px;
+  background-color: var(--ios-action-bg);
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.1s;
+  font-size: 17px;
+  color: var(--ios-action-text);
+}
+
+.actionRow:active,
+.actionRowActive {
+  background-color: var(--ios-action-bg-active);
+}
+
+.actionRow.firstRow {
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+.actionRow.lastRow {
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  border-bottom: none;
+}
+
+.actionRow:not(.lastRow) {
+  border-bottom: 0.5px solid var(--ios-action-border);
+}
+
+.actionRowText {
+  font-size: 17px;
+  color: var(--ios-action-text);
+}
+
+/* ============================================================================
+   CANCEL BUTTON
+   ============================================================================ */
+
+.cancelContainer {
+  padding: 4px 12px 0;
+}
+
+.cancelButton {
+  width: 100%;
+  padding: 14px 16px;
+  background-color: var(--ios-action-bg);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.cancelButtonText {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ios-cancel-text);
+}

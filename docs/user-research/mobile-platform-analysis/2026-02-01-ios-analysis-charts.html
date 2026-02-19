@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iPhone & iOS Version Analysis - Enterprise Report</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #fff;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d4ff, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .subtitle {
+            text-align: center;
+            color: #94a3b8;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        .chart-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .chart-card h2 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .chart-card h2::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(180deg, #00d4ff, #7c3aed);
+            border-radius: 2px;
+        }
+        .chart-container {
+            position: relative;
+            height: 350px;
+        }
+        .chart-container.tall {
+            height: 450px;
+        }
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #00d4ff, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .stat-label {
+            color: #94a3b8;
+            margin-top: 5px;
+            font-size: 0.9rem;
+        }
+        .legend-note {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.85rem;
+            margin-top: 40px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+        }
+        @media (max-width: 600px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>iPhone & iOS Version Analysis</h1>
+        <p class="subtitle">Enterprise Decision Report | Data as of January 2026</p>
+
+        <!-- Key Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">89.5%</div>
+                <div class="stat-label">iOS 17+ Coverage</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">1.5B</div>
+                <div class="stat-label">Global iPhone Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">3.2yr</div>
+                <div class="stat-label">Avg Upgrade Cycle</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">60%</div>
+                <div class="stat-label">iOS 18.x Adoption</div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <!-- iOS Version Distribution -->
+            <div class="chart-card">
+                <h2>Global iOS Version Distribution</h2>
+                <div class="chart-container">
+                    <canvas id="iosVersionChart"></canvas>
+                </div>
+            </div>
+
+            <!-- iPhone Market Share by Country -->
+            <div class="chart-card">
+                <h2>iPhone Market Share by Country</h2>
+                <div class="chart-container">
+                    <canvas id="countryShareChart"></canvas>
+                </div>
+            </div>
+
+            <!-- iPhone Model Distribution -->
+            <div class="chart-card">
+                <h2>iPhone Model Distribution (Active Devices)</h2>
+                <div class="chart-container">
+                    <canvas id="modelChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Min iOS Coverage -->
+            <div class="chart-card">
+                <h2>Minimum iOS Target Coverage</h2>
+                <div class="chart-container">
+                    <canvas id="coverageChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Regional iOS vs Android -->
+            <div class="chart-card full-width">
+                <h2>iOS vs Android Market Share by Region</h2>
+                <div class="chart-container">
+                    <canvas id="regionalChart"></canvas>
+                </div>
+            </div>
+
+            <!-- iOS Version by Region -->
+            <div class="chart-card full-width">
+                <h2>iOS Version Adoption by Region</h2>
+                <div class="chart-container tall">
+                    <canvas id="regionVersionChart"></canvas>
+                </div>
+            </div>
+
+            <!-- User Demographics -->
+            <div class="chart-card">
+                <h2>iOS vs Android by Demographics</h2>
+                <div class="chart-container">
+                    <canvas id="demographicsChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Device Age Distribution -->
+            <div class="chart-card">
+                <h2>Device Age Distribution</h2>
+                <div class="chart-container">
+                    <canvas id="deviceAgeChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="legend-note">
+            Data sources: TelemetryDeck (16M MAU), StatCounter, Counterpoint Research, IDC, CIRP, Apple Developer<br>
+            Note: Regional variations may differ based on enterprise vs consumer segments
+        </div>
+    </div>
+
+    <script>
+        // Color palette
+        const colors = {
+            primary: '#00d4ff',
+            secondary: '#7c3aed',
+            success: '#10b981',
+            warning: '#f59e0b',
+            danger: '#ef4444',
+            info: '#3b82f6',
+            gradient: ['#00d4ff', '#06b6d4', '#0891b2', '#0e7490', '#155e75', '#164e63', '#134e4a', '#115e59', '#047857', '#065f46']
+        };
+
+        const chartColors = [
+            'rgba(0, 212, 255, 0.8)',
+            'rgba(124, 58, 237, 0.8)',
+            'rgba(16, 185, 129, 0.8)',
+            'rgba(245, 158, 11, 0.8)',
+            'rgba(239, 68, 68, 0.8)',
+            'rgba(59, 130, 246, 0.8)',
+            'rgba(236, 72, 153, 0.8)',
+            'rgba(168, 85, 247, 0.8)',
+            'rgba(34, 211, 238, 0.8)',
+            'rgba(74, 222, 128, 0.8)'
+        ];
+
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
+
+        // 1. iOS Version Distribution (Doughnut)
+        new Chart(document.getElementById('iosVersionChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['iOS 18.7', 'iOS 18.6', 'iOS 26.1', 'iOS 18.5', 'iOS 16.7', 'iOS 26.2', 'iOS 15.8', 'Other'],
+                datasets: [{
+                    data: [30.3, 29.8, 10.7, 6.0, 2.3, 2.0, 1.8, 17.1],
+                    backgroundColor: chartColors,
+                    borderWidth: 0,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: { padding: 15, usePointStyle: true }
+                    }
+                },
+                cutout: '60%'
+            }
+        });
+
+        // 2. iPhone Market Share by Country (Horizontal Bar)
+        new Chart(document.getElementById('countryShareChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Japan', 'Denmark', 'USA', 'Canada', 'UK', 'Europe (avg)', 'South Korea', 'China', 'Africa', 'India'],
+                datasets: [{
+                    label: 'iPhone Market Share %',
+                    data: [61, 63, 55, 60, 45, 39, 28, 23, 15, 10],
+                    backgroundColor: chartColors,
+                    borderRadius: 6,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: {
+                        max: 100,
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        ticks: { callback: v => v + '%' }
+                    },
+                    y: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // 3. iPhone Model Distribution (Bar)
+        new Chart(document.getElementById('modelChart'), {
+            type: 'bar',
+            data: {
+                labels: ['iPhone 13', 'iPhone 15', 'iPhone 16 Pro', 'iPhone 14', 'iPhone 15 Pro', 'iPhone 15 Pro Max', 'iPhone 16 Pro Max', 'iPhone 12', 'iPhone 11', 'iPhone SE'],
+                datasets: [{
+                    label: 'Market Share %',
+                    data: [15.29, 11.68, 11.55, 9.5, 9.0, 8.5, 8.0, 7.0, 5.0, 4.0],
+                    backgroundColor: 'rgba(0, 212, 255, 0.7)',
+                    borderColor: 'rgba(0, 212, 255, 1)',
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        ticks: { callback: v => v + '%' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { maxRotation: 45, minRotation: 45 }
+                    }
+                }
+            }
+        });
+
+        // 4. Min iOS Coverage (Horizontal Bar)
+        new Chart(document.getElementById('coverageChart'), {
+            type: 'bar',
+            data: {
+                labels: ['iOS 15+ (Legacy)', 'iOS 16+ (Max Reach)', 'iOS 17+ (Recommended)', 'iOS 18+ (Latest)'],
+                datasets: [{
+                    label: 'Device Coverage %',
+                    data: [96.8, 94.1, 89.5, 84.9],
+                    backgroundColor: [
+                        'rgba(239, 68, 68, 0.7)',
+                        'rgba(245, 158, 11, 0.7)',
+                        'rgba(16, 185, 129, 0.7)',
+                        'rgba(59, 130, 246, 0.7)'
+                    ],
+                    borderRadius: 6,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: {
+                        min: 80,
+                        max: 100,
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        ticks: { callback: v => v + '%' }
+                    },
+                    y: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // 5. Regional iOS vs Android (Stacked Bar)
+        new Chart(document.getElementById('regionalChart'), {
+            type: 'bar',
+            data: {
+                labels: ['North America', 'Japan', 'Western Europe', 'South Korea', 'China', 'Latin America', 'Southeast Asia', 'Africa'],
+                datasets: [
+                    {
+                        label: 'iOS',
+                        data: [55, 61, 39, 28, 23, 20, 15, 15],
+                        backgroundColor: 'rgba(0, 212, 255, 0.8)',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Android',
+                        data: [45, 39, 61, 72, 77, 80, 85, 85],
+                        backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                        borderRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: { usePointStyle: true, padding: 20 }
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: true,
+                        grid: { display: false }
+                    },
+                    y: {
+                        stacked: true,
+                        max: 100,
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        ticks: { callback: v => v + '%' }
+                    }
+                }
+            }
+        });
+
+        // 6. iOS Version by Region (Grouped Bar)
+        new Chart(document.getElementById('regionVersionChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Global', 'Europe', 'North America', 'China', 'India'],
+                datasets: [
+                    {
+                        label: 'iOS 18.x',
+                        data: [68, 72, 70, 45, 78],
+                        backgroundColor: 'rgba(0, 212, 255, 0.8)',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'iOS 26.x',
+                        data: [14, 13, 16, 8, 5],
+                        backgroundColor: 'rgba(124, 58, 237, 0.8)',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'iOS 17.x',
+                        data: [8, 7, 6, 22, 8],
+                        backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'iOS 16 & older',
+                        data: [10, 8, 8, 25, 9],
+                        backgroundColor: 'rgba(245, 158, 11, 0.8)',
+                        borderRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: { usePointStyle: true, padding: 15 }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false }
+                    },
+                    y: {
+                        max: 80,
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        ticks: { callback: v => v + '%' }
+                    }
+                }
+            }
+        });
+
+        // 7. User Demographics (Radar)
+        new Chart(document.getElementById('demographicsChart'), {
+            type: 'radar',
+            data: {
+                labels: ['Income >$50K', 'College Educated', 'Urban', 'Age 18-34', 'Tech Industry'],
+                datasets: [
+                    {
+                        label: 'iOS Users',
+                        data: [61, 55, 58, 52, 60],
+                        backgroundColor: 'rgba(0, 212, 255, 0.2)',
+                        borderColor: 'rgba(0, 212, 255, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(0, 212, 255, 1)'
+                    },
+                    {
+                        label: 'Android Users',
+                        data: [39, 45, 42, 48, 40],
+                        backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                        borderColor: 'rgba(16, 185, 129, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(16, 185, 129, 1)'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: { usePointStyle: true }
+                    }
+                },
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        max: 70,
+                        grid: { color: 'rgba(255,255,255,0.1)' },
+                        angleLines: { color: 'rgba(255,255,255,0.1)' },
+                        pointLabels: { color: '#94a3b8' },
+                        ticks: { display: false }
+                    }
+                }
+            }
+        });
+
+        // 8. Device Age Distribution (Doughnut)
+        new Chart(document.getElementById('deviceAgeChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['<1 year (2024+)', '1-2 years (2023)', '2-3 years (2022)', '3-4 years (2021)', '4+ years (2020-)'],
+                datasets: [{
+                    data: [25, 30, 20, 15, 10],
+                    backgroundColor: [
+                        'rgba(0, 212, 255, 0.8)',
+                        'rgba(124, 58, 237, 0.8)',
+                        'rgba(16, 185, 129, 0.8)',
+                        'rgba(245, 158, 11, 0.8)',
+                        'rgba(239, 68, 68, 0.8)'
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: { padding: 12, usePointStyle: true }
+                    }
+                },
+                cutout: '55%'
+            }
+        });
+    </script>
+</body>
+</html>

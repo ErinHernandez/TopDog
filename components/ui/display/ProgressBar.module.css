@@ -1,0 +1,100 @@
+/**
+ * ProgressBar CSS Module
+ *
+ * Migrated from inline styles for CSP compliance.
+ * Uses CSS custom properties from tokens.css for colors.
+ */
+
+/* ============================================================================
+   CONTAINER
+   ============================================================================ */
+
+.container {
+  position: relative;
+  overflow: hidden;
+  flex: 1;
+}
+
+.container[data-size="sm"] {
+  height: 4px;
+  border-radius: 2px;
+}
+
+.container[data-size="md"] {
+  height: 8px;
+  border-radius: 4px;
+}
+
+.container[data-size="lg"] {
+  height: 12px;
+  border-radius: 6px;
+}
+
+/* ============================================================================
+   TRACK (background)
+   ============================================================================ */
+
+.track {
+  position: absolute;
+  inset: 0;
+  background-color: var(--progress-bg, rgba(255, 255, 255, 0.1));
+  border-radius: inherit;
+}
+
+/* ============================================================================
+   FILL
+   ============================================================================ */
+
+.fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  transition: width 300ms ease-out;
+  background-color: var(--progress-color, var(--color-state-active));
+  border-radius: inherit;
+}
+
+/* ============================================================================
+   INSIDE LABEL
+   ============================================================================ */
+
+.insideLabel {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+}
+
+.insideLabel[data-invert="true"] {
+  color: #000000;
+}
+
+.insideLabel[data-invert="false"] {
+  color: #ffffff;
+}
+
+/* ============================================================================
+   WITH RIGHT LABEL WRAPPER
+   ============================================================================ */
+
+.withLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+/* ============================================================================
+   RIGHT LABEL
+   ============================================================================ */
+
+.rightLabel {
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  flex-shrink: 0;
+  min-width: 36px;
+  color: var(--text-secondary);
+}

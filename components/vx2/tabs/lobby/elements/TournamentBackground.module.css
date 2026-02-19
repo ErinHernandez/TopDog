@@ -1,0 +1,44 @@
+.container {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-base);
+  border-radius: var(--border-radius, 0px);
+  overflow: hidden;
+}
+
+/* Note: To set border-radius, use inline style with --border-radius CSS variable */
+
+.placeholder {
+  position: absolute;
+  inset: 0;
+  background-image: var(--placeholder-image);
+  background-size: cover;
+  background-position: center;
+  opacity: var(--is-loaded, 0);
+  transition: opacity var(--duration-slow) ease-out;
+}
+
+/* Note: To set is-loaded, use inline style with --is-loaded CSS variable */
+
+.image {
+  position: absolute;
+  inset: 0;
+  background-image: var(--image);
+  background-size: cover;
+  background-position: center;
+  opacity: var(--is-loaded, 0);
+  transition: opacity var(--duration-slow) ease-out;
+}
+
+/* Note: To set is-loaded, use inline style with --is-loaded CSS variable */
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(0, 0, 0, 0.1) 50%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+}

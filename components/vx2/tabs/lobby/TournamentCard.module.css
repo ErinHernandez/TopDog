@@ -1,0 +1,208 @@
+/**
+ * TournamentCard - CSS Module
+ *
+ * Styles for the TournamentCard component.
+ * Uses CSS custom properties from tokens.css for dynamic values.
+ * CSP-compliant: No inline styles.
+ */
+
+/* ============================================================================
+   MAIN CARD
+   ============================================================================ */
+
+.card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: 21px;
+  isolation: isolate;
+}
+
+.card.featured {
+  border-color: var(--color-state-active);
+  border-width: 3px;
+}
+
+/* ============================================================================
+   BACKGROUND LAYERS
+   ============================================================================ */
+
+/* Blur placeholder layer - shows instantly, loads first */
+.blurPlaceholder {
+  position: absolute;
+  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('data:image/webp;base64,UklGRlQAAABXRUJQVlA4IEgAAABwAwCdASoUABsAPyl+uFOuKCWisAwBwCUJZQAAW+q+9Bpo4aAA/uvZ+YkAc4jvVTc7+oJAY99soPLjJTrwm3j5Y3VE0BWmGAA=');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: var(--blur-border-radius);
+  z-index: var(--blur-placeholder-z-index);
+}
+
+/* Full image layer - fades in when loaded */
+.fullImage {
+  position: absolute;
+  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background-image: var(--card-background);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: var(--blur-border-radius);
+  z-index: var(--full-image-z-index);
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+  will-change: opacity;
+  transform: translateZ(0);
+}
+
+.fullImage.loaded {
+  opacity: 1;
+}
+
+/* ============================================================================
+   CONTENT LAYER
+   ============================================================================ */
+
+.contentLayer {
+  position: relative;
+  z-index: var(--content-z-index);
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  justify-content: space-between;
+}
+
+/* ============================================================================
+   TITLE SECTION
+   ============================================================================ */
+
+.titleContainer {
+  margin-top: var(--title-margin-top);
+}
+
+.title {
+  margin: 0;
+  padding: 0;
+  font-size: 32px;
+  font-family: 'Anton SC', sans-serif;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-primary);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+/* ============================================================================
+   SKELETON LOADER
+   ============================================================================ */
+
+.skeleton {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: 21px;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.skeletonTitle {
+  width: 70%;
+  height: 46px;
+  background-color: rgba(255, 255, 255, 0.1);
+  margin: 0 auto;
+  border-radius: 0.375rem;
+  margin-bottom: var(--title-margin-bottom);
+}
+
+.skeletonProgress {
+  margin-bottom: 20px;
+}
+
+.skeletonProgressLabels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.skeletonProgressLabel {
+  width: 80px;
+  height: 14px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 0.375rem;
+}
+
+.skeletonProgressLabelLarge {
+  width: 60px;
+}
+
+.skeletonProgressBar {
+  width: 100%;
+  height: 8px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 0.375rem;
+}
+
+.skeletonButton {
+  width: 100%;
+  height: 57px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 0.375rem;
+  margin-bottom: 20px;
+}
+
+.skeletonStats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+}
+
+.skeletonStatItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.skeletonStatValue {
+  width: 50px;
+  height: 24px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 0.375rem;
+  margin-bottom: 4px;
+}
+
+.skeletonStatLabel {
+  width: 40px;
+  height: 14px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 0.375rem;
+}

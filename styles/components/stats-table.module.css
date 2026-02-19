@@ -1,0 +1,221 @@
+/**
+ * Stats Table - CSS Module
+ *
+ * Shared styles for player stats tables (QB, RB, WR/TE layouts).
+ * Uses CSS Grid instead of absolute positioning for maintainability.
+ *
+ * Usage:
+ * ```tsx
+ * import styles from '@/styles/components/stats-table.module.css';
+ * <div className={styles.statsTable} data-position="qb">
+ * ```
+ */
+
+/* ============================================================================
+   BASE TABLE STRUCTURE
+   ============================================================================ */
+
+.statsTable {
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.statsTable::-webkit-scrollbar {
+  display: none;
+}
+
+.statsTableInner {
+  min-width: var(--stats-table-min-width, 850px);
+}
+
+/* ============================================================================
+   HEADER ROW
+   ============================================================================ */
+
+.statsHeader {
+  display: grid;
+  position: relative;
+  padding: 0;
+  font-weight: 500;
+  font-size: var(--font-size-sm);
+  height: 36px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  color: var(--stats-header-color, var(--color-gray-400));
+}
+
+.statsHeader::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--stats-line-color, #4b5563);
+}
+
+/* ============================================================================
+   DATA ROW
+   ============================================================================ */
+
+.statsRow {
+  display: grid;
+  color: white;
+  font-size: var(--font-size-sm);
+  height: 24px;
+  align-items: center;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* ============================================================================
+   CELL STYLES
+   ============================================================================ */
+
+.cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.cellLeft {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  text-align: left;
+  padding-left: 6px;
+}
+
+/* ============================================================================
+   QB LAYOUT - 16 columns
+   YEAR CMP ATT YDS CMP% AVG TD INT LNG SACK CAR YDS AVG TD LNG FUM
+   ============================================================================ */
+
+.statsTable[data-position="qb"] .statsTableInner {
+  min-width: 726px;
+}
+
+.statsTable[data-position="qb"] .statsHeader,
+.statsTable[data-position="qb"] .statsRow {
+  grid-template-columns:
+    40px  /* YEAR */
+    35px  /* CMP */
+    35px  /* ATT */
+    35px  /* YDS */
+    40px  /* CMP% */
+    35px  /* AVG */
+    30px  /* TD */
+    30px  /* INT */
+    35px  /* LNG */
+    40px  /* SACK */
+    30px  /* CAR */
+    30px  /* YDS */
+    30px  /* AVG */
+    25px  /* TD */
+    30px  /* LNG */
+    30px; /* FUM */
+  padding-left: 6px;
+}
+
+/* ============================================================================
+   RB LAYOUT - 14 columns
+   YEAR CAR YDS AVG TD LNG FUM REC TGTS YDS AVG TD LNG FD
+   ============================================================================ */
+
+.statsTable[data-position="rb"] .statsTableInner {
+  min-width: 587px;
+}
+
+.statsTable[data-position="rb"] .statsHeader,
+.statsTable[data-position="rb"] .statsRow {
+  grid-template-columns:
+    35px  /* YEAR */
+    30px  /* CAR */
+    30px  /* YDS */
+    30px  /* AVG */
+    25px  /* TD */
+    30px  /* LNG */
+    30px  /* FUM */
+    30px  /* REC */
+    35px  /* TGTS */
+    30px  /* YDS */
+    30px  /* AVG */
+    25px  /* TD */
+    30px  /* LNG */
+    25px; /* FD */
+  padding-left: 6px;
+}
+
+/* ============================================================================
+   WR/TE LAYOUT - 14 columns
+   YEAR REC TGTS YDS AVG TD LNG FD CAR YDS AVG TD LNG FUM
+   ============================================================================ */
+
+.statsTable[data-position="wr"],
+.statsTable[data-position="te"] {
+  /* Same as RB layout */
+}
+
+.statsTable[data-position="wr"] .statsTableInner,
+.statsTable[data-position="te"] .statsTableInner {
+  min-width: 587px;
+}
+
+.statsTable[data-position="wr"] .statsHeader,
+.statsTable[data-position="wr"] .statsRow,
+.statsTable[data-position="te"] .statsHeader,
+.statsTable[data-position="te"] .statsRow {
+  grid-template-columns:
+    35px  /* YEAR */
+    30px  /* REC */
+    35px  /* TGTS */
+    30px  /* YDS */
+    30px  /* AVG */
+    25px  /* TD */
+    30px  /* LNG */
+    25px  /* FD */
+    30px  /* CAR */
+    30px  /* YDS */
+    30px  /* AVG */
+    25px  /* TD */
+    30px  /* LNG */
+    30px; /* FUM */
+  padding-left: 6px;
+}
+
+/* ============================================================================
+   DEFAULT/FALLBACK LAYOUT - 6 columns
+   ============================================================================ */
+
+.statsTable[data-position="default"] .statsHeader,
+.statsTable[data-position="default"] .statsRow {
+  grid-template-columns: repeat(6, 1fr);
+}
+
+/* ============================================================================
+   TEAM-SPECIFIC HEADER COLORS
+   For teams with light backgrounds (like DET)
+   ============================================================================ */
+
+.statsTable[data-light-bg="true"] .statsHeader {
+  --stats-header-color: #000000;
+  --stats-line-color: #000000;
+}
+
+/* ============================================================================
+   CONTAINER WRAPPER
+   ============================================================================ */
+
+.statsContainer {
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-top: 0;
+}
+
+.statsRowsWrapper {
+  padding: 0 0 6px 0;
+}

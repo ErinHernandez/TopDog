@@ -1,0 +1,128 @@
+/* ============================================================================
+   PositionNeedsIndicator.module.css
+   Migrated to CSS Modules for CSP compliance
+   ============================================================================ */
+
+/* Main container */
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Section header */
+.header {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ============================================================================
+   NeedPill Component Styles
+   ============================================================================ */
+
+/* Main pill container */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background-color: var(--pill-bg);
+  border: 1px solid var(--pill-border);
+}
+
+/* Position badge inside pill */
+.pillBadge {
+  background-color: var(--position-color);
+  color: var(--position-text-color);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+/* Count text inside pill */
+.pillCount {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+  letter-spacing: 0;
+  color: var(--count-color);
+}
+
+/* ============================================================================
+   PositionRow Component Styles
+   ============================================================================ */
+
+/* Position row flex container */
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Position badge in row */
+.rowBadge {
+  width: 32px;
+  background-color: var(--position-color);
+  color: var(--position-text-color);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 0;
+  border-radius: 4px;
+  text-align: center;
+}
+
+/* Progress bar container */
+.progressContainer {
+  flex: 1;
+}
+
+/* Progress bar background */
+.progressBar {
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+/* Progress bar fill */
+.progressFill {
+  width: var(--progress-width, 0%);
+  height: 100%;
+  background-color: var(--urgency-color);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* Count display in row */
+.rowCount {
+  min-width: 50px;
+  text-align: right;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--urgency-color);
+}
+
+/* ============================================================================
+   Dynamic CSS Custom Properties
+============================================================================ */
+
+.pill {
+  --pill-bg: rgba(255, 255, 255, 0.06);
+  --pill-border: rgba(255, 255, 255, 0.1);
+  --position-color: inherit;
+  --position-text-color: #fff;
+  --count-color: rgba(255, 255, 255, 0.8);
+}
+
+.row {
+  --position-color: inherit;
+  --position-text-color: #fff;
+  --urgency-color: inherit;
+  --progress-width: 0%;
+}

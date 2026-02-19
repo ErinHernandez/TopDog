@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- TopDog Studio — Android Companion Viewer Manifest -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Network permission for WebSocket connection to companion service -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Allow cleartext traffic to localhost (companion service) -->
+    <application
+        android:allowBackup="false"
+        android:label="TopDog Viewer"
+        android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
+        android:theme="@style/Theme.TopDogViewer">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="TopDog Viewer"
+            android:configChanges="orientation|screenSize">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

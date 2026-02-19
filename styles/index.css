@@ -1,0 +1,43 @@
+/**
+ * Main Styles Index
+ *
+ * This file imports all CSS custom properties and utility classes.
+ * Import this single file in _app.tsx to enable the CSS variable system.
+ *
+ * @example
+ * // In _app.tsx
+ * import '@/styles/index.css';
+ */
+
+/* ============================================================================
+   MASTER TOKEN FILE (Single Source of Truth)
+   ============================================================================ */
+
+@import './tokens/_tokens.css';
+
+/* ============================================================================
+   CSS CUSTOM PROPERTIES (Variables) - Component-Specific Overrides
+   These files extend the master tokens with component-specific variables
+   ============================================================================ */
+
+@import './variables/colors.css';
+@import './variables/spacing.css';
+@import './variables/typography.css';
+@import './variables/layout.css';
+@import './variables/animations.css';
+
+/* ============================================================================
+   UTILITY CLASSES - Layout & Display
+   ============================================================================ */
+
+@import './utilities/layout.css';
+@import './utilities/spacing.css';
+@import './utilities/display.css';
+
+/* ============================================================================
+   UTILITY CLASSES - Static Classes (Replaces inline styles)
+   ============================================================================ */
+
+@import './utilities/positions.css';
+@import './utilities/teams.css';
+@import './utilities/dynamic.css';

@@ -1,0 +1,238 @@
+.root {
+  min-height: 100vh;
+  background-color: var(--bg-primary, #1a1f2e);
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  padding-top: 16px;
+}
+
+.previewSection {
+  width: 100%;
+  margin-bottom: 24px;
+  order: -1;
+}
+
+.sectionsContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tabsHeader {
+  display: flex;
+  border-bottom: 1px solid var(--border-light, #334155);
+}
+
+.tabButton {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.2s ease;
+  cursor: pointer;
+  background: none;
+  min-height: 48px;
+  border: none;
+}
+
+.tabButton:hover {
+  opacity: 0.8;
+}
+
+.tabButton.active {
+  border-bottom-color: var(--color-state-info, #3b82f6);
+  color: var(--color-state-info, #3b82f6);
+}
+
+.tabButton:not(.active) {
+  border-bottom-color: transparent;
+  color: var(--text-secondary, #64748b);
+}
+
+.contentSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: var(--text-secondary, #64748b);
+}
+
+.backgroundTypeContainer {
+  display: flex;
+  gap: 8px;
+}
+
+.backgroundTypeButton {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  text-transform: capitalize;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: 1px solid var(--border-default, #334155);
+  min-height: 48px;
+  font-weight: 500;
+}
+
+.backgroundTypeButton.active {
+  background-color: var(--color-state-info, #3b82f6);
+  color: #ffffff;
+}
+
+.backgroundTypeButton:not(.active) {
+  background-color: var(--bg-tertiary, #334155);
+  color: var(--text-secondary, #64748b);
+}
+
+.colorPickerContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.colorInput {
+  width: 64px;
+  height: 40px;
+  border-radius: 4px;
+  border: 1px solid var(--border-default, #334155);
+  cursor: pointer;
+}
+
+.colorValue {
+  font-size: 14px;
+  font-family: monospace;
+  color: var(--text-muted, #475569);
+}
+
+.overlayCheckbox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  min-height: 48px;
+}
+
+.checkboxInput {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  accent-color: var(--color-state-info, #3b82f6);
+  cursor: pointer;
+}
+
+.checkboxLabel {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary, #f1f5f9);
+  cursor: pointer;
+}
+
+.imageSelector {
+  display: flex;
+  gap: 8px;
+}
+
+.imageButton {
+  padding: 12px;
+  border-radius: 8px;
+  border: 2px solid;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  background-color: var(--bg-tertiary, #334155);
+}
+
+.imageButton.active {
+  border-color: var(--color-state-info, #3b82f6);
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.imageButton:not(.active) {
+  border-color: var(--border-light, #475569);
+  background-color: var(--bg-tertiary, #334155);
+}
+
+.imageIcon {
+  width: 40px;
+  height: 40px;
+}
+
+.actionsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-light, #334155);
+  margin-top: 0;
+}
+
+.actionButton {
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: none;
+  min-height: 48px;
+  font-size: 14px;
+}
+
+.saveButton {
+  background-color: var(--color-state-info, #3b82f6);
+  color: #ffffff;
+}
+
+.saveButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.resetButton {
+  background-color: var(--bg-tertiary, #334155);
+  color: var(--text-secondary, #64748b);
+}
+
+.resetButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (min-width: 640px) {
+  .actionsContainer {
+    flex-direction: row;
+  }
+
+  .actionButton {
+    flex: 1;
+  }
+
+  .actionButton.saveButton {
+    flex: 0 1 auto;
+  }
+
+  .actionButton.resetButton {
+    flex: 0 1 auto;
+  }
+}

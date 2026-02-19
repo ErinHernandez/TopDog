@@ -1,0 +1,386 @@
+/**
+ * VX2 Draft Logic - Autodraft AI
+ * 
+ * Player selection algorithm for autopick.
+ * Priority: Queue → Custom Rankings → ADP
+ * 
+ * All new implementations - no code reuse.
+ */
+
+import { DEFAULT_POSITION_LIMITS, DRAFT_CONFIG } from '../constants';
+import type { 
+  DraftPlayer, 
+  PositionLimits, 
+  PositionCounts,
+  Position,
+  AutodraftResult,
+  AutodraftSource,
+} from '../types';
+
+// ============================================================================
+// POSITION COUNTING
+// ============================================================================
+
+/**
+ * Create an empty position counts object.
+ */
+export function createEmptyPositionCounts(): PositionCounts {
+  return { QB: 0, RB: 0, WR: 0, TE: 0 };
+}
+
+/**
+ * Calculate position counts from a roster of players.
+ * 
+ * @param roster - Array of players
+ * @returns Position counts
+ */
+export function calculatePositionCounts(roster: DraftPlayer[]): PositionCounts {
+  const counts = createEmptyPositionCounts();
+  
+  for (const player of roster) {
+    if (player.position in counts) {
+      counts[player.position]++;
+    }
+  }
+  
+  return counts;
+}
+
+/**
+ * Get total roster size from position counts.
+ */
+export function getTotalRosterSize(counts: PositionCounts): number {
+  return counts.QB + counts.RB + counts.WR + counts.TE;
+}
+
+// ============================================================================
+// POSITION LIMIT VALIDATION
+// ============================================================================
+
+/**
+ * Check if a player can be drafted within position limits.
+ * 
+ * @param player - Player to check
+ * @param currentRoster - Current roster (players already drafted by this participant)
+ * @param limits - Position limits
+ * @returns true if player can be drafted
+ * 
+ * @example
+ * const roster = [{ position: 'QB' }, { position: 'QB' }];
+ * canDraftPlayer({ position: 'QB' }, roster, { QB: 2, ... })  // false (limit reached)
+ * canDraftPlayer({ position: 'RB' }, roster, { RB: 10, ... }) // true
+ */
+export function canDraftPlayer(
+  player: DraftPlayer,
+  currentRoster: DraftPlayer[],
+  limits: PositionLimits = DEFAULT_POSITION_LIMITS
+): boolean {
+  const positionCounts = calculatePositionCounts(currentRoster);
+  const currentCount = positionCounts[player.position] ?? 0;
+  const limit = limits[player.position] ?? Infinity;
+  
+  return currentCount < limit;
+}
+
+/**
+ * Filter players to only those within position limits.
+ * 
+ * @param players - Available players
+ * @param currentRoster - Current roster
+ * @param limits - Position limits
+ * @returns Filtered array of draftable players
+ */
+export function filterDraftablePlayers(
+  players: DraftPlayer[],
+  currentRoster: DraftPlayer[],
+  limits: PositionLimits = DEFAULT_POSITION_LIMITS
+): DraftPlayer[] {
+  return players.filter(player => canDraftPlayer(player, currentRoster, limits));
+}
+
+/**
+ * Get remaining slots for each position.
+ * 
+ * @param currentRoster - Current roster
+ * @param limits - Position limits
+ * @returns Remaining slots per position
+ */
+export function getRemainingSlots(
+  currentRoster: DraftPlayer[],
+  limits: PositionLimits = DEFAULT_POSITION_LIMITS
+): PositionCounts {
+  const counts = calculatePositionCounts(currentRoster);
+  
+  return {
+    QB: Math.max(0, limits.QB - counts.QB),
+    RB: Math.max(0, limits.RB - counts.RB),
+    WR: Math.max(0, limits.WR - counts.WR),
+    TE: Math.max(0, limits.TE - counts.TE),
+  };
+}
+
+// ============================================================================
+// AUTODRAFT SELECTION
+// ============================================================================
+
+/**
+ * Select the best player for autodraft.
+ * 
+ * Priority order:
+ * 1. First available player from queue (respecting position limits)
+ * 2. Highest-ranked player from custom rankings (respecting position limits)
+ * 3. Best available by ADP (respecting position limits)
+ * 
+ * @param availablePlayers - Players still available in draft
+ * @param currentRoster - Current roster for this participant
+ * @param queue - User's queue (player IDs in priority order)
+ * @param customRankings - User's custom rankings (player IDs in rank order)
+ * @param positionLimits - Position limits
+ * @returns Selected player and source, or null if none available
+ * 
+ * @example
+ * const result = selectAutodraftPlayer(available, roster, ['player1'], [], limits);
+ * // { player: {...}, source: 'queue' }
+ */
+export function selectAutodraftPlayer(
+  availablePlayers: DraftPlayer[],
+  currentRoster: DraftPlayer[],
+  queue: string[] = [],
+  customRankings: string[] = [],
+  positionLimits: PositionLimits = DEFAULT_POSITION_LIMITS,
+  excludedPlayerNames: string[] = []
+): AutodraftResult | null {
+  // Filter to only draftable players (within position limits)
+  const draftablePlayers = filterDraftablePlayers(
+    availablePlayers,
+    currentRoster,
+    positionLimits
+  );
+  
+  if (draftablePlayers.length === 0) {
+    return null;
+  }
+  
+  // Create lookup maps for O(1) availability checks (by both id and name)
+  const availableById = new Map(draftablePlayers.map(p => [p.id, p]));
+  const availableByName = new Map(draftablePlayers.map(p => [p.name, p]));
+  
+  // Check if we need positions for a valid lineup
+  const remainingSlots = getRemainingSlots(currentRoster, positionLimits);
+  const neededPositions = (['QB', 'RB', 'WR', 'TE'] as const).filter(
+    pos => remainingSlots[pos] > 0
+  );
+  
+  // Helper to check if player is excluded
+  const isExcluded = (player: DraftPlayer): boolean => {
+    return excludedPlayerNames.length > 0 && (
+      excludedPlayerNames.includes(player.id) || 
+      excludedPlayerNames.includes(player.name)
+    );
+  };
+  
+  // Helper to check if excluded player is necessary for valid lineup
+  const isNecessaryExcluded = (player: DraftPlayer): boolean => {
+    if (!isExcluded(player)) return false;
+    if (!neededPositions.includes(player.position)) return false;
+    
+    // Check if this is the only remaining player for this needed position
+    const playersForPosition = draftablePlayers.filter(p => p.position === player.position);
+    return playersForPosition.length === 1;
+  };
+  
+  // Priority 1: Check queue
+  // Excluded players can be auto-drafted from queue if queue only contains excluded players
+  const queuePlayers = queue
+    .map(id => availableById.get(id) || availableByName.get(id))
+    .filter((p): p is DraftPlayer => !!p);
+  
+  if (queuePlayers.length > 0) {
+    // If queue has non-excluded players, use first non-excluded
+    const nonExcluded = queuePlayers.find(p => !isExcluded(p));
+    if (nonExcluded) {
+      return { player: nonExcluded, source: 'queue' };
+    }
+    // If queue only has excluded players, use first one (allowed per docs)
+    return { player: queuePlayers[0]!, source: 'queue' };
+  }
+  
+  // Priority 2: Check custom rankings (filter out excluded unless necessary)
+  for (const playerId of customRankings) {
+    const player = availableById.get(playerId) || availableByName.get(playerId);
+    if (player) {
+      // Allow excluded if necessary for valid lineup
+      if (!isExcluded(player) || isNecessaryExcluded(player)) {
+        return { player, source: 'custom_ranking' };
+      }
+    }
+  }
+  
+  // Priority 3: Best by ADP (filter out excluded unless necessary)
+  const nonExcludedPlayers = draftablePlayers.filter(p => !isExcluded(p) || isNecessaryExcluded(p));
+  
+  if (nonExcludedPlayers.length === 0) {
+    // If no non-excluded players available, check if we need to use excluded for valid lineup
+    // This shouldn't happen if isNecessaryExcluded logic is correct, but as fallback:
+    if (draftablePlayers.length > 0) {
+      return { player: draftablePlayers[0]!, source: 'adp' };
+    }
+    return null;
+  }
+
+  const sortedByADP = [...nonExcludedPlayers].sort((a, b) => {
+    // Handle missing ADP values
+    const adpA = a.adp ?? 999;
+    const adpB = b.adp ?? 999;
+    return adpA - adpB;
+  });
+
+  return { player: sortedByADP[0]!, source: 'adp' };
+}
+
+/**
+ * Get the best available player by ADP only.
+ * Used when queue and rankings are empty.
+ * 
+ * @param availablePlayers - Available players
+ * @param currentRoster - Current roster
+ * @param positionLimits - Position limits
+ * @returns Best available player, or null
+ */
+export function getBestAvailableByADP(
+  availablePlayers: DraftPlayer[],
+  currentRoster: DraftPlayer[],
+  positionLimits: PositionLimits = DEFAULT_POSITION_LIMITS
+): DraftPlayer | null {
+  const draftable = filterDraftablePlayers(availablePlayers, currentRoster, positionLimits);
+  
+  if (draftable.length === 0) {
+    return null;
+  }
+  
+  return draftable.reduce((best, player) => {
+    const bestADP = best.adp ?? 999;
+    const playerADP = player.adp ?? 999;
+    return playerADP < bestADP ? player : best;
+  });
+}
+
+/**
+ * Get best available player at a specific position.
+ *
+ * @param position - Position to filter by
+ * @param availablePlayers - Available players
+ * @param currentRoster - Current roster
+ * @param positionLimits - Position limits
+ * @returns Best player at position, or null
+ */
+export function getBestAvailableAtPosition(
+  position: Position,
+  availablePlayers: DraftPlayer[],
+  currentRoster: DraftPlayer[],
+  positionLimits: PositionLimits = DEFAULT_POSITION_LIMITS
+): DraftPlayer | null {
+  // Build position lookup map for O(1) access
+  const playersByPosition = new Map<Position, DraftPlayer[]>();
+  for (const player of availablePlayers) {
+    if (!playersByPosition.has(player.position)) {
+      playersByPosition.set(player.position, []);
+    }
+    const positionPlayers = playersByPosition.get(player.position);
+    if (positionPlayers) {
+      positionPlayers.push(player);
+    }
+  }
+
+  const atPosition = playersByPosition.get(position) || [];
+  return getBestAvailableByADP(atPosition, currentRoster, positionLimits);
+}
+
+// ============================================================================
+// ROSTER ANALYSIS
+// ============================================================================
+
+/**
+ * Determine the most needed position based on current roster.
+ * Returns the position with the most remaining slots.
+ * 
+ * @param currentRoster - Current roster
+ * @param limits - Position limits
+ * @returns Most needed position
+ */
+export function getMostNeededPosition(
+  currentRoster: DraftPlayer[],
+  limits: PositionLimits = DEFAULT_POSITION_LIMITS
+): Position {
+  const remaining = getRemainingSlots(currentRoster, limits);
+  
+  let mostNeeded: Position = 'WR';
+  let maxRemaining = 0;
+  
+  for (const pos of ['QB', 'RB', 'WR', 'TE'] as Position[]) {
+    if (remaining[pos] > maxRemaining) {
+      maxRemaining = remaining[pos];
+      mostNeeded = pos;
+    }
+  }
+  
+  return mostNeeded;
+}
+
+/**
+ * Check if roster construction is balanced.
+ * A roster is balanced if no position has hit its limit while others have many slots.
+ * 
+ * @param currentRoster - Current roster
+ * @param limits - Position limits
+ * @returns true if balanced
+ */
+export function isRosterBalanced(
+  currentRoster: DraftPlayer[],
+  limits: PositionLimits = DEFAULT_POSITION_LIMITS
+): boolean {
+  const remaining = getRemainingSlots(currentRoster, limits);
+  const values = Object.values(remaining);
+  
+  // Check if any position is maxed while others have many slots
+  const hasMaxed = values.some(v => v === 0);
+  const hasMany = values.some(v => v >= 5);
+  
+  return !(hasMaxed && hasMany);
+}
+
+/**
+ * Get tracker color based on roster needs.
+ * Returns the color of the most needed position.
+ * 
+ * @param currentRoster - Current roster
+ * @param limits - Position limits
+ * @returns Hex color string
+ */
+export function getTrackerColor(
+  currentRoster: DraftPlayer[],
+  limits: PositionLimits = DEFAULT_POSITION_LIMITS
+): string {
+  const remaining = getRemainingSlots(currentRoster, limits);
+  const counts = calculatePositionCounts(currentRoster);
+  
+  // If all positions have same count, return neutral
+  const uniqueCounts = new Set(Object.values(counts));
+  if (uniqueCounts.size === 1) {
+    return '#6B7280'; // Gray
+  }
+  
+  // Return color of most needed position
+  const colors: Record<Position, string> = {
+    QB: '#F472B6',
+    RB: '#0FBA80',
+    WR: '#FBBF25',
+    TE: '#7C3AED',
+  };
+  
+  const mostNeeded = getMostNeededPosition(currentRoster, limits);
+  return colors[mostNeeded];
+}
+
+
+

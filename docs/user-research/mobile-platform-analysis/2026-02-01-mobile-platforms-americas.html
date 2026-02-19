@@ -1,0 +1,2093 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Platform Analysis - Americas (ex US/Canada) | February 2026</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #172554 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #fff;
+        }
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.4rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .subtitle {
+            text-align: center;
+            color: #94a3b8;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        .scope-note {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 40px;
+            font-size: 0.9rem;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+            display: inline-block;
+            width: 100%;
+        }
+        .section-header {
+            font-size: 1.5rem;
+            margin: 40px 0 25px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(139, 92, 246, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .section-header .icon {
+            font-size: 1.8rem;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        .grid-3 {
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        }
+        .chart-card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 22px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        .chart-card.ios {
+            border-left: 3px solid #3b82f6;
+        }
+        .chart-card.android {
+            border-left: 3px solid #34d399;
+        }
+        .chart-card.other {
+            border-left: 3px solid #f59e0b;
+        }
+        .chart-card.combined {
+            border-left: 3px solid #8b5cf6;
+        }
+        .chart-card h2 {
+            font-size: 1.1rem;
+            margin-bottom: 18px;
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .chart-card h2 .platform-tag {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .chart-card h2 .platform-tag.ios {
+            background: rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
+        }
+        .chart-card h2 .platform-tag.android {
+            background: rgba(52, 211, 153, 0.3);
+            color: #34d399;
+        }
+        .chart-card h2 .platform-tag.all {
+            background: rgba(139, 92, 246, 0.3);
+            color: #a78bfa;
+        }
+        .chart-container {
+            position: relative;
+            height: 320px;
+        }
+        .chart-container.tall {
+            height: 420px;
+        }
+        .chart-container.short {
+            height: 260px;
+        }
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .stat-card.ios {
+            border-top: 3px solid #3b82f6;
+        }
+        .stat-card.android {
+            border-top: 3px solid #34d399;
+        }
+        .stat-card.warning {
+            border-top: 3px solid #f59e0b;
+        }
+        .stat-card.danger {
+            border-top: 3px solid #ef4444;
+        }
+        .stat-card.purple {
+            border-top: 3px solid #8b5cf6;
+        }
+        .stat-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+        .stat-value.ios {
+            color: #60a5fa;
+        }
+        .stat-value.android {
+            color: #34d399;
+        }
+        .stat-value.warning {
+            color: #fbbf24;
+        }
+        .stat-value.danger {
+            color: #f87171;
+        }
+        .stat-value.purple {
+            color: #a78bfa;
+        }
+        .stat-label {
+            color: #94a3b8;
+            margin-top: 4px;
+            font-size: 0.8rem;
+        }
+        .country-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        .country-table th, .country-table td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .country-table th {
+            background: rgba(255, 255, 255, 0.04);
+            font-weight: 600;
+            color: #a78bfa;
+            position: sticky;
+            top: 0;
+        }
+        .country-table tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .legacy-high { color: #f87171; font-weight: 600; }
+        .legacy-medium { color: #fbbf24; font-weight: 600; }
+        .legacy-low { color: #34d399; font-weight: 600; }
+        .region-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        .region-badge.caribbean { background: rgba(236, 72, 153, 0.3); color: #f472b6; }
+        .region-badge.central { background: rgba(6, 182, 212, 0.3); color: #22d3ee; }
+        .region-badge.south { background: rgba(16, 185, 129, 0.3); color: #34d399; }
+        .vendor-bar {
+            display: flex;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            background: rgba(255,255,255,0.1);
+        }
+        .vendor-bar span {
+            height: 100%;
+        }
+        .legend-note {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.85rem;
+            margin-top: 40px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+        }
+        .table-scroll {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .comparison-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 900px) {
+            .comparison-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 600px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Mobile Platform Analysis: The Americas</h1>
+        <p class="subtitle">North & South America (Excluding United States & Canada) | February 1, 2026</p>
+        <p class="scope-note">📍 Coverage: Mexico, Central America, Caribbean, South America | 🚫 Excludes: US, Canada, India, China</p>
+
+        <!-- Executive Summary Stats -->
+        <div class="stats-grid">
+            <div class="stat-card purple">
+                <div class="stat-value purple">~565M</div>
+                <div class="stat-label">Total Mobile Devices</div>
+            </div>
+            <div class="stat-card android">
+                <div class="stat-value android">~480M</div>
+                <div class="stat-label">Android Devices (85%)</div>
+            </div>
+            <div class="stat-card ios">
+                <div class="stat-value ios">~85M</div>
+                <div class="stat-label">iOS Devices (15%)</div>
+            </div>
+            <div class="stat-card warning">
+                <div class="stat-value warning">~103M</div>
+                <div class="stat-label">Legacy Devices Total</div>
+            </div>
+            <div class="stat-card danger">
+                <div class="stat-value danger">18.2%</div>
+                <div class="stat-label">Legacy Device Share</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" style="color:#94a3b8">3.6 yrs</div>
+                <div class="stat-label">Avg Device Age</div>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION: OVERALL MARKET ==================== -->
+        <h2 class="section-header"><span class="icon">📊</span> Overall Market Overview</h2>
+
+        <div class="grid">
+            <!-- Platform Market Share -->
+            <div class="chart-card combined">
+                <h2><span class="platform-tag all">ALL</span> Platform Market Share - Americas (ex US/CA)</h2>
+                <div class="chart-container">
+                    <canvas id="platformShareChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Platform by Sub-Region -->
+            <div class="chart-card combined">
+                <h2><span class="platform-tag all">ALL</span> Platform Share by Sub-Region</h2>
+                <div class="chart-container">
+                    <canvas id="platformSubregionChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Total Legacy by Platform -->
+            <div class="chart-card combined">
+                <h2><span class="platform-tag all">ALL</span> Legacy Devices by Platform</h2>
+                <div class="chart-container short">
+                    <canvas id="legacyByPlatformChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Device Age Distribution -->
+            <div class="chart-card combined">
+                <h2><span class="platform-tag all">ALL</span> Device Age Distribution</h2>
+                <div class="chart-container short">
+                    <canvas id="deviceAgeChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION: COUNTRY DATA ==================== -->
+        <h2 class="section-header"><span class="icon">🌎</span> Country-Level Analysis</h2>
+
+        <div class="grid">
+            <!-- Master Country Table -->
+            <div class="chart-card combined full-width">
+                <h2><span class="platform-tag all">ALL</span> Complete Country Breakdown</h2>
+                <div class="table-scroll">
+                    <table class="country-table">
+                        <thead>
+                            <tr>
+                                <th>Country</th>
+                                <th>Region</th>
+                                <th>Population</th>
+                                <th>Mobile Users</th>
+                                <th>Android %</th>
+                                <th>iOS %</th>
+                                <th>Other %</th>
+                                <th>Android Legacy</th>
+                                <th>iOS Legacy</th>
+                                <th>Top Vendor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Brazil</strong></td>
+                                <td><span class="region-badge south">South</span></td>
+                                <td>216M</td>
+                                <td>~214M</td>
+                                <td>85%</td>
+                                <td>15%</td>
+                                <td>0.3%</td>
+                                <td class="legacy-medium">17%</td>
+                                <td class="legacy-medium">14%</td>
+                                <td>Samsung (42%)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Mexico</strong></td>
+                                <td><span class="region-badge central">Central</span></td>
+                                <td>129M</td>
+                                <td>~127M</td>
+                                <td>78%</td>
+                                <td>22%</td>
+                                <td>0.2%</td>
+                                <td class="legacy-medium">15%</td>
+                                <td class="legacy-medium">11%</td>
+                                <td>Samsung (35%)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Argentina</strong></td>
+                                <td><span class="region-badge south">South</span></td>
+                                <td>46M</td>
+                                <td>~45.5M</td>
+                                <td>88%</td>
+                                <td>12%</td>
+                                <td>0.4%</td>
+                                <td class="legacy-high">24%</td>
+                                <td class="legacy-high">18%</td>
+                                <td>Samsung (38%)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Colombia</strong></td>
+                                <td><span class="region-badge south">South</span></td>
+                                <td>52M</td>
+                                <td>~50M</td>
+                                <td>86%</td>
+                                <td>14%</td>
+                                <td>0.3%</td>
+                                <td class="legacy-medium">19%</td>
+                                <td class="legacy-medium">13%</td>
+                                <td>Samsung (40%)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Peru</strong></td>
+                                <td><span class="region-badge south">South</span></td>
+                                <td>34M</td>
+                                <td>~31.5M</td>
+                                <td>89%</td>
+                                <td>11%</td>
+                                <td>0.5%</td>
+                                <td class="legacy-high">22%</td>
+                                <td class="legacy-high">16%</td>
+                                <td>Samsung (35%)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Venezuela</strong></td>
+                                <td><span class="region-badge south">South</span></td>
+                                <td>29M</td>
+                                <td>~25M</td>
+                                <td>92%</td>
+                                <td>8%</td>
+                                <td>0.8%</td>
+                                <td class="legacy-high">32%</td>
+                                <td class="legacy-high">22%</td>
+                                <td>Xiaomi (35%)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Chile</strong></td>
+                                <td><span class="region-badge south">South</span></td>
+                                <td>20M</td>
+                                <td>~20M</td>
+                                <td>75%</td>
+                                <td>25%</td>
+                                <td>0.2%</td>
+                                <td class="legacy-low">12%</td>
+                                <td class="legacy-low">9%</td>
+                                <td>Samsung (45%)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Ecuador</strong></td>
+                                <td><span class="region-badge south">South</span></td>
+                                <td>18M</td>
+                                <td>~17.8M</td>
+                                <td>90%</td>
+                                <td>10%</td>
+                                <td>0.6%</td>
+                                <td class="legacy-high">25%</td>
+                                <td class="legacy-high">17%</td>
+                                <td>Samsung (38%)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Guatemala</strong></td>
+                                <td><span class="region-badge central">Central</span></td>
+                                <td>18M</td>
+                                <td>~17.6M</td>
+                                <td>91%</td>
+                                <td>9%</td>
+                                <td>1.2%</td>
+                                <td class="legacy-high">28%</td>
+                                <td class="legacy-high">19%</td>
+                                <td>Samsung (32%)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cuba</strong></td>
+                                <td><span class="region-badge caribbean">Caribbean</span></td>
+                                <td>11M</td>
+                                <td>~6.5M</td>
+                                <td>94%</td>
+                                <td>5%</td>
+                                <td>1.5%</td>
+                                <td class="legacy-high">45%</td>
+                                <td class="legacy-high">35%</td>
+                                <td>Xiaomi (40%)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Dominican Rep.</strong></td>
+                                <td><span class="region-badge caribbean">Caribbean</span></td>
+                                <td>11M</td>
+                                <td>~11M</td>
+                                <td>82%</td>
+                                <td>18%</td>
+                                <td>0.3%</td>
+                                <td class="legacy-medium">16%</td>
+                                <td class="legacy-medium">12%</td>
+                                <td>Samsung (42%)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Bolivia</strong></td>
+                                <td><span class="region-badge south">South</span></td>
+                                <td>12M</td>
+                                <td>~11M</td>
+                                <td>93%</td>
+                                <td>6%</td>
+                                <td>1.0%</td>
+                                <td class="legacy-high">30%</td>
+                                <td class="legacy-high">20%</td>
+                                <td>Samsung (30%)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Honduras</strong></td>
+                                <td><span class="region-badge central">Central</span></td>
+                                <td>10M</td>
+                                <td>~9.8M</td>
+                                <td>92%</td>
+                                <td>8%</td>
+                                <td>1.0%</td>
+                                <td class="legacy-high">30%</td>
+                                <td class="legacy-high">20%</td>
+                                <td>Samsung (33%)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Paraguay</strong></td>
+                                <td><span class="region-badge south">South</span></td>
+                                <td>7M</td>
+                                <td>~6.8M</td>
+                                <td>90%</td>
+                                <td>10%</td>
+                                <td>0.5%</td>
+                                <td class="legacy-high">26%</td>
+                                <td class="legacy-high">18%</td>
+                                <td>Samsung (35%)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>El Salvador</strong></td>
+                                <td><span class="region-badge central">Central</span></td>
+                                <td>6.5M</td>
+                                <td>~6.3M</td>
+                                <td>88%</td>
+                                <td>12%</td>
+                                <td>0.4%</td>
+                                <td class="legacy-high">24%</td>
+                                <td class="legacy-medium">15%</td>
+                                <td>Samsung (36%)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Nicaragua</strong></td>
+                                <td><span class="region-badge central">Central</span></td>
+                                <td>7M</td>
+                                <td>~5.5M</td>
+                                <td>93%</td>
+                                <td>6%</td>
+                                <td>1.2%</td>
+                                <td class="legacy-high">32%</td>
+                                <td class="legacy-high">22%</td>
+                                <td>Samsung (28%)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Costa Rica</strong></td>
+                                <td><span class="region-badge central">Central</span></td>
+                                <td>5.2M</td>
+                                <td>~5.4M</td>
+                                <td>72%</td>
+                                <td>28%</td>
+                                <td>0.2%</td>
+                                <td class="legacy-low">11%</td>
+                                <td class="legacy-low">8%</td>
+                                <td>Samsung (40%)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Panama</strong></td>
+                                <td><span class="region-badge central">Central</span></td>
+                                <td>4.4M</td>
+                                <td>~4.3M</td>
+                                <td>70%</td>
+                                <td>30%</td>
+                                <td>0.2%</td>
+                                <td class="legacy-low">10%</td>
+                                <td class="legacy-low">7%</td>
+                                <td>Samsung (42%)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Uruguay</strong></td>
+                                <td><span class="region-badge south">South</span></td>
+                                <td>3.5M</td>
+                                <td>~3.6M</td>
+                                <td>78%</td>
+                                <td>22%</td>
+                                <td>0.2%</td>
+                                <td class="legacy-medium">14%</td>
+                                <td class="legacy-low">10%</td>
+                                <td>Samsung (44%)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Jamaica</strong></td>
+                                <td><span class="region-badge caribbean">Caribbean</span></td>
+                                <td>3M</td>
+                                <td>~3M</td>
+                                <td>75%</td>
+                                <td>25%</td>
+                                <td>0.4%</td>
+                                <td class="legacy-medium">18%</td>
+                                <td class="legacy-medium">14%</td>
+                                <td>Samsung (38%)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Puerto Rico</strong></td>
+                                <td><span class="region-badge caribbean">Caribbean</span></td>
+                                <td>3.2M</td>
+                                <td>~3.3M</td>
+                                <td>45%</td>
+                                <td>55%</td>
+                                <td>0.1%</td>
+                                <td class="legacy-low">8%</td>
+                                <td class="legacy-low">6%</td>
+                                <td>Apple (55%)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Trinidad & Tobago</strong></td>
+                                <td><span class="region-badge caribbean">Caribbean</span></td>
+                                <td>1.5M</td>
+                                <td>~1.6M</td>
+                                <td>70%</td>
+                                <td>30%</td>
+                                <td>0.2%</td>
+                                <td class="legacy-medium">15%</td>
+                                <td class="legacy-low">10%</td>
+                                <td>Samsung (40%)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Haiti</strong></td>
+                                <td><span class="region-badge caribbean">Caribbean</span></td>
+                                <td>12M</td>
+                                <td>~7M</td>
+                                <td>96%</td>
+                                <td>3%</td>
+                                <td>2.0%</td>
+                                <td class="legacy-high">48%</td>
+                                <td class="legacy-high">38%</td>
+                                <td>Tecno (25%)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Bahamas</strong></td>
+                                <td><span class="region-badge caribbean">Caribbean</span></td>
+                                <td>0.4M</td>
+                                <td>~0.42M</td>
+                                <td>7%</td>
+                                <td>93%</td>
+                                <td>0.1%</td>
+                                <td class="legacy-low">6%</td>
+                                <td class="legacy-low">5%</td>
+                                <td>Apple (93%)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Belize</strong></td>
+                                <td><span class="region-badge central">Central</span></td>
+                                <td>0.4M</td>
+                                <td>~0.38M</td>
+                                <td>31%</td>
+                                <td>69%</td>
+                                <td>0.3%</td>
+                                <td class="legacy-low">10%</td>
+                                <td class="legacy-low">7%</td>
+                                <td>Apple (69%)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Country by Total Devices -->
+            <div class="chart-card combined full-width">
+                <h2><span class="platform-tag all">ALL</span> Total Mobile Devices by Country</h2>
+                <div class="chart-container tall">
+                    <canvas id="countryDevicesChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION: iOS DEEP DIVE ==================== -->
+        <h2 class="section-header"><span class="icon">🍎</span> iOS Deep Dive</h2>
+
+        <div class="grid">
+            <!-- iOS Version Distribution -->
+            <div class="chart-card ios">
+                <h2><span class="platform-tag ios">iOS</span> Version Distribution - LATAM</h2>
+                <div class="chart-container">
+                    <canvas id="iosVersionChart"></canvas>
+                </div>
+            </div>
+
+            <!-- iOS Device Cap -->
+            <div class="chart-card ios">
+                <h2><span class="platform-tag ios">iOS</span> Devices by Max iOS Support</h2>
+                <div class="chart-container">
+                    <canvas id="iosCapChart"></canvas>
+                </div>
+            </div>
+
+            <!-- iOS Legacy by Country -->
+            <div class="chart-card ios full-width">
+                <h2><span class="platform-tag ios">iOS</span> Legacy Share by Country (iOS 16 & Older)</h2>
+                <div class="chart-container">
+                    <canvas id="iosLegacyCountryChart"></canvas>
+                </div>
+            </div>
+
+            <!-- iOS Model Distribution -->
+            <div class="chart-card ios">
+                <h2><span class="platform-tag ios">iOS</span> iPhone Model Distribution</h2>
+                <div class="chart-container">
+                    <canvas id="iosModelChart"></canvas>
+                </div>
+            </div>
+
+            <!-- iOS Refurbished Market -->
+            <div class="chart-card ios">
+                <h2><span class="platform-tag ios">iOS</span> Refurbished iPhone Market</h2>
+                <div class="chart-container">
+                    <canvas id="iosRefurbChart"></canvas>
+                </div>
+            </div>
+
+            <!-- iOS 26.x Minor Version Breakdown -->
+            <div class="chart-card ios">
+                <h2><span class="platform-tag ios">iOS</span> iOS 26.x Minor Version Breakdown (Current)</h2>
+                <div class="chart-container">
+                    <canvas id="ios26MinorChart"></canvas>
+                </div>
+            </div>
+
+            <!-- iOS 18.x Minor Version Breakdown -->
+            <div class="chart-card ios">
+                <h2><span class="platform-tag ios">iOS</span> iOS 18.x Minor Version Breakdown</h2>
+                <div class="chart-container">
+                    <canvas id="ios18MinorChart"></canvas>
+                </div>
+            </div>
+
+            <!-- iOS 17.x Minor Version Breakdown -->
+            <div class="chart-card ios">
+                <h2><span class="platform-tag ios">iOS</span> iOS 17.x Minor Version Breakdown</h2>
+                <div class="chart-container">
+                    <canvas id="ios17MinorChart"></canvas>
+                </div>
+            </div>
+
+            <!-- iOS 16.x Minor Version Breakdown -->
+            <div class="chart-card ios">
+                <h2><span class="platform-tag ios">iOS</span> iOS 16.x Minor Version Breakdown</h2>
+                <div class="chart-container">
+                    <canvas id="ios16MinorChart"></canvas>
+                </div>
+            </div>
+
+            <!-- iOS 15.x and Older Breakdown -->
+            <div class="chart-card ios">
+                <h2><span class="platform-tag ios">iOS</span> iOS 15.x & Older Breakdown</h2>
+                <div class="chart-container">
+                    <canvas id="ios15OlderChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Complete iOS Version Table -->
+            <div class="chart-card ios full-width">
+                <h2><span class="platform-tag ios">iOS</span> Complete Minor Version Distribution - LATAM</h2>
+                <div class="table-scroll" style="max-height: 600px;">
+                    <table class="country-table">
+                        <thead>
+                            <tr>
+                                <th>iOS Version</th>
+                                <th>LATAM Share</th>
+                                <th>Est. Devices</th>
+                                <th>Release Date</th>
+                                <th>Status</th>
+                                <th>Key Features/Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- iOS 26.x -->
+                            <tr style="background: rgba(139, 92, 246, 0.1);">
+                                <td><strong>iOS 26.2</strong></td>
+                                <td>1.8%</td>
+                                <td>~1.5M</td>
+                                <td>Jan 2026</td>
+                                <td class="legacy-low">Current</td>
+                                <td>Latest stable release</td>
+                            </tr>
+                            <tr style="background: rgba(139, 92, 246, 0.1);">
+                                <td><strong>iOS 26.1</strong></td>
+                                <td>6.2%</td>
+                                <td>~5.3M</td>
+                                <td>Nov 2025</td>
+                                <td class="legacy-low">Current</td>
+                                <td>Major adoption wave</td>
+                            </tr>
+                            <tr style="background: rgba(139, 92, 246, 0.1);">
+                                <td><strong>iOS 26.0</strong></td>
+                                <td>2.0%</td>
+                                <td>~1.7M</td>
+                                <td>Sept 2025</td>
+                                <td class="legacy-low">Current</td>
+                                <td>Initial release</td>
+                            </tr>
+                            <!-- iOS 18.x -->
+                            <tr style="background: rgba(59, 130, 246, 0.1);">
+                                <td><strong>iOS 18.7</strong></td>
+                                <td>22.5%</td>
+                                <td>~19.1M</td>
+                                <td>Aug 2025</td>
+                                <td class="legacy-low">Supported</td>
+                                <td>Pre-iOS 26 final</td>
+                            </tr>
+                            <tr style="background: rgba(59, 130, 246, 0.1);">
+                                <td><strong>iOS 18.6</strong></td>
+                                <td>18.2%</td>
+                                <td>~15.5M</td>
+                                <td>Jul 2025</td>
+                                <td class="legacy-low">Supported</td>
+                                <td>Security updates</td>
+                            </tr>
+                            <tr style="background: rgba(59, 130, 246, 0.1);">
+                                <td><strong>iOS 18.5</strong></td>
+                                <td>6.8%</td>
+                                <td>~5.8M</td>
+                                <td>May 2025</td>
+                                <td class="legacy-low">Supported</td>
+                                <td>Performance improvements</td>
+                            </tr>
+                            <tr style="background: rgba(59, 130, 246, 0.1);">
+                                <td><strong>iOS 18.4</strong></td>
+                                <td>3.2%</td>
+                                <td>~2.7M</td>
+                                <td>Apr 2025</td>
+                                <td class="legacy-low">Supported</td>
+                                <td>Bug fixes</td>
+                            </tr>
+                            <tr style="background: rgba(59, 130, 246, 0.1);">
+                                <td><strong>iOS 18.3</strong></td>
+                                <td>2.8%</td>
+                                <td>~2.4M</td>
+                                <td>Feb 2025</td>
+                                <td class="legacy-low">Supported</td>
+                                <td>Stability release</td>
+                            </tr>
+                            <tr style="background: rgba(59, 130, 246, 0.1);">
+                                <td><strong>iOS 18.2</strong></td>
+                                <td>1.9%</td>
+                                <td>~1.6M</td>
+                                <td>Dec 2024</td>
+                                <td class="legacy-low">Supported</td>
+                                <td>Apple Intelligence expansion</td>
+                            </tr>
+                            <tr style="background: rgba(59, 130, 246, 0.1);">
+                                <td><strong>iOS 18.1</strong></td>
+                                <td>1.5%</td>
+                                <td>~1.3M</td>
+                                <td>Oct 2024</td>
+                                <td class="legacy-low">Supported</td>
+                                <td>Apple Intelligence launch</td>
+                            </tr>
+                            <tr style="background: rgba(59, 130, 246, 0.1);">
+                                <td><strong>iOS 18.0</strong></td>
+                                <td>1.1%</td>
+                                <td>~0.9M</td>
+                                <td>Sept 2024</td>
+                                <td class="legacy-low">Supported</td>
+                                <td>Initial iOS 18 release</td>
+                            </tr>
+                            <!-- iOS 17.x -->
+                            <tr style="background: rgba(6, 182, 212, 0.1);">
+                                <td><strong>iOS 17.7</strong></td>
+                                <td>4.2%</td>
+                                <td>~3.6M</td>
+                                <td>Sept 2024</td>
+                                <td class="legacy-medium">Legacy</td>
+                                <td>Security patches only</td>
+                            </tr>
+                            <tr style="background: rgba(6, 182, 212, 0.1);">
+                                <td><strong>iOS 17.6</strong></td>
+                                <td>5.8%</td>
+                                <td>~4.9M</td>
+                                <td>Jul 2024</td>
+                                <td class="legacy-medium">Legacy</td>
+                                <td>Final feature update</td>
+                            </tr>
+                            <tr style="background: rgba(6, 182, 212, 0.1);">
+                                <td><strong>iOS 17.5</strong></td>
+                                <td>2.4%</td>
+                                <td>~2.0M</td>
+                                <td>May 2024</td>
+                                <td class="legacy-medium">Legacy</td>
+                                <td>Bug fixes</td>
+                            </tr>
+                            <tr style="background: rgba(6, 182, 212, 0.1);">
+                                <td><strong>iOS 17.4</strong></td>
+                                <td>1.8%</td>
+                                <td>~1.5M</td>
+                                <td>Mar 2024</td>
+                                <td class="legacy-medium">Legacy</td>
+                                <td>EU DMA compliance</td>
+                            </tr>
+                            <tr style="background: rgba(6, 182, 212, 0.1);">
+                                <td><strong>iOS 17.3</strong></td>
+                                <td>1.2%</td>
+                                <td>~1.0M</td>
+                                <td>Jan 2024</td>
+                                <td class="legacy-medium">Legacy</td>
+                                <td>Stolen Device Protection</td>
+                            </tr>
+                            <tr style="background: rgba(6, 182, 212, 0.1);">
+                                <td><strong>iOS 17.2</strong></td>
+                                <td>1.1%</td>
+                                <td>~0.9M</td>
+                                <td>Dec 2023</td>
+                                <td class="legacy-medium">Legacy</td>
+                                <td>Journal app launch</td>
+                            </tr>
+                            <tr style="background: rgba(6, 182, 212, 0.1);">
+                                <td><strong>iOS 17.1</strong></td>
+                                <td>0.8%</td>
+                                <td>~0.7M</td>
+                                <td>Oct 2023</td>
+                                <td class="legacy-medium">Legacy</td>
+                                <td>AirDrop improvements</td>
+                            </tr>
+                            <tr style="background: rgba(6, 182, 212, 0.1);">
+                                <td><strong>iOS 17.0</strong></td>
+                                <td>1.2%</td>
+                                <td>~1.0M</td>
+                                <td>Sept 2023</td>
+                                <td class="legacy-medium">Legacy</td>
+                                <td>StandBy, Contact Posters</td>
+                            </tr>
+                            <!-- iOS 16.x -->
+                            <tr style="background: rgba(245, 158, 11, 0.1);">
+                                <td><strong>iOS 16.7</strong></td>
+                                <td>2.8%</td>
+                                <td>~2.4M</td>
+                                <td>Sept 2023</td>
+                                <td class="legacy-high">Obsolete</td>
+                                <td>iPhone 8/X final version</td>
+                            </tr>
+                            <tr style="background: rgba(245, 158, 11, 0.1);">
+                                <td><strong>iOS 16.6</strong></td>
+                                <td>1.2%</td>
+                                <td>~1.0M</td>
+                                <td>Jul 2023</td>
+                                <td class="legacy-high">Obsolete</td>
+                                <td>Security patches</td>
+                            </tr>
+                            <tr style="background: rgba(245, 158, 11, 0.1);">
+                                <td><strong>iOS 16.5</strong></td>
+                                <td>0.8%</td>
+                                <td>~0.7M</td>
+                                <td>May 2023</td>
+                                <td class="legacy-high">Obsolete</td>
+                                <td>Sports tab in News</td>
+                            </tr>
+                            <tr style="background: rgba(245, 158, 11, 0.1);">
+                                <td><strong>iOS 16.4</strong></td>
+                                <td>0.6%</td>
+                                <td>~0.5M</td>
+                                <td>Mar 2023</td>
+                                <td class="legacy-high">Obsolete</td>
+                                <td>Web push notifications</td>
+                            </tr>
+                            <tr style="background: rgba(245, 158, 11, 0.1);">
+                                <td><strong>iOS 16.3</strong></td>
+                                <td>0.5%</td>
+                                <td>~0.4M</td>
+                                <td>Jan 2023</td>
+                                <td class="legacy-high">Obsolete</td>
+                                <td>Security Keys support</td>
+                            </tr>
+                            <tr style="background: rgba(245, 158, 11, 0.1);">
+                                <td><strong>iOS 16.2</strong></td>
+                                <td>0.4%</td>
+                                <td>~0.3M</td>
+                                <td>Dec 2022</td>
+                                <td class="legacy-high">Obsolete</td>
+                                <td>Freeform app, Live Activities</td>
+                            </tr>
+                            <tr style="background: rgba(245, 158, 11, 0.1);">
+                                <td><strong>iOS 16.1</strong></td>
+                                <td>0.4%</td>
+                                <td>~0.3M</td>
+                                <td>Oct 2022</td>
+                                <td class="legacy-high">Obsolete</td>
+                                <td>iCloud Shared Library</td>
+                            </tr>
+                            <tr style="background: rgba(245, 158, 11, 0.1);">
+                                <td><strong>iOS 16.0</strong></td>
+                                <td>0.3%</td>
+                                <td>~0.3M</td>
+                                <td>Sept 2022</td>
+                                <td class="legacy-high">Obsolete</td>
+                                <td>Lock Screen customization</td>
+                            </tr>
+                            <!-- iOS 15.x -->
+                            <tr style="background: rgba(239, 68, 68, 0.1);">
+                                <td><strong>iOS 15.8</strong></td>
+                                <td>2.1%</td>
+                                <td>~1.8M</td>
+                                <td>Oct 2023</td>
+                                <td class="legacy-high">Obsolete</td>
+                                <td>iPhone 6s/7 final version</td>
+                            </tr>
+                            <tr style="background: rgba(239, 68, 68, 0.1);">
+                                <td><strong>iOS 15.7</strong></td>
+                                <td>0.6%</td>
+                                <td>~0.5M</td>
+                                <td>Sept 2022</td>
+                                <td class="legacy-high">Obsolete</td>
+                                <td>Security updates</td>
+                            </tr>
+                            <tr style="background: rgba(239, 68, 68, 0.1);">
+                                <td><strong>iOS 15.6</strong></td>
+                                <td>0.5%</td>
+                                <td>~0.4M</td>
+                                <td>Jul 2022</td>
+                                <td class="legacy-high">Obsolete</td>
+                                <td>Bug fixes</td>
+                            </tr>
+                            <tr style="background: rgba(239, 68, 68, 0.1);">
+                                <td><strong>iOS 15.5</strong></td>
+                                <td>0.3%</td>
+                                <td>~0.3M</td>
+                                <td>May 2022</td>
+                                <td class="legacy-high">Obsolete</td>
+                                <td>Wallet updates</td>
+                            </tr>
+                            <tr style="background: rgba(239, 68, 68, 0.1);">
+                                <td><strong>iOS 15.4</strong></td>
+                                <td>0.3%</td>
+                                <td>~0.3M</td>
+                                <td>Mar 2022</td>
+                                <td class="legacy-high">Obsolete</td>
+                                <td>Face ID with mask</td>
+                            </tr>
+                            <tr style="background: rgba(239, 68, 68, 0.1);">
+                                <td><strong>iOS 15.0-15.3</strong></td>
+                                <td>0.7%</td>
+                                <td>~0.6M</td>
+                                <td>Sept 2021-Jan 2022</td>
+                                <td class="legacy-high">Obsolete</td>
+                                <td>SharePlay, Focus modes</td>
+                            </tr>
+                            <!-- iOS 14 and older -->
+                            <tr style="background: rgba(127, 29, 29, 0.15);">
+                                <td><strong>iOS 14.x</strong></td>
+                                <td>0.8%</td>
+                                <td>~0.7M</td>
+                                <td>2020-2021</td>
+                                <td class="legacy-high">Obsolete</td>
+                                <td>Widgets, App Library</td>
+                            </tr>
+                            <tr style="background: rgba(127, 29, 29, 0.15);">
+                                <td><strong>iOS 13.x</strong></td>
+                                <td>0.4%</td>
+                                <td>~0.3M</td>
+                                <td>2019-2020</td>
+                                <td class="legacy-high">Obsolete</td>
+                                <td>Dark Mode, Sign in with Apple</td>
+                            </tr>
+                            <tr style="background: rgba(127, 29, 29, 0.15);">
+                                <td><strong>iOS 12.5</strong></td>
+                                <td>0.6%</td>
+                                <td>~0.5M</td>
+                                <td>2018-2019</td>
+                                <td class="legacy-high">Obsolete</td>
+                                <td>iPhone 5s/6 final version</td>
+                            </tr>
+                            <tr style="background: rgba(127, 29, 29, 0.15);">
+                                <td><strong>iOS 11 & older</strong></td>
+                                <td>0.2%</td>
+                                <td>~0.2M</td>
+                                <td>Pre-2018</td>
+                                <td class="legacy-high">Obsolete</td>
+                                <td>No App Store support</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- iOS Version by Country Heatmap -->
+            <div class="chart-card ios full-width">
+                <h2><span class="platform-tag ios">iOS</span> iOS Version Distribution by Country (Top 10)</h2>
+                <div class="chart-container tall">
+                    <canvas id="iosVersionCountryChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION: ANDROID DEEP DIVE ==================== -->
+        <h2 class="section-header"><span class="icon">🤖</span> Android Deep Dive</h2>
+
+        <div class="grid">
+            <!-- Android Version Distribution -->
+            <div class="chart-card android">
+                <h2><span class="platform-tag android">Android</span> Version Distribution - LATAM</h2>
+                <div class="chart-container">
+                    <canvas id="androidVersionChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Android API Coverage -->
+            <div class="chart-card android">
+                <h2><span class="platform-tag android">Android</span> API Level Coverage</h2>
+                <div class="chart-container">
+                    <canvas id="androidApiChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Android Legacy by Country -->
+            <div class="chart-card android full-width">
+                <h2><span class="platform-tag android">Android</span> Legacy Share by Country (Android 11 & Older)</h2>
+                <div class="chart-container">
+                    <canvas id="androidLegacyCountryChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Android Vendor Share -->
+            <div class="chart-card android">
+                <h2><span class="platform-tag android">Android</span> Vendor Market Share</h2>
+                <div class="chart-container">
+                    <canvas id="androidVendorChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Android Vendor by Country -->
+            <div class="chart-card android">
+                <h2><span class="platform-tag android">Android</span> Vendor Legacy Share</h2>
+                <div class="chart-container">
+                    <canvas id="androidVendorLegacyChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Android Price Segments -->
+            <div class="chart-card android full-width">
+                <h2><span class="platform-tag android">Android</span> Price Segment by Country</h2>
+                <div class="chart-container">
+                    <canvas id="androidPriceChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION: OTHER PLATFORMS ==================== -->
+        <h2 class="section-header"><span class="icon">📱</span> Other Platforms & Feature Phones</h2>
+
+        <div class="grid grid-3">
+            <!-- Other OS Distribution -->
+            <div class="chart-card other">
+                <h2>Other Mobile OS Distribution</h2>
+                <div class="chart-container short">
+                    <canvas id="otherOsChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Feature Phone Presence -->
+            <div class="chart-card other">
+                <h2>Feature Phone Presence by Country</h2>
+                <div class="chart-container short">
+                    <canvas id="featurePhoneChart"></canvas>
+                </div>
+            </div>
+
+            <!-- KaiOS & Other -->
+            <div class="chart-card other">
+                <h2>Non-Smartphone Mobile Usage</h2>
+                <div class="chart-container short">
+                    <canvas id="nonSmartphoneChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SECTION: NFL & STRATEGIC ==================== -->
+        <h2 class="section-header"><span class="icon">🏈</span> NFL Interest & Strategic Insights</h2>
+
+        <div class="grid">
+            <!-- NFL Markets Overview -->
+            <div class="chart-card combined">
+                <h2><span class="platform-tag all">ALL</span> NFL Interest vs Device Modernity</h2>
+                <div class="chart-container">
+                    <canvas id="nflScatterChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Priority Markets -->
+            <div class="chart-card combined">
+                <h2><span class="platform-tag all">ALL</span> Priority Market Scoring</h2>
+                <div class="chart-container">
+                    <canvas id="priorityMarketsChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Platform Recommendation -->
+            <div class="chart-card combined full-width">
+                <h2><span class="platform-tag all">ALL</span> Platform Strategy Recommendations by Country</h2>
+                <table class="country-table">
+                    <thead>
+                        <tr>
+                            <th>Country</th>
+                            <th>NFL Interest</th>
+                            <th>Total Devices</th>
+                            <th>Primary Strategy</th>
+                            <th>Min Android</th>
+                            <th>Min iOS</th>
+                            <th>Legacy Risk</th>
+                            <th>Priority</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Mexico</strong></td>
+                            <td>🔥 Very High</td>
+                            <td>127M</td>
+                            <td>Android-first, strong iOS</td>
+                            <td>Android 12 (API 31)</td>
+                            <td>iOS 16+</td>
+                            <td class="legacy-medium">Medium</td>
+                            <td>⭐⭐⭐⭐⭐</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Brazil</strong></td>
+                            <td>🔥 High</td>
+                            <td>214M</td>
+                            <td>Android-first</td>
+                            <td>Android 12 (API 31)</td>
+                            <td>iOS 16+</td>
+                            <td class="legacy-medium">Medium</td>
+                            <td>⭐⭐⭐⭐⭐</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Puerto Rico</strong></td>
+                            <td>🔥 Very High</td>
+                            <td>3.3M</td>
+                            <td>iOS-first (US territory)</td>
+                            <td>Android 13 (API 33)</td>
+                            <td>iOS 17+</td>
+                            <td class="legacy-low">Low</td>
+                            <td>⭐⭐⭐⭐⭐</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Colombia</strong></td>
+                            <td>📈 Growing</td>
+                            <td>50M</td>
+                            <td>Android-first</td>
+                            <td>Android 11 (API 30)</td>
+                            <td>iOS 16+</td>
+                            <td class="legacy-medium">Medium</td>
+                            <td>⭐⭐⭐⭐</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Argentina</strong></td>
+                            <td>📈 Growing</td>
+                            <td>45.5M</td>
+                            <td>Android-first</td>
+                            <td>Android 11 (API 30)</td>
+                            <td>iOS 15+</td>
+                            <td class="legacy-high">High</td>
+                            <td>⭐⭐⭐⭐</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Chile</strong></td>
+                            <td>📈 Growing</td>
+                            <td>20M</td>
+                            <td>Balanced (strong iOS)</td>
+                            <td>Android 12 (API 31)</td>
+                            <td>iOS 17+</td>
+                            <td class="legacy-low">Low</td>
+                            <td>⭐⭐⭐⭐</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Dominican Rep.</strong></td>
+                            <td>📈 Growing</td>
+                            <td>11M</td>
+                            <td>Android-first</td>
+                            <td>Android 12 (API 31)</td>
+                            <td>iOS 16+</td>
+                            <td class="legacy-medium">Medium</td>
+                            <td>⭐⭐⭐</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Panama</strong></td>
+                            <td>📈 Growing</td>
+                            <td>4.3M</td>
+                            <td>Balanced</td>
+                            <td>Android 12 (API 31)</td>
+                            <td>iOS 17+</td>
+                            <td class="legacy-low">Low</td>
+                            <td>⭐⭐⭐</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Costa Rica</strong></td>
+                            <td>📊 Moderate</td>
+                            <td>5.4M</td>
+                            <td>Balanced (strong iOS)</td>
+                            <td>Android 12 (API 31)</td>
+                            <td>iOS 17+</td>
+                            <td class="legacy-low">Low</td>
+                            <td>⭐⭐⭐</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Peru</strong></td>
+                            <td>📊 Moderate</td>
+                            <td>31.5M</td>
+                            <td>Android-only initially</td>
+                            <td>Android 10 (API 29)</td>
+                            <td>iOS 15+</td>
+                            <td class="legacy-high">High</td>
+                            <td>⭐⭐⭐</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Venezuela</strong></td>
+                            <td>📊 Moderate</td>
+                            <td>25M</td>
+                            <td>Android-only, consider lite</td>
+                            <td>Android 10 (API 29)</td>
+                            <td>iOS 15+</td>
+                            <td class="legacy-high">Very High</td>
+                            <td>⭐⭐</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Guatemala</strong></td>
+                            <td>📊 Emerging</td>
+                            <td>17.6M</td>
+                            <td>Android-only, lite version</td>
+                            <td>Android 10 (API 29)</td>
+                            <td>iOS 15+</td>
+                            <td class="legacy-high">Very High</td>
+                            <td>⭐⭐</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Honduras</strong></td>
+                            <td>📊 Emerging</td>
+                            <td>9.8M</td>
+                            <td>Android-only, lite version</td>
+                            <td>Android 10 (API 29)</td>
+                            <td>iOS 15+</td>
+                            <td class="legacy-high">Very High</td>
+                            <td>⭐⭐</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cuba</strong></td>
+                            <td>📉 Limited</td>
+                            <td>6.5M</td>
+                            <td>PWA/Web-first</td>
+                            <td>Android 9 (API 28)</td>
+                            <td>iOS 14+</td>
+                            <td class="legacy-high">Extreme</td>
+                            <td>⭐</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Haiti</strong></td>
+                            <td>📉 Limited</td>
+                            <td>7M</td>
+                            <td>PWA/Web-first, lite app</td>
+                            <td>Android 9 (API 28)</td>
+                            <td>iOS 14+</td>
+                            <td class="legacy-high">Extreme</td>
+                            <td>⭐</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="legend-note">
+            Data sources: StatCounter, TelemetryDeck, Counterpoint Research, IDC Latin America, GSMArena, GSMA Intelligence | Data as of January 2026<br>
+            Total coverage: ~565M mobile devices across 25 countries in the Americas (excluding US, Canada, India, China)<br>
+            Legacy definitions: iOS 16 & older (released before Sept 2023), Android 11 & older (API level ≤30, released before Sept 2021)
+        </div>
+    </div>
+
+    <script>
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.08)';
+
+        const iosColor = 'rgba(59, 130, 246, 0.8)';
+        const androidColor = 'rgba(52, 211, 153, 0.8)';
+        const otherColor = 'rgba(245, 158, 11, 0.8)';
+        const legacyRed = 'rgba(239, 68, 68, 0.8)';
+        const legacyAmber = 'rgba(245, 158, 11, 0.8)';
+
+        // 1. Platform Market Share
+        new Chart(document.getElementById('platformShareChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Android', 'iOS', 'Other (KaiOS, HarmonyOS, Feature)'],
+                datasets: [{
+                    data: [84.7, 14.9, 0.4],
+                    backgroundColor: [androidColor, iosColor, otherColor],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right', labels: { padding: 15, usePointStyle: true } }
+                },
+                cutout: '60%'
+            }
+        });
+
+        // 2. Platform by Sub-Region
+        new Chart(document.getElementById('platformSubregionChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Caribbean', 'Central America', 'South America'],
+                datasets: [
+                    { label: 'Android', data: [72, 82, 86], backgroundColor: androidColor, borderRadius: 4 },
+                    { label: 'iOS', data: [27.5, 17.5, 13.5], backgroundColor: iosColor, borderRadius: 4 },
+                    { label: 'Other', data: [0.5, 0.5, 0.5], backgroundColor: otherColor, borderRadius: 4 }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'top', labels: { usePointStyle: true } } },
+                scales: {
+                    x: { stacked: true, grid: { display: false } },
+                    y: { stacked: true, max: 100, ticks: { callback: v => v + '%' } }
+                }
+            }
+        });
+
+        // 3. Legacy by Platform
+        new Chart(document.getElementById('legacyByPlatformChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Android', 'iOS'],
+                datasets: [
+                    { label: 'Current/Modern', data: [81.5, 86.5], backgroundColor: ['rgba(52, 211, 153, 0.8)', 'rgba(59, 130, 246, 0.8)'], borderRadius: 4 },
+                    { label: 'Legacy', data: [18.5, 13.5], backgroundColor: [legacyAmber, legacyRed], borderRadius: 4 }
+                ]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'top', labels: { usePointStyle: true } } },
+                scales: {
+                    x: { stacked: true, max: 100, ticks: { callback: v => v + '%' } },
+                    y: { stacked: true, grid: { display: false } }
+                }
+            }
+        });
+
+        // 4. Device Age Distribution
+        new Chart(document.getElementById('deviceAgeChart'), {
+            type: 'bar',
+            data: {
+                labels: ['<1 year', '1-2 years', '2-3 years', '3-4 years', '4-5 years', '5+ years'],
+                datasets: [{
+                    label: 'Device Share',
+                    data: [18, 24, 22, 16, 12, 8],
+                    backgroundColor: ['rgba(52, 211, 153, 0.8)', 'rgba(163, 230, 53, 0.8)', 'rgba(234, 179, 8, 0.8)', 'rgba(245, 158, 11, 0.8)', 'rgba(239, 68, 68, 0.8)', 'rgba(127, 29, 29, 0.8)'],
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { ticks: { callback: v => v + '%' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 5. Country Total Devices
+        new Chart(document.getElementById('countryDevicesChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Brazil', 'Mexico', 'Colombia', 'Argentina', 'Peru', 'Venezuela', 'Chile', 'Ecuador', 'Guatemala', 'Dominican Rep.', 'Bolivia', 'Honduras', 'Haiti', 'Paraguay', 'El Salvador', 'Nicaragua', 'Costa Rica', 'Panama', 'Uruguay', 'Jamaica', 'Puerto Rico', 'Trinidad', 'Cuba', 'Bahamas', 'Belize'],
+                datasets: [
+                    { label: 'Android', data: [182, 99, 43, 40, 28, 23, 15, 16, 16, 9, 10.2, 9, 6.7, 6.1, 5.5, 5.1, 3.9, 3, 2.8, 2.3, 1.5, 1.1, 6.1, 0.03, 0.12], backgroundColor: androidColor, borderRadius: 4 },
+                    { label: 'iOS', data: [32, 28, 7, 5.5, 3.5, 2, 5, 1.8, 1.6, 2, 0.7, 0.8, 0.2, 0.7, 0.76, 0.33, 1.5, 1.3, 0.8, 0.75, 1.8, 0.48, 0.33, 0.39, 0.26], backgroundColor: iosColor, borderRadius: 4 }
+                ]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'top', labels: { usePointStyle: true } } },
+                scales: {
+                    x: { stacked: true, ticks: { callback: v => v + 'M' } },
+                    y: { stacked: true, grid: { display: false } }
+                }
+            }
+        });
+
+        // iOS Charts
+        // 6. iOS Version Distribution
+        new Chart(document.getElementById('iosVersionChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['iOS 18.x', 'iOS 26.x', 'iOS 17.x', 'iOS 16.x', 'iOS 15.x', 'iOS 14 & older'],
+                datasets: [{
+                    data: [58, 10, 18.5, 7, 4.5, 2],
+                    backgroundColor: ['rgba(59, 130, 246, 0.9)', 'rgba(99, 102, 241, 0.8)', 'rgba(6, 182, 212, 0.8)', 'rgba(245, 158, 11, 0.8)', 'rgba(239, 68, 68, 0.8)', 'rgba(127, 29, 29, 0.8)'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'right', labels: { padding: 12, usePointStyle: true } } },
+                cutout: '55%'
+            }
+        });
+
+        // 7. iOS Cap
+        new Chart(document.getElementById('iosCapChart'), {
+            type: 'pie',
+            data: {
+                labels: ['iOS 18+ capable', 'iOS 16 max (8/X)', 'iOS 15 max (6s/7)', 'iOS 12 max (5s/6)'],
+                datasets: [{
+                    data: [83.5, 7.0, 6.5, 3.0],
+                    backgroundColor: ['rgba(59, 130, 246, 0.8)', 'rgba(245, 158, 11, 0.8)', 'rgba(239, 68, 68, 0.8)', 'rgba(127, 29, 29, 0.8)'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'right', labels: { padding: 12, usePointStyle: true } } }
+            }
+        });
+
+        // 8. iOS Legacy by Country
+        new Chart(document.getElementById('iosLegacyCountryChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Haiti', 'Cuba', 'Venezuela', 'Honduras', 'Guatemala', 'Bolivia', 'Argentina', 'Ecuador', 'Peru', 'Nicaragua', 'Jamaica', 'Brazil', 'Colombia', 'Dominican Rep.', 'Mexico', 'Uruguay', 'Chile', 'Costa Rica', 'Panama', 'Puerto Rico', 'Bahamas'],
+                datasets: [
+                    { label: 'iOS 15 & older', data: [22, 20, 12, 11, 10, 11, 9, 8, 8, 12, 7, 7, 6, 5, 5, 5, 4, 3, 3, 2.5, 2], backgroundColor: legacyRed, borderRadius: 4 },
+                    { label: 'iOS 16 only', data: [16, 15, 10, 9, 9, 9, 9, 9, 8, 10, 7, 7, 7, 7, 6, 5, 5, 5, 4, 3.5, 3], backgroundColor: legacyAmber, borderRadius: 4 }
+                ]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'top', labels: { usePointStyle: true } } },
+                scales: {
+                    x: { stacked: true, ticks: { callback: v => v + '%' } },
+                    y: { stacked: true, grid: { display: false } }
+                }
+            }
+        });
+
+        // 9. iOS Model Distribution
+        new Chart(document.getElementById('iosModelChart'), {
+            type: 'bar',
+            data: {
+                labels: ['iPhone 13', 'iPhone 14', 'iPhone 12', 'iPhone 11', 'iPhone 15', 'iPhone XR', 'iPhone 8/X', 'iPhone 7 & older'],
+                datasets: [{
+                    label: 'Share %',
+                    data: [18, 15, 14, 12, 10, 9, 12, 10],
+                    backgroundColor: ['rgba(59, 130, 246, 0.8)', 'rgba(99, 102, 241, 0.8)', 'rgba(6, 182, 212, 0.8)', 'rgba(34, 197, 94, 0.8)', 'rgba(139, 92, 246, 0.8)', 'rgba(245, 158, 11, 0.8)', 'rgba(239, 68, 68, 0.8)', 'rgba(127, 29, 29, 0.8)'],
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { callback: v => v + '%' } },
+                    y: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 10. iOS Refurbished
+        new Chart(document.getElementById('iosRefurbChart'), {
+            type: 'bar',
+            data: {
+                labels: ['iPhone 13/14', 'iPhone 11/12', 'iPhone XR/XS', 'iPhone 8/X', 'iPhone 7-'],
+                datasets: [{
+                    label: 'Refurb Share %',
+                    data: [30, 38, 22, 7, 3],
+                    backgroundColor: ['rgba(52, 211, 153, 0.8)', 'rgba(6, 182, 212, 0.8)', 'rgba(245, 158, 11, 0.8)', 'rgba(239, 68, 68, 0.8)', 'rgba(127, 29, 29, 0.8)'],
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { ticks: { callback: v => v + '%' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 10a. iOS 26.x Minor Version Breakdown (Current)
+        new Chart(document.getElementById('ios26MinorChart'), {
+            type: 'bar',
+            data: {
+                labels: ['26.2', '26.1', '26.0'],
+                datasets: [{
+                    label: 'Share %',
+                    data: [1.8, 6.2, 2.0],
+                    backgroundColor: [
+                        'rgba(139, 92, 246, 0.9)',
+                        'rgba(139, 92, 246, 0.8)',
+                        'rgba(168, 85, 247, 0.7)'
+                    ],
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: 'iOS 26.x total: 10% of LATAM iOS devices (Current)', color: '#a78bfa' }
+                },
+                scales: {
+                    x: { ticks: { callback: v => v + '%' } },
+                    y: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 10b. iOS 18.x Minor Version Breakdown
+        new Chart(document.getElementById('ios18MinorChart'), {
+            type: 'bar',
+            data: {
+                labels: ['18.7', '18.6', '18.5', '18.4', '18.3', '18.2', '18.1', '18.0'],
+                datasets: [{
+                    label: 'Share %',
+                    data: [22.5, 18.2, 6.8, 3.2, 2.8, 1.9, 1.5, 1.1],
+                    backgroundColor: [
+                        'rgba(59, 130, 246, 0.9)',
+                        'rgba(59, 130, 246, 0.8)',
+                        'rgba(99, 102, 241, 0.8)',
+                        'rgba(99, 102, 241, 0.7)',
+                        'rgba(139, 92, 246, 0.7)',
+                        'rgba(139, 92, 246, 0.6)',
+                        'rgba(168, 85, 247, 0.6)',
+                        'rgba(168, 85, 247, 0.5)'
+                    ],
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: 'iOS 18.x total: 58% of LATAM iOS devices', color: '#94a3b8' }
+                },
+                scales: {
+                    x: { ticks: { callback: v => v + '%' } },
+                    y: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 10c. iOS 17.x Minor Version Breakdown
+        new Chart(document.getElementById('ios17MinorChart'), {
+            type: 'bar',
+            data: {
+                labels: ['17.7', '17.6', '17.5', '17.4', '17.3', '17.2', '17.1', '17.0'],
+                datasets: [{
+                    label: 'Share %',
+                    data: [4.2, 5.8, 2.4, 1.8, 1.2, 1.1, 0.8, 1.2],
+                    backgroundColor: [
+                        'rgba(6, 182, 212, 0.9)',
+                        'rgba(6, 182, 212, 0.8)',
+                        'rgba(6, 182, 212, 0.7)',
+                        'rgba(14, 165, 233, 0.7)',
+                        'rgba(14, 165, 233, 0.6)',
+                        'rgba(56, 189, 248, 0.6)',
+                        'rgba(56, 189, 248, 0.5)',
+                        'rgba(125, 211, 252, 0.5)'
+                    ],
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: 'iOS 17.x total: 18.5% of LATAM iOS devices', color: '#94a3b8' }
+                },
+                scales: {
+                    x: { ticks: { callback: v => v + '%' } },
+                    y: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 10d. iOS 16.x Minor Version Breakdown
+        new Chart(document.getElementById('ios16MinorChart'), {
+            type: 'bar',
+            data: {
+                labels: ['16.7', '16.6', '16.5', '16.4', '16.3', '16.2', '16.1', '16.0'],
+                datasets: [{
+                    label: 'Share %',
+                    data: [2.8, 1.2, 0.8, 0.6, 0.5, 0.4, 0.4, 0.3],
+                    backgroundColor: [
+                        'rgba(245, 158, 11, 0.9)',
+                        'rgba(245, 158, 11, 0.8)',
+                        'rgba(245, 158, 11, 0.7)',
+                        'rgba(251, 191, 36, 0.7)',
+                        'rgba(251, 191, 36, 0.6)',
+                        'rgba(252, 211, 77, 0.6)',
+                        'rgba(252, 211, 77, 0.5)',
+                        'rgba(253, 224, 71, 0.5)'
+                    ],
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: 'iOS 16.x total: 7% of LATAM iOS devices (Legacy)', color: '#f59e0b' }
+                },
+                scales: {
+                    x: { ticks: { callback: v => v + '%' } },
+                    y: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 10e. iOS 15.x and Older Breakdown
+        new Chart(document.getElementById('ios15OlderChart'), {
+            type: 'bar',
+            data: {
+                labels: ['15.8', '15.7', '15.6', '15.5', '15.4', '15.0-15.3', '14.x', '13.x', '12.5', '11 & older'],
+                datasets: [{
+                    label: 'Share %',
+                    data: [2.1, 0.6, 0.5, 0.3, 0.3, 0.7, 0.8, 0.4, 0.6, 0.2],
+                    backgroundColor: [
+                        'rgba(239, 68, 68, 0.9)',
+                        'rgba(239, 68, 68, 0.8)',
+                        'rgba(239, 68, 68, 0.7)',
+                        'rgba(248, 113, 113, 0.7)',
+                        'rgba(248, 113, 113, 0.6)',
+                        'rgba(252, 165, 165, 0.6)',
+                        'rgba(127, 29, 29, 0.8)',
+                        'rgba(127, 29, 29, 0.7)',
+                        'rgba(127, 29, 29, 0.6)',
+                        'rgba(75, 85, 99, 0.6)'
+                    ],
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: 'iOS 15 & older: 6.5% of LATAM iOS devices (Obsolete)', color: '#ef4444' }
+                },
+                scales: {
+                    x: { ticks: { callback: v => v + '%' } },
+                    y: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 10f. iOS Version by Country Heatmap
+        new Chart(document.getElementById('iosVersionCountryChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Brazil', 'Mexico', 'Argentina', 'Colombia', 'Chile', 'Peru', 'Venezuela', 'Dominican Rep.', 'Puerto Rico', 'Costa Rica'],
+                datasets: [
+                    {
+                        label: 'iOS 26.x',
+                        data: [9, 11, 7, 8, 14, 6, 4, 10, 18, 15],
+                        backgroundColor: 'rgba(139, 92, 246, 0.8)',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'iOS 18.7',
+                        data: [21, 24, 18, 20, 26, 17, 12, 22, 28, 25],
+                        backgroundColor: 'rgba(59, 130, 246, 0.9)',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'iOS 18.0-18.6',
+                        data: [32, 30, 28, 31, 32, 27, 22, 29, 32, 31],
+                        backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'iOS 17.x',
+                        data: [20, 18, 22, 21, 16, 24, 26, 19, 14, 17],
+                        backgroundColor: 'rgba(6, 182, 212, 0.8)',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'iOS 16.x',
+                        data: [8, 7, 11, 9, 6, 12, 14, 9, 4, 6],
+                        backgroundColor: 'rgba(245, 158, 11, 0.8)',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'iOS 15 & older',
+                        data: [10, 10, 14, 11, 6, 14, 22, 11, 4, 6],
+                        backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                        borderRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 12 } },
+                    title: { display: true, text: 'iOS version distribution varies significantly by country economics', color: '#94a3b8' }
+                },
+                scales: {
+                    x: { stacked: true, grid: { display: false } },
+                    y: { stacked: true, max: 100, ticks: { callback: v => v + '%' } }
+                }
+            }
+        });
+
+        // Android Charts
+        // 11. Android Version Distribution
+        new Chart(document.getElementById('androidVersionChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Android 14', 'Android 13', 'Android 12', 'Android 11', 'Android 10', 'Android 9-'],
+                datasets: [{
+                    data: [28.5, 25.0, 18.0, 10.3, 8.0, 10.2],
+                    backgroundColor: ['rgba(52, 211, 153, 0.9)', 'rgba(163, 230, 53, 0.8)', 'rgba(34, 197, 94, 0.8)', 'rgba(245, 158, 11, 0.8)', 'rgba(239, 68, 68, 0.8)', 'rgba(127, 29, 29, 0.8)'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'right', labels: { padding: 12, usePointStyle: true } } },
+                cutout: '55%'
+            }
+        });
+
+        // 12. Android API Coverage
+        new Chart(document.getElementById('androidApiChart'), {
+            type: 'line',
+            data: {
+                labels: ['API 34', 'API 33', 'API 32', 'API 31', 'API 30', 'API 29', 'API 28', 'API 26'],
+                datasets: [{
+                    label: 'Cumulative %',
+                    data: [28.5, 53.5, 58.5, 71.5, 81.5, 89.7, 95.2, 98.5],
+                    borderColor: 'rgba(52, 211, 153, 1)',
+                    backgroundColor: 'rgba(52, 211, 153, 0.2)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { min: 0, max: 100, ticks: { callback: v => v + '%' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 13. Android Legacy by Country
+        new Chart(document.getElementById('androidLegacyCountryChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Haiti', 'Cuba', 'Venezuela', 'Honduras', 'Nicaragua', 'Bolivia', 'Guatemala', 'Paraguay', 'Ecuador', 'Argentina', 'El Salvador', 'Peru', 'Colombia', 'Jamaica', 'Brazil', 'Dominican Rep.', 'Mexico', 'Uruguay', 'Chile', 'Costa Rica', 'Panama', 'Puerto Rico'],
+                datasets: [
+                    { label: 'Android 10 & older', data: [30, 28, 18, 16, 18, 17, 15, 14, 13, 12, 13, 11, 9, 9, 7, 7, 6, 7, 5, 4, 4, 3], backgroundColor: legacyRed, borderRadius: 4 },
+                    { label: 'Android 11 only', data: [18, 17, 14, 14, 14, 13, 13, 12, 12, 12, 11, 11, 10, 9, 10, 9, 9, 7, 7, 7, 6, 5], backgroundColor: legacyAmber, borderRadius: 4 }
+                ]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'top', labels: { usePointStyle: true } } },
+                scales: {
+                    x: { stacked: true, ticks: { callback: v => v + '%' } },
+                    y: { stacked: true, grid: { display: false } }
+                }
+            }
+        });
+
+        // 14. Android Vendor Share
+        new Chart(document.getElementById('androidVendorChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Samsung', 'Xiaomi', 'Motorola', 'Huawei', 'Realme', 'Tecno', 'Other'],
+                datasets: [{
+                    data: [38, 22, 18, 6, 5, 4, 7],
+                    backgroundColor: ['rgba(59, 130, 246, 0.8)', 'rgba(251, 146, 60, 0.8)', 'rgba(234, 179, 8, 0.8)', 'rgba(239, 68, 68, 0.8)', 'rgba(139, 92, 246, 0.8)', 'rgba(6, 182, 212, 0.8)', 'rgba(107, 114, 128, 0.8)'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'right', labels: { padding: 12, usePointStyle: true } } },
+                cutout: '55%'
+            }
+        });
+
+        // 15. Android Vendor Legacy
+        new Chart(document.getElementById('androidVendorLegacyChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Samsung', 'Xiaomi', 'Motorola', 'Huawei', 'Realme', 'Tecno', 'Other'],
+                datasets: [
+                    { label: 'Android 10-', data: [6, 8, 7, 15, 4, 12, 18], backgroundColor: legacyRed, borderRadius: 4 },
+                    { label: 'Android 11', data: [8, 10, 9, 12, 6, 10, 14], backgroundColor: legacyAmber, borderRadius: 4 }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'top', labels: { usePointStyle: true } } },
+                scales: {
+                    x: { stacked: true, grid: { display: false } },
+                    y: { stacked: true, ticks: { callback: v => v + '%' } }
+                }
+            }
+        });
+
+        // 16. Android Price Segments
+        new Chart(document.getElementById('androidPriceChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Brazil', 'Mexico', 'Argentina', 'Colombia', 'Chile', 'Peru', 'Venezuela'],
+                datasets: [
+                    { label: 'Ultra Budget (<$100)', data: [18, 15, 28, 22, 10, 30, 45], backgroundColor: 'rgba(127, 29, 29, 0.8)', borderRadius: 4 },
+                    { label: 'Budget ($100-200)', data: [32, 35, 38, 35, 25, 35, 35], backgroundColor: 'rgba(239, 68, 68, 0.8)', borderRadius: 4 },
+                    { label: 'Mid-range ($200-400)', data: [32, 30, 22, 28, 38, 25, 15], backgroundColor: 'rgba(245, 158, 11, 0.8)', borderRadius: 4 },
+                    { label: 'Upper Mid ($400-600)', data: [12, 14, 8, 10, 18, 7, 4], backgroundColor: 'rgba(52, 211, 153, 0.8)', borderRadius: 4 },
+                    { label: 'Premium ($600+)', data: [6, 6, 4, 5, 9, 3, 1], backgroundColor: 'rgba(59, 130, 246, 0.8)', borderRadius: 4 }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 12 } } },
+                scales: {
+                    x: { stacked: true, grid: { display: false } },
+                    y: { stacked: true, max: 100, ticks: { callback: v => v + '%' } }
+                }
+            }
+        });
+
+        // Other Platforms Charts
+        // 17. Other OS Distribution
+        new Chart(document.getElementById('otherOsChart'), {
+            type: 'pie',
+            data: {
+                labels: ['KaiOS', 'HarmonyOS', 'Feature Phone', 'Other'],
+                datasets: [{
+                    data: [35, 25, 30, 10],
+                    backgroundColor: ['rgba(139, 92, 246, 0.8)', 'rgba(239, 68, 68, 0.8)', 'rgba(107, 114, 128, 0.8)', 'rgba(75, 85, 99, 0.8)'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right', labels: { padding: 10, usePointStyle: true } },
+                    title: { display: true, text: '~2.3M devices total', color: '#94a3b8' }
+                }
+            }
+        });
+
+        // 18. Feature Phone Presence
+        new Chart(document.getElementById('featurePhoneChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Haiti', 'Cuba', 'Guatemala', 'Honduras', 'Bolivia', 'Nicaragua'],
+                datasets: [{
+                    label: 'Feature Phone %',
+                    data: [8, 6, 4, 3.5, 3, 3],
+                    backgroundColor: 'rgba(107, 114, 128, 0.8)',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { callback: v => v + '%' } },
+                    y: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 19. Non-smartphone Usage
+        new Chart(document.getElementById('nonSmartphoneChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Smartphone Only', 'Feature + Smart', 'Feature Only'],
+                datasets: [{
+                    data: [96.5, 2.5, 1.0],
+                    backgroundColor: ['rgba(52, 211, 153, 0.8)', 'rgba(245, 158, 11, 0.8)', 'rgba(107, 114, 128, 0.8)'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'right', labels: { padding: 10, usePointStyle: true } } },
+                cutout: '50%'
+            }
+        });
+
+        // NFL Charts
+        // 20. NFL Scatter
+        new Chart(document.getElementById('nflScatterChart'), {
+            type: 'scatter',
+            data: {
+                datasets: [
+                    {
+                        label: 'High NFL Interest',
+                        data: [{ x: 127, y: 13, r: 30 }, { x: 214, y: 15.5, r: 45 }, { x: 3.3, y: 7, r: 8 }],
+                        backgroundColor: 'rgba(52, 211, 153, 0.7)',
+                        pointRadius: 20
+                    },
+                    {
+                        label: 'Medium Interest',
+                        data: [{ x: 50, y: 16, r: 15 }, { x: 45.5, y: 21, r: 14 }, { x: 20, y: 10.5, r: 10 }],
+                        backgroundColor: 'rgba(245, 158, 11, 0.7)',
+                        pointRadius: 15
+                    },
+                    {
+                        label: 'Emerging Interest',
+                        data: [{ x: 25, y: 27, r: 10 }, { x: 31.5, y: 19, r: 11 }, { x: 17.6, y: 23.5, r: 9 }],
+                        backgroundColor: 'rgba(239, 68, 68, 0.7)',
+                        pointRadius: 12
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top', labels: { usePointStyle: true } },
+                    tooltip: { callbacks: { label: ctx => `Devices: ${ctx.parsed.x}M, Legacy: ${ctx.parsed.y}%` } }
+                },
+                scales: {
+                    x: { title: { display: true, text: 'Total Devices (Millions)', color: '#94a3b8' } },
+                    y: { title: { display: true, text: 'Legacy Share %', color: '#94a3b8' } }
+                }
+            }
+        });
+
+        // 21. Priority Markets
+        new Chart(document.getElementById('priorityMarketsChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Mexico', 'Brazil', 'Puerto Rico', 'Colombia', 'Argentina', 'Chile', 'Dominican Rep.', 'Panama', 'Costa Rica', 'Peru'],
+                datasets: [{
+                    label: 'Priority Score',
+                    data: [95, 92, 90, 78, 75, 72, 68, 65, 62, 58],
+                    backgroundColor: ['rgba(52, 211, 153, 0.9)', 'rgba(52, 211, 153, 0.85)', 'rgba(52, 211, 153, 0.8)', 'rgba(163, 230, 53, 0.8)', 'rgba(163, 230, 53, 0.75)', 'rgba(234, 179, 8, 0.8)', 'rgba(234, 179, 8, 0.75)', 'rgba(234, 179, 8, 0.7)', 'rgba(245, 158, 11, 0.7)', 'rgba(245, 158, 11, 0.65)'],
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: 'Based on: NFL interest, device volume, legacy risk, iOS penetration', color: '#94a3b8' }
+                },
+                scales: {
+                    x: { max: 100 },
+                    y: { grid: { display: false } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

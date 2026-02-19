@@ -1,0 +1,243 @@
+/* PlayerExpandedCard.module.css - Pixel-perfect expanded player stats card styles */
+
+/* ============================================================================
+   CSS Custom Properties - Color values from COLORS constant
+   ============================================================================ */
+/* ============================================================================
+   Size values from PX constant (in pixels)
+   ============================================================================ */
+/* ============================================================================
+   Container - Main card wrapper with gradient background
+   ============================================================================ */
+.container {
+  padding: 2px;
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  background: var(--card-background);
+}
+
+/* ============================================================================
+   Header - Logo, badges, and draft button section
+   ============================================================================ */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: var(--pec-header-padding-top);
+  padding-bottom: var(--pec-header-padding-bottom);
+  padding-left: var(--pec-header-padding-x);
+  padding-right: var(--pec-header-padding-x);
+}
+
+/* ============================================================================
+   Logo - Team logo image
+   ============================================================================ */
+.logo {
+  width: var(--pec-logo-size);
+  height: var(--pec-logo-size);
+  flex-shrink: 0;
+  display: block;
+}
+
+/* ============================================================================
+   Badges container - Holds Bye, ADP, and Proj badges
+   ============================================================================ */
+.badgesContainer {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--pec-badge-gap);
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+/* ============================================================================
+   Badge - Individual badge (Bye, ADP, Proj)
+   ============================================================================ */
+.badge {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.badge.byeBadge {
+  min-width: var(--pec-badge-min-width-bye);
+}
+
+.badge.adpBadge {
+  min-width: var(--pec-badge-min-width-adp);
+}
+
+.badge.projBadge {
+  min-width: var(--pec-badge-min-width-proj);
+}
+
+.badgeLabel {
+  font-size: var(--pec-badge-label-size);
+  color: var(--label-color);
+}
+
+.badgeValue {
+  font-size: var(--pec-badge-value-size);
+  font-weight: 500;
+  color: var(--pec-primary-text-color);
+}
+
+/* ============================================================================
+   Draft button - Action button for drafting player
+   ============================================================================ */
+.draftButton {
+  padding-top: var(--pec-draft-button-padding-y);
+  padding-bottom: var(--pec-draft-button-padding-y);
+  padding-left: var(--pec-draft-button-padding-x);
+  padding-right: var(--pec-draft-button-padding-x);
+  border-radius: 4px;
+  font-size: var(--pec-draft-button-font-size);
+  font-weight: 700;
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.draftButton.active {
+  background: url(/wr_blue.png) no-repeat center center;
+  background-size: cover;
+  opacity: 1;
+}
+
+.draftButton.inactive {
+  background-color: var(--pec-draft-button-inactive-color);
+  opacity: 0.7;
+}
+
+/* ============================================================================
+   Stats area - Scrollable container for stats table
+   ============================================================================ */
+.statsArea {
+  padding-top: 0;
+  padding-bottom: 8px;
+  margin-top: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  cursor: grab;
+}
+
+.statsArea::-webkit-scrollbar {
+  display: none;
+}
+
+/* ============================================================================
+   Stats table - Position-specific stats table wrapper
+   ============================================================================ */
+.statsTable {
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.statsTableQB {
+  min-width: 650px;
+}
+
+.statsTableRB {
+  min-width: 480px;
+}
+
+.statsTableWRTE {
+  min-width: 480px;
+}
+
+/* ============================================================================
+   Stats header - Column header row
+   ============================================================================ */
+.statsHeader {
+  position: relative;
+  height: var(--pec-header-height);
+  padding-top: 3px;
+  padding-bottom: 4px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.statsHeader.lightBg {
+  color: var(--pec-header-label-color-dark);
+}
+
+.statsHeader.darkBg {
+  color: var(--pec-header-label-color);
+}
+
+.statsHeaderLine {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+}
+
+.statsHeaderLine.lightBg {
+  background: var(--pec-line-color-dark);
+}
+
+.statsHeaderLine.darkBg {
+  background: var(--pec-line-color);
+}
+
+.statsHeaderColumn {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  left: var(--column-left);
+  width: var(--column-width);
+}
+
+.statsHeaderColumn.first {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.statsHeaderColumn.other {
+  justify-content: center;
+  text-align: center;
+}
+
+/* ============================================================================
+   Stats row - Data row in stats table
+   ============================================================================ */
+.statsRow {
+  position: relative;
+  height: var(--pec-row-height);
+  padding: 4px 0;
+  color: var(--pec-primary-text-color);
+  font-size: 14px;
+}
+
+.statsRowYear {
+  position: absolute;
+  left: var(--pec-year-label-left);
+  width: var(--pec-year-column-width);
+  text-align: left;
+}
+
+.statsRowValue {
+  position: absolute;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  left: var(--row-value-left);
+  width: var(--row-value-width);
+}
+
+/* ============================================================================
+   Stats table padding wrapper
+   ============================================================================ */
+.statsTablePadding {
+  padding: 0 0 6px 0;
+}

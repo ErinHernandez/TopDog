@@ -1,0 +1,49 @@
+version: '3.8'
+
+# Production override for docker-compose.yml
+# Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#
+# This configuration:
+# - Uses the multi-stage Dockerfile for optimized production builds
+# - Removes volume mounts (immutable container)
+# - Sets NODE_ENV=production
+# - Disables hot reload
+# - Configures resource limits
+# - Uses health checks for orchestration awareness
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: npm start
+    volumes: []
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '1'
+          memory: 1G
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  redis:
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M

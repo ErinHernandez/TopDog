@@ -1,0 +1,305 @@
+# TopDog Studio Helm Chart Values
+# Self-hosted vLLM + Qwen2.5-Coder deployment configuration
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Global Configuration
+# ─────────────────────────────────────────────────────────────────────────────
+
+global:
+  environment: production
+  replicaCount: 2
+
+# ─────────────────────────────────────────────────────────────────────────────
+# vLLM Deployment
+# ─────────────────────────────────────────────────────────────────────────────
+
+vllm:
+  enabled: true
+  replicas: 1
+  image:
+    repository: vllm/vllm-openai
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 8000
+    targetPort: 8000
+
+  resources:
+    requests:
+      memory: "16Gi"
+      cpu: "4"
+      nvidia.com/gpu: "1"
+    limits:
+      memory: "32Gi"
+      cpu: "8"
+      nvidia.com/gpu: "1"
+
+  # GPU Configuration
+  gpu:
+    enabled: true
+    type: nvidia
+    count: 1
+    memory: "24Gi"
+
+  # Startup probe configuration
+  startupProbe:
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    timeoutSeconds: 10
+    failureThreshold: 30
+
+  # Liveness probe
+  livenessProbe:
+    initialDelaySeconds: 120
+    periodSeconds: 30
+    timeoutSeconds: 10
+    failureThreshold: 3
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Qwen2.5-Coder Model Configuration
+# ─────────────────────────────────────────────────────────────────────────────
+
+model:
+  # Model repository and version
+  repository: Qwen/Qwen2.5-Coder-32B-Instruct
+  revision: main
+
+  # Model optimization
+  quantization: gptq  # gptq, bitsandbytes, or none
+  dtype: float16
+
+  # Context length and token limits
+  maxModelLen: 4096
+  maxTokensPerRequest: 2048
+  maxBatchSize: 32
+
+  # Model loading
+  loadFormat: auto
+  gpuMemoryUtilization: 0.9
+
+# ─────────────────────────────────────────────────────────────────────────────
+# LiteLLM Proxy Configuration
+# ─────────────────────────────────────────────────────────────────────────────
+
+litellm:
+  enabled: true
+  replicas: 1
+  image:
+    repository: ghcr.io/berriai/litellm
+    tag: main
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 8000
+    targetPort: 8000
+
+  # LiteLLM API Configuration
+  apiKey: ""  # Set via secrets in production
+  apiVersion: "v1"
+
+  # Model aliases for consistent interface
+  modelAliases:
+    qwen-coder: "openai/qwen-32b-instruct"
+    code-generation: "openai/qwen-32b-instruct"
+    code-chat: "openai/qwen-32b-instruct"
+
+  # Proxy settings
+  proxy:
+    port: 8000
+    host: "0.0.0.0"
+    timeout: 600
+
+  resources:
+    requests:
+      memory: "4Gi"
+      cpu: "2"
+    limits:
+      memory: "8Gi"
+      cpu: "4"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PostgreSQL Configuration (pgvector storage)
+# ─────────────────────────────────────────────────────────────────────────────
+
+postgresql:
+  enabled: true
+  auth:
+    username: topdog
+    password: ""  # Set via secrets in production
+    database: topdog_vectors
+
+  primary:
+    resources:
+      requests:
+        memory: "2Gi"
+        cpu: "500m"
+      limits:
+        memory: "4Gi"
+        cpu: "1"
+
+  service:
+    type: ClusterIP
+    port: 5432
+
+  # pgvector extension
+  extensions:
+    - pgvector
+
+  persistence:
+    enabled: true
+    size: 20Gi
+    storageClassName: standard
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Monitoring Configuration
+# ─────────────────────────────────────────────────────────────────────────────
+
+monitoring:
+  enabled: true
+
+  prometheus:
+    enabled: true
+    port: 9090
+    retention: 15d
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "2Gi"
+        cpu: "1"
+
+  grafana:
+    enabled: true
+    port: 3000
+    adminPassword: ""  # Set via secrets in production
+    datasource: prometheus
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "250m"
+      limits:
+        memory: "1Gi"
+        cpu: "500m"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Ingress Configuration
+# ─────────────────────────────────────────────────────────────────────────────
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+
+  hosts:
+    - host: topdog.studio
+      paths:
+        - path: /api
+          pathType: Prefix
+          backend: vllm
+        - path: /v1
+          pathType: Prefix
+          backend: litellm
+        - path: /metrics
+          pathType: Prefix
+          backend: prometheus
+        - path: /grafana
+          pathType: Prefix
+          backend: grafana
+
+  tls:
+    enabled: true
+    issuer: letsencrypt-prod
+    secretName: topdog-studio-tls
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Storage Configuration
+# ─────────────────────────────────────────────────────────────────────────────
+
+storage:
+  class: standard
+  models:
+    size: 100Gi
+    path: /models
+  cache:
+    size: 50Gi
+    path: /cache
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Security Configuration
+# ─────────────────────────────────────────────────────────────────────────────
+
+security:
+  rbac:
+    enabled: true
+  podSecurityPolicy:
+    enabled: false
+  networkPolicy:
+    enabled: true
+
+  # Secrets management
+  secrets:
+    apiKey:
+      name: topdog-api-key
+      key: value
+    databasePassword:
+      name: postgres-password
+      key: password
+    liteLLMKey:
+      name: litellm-api-key
+      key: value
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Environment-Specific Overrides
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Development environment overrides
+development:
+  enabled: false
+  vllm:
+    replicas: 1
+    resources:
+      requests:
+        memory: "8Gi"
+        cpu: "2"
+  litellm:
+    replicas: 1
+  model:
+    maxBatchSize: 8
+    gpuMemoryUtilization: 0.7
+
+# Staging environment overrides
+staging:
+  enabled: false
+  vllm:
+    replicas: 1
+    resources:
+      requests:
+        memory: "12Gi"
+        cpu: "3"
+  litellm:
+    replicas: 1
+  model:
+    maxBatchSize: 16
+
+# Production environment overrides
+production:
+  enabled: true
+  vllm:
+    replicas: 2
+    resources:
+      requests:
+        memory: "16Gi"
+        cpu: "4"
+  litellm:
+    replicas: 2
+  model:
+    maxBatchSize: 32
+  postgresql:
+    primary:
+      replicas: 3

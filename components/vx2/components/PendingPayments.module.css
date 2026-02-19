@@ -1,0 +1,255 @@
+/**
+ * PendingPayments CSS Module
+ *
+ * Zero-runtime CSS for CSP compliance.
+ * Uses tokens.css variables for all colors.
+ */
+
+/* ============================================================================
+   CONTAINER STYLES
+   ============================================================================ */
+
+.container {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background-color: var(--bg-secondary);
+}
+
+/* ============================================================================
+   HEADER STYLES
+   ============================================================================ */
+
+.header {
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.headerText h3 {
+  font-weight: 600;
+  font-size: var(--font-size-lg);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.headerText p {
+  font-size: var(--font-size-sm);
+  margin-top: 0.125rem;
+  margin-bottom: 0;
+  color: var(--text-secondary);
+}
+
+.refreshButton {
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.refreshButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spinIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.spinIcon.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================================================
+   CONTENT AREA STYLES
+   ============================================================================ */
+
+.content {
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.loadingContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+.spinner {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid var(--color-state-active);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.errorMessage {
+  text-align: center;
+  padding: 1.5rem 0;
+  color: var(--color-state-error);
+}
+
+/* ============================================================================
+   PAYMENT CARD STYLES
+   ============================================================================ */
+
+.card {
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-default);
+  transition: opacity 0.2s ease;
+}
+
+.card.disabled {
+  opacity: 0.6;
+}
+
+.cardContent {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+}
+
+.paymentIcon {
+  font-size: 1.875rem;
+  flex-shrink: 0;
+}
+
+.cardBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  margin-bottom: 0.25rem;
+}
+
+.cardTitle {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.cardAmount {
+  font-weight: 700;
+  flex-shrink: 0;
+  color: var(--color-state-success);
+}
+
+.cardDescription {
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-sm);
+  margin-top: 0;
+  color: var(--text-secondary);
+}
+
+/* ============================================================================
+   EXPIRATION STATUS
+   ============================================================================ */
+
+.expirationContainer {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: 0.75rem;
+}
+
+.expirationLabel {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+.expirationBadge {
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--radius-sm);
+  background-color: rgba(245, 158, 11, 0.12);
+  color: var(--color-state-warning);
+}
+
+.expirationBadge.expiringSoon {
+  background-color: rgba(239, 68, 68, 0.12);
+  color: var(--color-state-error);
+}
+
+/* ============================================================================
+   ACTION BUTTONS
+   ============================================================================ */
+
+.actions {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.viewButton {
+  flex: 1;
+  padding: var(--spacing-sm) 0.75rem;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: var(--color-state-success);
+  color: #fff;
+}
+
+.viewButton:disabled {
+  background-color: var(--bg-elevated);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+.viewButton:not(:disabled):hover {
+  opacity: 0.9;
+}
+
+.cancelButton {
+  padding: var(--spacing-sm) 0.75rem;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  border: 1px solid var(--border-default);
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancelButton:disabled {
+  cursor: not-allowed;
+}
+
+.cancelButton.cancelling {
+  opacity: 0.5;
+}
+
+.cancelButton:not(:disabled):hover {
+  opacity: 0.8;
+}

@@ -1,0 +1,91 @@
+/**
+ * DraftStatusBar Styles
+ *
+ * CSS Module for DraftStatusBar component.
+ * Uses CSS custom properties for dynamic values from constants.
+ */
+
+@keyframes headerShake {
+  0%, 100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  10% {
+    transform: translateX(-4px) rotate(-2deg);
+  }
+  20% {
+    transform: translateX(4px) rotate(2deg);
+  }
+  30% {
+    transform: translateX(-4px) rotate(-2deg);
+  }
+  40% {
+    transform: translateX(4px) rotate(2deg);
+  }
+  50% {
+    transform: translateX(-4px) rotate(-2deg);
+  }
+  60% {
+    transform: translateX(4px) rotate(2deg);
+  }
+  70% {
+    transform: translateX(-4px) rotate(-2deg);
+  }
+  80% {
+    transform: translateX(4px) rotate(2deg);
+  }
+  90% {
+    transform: translateX(-2px) rotate(-1deg);
+  }
+}
+
+.container {
+  position: relative;
+  height: var(--header-height, 64px);
+  padding-top: 28px; /* Space for Dynamic Island (8px top + 20px height) */
+  padding-bottom: 2px; /* Padding below safe area */
+  z-index: 60;
+  flex-shrink: 0;
+  transition: background-color 0.15s ease;
+  transform-origin: center center;
+  -webkit-tap-highlight-color: transparent;
+
+  /* Dynamic background based on state */
+  background-color: var(--bg-color, #101927);
+  background-image: var(--bg-image, none);
+  background-repeat: var(--bg-repeat, repeat);
+  background-size: var(--bg-size, auto);
+  background-position: var(--bg-position, center center);
+}
+
+.container.clickable {
+  cursor: pointer;
+}
+
+.container.notClickable {
+  cursor: default;
+}
+
+.container.shaking {
+  animation: headerShake 0.6s ease-in-out;
+}
+
+.timerContainer {
+  position: absolute;
+  top: 28px; /* Below Dynamic Island (8px top + 20px height) */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none; /* Allow clicks through to parent container */
+  z-index: 1;
+}
+
+.timerValue {
+  font-size: 24px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #ffffff;
+  pointer-events: none;
+}

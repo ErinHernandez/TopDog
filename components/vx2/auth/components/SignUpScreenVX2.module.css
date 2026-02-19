@@ -1,0 +1,602 @@
+/**
+ * SignUpScreenVX2 Component CSS Module
+ *
+ * Component-specific styles for the full-screen sign-up flow.
+ * Shared styles are in auth-shared.module.css.
+ */
+
+/* ============================================================================
+   MAIN CONTAINER
+   ============================================================================ */
+
+.container {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  z-index: var(--z-modal, 100);
+}
+
+/* ============================================================================
+   SAFE AREA HEADER
+   ============================================================================ */
+
+.safeAreaHeader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: max(env(safe-area-inset-top, 59px), 59px);
+  background-image: url(/wr_blue.png);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  z-index: 1;
+}
+
+.safeAreaSpacer {
+  height: max(env(safe-area-inset-top, 59px), 59px);
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+   CONTENT AREA
+   ============================================================================ */
+
+.contentArea {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.contentArea::-webkit-scrollbar {
+  display: none;
+}
+
+.contentSpacer {
+  min-height: 20px;
+}
+
+/* ============================================================================
+   SECTION: LOGO & TITLE
+   ============================================================================ */
+
+.logoSection {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logoImage {
+  height: 56px;
+}
+
+.titleText {
+  margin-top: 24px;
+  font-size: 17px;
+}
+
+/* ============================================================================
+   PASSWORD STRENGTH INDICATOR
+   ============================================================================ */
+
+.strengthContainer {
+  margin-top: 12px;
+  opacity: var(--strength-opacity, 0);
+  transition: opacity 0.2s ease-out;
+}
+
+.strengthContainer.visible {
+  opacity: 1;
+}
+
+.strengthBars {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.strengthBar {
+  flex: 1;
+  height: 6px;
+  border-radius: 9999px;
+  transition: background-color 0.2s ease-out;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.strengthBar.active {
+  background-color: var(--strength-color);
+}
+
+.strengthInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.strengthLabel {
+  font-size: 13px;
+}
+
+.strengthCharCount {
+  font-size: 13px;
+}
+
+/* ============================================================================
+   INPUT WRAPPER & STYLING
+   ============================================================================ */
+
+.inputField {
+  width: 100%;
+  padding: 16px 20px;
+  border-radius: 12px;
+  outline: none;
+  transition: all 0.15s ease;
+  background-color: var(--bg-secondary, rgba(255, 255, 255, 0.05));
+  border: 2px solid var(--input-border);
+  font-size: 17px;
+  height: 56px;
+}
+
+.inputField:focus {
+  border-color: var(--focus-border, rgba(96, 165, 250, 0.5));
+}
+
+.inputField::placeholder {
+  color: var(--text-muted, rgba(255, 255, 255, 0.5));
+}
+
+.inputField:disabled {
+  opacity: 0.5;
+}
+
+.inputField.error {
+  border-color: var(--color-state-error) !important;
+}
+
+.inputFieldWithRight {
+  padding-right: 52px;
+}
+
+.inputRightElement {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.inputWrapper {
+  position: relative;
+}
+
+.errorMessage {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding-left: 4px;
+  font-size: 13px;
+}
+
+.errorIcon {
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+   PASSWORD REQUIREMENTS BOX
+   ============================================================================ */
+
+.requirementsBox {
+  padding: 16px;
+  border-radius: 12px;
+  margin-top: 24px;
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.requirementsTitle {
+  font-weight: 500;
+  margin-bottom: 12px;
+  font-size: 15px;
+}
+
+.requirementsList {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.requirementItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.requirementIcon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+
+.requirementChecked {
+  color: var(--color-state-success);
+}
+
+.requirementUnchecked {
+  color: var(--text-muted);
+}
+
+/* ============================================================================
+   PASSWORD VISIBILITY TOGGLE
+   ============================================================================ */
+
+.toggleButton {
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.15s ease;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.toggleButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================================================
+   ERROR BANNER
+   ============================================================================ */
+
+.errorBanner {
+  margin-bottom: 16px;
+  padding: 16px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: var(--color-state-error-bg, rgba(239, 68, 68, 0.1));
+  border: 1px solid var(--color-state-error-border, rgba(239, 68, 68, 0.125));
+}
+
+.errorBannerIcon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.errorBannerText {
+  font-size: 15px;
+}
+
+/* ============================================================================
+   FOOTER SECTION
+   ============================================================================ */
+
+.footer {
+  flex-shrink: 0;
+  border-top: 1px solid var(--border-default);
+}
+
+.footerContent {
+  padding: var(--footer-padding, 12px 24px 16px);
+  padding-bottom: max(env(safe-area-inset-bottom), 24px);
+}
+
+.footerButton {
+  width: 100%;
+  font-weight: 700;
+  transition: all 0.15s ease;
+  font-size: 17px;
+  height: 72px;
+  border: none;
+  cursor: pointer;
+  border-radius: 0;
+}
+
+.footerButtonEnabled {
+  background: url(/wr_blue.png) no-repeat center center;
+  background-size: cover;
+  color: #fff;
+  opacity: 1;
+}
+
+.footerButtonDisabled {
+  background-color: var(--bg-tertiary);
+  color: var(--text-disabled);
+  opacity: 0.6;
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+  background-color: var(--border-default);
+}
+
+.footerText {
+  text-align: center;
+  font-size: 15px;
+  padding-top: 16px;
+  padding-bottom: 8px;
+}
+
+.footerLink {
+  font-weight: 600;
+  background: url(/wr_blue.png) no-repeat center center;
+  background-size: cover;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+/* ============================================================================
+   HEADER WITH BACK BUTTON
+   ============================================================================ */
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+  padding: var(--header-padding, 12px 16px);
+}
+
+.backButton {
+  padding: 8px;
+  border-radius: 9999px;
+  transition: background-color 0.15s ease;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.backButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================================================
+   CENTERED CONTENT (Username, Email Verify Steps)
+   ============================================================================ */
+
+.centeredContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 var(--content-horizontal-padding, 24px);
+}
+
+.centerSection {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.iconCircle {
+  width: 80px;
+  height: 80px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  background: url(/wr_blue.png) no-repeat center center;
+  background-size: cover;
+}
+
+.iconCircleIcon {
+  width: 40px;
+  height: 40px;
+  color: #fff;
+}
+
+.centerTitle {
+  font-weight: 700;
+  margin-bottom: 8px;
+  font-size: 24px;
+}
+
+.centerSubtitle {
+  font-size: 15px;
+}
+
+.usernameRequirementsBox {
+  padding: 16px;
+  border-radius: 12px;
+  margin-top: 24px;
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.requirementsListVertical {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ============================================================================
+   SUCCESS STEP
+   ============================================================================ */
+
+.successContainer {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal, 100);
+  padding: 0 var(--content-horizontal-padding, 24px);
+}
+
+.successIconCircle {
+  width: 96px;
+  height: 96px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  background-color: var(--color-state-success-bg, rgba(16, 185, 129, 0.15));
+}
+
+.successIcon {
+  width: 48px;
+  height: 48px;
+}
+
+.successTitle {
+  font-weight: 700;
+  margin-bottom: 12px;
+  font-size: 28px;
+}
+
+.successSubtitle {
+  text-align: center;
+  margin-bottom: 24px;
+  font-size: 17px;
+}
+
+.successInfoBox {
+  text-align: center;
+  margin-bottom: 24px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 448px;
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.infoText {
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.infoEmail {
+  font-weight: 500;
+  font-size: 15px;
+  margin: 8px 0;
+}
+
+.taxReminder {
+  text-align: center;
+  margin-bottom: 32px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 448px;
+  background-color: rgba(255, 255, 255, 0.03);
+  border-left: 3px solid var(--text-muted);
+}
+
+.taxReminderText {
+  font-size: 13px;
+}
+
+.successButton {
+  width: 100%;
+  max-width: 448px;
+  font-weight: 700;
+  font-size: 17px;
+  height: 72px;
+  border-radius: 12px;
+  background: url(/wr_blue.png) no-repeat center center;
+  background-size: cover;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+/* ============================================================================
+   EMAIL VERIFICATION CODE INPUT
+   ============================================================================ */
+
+.codeInput {
+  width: 100%;
+  padding: 16px 20px;
+  border-radius: 12px;
+  outline: none;
+  transition: all 0.15s ease;
+  background-color: var(--bg-secondary, rgba(255, 255, 255, 0.05));
+  border: 2px solid var(--border-default);
+  color: var(--text-primary);
+  font-size: 24px;
+  height: 64px;
+  text-align: center;
+  letter-spacing: 0.5em;
+  font-family: monospace;
+}
+
+.codeInput:focus {
+  border-color: var(--focus-border, rgba(96, 165, 250, 0.5));
+}
+
+.codeInput::placeholder {
+  color: var(--text-muted);
+}
+
+.codeInput:disabled {
+  opacity: 0.5;
+}
+
+/* ============================================================================
+   RESEND CODE SECTION
+   ============================================================================ */
+
+.resendSection {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.resendLink {
+  font-weight: 600;
+  background: url(/wr_blue.png) no-repeat center center;
+  background-size: cover;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* ============================================================================
+   SPINNER
+   ============================================================================ */
+
+.spinner {
+  animation: spin 1s linear infinite;
+  border-radius: 50%;
+  height: 20px;
+  width: 20px;
+  border: 2px solid transparent;
+  border-top-color: #fff;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================================================
+   SPACING UTILITIES
+   ============================================================================ */
+
+.spaceY4 {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}

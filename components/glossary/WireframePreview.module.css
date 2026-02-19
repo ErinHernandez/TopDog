@@ -1,0 +1,560 @@
+/**
+ * WireframePreview Styles
+ * Device frames and element highlighting for glossary
+ */
+
+.wireframeContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #111111;
+  border-radius: 12px;
+  border: 1px solid #2a2a2a;
+}
+
+.platformHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #E5E7EB;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.deviceFrame {
+  position: relative;
+  background: #0a0a0a;
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.7),
+    inset 0 1px 1px rgba(255, 255, 255, 0.03);
+  overflow: hidden;
+}
+
+.bezel {
+  position: absolute;
+  inset: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.dynamicIsland {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90px;
+  height: 28px;
+  background: #000;
+  border-radius: 20px;
+  z-index: 10;
+}
+
+.notch {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 150px;
+  height: 30px;
+  background: #1F2937;
+  border-radius: 0 0 20px 20px;
+  z-index: 10;
+}
+
+.screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #1a1a1a;
+  overflow: hidden;
+}
+
+.screenRegion {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Dark theme screen regions */
+.screenRegion:nth-child(1) { background: #252525; } /* Status Bar */
+.screenRegion:nth-child(2) { background: #222222; } /* Picks Bar */
+.screenRegion:nth-child(3) { background: #1a1a1a; } /* Main Content */
+.screenRegion:nth-child(4) { background: #232323; } /* Footer */
+
+.regionLabel {
+  font-size: 8px;
+  color: #64748B;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.elementHighlight {
+  position: absolute;
+  border: 2px solid;
+  border-radius: 4px;
+  background: rgba(99, 102, 241, 0.25);
+  animation: pulse 2s ease-in-out infinite;
+  z-index: 20;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.elementLabel {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 25;
+  max-width: 100px;
+}
+
+.elementLabelId {
+  font-size: 8px;
+  font-weight: 700;
+  font-family: 'SF Mono', Monaco, monospace;
+  background: currentColor;
+  color: white;
+  padding: 2px 4px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.elementLabelId::before {
+  content: '';
+}
+
+.elementLabelName {
+  font-size: 7px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.safeAreaIndicator {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 4px,
+    rgba(239, 68, 68, 0.15) 4px,
+    rgba(239, 68, 68, 0.15) 8px
+  );
+  border: 1px dashed rgba(239, 68, 68, 0.4);
+  z-index: 5;
+}
+
+.safeAreaIndicator span {
+  font-size: 6px;
+  color: #F87171;
+  text-transform: uppercase;
+  background: #1E293B;
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+
+.homeBar {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 4px;
+  background: #4B5563;
+  border-radius: 2px;
+}
+
+.androidNav {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 24px;
+}
+
+.navButton {
+  width: 12px;
+  height: 12px;
+  background: #4B5563;
+  border-radius: 50%;
+}
+
+.navButton:nth-child(2) {
+  border-radius: 2px;
+}
+
+.navButton:nth-child(3) {
+  width: 14px;
+  height: 14px;
+  background: transparent;
+  border: 2px solid #4B5563;
+  border-radius: 3px;
+}
+
+.deviceSpecs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 10px;
+  color: #9CA3AF;
+}
+
+.deviceSpecs span {
+  background: #374151;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Multi-platform container */
+.multiPlatformContainer {
+  margin-top: 24px;
+  padding: 24px;
+  background: #111111;
+  border: 1px solid #2a2a2a;
+  border-radius: 16px;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #F3F4F6;
+  margin: 0 0 8px 0;
+}
+
+.sectionDescription {
+  font-size: 13px;
+  color: #9CA3AF;
+  margin: 0 0 20px 0;
+  line-height: 1.5;
+}
+
+/* Horizontal carousel for device previews */
+.wireframeCarousel {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 8px 4px 16px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.wireframeCarousel::-webkit-scrollbar {
+  height: 6px;
+}
+
+.wireframeCarousel::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 3px;
+}
+
+.wireframeCarousel::-webkit-scrollbar-thumb {
+  background: #3a3a3a;
+  border-radius: 3px;
+}
+
+.wireframeCarousel::-webkit-scrollbar-thumb:hover {
+  background: #4a4a4a;
+}
+
+.wireframeCard {
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  background: transparent;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  padding: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.wireframeCard:hover {
+  border-color: #3a3a3a;
+  background: #1a1a1a;
+}
+
+.wireframeCard.selected {
+  border-color: #818CF8;
+  background: rgba(99, 102, 241, 0.1);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+.wireframeCard.selected .wireframeContainer {
+  background: #1a1a1a;
+}
+
+/* Platform details panel */
+.platformDetails {
+  margin-top: 20px;
+  padding: 20px;
+  background: linear-gradient(135deg, #1a1a1a 0%, #111111 100%);
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  max-width: 600px;
+}
+
+.platformDetailsHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #F3F4F6;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.platformSpecsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.platformSpecItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  background: #1a1a1a;
+  border-radius: 8px;
+  border: 1px solid #2a2a2a;
+}
+
+.specLabel {
+  font-size: 11px;
+  font-weight: 500;
+  color: #9CA3AF;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.specValue {
+  font-size: 14px;
+  font-weight: 600;
+  color: #F3F4F6;
+  font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+}
+
+.elementPositionInfo {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #2a2a2a;
+}
+
+.positionGrid {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+  font-size: 13px;
+  font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+  color: #D1D5DB;
+}
+
+/* Legacy grid (kept for compatibility) */
+.wireframeGrid {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+}
+
+@media (max-width: 768px) {
+  .wireframeCarousel {
+    gap: 12px;
+    padding: 4px 2px 12px;
+  }
+
+  .wireframeCard {
+    transform: scale(0.9);
+    transform-origin: top left;
+  }
+
+  .platformSpecsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .positionGrid {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
+
+/* ============================================
+   DARK MODE
+   ============================================ */
+@media (prefers-color-scheme: dark) {
+  .wireframeContainer {
+    background: #111111;
+    border-color: #2a2a2a;
+  }
+
+  .platformHeader {
+    color: #E5E7EB;
+  }
+
+  .deviceFrame {
+    background: #0a0a0a;
+    box-shadow:
+      0 25px 50px -12px rgba(0, 0, 0, 0.7),
+      inset 0 1px 1px rgba(255, 255, 255, 0.03);
+  }
+
+  .screen {
+    background: #1a1a1a;
+  }
+
+  .screenRegion {
+    border-color: rgba(255, 255, 255, 0.06);
+  }
+
+  /* Dark theme screen regions */
+  .screenRegion:nth-child(1) { background: #252525; } /* Status Bar */
+  .screenRegion:nth-child(2) { background: #222222; } /* Picks Bar */
+  .screenRegion:nth-child(3) { background: #1a1a1a; } /* Main Content */
+  .screenRegion:nth-child(4) { background: #232323; } /* Footer */
+
+  .regionLabel {
+    color: #6B7280;
+  }
+
+  .elementHighlight {
+    background: rgba(99, 102, 241, 0.2);
+  }
+
+  .safeAreaIndicator {
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 4px,
+      rgba(239, 68, 68, 0.15) 4px,
+      rgba(239, 68, 68, 0.15) 8px
+    );
+    border-color: rgba(239, 68, 68, 0.4);
+  }
+
+  .safeAreaIndicator span {
+    background: #1a1a1a;
+    color: #F87171;
+  }
+
+  .homeBar {
+    background: #3a3a3a;
+  }
+
+  .navButton {
+    background: #3a3a3a;
+  }
+
+  .navButton:nth-child(3) {
+    border-color: #3a3a3a;
+  }
+
+  .deviceSpecs {
+    color: #9CA3AF;
+  }
+
+  .deviceSpecs span {
+    background: #2a2a2a;
+  }
+
+  /* Multi-platform container dark mode */
+  .multiPlatformContainer {
+    background: #111111;
+    border-color: #2a2a2a;
+  }
+
+  .sectionTitle {
+    color: #F3F4F6;
+  }
+
+  .sectionDescription {
+    color: #9CA3AF;
+  }
+
+  /* Carousel dark mode */
+  .wireframeCarousel::-webkit-scrollbar-track {
+    background: #1a1a1a;
+  }
+
+  .wireframeCarousel::-webkit-scrollbar-thumb {
+    background: #3a3a3a;
+  }
+
+  .wireframeCarousel::-webkit-scrollbar-thumb:hover {
+    background: #4a4a4a;
+  }
+
+  .wireframeCard:hover {
+    border-color: #3a3a3a;
+    background: #1a1a1a;
+  }
+
+  .wireframeCard.selected {
+    border-color: #818CF8;
+    background: rgba(99, 102, 241, 0.1);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  }
+
+  .wireframeCard.selected .wireframeContainer {
+    background: #1a1a1a;
+  }
+
+  /* Platform details dark mode */
+  .platformDetails {
+    background: linear-gradient(135deg, #1a1a1a 0%, #111111 100%);
+    border-color: #2a2a2a;
+  }
+
+  .platformDetailsHeader {
+    color: #F3F4F6;
+    border-color: #2a2a2a;
+  }
+
+  .platformSpecItem {
+    background: #1a1a1a;
+    border-color: #2a2a2a;
+  }
+
+  .specLabel {
+    color: #9CA3AF;
+  }
+
+  .specValue {
+    color: #F3F4F6;
+  }
+
+  .elementPositionInfo {
+    border-color: #2a2a2a;
+  }
+
+  .positionGrid {
+    color: #D1D5DB;
+  }
+}

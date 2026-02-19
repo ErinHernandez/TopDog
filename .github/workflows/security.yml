@@ -1,0 +1,151 @@
+# ==============================================================================
+# Idesaign Security Scanning
+#
+# Weekly dependency vulnerability audit + license compliance check.
+# Creates a GitHub issue automatically when critical vulnerabilities are found.
+# Also runs on every push to main (non-blocking, informational).
+# ==============================================================================
+
+name: Security Scan
+
+on:
+  schedule:
+    # Every Monday at 09:00 UTC
+    - cron: '0 9 * * 1'
+  push:
+    branches: [main]
+    paths:
+      - 'package.json'
+      - 'package-lock.json'
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  dependency-audit:
+    name: Dependency Audit
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run full audit
+        id: audit
+        run: |
+          set +e
+          npm audit --json > audit-report.json 2>&1
+          EXIT_CODE=$?
+          set -e
+
+          # Parse vulnerability counts
+          CRITICAL=$(node -e "try { const r = require('./audit-report.json'); console.log(r.metadata?.vulnerabilities?.critical || 0); } catch { console.log(0); }")
+          HIGH=$(node -e "try { const r = require('./audit-report.json'); console.log(r.metadata?.vulnerabilities?.high || 0); } catch { console.log(0); }")
+          MODERATE=$(node -e "try { const r = require('./audit-report.json'); console.log(r.metadata?.vulnerabilities?.moderate || 0); } catch { console.log(0); }")
+          TOTAL=$(node -e "try { const r = require('./audit-report.json'); console.log(r.metadata?.vulnerabilities?.total || 0); } catch { console.log(0); }")
+
+          echo "critical=$CRITICAL" >> $GITHUB_OUTPUT
+          echo "high=$HIGH" >> $GITHUB_OUTPUT
+          echo "moderate=$MODERATE" >> $GITHUB_OUTPUT
+          echo "total=$TOTAL" >> $GITHUB_OUTPUT
+
+          echo "## Security Audit Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Severity | Count |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Critical | $CRITICAL |" >> $GITHUB_STEP_SUMMARY
+          echo "| High     | $HIGH |" >> $GITHUB_STEP_SUMMARY
+          echo "| Moderate | $MODERATE |" >> $GITHUB_STEP_SUMMARY
+          echo "| Total    | $TOTAL |" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-report
+          path: audit-report.json
+          retention-days: 30
+
+      - name: Create issue for critical vulnerabilities
+        if: steps.audit.outputs.critical != '0'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const critical = '${{ steps.audit.outputs.critical }}';
+            const high = '${{ steps.audit.outputs.high }}';
+            const total = '${{ steps.audit.outputs.total }}';
+
+            const title = `Security: ${critical} critical vulnerabilities detected`;
+            const body = [
+              '## Automated Security Alert',
+              '',
+              `**${critical}** critical and **${high}** high-severity vulnerabilities detected in dependencies.`,
+              '',
+              '### Action Required',
+              '1. Run `npm audit` locally to review details',
+              '2. Run `npm audit fix` to auto-fix where possible',
+              '3. Review and manually update remaining packages',
+              '4. Test thoroughly after updates',
+              '',
+              `_Total vulnerabilities: ${total}_`,
+              `_Detected: ${new Date().toISOString()}_`,
+              `_Workflow: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}_`,
+            ].join('\n');
+
+            // Check for existing open issue to avoid duplicates
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'security',
+              per_page: 10,
+            });
+
+            const existing = issues.find(i => i.title.includes('critical vulnerabilities'));
+
+            if (existing) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing.number,
+                body: `Updated scan: ${critical} critical, ${high} high, ${total} total.\n\n_${new Date().toISOString()}_`,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+                labels: ['security', 'priority:high'],
+              });
+            }
+
+  license-check:
+    name: License Compliance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check for disallowed licenses
+        run: |
+          npx license-checker --production --onlyAllow 'MIT;ISC;BSD-2-Clause;BSD-3-Clause;Apache-2.0;0BSD;CC0-1.0;Unlicense;CC-BY-4.0;BlueOak-1.0.0;Python-2.0' --summary 2>&1 || {
+            echo "::warning::Some production dependencies have non-standard licenses. Review manually."
+            exit 0
+          }

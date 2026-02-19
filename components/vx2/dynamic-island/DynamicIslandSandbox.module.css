@@ -1,0 +1,307 @@
+/* Dynamic Island Sandbox - CSS Module */
+
+/* ========================================================================== */
+/* ANIMATIONS */
+/* ========================================================================== */
+
+@keyframes pulseBackground {
+  0%, 100% {
+    opacity: 1;
+    background-size: 200px 200px;
+  }
+  50% {
+    opacity: 0.7;
+    background-size: 220px 220px;
+  }
+}
+
+/* ========================================================================== */
+/* LAYOUT */
+/* ========================================================================== */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.stateSelector {
+  display: flex;
+  gap: 1rem;
+}
+
+.stateButton {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition-property: background-color, color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.stateButton {
+  --button-bg-active: #2563eb;
+  --button-text-active: #fff;
+  --button-bg-inactive: #e5e7eb;
+  --button-text-inactive: #374151;
+  --button-bg-inactive-hover: #d1d5db;
+}
+
+.stateButton:active {
+  background-color: var(--button-bg-active);
+  color: var(--button-text-active);
+}
+
+.stateButton:not(:active) {
+  background-color: var(--button-bg-inactive);
+  color: var(--button-text-inactive);
+}
+
+.stateButton:not(:active):hover {
+  background-color: var(--button-bg-inactive-hover);
+}
+
+.visualizationWrapper {
+  position: relative;
+  width: 100%;
+  max-width: 28rem;
+}
+
+.iphoneFrame {
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #000;
+  border-radius: 3rem;
+  padding: 0.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.iphoneScreen {
+  background-color: #fff;
+  border-radius: 2.5rem;
+  overflow: hidden;
+}
+
+.statusBar {
+  position: relative;
+  height: 3.5rem;
+  background: linear-gradient(to bottom, #f3f4f6, #fff);
+}
+
+.appContent {
+  height: 24rem;
+  background-color: #fff;
+  padding: 1rem;
+}
+
+.appContentBox {
+  height: 100%;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.appContentText {
+  text-align: center;
+  color: #9ca3af;
+}
+
+.appContentTitle {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.appContentSubtitle {
+  font-size: 0.875rem;
+}
+
+.stateInfo {
+  width: 100%;
+  max-width: 28rem;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+}
+
+.stateInfoTitle {
+  font-weight: bold;
+  font-size: 1.125rem;
+  margin-bottom: 1rem;
+}
+
+.stateInfoContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.stateInfoItem {
+  margin: 0;
+}
+
+.stateInfoLabel {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.stateInfoValue {
+  padding-left: 1rem;
+}
+
+/* ========================================================================== */
+/* DYNAMIC ISLAND */
+/* ========================================================================== */
+
+.islandContainer {
+  position: absolute;
+  top: 0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.emptyStatusBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emptyStatusBarTime {
+  font-size: 0.75rem;
+  color: #4b5563;
+}
+
+.islandPill {
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 500;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+  background-color: var(--island-bg-color);
+  width: var(--island-width);
+  height: var(--island-height);
+}
+
+.islandPill.clickable {
+  cursor: pointer;
+}
+
+.islandPill.clickable:hover {
+  opacity: 0.9;
+}
+
+.islandPill.withBackgroundImage {
+  background-image: var(--island-bg-image);
+  background-repeat: repeat;
+  background-size: 200px 200px;
+  animation: pulseBackground 2s ease-in-out infinite;
+}
+
+.compactView {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
+.timerDisplay {
+  font-feature-settings: "tnum" 1;
+}
+
+.compactText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 80px;
+}
+
+.expandedView {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  width: 100%;
+}
+
+.timerBar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.timerBarSeconds {
+  font-feature-settings: "tnum" 1;
+  font-weight: bold;
+  font-size: 0.875rem;
+}
+
+.timerBarContainer {
+  flex: 1;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 9999px;
+  height: 0.375rem;
+}
+
+.timerBarFill {
+  background-color: #fff;
+  height: 100%;
+  border-radius: 9999px;
+  transition-property: width;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 1000ms;
+  width: var(--timer-progress-percent);
+}
+
+.expandedText {
+  font-size: 0.75rem;
+  margin-top: 0.125rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+  text-align: center;
+}
+
+/* ========================================================================== */
+/* URGENCY STATES */
+/* ========================================================================== */
+
+.islandCritical {
+  background-color: #ef4444;
+}
+
+.islandWarning {
+  background-color: #f97316;
+}
+
+.islandNormal {
+  background-color: #000;
+}

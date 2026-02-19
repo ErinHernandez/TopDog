@@ -1,0 +1,739 @@
+/* DepositModalVX2 Module Styles */
+/* Migrated for CSP compliance - all styles use CSS custom properties for dynamic values */
+
+/* ============================================================================
+   CARD BRAND ICON
+   ============================================================================ */
+
+.cardBrandIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 1.25rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: #fff;
+}
+
+.brand-visa {
+  background-color: #1A1F71;
+}
+
+.brand-mastercard {
+  background-color: #EB001B;
+}
+
+.brand-amex {
+  background-color: #006FCF;
+}
+
+.brand-discover {
+  background-color: #FF6000;
+}
+
+.brand-default {
+  background-color: var(--text-muted);
+}
+
+/* ============================================================================
+   AMOUNT STEP
+   ============================================================================ */
+
+.amountStepContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.currencyNotice {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: var(--info-bg);
+  border: 1px solid var(--info-border);
+}
+
+.currencyNoticeTitle {
+  font-size: var(--font-sm, 0.875rem);
+  color: var(--text-primary);
+}
+
+.currencyNoticeSubtitle {
+  margin-top: 0.5rem;
+  font-size: var(--font-xs, 0.75rem);
+  color: var(--text-secondary);
+}
+
+.continueButton {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: var(--btn-bg);
+  color: var(--btn-text);
+  opacity: var(--btn-opacity);
+}
+
+.continueButton:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.continueButton:disabled {
+  cursor: not-allowed;
+}
+
+/* ============================================================================
+   METHOD STEP
+   ============================================================================ */
+
+.methodStepTitle {
+  font-size: var(--font-lg, 1.125rem);
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.expressCheckoutContainer {
+  margin-bottom: 1rem;
+}
+
+.dividerContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.dividerLine {
+  flex: 1;
+  height: 1px;
+  background-color: var(--border-default);
+}
+
+.dividerText {
+  color: var(--text-muted);
+  font-size: var(--font-sm, 0.875rem);
+}
+
+.savedMethodsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.savedMethodsLabel {
+  margin-bottom: 0.5rem;
+  font-size: var(--font-sm, 0.875rem);
+  color: var(--text-secondary);
+}
+
+.methodButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-default);
+  background-color: var(--bg-tertiary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.methodButton:hover {
+  opacity: 0.95;
+}
+
+.methodButtonSelected {
+  background-color: rgba(0, 208, 132, 0.2);
+  border-color: var(--color-state-active, #00d084);
+}
+
+.methodButtonContent {
+  flex: 1;
+  text-align: left;
+}
+
+.methodCardBrand {
+  color: var(--text-primary);
+}
+
+.methodCardExpiry {
+  font-size: var(--font-xs, 0.75rem);
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.defaultBadge {
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  background-color: var(--color-state-active, #00d084);
+  color: #000;
+  white-space: nowrap;
+}
+
+.defaultBadge[data-default] {
+  display: inline-block;
+}
+
+.addPaymentButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-default);
+  background-color: var(--bg-tertiary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.addPaymentButton:hover {
+  opacity: 0.95;
+}
+
+.addPaymentButtonActive {
+  background-color: rgba(0, 208, 132, 0.2);
+  border-color: var(--color-state-active, #00d084);
+}
+
+.addPaymentIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 1.25rem;
+  border-radius: 0.375rem;
+  background-color: var(--color-state-active, #00d084);
+  color: #000;
+}
+
+.addPaymentText {
+  color: var(--text-primary);
+}
+
+.newCardSection {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.paymentElementContainer {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: var(--bg-tertiary);
+}
+
+.saveCardLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.saveCardCheckbox {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 0.25rem;
+  accent-color: var(--color-state-active, #00d084);
+}
+
+.saveCardText {
+  font-size: var(--font-sm, 0.875rem);
+  color: var(--text-secondary);
+}
+
+.methodButtonsContainer {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.backButton {
+  flex: 1;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  border: 1px solid var(--border-default);
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.backButton:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.backButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.nextButton {
+  flex: 1;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: var(--next-btn-bg);
+  color: var(--next-btn-text);
+  opacity: var(--next-btn-opacity);
+}
+
+.nextButton:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.nextButton:disabled {
+  cursor: not-allowed;
+}
+
+/* ============================================================================
+   CONFIRM STEP
+   ============================================================================ */
+
+.confirmStepTitle {
+  font-size: var(--font-lg, 1.125rem);
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.summaryCard {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: var(--bg-tertiary);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.summaryLabel {
+  color: var(--text-secondary);
+}
+
+.summaryValue {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.summaryPaymentMethod {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.summaryConversionFree {
+  font-weight: 600;
+  color: var(--color-state-success, #10b981);
+}
+
+.summaryDivider {
+  border-top: 1px solid var(--border-default);
+  padding-top: 0.75rem;
+}
+
+.totalLabel {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.totalValue {
+  font-weight: bold;
+  font-size: 1.125rem;
+  color: var(--color-state-success, #10b981);
+}
+
+.conversionNote {
+  text-align: center;
+  font-size: var(--font-xs, 0.75rem);
+  color: var(--text-muted);
+}
+
+.confirmButtonsContainer {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.confirmBackButton {
+  flex: 1;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  border: 1px solid var(--border-default);
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  opacity: var(--confirm-btn-opacity);
+}
+
+.confirmBackButton:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.confirmBackButton:disabled {
+  cursor: not-allowed;
+}
+
+.depositButton {
+  flex: 1;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: var(--deposit-btn-bg);
+  color: var(--deposit-btn-text);
+}
+
+.depositButton:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.depositButton:disabled {
+  cursor: not-allowed;
+}
+
+.depositButtonProcessing {
+  background-color: var(--bg-tertiary);
+  color: var(--text-muted);
+}
+
+.processingSpinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid white/30;
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================================================
+   RESULT STEP (SUCCESS/ERROR)
+   ============================================================================ */
+
+.resultContainer {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 2rem 0;
+}
+
+.resultIcon {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.resultIconSuccess {
+  background-color: rgba(16, 185, 129, 0.2);
+}
+
+.resultIconSuccess svg {
+  width: 2rem;
+  height: 2rem;
+  color: var(--color-state-success, #10b981);
+}
+
+.resultIconError {
+  background-color: rgba(239, 68, 68, 0.2);
+}
+
+.resultIconError svg {
+  width: 2rem;
+  height: 2rem;
+  color: var(--color-state-error, #ef4444);
+}
+
+.resultTitle {
+  font-size: var(--font-xl, 1.25rem);
+  font-weight: 600;
+}
+
+.resultTitleSuccess {
+  color: var(--color-state-success, #10b981);
+}
+
+.resultTitleError {
+  color: var(--color-state-error, #ef4444);
+}
+
+.resultMessage {
+  color: var(--text-secondary);
+}
+
+.resultSubtext {
+  margin-top: 0.25rem;
+  font-size: var(--font-xs, 0.75rem);
+  color: var(--text-muted);
+}
+
+.resultTransactionId {
+  margin-top: 0.5rem;
+  font-size: var(--font-xs, 0.75rem);
+  color: var(--text-muted);
+}
+
+.resultButton {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: var(--color-state-active, #00d084);
+  color: #000;
+}
+
+.resultButton:hover {
+  opacity: 0.9;
+}
+
+/* ============================================================================
+   MODAL CONTAINER
+   ============================================================================ */
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: var(--z-modal, 1000);
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+}
+
+.modalContent {
+  position: relative;
+  width: 100%;
+  max-width: 28rem;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background-color: var(--bg-secondary);
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.backNavButton {
+  padding: 0.25rem;
+  border-radius: 0.375rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.backNavButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.backNavIcon {
+  display: inline-block;
+  color: var(--text-primary);
+}
+
+.modalTitle {
+  font-size: var(--font-lg, 1.125rem);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.closeButton {
+  padding: 0.5rem;
+  border-radius: 9999px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.closeButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.closeIcon {
+  display: inline-block;
+  color: var(--text-muted);
+}
+
+.modalBody {
+  padding: 1.5rem;
+}
+
+/* ============================================================================
+   LOADING/ERROR STATE
+   ============================================================================ */
+
+.loadingOverlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal, 1000);
+}
+
+.loadingBackdrop {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+}
+
+.loadingBox {
+  position: relative;
+  padding: 2rem;
+  border-radius: 0.75rem;
+  max-width: 28rem;
+  margin: 0 1rem;
+  background-color: var(--bg-secondary);
+}
+
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+}
+
+.errorIcon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--error-bg);
+}
+
+.errorIconContent {
+  color: var(--color-state-error, #ef4444);
+  font-size: 1.5rem;
+}
+
+.errorTitle {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.errorMessage {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.errorButtonsContainer {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.errorCancelButton {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  background-color: transparent;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.errorCancelButton:hover {
+  opacity: 0.8;
+}
+
+.errorRetryButton {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  background-color: var(--color-state-info, #3b82f6);
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.errorRetryButton:hover {
+  opacity: 0.9;
+}
+
+.loadingContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.loadingSpinner {
+  display: inline-block;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loadingText {
+  color: var(--text-primary);
+}
+
+/* ============================================================================
+   CSS CUSTOM PROPERTIES (Variables)
+   ============================================================================ */

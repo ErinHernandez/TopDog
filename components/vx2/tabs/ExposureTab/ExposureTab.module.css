@@ -1,0 +1,92 @@
+/**
+ * ExposureTab CSS Module
+ *
+ * Uses color tokens and spacing from tokens.css
+ */
+
+/* Header */
+.header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Typography */
+.title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+}
+
+.statLabel {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+.playerSubtext {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+/* Stats Summary */
+.statsContainer {
+  display: flex;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg);
+  background-color: var(--bg-primary);
+}
+
+.statCard {
+  flex: 1;
+  padding: var(--spacing-md);
+  text-align: center;
+  border-radius: var(--radius-md);
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+/* Player List */
+.playerList {
+  flex: 1;
+  overflow-y: auto;
+  padding-left: var(--spacing-lg);
+  padding-right: var(--spacing-lg);
+  background-color: var(--bg-primary);
+}
+
+.playerRow {
+  margin-bottom: var(--spacing-sm);
+  padding: var(--spacing-md);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+/* Position Badge */
+.positionBadge {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-xs);
+  color: #000;
+  background-color: var(--position-color, #6B7280);
+}
+
+/* Position-specific badge colors */
+.positionBadge[data-position="qb"] {
+  --position-color: var(--color-position-qb);
+}
+.positionBadge[data-position="rb"] {
+  --position-color: var(--color-position-rb);
+}
+.positionBadge[data-position="wr"] {
+  --position-color: var(--color-position-wr);
+}
+.positionBadge[data-position="te"] {
+  --position-color: var(--color-position-te);
+}

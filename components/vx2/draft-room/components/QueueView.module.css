@@ -1,0 +1,297 @@
+/**
+ * QueueView Styles
+ *
+ * CSS Module for QueueView component.
+ * Uses CSS custom properties for dynamic values from constants.
+ * Ensures CSP compliance by avoiding inline styles.
+ */
+
+/* ============================================================================
+   CONTAINER & LAYOUT
+   ============================================================================ */
+
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--queue-bg, #101927);
+}
+
+/* Scrollable queue list container */
+.scrollContainer {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* Hide scrollbar for webkit browsers */
+.scrollContainer::-webkit-scrollbar {
+  display: none;
+}
+
+/* Queue items wrapper */
+.itemsWrapper {
+  margin-left: var(--container-padding-x, 4px);
+  margin-right: var(--container-padding-x, 4px);
+  padding-top: var(--container-padding-y, 8px);
+  padding-bottom: 24px;
+}
+
+/* ============================================================================
+   QUEUE ITEM ROW
+   ============================================================================ */
+
+.queueRow {
+  display: flex;
+  align-items: center;
+  background-color: var(--card-bg, #1f2833);
+  border-bottom: var(--row-border-width, 1px) solid var(--card-border, rgba(255, 255, 255, 0.1));
+  height: var(--row-height, 40px);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+.queueRow:hover {
+  background-color: rgba(31, 40, 51, 0.8);
+}
+
+/* ============================================================================
+   QUEUE NUMBER
+   ============================================================================ */
+
+.queueNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--queue-number-width, 28px);
+  font-weight: 600;
+  font-size: var(--queue-number-font-size, 13px);
+  color: var(--text-secondary, #9ca3af);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+   PLAYER INFO SECTION
+   ============================================================================ */
+
+.playerInfo {
+  flex: 1;
+  min-width: 0;
+  padding-left: 6px;
+}
+
+.playerName {
+  font-weight: 500;
+  font-size: var(--player-name-font-size, 13px);
+  color: var(--text-primary, #ffffff);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.playerDetails {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.playerTeam {
+  font-size: var(--player-info-font-size, 11px);
+  color: var(--text-secondary, #9ca3af);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ============================================================================
+   POSITION BADGE
+   ============================================================================ */
+
+.positionBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--badge-padding-y, 1px) var(--badge-padding-x, 5px);
+  border-radius: var(--badge-border-radius, 3px);
+  background-color: var(--position-color, #9ca3af);
+  color: #000000;
+  font-size: var(--badge-font-size, 10px);
+  font-weight: 700;
+  margin-right: var(--badge-margin-right, 6px);
+  flex-shrink: 0;
+}
+
+/* Position-specific badge colors */
+.positionBadge[data-position="qb"] { --position-color: var(--color-position-qb); }
+.positionBadge[data-position="rb"] { --position-color: var(--color-position-rb); }
+.positionBadge[data-position="wr"] { --position-color: var(--color-position-wr); }
+.positionBadge[data-position="te"] { --position-color: var(--color-position-te); }
+.positionBadge[data-position="bn"] { --position-color: var(--color-position-bn); }
+.positionBadge[data-position="flex"] { --position-color: var(--color-position-wr); }
+.positionBadge[data-position="k"] { --position-color: var(--text-muted); }
+.positionBadge[data-position="dst"] { --position-color: var(--text-muted); }
+.positionBadge[data-position="def"] { --position-color: var(--text-muted); }
+
+/* ============================================================================
+   ADP COLUMN
+   ============================================================================ */
+
+.adpColumn {
+  width: var(--adp-width, 48px);
+  text-align: center;
+  font-size: var(--adp-font-size, 13px);
+  color: var(--text-secondary, #9ca3af);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+   REORDER CONTROLS
+   ============================================================================ */
+
+.reorderControls {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.iconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--reorder-button-size, 24px);
+  height: var(--reorder-button-size, 24px);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: var(--text-secondary, #9ca3af);
+  opacity: 1;
+  transition: color 0.15s ease, background-color 0.15s ease;
+  border-radius: 4px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.iconButton:hover:not(:disabled) {
+  background-color: rgba(156, 163, 175, 0.1);
+  color: var(--text-primary, #ffffff);
+}
+
+.iconButton:disabled {
+  cursor: default;
+  color: rgba(156, 163, 175, 0.3);
+  opacity: 0.3;
+}
+
+.iconButton.danger {
+  color: var(--remove-button, #ef4444);
+}
+
+.iconButton.danger:hover:not(:disabled) {
+  background-color: rgba(239, 68, 68, 0.2);
+}
+
+.iconButton svg {
+  width: var(--reorder-icon-size, 12px);
+  height: var(--reorder-icon-size, 12px);
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+   REMOVE BUTTON
+   ============================================================================ */
+
+.removeButtonWrapper {
+  margin-right: var(--remove-button-margin-right, 4px);
+  flex-shrink: 0;
+}
+
+.removeIcon {
+  width: var(--remove-icon-size, 14px);
+  height: var(--remove-icon-size, 14px);
+}
+
+/* ============================================================================
+   EMPTY STATE
+   ============================================================================ */
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--empty-padding, 24px);
+  height: 100%;
+}
+
+.emptyIcon {
+  width: var(--empty-icon-size, 56px);
+  height: var(--empty-icon-size, 56px);
+  margin-bottom: 16px;
+  color: var(--text-muted, #6b7280);
+  flex-shrink: 0;
+}
+
+.emptyTitle {
+  font-weight: 600;
+  font-size: var(--empty-title-font-size, 16px);
+  color: var(--text-primary, #ffffff);
+  margin-bottom: 4px;
+}
+
+.emptyDescription {
+  font-size: var(--empty-desc-font-size, 14px);
+  color: var(--text-secondary, #9ca3af);
+  max-width: 280px;
+  margin-bottom: 0;
+}
+
+.browseButton {
+  margin-top: 16px;
+  padding: 8px 16px;
+  background-color: #3B82F6;
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.browseButton:hover {
+  background-color: #2563EB;
+}
+
+.browseButton:active {
+  background-color: #1D4ED8;
+}
+
+/* ============================================================================
+   FOOTER
+   ============================================================================ */
+
+.footer {
+  padding-left: var(--footer-padding-x, 16px);
+  padding-right: var(--footer-padding-x, 16px);
+  padding-top: var(--footer-padding-y, 8px);
+  padding-bottom: var(--footer-padding-y, 8px);
+  border-top: 1px solid var(--footer-border, rgba(255, 255, 255, 0.1));
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.footerText {
+  font-size: var(--footer-font-size, 12px);
+  color: var(--text-muted, #6b7280);
+  line-height: 1.4;
+}

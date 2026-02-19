@@ -1,0 +1,172 @@
+/**
+ * SearchBar.module.css
+ * Styling for the search input component
+ */
+
+/* ============================================================================
+   SEARCH CONTAINER
+   ============================================================================ */
+
+.searchContainer {
+  width: 100%;
+  padding: var(--spacing-md) 0;
+}
+
+/* ============================================================================
+   SEARCH WRAPPER
+   ============================================================================ */
+
+.searchWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: var(--search-height, 44px);
+  padding: 0 var(--spacing-md);
+  background-color: var(--search-bg, var(--bg-secondary));
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-normal);
+}
+
+.searchWrapper:hover {
+  border-color: var(--border-subtle);
+  background-color: var(--bg-card);
+}
+
+.searchWrapper:focus-within {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(93, 197, 191, 0.1);
+}
+
+/* ============================================================================
+   SEARCH ICON
+   ============================================================================ */
+
+.searchIcon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-right: var(--spacing-sm);
+  color: var(--search-placeholder, var(--text-muted));
+  transition: color var(--transition-normal);
+}
+
+.searchWrapper:focus-within .searchIcon {
+  color: var(--border-focus);
+}
+
+/* ============================================================================
+   SEARCH INPUT
+   ============================================================================ */
+
+.searchInput {
+  flex: 1;
+  background-color: transparent;
+  border: none;
+  outline: none;
+  padding: 0;
+  font-size: var(--search-font-size, var(--font-size-sm));
+  color: var(--text-primary);
+  caret-color: var(--border-focus);
+  font-family: inherit;
+}
+
+.searchInput::placeholder {
+  color: var(--search-placeholder, var(--text-muted));
+}
+
+/* ============================================================================
+   CLEAR BUTTON
+   ============================================================================ */
+
+.clearButton {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin-left: var(--spacing-xs);
+  background-color: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: all var(--transition-normal);
+  padding: 0;
+}
+
+.clearButton:hover {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.clearButton:focus {
+  outline: none;
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.clearButton:active {
+  background-color: var(--border-default);
+}
+
+/* ============================================================================
+   KEYBOARD SHORTCUT HINT
+   ============================================================================ */
+
+.shortcutHint {
+  flex-shrink: 0;
+  display: none;
+  align-items: center;
+  margin-left: var(--spacing-sm);
+}
+
+@media (min-width: 768px) {
+  .shortcutHint {
+    display: flex;
+  }
+}
+
+.kbd {
+  padding: 2px 6px;
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+  font-family: monospace;
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+}
+
+/* ============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  .searchWrapper {
+    height: 40px;
+    padding: 0 var(--spacing-sm);
+  }
+
+  .searchIcon {
+    width: 20px;
+    height: 20px;
+    margin-right: var(--spacing-xs);
+  }
+
+  .clearButton {
+    width: 28px;
+    height: 28px;
+  }
+
+  .searchInput {
+    font-size: var(--font-size-xs);
+  }
+}

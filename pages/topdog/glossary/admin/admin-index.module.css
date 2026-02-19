@@ -1,0 +1,332 @@
+/**
+ * Glossary Admin Index - Styles
+ */
+
+.container {
+  min-height: 100vh;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    #1a1a1a;
+  background-size: 40px 40px, 40px 40px, 100% 100%;
+  color: #f5f5f5;
+}
+
+/* Header */
+.header {
+  padding: 3rem 2rem 2rem;
+  text-align: center;
+  border-bottom: 1px solid #262626;
+}
+
+.headerContent {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.backLink {
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  color: #737373;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.backLink:hover {
+  color: #a3a3a3;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+
+.subtitle {
+  color: #737373;
+  font-size: 1.125rem;
+  margin: 0;
+}
+
+/* Workflow Section */
+.workflowSection {
+  padding: 2rem;
+  background: #171717;
+  border-bottom: 1px solid #262626;
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #a3a3a3;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 1.5rem;
+  text-align: center;
+}
+
+.workflow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.workflowStep {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.25rem 2rem;
+  background: #0a0a0a;
+  border: 1px solid #262626;
+  border-radius: 12px;
+  position: relative;
+}
+
+.stepNumber {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  width: 24px;
+  height: 24px;
+  background: #3B82F6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.workflowStep span {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.workflowArrow {
+  color: #404040;
+  flex-shrink: 0;
+}
+
+/* Main Cards */
+.main {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  padding: 1.5rem;
+  background: #171717;
+  border: 1px solid #262626;
+  border-radius: 16px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  border-color: #404040;
+  transform: translateY(-4px);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.cardIcon {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cardContent {
+  flex: 1;
+}
+
+.cardContent h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+}
+
+.cardContent p {
+  color: #737373;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  margin: 0 0 1rem;
+}
+
+.cardFeatures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.cardFeatures span {
+  padding: 0.25rem 0.625rem;
+  background: #262626;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: #a3a3a3;
+}
+
+.cardArrow {
+  color: #525252;
+  flex-shrink: 0;
+  margin-top: 0.5rem;
+  transition: transform 0.15s;
+}
+
+.card:hover .cardArrow {
+  transform: translateX(4px);
+  color: #a3a3a3;
+}
+
+/* Stats Section */
+.statsSection {
+  padding: 2rem;
+  background: #0a0a0a;
+  border-top: 1px solid #262626;
+  border-bottom: 1px solid #262626;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.statCard {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: #171717;
+  border: 1px solid #262626;
+  border-radius: 12px;
+}
+
+.statCard svg {
+  color: #525252;
+}
+
+.statInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.statValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.statLabel {
+  font-size: 0.8125rem;
+  color: #737373;
+}
+
+/* Actions Section */
+.actionsSection {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.actionButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: #262626;
+  border: 1px solid #404040;
+  border-radius: 8px;
+  color: #f5f5f5;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.actionButton:hover {
+  background: #333333;
+  border-color: #525252;
+}
+
+.actionButtonLink {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: #3B82F6;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+
+.actionButtonLink:hover {
+  background: #2563EB;
+}
+
+/* Footer */
+.footer {
+  padding: 2rem;
+  text-align: center;
+  border-top: 1px solid #262626;
+}
+
+.footer p {
+  color: #525252;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .workflow {
+    flex-direction: column;
+  }
+
+  .workflowArrow {
+    transform: rotate(90deg);
+  }
+
+  .card {
+    flex-direction: column;
+  }
+
+  .cardIcon {
+    width: 56px;
+    height: 56px;
+  }
+}

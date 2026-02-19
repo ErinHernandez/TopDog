@@ -1,0 +1,25 @@
+.tokenText {
+  font-size: 12px;
+  color: #666;
+}
+
+.enableButton {
+  padding: 12px 24px;
+  background-color: #1E3A5F;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.enableButton:hover:not(:disabled) {
+  background-color: #152a47;
+}
+
+.enableButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}

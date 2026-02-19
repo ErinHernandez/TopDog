@@ -1,0 +1,305 @@
+/**
+ * FilterPanel.module.css
+ * Styling for the filter panel component
+ */
+
+/* ============================================================================
+   FILTER PANEL CONTAINER
+   ============================================================================ */
+
+.filterPanel {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: all var(--transition-normal);
+}
+
+/* ============================================================================
+   FILTER HEADER / TOGGLE
+   ============================================================================ */
+
+.filterHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--spacing-lg);
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.filterHeader:hover {
+  background-color: var(--bg-tertiary);
+}
+
+.filterHeader:focus {
+  outline: none;
+  background-color: var(--bg-tertiary);
+  box-shadow: inset 0 0 0 2px var(--border-focus);
+}
+
+.filterTitle {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+.filterBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 var(--spacing-sm);
+  margin-left: var(--spacing-sm);
+  background-color: var(--color-brand-primary);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  color: #000000;
+}
+
+.expandIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: var(--text-secondary);
+  transition: transform var(--transition-normal);
+  margin-left: var(--spacing-md);
+}
+
+.expandIconOpen {
+  transform: rotate(180deg);
+}
+
+/* ============================================================================
+   FILTER CONTENT
+   ============================================================================ */
+
+.filterContent {
+  padding: 0 var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
+  border-top: 1px solid var(--border-light);
+  animation: slideDown 200ms ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================================
+   FILTER SECTION
+   ============================================================================ */
+
+.filterSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.filterSection:last-of-type {
+  margin-bottom: var(--spacing-md);
+}
+
+.filterSectionTitle {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ============================================================================
+   MODULE SELECTOR
+   ============================================================================ */
+
+.moduleSelector {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.moduleOption {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  text-align: left;
+}
+
+.moduleOption:hover {
+  background-color: var(--bg-secondary);
+  border-color: var(--border-subtle);
+}
+
+.moduleOptionSelected {
+  background-color: var(--color-blue-bg);
+  border-color: var(--border-focus);
+  color: var(--text-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.moduleOptionSelected:hover {
+  background-color: #2DB2F3;
+}
+
+/* ============================================================================
+   TYPE GRID
+   ============================================================================ */
+
+.typeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--spacing-sm);
+}
+
+/* ============================================================================
+   TYPE CHECKBOX
+   ============================================================================ */
+
+.typeCheckbox {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.typeCheckbox:hover {
+  background-color: var(--bg-secondary);
+  border-color: var(--border-subtle);
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--color-brand-primary);
+  flex-shrink: 0;
+}
+
+.checkboxLabel {
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+}
+
+/* ============================================================================
+   INTERACTIVE TOGGLE
+   ============================================================================ */
+
+.interactiveToggle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.interactiveToggle:hover {
+  background-color: var(--bg-secondary);
+  border-color: var(--border-subtle);
+}
+
+.toggleLabel {
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+}
+
+/* ============================================================================
+   CLEAR FILTERS BUTTON
+   ============================================================================ */
+
+.clearFiltersButton {
+  width: 100%;
+  padding: var(--spacing-md);
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-error);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-state-error);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  margin-top: var(--spacing-sm);
+}
+
+.clearFiltersButton:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: var(--color-state-error);
+}
+
+.clearFiltersButton:focus {
+  outline: none;
+  background-color: rgba(239, 68, 68, 0.15);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+}
+
+/* ============================================================================
+   SCROLLBAR STYLING
+   ============================================================================ */
+
+.moduleSelector::-webkit-scrollbar {
+  width: 6px;
+}
+
+.moduleSelector::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+.moduleSelector::-webkit-scrollbar-thumb {
+  background-color: var(--border-default);
+  border-radius: 3px;
+}
+
+.moduleSelector::-webkit-scrollbar-thumb:hover {
+  background-color: var(--border-subtle);
+}
+
+/* ============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  .filterHeader {
+    padding: var(--spacing-md);
+  }
+
+  .filterContent {
+    padding: 0 var(--spacing-md) var(--spacing-md) var(--spacing-md);
+  }
+
+  .typeGrid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+
+  .filterSection {
+    margin-bottom: var(--spacing-md);
+  }
+}

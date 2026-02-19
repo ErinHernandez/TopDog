@@ -1,0 +1,286 @@
+/* ProfileTabVX2.module.css - Styles for ProfileTabVX2 component */
+
+/* ============================================================================
+   Main Container
+   ============================================================================ */
+
+.mainContainer {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow-y: auto;
+  padding-left: var(--spacing-lg);
+  padding-right: var(--spacing-lg);
+  padding-top: var(--spacing-xl);
+  padding-bottom: var(--spacing-xl);
+  background-color: var(--bg-primary);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.mainContainer::-webkit-scrollbar {
+  display: none;
+}
+
+/* ============================================================================
+   Avatar Box Styles
+   ============================================================================ */
+
+.avatarBox {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: var(--box-width);
+  height: var(--box-height);
+  border-width: var(--box-border-width);
+  border-style: solid;
+  border-color: var(--box-border-color);
+  border-top-width: var(--box-top-border-width);
+  background-color: var(--box-bg);
+  border-radius: var(--radius-lg);
+}
+
+.avatarBoxUsername {
+  position: absolute;
+  left: 0;
+  right: 0;
+  font-weight: var(--font-weight-bold);
+  text-align: center;
+  text-transform: uppercase;
+  font-size: var(--font-size-xs);
+  color: var(--username-color);
+  top: var(--username-top);
+  transform: translateY(-50%);
+  padding: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+.avatarBoxBlack {
+  color: var(--black-text);
+  --username-color: var(--black-text);
+}
+
+.avatarBoxWhite {
+  color: var(--text-primary);
+}
+
+/* ============================================================================
+   Player Card / Customization Box
+   ============================================================================ */
+
+.playerCardContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: var(--spacing-lg);
+  padding-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.playerCardButton {
+  width: var(--box-width);
+  height: var(--box-height);
+  border-width: var(--box-border-width);
+  border-style: solid;
+  border-color: var(--box-border-color);
+  border-top-width: var(--box-top-border-width);
+  background-color: var(--player-card-bg);
+  border-radius: var(--radius-lg);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  padding: 0;
+  outline: none;
+  transition: opacity 0.15s ease;
+}
+
+.playerCardButton:active {
+  opacity: 0.8;
+}
+
+.playerCardUsername {
+  position: absolute;
+  left: 0;
+  right: 0;
+  font-size: var(--font-size-xs);
+  color: var(--text-primary);
+  font-weight: var(--font-weight-bold);
+  text-align: center;
+  text-transform: uppercase;
+  top: var(--username-top);
+  transform: translateY(-50%);
+  padding: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+.playerCardInner {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.playerCardCustomizeText {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  text-align: center;
+  font-style: italic;
+}
+
+/* ============================================================================
+   Account Balance Section
+   ============================================================================ */
+
+.accountBalanceContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.accountBalanceLabel {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  margin-bottom: var(--spacing-xs);
+}
+
+.accountBalanceValue {
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-2xl);
+  color: var(--text-primary);
+}
+
+/* ============================================================================
+   Deposit Button Styles
+   ============================================================================ */
+
+.depositButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--font-weight-bold);
+  border: none;
+  border-radius: var(--radius-lg);
+  padding-top: var(--spacing-md);
+  padding-bottom: var(--spacing-md);
+  padding-left: var(--spacing-xl);
+  padding-right: var(--spacing-xl);
+  font-size: var(--font-size-base);
+  cursor: pointer;
+  margin-bottom: var(--spacing-lg);
+  gap: var(--spacing-sm);
+  transition: opacity 0.15s ease;
+  color: var(--text-primary);
+  opacity: 1;
+}
+
+.depositButton:not(:disabled) {
+  background: url(/wr_blue.png) no-repeat center center;
+  background-size: cover;
+}
+
+.depositButton:disabled {
+  background-color: var(--bg-tertiary);
+  color: var(--text-disabled);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.depositButton svg {
+  color: currentColor;
+}
+
+/* ============================================================================
+   Menu Items Styles
+   ============================================================================ */
+
+.menuNav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.menuNavFirst {
+  margin-bottom: var(--spacing-lg);
+}
+
+.menuItemButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: var(--font-weight-semibold);
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  padding-top: var(--spacing-md);
+  padding-bottom: var(--spacing-md);
+  padding-left: var(--spacing-lg);
+  padding-right: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.menuItemButton:hover {
+  background-color: var(--color-dropdown-hover);
+}
+
+.menuItemButton:active {
+  transform: scale(0.98);
+}
+
+.menuItemButton svg {
+  color: var(--text-muted);
+}
+
+.menuItemIcon {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.menuItemIconColor {
+  color: var(--text-secondary);
+}
+
+/* ============================================================================
+   Divider
+   ============================================================================ */
+
+.divider {
+  height: 2px;
+  margin-bottom: var(--spacing-lg);
+  background-image: var(--tiled-bg-image);
+  background-size: var(--tiled-bg-size);
+  background-repeat: var(--tiled-bg-repeat);
+}
+
+/* ============================================================================
+   Skeleton Loaders
+   ============================================================================ */
+
+.menuSkeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* ============================================================================
+   Bottom Padding
+   ============================================================================ */
+
+.bottomPadding {
+  height: var(--spacing-2xl);
+  flex-shrink: 0;
+}

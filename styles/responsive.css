@@ -1,0 +1,646 @@
+/**
+ * Idesaign — Responsive Design Overrides
+ *
+ * Provides responsive layout adjustments across all pages using
+ * consistent breakpoints and CSS custom properties.
+ *
+ * Breakpoints:
+ * - 480px  → phone (max-width)
+ * - 768px  → tablet portrait (max-width)
+ * - 1024px → tablet landscape (max-width)
+ * - 1440px → wide desktop (min-width)
+ *
+ * Architecture:
+ * - Uses descendant selectors to target CSS Module pages
+ * - Overrides only what's necessary; inherits from globals.css
+ * - Touch-friendly tap targets (44x44px minimum)
+ * - Responsive typography via clamp() where possible
+ * - SSR-safe (no JavaScript needed for basic responsive behavior)
+ */
+
+/* ================================================================
+   GLOBAL RESPONSIVE ADJUSTMENTS
+   ================================================================ */
+
+/* Ensure touch targets meet 44x44px minimum */
+@media (max-width: 768px) {
+  button,
+  a,
+  [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Typography: minimum 14px on mobile */
+@media (max-width: 480px) {
+  body {
+    font-size: clamp(0.875rem, 2.5vw, 1rem);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-size: clamp(0.875rem, 4vw, 2rem);
+  }
+}
+
+/* ================================================================
+   LANDING PAGE RESPONSIVE OVERRIDES
+   styles/landing.module.css
+   ================================================================ */
+
+/* Hero section: scale text down on mobile */
+@media (max-width: 768px) {
+  .heroHeading {
+    font-size: clamp(1.5rem, 6vw, 2.5rem);
+    margin-bottom: var(--space-4);
+  }
+
+  .heroSubheading {
+    font-size: clamp(0.875rem, 2vw, 1rem);
+    margin-bottom: var(--space-6);
+  }
+
+  .hero {
+    padding: var(--space-12) var(--space-4);
+    min-height: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    padding: var(--space-8) var(--space-3);
+    min-height: auto;
+  }
+
+  .heroHeading {
+    font-size: clamp(1.25rem, 5vw, 2rem);
+    margin-bottom: var(--space-3);
+    letter-spacing: -0.3px;
+  }
+
+  .heroSubheading {
+    font-size: var(--text-md);
+    margin-bottom: var(--space-6);
+    line-height: var(--leading-relaxed);
+  }
+
+  .heroCtas {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .ctaButtonPrimary,
+  .ctaButtonSecondary {
+    width: 100%;
+    height: 44px;
+    padding: 0 var(--space-4);
+    font-size: var(--text-md);
+  }
+}
+
+/* Feature grid: 1 col on phone, 2 on tablet, 3+ on desktop */
+@media (max-width: 480px) {
+  .featureGrid {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  .featureCard {
+    padding: var(--space-5);
+  }
+
+  .featureIcon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .featureIcon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .featureTitle {
+    font-size: var(--text-md);
+  }
+
+  .featureDescription {
+    font-size: var(--text-sm);
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .featureGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1025px) {
+  .featureGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Stats section: stack vertically on phone */
+@media (max-width: 480px) {
+  .statsGrid {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  .statCard {
+    padding: var(--space-5);
+  }
+
+  .statNumber {
+    font-size: var(--text-3xl);
+  }
+
+  .statLabel {
+    font-size: var(--text-sm);
+  }
+}
+
+@media (max-width: 768px) {
+  .features {
+    padding: var(--space-12) var(--space-4);
+  }
+
+  .socialProof {
+    padding: var(--space-12) var(--space-4);
+  }
+
+  .ctaSection {
+    padding: var(--space-12) var(--space-4);
+  }
+
+  .sectionHeader {
+    margin-bottom: var(--space-10);
+  }
+
+  .sectionHeading {
+    font-size: clamp(1.25rem, 5vw, 2rem);
+  }
+
+  .socialProofHeading {
+    font-size: clamp(1.25rem, 5vw, 2rem);
+  }
+
+  .ctaSectionHeading {
+    font-size: clamp(1.25rem, 5vw, 2rem);
+  }
+
+  .ctaButtonLarge {
+    height: 44px;
+    padding: 0 var(--space-6);
+    font-size: var(--text-md);
+  }
+}
+
+/* ================================================================
+   GALLERY PAGE RESPONSIVE OVERRIDES
+   styles/gallery.module.css
+   ================================================================ */
+
+/* Grid: 1 col on phone, 2 on tablet, 3-4 on desktop */
+@media (max-width: 480px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+
+  .gridContainer {
+    padding: var(--space-3);
+  }
+
+  .card {
+    border-radius: var(--radius-md);
+  }
+
+  .cardContent {
+    padding: var(--space-3);
+    gap: var(--space-2);
+  }
+
+  .cardTitle {
+    font-size: var(--text-md);
+  }
+
+  .cardAuthor {
+    font-size: var(--text-sm);
+  }
+
+  .cardStats {
+    font-size: var(--text-xs);
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+  }
+
+  .heroTitle {
+    font-size: var(--text-2xl);
+  }
+}
+
+@media (min-width: 1025px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--space-6);
+  }
+}
+
+/* Filter bar wraps on small screens */
+@media (max-width: 768px) {
+  .filterBar {
+    padding: var(--space-4);
+  }
+
+  .filterTabs {
+    gap: var(--space-2);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    justify-content: flex-start;
+  }
+
+  .tab {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .headerContent {
+    gap: var(--space-2);
+    padding: 0 var(--space-3);
+  }
+
+  .logo {
+    font-size: var(--text-md);
+  }
+
+  .nav {
+    display: none;
+  }
+
+  .hero {
+    padding: var(--space-6) var(--space-3);
+  }
+
+  .heroTitle {
+    font-size: var(--text-xl);
+  }
+
+  .heroSubtitle {
+    font-size: var(--text-sm);
+  }
+}
+
+/* ================================================================
+   DASHBOARD PAGE RESPONSIVE OVERRIDES
+   styles/dashboard.module.css
+   ================================================================ */
+
+/* Sidebar collapses to hidden on tablet/phone */
+@media (max-width: 1280px) {
+  .sidebar {
+    display: none;
+  }
+
+  .mainContainer {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Project grid: 1 col on phone, 2 on tablet, 3+ on desktop */
+@media (max-width: 768px) {
+  .mainContainer {
+    padding: var(--space-4);
+    gap: var(--space-4);
+  }
+
+  .header {
+    padding: var(--space-4);
+  }
+
+  .headerLeft {
+    width: 100%;
+  }
+
+  .headerRight {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .welcomeSection {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3);
+  }
+
+  .newProjectButton {
+    width: 100%;
+    height: 44px;
+    justify-content: center;
+  }
+
+  .projectsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: var(--space-3);
+  }
+
+  .nav {
+    width: 100%;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .navLink {
+    width: 100%;
+    text-align: center;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    min-height: 100dvh;
+  }
+
+  .mainContainer {
+    padding: var(--space-3);
+    gap: var(--space-3);
+  }
+
+  .header {
+    padding: var(--space-3);
+  }
+
+  .logo {
+    font-size: var(--text-base);
+  }
+
+  .welcomeHeading {
+    font-size: var(--text-xl);
+  }
+
+  .projectsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .projectCard {
+    min-height: auto;
+  }
+
+  .projectName {
+    font-size: var(--text-sm);
+  }
+}
+
+/* ================================================================
+   EDITOR PAGE RESPONSIVE OVERRIDES
+   styles/editor.module.css
+   ================================================================ */
+
+/* Simplified tablet layout */
+@media (max-width: 1024px) {
+  /* Panels collapse by default on tablet */
+  .editorContainer {
+    flex-direction: column;
+  }
+
+  /* Canvas expands on tablet */
+  .editorContent {
+    flex: 1;
+  }
+}
+
+/* Touch-friendly on mobile */
+@media (max-width: 768px) {
+  .editorContainer {
+    width: 100vw;
+    height: 100dvh;
+  }
+
+  /* Ensure buttons are 44x44 minimum */
+  button {
+    min-height: 44px;
+    min-width: 44px;
+    padding: var(--space-2);
+  }
+
+  .loadingContainer p {
+    font-size: var(--text-md);
+  }
+
+  .errorContainer h1 {
+    font-size: var(--text-xl);
+  }
+
+  .errorContainer p {
+    font-size: var(--text-sm);
+  }
+
+  .errorButton {
+    min-height: 44px;
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-md);
+  }
+}
+
+/* ================================================================
+   AUTH PAGES RESPONSIVE OVERRIDES
+   styles/login.module.css, signup.module.css, reset-password.module.css
+   ================================================================ */
+
+@media (max-width: 480px) {
+  .card {
+    width: 100%;
+    max-width: 100%;
+    padding: var(--space-5);
+    margin: var(--space-3);
+  }
+
+  .container {
+    padding: var(--space-3);
+  }
+
+  .logo {
+    font-size: var(--text-xl);
+  }
+
+  .header {
+    margin-bottom: var(--space-5);
+  }
+
+  .input,
+  .primaryButton,
+  .googleButton {
+    width: 100%;
+    height: 44px;
+    min-height: 44px;
+    font-size: var(--text-md);
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .form {
+    gap: var(--space-3);
+  }
+
+  .label {
+    font-size: var(--text-md);
+  }
+
+  .fieldError {
+    font-size: var(--text-sm);
+  }
+
+  .divider {
+    margin: var(--space-4) 0;
+  }
+
+  .links {
+    margin-bottom: var(--space-4);
+  }
+
+  .link {
+    font-size: var(--text-sm);
+  }
+
+  .footer {
+    padding-top: var(--space-4);
+  }
+
+  .footerText {
+    font-size: var(--text-sm);
+  }
+}
+
+@media (max-width: 768px) {
+  .card {
+    max-width: 90%;
+  }
+
+  .errorBanner {
+    padding: var(--space-2) var(--space-3);
+    gap: var(--space-2);
+  }
+
+  .errorText {
+    font-size: var(--text-sm);
+  }
+}
+
+/* ================================================================
+   PROFILE & SETTINGS PAGES RESPONSIVE OVERRIDES
+   styles/profile.module.css, settings.module.css
+   ================================================================ */
+
+/* Stack columns on phone */
+@media (max-width: 768px) {
+  [role="tabpanel"],
+  .tabContent {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .twoColumn {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+}
+
+/* Tab navigation horizontal scroll on phone */
+@media (max-width: 480px) {
+  [role="tablist"],
+  .tabNav {
+    display: flex;
+    gap: var(--space-2);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: var(--space-2);
+  }
+
+  [role="tab"],
+  .tabButton {
+    min-width: max-content;
+    white-space: nowrap;
+    padding: var(--space-2) var(--space-3);
+    height: 40px;
+  }
+
+  .input,
+  textarea,
+  select {
+    font-size: var(--text-md);
+    min-height: 44px;
+    padding: var(--space-2) var(--space-3);
+  }
+}
+
+/* ================================================================
+   FORM FIELDS — GENERAL OVERRIDES
+   ================================================================ */
+
+@media (max-width: 480px) {
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+    min-height: 44px;
+  }
+
+  button {
+    font-size: var(--text-md);
+    min-height: 44px;
+  }
+}
+
+/* ================================================================
+   CONTAINER QUERIES FALLBACK
+   For browsers that don't support container queries,
+   use media queries for responsive inner layouts
+   ================================================================ */
+
+@media (max-width: 640px) {
+  .contentContainer {
+    padding: var(--space-3);
+  }
+
+  .gridContainer {
+    gap: var(--space-3);
+  }
+}
+
+/* ================================================================
+   PRINT STYLES
+   ================================================================ */
+
+@media print {
+  .editorContainer,
+  .mainContainer {
+    overflow: visible;
+    height: auto;
+  }
+
+  button {
+    display: none;
+  }
+}

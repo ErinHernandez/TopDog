@@ -1,0 +1,264 @@
+/**
+ * TournamentCardV2 - CSS Modules for CSP compliance
+ *
+ * All dynamic values are passed via CSS custom properties (--var-name)
+ * This enables Content Security Policy (CSP) compliance by removing inline styles.
+ *
+ * Fixed V2 dimensions:
+ * - Outer padding: 21px
+ * - Border radius: 16px
+ * - Min height: 700px
+ * - Title margin top: 12px
+ * - Spacer height: 24px
+ */
+
+/* ============================================================================
+   NOTE: Global tokens (--bg-primary, --text-primary, etc.) are defined in
+   /styles/tokens.css and available globally. Do NOT use :root in CSS Modules.
+   ============================================================================ */
+
+/* ============================================================================
+   MAIN CARD CONTAINER
+   ============================================================================ */
+
+.cardContainer {
+  display: grid;
+  grid-template-rows: auto 24px 1fr;
+  gap: 0;
+
+  width: 100%;
+  height: 500px;
+  min-height: 500px;
+  max-height: 500px;
+  padding: 21px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  margin-top: auto;
+
+  background-color: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-default);
+
+  position: relative;
+  overflow: hidden;
+
+  contain: layout style paint;
+  isolation: isolate;
+}
+
+/* Featured card variant - uses state color border */
+.cardContainer.featured {
+  border-color: var(--color-state-active);
+  border-width: 3px;
+}
+
+/* ============================================================================
+   BACKGROUND LAYERS - Absolute positioned, outside grid flow
+   ============================================================================ */
+
+.blurLayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: var(--blur-placeholder);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: calc(var(--card-border-radius) - 1px);
+  z-index: 0;
+}
+
+.imageLayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: var(--card-bg-image-display);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: calc(var(--card-border-radius) - 1px);
+  z-index: 1;
+
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+  will-change: opacity;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+.imageLayer.loaded {
+  opacity: 1;
+}
+
+/* ============================================================================
+   CONTENT CONTAINER - Positioned above backgrounds
+   ============================================================================ */
+
+.contentContainer {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-rows: auto 24px 1fr;
+  gap: 0;
+  height: 100%;
+  width: 100%;
+  contain: layout;
+  overflow: hidden;
+}
+
+/* ============================================================================
+   TITLE SECTION - Row 1
+   ============================================================================ */
+
+.titleSectionWrapper {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  contain: layout style;
+}
+
+.title {
+  font-size: 46px;
+  font-family: 'Anton SC', sans-serif;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  line-height: 1.1;
+  text-align: center;
+
+  color: var(--text-primary);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+
+  margin: 0;
+}
+
+/* ============================================================================
+   SPACER - Row 2
+   ============================================================================ */
+
+.spacer {
+  /* Grid row 2 is 24px, this element just fills it */
+}
+
+/* ============================================================================
+   BOTTOM SECTION - Row 3
+   ============================================================================ */
+
+.bottomSectionWrapper {
+  align-self: stretch;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+
+  padding-bottom: 0;
+  margin-bottom: 0;
+  min-height: 0;
+}
+
+/* ============================================================================
+   SKELETON LOADING STATE
+   ============================================================================ */
+
+.skeletonContainer {
+  display: grid;
+  grid-template-rows: auto 24px 1fr;
+  gap: 0;
+  width: 100%;
+  min-height: 500px;
+  padding: 21px;
+  background-color: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-default);
+}
+
+.skeletonContainer.pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Title skeleton */
+.skeletonTitleWrapper {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.skeletonTitleBar {
+  width: 70%;
+  height: 46px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+/* Bottom skeleton */
+.skeletonBottomSection {
+  display: grid;
+  grid-template-rows: 8px 57px 48px;
+  gap: 16px;
+  align-self: end;
+}
+
+.skeletonProgressBar,
+.skeletonButton {
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.skeletonProgressBar {
+  height: 8px;
+}
+
+.skeletonButton {
+  height: 57px;
+  border-radius: 8px;
+}
+
+.skeletonStatsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  height: 48px;
+}
+
+.skeletonStatItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.skeletonStatLabel,
+.skeletonStatValue {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.skeletonStatLabel {
+  width: 50px;
+  height: 24px;
+  margin-bottom: 4px;
+}
+
+.skeletonStatValue {
+  width: 40px;
+  height: 14px;
+}
+
+/* ============================================================================
+   ANIMATIONS
+   ============================================================================ */
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

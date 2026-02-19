@@ -1,0 +1,191 @@
+/**
+ * AmountStepper CSS Module
+ *
+ * Zero-runtime CSS for CSP compliance.
+ * Uses tokens.css variables for all colors.
+ */
+
+/* ============================================================================
+   CONTAINER
+   ============================================================================ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ============================================================================
+   EXPLANATION BANNER
+   ============================================================================ */
+
+.explanationBanner {
+  padding: var(--spacing-md);
+  border-radius: var(--radius-lg);
+  background-color: rgba(59, 130, 246, 0.07);
+  border: 1px solid rgba(59, 130, 246, 0.19);
+}
+
+.explanationText {
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ============================================================================
+   STEPPER CONTROL
+   ============================================================================ */
+
+.stepperControl {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.stepperRow {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+/* ============================================================================
+   STEPPER BUTTONS
+   ============================================================================ */
+
+.stepperButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  transition: all 150ms ease;
+  width: 48px;
+  height: 48px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-default);
+  cursor: pointer;
+  color: var(--text-primary);
+}
+
+.stepperButton:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.stepperButtonDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: var(--border-light);
+}
+
+.stepperButtonDisabled svg {
+  color: var(--text-muted);
+}
+
+.stepperButtonIncrement {
+  background-color: var(--color-state-active);
+  border-color: var(--color-state-active);
+  color: #000;
+}
+
+/* ============================================================================
+   AMOUNT DISPLAY
+   ============================================================================ */
+
+.amountDisplay {
+  text-align: center;
+  min-width: 140px;
+}
+
+.amountValue {
+  font-weight: 700;
+  font-size: var(--font-size-3xl);
+  color: var(--text-primary);
+}
+
+.localEquivalent {
+  margin-top: 0.25rem;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+/* ============================================================================
+   LIMIT MESSAGES
+   ============================================================================ */
+
+.limitMessage {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* ============================================================================
+   QUICK SELECT
+   ============================================================================ */
+
+.quickSelectContainer {
+  width: 100%;
+}
+
+.quickSelectLabel {
+  text-align: center;
+  margin-bottom: 0.75rem;
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+.quickSelectGrid {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.quickSelectChip {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: 9999px;
+  font-weight: 500;
+  transition: all 150ms ease;
+  font-size: var(--font-size-sm);
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  border: 1px solid var(--border-default);
+  cursor: pointer;
+}
+
+.quickSelectChip:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.quickSelectChipSelected {
+  background-color: var(--color-state-active);
+  color: #000;
+  border-color: var(--color-state-active);
+}
+
+/* ============================================================================
+   EXCHANGE RATE BOX
+   ============================================================================ */
+
+.exchangeRateBox {
+  padding: 0.75rem;
+  border-radius: var(--radius-md);
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-light);
+}
+
+.exchangeRateText {
+  text-align: center;
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.exchangeRateDisclaimer {
+  text-align: center;
+  margin-top: 0.25rem;
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  opacity: 0.7;
+}

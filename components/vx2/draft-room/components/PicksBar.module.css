@@ -1,0 +1,424 @@
+/**
+ * PicksBar - CSS Module for CSP Compliance
+ *
+ * Extracted from inline styles in PicksBar.tsx for Content Security Policy compliance.
+ * Uses CSS custom properties for dynamic values that vary at runtime.
+ */
+
+/* ============================================================================
+   CSS Custom Properties (Dynamic Values from Constants)
+   ============================================================================ */
+
+/* ============================================================================
+   Scrolling Username Component
+   ============================================================================ */
+
+.scrollingUsernameContainer {
+  overflow: hidden;
+  width: 100%;
+  text-align: center;
+}
+
+.scrollingUsernameContainerTruncated {
+  cursor: pointer;
+}
+
+.scrollingUsernameContainerTruncated:hover {
+  opacity: 0.9;
+}
+
+.scrollingUsernameContainerScrolling {
+  text-align: left;
+}
+
+.scrollingUsernameText {
+  display: inline-block;
+  white-space: nowrap;
+  transition: transform 0.3s ease-out;
+  color: var(--scroll-color);
+  font-size: var(--scroll-font-size);
+  font-weight: var(--scroll-font-weight);
+  transform: var(--scroll-transform);
+}
+
+.scrollingUsernameTextScrolling {
+  transition: transform var(--animation-duration, 1.5s) ease-in-out;
+}
+
+/* ============================================================================
+   Main Container & Scroll View
+   ============================================================================ */
+
+.container {
+  width: 100%;
+  height: 100%;
+  background-color: var(--picks-bar-container-bg);
+  padding-top: var(--picks-bar-container-padding-top);
+  padding-bottom: 0;
+  padding-left: 0;
+  padding-right: 0;
+  margin-bottom: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.scrollableContainer {
+  display: flex;
+  gap: var(--picks-bar-card-gap);
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+/* Hide scrollbar in WebKit browsers */
+.scrollableContainer::-webkit-scrollbar {
+  width: 0px !important;
+  height: 0px !important;
+  display: none !important;
+}
+
+.picksContent {
+  display: flex;
+  align-items: flex-start;
+  height: 100%;
+  gap: var(--picks-bar-card-gap);
+  background-color: var(--picks-bar-container-bg);
+  margin-bottom: 0;
+  padding-bottom: 0;
+  padding-left: var(--picks-content-padding);
+  padding-right: var(--picks-content-padding);
+}
+
+/* ============================================================================
+   Filled Pick Card
+   ============================================================================ */
+
+.filledCard {
+  flex-shrink: 0;
+  flex-grow: 0;
+  box-sizing: border-box;
+  width: var(--picks-bar-card-width);
+  min-width: var(--picks-bar-card-width);
+  max-width: var(--picks-bar-card-width);
+  margin-top: 4px;
+  margin-bottom: var(--picks-bar-card-margin);
+  margin-left: var(--picks-bar-card-margin);
+  margin-right: var(--picks-bar-card-margin);
+  border-radius: var(--picks-bar-card-border-radius);
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border-width: var(--picks-bar-card-border-width);
+  border-style: solid;
+}
+
+.filledCard[data-clickable="false"] {
+  cursor: default;
+}
+
+.filledCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  border-top-left-radius: var(--picks-bar-card-border-radius);
+  border-top-right-radius: var(--picks-bar-card-border-radius);
+}
+
+.filledCardContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: var(--picks-bar-content-min-height);
+  position: relative;
+}
+
+.filledCardPickNumberRow {
+  position: absolute;
+  top: var(--picks-bar-pick-number-top);
+  left: var(--picks-bar-pick-number-margin-left);
+  right: var(--picks-bar-pick-number-margin-left);
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--picks-bar-pick-number-font-size);
+  font-weight: 500;
+  color: var(--card-color-player-name-text);
+}
+
+.filledCardPlayerNames {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.filledCardPlayerName {
+  color: var(--card-color-player-name-text);
+  font-weight: 700;
+  font-size: var(--picks-bar-player-last-name-font-size);
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.filledCardTeam {
+  color: var(--card-color-player-name-text);
+  font-size: var(--picks-bar-player-pos-team-font-size);
+  text-align: center;
+  line-height: 1.2;
+  margin-bottom: 2px;
+}
+
+.filledCardTrackerContainer {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding-bottom: 5px;
+}
+
+/* ============================================================================
+   Blank Pick Card
+   ============================================================================ */
+
+.blankCard {
+  flex-shrink: 0;
+  flex-grow: 0;
+  box-sizing: border-box;
+  width: var(--picks-bar-card-width);
+  min-width: var(--picks-bar-card-width);
+  max-width: var(--picks-bar-card-width);
+  margin-top: 4px;
+  margin-bottom: var(--picks-bar-card-margin);
+  margin-left: var(--picks-bar-card-margin);
+  margin-right: var(--picks-bar-card-margin);
+  border-radius: var(--picks-bar-card-border-radius);
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border-color: var(--blank-card-border-color);
+}
+
+.blankCard[data-clickable="false"] {
+  cursor: default;
+}
+
+.blankCardTiled {
+  padding: var(--picks-bar-card-border-width);
+  background-color: var(--picks-bar-container-bg);
+}
+
+/* Tiled background pattern - uses CSS custom property set dynamically */
+.blankCardTiledBg {
+  background-image: var(--tiled-bg-image);
+  background-size: 4px 4px;
+  background-repeat: repeat;
+}
+
+.blankCardInner {
+  width: 100%;
+  height: 100%;
+  background-color: var(--picks-bar-card-bg);
+  border-radius: calc(var(--picks-bar-card-border-radius) - 2px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.blankCardSolid {
+  background-color: var(--picks-bar-card-bg);
+}
+
+.blankCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  border-top-left-radius: var(--picks-bar-card-border-radius);
+  border-top-right-radius: var(--picks-bar-card-border-radius);
+  background-color: var(--blank-card-header-bg);
+}
+
+.blankCardHeaderHeight {
+  height: calc(var(--picks-bar-header-height) + (var(--picks-bar-card-border-width) * 2));
+  margin-top: calc(-1 * var(--picks-bar-card-border-width) * 2);
+}
+
+.blankCardContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: var(--picks-bar-content-min-height);
+  position: relative;
+}
+
+.blankCardPickNumberRow {
+  position: absolute;
+  top: var(--picks-bar-pick-number-top);
+  left: var(--picks-bar-pick-number-margin-left);
+  right: var(--picks-bar-pick-number-margin-left);
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--picks-bar-pick-number-font-size);
+  font-weight: 500;
+  color: var(--card-color-player-name-text);
+}
+
+.blankCardCenterContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.blankCardStatus {
+  font-weight: 600;
+  color: var(--card-color-player-name-text);
+  font-size: 11px;
+  line-height: 1.2;
+  text-align: center;
+  margin-top: 6px;
+}
+
+.blankCardStatusUserPick {
+  font-weight: 500;
+  margin-top: 0;
+}
+
+.blankCardTrackerContainer {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding-bottom: 5px;
+}
+
+/* ============================================================================
+   Position Tracker Bar
+   ============================================================================ */
+
+.positionTrackerEmpty {
+  height: var(--picks-bar-tracker-height);
+  width: var(--picks-bar-tracker-empty-width);
+  background-color: var(--card-color-empty-tracker);
+  border-radius: var(--picks-bar-tracker-border-radius);
+}
+
+.positionTrackerFilled {
+  display: flex;
+  height: var(--picks-bar-tracker-height);
+  width: var(--picks-bar-tracker-width);
+  border-radius: var(--picks-bar-tracker-border-radius);
+  overflow: hidden;
+}
+
+.positionTrackerSegment {
+  /* Flex ratio is set dynamically via CSS custom property */
+  /* Background color is set via data-position attribute */
+  background-color: var(--position-color, #6B7280);
+  flex: var(--segment-flex, 1);
+}
+
+/* Position-specific tracker segment colors */
+.positionTrackerSegment[data-position="qb"] { --position-color: var(--color-position-qb); }
+.positionTrackerSegment[data-position="rb"] { --position-color: var(--color-position-rb); }
+.positionTrackerSegment[data-position="wr"] { --position-color: var(--color-position-wr); }
+.positionTrackerSegment[data-position="te"] { --position-color: var(--color-position-te); }
+.positionTrackerSegment[data-position="bn"] { --position-color: var(--color-position-bn); }
+
+/* Filled card position colors - border and header background */
+.filledCard[data-position="qb"] {
+  --position-color: var(--color-position-qb);
+  border-color: var(--position-color);
+}
+.filledCard[data-position="rb"] {
+  --position-color: var(--color-position-rb);
+  border-color: var(--position-color);
+}
+.filledCard[data-position="wr"] {
+  --position-color: var(--color-position-wr);
+  border-color: var(--position-color);
+}
+.filledCard[data-position="te"] {
+  --position-color: var(--color-position-te);
+  border-color: var(--position-color);
+}
+.filledCard[data-position="bn"] {
+  --position-color: var(--color-position-bn);
+  border-color: var(--position-color);
+}
+.filledCard[data-position="k"],
+.filledCard[data-position="dst"],
+.filledCard[data-position="def"] {
+  --position-color: var(--text-muted);
+  border-color: var(--position-color);
+}
+
+/* Filled card header inherits position color from parent */
+.filledCardHeader {
+  background-color: var(--position-color);
+}
+
+/* ============================================================================
+   Share Button
+   ============================================================================ */
+
+.shareButton {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
+  background-color: #3B82F6;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 20;
+}
+
+.shareButton:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.shareButton:hover:not(:disabled) {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+/* ============================================================================
+   Loading Spinner Animation
+   ============================================================================ */
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinnerIcon {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #FFFFFF;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}

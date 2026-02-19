@@ -1,0 +1,131 @@
+/* DraftFooter.module.css - Pixel-perfect footer navigation styles */
+
+/* ============================================================================
+   CSS Custom Properties - Color values from FOOTER_COLORS constant
+   ============================================================================ */
+/* ============================================================================
+   Size values from FOOTER_PX constant (in pixels)
+   ============================================================================ */
+/* ============================================================================
+   Nav container - footer wrapper
+   ============================================================================ */
+.nav {
+  background-color: var(--footer-bg-color);
+  height: var(--footer-container-height);
+  border-top: var(--footer-container-border-top) solid var(--footer-border-color);
+  width: 100%;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+   Tab bar container - holds all tab buttons
+   ============================================================================ */
+.tabBar {
+  display: flex;
+  flex: 1;
+  padding-top: var(--footer-tab-padding-top);
+  width: 100%;
+  overflow: hidden;
+}
+
+/* ============================================================================
+   Tab button - individual navigation tab
+   ============================================================================ */
+.tabButton {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  min-height: var(--footer-tab-min-height);
+  padding-left: var(--footer-tab-padding-x);
+  padding-right: var(--footer-tab-padding-x);
+  min-width: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.25s ease;
+}
+
+/* ============================================================================
+   Icon container - holds icon and badge wrapper
+   ============================================================================ */
+.iconContainer {
+  position: relative;
+  width: var(--footer-icon-size);
+  height: var(--footer-icon-size);
+}
+
+/* ============================================================================
+   Badge position wrapper - positions badge relative to icon
+   ============================================================================ */
+.badgeWrapper {
+  position: absolute;
+  top: 50%;
+  right: var(--footer-badge-offset-right);
+  transform: translateY(-50%);
+}
+
+/* ============================================================================
+   Badge - count display with styling
+   ============================================================================ */
+.badge {
+  min-width: var(--footer-badge-min-width);
+  height: var(--footer-badge-height);
+  border-radius: calc(var(--footer-badge-height) / 2);
+  background-color: var(--footer-badge-bg-color);
+  color: var(--footer-badge-text-color);
+  font-size: var(--footer-badge-font-size);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+}
+
+/* ============================================================================
+   Tab label - text below icon
+   ============================================================================ */
+.tabLabel {
+  font-size: var(--footer-label-font-size);
+  line-height: var(--footer-label-line-height);
+  margin-top: var(--footer-label-margin-top);
+  transition: color 0.25s ease;
+}
+
+.tabLabel.active {
+  color: var(--footer-active-color);
+  font-weight: 500;
+}
+
+.tabLabel.inactive {
+  color: var(--footer-inactive-color);
+  font-weight: 400;
+}
+
+/* ============================================================================
+   Home indicator - bottom bar for iPhone safe area
+   ============================================================================ */
+.homeIndicator {
+  width: var(--footer-home-indicator-width);
+  height: var(--footer-home-indicator-height);
+  background-color: var(--footer-home-indicator-color);
+  border-radius: var(--footer-home-indicator-height);
+  margin: var(--footer-home-indicator-margin-top) auto var(--footer-home-indicator-margin-bottom);
+}
+
+/* ============================================================================
+   Icon color styles - used by footer icon SVGs
+   ============================================================================ */
+svg.icon-active {
+  color: var(--footer-active-color);
+}
+
+svg.icon-inactive {
+  color: var(--footer-inactive-color);
+}

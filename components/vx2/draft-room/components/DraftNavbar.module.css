@@ -1,0 +1,245 @@
+/**
+ * DraftNavbar - CSS Module
+ *
+ * Styles for the draft room navigation bar with:
+ * - Blue tiled background
+ * - White back arrow (left)
+ * - Countdown timer (center)
+ * - Pulse animation at 3s, 2s, 1s, 0s
+ */
+
+/* ============================================================================
+   CUSTOM PROPERTIES (Dynamic Values)
+   ============================================================================ */
+
+/* ============================================================================
+   KEYFRAME ANIMATIONS
+   ============================================================================ */
+
+@keyframes navbar-pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.5);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes navbar-shake {
+  0%, 100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  10% {
+    transform: translateX(-4px) rotate(-2deg);
+  }
+  20% {
+    transform: translateX(4px) rotate(2deg);
+  }
+  30% {
+    transform: translateX(-4px) rotate(-2deg);
+  }
+  40% {
+    transform: translateX(4px) rotate(2deg);
+  }
+  50% {
+    transform: translateX(-4px) rotate(-2deg);
+  }
+  60% {
+    transform: translateX(4px) rotate(2deg);
+  }
+  70% {
+    transform: translateX(-4px) rotate(-2deg);
+  }
+  80% {
+    transform: translateX(4px) rotate(2deg);
+  }
+  90% {
+    transform: translateX(-2px) rotate(-1deg);
+  }
+}
+
+/* ============================================================================
+   CONTAINER STYLES
+   ============================================================================ */
+
+.header {
+  display: flex;
+  flex-direction: column;
+}
+
+.header.absolute {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  padding-top: max(0px, calc(env(safe-area-inset-top, 0px) - 20px));
+}
+
+.header.fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  padding-top: max(0px, calc(env(safe-area-inset-top, 0px) - 20px));
+}
+
+.header.relative {
+  flex-shrink: 0;
+}
+
+/* Background variants */
+.header.bgDark {
+  background-color: var(--bg-color-dark);
+}
+
+.header.bgRed {
+  background-color: var(--bg-color-red);
+}
+
+.header.bgTiled {
+  background-image: url(/wr_blue.png);
+  background-repeat: repeat;
+  background-size: 60px 60px;
+  background-color: var(--bg-color-blue);
+}
+
+/* ============================================================================
+   CONTENT WRAPPER
+   ============================================================================ */
+
+.navContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--navbar-height);
+  padding-left: var(--navbar-padding-x);
+  padding-right: var(--navbar-padding-x);
+}
+
+.navContent.shake {
+  animation: navbar-shake 0.6s ease-in-out;
+}
+
+/* ============================================================================
+   TIMER DISPLAY
+   ============================================================================ */
+
+.timerWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  height: 100%;
+}
+
+.timerDisplay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--navbar-height);
+  font-weight: var(--timer-font-weight);
+  font-size: var(--timer-font-size);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--text-color-white);
+}
+
+.timerDisplay.pulse {
+  animation: navbar-pulse 0.4s ease-out;
+}
+
+/* ============================================================================
+   BUTTON STYLES (Base)
+   ============================================================================ */
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--button-size);
+  height: var(--button-size);
+  border-radius: calc(var(--button-size) / 2);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--transition-duration);
+}
+
+.button:hover {
+  background-color: rgba(255, 255, 255, var(--button-hover-alpha));
+}
+
+.button:active {
+  background-color: rgba(255, 255, 255, var(--button-hover-alpha));
+}
+
+.button.exitButton {
+  position: relative;
+  z-index: 100;
+}
+
+/* ============================================================================
+   BUTTON SVG
+   ============================================================================ */
+
+.buttonSvg {
+  pointer-events: none;
+}
+
+/* ============================================================================
+   SPACER ELEMENTS
+   ============================================================================ */
+
+.spacer {
+  width: var(--button-size);
+}
+
+.spacerFlex {
+  flex: 1;
+}
+
+/* ============================================================================
+   ACCESSIBILITY & RESPONSIVE
+   ============================================================================ */
+
+/* Touch target minimum size (44px recommended) */
+@media (max-width: 480px) {
+  .button {
+    width: 44px;
+    height: 44px;
+    border-radius: 22px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  @keyframes navbar-pulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+  }
+
+  @keyframes navbar-shake {
+    0%, 100% {
+      transform: translateX(0) rotate(0deg);
+    }
+  }
+
+  .timerDisplay.pulse {
+    animation: none;
+  }
+
+  .navContent.shake {
+    animation: none;
+  }
+
+  .button {
+    transition: none;
+  }
+}

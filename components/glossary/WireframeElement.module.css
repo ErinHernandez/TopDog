@@ -1,0 +1,245 @@
+/**
+ * WireframeElement.module.css
+ * Styling for wireframe placeholder components
+ */
+
+/* ============================================================================
+   WIREFRAME BASE
+   ============================================================================ */
+
+.wireframe {
+  position: absolute;
+  border: 2px dashed var(--border-default);
+  border-radius: var(--radius-md);
+  background-color: rgba(93, 197, 191, 0.05);
+  transition: all var(--transition-normal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.wireframe:hover {
+  border-color: var(--border-subtle);
+  background-color: rgba(93, 197, 191, 0.1);
+  box-shadow: 0 0 0 1px rgba(93, 197, 191, 0.2);
+}
+
+/* ============================================================================
+   WIREFRAME VARIANTS
+   ============================================================================ */
+
+.variantDefault {
+  border-color: var(--border-default);
+  background-color: rgba(93, 197, 191, 0.05);
+}
+
+.variantDefault:hover {
+  border-color: var(--color-brand-primary);
+  background-color: rgba(93, 197, 191, 0.1);
+  box-shadow: 0 0 0 2px rgba(93, 197, 191, 0.2);
+}
+
+.variantHighlight {
+  border-color: var(--color-brand-primary);
+  border-width: 3px;
+  background-color: rgba(45, 226, 197, 0.15);
+  box-shadow: 0 0 0 4px rgba(45, 226, 197, 0.1);
+}
+
+.variantHighlight:hover {
+  background-color: rgba(45, 226, 197, 0.2);
+  box-shadow: 0 0 0 4px rgba(45, 226, 197, 0.15);
+}
+
+.variantSibling {
+  border-color: var(--border-subtle);
+  background-color: rgba(155, 163, 175, 0.05);
+}
+
+.variantSibling:hover {
+  border-color: var(--text-muted);
+  background-color: rgba(155, 163, 175, 0.1);
+}
+
+/* ============================================================================
+   INTERACTIVE STATE
+   ============================================================================ */
+
+.interactive {
+  cursor: pointer;
+}
+
+.interactive:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(93, 197, 191, 0.2);
+}
+
+.interactive:active {
+  background-color: rgba(93, 197, 191, 0.15);
+}
+
+/* ============================================================================
+   CORNER MARKERS
+   ============================================================================ */
+
+.corner {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background-color: var(--color-brand-primary);
+  border-radius: 1px;
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+}
+
+.wireframe:hover .corner {
+  opacity: 1;
+}
+
+.corner[style*='top: 0'][style*='left: 0'] {
+  border-radius: var(--radius-sm) 0 0 0;
+}
+
+.corner[style*='top: 0'][style*='right: 0'] {
+  border-radius: 0 var(--radius-sm) 0 0;
+}
+
+.corner[style*='bottom: 0'][style*='left: 0'] {
+  border-radius: 0 0 0 var(--radius-sm);
+}
+
+.corner[style*='bottom: 0'][style*='right: 0'] {
+  border-radius: 0 0 var(--radius-sm) 0;
+}
+
+/* ============================================================================
+   DIMENSIONS DISPLAY
+   ============================================================================ */
+
+.dimensionsDisplay {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-normal);
+  z-index: var(--z-elevated);
+}
+
+.wireframe:hover .dimensionsDisplay {
+  opacity: 1;
+}
+
+.dimensionText {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  font-family: monospace;
+  letter-spacing: 0.5px;
+}
+
+/* ============================================================================
+   LABEL TOOLTIP
+   ============================================================================ */
+
+.labelTooltip {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  z-index: var(--z-elevated);
+  pointer-events: none;
+  animation: fadeIn 150ms ease-out;
+  max-width: 90%;
+  white-space: normal;
+  text-align: center;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.labelText {
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* ============================================================================
+   WIREFRAME CONTAINER
+   ============================================================================ */
+
+.wireframeContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+}
+
+.containerLabelTooltip {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  z-index: var(--z-elevated);
+  pointer-events: none;
+  animation: fadeIn 150ms ease-out;
+}
+
+.containerLabelTooltip .labelText {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  .wireframe {
+    border-width: 1.5px;
+  }
+
+  .corner {
+    width: 6px;
+    height: 6px;
+  }
+
+  .dimensionsDisplay {
+    padding: 2px 4px;
+  }
+
+  .dimensionText {
+    font-size: 10px;
+  }
+
+  .labelTooltip {
+    padding: var(--spacing-sm);
+  }
+
+  .labelText {
+    font-size: var(--font-size-xs);
+  }
+}

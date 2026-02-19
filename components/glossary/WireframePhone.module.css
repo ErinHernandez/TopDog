@@ -1,0 +1,291 @@
+/**
+ * WireframePhone.module.css
+ *
+ * Styling for the WireframePhone component - iPhone 15 Pro device frame
+ * with wireframe visualization of screen elements.
+ *
+ * Features:
+ * - Realistic device bezel and frame styling
+ * - Dynamic Island notch appearance
+ * - Wireframe dashed border elements
+ * - Highlighted element glow effect
+ * - Responsive metadata display
+ */
+
+/* ============================================================================
+   CONTAINER & LAYOUT
+   ============================================================================ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* ============================================================================
+   DEVICE FRAME & SCREEN
+   ============================================================================ */
+
+.deviceFrame {
+  position: relative;
+  background: #000;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4),
+              0 0 1px rgba(255, 255, 255, 0.1),
+              inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+}
+
+.screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  background-image: linear-gradient(135deg, #f9f9f9 0%, #fff 100%);
+  overflow: hidden;
+}
+
+/* Status bar simulation at top */
+.statusBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.05) 50%, transparent 100%);
+  pointer-events: none;
+}
+
+/* ============================================================================
+   NOTCH / DYNAMIC ISLAND
+   ============================================================================ */
+
+.notchContainer {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  pointer-events: none;
+}
+
+.dynamicIsland {
+  background: #000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================================================
+   CONTENT AREA & ELEMENTS
+   ============================================================================ */
+
+.contentArea {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+/* Base wireframe element styling */
+.wireframeElement {
+  position: absolute;
+  border: 2px dashed #c0c0c0;
+  background: rgba(192, 192, 192, 0.02);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.wireframeElement:hover {
+  border-color: #a0a0a0;
+  background: rgba(192, 192, 192, 0.05);
+  box-shadow: 0 0 8px rgba(160, 160, 160, 0.2);
+}
+
+/* Highlighted element - shown as "real" with glow */
+.highlightedElement {
+  position: absolute;
+  border: 3px solid #3b82f6;
+  background: rgba(59, 130, 246, 0.08);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+
+  /* Blue glow effect */
+  box-shadow:
+    0 0 0 3px rgba(59, 130, 246, 0.15),
+    0 0 12px rgba(59, 130, 246, 0.4),
+    0 0 20px rgba(59, 130, 246, 0.2),
+    inset 0 0 8px rgba(59, 130, 246, 0.1);
+}
+
+.highlightedElement:hover {
+  border-color: #2563eb;
+  background: rgba(59, 130, 246, 0.12);
+  box-shadow:
+    0 0 0 3px rgba(59, 130, 246, 0.2),
+    0 0 16px rgba(59, 130, 246, 0.5),
+    0 0 24px rgba(59, 130, 246, 0.25),
+    inset 0 0 10px rgba(59, 130, 246, 0.15);
+}
+
+.highlightedElement:active {
+  border-color: #1d4ed8;
+  box-shadow:
+    0 0 0 2px rgba(59, 130, 246, 0.25),
+    0 0 8px rgba(59, 130, 246, 0.3),
+    inset 0 0 6px rgba(59, 130, 246, 0.2);
+}
+
+/* ============================================================================
+   ELEMENT LABELS (DEBUG)
+   ============================================================================ */
+
+.elementLabel {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  padding: 2px 4px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 600;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Menlo, monospace;
+  border-radius: 2px;
+  pointer-events: none;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  max-width: calc(100% - 8px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  z-index: 10;
+}
+
+/* ============================================================================
+   METADATA DISPLAY
+   ============================================================================ */
+
+.metadata {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba(245, 245, 245, 0.8);
+  border: 1px solid rgba(200, 200, 200, 0.3);
+  border-radius: 6px;
+  font-size: 11px;
+  color: #666;
+}
+
+.metadataRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.metadataLabel {
+  font-weight: 600;
+  color: #555;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  min-width: 65px;
+}
+
+.metadataValue {
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Menlo, monospace;
+  color: #3b82f6;
+  font-weight: 500;
+  word-break: break-all;
+}
+
+/* ============================================================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  .metadata {
+    font-size: 10px;
+    padding: 6px 10px;
+    gap: 4px;
+  }
+
+  .metadataRow {
+    gap: 6px;
+  }
+
+  .metadataLabel {
+    min-width: auto;
+  }
+
+  .elementLabel {
+    font-size: 8px;
+  }
+}
+
+/* ============================================================================
+   DARK MODE SUPPORT
+   ============================================================================ */
+
+@media (prefers-color-scheme: dark) {
+  .screen {
+    background: #1a1a1a;
+    background-image: linear-gradient(135deg, #242424 0%, #1a1a1a 100%);
+  }
+
+  .wireframeElement {
+    border-color: #505050;
+    background: rgba(80, 80, 80, 0.05);
+  }
+
+  .wireframeElement:hover {
+    border-color: #656565;
+    background: rgba(80, 80, 80, 0.1);
+  }
+
+  .metadata {
+    background: rgba(40, 40, 40, 0.8);
+    border-color: rgba(100, 100, 100, 0.2);
+    color: #aaa;
+  }
+
+  .metadataLabel {
+    color: #999;
+  }
+
+  .metadataValue {
+    color: #60a5fa;
+  }
+}
+
+/* ============================================================================
+   ANIMATION KEYFRAMES
+   ============================================================================ */
+
+@keyframes glowPulse {
+  0% {
+    box-shadow:
+      0 0 0 3px rgba(59, 130, 246, 0.15),
+      0 0 12px rgba(59, 130, 246, 0.4),
+      0 0 20px rgba(59, 130, 246, 0.2),
+      inset 0 0 8px rgba(59, 130, 246, 0.1);
+  }
+  50% {
+    box-shadow:
+      0 0 0 3px rgba(59, 130, 246, 0.2),
+      0 0 16px rgba(59, 130, 246, 0.5),
+      0 0 28px rgba(59, 130, 246, 0.3),
+      inset 0 0 10px rgba(59, 130, 246, 0.15);
+  }
+  100% {
+    box-shadow:
+      0 0 0 3px rgba(59, 130, 246, 0.15),
+      0 0 12px rgba(59, 130, 246, 0.4),
+      0 0 20px rgba(59, 130, 246, 0.2),
+      inset 0 0 8px rgba(59, 130, 246, 0.1);
+  }
+}
+
+/* Optional: Add subtle animation to highlighted elements */
+.highlightedElement.animate {
+  animation: glowPulse 2s ease-in-out infinite;
+}

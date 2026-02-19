@@ -1,0 +1,21 @@
+/**
+ * Idesaign — ARIA Live Region Styles
+ * Screen-reader-only visually hidden div for announcements
+ */
+
+.ariaLive {
+  /* Visually hidden but accessible to screen readers */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+
+  /* Ensure it's not focusable or interactive */
+  pointer-events: none;
+  user-select: none;
+}

@@ -1,0 +1,428 @@
+/* MatchupDetailView.module.css */
+
+/* CSS Variables for dynamic values */
+/* Container */
+.container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background-color: var(--bg-primary);
+}
+
+/* Header */
+.header {
+  background-color: var(--bg-secondary);
+  padding: calc(var(--spacing-sm) + 2px) var(--spacing-lg);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.backButton {
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  cursor: pointer;
+  padding: var(--spacing-sm);
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-md);
+  transition: background-color 0.15s ease;
+}
+
+.backButton:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.headerTitle {
+  text-align: center;
+}
+
+.headerSubtitle {
+  color: var(--text-muted);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.headerMain {
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.spacer {
+  width: 40px;
+}
+
+/* Team Headers */
+.teamHeadersContainer {
+  display: flex;
+  background-color: var(--bg-tertiary);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.teamHeader {
+  flex: 1;
+  padding: var(--spacing-md);
+  text-align: right;
+}
+
+.teamHeaderLeft {
+  composes: teamHeader;
+  border-right: 1px solid var(--border-lighter);
+  text-align: right;
+}
+
+.teamHeaderRight {
+  composes: teamHeader;
+  border-left: 1px solid var(--border-lighter);
+  text-align: left;
+}
+
+.teamHeaderLabel {
+  color: var(--color-blue-light);
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.teamHeaderName {
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.teamHeaderStats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.teamHeaderStatsLeft {
+  composes: teamHeaderStats;
+  justify-content: flex-end;
+}
+
+.teamHeaderStatsRight {
+  composes: teamHeaderStats;
+  justify-content: flex-start;
+}
+
+.rankBadge {
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 10px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.rankBadgeAdvancing {
+  composes: rankBadge;
+  background-color: rgba(16, 185, 129, 0.2);
+  color: var(--color-green);
+}
+
+.rankBadgeEliminated {
+  composes: rankBadge;
+  background-color: rgba(239, 68, 68, 0.2);
+  color: var(--color-red);
+}
+
+.pointsText {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.vsDivider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.vsDividerText {
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* Shared Players Banner */
+.sharedPlayersBanner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: calc(var(--spacing-sm) + 2px) var(--spacing-lg);
+  background-color: rgba(251, 191, 37, 0.1);
+  border-bottom: 1px solid rgba(251, 191, 37, 0.2);
+}
+
+.sharedPlayersIndicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-yellow);
+}
+
+.sharedPlayersText {
+  color: var(--color-yellow);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Rosters Container */
+.rostersContainer {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  scrollbar-width: none;
+}
+
+.rostersContainer::-webkit-scrollbar {
+  display: none;
+}
+
+.rosterSide {
+  flex: 1;
+  padding: var(--spacing-md) var(--spacing-xs) var(--spacing-md) var(--spacing-md);
+  border-right: 1px solid var(--border-lighter);
+}
+
+.rosterSideRight {
+  composes: rosterSide;
+  padding: var(--spacing-md) var(--spacing-md) var(--spacing-md) var(--spacing-xs);
+  border-right: none;
+  border-left: 1px solid var(--border-lighter);
+}
+
+.positionGroup {
+  margin-bottom: var(--spacing-md);
+}
+
+.positionLabel {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--spacing-xs);
+}
+
+.positionLabelLeft {
+  composes: positionLabel;
+  text-align: right;
+}
+
+.positionLabelQB {
+  color: var(--position-qb);
+}
+
+.positionLabelRB {
+  color: var(--position-rb);
+}
+
+.positionLabelWR {
+  color: var(--position-wr);
+}
+
+.positionLabelTE {
+  color: var(--position-te);
+}
+
+/* Player Chip */
+.playerChip {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-sm) calc(var(--spacing-sm) + 2px);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-xs);
+}
+
+.playerChipLeft {
+  composes: playerChip;
+  align-items: flex-end;
+}
+
+.playerChipRight {
+  composes: playerChip;
+  align-items: flex-start;
+}
+
+.playerChipShared {
+  background-color: rgba(251, 191, 37, 0.12);
+  border: 1px solid rgba(251, 191, 37, 0.3);
+}
+
+.playerChipDefault {
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-lightest);
+}
+
+.playerChipContent {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.playerChipContentLeft {
+  composes: playerChipContent;
+  flex-direction: row-reverse;
+}
+
+.playerChipContentRight {
+  composes: playerChipContent;
+  flex-direction: row;
+}
+
+.positionBadge {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.playerName {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.playerNameShared {
+  composes: playerName;
+  font-weight: 600;
+  color: var(--color-yellow);
+}
+
+.playerNameDefault {
+  composes: playerName;
+  color: var(--text-primary);
+}
+
+.statusBadge {
+  padding: 1px 5px;
+  border-radius: var(--radius-sm);
+  font-size: 8px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.statusOut {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+.statusDoubtful {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+}
+
+.statusQuestionable {
+  background-color: rgba(251, 191, 37, 0.2);
+  color: var(--color-yellow);
+}
+
+.sharedIndicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--color-yellow);
+}
+
+.playerChipMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-top: 3px;
+  font-size: 10px;
+}
+
+.playerChipMetaLeft {
+  composes: playerChipMeta;
+  flex-direction: row-reverse;
+}
+
+.playerTeam {
+  color: var(--text-muted);
+}
+
+.playerProjection {
+  color: var(--text-secondary);
+}
+
+/* Navigation Controls */
+.navigationControls {
+  background-color: var(--bg-secondary);
+  border-top: 1px solid var(--border-light);
+  padding: var(--spacing-sm) var(--spacing-lg) var(--spacing-lg);
+}
+
+.navigationDots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md) 0;
+}
+
+.navigationDot {
+  height: 8px;
+  border-radius: var(--radius-full);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.navigationDotActive {
+  composes: navigationDot;
+  width: 16px;
+  background-color: var(--color-blue);
+}
+
+.navigationDotInactive {
+  composes: navigationDot;
+  width: 8px;
+}
+
+.navigationButtons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navigationButton {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: calc(var(--spacing-sm) + 2px) var(--spacing-lg);
+  background-color: rgba(255, 255, 255, 0.05);
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.navigationButton:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.navigationButtonDisabled {
+  background-color: rgba(255, 255, 255, 0.02);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.navigationHint {
+  color: var(--text-muted);
+  font-size: 11px;
+}

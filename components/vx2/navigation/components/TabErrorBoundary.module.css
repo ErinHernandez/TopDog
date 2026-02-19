@@ -1,0 +1,109 @@
+/**
+ * TabErrorBoundary CSS Module
+ *
+ * Zero-runtime CSS for CSP compliance.
+ * Uses tokens.css variables for all colors.
+ */
+
+/* ============================================================================
+   ERROR FALLBACK CONTAINER
+   ============================================================================ */
+
+.container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-lg);
+  background-color: var(--bg-primary);
+}
+
+/* ============================================================================
+   ERROR ICON
+   ============================================================================ */
+
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  margin-bottom: var(--spacing-md);
+  width: 64px;
+  height: 64px;
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--color-state-error);
+}
+
+/* ============================================================================
+   ERROR TEXT
+   ============================================================================ */
+
+.title {
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: var(--spacing-xs);
+  color: var(--text-primary);
+  font-size: var(--font-size-lg);
+}
+
+.description {
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+  color: var(--text-secondary);
+  font-size: var(--font-size-base);
+  max-width: 280px;
+}
+
+/* ============================================================================
+   ERROR DETAILS (DEV ONLY)
+   ============================================================================ */
+
+.details {
+  width: 100%;
+  max-width: 24rem;
+  margin-bottom: var(--spacing-lg);
+  text-align: left;
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+}
+
+.detailsSummary {
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.detailsContent {
+  margin-top: var(--spacing-xs);
+  overflow-x: auto;
+  color: var(--color-state-error);
+  font-size: var(--font-size-xs);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ============================================================================
+   RETRY BUTTON
+   ============================================================================ */
+
+.retryButton {
+  font-weight: 500;
+  transition: background-color 0.15s ease;
+  background-color: var(--color-state-active);
+  color: var(--text-primary);
+  padding: var(--spacing-md) var(--spacing-xl);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  border: none;
+  cursor: pointer;
+}
+
+.retryButton:hover {
+  opacity: 0.9;
+}
+
+.retryButton:active {
+  opacity: 0.8;
+}

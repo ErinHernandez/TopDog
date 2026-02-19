@@ -1,0 +1,118 @@
+/**
+ * PicksBarCard - CSS Module
+ *
+ * CSP-compliant styling for the PicksBarCard component.
+ * Uses CSS custom properties for dynamic values from component constants.
+ */
+
+/* ============================================================================ */
+/* CSS Custom Properties - Dynamic Values */
+/* ============================================================================ */
+
+/* ============================================================================ */
+/* Outer Container */
+/* ============================================================================ */
+
+.container {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--pbc-bg-color);
+  margin: var(--pbc-margin);
+  min-width: var(--pbc-min-width);
+  width: var(--pbc-width);
+  border-radius: var(--pbc-border-radius);
+  border: var(--pbc-border-width) solid var(--pbc-border-color);
+  overflow: hidden;
+}
+
+/* ============================================================================ */
+/* Header - Participant Name */
+/* ============================================================================ */
+
+.header {
+  height: var(--pbc-header-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  background-color: var(--pbc-border-color);
+  font-size: var(--pbc-header-font-size);
+  font-weight: 500;
+  color: var(--pbc-text-color);
+  text-transform: uppercase;
+  text-align: center;
+}
+
+/* ============================================================================ */
+/* Content Area */
+/* ============================================================================ */
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  padding-bottom: var(--pbc-content-padding-bottom);
+  min-height: var(--pbc-content-min-height);
+}
+
+/* ============================================================================ */
+/* Pick Number (top-left) */
+/* ============================================================================ */
+
+.pickNumber {
+  align-self: flex-start;
+  font-size: 8px;
+  font-weight: 500;
+  color: var(--pbc-text-color);
+  margin-top: 2px;
+  margin-left: 2px;
+}
+
+/* ============================================================================ */
+/* Center Content */
+/* ============================================================================ */
+
+.centerContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ============================================================================ */
+/* Position Tracker Bar */
+/* ============================================================================ */
+
+.trackerContainer {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: var(--pbc-tracker-margin-top);
+}
+
+.tracker {
+  height: var(--pbc-tracker-height);
+  width: var(--pbc-tracker-empty-width);
+  background-color: var(--pbc-tracker-bg-color);
+  border-radius: var(--pbc-tracker-border-radius);
+}
+
+/* ============================================================================ */
+/* Border Color Variants */
+/* ============================================================================ */
+
+.borderUserBlue {
+  --pbc-border-color: #3B82F6;
+}
+
+.borderGray {
+  --pbc-border-color: #6B7280;
+}
+
+.borderOnTheClockRed {
+  --pbc-border-color: #EF4444;
+}

@@ -1,0 +1,486 @@
+/* ============================================================================
+ * PayMongoDepositModalVX2 - CSS Module for CSP Compliance
+ * ============================================================================ */
+
+/* ============================================================================
+ * Layout
+ * ============================================================================ */
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-4, 1rem);
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+}
+
+.modalContainer {
+  width: 100%;
+  max-width: 28rem;
+  background-color: var(--bg-modal, #101927);
+  border-radius: var(--radius-2xl, 1rem);
+  overflow: hidden;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.modalContent {
+  padding: var(--spacing-6, 1.5rem);
+}
+
+/* ============================================================================
+ * Header
+ * ============================================================================ */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-4, 1rem) var(--spacing-6, 1.5rem);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  gap: var(--spacing-3, 0.75rem);
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3, 0.75rem);
+}
+
+.backButton {
+  padding: var(--spacing-1, 0.25rem);
+  margin-left: var(--spacing--1, -0.25rem);
+  background-color: transparent;
+  border: none;
+  border-radius: var(--radius-lg, 0.5rem);
+  cursor: pointer;
+  transition: background-color 200ms ease;
+}
+
+.backButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.headerTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: white;
+}
+
+.closeButton {
+  padding: var(--spacing-2, 0.5rem);
+  background-color: transparent;
+  border: none;
+  border-radius: var(--radius-lg, 0.5rem);
+  cursor: pointer;
+  transition: background-color 200ms ease;
+}
+
+.closeButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Payment method icon – colors from theme via --paymongo-icon-bg / --paymongo-icon-text */
+.paymentMethodIconBox {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--paymongo-icon-bg);
+  color: var(--paymongo-icon-text);
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+/* ============================================================================
+ * Amount Selection Step
+ * ============================================================================ */
+
+.amountSelectionStep {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6, 1.5rem);
+}
+
+.amountLabel {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary, #9ca3af);
+  margin-bottom: var(--spacing-3, 0.75rem);
+}
+
+.quickAmountGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-2, 0.5rem);
+}
+
+.quickAmountButton {
+  padding: var(--spacing-3, 0.75rem) var(--spacing-4, 1rem);
+  border-radius: var(--radius-lg, 0.5rem);
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.quickAmountButtonActive {
+  background-color: var(--bg-primary, #2563eb);
+  color: white;
+}
+
+.quickAmountButtonInactive {
+  background-color: var(--bg-secondary, #1a2537);
+  color: var(--text-tertiary, #d1d5db);
+}
+
+.quickAmountButtonInactive:hover {
+  background-color: var(--bg-tertiary, #243044);
+}
+
+.customAmountSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2, 0.5rem);
+}
+
+.customAmountInputWrapper {
+  position: relative;
+}
+
+.customAmountPrefix {
+  position: absolute;
+  left: var(--spacing-4, 1rem);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary, #9ca3af);
+  font-size: 1.125rem;
+}
+
+.customAmountInput {
+  width: 100%;
+  padding-left: var(--spacing-10, 2.5rem);
+  padding-right: var(--spacing-4, 1rem);
+  padding-top: var(--spacing-3, 0.75rem);
+  padding-bottom: var(--spacing-3, 0.75rem);
+  background-color: var(--bg-secondary, #1a2537);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg, 0.5rem);
+  color: white;
+  font-size: 1.125rem;
+  transition: border-color 200ms ease;
+}
+
+.customAmountInput:focus {
+  outline: none;
+  border-color: var(--bg-primary, #2563eb);
+}
+
+.amountHint {
+  margin-top: var(--spacing-2, 0.5rem);
+  font-size: 0.75rem;
+  color: var(--text-muted, #6b7280);
+}
+
+.errorAlert {
+  padding: var(--spacing-3, 0.75rem);
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: var(--radius-lg, 0.5rem);
+}
+
+.errorText {
+  font-size: 0.875rem;
+  color: var(--text-error, #f87171);
+}
+
+.continueButton {
+  width: 100%;
+  padding: var(--spacing-3, 0.75rem);
+  border-radius: var(--radius-lg, 0.5rem);
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.continueButtonActive {
+  background-color: var(--bg-primary, #2563eb);
+  color: white;
+}
+
+.continueButtonActive:hover {
+  background-color: var(--bg-primary-dark, #1d4ed8);
+}
+
+.continueButtonDisabled {
+  background-color: var(--bg-disabled, #374151);
+  color: var(--text-disabled, #9ca3af);
+  cursor: not-allowed;
+}
+
+/* ============================================================================
+ * Payment Method Step
+ * ============================================================================ */
+
+.methodSelectionStep {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4, 1rem);
+}
+
+.amountDisplayBox {
+  padding: var(--spacing-4, 1rem);
+  background-color: var(--bg-secondary, #1a2537);
+  border-radius: var(--radius-lg, 0.5rem);
+  text-align: center;
+}
+
+.amountDisplayLabel {
+  font-size: 0.875rem;
+  color: var(--text-secondary, #9ca3af);
+  margin-bottom: var(--spacing-1, 0.25rem);
+}
+
+.amountDisplayValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+}
+
+.methodsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2, 0.5rem);
+}
+
+.methodButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4, 1rem);
+  padding: var(--spacing-4, 1rem);
+  border-radius: var(--radius-lg, 0.5rem);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: var(--bg-secondary, #1a2537);
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.methodButton:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.methodButtonActive {
+  background-color: rgba(37, 99, 235, 0.1);
+  border-color: var(--bg-primary, #2563eb);
+}
+
+.methodContent {
+  flex: 1;
+  text-align: left;
+}
+
+.methodHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2, 0.5rem);
+}
+
+.methodName {
+  font-weight: 500;
+  color: white;
+}
+
+.methodPopularBadge {
+  padding: var(--spacing-1, 0.25rem) var(--spacing-2, 0.5rem);
+  font-size: 0.75rem;
+  background-color: rgba(34, 197, 94, 0.2);
+  color: var(--text-success, #86efac);
+  border-radius: var(--radius-full, 9999px);
+}
+
+.methodDescription {
+  font-size: 0.875rem;
+  color: var(--text-secondary, #9ca3af);
+}
+
+.methodRadio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid var(--radio-border, #4b5563);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.methodRadioActive {
+  border-color: var(--bg-primary, #2563eb);
+  background-color: var(--bg-primary, #2563eb);
+}
+
+.methodRadioCheckmark {
+  width: 0.75rem;
+  height: 0.75rem;
+  color: white;
+  fill: currentColor;
+}
+
+.payButton {
+  width: 100%;
+  padding: var(--spacing-3, 0.75rem);
+  border-radius: var(--radius-lg, 0.5rem);
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.payButtonActive {
+  background-color: var(--bg-primary, #2563eb);
+  color: white;
+}
+
+.payButtonActive:hover {
+  background-color: var(--bg-primary-dark, #1d4ed8);
+}
+
+.payButtonDisabled {
+  background-color: var(--bg-disabled, #374151);
+  color: var(--text-disabled, #9ca3af);
+  cursor: not-allowed;
+}
+
+.securityNote {
+  font-size: 0.75rem;
+  color: var(--text-muted, #6b7280);
+  text-align: center;
+}
+
+/* ============================================================================
+ * Processing Step
+ * ============================================================================ */
+
+.processingStep {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-8, 2rem) 0;
+  text-align: center;
+}
+
+.spinnerContainer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  margin-bottom: var(--spacing-4, 1rem);
+  border-radius: 50%;
+  background-color: rgba(37, 99, 235, 0.2);
+}
+
+.spinner {
+  width: 2rem;
+  height: 2rem;
+  color: var(--bg-primary, #2563eb);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.processingTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: var(--spacing-2, 0.5rem);
+}
+
+.processingText {
+  color: var(--text-secondary, #9ca3af);
+}
+
+/* ============================================================================
+ * Error Step
+ * ============================================================================ */
+
+.errorStep {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-8, 2rem) 0;
+  text-align: center;
+}
+
+.errorIconContainer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  margin-bottom: var(--spacing-4, 1rem);
+  border-radius: 50%;
+  background-color: rgba(239, 68, 68, 0.2);
+}
+
+.errorIcon {
+  width: 2rem;
+  height: 2rem;
+  color: var(--text-error, #ef4444);
+}
+
+.errorTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: var(--spacing-2, 0.5rem);
+}
+
+.errorMessage {
+  color: var(--text-secondary, #9ca3af);
+  margin-bottom: var(--spacing-6, 1.5rem);
+}
+
+.tryAgainButton {
+  padding: var(--spacing-3, 0.75rem) var(--spacing-6, 1.5rem);
+  background-color: var(--bg-primary, #2563eb);
+  color: white;
+  font-weight: 500;
+  border: none;
+  border-radius: var(--radius-lg, 0.5rem);
+  cursor: pointer;
+  transition: background-color 200ms ease;
+}
+
+.tryAgainButton:hover {
+  background-color: var(--bg-primary-dark, #1d4ed8);
+}
+
+/* ============================================================================
+ * Responsive
+ * ============================================================================ */
+
+@media (max-width: 640px) {
+  .modalContainer {
+    border-radius: var(--radius-xl, 0.75rem);
+  }
+
+  .quickAmountGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

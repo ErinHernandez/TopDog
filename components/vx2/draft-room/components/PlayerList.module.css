@@ -1,0 +1,482 @@
+/**
+ * PlayerList CSS Module
+ *
+ * Pixel-perfect styling for available players list with filtering, search, and sorting.
+ * Uses CSS custom properties for dynamic values from PLAYER_LIST_PX and PLAYER_LIST_COLORS constants.
+ *
+ * CSP-compliant: No inline styles, all classes defined here.
+ */
+
+/* ============================================================================
+ * FILTER BUTTONS CONTAINER
+ * ============================================================================ */
+
+.filterContainer {
+  display: flex;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, 0.05);
+  position: relative;
+  margin-top: var(--spacing-xs);
+  margin-bottom: var(--spacing-xs);
+  width: 100%;
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+ * FILTER BUTTON
+ * ============================================================================ */
+
+.filterButton {
+  flex: 1;
+  padding: calc(var(--filter-height) / 2 - 12px) var(--row-padding-x);
+  font-weight: 700;
+  transition: all 0.2s ease;
+  border: none;
+  background-color: var(--filter-bg);
+  cursor: pointer;
+  min-width: 0;
+  font-size: var(--filter-font-size);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.filterButton:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.filterButtonActive {
+  background-color: var(--filter-active-bg);
+  color: currentColor;
+  opacity: 1;
+}
+
+.filterButtonInactive {
+  color: var(--text-muted);
+  opacity: 0.4;
+}
+
+.filterButtonBorder {
+  border-bottom: 2px solid currentColor;
+  width: 100%;
+  padding-bottom: 2px;
+}
+
+.filterCount {
+  font-size: var(--filter-count-font-size);
+  font-weight: 600;
+  display: inline;
+}
+
+/* Position-specific filter button colors */
+.filterButton[data-position="qb"] {
+  border-bottom: 3px solid var(--color-position-qb);
+}
+.filterButton[data-position="qb"].filterButtonActive {
+  color: var(--color-position-qb);
+}
+
+.filterButton[data-position="rb"] {
+  border-bottom: 3px solid var(--color-position-rb);
+}
+.filterButton[data-position="rb"].filterButtonActive {
+  color: var(--color-position-rb);
+}
+
+.filterButton[data-position="wr"] {
+  border-bottom: 3px solid var(--color-position-wr);
+}
+.filterButton[data-position="wr"].filterButtonActive {
+  color: var(--color-position-wr);
+}
+
+.filterButton[data-position="te"] {
+  border-bottom: 3px solid var(--color-position-te);
+}
+.filterButton[data-position="te"].filterButtonActive {
+  color: var(--color-position-te);
+}
+
+/* ============================================================================
+ * SEARCH BAR WRAPPER
+ * ============================================================================ */
+
+.searchBarWrapper {
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+ * SEARCH BAR CONTAINER
+ * ============================================================================ */
+
+.searchContainer {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+  margin-left: var(--spacing-sm);
+  margin-right: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+ * SEARCH INPUT WRAPPER
+ * ============================================================================ */
+
+.searchInputWrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  height: var(--search-height);
+  background-color: var(--search-bg);
+  border-radius: var(--radius-md);
+  padding-left: var(--spacing-md);
+  padding-right: var(--spacing-md);
+}
+
+.searchIcon {
+  margin-right: var(--spacing-sm);
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+}
+
+.searchInput {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: var(--search-font-size);
+  outline: none;
+  padding: 0;
+  font-family: inherit;
+}
+
+.searchInput::placeholder {
+  color: var(--search-placeholder);
+}
+
+/* ============================================================================
+ * CLEAR BUTTON
+ * ============================================================================ */
+
+.clearButton {
+  width: var(--search-clear-button-width);
+  height: var(--search-height);
+  background-color: var(--search-bg);
+  border: none;
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  flex-shrink: 0;
+}
+
+.clearButton:hover {
+  opacity: 0.8;
+}
+
+.clearButton:active {
+  opacity: 0.6;
+}
+
+/* ============================================================================
+ * PLAYER LIST CONTAINER
+ * ============================================================================ */
+
+.listContainer {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding-bottom: var(--spacing-xl);
+}
+
+.listContainer::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* ============================================================================
+ * LOADING/EMPTY STATE
+ * ============================================================================ */
+
+.emptyState {
+  padding: var(--spacing-xl);
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+/* ============================================================================
+ * VIRTUALIZED LIST WRAPPER
+ * ============================================================================ */
+
+.virtualizedListWrapper {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================================================
+ * COLUMN HEADERS (STICKY)
+ * ============================================================================ */
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  border-bottom: 1px solid var(--row-border);
+  background-color: var(--bg-primary);
+  padding-left: 4px;
+  padding-right: 4px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.headerColumn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  color: var(--text-secondary);
+  user-select: none;
+}
+
+.headerColumnActive {
+  color: var(--text-primary);
+}
+
+.headerColumnSortIndicator {
+  border-bottom: 2px solid var(--color-sort-indicator);
+  padding-bottom: 2px;
+  display: inline-block;
+}
+
+.adpColumn {
+  width: var(--adp-column-width);
+}
+
+.projColumn {
+  width: var(--proj-column-width);
+}
+
+.rankColumn {
+  width: var(--rank-column-width);
+}
+
+.playerInfoColumn {
+  flex: 1;
+}
+
+.queueButtonColumn {
+  width: var(--queue-button-container-width);
+}
+
+/* ============================================================================
+ * PLAYER ROW
+ * ============================================================================ */
+
+.playerRow {
+  display: flex;
+  align-items: center;
+  height: var(--row-height);
+  background-color: var(--row-bg);
+  cursor: pointer;
+  border-bottom: 1px solid var(--row-border);
+  padding-left: 4px;
+  padding-right: 4px;
+  transition: background-color 0.1s ease;
+  user-select: none;
+}
+
+.playerRow:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* ============================================================================
+ * PLAYER ROW - ADP COLUMN
+ * ============================================================================ */
+
+.playerAdpValue {
+  width: var(--adp-column-width);
+  text-align: center;
+  font-size: var(--stat-font-size);
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================================
+ * PLAYER ROW - PLAYER INFO
+ * ============================================================================ */
+
+.playerInfoContainer {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding-left: 6px;
+  min-width: 0;
+}
+
+.playerNameContainer {
+  min-width: 0;
+  flex: 1;
+}
+
+.playerName {
+  font-size: var(--player-name-font-size);
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.playerPositionTeam {
+  font-size: var(--player-team-font-size);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-top: 2px;
+}
+
+.playerPosition {
+  font-weight: 600;
+  display: inline;
+  /* Position color from data-position attribute */
+  color: var(--position-color, var(--text-secondary));
+}
+
+/* Position-specific text colors */
+.playerPosition[data-position="qb"] { --position-color: var(--color-position-qb); }
+.playerPosition[data-position="rb"] { --position-color: var(--color-position-rb); }
+.playerPosition[data-position="wr"] { --position-color: var(--color-position-wr); }
+.playerPosition[data-position="te"] { --position-color: var(--color-position-te); }
+.playerPosition[data-position="k"] { --position-color: var(--text-muted); }
+.playerPosition[data-position="dst"] { --position-color: var(--text-muted); }
+.playerPosition[data-position="def"] { --position-color: var(--text-muted); }
+
+/* ============================================================================
+ * PLAYER ROW - QUEUE BUTTON
+ * ============================================================================ */
+
+.queueButtonContainer {
+  width: var(--queue-button-container-width);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.queueButton {
+  width: var(--queue-button-size);
+  height: var(--queue-button-size);
+  border-radius: 50%;
+  border: 2px solid var(--color-queue-border);
+  background-color: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  padding: 0;
+  font-size: 16px;
+  color: var(--color-queue-border);
+}
+
+.queueButton:hover {
+  opacity: 0.8;
+}
+
+.queueButton:active {
+  transform: scale(0.95);
+}
+
+.queueButtonActive {
+  border-color: var(--color-queue-active);
+  background-color: var(--color-queue-active-bg);
+  color: var(--color-queue-active);
+}
+
+.queueButtonInactive {
+  border-color: var(--color-queue-border);
+  background-color: transparent;
+  color: var(--color-queue-border);
+}
+
+/* ============================================================================
+ * PLAYER ROW - PROJ COLUMN
+ * ============================================================================ */
+
+.playerProjValue {
+  width: var(--proj-column-width);
+  text-align: center;
+  font-size: var(--stat-font-size);
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================================
+ * PLAYER ROW - RANK COLUMN
+ * ============================================================================ */
+
+.playerRankValue {
+  width: var(--rank-column-width);
+  text-align: center;
+  font-size: var(--player-rank-font-size);
+  font-weight: 600;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================================
+ * EXPANDED CARD CONTAINER
+ * ============================================================================ */
+
+.expandedCardContainer {
+  padding: var(--spacing-sm) 4px;
+}
+
+/* ============================================================================
+ * MAIN CONTAINER
+ * ============================================================================ */
+
+.mainContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background-color: var(--bg-primary);
+  padding-top: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+/* Container wrapper for flex layout */
+.listContainer {
+  flex: 1;
+  min-height: 0;
+}
+
+/* Hide scrollbar on virtualized list */
+.virtualizedList {
+  scrollbar-width: none;
+}
+
+.virtualizedList::-webkit-scrollbar {
+  display: none;
+}

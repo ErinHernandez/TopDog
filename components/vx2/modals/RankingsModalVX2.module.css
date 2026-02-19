@@ -1,0 +1,780 @@
+/**
+ * RankingsModalVX2 CSS Module
+ *
+ * Migrated from inline styles for CSP compliance.
+ * Handles custom player rankings modal with tabbed interface.
+ */
+
+/* ============================================================================
+   MODAL CONTAINER
+   ============================================================================ */
+
+.modalContainer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  top: var(--modal-top, 60px);
+  background-color: var(--modal-bg, #0f172a);
+  z-index: var(--z-modal, 1000);
+}
+
+/* ============================================================================
+   CLOSE BUTTON
+   ============================================================================ */
+
+.closeButton {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: background-color 150ms ease;
+  color: var(--text-secondary, #64748b);
+  border: none;
+  cursor: pointer;
+  z-index: 110;
+  top: 16px;
+  right: 8px;
+  width: 40px;
+  height: 40px;
+}
+
+.closeButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================================================
+   CONTENT WRAPPER
+   ============================================================================ */
+
+.contentWrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: var(--content-px, 12px) var(--content-px, 16px);
+}
+
+.innerContainer {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ============================================================================
+   TAB BAR
+   ============================================================================ */
+
+.tabBar {
+  display: flex;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, 0.05);
+  margin-right: 44px;
+}
+
+.tabButton {
+  flex: 1;
+  padding: var(--tab-py, 10px) var(--tab-px, 16px);
+  font-weight: 700;
+  transition: all 150ms ease;
+  border: none;
+  background-color: transparent;
+  color: var(--text-muted, #64748b);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-size: var(--tab-font-size, 14px);
+}
+
+.tabButton.active {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary, #f1f5f9);
+  border-bottom-color: var(--text-primary, #f1f5f9);
+}
+
+.tabButton:not(.active) {
+  color: var(--text-muted, #64748b);
+}
+
+/* ============================================================================
+   POSITION FILTER
+   ============================================================================ */
+
+.positionFilter {
+  display: flex;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.filterButton {
+  flex: 1;
+  padding: var(--filter-py, 10px) var(--filter-px, 12px);
+  font-weight: 700;
+  transition: all 150ms ease;
+  border: none;
+  background-color: transparent;
+  color: var(--filter-color, #64748b);
+  border-bottom: 2px solid var(--filter-border-color, #64748b);
+  cursor: pointer;
+  font-size: var(--filter-font-size, 12px);
+}
+
+.filterButton.inactive {
+  opacity: 0.4;
+}
+
+.filterButton.active {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--filter-active-color, #f1f5f9);
+  opacity: 1;
+}
+
+.filterButton.active.all {
+  border-bottom-color: var(--filter-active-color, #f1f5f9);
+}
+
+/* Position-specific filter button colors */
+.filterButton[data-position="qb"] {
+  --position-color: var(--color-position-qb);
+  --filter-border-color: var(--position-color);
+}
+.filterButton[data-position="qb"].active {
+  --filter-color: var(--position-color);
+  --filter-active-color: var(--position-color);
+}
+
+.filterButton[data-position="rb"] {
+  --position-color: var(--color-position-rb);
+  --filter-border-color: var(--position-color);
+}
+.filterButton[data-position="rb"].active {
+  --filter-color: var(--position-color);
+  --filter-active-color: var(--position-color);
+}
+
+.filterButton[data-position="wr"] {
+  --position-color: var(--color-position-wr);
+  --filter-border-color: var(--position-color);
+}
+.filterButton[data-position="wr"].active {
+  --filter-color: var(--position-color);
+  --filter-active-color: var(--position-color);
+}
+
+.filterButton[data-position="te"] {
+  --position-color: var(--color-position-te);
+  --filter-border-color: var(--position-color);
+}
+.filterButton[data-position="te"].active {
+  --filter-color: var(--position-color);
+  --filter-active-color: var(--position-color);
+}
+
+/* ============================================================================
+   SEARCH INPUT
+   ============================================================================ */
+
+.searchContainer {
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted, #64748b);
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding-left: 40px;
+  padding-right: 16px;
+  padding-top: var(--search-py, 10px);
+  padding-bottom: var(--search-py, 10px);
+  border-radius: 12px;
+  outline: none;
+  transition: all 150ms ease;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary, #f1f5f9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: var(--search-font-size, 14px);
+}
+
+.searchInput::placeholder {
+  color: var(--text-muted, #64748b);
+}
+
+.searchInput:focus {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ============================================================================
+   SCROLLABLE CONTENT AREA
+   ============================================================================ */
+
+.scrollableContent {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: var(--scroll-pr, 4px);
+  scrollbar-width: thin;
+}
+
+.scrollableContent::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollableContent::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollableContent::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.scrollableContent::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* ============================================================================
+   PLAYER LIST & ITEM STYLES
+   ============================================================================ */
+
+.playerList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--list-gap, 4px);
+}
+
+.playerListItem {
+  display: flex;
+  align-items: center;
+  transition: all 150ms ease;
+  background-color: var(--item-bg, #1e293b);
+  border-left: 4px solid var(--item-border-color, #64748b);
+  border-radius: var(--item-radius, 12px);
+  padding: var(--item-py, 8px) var(--item-px, 16px);
+  gap: var(--item-gap, 8px);
+  opacity: var(--item-opacity, 1);
+}
+
+.playerListItem.excluded {
+  opacity: 0.5;
+}
+
+/* Position-specific player list item border colors */
+.playerListItem[data-position="qb"] {
+  --item-border-color: var(--color-position-qb);
+}
+.playerListItem[data-position="rb"] {
+  --item-border-color: var(--color-position-rb);
+}
+.playerListItem[data-position="wr"] {
+  --item-border-color: var(--color-position-wr);
+}
+.playerListItem[data-position="te"] {
+  --item-border-color: var(--color-position-te);
+}
+
+.playerADP {
+  text-align: center;
+  flex-shrink: 0;
+  width: 28px;
+  font-weight: 700;
+  color: var(--adp-color, #cbd5e1);
+  font-size: var(--adp-font-size, 14px);
+}
+
+.playerInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--info-gap, 6px);
+}
+
+.playerName {
+  font-weight: 600;
+  truncate: true;
+  color: var(--name-color, #f1f5f9);
+  font-size: var(--name-font-size, 14px);
+}
+
+.playerTeam {
+  flex-shrink: 0;
+  color: var(--team-color, #64748b);
+  font-size: var(--team-font-size, 12px);
+}
+
+.playerProj {
+  text-align: center;
+  flex-shrink: 0;
+  margin-right: 4px;
+}
+
+.playerProjValue {
+  font-weight: 600;
+  color: var(--proj-color, #f1f5f9);
+  font-size: var(--proj-font-size, 12px);
+}
+
+.playerProjLabel {
+  color: var(--proj-label-color, #64748b);
+  font-size: var(--proj-label-font-size, 12px);
+}
+
+/* ============================================================================
+   PLAYER ACTION BUTTONS
+   ============================================================================ */
+
+.playerActionButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 150ms ease;
+  flex-shrink: 0;
+  border: none;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--button-radius, 12px);
+}
+
+.excludeButton {
+  background-color: var(--exclude-bg, rgba(255, 255, 255, 0.05));
+  color: var(--exclude-color, #64748b);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.excludeButton.active {
+  background-color: rgba(239, 68, 68, 0.25);
+  color: var(--error-color, #ef4444);
+  border-color: var(--error-color, #ef4444);
+}
+
+.rankButton {
+  background-color: var(--rank-bg, rgba(96, 165, 250, 0.15));
+  color: var(--rank-color, #60a5fa);
+}
+
+.rankButton.active {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: var(--error-color, #ef4444);
+}
+
+/* ============================================================================
+   RANKED PLAYER ROW
+   ============================================================================ */
+
+.rankedPlayerRow {
+  display: flex;
+  align-items: center;
+  position: relative;
+  transition: all 150ms ease;
+  background-color: var(--row-bg, #1e293b);
+  border-left: 4px solid var(--row-border-color, #64748b);
+  border-radius: var(--row-radius, 12px);
+  padding: var(--row-py, 8px) var(--row-px, 16px);
+  gap: var(--row-gap, 8px);
+  opacity: var(--row-opacity, 1);
+  transform: var(--row-transform, scale(1));
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+
+.rankedPlayerRow:active {
+  cursor: grabbing;
+}
+
+.rankedPlayerRow.dragging {
+  opacity: 0.5;
+  transform: scale(1.02);
+}
+
+/* Position-specific ranked player row border colors */
+.rankedPlayerRow[data-position="qb"] {
+  --row-border-color: var(--color-position-qb);
+}
+.rankedPlayerRow[data-position="rb"] {
+  --row-border-color: var(--color-position-rb);
+}
+.rankedPlayerRow[data-position="wr"] {
+  --row-border-color: var(--color-position-wr);
+}
+.rankedPlayerRow[data-position="te"] {
+  --row-border-color: var(--color-position-te);
+}
+
+.playerRank {
+  text-align: center;
+  flex-shrink: 0;
+  width: 28px;
+  font-weight: 700;
+  color: var(--rank-number-color, #cbd5e1);
+  font-size: var(--rank-number-font-size, 14px);
+}
+
+/* ============================================================================
+   MOVE RANK POPUP
+   ============================================================================ */
+
+.movePopupOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 200;
+  border-radius: var(--popup-radius, 12px);
+}
+
+.movePopupContent {
+  display: flex;
+  align-items: center;
+  gap: var(--popup-gap, 8px);
+}
+
+.moveButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 150ms ease;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--move-button-radius, 8px);
+  background-color: rgba(255, 255, 255, 0.15);
+  color: var(--move-button-color, #f1f5f9);
+  border: none;
+  cursor: pointer;
+}
+
+.moveButton:disabled {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted, #475569);
+  cursor: not-allowed;
+}
+
+.moveButton:not(:disabled):hover {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+.rankInput {
+  text-align: center;
+  font-weight: 700;
+  outline: none;
+  width: 48px;
+  height: 32px;
+  border-radius: var(--input-radius, 8px);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--input-color, #f1f5f9);
+  border: 1px solid var(--input-border-color, #60a5fa);
+  font-size: var(--input-font-size, 14px);
+}
+
+.moveSubmitButton {
+  font-weight: 700;
+  transition: all 150ms ease;
+  padding: 0 12px;
+  height: 32px;
+  border-radius: var(--submit-radius, 8px);
+  background-color: var(--submit-bg, #60a5fa);
+  color: var(--submit-color, #000);
+  border: none;
+  cursor: pointer;
+  font-size: var(--submit-font-size, 12px);
+}
+
+.moveSubmitButton:hover {
+  opacity: 0.9;
+}
+
+.moveCancelButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 150ms ease;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--cancel-radius, 8px);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-muted, #64748b);
+  border: none;
+  cursor: pointer;
+}
+
+/* ============================================================================
+   EMPTY STATES
+   ============================================================================ */
+
+.emptyState {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--text-muted, #64748b);
+  padding: var(--empty-p, 16px);
+}
+
+.emptyIcon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 16px;
+  opacity: 0.4;
+}
+
+.emptyTitle {
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: var(--text-secondary, #cbd5e1);
+  font-size: var(--empty-title-font-size, 14px);
+}
+
+.emptyDescription {
+  font-size: var(--empty-desc-font-size, 12px);
+  color: var(--text-muted, #64748b);
+}
+
+.searchNoResults {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted, #64748b);
+}
+
+/* ============================================================================
+   INFO TEXT
+   ============================================================================ */
+
+.infoText {
+  margin-bottom: 12px;
+  color: var(--text-muted, #64748b);
+  font-size: var(--info-font-size, 12px);
+}
+
+.resultCount {
+  color: var(--count-color, #cbd5e1);
+}
+
+/* ============================================================================
+   ERROR MESSAGE
+   ============================================================================ */
+
+.errorMessage {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: var(--error-radius, 8px);
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--color-state-error, #ef4444);
+  font-size: var(--error-font-size, 14px);
+}
+
+/* ============================================================================
+   FOOTER / ACTION BUTTONS
+   ============================================================================ */
+
+.footer {
+  display: flex;
+  gap: var(--footer-gap, 12px);
+  margin-top: var(--footer-mt, 4px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: var(--footer-pt, 8px);
+}
+
+.actionButton {
+  flex: 1;
+  padding: var(--button-py, 8px) var(--button-px, 16px);
+  border-radius: var(--action-radius, 8px);
+  font-weight: 600;
+  transition: all 150ms ease;
+  border: none;
+  cursor: pointer;
+  font-size: var(--action-font-size, 14px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--action-gap, 8px);
+}
+
+.undoButton {
+  background-color: var(--undo-bg, rgba(255, 255, 255, 0.1));
+  color: var(--undo-color, #f1f5f9);
+  opacity: var(--undo-opacity, 1);
+  cursor: var(--undo-cursor, pointer);
+}
+
+.undoButton:disabled {
+  background-color: var(--undo-disabled-bg, #1e293b);
+  color: var(--undo-disabled-color, #475569);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.undoButton:not(:disabled):hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.saveButton {
+  background-color: var(--save-bg, #60a5fa);
+  color: var(--save-color, #000);
+  opacity: var(--save-opacity, 1);
+  cursor: var(--save-cursor, pointer);
+}
+
+.saveButton:disabled {
+  background-color: var(--save-disabled-bg, #1e293b);
+  color: var(--save-disabled-color, #475569);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.saveButton:not(:disabled):hover {
+  opacity: 0.9;
+}
+
+.loadingSpinner {
+  animation: spin 1s linear infinite;
+  border-radius: 50%;
+  height: 16px;
+  width: 16px;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================================================
+   LOADING STATE
+   ============================================================================ */
+
+.loadingContainer {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinnerCircle {
+  animation: spin 1s linear infinite;
+  border-radius: 50%;
+  height: 32px;
+  width: 32px;
+  border: 2px solid transparent;
+  border-top-color: var(--spinner-color, #60a5fa);
+}
+
+/* ============================================================================
+   MODAL DIALOGS
+   ============================================================================ */
+
+.modalOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 300;
+}
+
+.modalDialog {
+  border-radius: var(--dialog-radius, 12px);
+  padding: var(--dialog-p, 20px);
+  width: 288px;
+  margin: 0 16px;
+  background-color: var(--dialog-bg, #1e293b);
+}
+
+.modalDialogTitle {
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text-primary, #f1f5f9);
+  font-size: var(--dialog-title-font-size, 16px);
+}
+
+.modalDialogDescription {
+  margin-bottom: 20px;
+  color: var(--text-muted, #64748b);
+  font-size: var(--dialog-desc-font-size, 14px);
+}
+
+.modalDialogButtons {
+  display: flex;
+  gap: var(--dialog-gap, 12px);
+}
+
+.modalDialogButton {
+  flex: 1;
+  padding: var(--dialog-button-py, 10px) var(--dialog-button-px, 16px);
+  border-radius: var(--dialog-button-radius, 8px);
+  font-weight: 600;
+  transition: all 150ms ease;
+  border: none;
+  cursor: pointer;
+  font-size: var(--dialog-button-font-size, 14px);
+}
+
+.dialogBackButton {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--dialog-back-color, #f1f5f9);
+}
+
+.dialogBackButton:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.dialogDestructiveButton {
+  background-color: var(--color-state-error, #ef4444);
+  color: #fff;
+}
+
+.dialogDestructiveButton:hover {
+  opacity: 0.9;
+}
+
+.dialogBackButton {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================================================
+   DRAG AND DROP INDICATORS
+   ============================================================================ */
+
+.dragIndicatorTop {
+  border-top: 2px solid var(--drag-color, #60a5fa);
+  border-bottom: 2px solid transparent;
+}
+
+.dragIndicatorBottom {
+  border-top: 2px solid transparent;
+  border-bottom: 2px solid var(--drag-color, #60a5fa);
+}
+
+.dragIndicatorMargin {
+  margin-top: -2px;
+}

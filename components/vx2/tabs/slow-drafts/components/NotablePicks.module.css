@@ -1,0 +1,181 @@
+/* ============================================================================
+   NotablePicks.module.css
+   ============================================================================
+   CSS Module for NotablePicks component - CSP compliant styling
+*/
+
+/* ============================================================================
+   Section Label
+============================================================================ */
+.sectionLabel {
+  margin-bottom: var(--section-label-margin-bottom);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+/* ============================================================================
+   Empty State
+============================================================================ */
+.emptyContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.emptyMessage {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 13px;
+  font-style: italic;
+  padding: 8px 0;
+}
+
+/* ============================================================================
+   Event Item Button
+============================================================================ */
+.eventButton {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background-color: var(--event-bg-color);
+  border: 1px solid var(--event-border-color);
+  width: 100%;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.eventButton:active {
+  transform: scale(0.99);
+}
+
+/* ============================================================================
+   Event Item - Pick Number Column
+============================================================================ */
+.pickNumber {
+  min-width: 36px;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  padding-top: 2px;
+}
+
+/* ============================================================================
+   Event Item - Content
+============================================================================ */
+.content {
+  flex: 1;
+  min-width: 0;
+}
+
+.mainLine {
+  margin-bottom: 4px;
+}
+
+.drafterName {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+}
+
+.actionText {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+}
+
+.playerName {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.playerPosition {
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: 4px;
+  color: var(--position-color);
+}
+
+.playerPosition {
+  color: var(--position-color);
+}
+
+/* ============================================================================
+   Event Item - Badge and Info Row
+============================================================================ */
+.badgeRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.typeBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--event-color);
+  background-color: var(--event-badge-bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.adpDelta {
+  font-size: 11px;
+  color: var(--event-color);
+  font-weight: 500;
+}
+
+/* ============================================================================
+   Event Item - Timestamp
+============================================================================ */
+.timestamp {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.35);
+  padding-top: 2px;
+}
+
+/* ============================================================================
+   Show More Button
+============================================================================ */
+.showMoreButton {
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px 0;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  transition: opacity 0.2s ease;
+}
+
+.showMoreButton:active {
+  opacity: 0.7;
+}
+
+/* ============================================================================
+   Dynamic CSS Custom Properties
+============================================================================ */
+
+.eventButton {
+  --event-bg-color: rgba(255, 255, 255, 0.04);
+  --event-border-color: rgba(255, 255, 255, 0.1);
+}
+
+.playerPosition {
+  --position-color: inherit;
+}
+
+.typeBadge {
+  --event-color: inherit;
+  --event-badge-bg: rgba(255, 255, 255, 0.1);
+}
+
+.adpDelta {
+  --event-color: inherit;
+}

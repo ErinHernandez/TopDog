@@ -1,0 +1,155 @@
+/**
+ * LoadingSpinner Styles
+ * Pure CSS animations for spinner states
+ */
+
+.spinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Size variants */
+.size-sm {
+  width: 24px;
+  height: 24px;
+}
+
+.size-md {
+  width: 32px;
+  height: 32px;
+}
+
+.size-lg {
+  width: 48px;
+  height: 48px;
+}
+
+/* Centered variant */
+.centered {
+  width: 100%;
+  height: 100%;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Outer rotating ring */
+.ring {
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--color-border-default);
+  border-top-color: var(--color-accent);
+  border-radius: var(--radius-full);
+  animation: spin 1s linear infinite;
+}
+
+.size-sm .ring {
+  border-width: 1.5px;
+}
+
+.size-lg .ring {
+  border-width: 3px;
+}
+
+/* Animated dots pattern */
+.dot {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background-color: var(--color-accent);
+  border-radius: var(--radius-full);
+  animation: pulse 1s ease-in-out infinite;
+
+  /* Position dots around circle */
+  top: 50%;
+  left: 50%;
+}
+
+.size-sm .dot {
+  width: 2px;
+  height: 2px;
+}
+
+.size-lg .dot {
+  width: 6px;
+  height: 6px;
+}
+
+.dot:nth-child(2) {
+  transform: translate(-50%, -50%) rotate(120deg) translateY(-12px);
+}
+
+.size-sm .dot:nth-child(2) {
+  transform: translate(-50%, -50%) rotate(120deg) translateY(-8px);
+}
+
+.size-lg .dot:nth-child(2) {
+  transform: translate(-50%, -50%) rotate(120deg) translateY(-16px);
+}
+
+.dot:nth-child(3) {
+  transform: translate(-50%, -50%) rotate(240deg) translateY(-12px);
+}
+
+.size-sm .dot:nth-child(3) {
+  transform: translate(-50%, -50%) rotate(240deg) translateY(-8px);
+}
+
+.size-lg .dot:nth-child(3) {
+  transform: translate(-50%, -50%) rotate(240deg) translateY(-16px);
+}
+
+/* Optional label text */
+.label {
+  margin-top: var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  text-align: center;
+  animation: fadeInOut 1.5s ease-in-out infinite;
+}
+
+/* Animations */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.3;
+    filter: drop-shadow(0 0 2px var(--color-accent));
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 4px var(--color-accent));
+  }
+}
+
+@keyframes fadeInOut {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .ring,
+  .dot,
+  .label {
+    animation: none;
+    opacity: 0.6;
+  }
+
+  .ring {
+    border-top-color: var(--color-accent-text);
+  }
+}

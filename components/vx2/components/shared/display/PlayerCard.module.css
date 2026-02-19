@@ -1,0 +1,208 @@
+/**
+ * PlayerCard CSS Module
+ *
+ * Migrated from inline styles for CSP compliance.
+ * Uses CSS custom properties from tokens.css for colors.
+ */
+
+/* ============================================================================
+   CONTAINER
+   ============================================================================ */
+
+.container {
+  display: flex;
+  align-items: center;
+  transition: opacity 150ms ease, background-color 150ms ease;
+  background-color: var(--bg-secondary);
+  /* Border uses --position-color from data-position attribute (set in utilities.css) */
+  border-left-width: 4px;
+  border-left-style: solid;
+  border-left-color: var(--position-color);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  text-align: left;
+}
+
+.container[data-size="sm"] {
+  padding: var(--spacing-xs) var(--spacing-md);
+  gap: var(--spacing-sm);
+}
+
+.container[data-size="md"] {
+  padding: var(--spacing-sm) var(--spacing-md);
+  gap: var(--spacing-sm);
+}
+
+.containerClickable {
+  cursor: pointer;
+  border: none;
+}
+
+.containerClickable:hover {
+  filter: brightness(1.1);
+}
+
+.containerDisabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ============================================================================
+   ADP/RANK COLUMN
+   ============================================================================ */
+
+.valueColumn {
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.valueColumn[data-size="sm"] {
+  width: 28px;
+}
+
+.valueColumn[data-size="md"] {
+  width: 32px;
+}
+
+.valueText {
+  font-weight: 700;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+/* ============================================================================
+   NAME & TEAM
+   ============================================================================ */
+
+.nameTeamWrapper {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.playerName {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.playerTeam {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+}
+
+/* ============================================================================
+   PROJECTION COLUMN
+   ============================================================================ */
+
+.projectionColumn {
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.projectionValue {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: var(--font-size-xs);
+}
+
+.projectionLabel {
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+}
+
+/* ============================================================================
+   ACTION BUTTONS
+   ============================================================================ */
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 150ms ease, background-color 150ms ease;
+  flex-shrink: 0;
+  border-radius: var(--radius-lg);
+  border: none;
+  cursor: pointer;
+}
+
+.actionButton[data-size="sm"] {
+  width: 32px;
+  height: 32px;
+}
+
+.actionButton[data-size="md"] {
+  width: 36px;
+  height: 36px;
+}
+
+/* Add button (not active) */
+.actionButton[data-action="add"] {
+  background-color: rgba(96, 165, 250, 0.15);
+  color: var(--color-state-active);
+}
+
+/* Remove button */
+.actionButton[data-action="remove"] {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: var(--color-state-error);
+}
+
+.actionButton:hover:not([data-disabled="true"]) {
+  filter: brightness(1.2);
+}
+
+.actionButton[data-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* ============================================================================
+   REORDER BUTTONS
+   ============================================================================ */
+
+.reorderWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.reorderButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 150ms ease, background-color 150ms ease;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+.reorderButton[data-size="sm"] {
+  width: 32px;
+  height: 16px;
+}
+
+.reorderButton[data-size="md"] {
+  width: 36px;
+  height: 18px;
+}
+
+.reorderButton:hover:not([data-disabled="true"]) {
+  filter: brightness(1.2);
+}
+
+.reorderButton[data-disabled="true"] {
+  background-color: transparent;
+  color: var(--text-disabled);
+  cursor: not-allowed;
+  opacity: 0.3;
+}

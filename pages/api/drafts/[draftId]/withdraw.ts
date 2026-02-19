@@ -1,0 +1,247 @@
+/**
+ * Draft Withdrawal API
+ *
+ * Handles user withdrawal from a draft before it starts.
+ * Processes refunds and removes participant from draft room.
+ *
+ * POST /api/drafts/[draftId]/withdraw
+ *
+ * FIX #3 - CSRF PROTECTION: Added CSRF protection for state-changing operation
+ * Validates CSRF token from request headers/cookies before processing withdrawal.
+ *
+ * @module pages/api/drafts/[draftId]/withdraw
+ */
+
+import {
+  doc,
+  getDoc,
+  serverTimestamp,
+  runTransaction,
+  increment,
+  arrayUnion,
+} from 'firebase/firestore';
+import type { NextApiRequest, NextApiResponse } from 'next';
+
+import {
+  withErrorHandling,
+  validateMethod,
+  validateRequestBody,
+  createSuccessResponse,
+} from '../../../../lib/apiErrorHandler';
+import { withCSRFProtection, validateCSRFToken } from '../../../../lib/csrfProtection';
+import { db } from '../../../../lib/firebase';
+import { draftWithdrawRequestSchema } from '../../../../lib/validation/schemas';
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+interface WithdrawRequest {
+  /** User ID requesting withdrawal */
+  userId: string;
+}
+
+interface WithdrawResponse {
+  success: boolean;
+  refundAmount?: number;
+  refundStatus?: 'processed' | 'pending' | 'not_applicable';
+  removedFromParticipants: boolean;
+  message?: string;
+}
+
+// ============================================================================
+// HANDLER
+// ============================================================================
+
+const withdrawHandler = async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+): Promise<void> {
+  await withErrorHandling(req, res, async (req, res, logger) => {
+    validateMethod(req, ['POST'], logger);
+
+    // SECURITY FIX #3: Validate CSRF token for state-changing operation
+    if (!validateCSRFToken(req)) {
+      logger.warn('CSRF validation failed for draft withdrawal', {
+        component: 'draft-withdraw',
+        operation: 'withdraw',
+      });
+      return res.status(403).json({
+        ok: false,
+        error: {
+          code: 'CSRF_TOKEN_INVALID',
+          message: 'Invalid or missing CSRF token',
+        },
+      });
+    }
+
+    const { draftId } = req.query;
+    
+    if (!draftId || typeof draftId !== 'string') {
+      return res.status(400).json({
+        ok: false,
+        error: { code: 'INVALID_DRAFT_ID', message: 'Draft ID is required' },
+      });
+    }
+
+    // SECURITY: Validate request body using Zod schema
+    const body = validateRequestBody(req, draftWithdrawRequestSchema, logger);
+    const { userId } = body;
+    
+    // Verify draftId matches the one in the body (if provided)
+    if (body.draftId && body.draftId !== draftId) {
+      return res.status(400).json({
+        ok: false,
+        error: { code: 'DRAFT_ID_MISMATCH', message: 'Draft ID in body does not match URL parameter' },
+      });
+    }
+
+    if (!db) {
+      return res.status(500).json({
+        ok: false,
+        error: { code: 'DATABASE_ERROR', message: 'Database not available' },
+      });
+    }
+
+    logger.info('Processing withdrawal request', {
+      component: 'draft-withdraw',
+      operation: 'withdraw',
+      draftId,
+      userId,
+    });
+
+    // Get draft room document
+    const draftRef = doc(db, 'draftRooms', draftId);
+    const draftSnap = await getDoc(draftRef);
+
+    if (!draftSnap.exists()) {
+      logger.warn('Draft room not found for withdrawal', { draftId, userId });
+      return res.status(404).json({
+        ok: false,
+        error: { code: 'DRAFT_NOT_FOUND', message: 'Draft room not found' },
+      });
+    }
+
+    const draftData = draftSnap.data();
+    const draftStatus = draftData.status as string;
+
+    // Only allow withdrawal if draft hasn't started
+    if (draftStatus === 'active' || draftStatus === 'complete') {
+      logger.warn('Cannot withdraw from active/complete draft', {
+        draftId,
+        userId,
+        status: draftStatus,
+      });
+      return res.status(400).json({
+        ok: false,
+        error: {
+          code: 'DRAFT_ALREADY_STARTED',
+          message: 'Cannot withdraw from a draft that has already started',
+        },
+      });
+    }
+
+    // Find participant
+    const participants = draftData.participants as Array<{
+      id: string;
+      name: string;
+      userId?: string;
+      entryFee?: number;
+    }>;
+    const participant = participants.find(
+      p => p.id === userId || p.userId === userId
+    );
+
+    if (!participant) {
+      logger.warn('User not found in draft participants', { draftId, userId });
+      return res.status(404).json({
+        ok: false,
+        error: {
+          code: 'PARTICIPANT_NOT_FOUND',
+          message: 'User is not a participant in this draft',
+        },
+      });
+    }
+
+    // Process withdrawal in a transaction
+    let refundAmount = 0;
+    let refundStatus: 'processed' | 'pending' | 'not_applicable' = 'not_applicable';
+
+    await runTransaction(db, async transaction => {
+      // Re-read draft data in transaction
+      const draftDoc = await transaction.get(draftRef);
+      if (!draftDoc.exists()) {
+        throw new Error('Draft room not found');
+      }
+
+      const currentData = draftDoc.data();
+      const currentParticipants = currentData.participants as Array<{
+        id: string;
+        name: string;
+        userId?: string;
+        entryFee?: number;
+      }>;
+
+      // Remove participant from list
+      const updatedParticipants = currentParticipants.filter(
+        p => p.id !== userId && p.userId !== userId
+      );
+
+      // Check if there was an entry fee to refund
+      const withdrawingParticipant = currentParticipants.find(
+        p => p.id === userId || p.userId === userId
+      );
+
+      if (withdrawingParticipant?.entryFee && withdrawingParticipant.entryFee > 0) {
+        refundAmount = withdrawingParticipant.entryFee;
+        refundStatus = 'pending';
+
+        // Credit balance back to user account
+        const userRef = doc(db!, 'users', userId);
+        transaction.update(userRef, {
+          balance: increment(refundAmount),
+          updatedAt: serverTimestamp(),
+        });
+
+        refundStatus = 'processed';
+      }
+
+      // Update draft room - track withdrawal for auditing
+      transaction.update(draftRef, {
+        participants: updatedParticipants,
+        participantCount: updatedParticipants.length,
+        updatedAt: serverTimestamp(),
+        withdrawalHistory: arrayUnion({
+          participantId: withdrawingParticipant?.id,
+          participantName: withdrawingParticipant?.name,
+          withdrawnAt: new Date().toISOString(),
+          refundAmount,
+        }),
+      });
+    });
+
+    logger.info('Withdrawal processed successfully', {
+      component: 'draft-withdraw',
+      operation: 'withdraw',
+      draftId,
+      userId,
+      refundAmount,
+      refundStatus,
+    });
+
+    const response: WithdrawResponse = {
+      success: true,
+      refundAmount,
+      refundStatus,
+      removedFromParticipants: true,
+      message: refundAmount > 0
+        ? `Successfully withdrawn. $${(refundAmount / 100).toFixed(2)} has been refunded to your balance.`
+        : 'Successfully withdrawn from the draft.',
+    };
+
+    return res.status(200).json(createSuccessResponse(response));
+  });
+};
+
+// Export with CSRF protection wrapper
+export default withCSRFProtection(withdrawHandler);

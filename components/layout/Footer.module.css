@@ -1,0 +1,66 @@
+/**
+ * Footer.module.css — Minimal footer
+ */
+
+.footer {
+  background-color: var(--color-bg-base);
+  border-top: 1px solid var(--color-border-subtle);
+  margin-top: var(--space-16);
+}
+
+/* Bottom Bar */
+.bottomBar {
+  background-color: var(--color-bg-elevated);
+  border-top: 1px solid var(--color-border-subtle);
+  padding: var(--space-6);
+}
+
+.bottomContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+}
+
+.copyright {
+  font-size: var(--text-md);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.footerNav {
+  display: flex;
+  gap: var(--space-6);
+  align-items: center;
+}
+
+.footerLink {
+  font-size: var(--text-md);
+  color: var(--color-text-secondary);
+  transition: color var(--transition-fast);
+  text-decoration: none;
+}
+
+.footerLink:hover {
+  color: var(--color-accent-text);
+}
+
+/* Responsive Design */
+@media (max-width: 767px) {
+  .bottomContainer {
+    flex-direction: column;
+    gap: var(--space-4);
+    text-align: center;
+  }
+
+  .footerNav {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-4);
+  }
+
+  .copyright {
+    font-size: var(--text-sm);
+  }
+}

@@ -1,0 +1,410 @@
+/**
+ * Community, Feedback, Comparison, Projects Route Definitions
+ * @module lib/api-docs/routes/community
+ */
+import type { RouteDefinition } from '../types';
+
+export const communityRoutes: RouteDefinition[] = [
+  // Feedback
+  {
+    operationId: 'submitFeedback',
+    method: 'POST',
+    path: '/api/studio/feedback/submit',
+    summary: 'Submit feedback',
+    description: 'Submit user feedback on a generation result (thumbs up/down, text comment).',
+    category: 'Feedback',
+    auth: 'bearer',
+    rateLimit: '100/hour',
+    parameters: [
+      { name: 'resultId', in: 'body', required: true, description: 'Generation result ID', type: 'string' },
+      { name: 'rating', in: 'body', required: true, description: 'Rating value', type: 'string', enum: ['positive', 'negative', 'neutral'] },
+      { name: 'comment', in: 'body', required: false, description: 'Text feedback', type: 'string' },
+    ],
+    responses: [
+      { statusCode: 201, description: 'Feedback recorded', example: '{"feedbackId":"fb_abc","recorded":true}' },
+    ],
+  },
+  {
+    operationId: 'getFeedback',
+    method: 'GET',
+    path: '/api/studio/feedback/{resultId}',
+    summary: 'Get feedback for result',
+    description: 'Get feedback status for a specific generation result.',
+    category: 'Feedback',
+    auth: 'bearer',
+    rateLimit: '200/min',
+    parameters: [
+      { name: 'resultId', in: 'path', required: true, description: 'Result ID', type: 'string' },
+    ],
+    responses: [
+      { statusCode: 200, description: 'Feedback data', example: '{"resultId":"res_abc","rating":"positive","comment":"Great quality"}' },
+    ],
+  },
+  {
+    operationId: 'feedbackSnapshot',
+    method: 'GET',
+    path: '/api/studio/preferences/snapshot',
+    summary: 'Feedback snapshot summary',
+    description: 'Get aggregate feedback statistics across all results.',
+    category: 'Feedback',
+    auth: 'bearer',
+    rateLimit: '100/hour',
+    parameters: [
+      { name: 'period', in: 'query', required: false, description: 'Time period', type: 'string', enum: ['7d', '30d', '90d'], default: '30d' },
+    ],
+    responses: [
+      { statusCode: 200, description: 'Snapshot data', example: '{"total":250,"positive":200,"negative":30,"neutral":20}' },
+    ],
+  },
+  {
+    operationId: 'sentimentDrift',
+    method: 'GET',
+    path: '/api/studio/preferences/drift',
+    summary: 'Sentiment drift analysis',
+    description: 'Analyze sentiment trends over time to detect changes in user satisfaction.',
+    category: 'Feedback',
+    auth: 'bearer',
+    rateLimit: '50/hour',
+    parameters: [
+      { name: 'period', in: 'query', required: false, description: 'Analysis period', type: 'string', default: '30d' },
+    ],
+    responses: [
+      { statusCode: 200, description: 'Drift data', example: '{"trend":"improving","delta":0.05,"dataPoints":[]}' },
+    ],
+  },
+  // Comparison
+  {
+    operationId: 'createComparison',
+    method: 'POST',
+    path: '/api/studio/comparison/create',
+    summary: 'Create A/B comparison',
+    description: 'Create a side-by-side comparison between two generation results for evaluation.',
+    category: 'Comparison',
+    auth: 'bearer',
+    rateLimit: '50/hour',
+    parameters: [
+      { name: 'resultIdA', in: 'body', required: true, description: 'First result ID', type: 'string' },
+      { name: 'resultIdB', in: 'body', required: true, description: 'Second result ID', type: 'string' },
+    ],
+    responses: [
+      { statusCode: 201, description: 'Comparison created', example: '{"comparisonId":"cmp_abc","resultA":"...","resultB":"..."}' },
+    ],
+  },
+  {
+    operationId: 'listComparisons',
+    method: 'GET',
+    path: '/api/studio/comparison/list',
+    summary: 'List comparisons',
+    description: 'List user\'s A/B comparisons with pagination.',
+    category: 'Comparison',
+    auth: 'bearer',
+    rateLimit: '200/min',
+    parameters: [
+      { name: 'limit', in: 'query', required: false, description: 'Max results', type: 'integer', default: 20 },
+    ],
+    responses: [
+      { statusCode: 200, description: 'Comparison list', example: '{"comparisons":[],"total":5}' },
+    ],
+  },
+  {
+    operationId: 'recordChoice',
+    method: 'POST',
+    path: '/api/studio/comparison/record-choice',
+    summary: 'Record comparison choice',
+    description: 'Record user preference in an A/B comparison (chose A, chose B, or no preference).',
+    category: 'Comparison',
+    auth: 'bearer',
+    rateLimit: '100/hour',
+    parameters: [
+      { name: 'comparisonId', in: 'body', required: true, description: 'Comparison ID', type: 'string' },
+      { name: 'choice', in: 'body', required: true, description: 'Preference', type: 'string', enum: ['a', 'b', 'neither'] },
+    ],
+    responses: [
+      { statusCode: 200, description: 'Choice recorded', example: '{"recorded":true}' },
+    ],
+  },
+  {
+    operationId: 'evaluateFeatures',
+    method: 'POST',
+    path: '/api/studio/features/evaluate',
+    summary: 'Evaluate feature flags',
+    description: 'Evaluate feature flags for the current user context. Returns active features.',
+    category: 'Comparison',
+    auth: 'bearer',
+    rateLimit: '200/min',
+    parameters: [
+      { name: 'context', in: 'body', required: false, description: 'Evaluation context', type: 'object' },
+    ],
+    responses: [
+      { statusCode: 200, description: 'Feature flags', example: '{"flags":{"newEditor":true,"darkMode":true,"betaAI":false}}' },
+    ],
+  },
+  // Projects
+  {
+    operationId: 'createProject',
+    method: 'POST',
+    path: '/api/studio/projects/create',
+    summary: 'Create project',
+    description: 'Create a new design project with initial settings.',
+    category: 'Projects',
+    auth: 'bearer',
+    rateLimit: '50/hour',
+    parameters: [
+      { name: 'name', in: 'body', required: true, description: 'Project name', type: 'string' },
+      { name: 'width', in: 'body', required: false, description: 'Canvas width', type: 'integer', default: 1920 },
+      { name: 'height', in: 'body', required: false, description: 'Canvas height', type: 'integer', default: 1080 },
+      { name: 'template', in: 'body', required: false, description: 'Template ID to start from', type: 'string' },
+    ],
+    responses: [
+      { statusCode: 201, description: 'Project created', example: '{"projectId":"prj_abc","name":"My Design","createdAt":"..."}' },
+    ],
+  },
+  {
+    operationId: 'listProjects',
+    method: 'GET',
+    path: '/api/studio/projects/list',
+    summary: 'List projects',
+    description: 'List user\'s design projects with pagination and optional search.',
+    category: 'Projects',
+    auth: 'bearer',
+    rateLimit: '200/min',
+    parameters: [
+      { name: 'limit', in: 'query', required: false, description: 'Max results', type: 'integer', default: 20 },
+      { name: 'offset', in: 'query', required: false, description: 'Pagination offset', type: 'integer', default: 0 },
+      { name: 'search', in: 'query', required: false, description: 'Search by name', type: 'string' },
+    ],
+    responses: [
+      { statusCode: 200, description: 'Project list', example: '{"projects":[],"total":12}' },
+    ],
+  },
+  {
+    operationId: 'getProject',
+    method: 'GET',
+    path: '/api/studio/projects/{id}',
+    summary: 'Get project details',
+    description: 'Get full project details including layers, settings, and metadata.',
+    category: 'Projects',
+    auth: 'bearer',
+    rateLimit: '200/min',
+    parameters: [
+      { name: 'id', in: 'path', required: true, description: 'Project ID', type: 'string' },
+    ],
+    responses: [
+      { statusCode: 200, description: 'Project details', example: '{"projectId":"prj_abc","name":"...","layers":[],"settings":{}}' },
+      { statusCode: 404, description: 'Project not found' },
+    ],
+  },
+  {
+    operationId: 'duplicateProject',
+    method: 'POST',
+    path: '/api/studio/projects/{id}/duplicate',
+    summary: 'Duplicate project',
+    description: 'Create a copy of an existing project with all layers and settings.',
+    category: 'Projects',
+    auth: 'bearer',
+    rateLimit: '20/hour',
+    parameters: [
+      { name: 'id', in: 'path', required: true, description: 'Source project ID', type: 'string' },
+      { name: 'name', in: 'body', required: false, description: 'Name for the copy', type: 'string' },
+    ],
+    responses: [
+      { statusCode: 201, description: 'Project duplicated', example: '{"projectId":"prj_xyz","name":"My Design (Copy)"}' },
+    ],
+  },
+  {
+    operationId: 'countProjects',
+    method: 'GET',
+    path: '/api/studio/projects/count',
+    summary: 'Count projects',
+    description: 'Get the total number of projects for the current user.',
+    category: 'Projects',
+    auth: 'bearer',
+    rateLimit: '200/min',
+    parameters: [],
+    responses: [
+      { statusCode: 200, description: 'Project count', example: '{"count":12}' },
+    ],
+  },
+  // Community
+  {
+    operationId: 'getCommunity',
+    method: 'GET',
+    path: '/api/studio/community',
+    summary: 'Community hub',
+    description: 'Get community hub data including featured designs, trending creators, and activity.',
+    category: 'Community',
+    auth: 'optional',
+    rateLimit: '200/min',
+    parameters: [],
+    responses: [
+      { statusCode: 200, description: 'Community data', example: '{"featured":[],"trending":[],"recent":[]}' },
+    ],
+  },
+  {
+    operationId: 'getGallery',
+    method: 'GET',
+    path: '/api/studio/community/gallery',
+    summary: 'Browse community gallery',
+    description: 'Browse published designs in the community gallery with filtering and pagination.',
+    category: 'Community',
+    auth: 'optional',
+    rateLimit: '200/min',
+    parameters: [
+      { name: 'sort', in: 'query', required: false, description: 'Sort order', type: 'string', enum: ['recent', 'popular', 'trending'], default: 'recent' },
+      { name: 'limit', in: 'query', required: false, description: 'Max results', type: 'integer', default: 20 },
+      { name: 'cursor', in: 'query', required: false, description: 'Pagination cursor', type: 'string' },
+    ],
+    responses: [
+      { statusCode: 200, description: 'Gallery items', example: '{"items":[],"nextCursor":"...","total":1500}' },
+    ],
+  },
+  {
+    operationId: 'publishToGallery',
+    method: 'POST',
+    path: '/api/studio/community/gallery',
+    summary: 'Publish design to gallery',
+    description: 'Publish a project to the community gallery for others to view and remix.',
+    category: 'Community',
+    auth: 'bearer',
+    rateLimit: '20/hour',
+    parameters: [
+      { name: 'projectId', in: 'body', required: true, description: 'Project to publish', type: 'string' },
+      { name: 'title', in: 'body', required: true, description: 'Gallery title', type: 'string' },
+      { name: 'description', in: 'body', required: false, description: 'Gallery description', type: 'string' },
+      { name: 'tags', in: 'body', required: false, description: 'Searchable tags', type: 'array' },
+    ],
+    responses: [
+      { statusCode: 201, description: 'Published', example: '{"postId":"post_abc","url":"https://idesaign.ai/gallery/post_abc"}' },
+    ],
+  },
+  {
+    operationId: 'getCommunityPost',
+    method: 'GET',
+    path: '/api/studio/community/posts/{id}',
+    summary: 'Get community post',
+    description: 'Get details of a specific community post.',
+    category: 'Community',
+    auth: 'optional',
+    rateLimit: '200/min',
+    parameters: [
+      { name: 'id', in: 'path', required: true, description: 'Post ID', type: 'string' },
+    ],
+    responses: [
+      { statusCode: 200, description: 'Post details', example: '{"postId":"post_abc","title":"...","author":{},"likes":42}' },
+    ],
+  },
+  {
+    operationId: 'getCommunityPrompts',
+    method: 'GET',
+    path: '/api/studio/community/prompts',
+    summary: 'Browse shared prompts',
+    description: 'Browse AI prompts shared by the community.',
+    category: 'Community',
+    auth: 'optional',
+    rateLimit: '200/min',
+    parameters: [
+      { name: 'sort', in: 'query', required: false, description: 'Sort order', type: 'string', enum: ['recent', 'popular'], default: 'popular' },
+      { name: 'limit', in: 'query', required: false, description: 'Max results', type: 'integer', default: 20 },
+    ],
+    responses: [
+      { statusCode: 200, description: 'Prompt list', example: '{"prompts":[],"total":300}' },
+    ],
+  },
+  {
+    operationId: 'getCommunityCollections',
+    method: 'GET',
+    path: '/api/studio/community/collections',
+    summary: 'Browse curated collections',
+    description: 'Browse curated design collections.',
+    category: 'Community',
+    auth: 'optional',
+    rateLimit: '200/min',
+    parameters: [],
+    responses: [
+      { statusCode: 200, description: 'Collections', example: '{"collections":[]}' },
+    ],
+  },
+  {
+    operationId: 'followUser',
+    method: 'POST',
+    path: '/api/studio/community/follows',
+    summary: 'Follow/unfollow designer',
+    description: 'Follow or unfollow a community designer.',
+    category: 'Community',
+    auth: 'bearer',
+    rateLimit: '100/hour',
+    parameters: [
+      { name: 'targetUserId', in: 'body', required: true, description: 'User to follow/unfollow', type: 'string' },
+      { name: 'action', in: 'body', required: true, description: 'Follow action', type: 'string', enum: ['follow', 'unfollow'] },
+    ],
+    responses: [
+      { statusCode: 200, description: 'Action complete', example: '{"following":true}' },
+    ],
+  },
+  {
+    operationId: 'likeDesign',
+    method: 'POST',
+    path: '/api/studio/community/likes',
+    summary: 'Like/unlike design',
+    description: 'Like or unlike a community design.',
+    category: 'Community',
+    auth: 'bearer',
+    rateLimit: '200/hour',
+    parameters: [
+      { name: 'postId', in: 'body', required: true, description: 'Post to like/unlike', type: 'string' },
+    ],
+    responses: [
+      { statusCode: 200, description: 'Action complete', example: '{"liked":true,"totalLikes":43}' },
+    ],
+  },
+  {
+    operationId: 'remixDesign',
+    method: 'POST',
+    path: '/api/studio/community/remix',
+    summary: 'Remix community design',
+    description: 'Create a remix (fork) of a community design to use as a starting point.',
+    category: 'Community',
+    auth: 'bearer',
+    rateLimit: '20/hour',
+    parameters: [
+      { name: 'postId', in: 'body', required: true, description: 'Post to remix', type: 'string' },
+    ],
+    responses: [
+      { statusCode: 201, description: 'Remix created', example: '{"projectId":"prj_remix","remixOf":"post_abc"}' },
+    ],
+  },
+  {
+    operationId: 'searchUsers',
+    method: 'GET',
+    path: '/api/studio/community/users',
+    summary: 'Search community users',
+    description: 'Search for community users by display name or username.',
+    category: 'Community',
+    auth: 'optional',
+    rateLimit: '100/min',
+    parameters: [
+      { name: 'q', in: 'query', required: true, description: 'Search query', type: 'string' },
+      { name: 'limit', in: 'query', required: false, description: 'Max results', type: 'integer', default: 20 },
+    ],
+    responses: [
+      { statusCode: 200, description: 'User results', example: '{"users":[],"total":5}' },
+    ],
+  },
+  {
+    operationId: 'communityTelemetry',
+    method: 'POST',
+    path: '/api/studio/community/telemetry',
+    summary: 'Record community interaction',
+    description: 'Record anonymous telemetry for community interactions (views, clicks, time spent).',
+    category: 'Community',
+    auth: 'optional',
+    rateLimit: '1000/hour',
+    parameters: [
+      { name: 'event', in: 'body', required: true, description: 'Event type', type: 'string' },
+      { name: 'data', in: 'body', required: false, description: 'Event data', type: 'object' },
+    ],
+    responses: [
+      { statusCode: 200, description: 'Recorded', example: '{"recorded":true}' },
+    ],
+  },
+];

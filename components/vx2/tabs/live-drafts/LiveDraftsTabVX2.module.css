@@ -1,0 +1,360 @@
+/**
+ * LiveDraftsTabVX2 CSS Module
+ *
+ * Uses CSS custom properties from tokens.css for colors.
+ */
+
+/* Main container */
+.container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background-color: var(--bg-primary);
+}
+
+/* Header section */
+.header {
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: var(--bg-primary);
+  padding-left: var(--spacing-lg);
+  padding-right: var(--spacing-lg);
+  padding-top: var(--spacing-md);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--border-default);
+}
+
+/* Tab Switcher */
+.tabSwitcher {
+  display: flex;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, 0.06);
+  padding: 3px;
+  gap: 3px;
+}
+
+.tabButton {
+  flex: 1;
+  padding-top: 0.625rem;
+  padding-bottom: 0.625rem;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  font-weight: 600;
+  transition: all 200ms ease;
+  font-size: var(--font-size-sm);
+  border-radius: var(--radius-md);
+  letter-spacing: -0.01em;
+  border: none;
+  cursor: pointer;
+  background-color: transparent;
+  color: var(--text-muted);
+}
+
+.tabButton[data-active="true"] {
+  color: var(--text-primary);
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Draft List Container */
+.listContainer {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-left: var(--spacing-lg);
+  padding-right: var(--spacing-lg);
+  padding-top: var(--spacing-sm);
+  padding-bottom: var(--spacing-sm);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.listContainer::-webkit-scrollbar {
+  display: none;
+}
+
+.draftsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* Draft Card */
+.draftCard {
+  width: 100%;
+  text-align: left;
+  transition: all 200ms ease;
+  position: relative;
+  overflow: hidden;
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-xl);
+  height: 110px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  background-color: var(--bg-secondary);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.draftCard:active:not(.draftCardYourTurn) {
+  transform: scale(0.98);
+}
+
+.draftCardYourTurn {
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.cardOverlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-color: rgba(0, 0, 0, 0.45);
+  border-radius: var(--radius-xl);
+  z-index: 0;
+}
+
+.cardContent {
+  position: relative;
+  z-index: 10;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.cardInfoRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.teamName {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  flex: 1;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-primary);
+  font-size: 15px;
+  letter-spacing: -0.01em;
+}
+
+/* When it's your turn, team name is white */
+.draftCardYourTurn .teamName {
+  color: #ffffff;
+}
+
+.badgeContainer {
+  flex-shrink: 0;
+  margin-left: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.onTheClockBadge {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  color: #ffffff;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-xs);
+  line-height: 1.3;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.timerDisplay {
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  letter-spacing: 0;
+}
+
+.timerDisplay[data-slow="true"] {
+  font-size: 18px;
+  letter-spacing: -0.02em;
+}
+
+.picksAwayText {
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+  letter-spacing: -0.01em;
+}
+
+/* Draft Progress Bar */
+.progressBarContainer {
+  position: relative;
+  height: 5px;
+  border-radius: 3px;
+  background-color: rgba(255, 255, 255, 0.12);
+  margin-bottom: 18px;
+}
+
+.progressBarFill {
+  position: absolute;
+  inset-y: 0;
+  left: 0;
+  width: var(--progress-percent);
+  background-color: var(--progress-color, var(--color-state-active));
+  border-radius: 3px;
+  box-shadow: 0 0 4px var(--progress-color-shadow, rgba(96, 165, 250, 0.25));
+  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.roundKnobContainer {
+  position: absolute;
+  z-index: 2;
+  left: var(--knob-position);
+  top: 50%;
+  transform: translateX(-50%) translateY(-50%);
+}
+
+.roundDot {
+  border-radius: 50%;
+  transition: all 200ms ease;
+  width: 6px;
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: none;
+}
+
+/* Past rounds */
+.roundDot[data-past="true"] {
+  background-color: var(--progress-color, var(--color-state-active));
+  border: 1px solid var(--progress-color, var(--color-state-active));
+}
+
+/* Current round */
+.roundDot[data-current="true"] {
+  width: 8px;
+  height: 8px;
+  background-color: #FFFFFF;
+  border: 2px solid var(--progress-color, var(--color-state-active));
+  box-shadow: 0 0 6px rgba(96, 165, 250, 0.5);
+}
+
+/* Your turn current round - white glow */
+.roundDot[data-current="true"][data-your-turn="true"] {
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
+}
+
+.roundLabel {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 10px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 600;
+  white-space: nowrap;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+/* Draft Card Skeleton */
+.skeletonCard {
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-xl);
+  background-color: var(--bg-secondary);
+}
+
+.skeletonHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.skeletonProgress {
+  margin-top: 0.75rem;
+}
+
+/* Join Button Section */
+.joinButtonSection {
+  padding: var(--spacing-lg);
+  border-top: 1px solid var(--border-default);
+}
+
+.joinButton {
+  width: 100%;
+  font-weight: 600;
+  transition: all 200ms ease;
+  height: var(--button-height, 48px);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-state-active);
+  color: #ffffff;
+  font-size: var(--font-size-base);
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.joinButton:active {
+  transform: scale(0.98);
+}
+
+/* Loading/Empty State Container */
+.stateContainer {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background-color: var(--bg-primary);
+}
+
+.errorStateContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  background-color: var(--bg-primary);
+  padding: var(--spacing-xl);
+}
+
+.emptyStateContainer {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background-color: var(--bg-primary);
+}
+
+.emptyStateCentral {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl);
+}
+
+/* Bottom Padding */
+.bottomPadding {
+  height: var(--spacing-2xl);
+  flex-shrink: 0;
+}
+
+/* Skeleton items for loading state header */
+.skeletonMetaWrapper {
+  margin-top: 0.25rem;
+}

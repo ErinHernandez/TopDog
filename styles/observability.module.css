@@ -1,0 +1,628 @@
+.container {
+  min-height: 100vh;
+  background-color: #1e2a3a;
+  padding: 24px 32px;
+  font-family: Inter, system-ui, sans-serif;
+  overflow-y: auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.refreshInfo {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  align-items: center;
+  font-size: 13px;
+  color: #6b7a94;
+}
+
+.refreshButton {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid #334155;
+  background-color: transparent;
+  color: #c5d0e6;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.refreshButton:hover {
+  background-color: #2a3a4e;
+  border-color: #3f4f63;
+}
+
+.refreshButton:active {
+  background-color: #252f3e;
+}
+
+.autoRefreshToggle {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+  color: #6b7a94;
+  font-size: 13px;
+}
+
+.toggleSwitch {
+  position: relative;
+  width: 40px;
+  height: 24px;
+  background-color: #334155;
+  border: 1px solid #3f4f63;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.toggleSwitch.enabled {
+  background-color: #2563eb;
+  border-color: #2563eb;
+}
+
+.toggleSlider {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  transition: left 0.2s ease;
+}
+
+.toggleSwitch.enabled .toggleSlider {
+  left: 18px;
+}
+
+.statusGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.card {
+  background-color: #252f3e;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.cardLabel {
+  font-size: 13px;
+  color: #6b7a94;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+  font-weight: 500;
+}
+
+.cardValue {
+  font-size: 28px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-top: 8px;
+  margin: 0;
+}
+
+.cardStatus {
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.statusDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.statusHealthy {
+  background-color: #22c55e;
+}
+
+.statusDegraded {
+  background-color: #eab308;
+}
+
+.statusUnhealthy {
+  background-color: #ef4444;
+}
+
+.statusText {
+  font-size: 14px;
+  color: #c5d0e6;
+}
+
+.section {
+  margin-top: 32px;
+}
+
+.sectionTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 16px;
+  margin: 0 0 16px 0;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.tableHeader {
+  background-color: #1a2332;
+  color: #6b7a94;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+  border-bottom: 1px solid #334155;
+}
+
+.tableHeader th {
+  padding: 12px 16px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease;
+}
+
+.tableHeader th:hover {
+  background-color: #1e2a3a;
+}
+
+.tableRow {
+  border-bottom: 1px solid #334155;
+  transition: background-color 0.2s ease;
+}
+
+.tableRow:hover {
+  background-color: #2a3a4e;
+}
+
+.tableCell {
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #c5d0e6;
+}
+
+.sortArrow {
+  margin-left: 6px;
+  font-size: 12px;
+  color: #6b7a94;
+}
+
+.memorySection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.memoryCard {
+  background-color: #252f3e;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.memoryBarContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.memoryBarLabel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: #6b7a94;
+}
+
+.memoryBar {
+  height: 24px;
+  background-color: #1a2332;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid #334155;
+}
+
+.memoryFill {
+  height: 100%;
+  background-color: #2563eb;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.memoryStats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.memoryStat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.memoryStatLabel {
+  font-size: 12px;
+  color: #6b7a94;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.memoryStatValue {
+  font-size: 16px;
+  font-weight: 600;
+  color: #c5d0e6;
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.filterButton {
+  padding: 6px 16px;
+  border-radius: 4px;
+  border: 1px solid #334155;
+  background-color: transparent;
+  color: #c5d0e6;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.filterButton:hover {
+  border-color: #3f4f63;
+  background-color: #2a3a4e;
+}
+
+.filterButtonActive {
+  background-color: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+}
+
+.incidentCard {
+  background-color: #252f3e;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.incidentContent {
+  flex: 1;
+}
+
+.incidentHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.incidentService {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.incidentDescription {
+  font-size: 14px;
+  color: #c5d0e6;
+  margin-bottom: 8px;
+}
+
+.incidentTimestamp {
+  font-size: 12px;
+  color: #6b7a94;
+}
+
+.severityBadge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  min-width: 50px;
+}
+
+.severityCritical {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.severityWarning {
+  background-color: rgba(234, 179, 8, 0.15);
+  color: #eab308;
+}
+
+.severityInfo {
+  background-color: rgba(37, 99, 235, 0.15);
+  color: #2563eb;
+}
+
+.severityLow {
+  background-color: rgba(107, 122, 148, 0.15);
+  color: #9ca3af;
+}
+
+.alertRuleRow {
+  background-color: #252f3e;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.alertRuleContent {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.alertRuleName {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.alertRuleMetric {
+  font-size: 13px;
+  color: #6b7a94;
+}
+
+.alertRuleThreshold {
+  font-size: 13px;
+  color: #c5d0e6;
+}
+
+.alertChannels {
+  display: flex;
+  gap: 4px;
+}
+
+.alertChannel {
+  font-size: 11px;
+  color: #6b7a94;
+  background-color: #1a2332;
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+
+.alertStatus {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.alertStatusBadge {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 3px;
+  background-color: #1a2332;
+  color: #22c55e;
+}
+
+.alertStatusBadge.disabled {
+  color: #6b7a94;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 40px;
+  color: #6b7a94;
+  background-color: #252f3e;
+  border: 1px solid #334155;
+  border-radius: 8px;
+}
+
+.emptyStateIcon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+.emptyStateText {
+  font-size: 14px;
+}
+
+.loadingState {
+  text-align: center;
+  padding: 40px;
+  color: #6b7a94;
+}
+
+.loadingSpinner {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  border: 3px solid #334155;
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.errorState {
+  padding: 20px;
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid #ef4444;
+  border-radius: 8px;
+  color: #fca5a5;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.alertSummary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.alertSummaryCard {
+  background-color: #252f3e;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+}
+
+.alertSummaryValue {
+  font-size: 24px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 4px;
+}
+
+.alertSummaryLabel {
+  font-size: 12px;
+  color: #6b7a94;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+@media (max-width: 1024px) {
+  .statusGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .headerRight {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .alertSummary {
+    grid-template-columns: 1fr;
+  }
+
+  .memoryStats {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+
+  .statusGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .title {
+    font-size: 20px;
+  }
+
+  .headerLeft {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .headerRight {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .refreshInfo {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .table {
+    font-size: 12px;
+  }
+
+  .tableCell {
+    padding: 8px 12px;
+  }
+
+  .incidentCard {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .alertRuleRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .alertRuleContent {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

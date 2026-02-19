@@ -1,0 +1,533 @@
+/**
+ * PhoneAuthModal Component Styles
+ *
+ * Component-specific styles for the phone authentication modal.
+ * Shared styles are imported from auth-shared.module.css
+ */
+
+/* ============================================================================
+   PHONE STEP SPECIFIC
+   ============================================================================ */
+
+.phoneStepContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.introSection {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.introTitle {
+  font-weight: var(--font-weight-bold);
+  margin-bottom: 8px;
+  color: var(--text-primary);
+  font-size: var(--font-size-xl);
+}
+
+.introDescription {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+/* ============================================================================
+   PHONE INPUT SECTION
+   ============================================================================ */
+
+.phoneInputSection {
+  margin-bottom: 24px;
+}
+
+.phoneInputLabel {
+  display: block;
+  font-weight: var(--font-weight-medium);
+  margin-bottom: 8px;
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+}
+
+.phoneInputGroup {
+  display: flex;
+  gap: 8px;
+}
+
+.countrySelector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 2px solid var(--border-default);
+  min-width: 100px;
+  cursor: pointer;
+  transition: all 150ms ease;
+  background: none;
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+}
+
+.countrySelector:hover {
+  border-color: var(--focus-border, rgba(96, 165, 250, 0.5));
+}
+
+.countrySelectorFlag {
+  font-size: 20px;
+}
+
+.countrySelectorCode {
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+}
+
+.countrySelectorChevron {
+  flex-shrink: 0;
+}
+
+.phoneNumberInput {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 12px;
+  outline: none;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  border: 2px solid var(--border-default);
+  font-size: var(--font-size-base);
+  transition: all 150ms ease;
+}
+
+.phoneNumberInput:focus {
+  border-color: var(--focus-border, rgba(96, 165, 250, 0.5));
+}
+
+.phoneNumberInput::placeholder {
+  color: var(--text-muted);
+}
+
+.phoneNumberInput:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================================================
+   COUNTRY PICKER DROPDOWN
+   ============================================================================ */
+
+.countryPickerDropdown {
+  margin-bottom: 16px;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+}
+
+.countrySearchBox {
+  padding: 8px;
+}
+
+.countrySearchInput {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  outline: none;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  border: 1px solid transparent;
+  font-size: var(--font-size-sm);
+  transition: all 150ms ease;
+}
+
+.countrySearchInput:focus {
+  border-color: var(--focus-border, rgba(96, 165, 250, 0.5));
+}
+
+.countrySearchInput::placeholder {
+  color: var(--text-muted);
+}
+
+.countryList {
+  max-height: 240px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.countryList::-webkit-scrollbar {
+  display: none;
+}
+
+.countryItem {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+  background: transparent;
+  border: none;
+  text-align: left;
+}
+
+.countryItem:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.countryItemSelected {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.countryItemFlag {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.countryItemName {
+  flex: 1;
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+}
+
+.countryItemCode {
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+   INFO BOX
+   ============================================================================ */
+
+.infoBox {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.infoIcon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.infoText {
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-normal);
+}
+
+/* ============================================================================
+   VERIFY STEP SPECIFIC
+   ============================================================================ */
+
+.verifyStepContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.verifyContentArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.verifyTitle {
+  font-weight: var(--font-weight-bold);
+  margin-bottom: 8px;
+  color: var(--text-primary);
+  font-size: var(--font-size-xl);
+}
+
+.verifyDescription {
+  text-align: center;
+  margin-bottom: 32px;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+}
+
+.verifyMaskedPhone {
+  color: var(--text-primary);
+}
+
+/* ============================================================================
+   OTP INPUT SECTION
+   ============================================================================ */
+
+.otpInputGroup {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.otpInput {
+  width: 48px;
+  height: 56px;
+  text-align: center;
+  font-weight: var(--font-weight-bold);
+  border-radius: 8px;
+  outline: none;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  border: 2px solid var(--border-default);
+  font-size: var(--font-size-2xl);
+  transition: all 150ms ease;
+}
+
+.otpInput:focus {
+  border-color: var(--focus-border, rgba(96, 165, 250, 0.5));
+}
+
+.otpInput:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.otpInputFilled {
+  border-color: var(--focus-border, rgba(96, 165, 250, 0.5));
+}
+
+.otpInputError {
+  border-color: var(--color-state-error) !important;
+}
+
+/* ============================================================================
+   LOADING STATE
+   ============================================================================ */
+
+.loadingIndicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--focus-border, rgba(96, 165, 250, 0.5));
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spinAnimation 0.8s linear infinite;
+}
+
+@keyframes spinAnimation {
+  to { transform: rotate(360deg); }
+}
+
+.loadingText {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+/* ============================================================================
+   RESEND SECTION
+   ============================================================================ */
+
+.resendSection {
+  text-align: center;
+}
+
+.resendLabel {
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+  margin-bottom: 4px;
+}
+
+.resendCooldown {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.resendButton {
+  font-weight: var(--font-weight-semibold);
+  background: url(/wr_blue.png) no-repeat center center;
+  background-size: cover;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  font-size: var(--font-size-sm);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: opacity 150ms ease;
+}
+
+.resendButton:hover {
+  opacity: 0.8;
+}
+
+/* ============================================================================
+   SUCCESS STEP SPECIFIC
+   ============================================================================ */
+
+.successStepContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.successIcon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  background-color: rgba(16, 185, 129, 0.15);
+}
+
+.successTitle {
+  font-weight: var(--font-weight-bold);
+  margin-bottom: 8px;
+  color: var(--text-primary);
+  font-size: var(--font-size-2xl);
+}
+
+.successDescription {
+  text-align: center;
+  margin-bottom: 32px;
+  color: var(--text-secondary);
+  font-size: var(--font-size-lg);
+}
+
+.successButton {
+  width: 100%;
+  padding: 16px;
+  border-radius: 12px;
+  font-weight: var(--font-weight-bold);
+  background: url(/wr_blue.png) no-repeat center center;
+  background-size: cover;
+  color: #000;
+  border: none;
+  font-size: var(--font-size-lg);
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.successButton:hover {
+  opacity: 0.9;
+}
+
+.successButton:active {
+  opacity: 0.8;
+}
+
+/* ============================================================================
+   ACTION BUTTONS
+   ============================================================================ */
+
+.actionButton {
+  width: 100%;
+  padding: 16px;
+  border-radius: 12px;
+  font-weight: var(--font-weight-bold);
+  transition: all 150ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: var(--font-size-lg);
+  border: none;
+  cursor: pointer;
+}
+
+.actionButtonEnabled {
+  background: url(/wr_blue.png) no-repeat center center;
+  background-size: cover;
+  color: #000;
+}
+
+.actionButtonEnabled:hover {
+  opacity: 0.95;
+}
+
+.actionButtonDisabled {
+  background-color: var(--bg-tertiary);
+  color: var(--text-disabled);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.actionButtonLoading {
+  opacity: 0.7;
+}
+
+/* ============================================================================
+   SWITCH AUTH METHOD
+   ============================================================================ */
+
+.switchAuthContainer {
+  text-align: center;
+  margin-top: 16px;
+}
+
+.switchAuthText {
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+  margin-bottom: 4px;
+}
+
+.switchAuthButton {
+  font-weight: var(--font-weight-semibold);
+  background: url(/wr_blue.png) no-repeat center center;
+  background-size: cover;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  transition: opacity 150ms ease;
+}
+
+.switchAuthButton:hover {
+  opacity: 0.8;
+}
+
+/* ============================================================================
+   MODAL ROOT CONTAINER
+   ============================================================================ */
+
+.modalRoot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  top: var(--content-top-inset, 60px);
+  background-color: var(--modal-bg);
+  z-index: var(--z-modal);
+}
+
+/* ============================================================================
+   HIDDEN ELEMENTS
+   ============================================================================ */
+
+.recaptchaContainer {
+  display: none;
+}
+
+/* ============================================================================
+   INLINE STYLE MIGRATIONS
+   ============================================================================ */
+
+.phoneInputLoading {
+  opacity: 0.5;
+}

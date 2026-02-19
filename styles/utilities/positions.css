@@ -1,0 +1,160 @@
+/**
+ * Position Color Utility Classes
+ *
+ * Static CSS classes for fantasy position colors.
+ * Use these instead of inline style={{ color: POSITION_COLORS[position] }}
+ *
+ * @example
+ * // BEFORE (violates static CSS directive)
+ * <span style={{ color: POSITION_COLORS[player.position] }}>
+ *
+ * // AFTER (compliant)
+ * <span className={`text-position-${player.position.toLowerCase()}`}>
+ */
+
+/* ============================================================================
+   TEXT COLORS
+   ============================================================================ */
+.text-position-qb { color: var(--color-position-qb); }
+.text-position-rb { color: var(--color-position-rb); }
+.text-position-wr { color: var(--color-position-wr); }
+.text-position-te { color: var(--color-position-te); }
+.text-position-flex { color: var(--text-secondary); }
+.text-position-bn { color: var(--color-position-bn); }
+.text-position-k { color: var(--color-position-bn); }
+.text-position-dst { color: var(--color-position-bn); }
+.text-position-def { color: var(--color-position-bn); }
+
+/* ============================================================================
+   BACKGROUND COLORS (solid)
+   ============================================================================ */
+.bg-position-qb { background-color: var(--color-position-qb); }
+.bg-position-rb { background-color: var(--color-position-rb); }
+.bg-position-wr { background-color: var(--color-position-wr); }
+.bg-position-te { background-color: var(--color-position-te); }
+.bg-position-flex { background-color: transparent; }
+.bg-position-bn { background-color: var(--color-position-bn); }
+.bg-position-k { background-color: var(--color-position-bn); }
+.bg-position-dst { background-color: var(--color-position-bn); }
+.bg-position-def { background-color: var(--color-position-bn); }
+
+/* ============================================================================
+   BACKGROUND COLORS (30% opacity for subtle backgrounds)
+   ============================================================================ */
+.bg-position-qb-subtle { background-color: var(--color-position-qb-bg); }
+.bg-position-rb-subtle { background-color: var(--color-position-rb-bg); }
+.bg-position-wr-subtle { background-color: var(--color-position-wr-bg); }
+.bg-position-te-subtle { background-color: var(--color-position-te-bg); }
+.bg-position-flex-subtle { background-color: rgba(255, 255, 255, 0.05); }
+.bg-position-bn-subtle { background-color: rgba(107, 114, 128, 0.3); }
+
+/* ============================================================================
+   BORDER COLORS
+   ============================================================================ */
+.border-position-qb { border-color: var(--color-position-qb); }
+.border-position-rb { border-color: var(--color-position-rb); }
+.border-position-wr { border-color: var(--color-position-wr); }
+.border-position-te { border-color: var(--color-position-te); }
+.border-position-flex { border-color: var(--border-default); }
+.border-position-bn { border-color: var(--color-position-bn); }
+
+/* ============================================================================
+   GRADIENTS (for buttons, badges, etc.)
+   ============================================================================ */
+.gradient-position-qb {
+  background: linear-gradient(135deg, var(--color-position-qb) 0%, var(--color-position-qb-end) 100%);
+}
+.gradient-position-rb {
+  background: linear-gradient(135deg, var(--color-position-rb) 0%, var(--color-position-rb-end) 100%);
+}
+.gradient-position-wr {
+  background: linear-gradient(135deg, var(--color-position-wr) 0%, var(--color-position-wr-end) 100%);
+}
+.gradient-position-te {
+  background: linear-gradient(135deg, var(--color-position-te) 0%, var(--color-position-te-end) 100%);
+}
+.gradient-position-flex {
+  background: linear-gradient(135deg, var(--color-position-rb) 0%, var(--color-position-wr) 50%, var(--color-position-te) 100%);
+}
+
+/* ============================================================================
+   VERTICAL GRADIENTS (for queue, lists)
+   ============================================================================ */
+.gradient-position-qb-vertical {
+  background: linear-gradient(180deg, var(--color-position-qb) 0%, var(--color-position-qb-end) 100%);
+}
+.gradient-position-rb-vertical {
+  background: linear-gradient(180deg, var(--color-position-rb) 0%, var(--color-position-rb-end) 100%);
+}
+.gradient-position-wr-vertical {
+  background: linear-gradient(180deg, var(--color-position-wr) 0%, var(--color-position-wr-end) 100%);
+}
+.gradient-position-te-vertical {
+  background: linear-gradient(180deg, var(--color-position-te) 0%, var(--color-position-te-end) 100%);
+}
+
+/* ============================================================================
+   LEFT BORDER ACCENT (for list items)
+   ============================================================================ */
+.border-l-position-qb { border-left: 3px solid var(--color-position-qb); }
+.border-l-position-rb { border-left: 3px solid var(--color-position-rb); }
+.border-l-position-wr { border-left: 3px solid var(--color-position-wr); }
+.border-l-position-te { border-left: 3px solid var(--color-position-te); }
+.border-l-position-flex { border-left: 3px solid var(--border-default); }
+.border-l-position-bn { border-left: 3px solid var(--color-position-bn); }
+
+/* ============================================================================
+   RING/OUTLINE (for focus states)
+   ============================================================================ */
+.ring-position-qb { box-shadow: 0 0 0 2px var(--color-position-qb); }
+.ring-position-rb { box-shadow: 0 0 0 2px var(--color-position-rb); }
+.ring-position-wr { box-shadow: 0 0 0 2px var(--color-position-wr); }
+.ring-position-te { box-shadow: 0 0 0 2px var(--color-position-te); }
+
+/* ============================================================================
+   POSITION BADGES (compact, pill-shaped)
+   ============================================================================ */
+.badge-position {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 6px;
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-bold);
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-position-qb {
+  background-color: var(--color-position-qb);
+  color: white;
+}
+.badge-position-rb {
+  background-color: var(--color-position-rb);
+  color: white;
+}
+.badge-position-wr {
+  background-color: var(--color-position-wr);
+  color: #1f2937;
+}
+.badge-position-te {
+  background-color: var(--color-position-te);
+  color: white;
+}
+.badge-position-flex {
+  background: linear-gradient(135deg, var(--color-position-rb) 0%, var(--color-position-wr) 50%, var(--color-position-te) 100%);
+  color: white;
+}
+.badge-position-bn {
+  background-color: var(--color-position-bn);
+  color: white;
+}
+.badge-position-k {
+  background-color: var(--color-position-bn);
+  color: white;
+}
+.badge-position-dst {
+  background-color: var(--color-position-bn);
+  color: white;
+}

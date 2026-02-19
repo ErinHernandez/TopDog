@@ -1,0 +1,355 @@
+/**
+ * DraftBoard CSS Module
+ *
+ * Pixel-perfect styling for enterprise-grade draft board grid.
+ * Uses CSS custom properties for dynamic values from constants.
+ *
+ * CSP-compliant: No inline styles, all classes defined here.
+ */
+
+/* ============================================================================
+ * MAIN CONTAINER
+ * ============================================================================ */
+
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--board-background);
+  position: relative;
+}
+
+/* ============================================================================
+ * SCROLL CONTAINER
+ * ============================================================================ */
+
+.scrollContainer {
+  flex: 1;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollContainer::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* ============================================================================
+ * BOARD CONTENT (Capturable)
+ * ============================================================================ */
+
+.boardContent {
+  /* Will be positioned absolutely for capture */
+}
+
+/* ============================================================================
+ * TEAM HEADERS (Sticky)
+ * ============================================================================ */
+
+.headersContainer {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: var(--board-background);
+  padding-top: 16px;
+}
+
+.headersRow {
+  display: flex;
+  width: max-content;
+  min-width: var(--headers-row-min-width);
+}
+
+.teamHeader {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--header-bg-gray);
+  margin: var(--cell-margin);
+  min-width: var(--cell-width);
+  width: var(--cell-width);
+  border-radius: var(--cell-border-radius);
+  overflow: hidden;
+  border-width: var(--cell-border-width);
+  border-style: solid;
+  border-color: var(--team-header-border-color);
+}
+
+.teamHeaderUsername {
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  font-size: var(--header-font-size);
+  font-weight: 500;
+  color: var(--text-white);
+  text-transform: uppercase;
+  text-align: center;
+  background-color: var(--team-header-username-bg);
+}
+
+.teamHeaderContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  padding-bottom: var(--content-padding-bottom);
+  min-height: var(--content-min-height);
+}
+
+.onTheClock {
+  font-weight: 600;
+  color: var(--text-white);
+  font-size: 11px;
+  line-height: 1.2;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.trackerContainer {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: var(--tracker-margin-top);
+}
+
+.trackerEmpty {
+  height: var(--tracker-height);
+  width: var(--tracker-empty-width);
+  background-color: var(--tracker-empty);
+  border-radius: var(--tracker-border-radius);
+}
+
+.trackerFilled {
+  display: flex;
+  height: var(--tracker-height);
+  width: var(--tracker-width);
+  border-radius: var(--tracker-border-radius);
+  overflow: hidden;
+}
+
+.trackerSegment {
+  height: 100%;
+  width: var(--tracker-segment-width);
+  /* Position color from data-position attribute */
+  background-color: var(--position-color, #6B7280);
+}
+
+/* Position-specific tracker segment colors */
+.trackerSegment[data-position="qb"] { --position-color: var(--color-position-qb); }
+.trackerSegment[data-position="rb"] { --position-color: var(--color-position-rb); }
+.trackerSegment[data-position="wr"] { --position-color: var(--color-position-wr); }
+.trackerSegment[data-position="te"] { --position-color: var(--color-position-te); }
+.trackerSegment[data-position="bn"] { --position-color: var(--color-position-bn); }
+
+.trackerSegmentFirst {
+  border-radius: 1px 0 0 1px;
+}
+
+.trackerSegmentLast {
+  border-radius: 0 1px 1px 0;
+}
+
+.trackerSegmentMiddle {
+  border-radius: 0;
+}
+
+/* ============================================================================
+ * DRAFT GRID
+ * ============================================================================ */
+
+.gridContainer {
+  padding-bottom: 24px;
+}
+
+.gridRow {
+  display: flex;
+  width: max-content;
+  min-width: var(--grid-row-min-width);
+}
+
+/* ============================================================================
+ * PICK CELLS
+ * ============================================================================ */
+
+.pickCell {
+  min-width: var(--cell-width);
+  width: var(--cell-width);
+  margin: var(--cell-margin);
+  border-radius: var(--cell-border-radius);
+  position: relative;
+  border-width: var(--cell-border-width);
+  border-style: solid;
+  /* border-color: set dynamically via style prop */
+  /* background-color: set dynamically via style prop */
+}
+
+.pickCellFirstRow {
+  margin-top: var(--first-row-margin-top);
+}
+
+.pickCellDefault {
+  border-color: var(--cell-border-default);
+  background-color: var(--cell-bg-default);
+}
+
+.pickCellUser {
+  /* border-color: set dynamically via style prop */
+  background-color: var(--cell-bg-default);
+}
+
+.pickCellPicked {
+  /* Position color from data-position attribute */
+  border-color: var(--position-color, #6B7280);
+  background-color: color-mix(in srgb, var(--position-color, #6B7280) 12%, transparent);
+}
+
+/* Position-specific picked cell colors */
+.pickCellPicked[data-position="qb"] { --position-color: var(--color-position-qb); }
+.pickCellPicked[data-position="rb"] { --position-color: var(--color-position-rb); }
+.pickCellPicked[data-position="wr"] { --position-color: var(--color-position-wr); }
+.pickCellPicked[data-position="te"] { --position-color: var(--color-position-te); }
+.pickCellPicked[data-position="bn"] { --position-color: var(--color-position-bn); }
+.pickCellPicked[data-position="k"] { --position-color: var(--text-muted); }
+.pickCellPicked[data-position="dst"] { --position-color: var(--text-muted); }
+.pickCellPicked[data-position="def"] { --position-color: var(--text-muted); }
+
+.pickCellOverlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.pickCellContent {
+  display: flex;
+  flex-direction: column;
+  height: var(--cell-height);
+  padding: 2px 3px;
+  position: relative;
+  z-index: 1;
+}
+
+.pickNumber {
+  font-size: var(--pick-number-font-size);
+  font-weight: 500;
+  color: var(--text-white);
+  line-height: 1;
+  margin-top: var(--pick-number-margin-top);
+  margin-left: var(--pick-number-margin-left);
+  flex-shrink: 0;
+}
+
+.pickContentArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.playerName {
+  font-weight: 700;
+  color: var(--text-white);
+  text-align: center;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.2;
+}
+
+.playerFirstName {
+  font-size: var(--player-first-name-font-size);
+  margin-top: -1px;
+}
+
+.playerLastName {
+  font-size: var(--player-last-name-font-size);
+  margin-top: 0;
+}
+
+.playerPosTeam {
+  color: var(--text-white);
+  text-align: center;
+  font-size: var(--player-pos-team-font-size);
+  line-height: 1.2;
+  margin-top: var(--player-pos-team-margin-top);
+}
+
+.onTheClockCell {
+  font-weight: 600;
+  color: var(--text-white);
+  font-size: 11px;
+  line-height: 1.2;
+  text-align: center;
+  margin-top: -2px;
+}
+
+.picksAway {
+  color: var(--text-gray);
+  font-size: var(--away-font-size);
+  margin-top: var(--away-margin-top);
+}
+
+/* ============================================================================
+ * SHARE BUTTON
+ * ============================================================================ */
+
+.shareButton {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  width: 48px;
+  height: 48px;
+  border-radius: 24px;
+  background-color: #3B82F6;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 20;
+}
+
+.shareButton:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.shareButton:not(:disabled) {
+  opacity: 1;
+}
+
+.shareButton:not(:disabled):hover {
+  opacity: 0.9;
+}
+
+.shareButton:not(:disabled):active {
+  transform: scale(0.95);
+}
+
+/* ============================================================================
+ * SPINNER ANIMATION
+ * ============================================================================ */
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--text-white);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

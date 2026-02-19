@@ -1,0 +1,99 @@
+/**
+ * WireframeCarousel Styles
+ * Horizontal device selector with smooth animations
+ */
+
+.carouselContainer {
+  width: 100%;
+  padding: 24px 0;
+  background: #1f1f1f;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+
+.carouselWrapper {
+  position: relative;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.carouselWrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.carousel {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 24px;
+  padding: 16px 32px;
+  min-width: min-content;
+}
+
+/* Selection indicator */
+.selectionIndicator {
+  position: relative;
+  width: calc(100% - 64px);
+  height: 2px;
+  margin: 16px 32px 0;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.indicatorLine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: #0ea5e9;
+  border-radius: 1px;
+  transition: transform 300ms ease, width 300ms ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .carousel {
+    justify-content: flex-start;
+    padding: 16px 24px;
+    gap: 16px;
+  }
+
+  .selectionIndicator {
+    width: calc(100% - 48px);
+    margin: 16px 24px 0;
+  }
+}
+
+/* Fade edges for scroll indication */
+.carouselWrapper::before,
+.carouselWrapper::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 32px;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+.carouselWrapper::before {
+  left: 0;
+  background: linear-gradient(to right, #1f1f1f, transparent);
+}
+
+.carouselWrapper::after {
+  right: 0;
+  background: linear-gradient(to left, #1f1f1f, transparent);
+}
+
+/* Show fade when scrollable */
+.carouselWrapper.scrollableLeft::before,
+.carouselWrapper.scrollableRight::after {
+  opacity: 1;
+}

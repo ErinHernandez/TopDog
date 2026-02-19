@@ -1,0 +1,277 @@
+# ==============================================================================
+# Idesaign CI Pipeline
+#
+# Enterprise-grade continuous integration:
+#   - Parallel jobs: type-check, unit tests, build, E2E
+#   - Dependency + Next.js build caching
+#   - Coverage threshold enforcement
+#   - Concurrency groups (cancels stale PR runs)
+#   - Runs on every push to main AND every PR targeting main
+# ==============================================================================
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  NODE_VERSION: '20'
+  CI: true
+
+# ---------------------------------------------------------------------------
+# Job 1 — Install & Cache Dependencies (shared by downstream jobs)
+# ---------------------------------------------------------------------------
+jobs:
+  install:
+    name: Install Dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Cache node_modules
+        uses: actions/cache/save@v4
+        with:
+          path: node_modules
+          key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+  # ---------------------------------------------------------------------------
+  # Job 2 — Type Check (tsc --noEmit)
+  # ---------------------------------------------------------------------------
+  typecheck:
+    name: Type Check
+    runs-on: ubuntu-latest
+    needs: install
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Restore node_modules
+        uses: actions/cache/restore@v4
+        with:
+          path: node_modules
+          key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Type check
+        run: npx tsc --noEmit --skipLibCheck
+
+  # ---------------------------------------------------------------------------
+  # Job 3 — Unit & Integration Tests (vitest)
+  # ---------------------------------------------------------------------------
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: install
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Restore node_modules
+        uses: actions/cache/restore@v4
+        with:
+          path: node_modules
+          key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Run tests with coverage
+        run: npx vitest run --coverage
+        env:
+          NODE_ENV: test
+
+      - name: Enforce coverage thresholds
+        run: |
+          node -e "
+            const report = require('./coverage/coverage-summary.json');
+            const { lines, statements, branches, functions } = report.total;
+            const MIN = 60;
+            let fail = false;
+            for (const [name, metric] of Object.entries({ lines, statements, branches, functions })) {
+              if (metric.pct < MIN) {
+                console.error('FAIL: ' + name + ' coverage ' + metric.pct + '% < ' + MIN + '% threshold');
+                fail = true;
+              } else {
+                console.log('PASS: ' + name + ' coverage ' + metric.pct + '%');
+              }
+            }
+            if (fail) process.exit(1);
+          "
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 14
+
+  # ---------------------------------------------------------------------------
+  # Job 4 — Build Verification (next build)
+  # ---------------------------------------------------------------------------
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: install
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Restore node_modules
+        uses: actions/cache/restore@v4
+        with:
+          path: node_modules
+          key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Restore Next.js build cache
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ hashFiles('**/*.ts', '**/*.tsx', '**/*.css') }}
+          restore-keys: |
+            nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
+            nextjs-${{ runner.os }}-
+
+      - name: Build application
+        run: npm run build
+        env:
+          NODE_ENV: production
+
+      - name: Report build output size
+        run: |
+          echo "## Build Output" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          du -sh .next/ >> $GITHUB_STEP_SUMMARY
+          du -sh .next/static/ >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+  # ---------------------------------------------------------------------------
+  # Job 5 — E2E Tests (Playwright)
+  # ---------------------------------------------------------------------------
+  e2e:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    needs: [install, build]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Restore node_modules
+        uses: actions/cache/restore@v4
+        with:
+          path: node_modules
+          key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run E2E tests
+        run: npx playwright test
+        env:
+          NODE_ENV: test
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+      - name: Upload test traces
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: test-results/
+          retention-days: 7
+
+  # ---------------------------------------------------------------------------
+  # Job 6 — Security Audit (npm audit)
+  # ---------------------------------------------------------------------------
+  audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    needs: install
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Restore node_modules
+        uses: actions/cache/restore@v4
+        with:
+          path: node_modules
+          key: nm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+        continue-on-error: true
+
+      - name: Check for known vulnerabilities
+        run: |
+          AUDIT_OUTPUT=$(npm audit --omit=dev --json 2>/dev/null || true)
+          CRITICAL=$(echo "$AUDIT_OUTPUT" | node -e "
+            let data = '';
+            process.stdin.on('data', c => data += c);
+            process.stdin.on('end', () => {
+              try {
+                const r = JSON.parse(data);
+                const c = r.metadata?.vulnerabilities?.critical || 0;
+                console.log(c);
+                if (c > 0) process.exit(1);
+              } catch { console.log(0); }
+            });
+          ")
+
+  # ---------------------------------------------------------------------------
+  # Gate — All checks must pass
+  # ---------------------------------------------------------------------------
+  ci-passed:
+    name: CI Passed
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [typecheck, test, build, e2e, audit]
+    steps:
+      - name: Check job results
+        run: |
+          echo "typecheck: ${{ needs.typecheck.result }}"
+          echo "test: ${{ needs.test.result }}"
+          echo "build: ${{ needs.build.result }}"
+          echo "e2e: ${{ needs.e2e.result }}"
+          echo "audit: ${{ needs.audit.result }}"
+
+          if [[ "${{ needs.typecheck.result }}" != "success" ]] || \
+             [[ "${{ needs.test.result }}" != "success" ]] || \
+             [[ "${{ needs.build.result }}" != "success" ]] || \
+             [[ "${{ needs.e2e.result }}" != "success" ]]; then
+            echo "::error::One or more required CI jobs failed"
+            exit 1
+          fi
+
+          echo "All required checks passed"

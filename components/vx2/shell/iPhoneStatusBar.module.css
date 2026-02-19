@@ -1,0 +1,115 @@
+/**
+ * iPhoneStatusBar CSS Module
+ *
+ * Migrated from inline styles for CSP compliance.
+ */
+
+/* ============================================================================
+   STATUS BAR CONTAINER
+   ============================================================================ */
+
+.statusBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 16px;
+  padding-right: 16px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  height: var(--status-bar-height, 28px);
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  z-index: 9999;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+/* Background variants */
+.statusBarDefault {
+  background-image: url(/wr_blue.png);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  background-origin: border-box;
+  background-clip: border-box;
+}
+
+.statusBarColored {
+  background-color: var(--status-bar-bg);
+}
+
+/* ============================================================================
+   TIME DISPLAY
+   ============================================================================ */
+
+.time {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  color: var(--text-primary, #ffffff);
+}
+
+/* ============================================================================
+   RIGHT SIDE CONTAINER
+   ============================================================================ */
+
+.rightSide {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ============================================================================
+   SIGNAL BARS
+   ============================================================================ */
+
+.signalBars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+}
+
+.signalBar {
+  width: 3px;
+  border-radius: 0.5px;
+  height: var(--signal-bar-height, 3px);
+}
+
+.signalBarActive {
+  background-color: var(--text-primary, #ffffff);
+}
+
+.signalBarInactive {
+  background-color: var(--status-bar-icon-inactive, rgba(255, 255, 255, 0.3));
+}
+
+/* ============================================================================
+   WIFI ICON
+   ============================================================================ */
+
+.wifiIcon {
+  margin-left: 2px;
+}
+
+/* ============================================================================
+   BATTERY SECTION
+   ============================================================================ */
+
+.batterySection {
+  display: flex;
+  align-items: center;
+  margin-left: 4px;
+  gap: 4px;
+}
+
+.batteryLevel {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  color: var(--text-primary, #ffffff);
+}

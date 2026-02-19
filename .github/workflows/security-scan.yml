@@ -1,0 +1,116 @@
+name: Weekly Security Scan
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # Every Monday at 9 AM UTC
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  security-scan:
+    name: Comprehensive Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Restore npm cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run npm audit (fail on high/critical)
+        run: npm audit --audit-level=high
+        continue-on-error: false
+
+      - name: Run npm audit for all levels (report only)
+        run: npm audit --json > npm-audit-full-report.json
+        continue-on-error: true
+
+      - name: Run TypeScript type checking
+        run: npx tsc --noEmit
+
+      - name: Run security audit script
+        run: npm run security:audit
+
+      - name: Check for secrets and credentials
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+        continue-on-error: true
+
+      - name: Run production-only audit
+        run: npm audit --production --audit-level=high
+
+      - name: Upload audit reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-audit-reports
+          path: |
+            npm-audit-full-report.json
+            audit-results.json
+          retention-days: 30
+
+      - name: Comment on latest commit with results
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let auditSummary = '## Security Scan Results\n\n';
+
+            try {
+              if (fs.existsSync('npm-audit-full-report.json')) {
+                const auditData = JSON.parse(fs.readFileSync('npm-audit-full-report.json', 'utf8'));
+                const vulnerabilities = auditData.metadata?.vulnerabilities || {};
+                auditSummary += `### NPM Audit Summary\n`;
+                auditSummary += `- Critical: ${vulnerabilities.critical || 0}\n`;
+                auditSummary += `- High: ${vulnerabilities.high || 0}\n`;
+                auditSummary += `- Moderate: ${vulnerabilities.moderate || 0}\n`;
+                auditSummary += `- Low: ${vulnerabilities.low || 0}\n\n`;
+              }
+            } catch (e) {
+              console.log('Could not parse audit report:', e.message);
+            }
+
+            auditSummary += `✅ Security scan completed on ${new Date().toISOString()}\n`;
+            auditSummary += `📊 View [audit artifacts](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID})`;
+
+            console.log(auditSummary);
+
+      - name: Notify on security failures
+        if: failure()
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          payload: |
+            {
+              "text": "Security Scan Failed",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Security Scan Failed*\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Details>"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+        continue-on-error: true

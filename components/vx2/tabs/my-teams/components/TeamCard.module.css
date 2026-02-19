@@ -1,0 +1,134 @@
+.cardContainer {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  padding-top: calc(var(--spacing-sm) + 6px);
+  padding-bottom: calc(var(--spacing-sm) + 6px);
+  padding-left: calc(var(--spacing-sm) + 4px);
+  padding-right: calc(var(--spacing-sm) + 4px);
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  min-height: 54px;
+  height: 54px;
+}
+
+.cardContainer.isDragging {
+  opacity: 0.5;
+}
+
+.cardContainer.isDragOver {
+  border-top: 2px solid var(--color-drag-indicator);
+}
+
+.cardContainer:active {
+  scale: 0.98;
+}
+
+.cardContainer.customSort {
+  cursor: move;
+}
+
+.rankBadge {
+  padding: 4px;
+  margin-right: var(--spacing-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  min-width: 28px;
+  height: 28px;
+}
+
+.rankText {
+  font-size: var(--font-size-xs);
+  color: var(--text-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.contentArea {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.textContent {
+  flex: 1;
+  text-align: left;
+  min-width: 0;
+}
+
+.teamNameRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  min-width: 0;
+  flex: 1;
+}
+
+.teamName {
+  font-weight: var(--font-weight-medium);
+  flex-shrink: 0;
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+}
+
+.draftDateText {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.pointsDiffContainer {
+  display: flex;
+  flex-direction: column;
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  margin-left: auto;
+  text-align: right;
+}
+
+.pointsDiffText {
+  white-space: nowrap;
+}
+
+.controlsContainer {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.controlsContainer.noCustomSort {
+  padding-left: var(--spacing-sm);
+}
+
+.moveButton {
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  border-radius: var(--radius-sm);
+  background-color: rgba(255, 255, 255, 0.05);
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.moveButton:active {
+  scale: 0.95;
+}
+
+.skeletonContainer {
+  padding-top: calc(var(--spacing-sm) + 6px);
+  padding-bottom: calc(var(--spacing-sm) + 6px);
+  padding-left: calc(var(--spacing-sm) + 4px);
+  padding-right: calc(var(--spacing-sm) + 4px);
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+}

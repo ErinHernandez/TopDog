@@ -1,0 +1,416 @@
+/**
+ * VirtualizedPlayerList - CSS Modules
+ *
+ * Styles for performance-optimized player list with virtual scrolling.
+ * Uses CSS custom properties for dynamic values from constants.
+ * CSP-compliant: No inline styles, all styling in CSS Module.
+ */
+
+/* ============================================================================
+   CUSTOM PROPERTIES (From Constants)
+   ============================================================================ */
+
+/* ============================================================================
+   MAIN CONTAINER
+   ============================================================================ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--bg-primary, #0f1419);
+}
+
+/* ============================================================================
+   FILTER BUTTONS & POSITION BUTTONS
+   ============================================================================ */
+
+.filterButtonGroup {
+  display: flex;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, 0.05);
+  margin-top: var(--spacing-md);
+  margin-bottom: var(--spacing-xs);
+}
+
+.filterButton {
+  flex: 1;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-weight: bold;
+  transition: var(--transition-all);
+  font-size: var(--search-font-size);
+  border: none;
+  border-bottom: 2px solid;
+  cursor: pointer;
+  background-color: transparent;
+}
+
+.filterButton.active {
+  background-color: rgba(255, 255, 255, 0.1);
+  opacity: 1;
+}
+
+.filterButton:not(.active) {
+  opacity: 0.4;
+  color: #a0aec0;
+}
+
+/* Filter button position colors - border and active text color */
+.filterButton[data-position="qb"] {
+  border-bottom-color: var(--color-position-qb);
+}
+.filterButton[data-position="qb"].active {
+  color: var(--color-position-qb);
+}
+.filterButton[data-position="rb"] {
+  border-bottom-color: var(--color-position-rb);
+}
+.filterButton[data-position="rb"].active {
+  color: var(--color-position-rb);
+}
+.filterButton[data-position="wr"] {
+  border-bottom-color: var(--color-position-wr);
+}
+.filterButton[data-position="wr"].active {
+  color: var(--color-position-wr);
+}
+.filterButton[data-position="te"] {
+  border-bottom-color: var(--color-position-te);
+}
+.filterButton[data-position="te"].active {
+  color: var(--color-position-te);
+}
+
+/* ============================================================================
+   SEARCH BAR
+   ============================================================================ */
+
+.searchContainer {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--search-margin-top);
+  margin-left: var(--search-margin-x);
+  margin-right: var(--search-margin-x);
+}
+
+.searchInputWrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  height: var(--search-height);
+  background-color: var(--search-bg);
+  border-radius: 8px;
+  padding: 0 var(--spacing-md);
+}
+
+.searchInputIcon {
+  margin-right: var(--spacing-sm);
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  stroke: var(--search-placeholder);
+}
+
+.searchInput {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--text-primary, #e5e7eb);
+  font-size: var(--search-font-size);
+  outline: none;
+  font-family: inherit;
+}
+
+.searchInput::placeholder {
+  color: var(--search-placeholder);
+}
+
+.clearButton {
+  width: calc(22.5% - 6px);
+  height: var(--search-height);
+  background-color: var(--search-bg);
+  border: none;
+  border-radius: 8px;
+  color: var(--text-primary, #e5e7eb);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-all);
+}
+
+.clearButton:hover {
+  background-color: rgba(31, 41, 55, 1);
+  opacity: 0.9;
+}
+
+/* ============================================================================
+   COLUMN HEADERS
+   ============================================================================ */
+
+.header {
+  display: flex;
+  align-items: center;
+  padding: var(--header-padding-y) 4px;
+  border-bottom: 1px solid var(--row-border);
+  background-color: var(--bg-primary, #0f1419);
+}
+
+.headerColumn {
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  flex-shrink: 0;
+  text-align: center;
+  transition: var(--transition-all);
+}
+
+.headerColumn.active {
+  color: var(--text-primary, #e5e7eb);
+}
+
+.headerColumn:not(.active) {
+  color: var(--text-secondary, #9ca3af);
+}
+
+.headerColumnLabel {
+  border-bottom: 2px solid transparent;
+  padding-bottom: 2px;
+  display: inline-block;
+  transition: var(--transition-all);
+}
+
+.headerColumn.active .headerColumnLabel {
+  border-bottom-color: var(--color-sort-indicator);
+}
+
+.headerColumnAdp {
+  width: var(--adp-column-width);
+}
+
+.headerColumnProj {
+  width: var(--proj-column-width);
+}
+
+.headerColumnRank {
+  width: var(--rank-column-width);
+}
+
+.headerColumnSpacer {
+  flex: 1;
+}
+
+.headerColumnQueueSpacer {
+  width: var(--queue-button-container-width);
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+   VIRTUALIZED SCROLL CONTAINER
+   ============================================================================ */
+
+.scrollContainer {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  position: relative;
+}
+
+.scrollContainer::-webkit-scrollbar {
+  display: none;
+}
+
+.virtualizedContent {
+  position: relative;
+  height: var(--virtualized-height);
+}
+
+.virtualizedViewport {
+  position: absolute;
+  top: var(--viewport-offset);
+  left: 0;
+  right: 0;
+}
+
+.nonVirtualizedContent {
+  padding-bottom: var(--spacing-xl);
+}
+
+.emptyState {
+  padding: var(--spacing-xl);
+  text-align: center;
+  color: var(--text-secondary, #9ca3af);
+}
+
+/* ============================================================================
+   PLAYER ROW
+   ============================================================================ */
+
+.playerRow {
+  display: flex;
+  align-items: center;
+  height: var(--row-height);
+  background-color: var(--row-bg);
+  cursor: pointer;
+  border-bottom: 1px solid var(--row-border);
+  transition: var(--transition-all);
+}
+
+.playerRow:hover {
+  background-color: rgba(31, 40, 51, 1);
+}
+
+.playerRow:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -1px;
+}
+
+/* ============================================================================
+   PLAYER ROW - ADP COLUMN
+   ============================================================================ */
+
+.adpColumn {
+  width: var(--adp-column-width);
+  text-align: center;
+  font-size: var(--stat-font-size);
+  color: var(--gray-text);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+   PLAYER ROW - PLAYER INFO
+   ============================================================================ */
+
+.playerInfo {
+  flex: 1;
+  padding-left: 10px;
+  padding-right: 8px;
+  min-width: 0;
+}
+
+.playerName {
+  font-size: var(--player-name-font-size);
+  font-weight: 500;
+  color: var(--text-primary, #e5e7eb);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.playerMetadata {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-top: 2px;
+}
+
+.positionBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--position-badge-padding);
+  border-radius: var(--position-badge-border-radius);
+  color: var(--black-text);
+  font-size: var(--position-badge-font-size);
+  font-weight: var(--position-badge-font-weight);
+  flex-shrink: 0;
+  /* Background color is set via data-position attribute */
+  background-color: var(--position-color, #6B7280);
+}
+
+.playerTeam {
+  font-size: var(--player-team-font-size);
+  color: var(--text-secondary, #9ca3af);
+}
+
+/* ============================================================================
+   PLAYER ROW - QUEUE BUTTON
+   ============================================================================ */
+
+.queueButtonContainer {
+  width: var(--queue-button-container-width);
+  display: flex;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.queueButton {
+  width: var(--queue-button-size);
+  height: var(--queue-button-size);
+  border-radius: var(--queue-button-border-radius);
+  border: var(--queue-button-border-width) solid var(--color-queue-border);
+  background-color: transparent;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  transition: var(--transition-all);
+}
+
+.queueButton:hover {
+  border-color: var(--color-queue-active);
+  background-color: var(--color-queue-hover-bg);
+}
+
+.queueButton.active {
+  border-color: var(--color-queue-active);
+  background-color: var(--color-queue-active-bg);
+}
+
+.queueButtonSvg {
+  width: var(--queue-button-svg-size);
+  height: var(--queue-button-svg-size);
+}
+
+/* ============================================================================
+   PLAYER ROW - PROJ & RANK COLUMNS
+   ============================================================================ */
+
+.projColumn {
+  width: var(--proj-column-width);
+  text-align: right;
+  padding-right: 8px;
+  font-size: var(--stat-font-size);
+  color: var(--text-secondary, #9ca3af);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.rankColumn {
+  width: var(--rank-column-width);
+  text-align: center;
+  padding-right: 4px;
+  font-size: var(--player-rank-font-size);
+  color: var(--text-secondary, #9ca3af);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+   EXPANDED CARD CONTAINER
+   ============================================================================ */
+
+.expandedCardContainer {
+  padding: var(--spacing-sm) 4px;
+}
+
+/* ============================================================================
+   DEBUG INFO
+   ============================================================================ */
+
+.debugInfo {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  font-size: 10px;
+  color: #666;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 2px 4px;
+  border-radius: 2px;
+  pointer-events: none;
+}

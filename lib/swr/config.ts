@@ -1,0 +1,285 @@
+/**
+ * SWR Configuration
+ * 
+ * Global configuration for SWR data fetching.
+ * Provides default fetcher, error handling, and revalidation settings.
+ */
+
+import type { SWRConfiguration } from 'swr';
+
+import { createScopedLogger } from '@/lib/clientLogger';
+
+const logger = createScopedLogger('[SWRConfig]');
+
+// ============================================================================
+// CUSTOM ERROR TYPE
+// ============================================================================
+
+/** Extended Error with API response info */
+export interface FetchError extends Error {
+  info?: Record<string, unknown>;
+  status?: number;
+}
+
+/** Discriminated union for fetch results - allows distinguishing no data from errors */
+export type FetchResult<T> =
+  | { ok: true; data: T }
+  | { ok: false; error: Error; status: number };
+
+
+// ============================================================================
+// FETCHERS
+// ============================================================================
+
+/**
+ * Default JSON fetcher for SWR
+ *
+ * NEW BEHAVIOR: Returns discriminated union instead of masking errors
+ * - { ok: true, data } for successful responses
+ * - { ok: false, error, status } for any HTTP error (4xx or 5xx)
+ *
+ * This allows components to distinguish between:
+ * - Empty data returned by API
+ * - Actual request failure (network error, 4xx, 5xx)
+ */
+export async function fetcher<T = unknown>(url: string): Promise<FetchResult<T>> {
+  try {
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      // Return error result for both 4xx and 5xx responses
+      const errorData = await res.json().catch(() => ({}));
+      const error: FetchError = new Error(
+        `HTTP ${res.status}: ${res.statusText || 'Error fetching data'}`
+      );
+      error.info = errorData;
+      error.status = res.status;
+
+      if (process.env.NODE_ENV === 'development') {
+        logger.warn(`Fetcher ${res.status} error for ${url}`, errorData);
+      }
+
+      return {
+        ok: false,
+        error,
+        status: res.status
+      };
+    }
+
+    const data = await res.json();
+
+    // Handle API responses that wrap data in { ok, data } format
+    const extractedData = (data.ok !== undefined && data.data !== undefined)
+      ? data.data
+      : data;
+
+    return {
+      ok: true,
+      data: extractedData as T
+    };
+  } catch (error) {
+    // Handle network errors and JSON parsing errors
+    const err = error instanceof Error ? error : new Error(String(error));
+
+    if (process.env.NODE_ENV === 'development') {
+      logger.error(`Fetcher error for ${url}:`, err);
+    }
+
+    return {
+      ok: false,
+      error: err,
+      status: 0  // 0 indicates network/client error, not HTTP error
+    };
+  }
+}
+
+/**
+ * Backward-compatible fetcher wrapper for existing components
+ *
+ * Converts FetchResult<T> to T, throwing on error
+ * Use this for components that need the old behavior
+ */
+export async function fetcherLegacy<T = unknown>(url: string): Promise<T> {
+  const result = await fetcher<T>(url);
+
+  if (!result.ok) {
+    // Type guard: when ok is false, error and status are present
+    const errorResult = result as { ok: false; error: Error; status: number };
+    throw errorResult.error;
+  }
+
+  // Type guard: when ok is true, data is present
+  const successResult = result as { ok: true; data: T };
+  return successResult.data;
+}
+
+/**
+ * Fetcher with custom options
+ */
+export async function fetcherWithOptions<T = unknown>(
+  [url, options]: [string, RequestInit]
+): Promise<T> {
+  const res = await fetch(url, options);
+
+  if (!res.ok) {
+    const error: FetchError = new Error('An error occurred while fetching the data.');
+    error.info = await res.json().catch(() => ({}));
+    error.status = res.status;
+    throw error;
+  }
+
+  const data = await res.json();
+
+  if (data.ok !== undefined && data.data !== undefined) {
+    return data.data as T;
+  }
+
+  return data as T;
+}
+
+/** POST fetcher argument type */
+interface PostFetcherArg {
+  arg: unknown;
+}
+
+/**
+ * POST fetcher for mutations
+ */
+export async function postFetcher<T = unknown>(
+  url: string, 
+  { arg }: PostFetcherArg
+): Promise<T> {
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(arg),
+  });
+  
+  if (!res.ok) {
+    const error: FetchError = new Error('An error occurred while posting the data.');
+    error.info = await res.json().catch(() => ({}));
+    error.status = res.status;
+    throw error;
+  }
+  
+  return res.json() as Promise<T>;
+}
+
+
+// ============================================================================
+// SWR CONFIGURATION
+// ============================================================================
+
+/**
+ * Default SWR configuration options
+ *
+ * Uses fetcherLegacy for backward compatibility with existing components
+ * The new fetcher returns discriminated union results; legacy wrapper throws errors
+ */
+export const swrConfig: SWRConfiguration = {
+  fetcher: fetcherLegacy,
+  
+  // Revalidation settings
+  revalidateOnFocus: false, // Don't refetch when window regains focus
+  revalidateOnReconnect: true, // Refetch when network reconnects
+  revalidateIfStale: true, // Refetch if data is stale
+  
+  // Deduplication - prevents duplicate requests within 2 seconds
+  dedupingInterval: 2000,
+  
+  // Error retry settings - default retry count
+  errorRetryCount: 3,
+  errorRetryInterval: 5000,
+  
+  // Custom retry logic - don't retry on 400/404 errors
+  onErrorRetry: (error, key, config, revalidate, { retryCount }) => {
+    const fetchError = error as FetchError;
+    // Don't retry on client errors (400, 404) - these are expected in some cases
+    if (fetchError.status === 400 || fetchError.status === 404) {
+      return; // Don't retry
+    }
+    // Retry up to 3 times for other errors
+    if (retryCount >= 3) {
+      return; // Stop retrying after 3 attempts
+    }
+    // Retry with exponential backoff
+    setTimeout(() => revalidate({ retryCount }), 5000);
+  },
+  
+  // Focus throttle - at most one revalidation per 5 seconds on focus
+  focusThrottleInterval: 5000,
+  
+  // Keep previous data while fetching new data
+  keepPreviousData: true,
+  
+  // Global error handler - only log in development, don't crash
+  onError: (error: Error, key: string) => {
+    const fetchError = error as FetchError;
+    // Only log non-400/404 errors in development
+    if (process.env.NODE_ENV === 'development' && fetchError.status !== 400 && fetchError.status !== 404) {
+      logger.error(`SWR Error [${key}]`, error);
+    }
+  },
+  
+  // Loading timeout - show loading state after 3 seconds
+  loadingTimeout: 3000,
+  
+  // Suspense mode disabled by default
+  suspense: false,
+};
+
+
+// ============================================================================
+// CACHE TIME CONSTANTS
+// ============================================================================
+
+/** Cache time constants (in milliseconds) */
+export const CACHE_TIMES = {
+  // Player data - rarely changes, long cache
+  PLAYERS: 24 * 60 * 60 * 1000, // 24 hours
+  PROJECTIONS: 24 * 60 * 60 * 1000, // 24 hours
+  
+  // Stats - moderate cache
+  SEASON_STATS: 6 * 60 * 60 * 1000, // 6 hours
+  WEEKLY_STATS: 1 * 60 * 60 * 1000, // 1 hour
+  
+  // Rankings - moderate cache
+  ADP: 6 * 60 * 60 * 1000, // 6 hours
+  RANKINGS: 6 * 60 * 60 * 1000, // 6 hours
+  
+  // Live data - short cache
+  INJURIES: 15 * 60 * 1000, // 15 minutes
+  NEWS: 5 * 60 * 1000, // 5 minutes
+  LIVE_SCORES: 10 * 1000, // 10 seconds
+} as const;
+
+/** Cache time type */
+export type CacheTimeKey = keyof typeof CACHE_TIMES;
+
+
+// ============================================================================
+// API ENDPOINTS
+// ============================================================================
+
+/** API endpoint constants */
+export const API_ENDPOINTS = {
+  PLAYERS: '/api/nfl/players',
+  PROJECTIONS: '/api/nfl/projections',
+  SEASON_STATS: '/api/nfl/stats/season',
+  WEEKLY_STATS: '/api/nfl/stats/weekly',
+  ADP: '/api/nfl/fantasy/adp',
+  RANKINGS: '/api/nfl/fantasy/rankings',
+  INJURIES: '/api/nfl/injuries',
+  NEWS: '/api/nfl/news',
+  TEAMS: '/api/nfl/teams',
+  SCHEDULE: '/api/nfl/schedule',
+  BYE_WEEKS: '/api/nfl/bye-weeks',
+} as const;
+
+/** API endpoint type */
+export type ApiEndpointKey = keyof typeof API_ENDPOINTS;
+export type ApiEndpointValue = typeof API_ENDPOINTS[ApiEndpointKey];
+
+
+export default swrConfig;
+

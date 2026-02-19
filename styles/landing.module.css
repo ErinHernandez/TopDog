@@ -1,0 +1,296 @@
+/**
+ * landing.module.css — Landing page styles
+ */
+
+.main {
+  flex: 1;
+  width: 100%;
+  padding-top: var(--header-height);
+}
+
+/* ================================================================
+   HERO SECTION
+   ================================================================ */
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  padding: var(--space-20) var(--space-6);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.heroGradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(37, 99, 235, 0.12) 0%,
+    rgba(30, 42, 58, 0) 50%,
+    rgba(37, 99, 235, 0.06) 100%
+  );
+  pointer-events: none;
+  animation: gradientShift 8s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.heroHeading {
+  font-size: clamp(2rem, 8vw, 3.5rem);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-6);
+  letter-spacing: -0.5px;
+}
+
+.heroSubheading {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+  margin-bottom: var(--space-10);
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.heroCtas {
+  display: flex;
+  gap: var(--space-4);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.ctaButtonPrimary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  padding: 0 var(--space-8);
+  background-color: var(--color-accent);
+  color: white;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-normal);
+  box-shadow: 0 0 0 0 var(--color-accent-subtle);
+  text-decoration: none;
+}
+
+.ctaButtonPrimary:hover {
+  background-color: var(--color-accent-hover);
+  box-shadow: 0 0 0 8px var(--color-accent-subtle);
+  transform: translateY(-2px);
+}
+
+.ctaButtonSecondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  padding: 0 var(--space-8);
+  background-color: transparent;
+  color: var(--color-text-primary);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  border: 2px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-normal);
+  text-decoration: none;
+}
+
+.ctaButtonSecondary:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background-color: rgba(37, 99, 235, 0.08);
+}
+
+/* ================================================================
+   FEATURES SECTION
+   ================================================================ */
+
+.features {
+  position: relative;
+  padding: var(--space-20) var(--space-6);
+  background-color: var(--color-bg-base);
+}
+
+.featuresContainer {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: var(--space-16);
+}
+
+.sectionHeading {
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-primary);
+  line-height: var(--leading-tight);
+  letter-spacing: -0.5px;
+}
+
+.featureGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--space-8);
+}
+
+.featureCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-8);
+  background-color: var(--color-bg-elevated);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-xl);
+  transition: all var(--transition-normal);
+  position: relative;
+}
+
+.featureCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(37, 99, 235, 0) 0%,
+    rgba(37, 99, 235, 0.5) 50%,
+    rgba(37, 99, 235, 0) 100%
+  );
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+}
+
+.featureCard:hover {
+  border-color: var(--color-border-default);
+  background-color: var(--color-bg-panel);
+  box-shadow: 0 0 0 1px var(--color-accent-subtle),
+              var(--shadow-md);
+  transform: translateY(-4px);
+}
+
+.featureCard:hover::before {
+  opacity: 1;
+}
+
+.featureIcon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(37, 99, 235, 0.1);
+  border-radius: var(--radius-lg);
+  color: var(--color-accent);
+  transition: all var(--transition-normal);
+  flex-shrink: 0;
+}
+
+.featureCard:hover .featureIcon {
+  background-color: rgba(37, 99, 235, 0.2);
+  transform: scale(1.1);
+}
+
+.featureIcon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.featureTitle {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.featureDescription {
+  font-size: var(--text-md);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+  margin: 0;
+}
+
+
+/* ================================================================
+   RESPONSIVE DESIGN
+   ================================================================ */
+
+@media (max-width: 767px) {
+  .main {
+    padding-top: var(--header-height);
+  }
+
+  .hero {
+    padding: var(--space-12) var(--space-4);
+    min-height: auto;
+  }
+
+  .heroHeading {
+    margin-bottom: var(--space-4);
+  }
+
+  .heroSubheading {
+    margin-bottom: var(--space-8);
+  }
+
+  .heroCtas {
+    gap: var(--space-3);
+  }
+
+  .ctaButtonPrimary,
+  .ctaButtonSecondary {
+    height: 40px;
+    padding: 0 var(--space-6);
+    font-size: var(--text-md);
+  }
+
+  .features {
+    padding: var(--space-12) var(--space-4);
+  }
+
+  .featureGrid {
+    gap: var(--space-6);
+  }
+
+  .featureCard {
+    padding: var(--space-6);
+  }
+
+  .sectionHeader {
+    margin-bottom: var(--space-12);
+  }
+
+}
+
+@media (max-width: 1023px) {
+  .featureGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

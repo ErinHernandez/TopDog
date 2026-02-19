@@ -1,0 +1,211 @@
+/**
+ * CurrencySelector CSS Module
+ *
+ * Zero-runtime CSS for CSP compliance.
+ * Uses tokens.css variables for all colors.
+ */
+
+/* ============================================================================
+   CONTAINER
+   ============================================================================ */
+
+.container {
+  position: relative;
+}
+
+/* ============================================================================
+   LABEL
+   ============================================================================ */
+
+.label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+/* ============================================================================
+   TRIGGER BUTTON
+   ============================================================================ */
+
+.triggerButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem var(--spacing-md);
+  border-radius: var(--radius-lg);
+  transition: all 150ms ease;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.triggerButtonOpen {
+  border-color: var(--color-state-active);
+}
+
+.triggerButtonDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================================================
+   TRIGGER CONTENT
+   ============================================================================ */
+
+.triggerContent {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.iconWrapper {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.currencyInfo {
+  text-align: left;
+}
+
+.currencyCode {
+  font-weight: 600;
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+}
+
+.currencyName {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+/* ============================================================================
+   CHEVRON
+   ============================================================================ */
+
+.chevron {
+  display: inline-block;
+  transition: transform 150ms ease;
+  color: var(--text-muted);
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+/* ============================================================================
+   DROPDOWN MENU
+   ============================================================================ */
+
+.dropdown {
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin-top: var(--spacing-sm);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  z-index: var(--z-dropdown);
+  max-height: 300px;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* ============================================================================
+   OPTION BUTTON
+   ============================================================================ */
+
+.optionButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem var(--spacing-md);
+  transition: all 150ms ease;
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border-light);
+  cursor: pointer;
+  text-align: left;
+}
+
+.optionButton:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.optionButtonSelected {
+  background-color: rgba(96, 165, 250, 0.15);
+}
+
+.optionButtonSelected:hover {
+  background-color: rgba(96, 165, 250, 0.15);
+}
+
+/* ============================================================================
+   OPTION CONTENT
+   ============================================================================ */
+
+.optionIconWrapper {
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.optionIconWrapperSelected {
+  background-color: rgba(96, 165, 250, 0.2);
+}
+
+.optionInfo {
+  flex: 1;
+  text-align: left;
+}
+
+.optionCodeRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+}
+
+.optionCodeRowSelected {
+  color: var(--color-state-active);
+}
+
+.recommendedBadge {
+  padding: 0.125rem var(--spacing-sm);
+  border-radius: 9999px;
+  font-size: var(--font-size-xs);
+  background-color: rgba(16, 185, 129, 0.2);
+  color: var(--color-state-success);
+}
+
+.optionName {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+/* ============================================================================
+   CHECKMARK
+   ============================================================================ */
+
+.checkmark {
+  flex-shrink: 0;
+  color: var(--color-state-active);
+}

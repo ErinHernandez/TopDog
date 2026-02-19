@@ -1,0 +1,23 @@
+apiVersion: v2
+name: topdog-studio
+description: TopDog Studio self-hosted deployment with vLLM and Qwen2.5-Coder
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+
+keywords:
+  - topdog
+  - ai-chat
+  - design-system
+  - vllm
+  - qwen
+
+maintainers:
+  - name: TopDog Engineering
+    email: engineering@topdog.studio
+
+home: https://github.com/topdog/studio
+sources:
+  - https://github.com/topdog/studio
+
+dependencies: []

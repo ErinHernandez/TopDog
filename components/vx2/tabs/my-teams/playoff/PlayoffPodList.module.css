@@ -1,0 +1,299 @@
+/* PlayoffPodList.module.css */
+
+/* Container */
+.container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background-color: var(--bg-primary);
+}
+
+/* Header */
+.header {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.title {
+  color: var(--text-primary);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  margin: 0;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  margin-top: 4px;
+}
+
+/* Search & Filter Section */
+.filterSection {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid var(--border-lighter);
+}
+
+.weekFilterContainer {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
+}
+
+.weekFilterButton {
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.weekFilterButtonActive {
+  composes: weekFilterButton;
+  background-color: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.4);
+  color: var(--color-blue-light);
+  font-weight: 600;
+}
+
+.weekFilterButton:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Pod List Container */
+.listContainer {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--spacing-md) var(--spacing-lg);
+  scrollbar-width: none;
+}
+
+.listContainer::-webkit-scrollbar {
+  display: none;
+}
+
+/* Loading State */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* Empty State */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2xl);
+  text-align: center;
+}
+
+.emptyStateText {
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* Week Group */
+.weekGroup {
+  margin-bottom: var(--spacing-lg);
+}
+
+.weekGroupTitle {
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--spacing-sm);
+}
+
+.weekGroupList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.flatList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* Bottom Padding */
+.bottomPadding {
+  height: var(--spacing-2xl);
+}
+
+/* Pod Card */
+.podCard {
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-light);
+  overflow: hidden;
+}
+
+.podCardHeader {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border-lighter);
+  cursor: pointer;
+  text-align: left;
+}
+
+.podCardHeaderContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.podCardTitleContainer {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.podCardTitle {
+  color: var(--text-primary);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+}
+
+.podCardWeekBadge {
+  padding: 2px 8px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+.podCardMeta {
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  margin-top: 4px;
+}
+
+.podCardChevron {
+  flex-shrink: 0;
+}
+
+/* User Team Quick View */
+.userTeamSection {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background-color: rgba(59, 130, 246, 0.08);
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.userTeamContent {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  flex: 1;
+  min-width: 0;
+}
+
+.rankBadge {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.rankBadgeAdvancing {
+  composes: rankBadge;
+  background-color: var(--color-green);
+}
+
+.rankBadgeEliminated {
+  composes: rankBadge;
+  background-color: #374151;
+}
+
+.userTeamInfo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.userTeamName {
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+}
+
+.userTeamStats {
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.userTeamStatus {
+  padding: 4px 10px;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.userTeamStatusAdvancing {
+  composes: userTeamStatus;
+  background-color: rgba(16, 185, 129, 0.2);
+  color: var(--color-green);
+}
+
+.userTeamStatusEliminated {
+  composes: userTeamStatus;
+  background-color: rgba(239, 68, 68, 0.2);
+  color: var(--color-red);
+}
+
+/* Skeleton */
+.skeleton {
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  height: 100px;
+}
+
+.skeletonLine {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+}
+
+.skeletonLineTitle {
+  composes: skeletonLine;
+  width: 120px;
+  height: 16px;
+}
+
+.skeletonLineMeta {
+  composes: skeletonLine;
+  width: 80px;
+  height: 12px;
+  margin-top: var(--spacing-sm);
+}

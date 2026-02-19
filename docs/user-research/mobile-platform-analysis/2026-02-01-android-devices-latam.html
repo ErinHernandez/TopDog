@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Android Devices - Latin America & Caribbean | February 2026</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #1a2e1a 0%, #1e3a2f 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #fff;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #34d399, #a3e635);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .subtitle {
+            text-align: center;
+            color: #94a3b8;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        .chart-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .chart-card h2 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .chart-card h2::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(180deg, #34d399, #a3e635);
+            border-radius: 2px;
+        }
+        .chart-container {
+            position: relative;
+            height: 350px;
+        }
+        .chart-container.tall {
+            height: 450px;
+        }
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .stat-card.warning {
+            border-color: rgba(245, 158, 11, 0.3);
+            background: rgba(245, 158, 11, 0.1);
+        }
+        .stat-card.danger {
+            border-color: rgba(239, 68, 68, 0.3);
+            background: rgba(239, 68, 68, 0.1);
+        }
+        .stat-card.success {
+            border-color: rgba(34, 197, 94, 0.3);
+            background: rgba(34, 197, 94, 0.1);
+        }
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #34d399, #a3e635);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .stat-label {
+            color: #94a3b8;
+            margin-top: 5px;
+            font-size: 0.85rem;
+        }
+        .country-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .country-table th, .country-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .country-table th {
+            background: rgba(255, 255, 255, 0.05);
+            font-weight: 600;
+            color: #34d399;
+        }
+        .country-table tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .legacy-high {
+            color: #ef4444;
+            font-weight: 600;
+        }
+        .legacy-medium {
+            color: #f59e0b;
+            font-weight: 600;
+        }
+        .legacy-low {
+            color: #34d399;
+            font-weight: 600;
+        }
+        .region-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .region-badge.caribbean {
+            background: rgba(139, 92, 246, 0.3);
+            color: #a78bfa;
+        }
+        .region-badge.central {
+            background: rgba(6, 182, 212, 0.3);
+            color: #22d3ee;
+        }
+        .region-badge.south {
+            background: rgba(16, 185, 129, 0.3);
+            color: #34d399;
+        }
+        .vendor-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .vendor-badge.samsung {
+            background: rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
+        }
+        .vendor-badge.xiaomi {
+            background: rgba(251, 146, 60, 0.3);
+            color: #fb923c;
+        }
+        .vendor-badge.motorola {
+            background: rgba(234, 179, 8, 0.3);
+            color: #facc15;
+        }
+        .legend-note {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.85rem;
+            margin-top: 40px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+        }
+        @media (max-width: 600px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Android Devices: Latin America & Caribbean</h1>
+        <p class="subtitle">North & South America (Excluding US & Canada) | February 1, 2026 | Excluding India & China</p>
+
+        <!-- Key Stats -->
+        <div class="stats-grid">
+            <div class="stat-card success">
+                <div class="stat-value">~480M</div>
+                <div class="stat-label">Total Android Devices</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">~85%</div>
+                <div class="stat-label">Android Market Share</div>
+            </div>
+            <div class="stat-card warning">
+                <div class="stat-value">18.5%</div>
+                <div class="stat-label">Android 11 & older</div>
+            </div>
+            <div class="stat-card warning">
+                <div class="stat-value">~89M</div>
+                <div class="stat-label">Legacy Devices (API <31)</div>
+            </div>
+            <div class="stat-card danger">
+                <div class="stat-value">8.2%</div>
+                <div class="stat-label">Android 10 & older</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">3.8 yrs</div>
+                <div class="stat-label">Avg Device Age</div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <!-- Android Version Distribution -->
+            <div class="chart-card">
+                <h2>Android Version Distribution - LATAM</h2>
+                <div class="chart-container">
+                    <canvas id="versionDistChart"></canvas>
+                </div>
+            </div>
+
+            <!-- API Level Coverage -->
+            <div class="chart-card">
+                <h2>API Level Coverage</h2>
+                <div class="chart-container">
+                    <canvas id="apiCoverageChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Legacy by Country -->
+            <div class="chart-card full-width">
+                <h2>Legacy Android Share by Country (Android 11 & Older)</h2>
+                <div class="chart-container">
+                    <canvas id="countryLegacyChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Vendor Market Share -->
+            <div class="chart-card">
+                <h2>Android Vendor Market Share - LATAM</h2>
+                <div class="chart-container">
+                    <canvas id="vendorChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Sub-region Comparison -->
+            <div class="chart-card">
+                <h2>Legacy Share by Sub-Region</h2>
+                <div class="chart-container">
+                    <canvas id="subregionChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Country Detail Table -->
+            <div class="chart-card full-width">
+                <h2>Country-Level Android Analysis</h2>
+                <table class="country-table">
+                    <thead>
+                        <tr>
+                            <th>Country</th>
+                            <th>Region</th>
+                            <th>Android Share</th>
+                            <th>Est. Devices</th>
+                            <th>Android 11 & Older</th>
+                            <th>Android 10 & Older</th>
+                            <th>Top Vendor</th>
+                            <th>Legacy Devices</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Brazil</td>
+                            <td><span class="region-badge south">South</span></td>
+                            <td>85%</td>
+                            <td>~182M</td>
+                            <td class="legacy-medium">17%</td>
+                            <td>7%</td>
+                            <td><span class="vendor-badge samsung">Samsung</span></td>
+                            <td>~31M</td>
+                        </tr>
+                        <tr>
+                            <td>Mexico</td>
+                            <td><span class="region-badge central">Central</span></td>
+                            <td>78%</td>
+                            <td>~99M</td>
+                            <td class="legacy-medium">15%</td>
+                            <td>6%</td>
+                            <td><span class="vendor-badge samsung">Samsung</span></td>
+                            <td>~15M</td>
+                        </tr>
+                        <tr>
+                            <td>Argentina</td>
+                            <td><span class="region-badge south">South</span></td>
+                            <td>88%</td>
+                            <td>~40M</td>
+                            <td class="legacy-high">24%</td>
+                            <td>12%</td>
+                            <td><span class="vendor-badge samsung">Samsung</span></td>
+                            <td>~9.6M</td>
+                        </tr>
+                        <tr>
+                            <td>Colombia</td>
+                            <td><span class="region-badge south">South</span></td>
+                            <td>86%</td>
+                            <td>~43M</td>
+                            <td class="legacy-medium">19%</td>
+                            <td>9%</td>
+                            <td><span class="vendor-badge samsung">Samsung</span></td>
+                            <td>~8.2M</td>
+                        </tr>
+                        <tr>
+                            <td>Peru</td>
+                            <td><span class="region-badge south">South</span></td>
+                            <td>89%</td>
+                            <td>~28M</td>
+                            <td class="legacy-high">22%</td>
+                            <td>11%</td>
+                            <td><span class="vendor-badge samsung">Samsung</span></td>
+                            <td>~6.2M</td>
+                        </tr>
+                        <tr>
+                            <td>Venezuela</td>
+                            <td><span class="region-badge south">South</span></td>
+                            <td>92%</td>
+                            <td>~23M</td>
+                            <td class="legacy-high">32%</td>
+                            <td>18%</td>
+                            <td><span class="vendor-badge xiaomi">Xiaomi</span></td>
+                            <td>~7.4M</td>
+                        </tr>
+                        <tr>
+                            <td>Chile</td>
+                            <td><span class="region-badge south">South</span></td>
+                            <td>75%</td>
+                            <td>~15M</td>
+                            <td class="legacy-low">12%</td>
+                            <td>5%</td>
+                            <td><span class="vendor-badge samsung">Samsung</span></td>
+                            <td>~1.8M</td>
+                        </tr>
+                        <tr>
+                            <td>Ecuador</td>
+                            <td><span class="region-badge south">South</span></td>
+                            <td>90%</td>
+                            <td>~16M</td>
+                            <td class="legacy-high">25%</td>
+                            <td>13%</td>
+                            <td><span class="vendor-badge samsung">Samsung</span></td>
+                            <td>~4.0M</td>
+                        </tr>
+                        <tr>
+                            <td>Guatemala</td>
+                            <td><span class="region-badge central">Central</span></td>
+                            <td>91%</td>
+                            <td>~16M</td>
+                            <td class="legacy-high">28%</td>
+                            <td>15%</td>
+                            <td><span class="vendor-badge samsung">Samsung</span></td>
+                            <td>~4.5M</td>
+                        </tr>
+                        <tr>
+                            <td>Dominican Rep.</td>
+                            <td><span class="region-badge caribbean">Caribbean</span></td>
+                            <td>82%</td>
+                            <td>~9M</td>
+                            <td class="legacy-medium">16%</td>
+                            <td>7%</td>
+                            <td><span class="vendor-badge samsung">Samsung</span></td>
+                            <td>~1.4M</td>
+                        </tr>
+                        <tr>
+                            <td>Honduras</td>
+                            <td><span class="region-badge central">Central</span></td>
+                            <td>92%</td>
+                            <td>~9M</td>
+                            <td class="legacy-high">30%</td>
+                            <td>16%</td>
+                            <td><span class="vendor-badge samsung">Samsung</span></td>
+                            <td>~2.7M</td>
+                        </tr>
+                        <tr>
+                            <td>Costa Rica</td>
+                            <td><span class="region-badge central">Central</span></td>
+                            <td>72%</td>
+                            <td>~3.9M</td>
+                            <td class="legacy-low">11%</td>
+                            <td>4%</td>
+                            <td><span class="vendor-badge samsung">Samsung</span></td>
+                            <td>~0.43M</td>
+                        </tr>
+                        <tr>
+                            <td>Panama</td>
+                            <td><span class="region-badge central">Central</span></td>
+                            <td>70%</td>
+                            <td>~3M</td>
+                            <td class="legacy-low">10%</td>
+                            <td>4%</td>
+                            <td><span class="vendor-badge samsung">Samsung</span></td>
+                            <td>~0.30M</td>
+                        </tr>
+                        <tr>
+                            <td>Puerto Rico</td>
+                            <td><span class="region-badge caribbean">Caribbean</span></td>
+                            <td>45%</td>
+                            <td>~1.5M</td>
+                            <td class="legacy-low">8%</td>
+                            <td>3%</td>
+                            <td><span class="vendor-badge samsung">Samsung</span></td>
+                            <td>~0.12M</td>
+                        </tr>
+                        <tr>
+                            <td>Jamaica</td>
+                            <td><span class="region-badge caribbean">Caribbean</span></td>
+                            <td>75%</td>
+                            <td>~2.3M</td>
+                            <td class="legacy-medium">18%</td>
+                            <td>9%</td>
+                            <td><span class="vendor-badge samsung">Samsung</span></td>
+                            <td>~0.41M</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Vendor by Country -->
+            <div class="chart-card full-width">
+                <h2>Top Android Vendors by Country</h2>
+                <div class="chart-container">
+                    <canvas id="vendorCountryChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Android Version by Vendor -->
+            <div class="chart-card">
+                <h2>Legacy Share by Vendor</h2>
+                <div class="chart-container">
+                    <canvas id="vendorLegacyChart"></canvas>
+                </div>
+            </div>
+
+            <!-- NFL Fan Overlap -->
+            <div class="chart-card">
+                <h2>NFL Interest vs Legacy Android Share</h2>
+                <div class="chart-container">
+                    <canvas id="nflOverlapChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Device Price Segments -->
+            <div class="chart-card">
+                <h2>Device Price Segment Distribution</h2>
+                <div class="chart-container">
+                    <canvas id="priceSegmentChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Update Lag -->
+            <div class="chart-card">
+                <h2>Months Behind Latest Android</h2>
+                <div class="chart-container">
+                    <canvas id="updateLagChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="legend-note">
+            Data sources: StatCounter, Counterpoint Research, IDC Latin America, GSMArena | Data as of January 2026<br>
+            Device counts are estimates based on ~480M total active Android devices in Latin America & Caribbean (excluding US/Canada)
+        </div>
+    </div>
+
+    <script>
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
+
+        const androidColors = [
+            'rgba(52, 211, 153, 0.8)',   // emerald
+            'rgba(163, 230, 53, 0.8)',   // lime
+            'rgba(34, 197, 94, 0.8)',    // green
+            'rgba(6, 182, 212, 0.8)',    // cyan
+            'rgba(59, 130, 246, 0.8)',   // blue
+            'rgba(139, 92, 246, 0.8)',   // violet
+            'rgba(245, 158, 11, 0.8)',   // amber
+            'rgba(239, 68, 68, 0.8)',    // red
+        ];
+
+        // 1. Android Version Distribution
+        new Chart(document.getElementById('versionDistChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Android 14', 'Android 13', 'Android 12', 'Android 11', 'Android 10', 'Android 9 & older'],
+                datasets: [{
+                    data: [28.5, 25.0, 18.0, 10.3, 8.0, 10.2],
+                    backgroundColor: [
+                        'rgba(52, 211, 153, 0.8)',
+                        'rgba(163, 230, 53, 0.8)',
+                        'rgba(34, 197, 94, 0.8)',
+                        'rgba(245, 158, 11, 0.8)',
+                        'rgba(239, 68, 68, 0.8)',
+                        'rgba(127, 29, 29, 0.8)'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: { padding: 12, usePointStyle: true }
+                    }
+                },
+                cutout: '55%'
+            }
+        });
+
+        // 2. API Level Coverage
+        new Chart(document.getElementById('apiCoverageChart'), {
+            type: 'line',
+            data: {
+                labels: ['API 34 (14)', 'API 33 (13)', 'API 32 (12L)', 'API 31 (12)', 'API 30 (11)', 'API 29 (10)', 'API 28 (9)', 'API 26 (8)'],
+                datasets: [{
+                    label: 'Cumulative Coverage %',
+                    data: [28.5, 53.5, 58.5, 71.5, 81.5, 89.7, 95.2, 98.5],
+                    borderColor: 'rgba(52, 211, 153, 1)',
+                    backgroundColor: 'rgba(52, 211, 153, 0.2)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 6,
+                    pointBackgroundColor: 'rgba(52, 211, 153, 1)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        min: 0,
+                        max: 100,
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        ticks: { callback: v => v + '%' }
+                    },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 3. Legacy by Country
+        new Chart(document.getElementById('countryLegacyChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Venezuela', 'Honduras', 'Guatemala', 'Ecuador', 'Argentina', 'Peru', 'Colombia', 'Jamaica', 'Brazil', 'Dominican Rep.', 'Mexico', 'Chile', 'Costa Rica', 'Panama', 'Puerto Rico'],
+                datasets: [
+                    {
+                        label: 'Android 10 & older',
+                        data: [18, 16, 15, 13, 12, 11, 9, 9, 7, 7, 6, 5, 4, 4, 3],
+                        backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Android 11 only',
+                        data: [14, 14, 13, 12, 12, 11, 10, 9, 10, 9, 9, 7, 7, 6, 5],
+                        backgroundColor: 'rgba(245, 158, 11, 0.8)',
+                        borderRadius: 4
+                    }
+                ]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top', labels: { usePointStyle: true } }
+                },
+                scales: {
+                    x: {
+                        stacked: true,
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        ticks: { callback: v => v + '%' }
+                    },
+                    y: { stacked: true, grid: { display: false } }
+                }
+            }
+        });
+
+        // 4. Vendor Market Share
+        new Chart(document.getElementById('vendorChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Samsung', 'Xiaomi', 'Motorola', 'Huawei', 'Realme', 'Other'],
+                datasets: [{
+                    data: [38, 22, 18, 8, 6, 8],
+                    backgroundColor: [
+                        'rgba(59, 130, 246, 0.8)',
+                        'rgba(251, 146, 60, 0.8)',
+                        'rgba(234, 179, 8, 0.8)',
+                        'rgba(239, 68, 68, 0.8)',
+                        'rgba(139, 92, 246, 0.8)',
+                        'rgba(107, 114, 128, 0.8)'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: { padding: 12, usePointStyle: true }
+                    }
+                },
+                cutout: '55%'
+            }
+        });
+
+        // 5. Sub-region Comparison
+        new Chart(document.getElementById('subregionChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Caribbean', 'Central America', 'South America'],
+                datasets: [
+                    {
+                        label: 'Android 10 & older',
+                        data: [6.5, 10.0, 9.5],
+                        backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Android 11 only',
+                        data: [7.5, 10.5, 11.0],
+                        backgroundColor: 'rgba(245, 158, 11, 0.8)',
+                        borderRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top', labels: { usePointStyle: true } }
+                },
+                scales: {
+                    x: { stacked: true, grid: { display: false } },
+                    y: {
+                        stacked: true,
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        ticks: { callback: v => v + '%' }
+                    }
+                }
+            }
+        });
+
+        // 6. Vendor by Country
+        new Chart(document.getElementById('vendorCountryChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Brazil', 'Mexico', 'Argentina', 'Colombia', 'Peru', 'Venezuela', 'Chile', 'Ecuador', 'Guatemala'],
+                datasets: [
+                    {
+                        label: 'Samsung',
+                        data: [42, 35, 38, 40, 35, 20, 45, 38, 32],
+                        backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Xiaomi',
+                        data: [18, 28, 22, 20, 25, 35, 15, 22, 28],
+                        backgroundColor: 'rgba(251, 146, 60, 0.8)',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Motorola',
+                        data: [25, 18, 20, 18, 15, 12, 18, 15, 15],
+                        backgroundColor: 'rgba(234, 179, 8, 0.8)',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Other',
+                        data: [15, 19, 20, 22, 25, 33, 22, 25, 25],
+                        backgroundColor: 'rgba(107, 114, 128, 0.8)',
+                        borderRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top', labels: { usePointStyle: true } }
+                },
+                scales: {
+                    x: { stacked: true, grid: { display: false } },
+                    y: {
+                        stacked: true,
+                        max: 100,
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        ticks: { callback: v => v + '%' }
+                    }
+                }
+            }
+        });
+
+        // 7. Legacy Share by Vendor
+        new Chart(document.getElementById('vendorLegacyChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Samsung', 'Xiaomi', 'Motorola', 'Huawei', 'Realme', 'Other'],
+                datasets: [
+                    {
+                        label: 'Android 10 & older',
+                        data: [6, 8, 7, 15, 4, 18],
+                        backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Android 11 only',
+                        data: [8, 10, 9, 12, 6, 14],
+                        backgroundColor: 'rgba(245, 158, 11, 0.8)',
+                        borderRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top', labels: { usePointStyle: true } },
+                    title: {
+                        display: true,
+                        text: 'Huawei devices show highest legacy share (no Google Play)',
+                        color: '#94a3b8'
+                    }
+                },
+                scales: {
+                    x: { stacked: true, grid: { display: false } },
+                    y: {
+                        stacked: true,
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        ticks: { callback: v => v + '%' }
+                    }
+                }
+            }
+        });
+
+        // 8. NFL Interest vs Legacy
+        new Chart(document.getElementById('nflOverlapChart'), {
+            type: 'scatter',
+            data: {
+                datasets: [
+                    {
+                        label: 'High NFL Interest',
+                        data: [
+                            { x: 85, y: 17, r: 182 },  // Brazil
+                            { x: 78, y: 15, r: 99 },   // Mexico
+                            { x: 45, y: 8, r: 1.5 }    // Puerto Rico
+                        ],
+                        backgroundColor: 'rgba(52, 211, 153, 0.7)',
+                        pointRadius: 20
+                    },
+                    {
+                        label: 'Medium NFL Interest',
+                        data: [
+                            { x: 86, y: 19, r: 43 },   // Colombia
+                            { x: 88, y: 24, r: 40 },   // Argentina
+                            { x: 75, y: 12, r: 15 }    // Chile
+                        ],
+                        backgroundColor: 'rgba(245, 158, 11, 0.7)',
+                        pointRadius: 15
+                    },
+                    {
+                        label: 'Emerging NFL Interest',
+                        data: [
+                            { x: 92, y: 32, r: 23 },   // Venezuela
+                            { x: 89, y: 22, r: 28 },   // Peru
+                            { x: 91, y: 28, r: 16 }    // Guatemala
+                        ],
+                        backgroundColor: 'rgba(239, 68, 68, 0.7)',
+                        pointRadius: 12
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top', labels: { usePointStyle: true } },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `Android Share: ${context.parsed.x}%, Legacy: ${context.parsed.y}%`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Android Market Share %', color: '#94a3b8' },
+                        grid: { color: 'rgba(255,255,255,0.05)' }
+                    },
+                    y: {
+                        title: { display: true, text: 'Legacy Android Share %', color: '#94a3b8' },
+                        grid: { color: 'rgba(255,255,255,0.05)' }
+                    }
+                }
+            }
+        });
+
+        // 9. Price Segment Distribution
+        new Chart(document.getElementById('priceSegmentChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Ultra Budget (<$100)', 'Budget ($100-200)', 'Mid-range ($200-400)', 'Upper Mid ($400-600)', 'Premium ($600+)'],
+                datasets: [{
+                    label: 'Market Share %',
+                    data: [22, 35, 28, 10, 5],
+                    backgroundColor: [
+                        'rgba(239, 68, 68, 0.8)',
+                        'rgba(245, 158, 11, 0.8)',
+                        'rgba(52, 211, 153, 0.8)',
+                        'rgba(59, 130, 246, 0.8)',
+                        'rgba(139, 92, 246, 0.8)'
+                    ],
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    title: {
+                        display: true,
+                        text: 'Budget devices (<$200) = 57% of market',
+                        color: '#94a3b8'
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        ticks: { callback: v => v + '%' }
+                    },
+                    y: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 10. Update Lag
+        new Chart(document.getElementById('updateLagChart'), {
+            type: 'bar',
+            data: {
+                labels: ['0-6 months', '6-12 months', '12-24 months', '24-36 months', '36+ months'],
+                datasets: [{
+                    label: 'Device Share %',
+                    data: [32, 22, 20, 14, 12],
+                    backgroundColor: [
+                        'rgba(52, 211, 153, 0.8)',
+                        'rgba(163, 230, 53, 0.8)',
+                        'rgba(245, 158, 11, 0.8)',
+                        'rgba(239, 68, 68, 0.8)',
+                        'rgba(127, 29, 29, 0.8)'
+                    ],
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    title: {
+                        display: true,
+                        text: '26% of devices are 2+ years behind current Android',
+                        color: '#94a3b8'
+                    }
+                },
+                scales: {
+                    y: {
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        ticks: { callback: v => v + '%' }
+                    },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

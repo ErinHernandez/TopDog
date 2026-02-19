@@ -1,0 +1,182 @@
+/**
+ * MyRosterStrip.module.css
+ *
+ * Styles for the MyRosterStrip component and its sub-components.
+ * Uses CSS custom properties (CSS variables) for dynamic values.
+ */
+
+/* ============================================================================
+ * ROSTER SQUARE
+ * ============================================================================ */
+
+.rosterSquare {
+  width: var(--roster-square-size);
+  height: var(--roster-square-size);
+  border-radius: var(--roster-square-border-radius);
+  background-color: var(--roster-square-bg-color);
+  border: var(--roster-square-border);
+  transition: transform 0.15s ease, background-color 0.15s ease;
+  flex-shrink: 0;
+  display: block;
+}
+
+/* ============================================================================
+ * PLAYER MINI CARD
+ * ============================================================================ */
+
+.playerMiniCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: var(--player-card-width);
+  height: var(--player-card-height);
+  background-color: rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 4px;
+  border: 2px solid var(--player-card-border-color);
+  transition: transform 0.15s ease;
+}
+
+.playerMiniCard:active {
+  transform: scale(0.95);
+}
+
+/* Position badge */
+.positionBadge {
+  background-color: var(--position-color);
+  color: var(--position-text-color);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 3px;
+  margin-bottom: 3px;
+}
+
+/* Player name */
+.playerName {
+  text-align: center;
+  line-height: 1.2;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: inherit;
+  letter-spacing: inherit;
+}
+
+/* Team/Position text */
+.playerTeam {
+  margin-top: auto;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-normal);
+  color: inherit;
+  letter-spacing: inherit;
+}
+
+/* ============================================================================
+ * MORE INDICATOR
+ * ============================================================================ */
+
+.moreIndicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--player-card-width);
+  height: var(--player-card-height);
+  background-color: rgba(255, 255, 255, 0.04);
+  border-radius: 8px;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  transition: transform 0.15s ease;
+}
+
+.moreIndicator:active {
+  transform: scale(0.95);
+}
+
+.moreIndicatorText {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ============================================================================
+ * MAIN ROSTER STRIP CONTAINER
+ * ============================================================================ */
+
+.compactContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--roster-square-gap);
+}
+
+.expandedContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Section label */
+.sectionLabel {
+  margin-bottom: var(--section-label-margin-bottom);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+/* Expanded player cards row */
+.expandedCardsRow {
+  display: flex;
+  overflow-x: auto;
+  gap: var(--expanded-player-card-gap);
+  padding-bottom: 4px; /* For scroll indicator */
+  scrollbar-width: none;
+}
+
+/* Hide scrollbar for webkit browsers */
+.expandedCardsRow::-webkit-scrollbar {
+  display: none;
+}
+
+/* Empty state */
+.emptyState {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 13px;
+  font-style: italic;
+}
+
+/* Dynamic CSS custom properties for roster square sizing */
+.rosterSquare {
+  --roster-square-size: 32px;
+  --roster-square-border-radius: 4px;
+  --roster-square-bg-color: rgba(255, 255, 255, 0.06);
+  --roster-square-border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Dynamic CSS custom properties for player cards */
+.playerMiniCard {
+  --player-card-width: 68px;
+  --player-card-height: 80px;
+  --player-card-border-color: currentColor;
+}
+
+/* Dynamic CSS custom properties for more indicator */
+.moreIndicator {
+  --player-card-width: 68px;
+  --player-card-height: 80px;
+}
+
+/* Dynamic CSS custom properties for gaps and margins */
+.compactContainer {
+  --roster-square-gap: 8px;
+}
+
+.expandedCardsRow {
+  --expanded-player-card-gap: 8px;
+}
+
+.sectionLabel {
+  --section-label-margin-bottom: 12px;
+}

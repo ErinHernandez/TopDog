@@ -1,0 +1,229 @@
+/**
+ * TournamentCardV3 - CSS Module for CSP Compliance
+ *
+ * Migrated from inline styles to CSS Modules to support Content Security Policy.
+ * Uses CSS custom properties for dynamic values and spacing tokens.
+ *
+ * Fixed V3 dimensions:
+ * - Outer padding: 21px
+ * - Border radius: 16px
+ * - Min height: 650px
+ * - Title margin top: 12px
+ * - Spacer min height: 24px
+ */
+
+/* ============================================================================
+   NOTE: Global tokens (--bg-primary, --text-primary, etc.) are defined in
+   /styles/tokens.css and available globally. Do NOT use :root in CSS Modules.
+   ============================================================================ */
+
+/* ============================================================================
+   CARD CONTAINER
+   ============================================================================ */
+
+.card {
+  position: relative;
+  width: 100%;
+  min-height: var(--card-min-height);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  background-color: var(--card-bg-fallback);
+  border-radius: var(--card-border-radius);
+  border: var(--card-border-width) solid var(--card-border-default);
+  overflow: hidden;
+  contain: layout style paint;
+  isolation: isolate;
+}
+
+.card.featured {
+  border-width: var(--card-border-width-featured);
+  border-color: var(--card-border-featured);
+}
+
+/* Dynamic style overrides */
+.card[style*="--card-bg"] {
+  background-color: var(--card-bg);
+}
+
+.card[style*="--card-border"] {
+  border-color: var(--card-border);
+}
+
+.card[style*="--card-min-height"] {
+  min-height: var(--card-min-height);
+}
+
+/* ============================================================================
+   CONTENT GRID LAYOUT
+   ============================================================================ */
+
+.contentGrid {
+  flex: 1;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: var(--card-padding);
+  z-index: 1;
+  position: relative;
+  contain: layout;
+  overflow: hidden;
+}
+
+/* ============================================================================
+   TITLE SECTION
+   ============================================================================ */
+
+.titleContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.titleWrapper {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  margin-top: var(--title-margin-top);
+  text-align: center;
+  contain: layout style;
+}
+
+/* Note: To set title font size, use inline style with --title-font-size CSS variable */
+
+.title {
+  font-size: var(--title-font-size);
+  font-family: 'Anton SC', sans-serif;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  line-height: var(--title-line-height);
+  text-align: center;
+  color: var(--text-primary);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  margin: 0;
+}
+
+/* Dynamic title font size override */
+.title[style*="--title-font-size"] {
+  font-size: var(--title-font-size);
+}
+
+/* ============================================================================
+   SPACER SECTION
+   ============================================================================ */
+
+.spacer {
+  min-height: var(--spacer-min-height);
+}
+
+/* ============================================================================
+   BOTTOM ANCHOR SECTION
+   ============================================================================ */
+
+.bottomAnchor {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-bottom: 0;
+  margin-bottom: 0;
+  min-height: 0;
+}
+
+/* ============================================================================
+   SKELETON LOADING STATE
+   ============================================================================ */
+
+.skeleton {
+  position: relative;
+  width: 100%;
+  min-height: var(--card-min-height);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  background-color: var(--card-bg-fallback);
+  border-radius: var(--card-border-radius);
+  border: var(--card-border-width) solid var(--card-border-default);
+  overflow: hidden;
+}
+
+.skeletonGrid {
+  flex: 1;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: var(--card-padding);
+}
+
+.skeletonTitleWrapper {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  margin-top: var(--title-margin-top);
+}
+
+.skeletonBar {
+  width: 70%;
+  height: var(--title-font-size);
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.skeletonSpacer {
+  min-height: var(--spacer-min-height);
+}
+
+.skeletonBottomSection {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-bottom: 0;
+}
+
+.skeletonBottomGrid {
+  display: grid;
+  grid-template-rows: var(--button-height) var(--stats-height);
+  gap: var(--bottom-row-gap);
+}
+
+.skeletonGrid {
+  display: grid;
+  grid-template-rows: var(--button-height) var(--stats-height);
+  gap: var(--bottom-row-gap);
+}
+
+.skeletonButton {
+  width: 100%;
+  height: var(--button-height);
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: var(--button-border-radius);
+}
+
+.skeletonStatsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--bottom-stats-gap);
+  height: var(--stats-height);
+}
+
+.skeletonStatItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.skeletonStatValue {
+  width: 60px;
+  height: 26px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  margin-bottom: 4px;
+}
+
+.skeletonStatLabel {
+  width: 50px;
+  height: 17px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}

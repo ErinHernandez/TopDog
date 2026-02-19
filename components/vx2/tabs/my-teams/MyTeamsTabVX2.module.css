@@ -1,0 +1,824 @@
+/* MyTeamsTabVX2.module.css - CSS Modules for CSP compliance */
+
+/* ============================================================================
+   CUSTOM PROPERTIES (CSS Variables for dynamic values)
+   ============================================================================ */
+
+/* ============================================================================
+   TEAM LIST VIEW
+   ============================================================================ */
+
+.teamListContainer {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  background-color: var(--color-bg-primary);
+}
+
+.searchSection {
+  padding-left: var(--spacing-lg);
+  padding-right: var(--spacing-lg);
+  padding-top: calc(var(--spacing-lg) + 6px);
+  padding-bottom: calc(var(--spacing-lg) + 2px);
+  border-bottom: 1px solid var(--color-border);
+  position: relative;
+}
+
+.searchInputWrapper {
+  position: relative;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: var(--spacing-xs);
+  background-color: var(--color-bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: var(--shadow-medium);
+}
+
+.dropdownOption {
+  width: 100%;
+  text-align: left;
+  padding-left: 12px;
+  padding-right: 12px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--color-border-light);
+  color: var(--color-text-primary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+  font-size: var(--font-size-sm);
+}
+
+.dropdownOption:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.dropdownOptionActive {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.dropdownOptionContent {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dropdownOptionInfo {
+  flex: 1;
+}
+
+.dropdownOptionName {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.dropdownOptionTeam {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.selectedItemsWrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.selectedItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 12px;
+  padding-right: 12px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  background-color: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+.selectedItemRemoveButton {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: var(--color-button-bg);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+.sortControlsSection {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.teamCountLabel {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.sortButtonsContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.saveButton {
+  padding: 6px 10px;
+  border-radius: var(--radius-md);
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background-color: var(--color-button-bg);
+  border: 1px solid var(--color-border);
+}
+
+.saveButtonActive {
+  background-color: var(--color-blue-bg);
+  border: none;
+  color: #fff;
+  cursor: pointer;
+}
+
+.saveButtonSaved {
+  background-color: var(--color-blue-bg);
+  border: none;
+  color: #fff;
+  opacity: 0.5;
+}
+
+.saveButtonDisabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.undoButton {
+  padding: 6px;
+  background-color: var(--color-button-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.undoButtonActive {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+}
+
+.undoButtonDisabled {
+  background-color: rgba(255, 255, 255, 0.03);
+  color: var(--text-muted);
+  cursor: default;
+  opacity: 0.5;
+}
+
+.teamListContent {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--spacing-lg);
+  scrollbar-width: none;
+}
+
+.teamListContent::-webkit-scrollbar {
+  display: none;
+}
+
+.teamListLoadingContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.teamListActualContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.teamListBottomPadding {
+  height: var(--spacing-2xl);
+}
+
+/* ============================================================================
+   TEAM CARD
+   ============================================================================ */
+
+.teamCard {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: calc(var(--spacing-sm) + 6px);
+  padding-bottom: calc(var(--spacing-sm) + 6px);
+  padding-left: calc(var(--spacing-sm) + 4px);
+  padding-right: calc(var(--spacing-sm) + 4px);
+  background-color: var(--color-bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  min-height: 54px;
+  height: 54px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  active: scale(0.98);
+}
+
+.teamCardDragging {
+  opacity: 0.5;
+}
+
+.teamCardDragOver {
+  border-top: 2px solid var(--color-drag-indicator);
+}
+
+.teamCardDraggable {
+  cursor: move;
+}
+
+.teamCardContent {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.teamCardRankBadge {
+  padding: 4px;
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  min-width: 28px;
+  height: 28px;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.teamCardRankText {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.teamCardInfoContainer {
+  flex: 1;
+  text-align: left;
+  min-width: 0;
+}
+
+.teamCardInfoContent {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.teamCardName {
+  font-weight: var(--font-weight-medium);
+  flex-shrink: 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+}
+
+.teamCardDraftDate {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.teamCardPointsContainer {
+  display: flex;
+  flex-direction: column;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin-left: auto;
+  text-align: right;
+}
+
+.teamCardPointsValue {
+  white-space: nowrap;
+}
+
+.teamCardRightContainer {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.teamCardActionsContainer {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.moveButton {
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  border-radius: var(--radius-sm);
+  background-color: rgba(255, 255, 255, 0.05);
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.moveButtonActive:active {
+  transform: scale(0.95);
+}
+
+.chevronContainer {
+  padding-left: var(--spacing-sm);
+  color: var(--text-muted);
+}
+
+/* ============================================================================
+   SORT DROPDOWN
+   ============================================================================ */
+
+.sortDropdownWrapper {
+  position: relative;
+}
+
+.sortDropdownButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.sortDropdownButtonLabel {
+  color: var(--color-text-muted);
+}
+
+.sortDropdownButtonValue {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.sortDropdownArrow {
+  width: 12px;
+  height: 12px;
+  transform: rotate(0deg);
+  transition: transform var(--transition-normal);
+}
+
+.sortDropdownArrowRotated {
+  transform: rotate(180deg);
+}
+
+.sortDropdownPanel {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  z-index: 1000;
+  box-shadow: var(--shadow-large);
+  min-width: 160px;
+}
+
+.sortDropdownItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 14px;
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-border-light);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  text-align: left;
+  transition: background-color var(--transition-fast);
+}
+
+.sortDropdownItem:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.sortDropdownItemActive {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-primary);
+}
+
+.sortDropdownItemLabel {
+  white-space: pre-line;
+}
+
+.sortDropdownItemCheckmark {
+  width: 12px;
+  height: 12px;
+  transform: rotate(0deg);
+}
+
+.sortDropdownItemCheckmarkRotated {
+  transform: rotate(180deg);
+}
+
+/* ============================================================================
+   TEAM DETAILS VIEW
+   ============================================================================ */
+
+.teamDetailsContainer {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  background-color: var(--color-bg-primary);
+}
+
+.positionTrackerSection {
+  background-color: #0c1420;
+  padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-lg) 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.teamHeaderWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+}
+
+.teamHeaderLeftSection {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing-sm) + 2px);
+  padding-left: var(--spacing-lg);
+}
+
+.backButton {
+  background: var(--color-button-bg);
+  border: none;
+  cursor: pointer;
+  padding: calc(var(--spacing-xs) - 1px);
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-md);
+  transition: background var(--transition-fast);
+  color: var(--text-muted);
+}
+
+.editButton {
+  background: var(--color-button-bg);
+  border: none;
+  cursor: pointer;
+  padding: calc(var(--spacing-xs) - 1px);
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-md);
+  transition: background var(--transition-fast);
+  color: var(--text-muted);
+}
+
+.teamNameContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.teamName {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pickPositionLabel {
+  color: #94a3b8;
+  font-size: 12px;
+  margin-top: calc(var(--spacing-xs) - 2px);
+}
+
+.teamHeaderRightSection {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.draftBoardButton {
+  background: var(--color-button-bg);
+  border: none;
+  cursor: pointer;
+  padding: calc(var(--spacing-xs) - 1px);
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-md);
+  transition: background var(--transition-fast);
+  margin-left: auto;
+  color: var(--text-muted);
+}
+
+.positionDistributionWrapper {
+  margin-bottom: var(--spacing-sm);
+  padding-left: var(--spacing-lg);
+  padding-right: var(--spacing-lg);
+}
+
+.positionDistributionBar {
+  display: flex;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.positionSegment {
+  min-width: var(--segment-min-width, 0);
+  width: var(--segment-width, auto);
+}
+
+.positionSegmentQB {
+  background-color: #F472B6;
+}
+
+.positionSegmentRB {
+  background-color: #0fba80;
+}
+
+.positionSegmentWR {
+  background-color: #FBBF25;
+}
+
+.positionSegmentTE {
+  background-color: #7C3AED;
+}
+
+.positionSegmentEmpty {
+  background-color: #374151;
+}
+
+.positionCountsWrapper {
+  display: flex;
+  gap: var(--spacing-lg);
+  padding-left: var(--spacing-lg);
+}
+
+.positionCount {
+  font-size: 13px;
+  font-weight: var(--font-weight-semibold);
+}
+
+.positionCountQB {
+  color: #F472B6;
+}
+
+.positionCountRB {
+  color: #0fba80;
+}
+
+.positionCountWR {
+  color: #FBBF25;
+}
+
+.positionCountTE {
+  color: #7C3AED;
+}
+
+.playerRosterSection {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  background-color: #101927;
+  padding: var(--spacing-md) calc(var(--spacing-md) - 2px);
+  scrollbar-width: none;
+}
+
+.playerRosterSection::-webkit-scrollbar {
+  display: none;
+}
+
+.positionGroupSpacing {
+  height: var(--spacing-md);
+}
+
+.positionGroup {
+  background-color: rgba(255, 255, 255, 0.015);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.playerRosterPadding {
+  height: var(--spacing-2xl);
+}
+
+/* ============================================================================
+   PLAYER ROW
+   ============================================================================ */
+
+.playerRow {
+  background-color: rgba(255, 255, 255, 0.02);
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+  border-left: 3px solid var(--position-border-color, transparent);
+}
+
+.playerRowPressed {
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+.playerRowFirstInGroup {
+  border-radius: 6px 6px 0 0;
+}
+
+.playerRowLastInGroup {
+  border-radius: 0 0 6px 6px;
+  margin-bottom: 0;
+}
+
+.playerRowBoth {
+  border-radius: 6px;
+}
+
+.playerRowWithGap {
+  margin-bottom: 1px;
+}
+
+.playerRowContent {
+  display: flex;
+  align-items: center;
+  padding: calc(var(--spacing-sm) + 2px) var(--spacing-md) calc(var(--spacing-sm) + 2px) calc(var(--spacing-sm) + 2px);
+  min-height: 44px;
+}
+
+.positionBadge {
+  font-size: 10px;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.3px;
+  padding: calc(var(--spacing-xs) - 3px) var(--spacing-sm);
+  border-radius: 4px;
+  text-transform: uppercase;
+  min-width: 32px;
+  text-align: center;
+  box-shadow: var(--shadow-small);
+}
+
+.positionBadgeQB {
+  background-color: #F472B6;
+  color: #1a0a12;
+}
+
+.positionBadgeRB {
+  background-color: #0fba80;
+  color: #041a12;
+}
+
+.positionBadgeWR {
+  background-color: #FBBF25;
+  color: #1a1505;
+}
+
+.positionBadgeTE {
+  background-color: #7C3AED;
+  color: #ffffff;
+}
+
+.positionBadgeDefault {
+  background-color: #6B7280;
+  color: #fff;
+}
+
+.playerInfoContainer {
+  flex: 1;
+  margin-left: var(--spacing-md);
+  min-width: 0;
+}
+
+.playerInfoContent {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-sm);
+}
+
+.playerName {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.playerTeam {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.playerExpandIndicator {
+  margin-left: var(--spacing-sm);
+  transform: rotate(0deg);
+  transition: transform var(--transition-normal);
+  opacity: 0.4;
+}
+
+.playerExpandIndicatorExpanded {
+  transform: rotate(180deg);
+}
+
+.playerStatsContainer {
+  padding: var(--spacing-sm) var(--spacing-md) var(--spacing-md);
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 0;
+}
+
+.playerStatsContainerLastInGroup {
+  border-radius: 0 0 6px 6px;
+}
+
+/* ============================================================================
+   PLAYER SORT PILL
+   ============================================================================ */
+
+.playerSortPill {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing-xs) - 3px);
+  padding: calc(var(--spacing-xs) - 2px) calc(var(--spacing-sm) - 2px);
+  background-color: var(--color-button-bg);
+  border: 1px solid var(--color-border-light);
+  border-radius: 16px;
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  font-weight: var(--font-weight-normal);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.playerSortPillActive {
+  background-color: var(--color-blue-bg);
+  border: 1px solid var(--color-blue-border);
+  color: var(--color-blue-accent);
+  font-weight: var(--font-weight-semibold);
+}
+
+.playerSortPillCheckmark {
+  width: 10px;
+  height: 10px;
+  transform: rotate(0deg);
+}
+
+.playerSortPillCheckmarkRotated {
+  transform: rotate(180deg);
+}
+
+/* ============================================================================
+   UNSAVED CHANGES MODAL
+   ============================================================================ */
+
+.unsavedChangesModal {
+  /* Styles handled by UnsavedChangesModal component */
+}

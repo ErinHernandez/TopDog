@@ -1,0 +1,276 @@
+/**
+ * Idesaign — Global Accessibility Styles
+ *
+ * Implements:
+ * - High contrast mode support (@media forced-colors)
+ * - Reduced motion support (@media prefers-reduced-motion)
+ * - Enhanced focus indicators for keyboard navigation
+ * - Print styles
+ * - Color adjustments for forced-colors mode
+ *
+ * Import this in _app.tsx or _document.tsx after globals.css
+ */
+
+/* ================================================================
+   FOCUS INDICATOR (Enhanced from globals.css)
+   Visible outline for keyboard navigation
+   ================================================================ */
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Extra thick outline in forced-colors mode */
+@media (forced-colors: active) {
+  :focus-visible {
+    outline-width: 3px;
+    outline-color: CanvasText;
+  }
+}
+
+/* ================================================================
+   REDUCED MOTION
+   Disable all transitions and animations for users with vestibular disorders
+   ================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Specifically disable transitions set in base styles */
+  a,
+  button,
+  input,
+  textarea,
+  select {
+    transition: none !important;
+  }
+
+  /* Preserve opacity changes for focus states, but no motion */
+  :focus-visible {
+    outline-offset: 0px;
+  }
+}
+
+/* ================================================================
+   HIGH CONTRAST MODE (Forced Colors)
+   Windows High Contrast mode and similar forced-colors environments
+   ================================================================ */
+
+@media (forced-colors: active) {
+  /* Ensure all text is readable */
+  body {
+    color: CanvasText;
+    background-color: Canvas;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: CanvasText;
+  }
+
+  /* Links visible in forced colors */
+  a {
+    color: LinkText;
+    text-decoration: underline;
+  }
+
+  a:visited {
+    color: VisitedText;
+  }
+
+  /* Buttons have visible borders */
+  button {
+    border: 2px solid ButtonBorder;
+    color: ButtonText;
+    background-color: ButtonFace;
+    forced-color-adjust: none;
+  }
+
+  button:hover {
+    background-color: Highlight;
+    color: HighlightText;
+  }
+
+  button:disabled {
+    color: GrayText;
+    border-color: GrayText;
+  }
+
+  /* Form inputs */
+  input,
+  textarea,
+  select {
+    border-color: CanvasText;
+    color: CanvasText;
+    background-color: Canvas;
+    forced-color-adjust: none;
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: 3px solid Highlight;
+    outline-offset: 2px;
+  }
+
+  input:disabled,
+  textarea:disabled,
+  select:disabled {
+    color: GrayText;
+    border-color: GrayText;
+  }
+
+  /* Ensure proper contrast for interactive elements */
+  button,
+  input,
+  textarea,
+  select,
+  a {
+    forced-color-adjust: none;
+  }
+
+  /* Remove background images in high contrast */
+  img {
+    forced-color-adjust: none;
+  }
+}
+
+/* ================================================================
+   PRINT STYLES
+   Optimize appearance for printing and print-to-PDF
+   ================================================================ */
+
+@media print {
+  /* Hide interactive elements when printing */
+  button,
+  input:not([type='checkbox']):not([type='radio']),
+  textarea,
+  select,
+  nav,
+  [role='navigation'] {
+    display: none !important;
+  }
+
+  /* Show content links */
+  a[href]::after {
+    content: ' (' attr(href) ')';
+    font-size: 0.8em;
+    color: #666;
+  }
+
+  /* Skip links should not print */
+  .sr-only,
+  [aria-hidden='true'] {
+    display: none !important;
+  }
+
+  /* Improve readability */
+  body {
+    background-color: white;
+    color: black;
+  }
+
+  a {
+    color: #000;
+    text-decoration: underline;
+  }
+
+  /* Prevent page breaks inside important elements */
+  article,
+  section {
+    page-break-inside: avoid;
+  }
+
+  img {
+    max-width: 100%;
+    page-break-inside: avoid;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+
+  p {
+    widows: 2;
+    orphans: 2;
+  }
+}
+
+/* ================================================================
+   SCREEN READER ONLY (Already in globals.css, kept for completeness)
+   Visually hidden but accessible to assistive technologies
+   ================================================================ */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ================================================================
+   SKIP LINK VISIBILITY
+   Ensure skip links are visible when needed
+   ================================================================ */
+
+a[href='#main-content']:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ================================================================
+   BETTER FOCUS INDICATORS FOR DARK THEME
+   Ensure focus indicators work well on all backgrounds
+   ================================================================ */
+
+/* On accent background, use a lighter outline */
+button[style*='background'],
+[style*='background-color'] :focus-visible {
+  outline-color: white;
+}
+
+/* ================================================================
+   INCLUSIVE FOCUS STYLING FOR LISTS
+   Make tab navigation through lists more obvious
+   ================================================================ */
+
+li > a:focus-visible,
+li > button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ================================================================
+   ACCESSIBILITY LABELS
+   Text labels for icon-only buttons are still accessible to keyboard users
+   ================================================================ */
+
+button[title]:focus-visible::after {
+  /* Don't add pseudo-element, just ensure title is visible on hover */
+}
+
+/* ================================================================
+   CONTRAST CHECK HELPERS (For development)
+   These classes help identify contrast issues in development
+   ================================================================ */
+
+/* Optionally add to development environment:
+   [data-a11y-check] { outline: 1px dashed red; }
+*/

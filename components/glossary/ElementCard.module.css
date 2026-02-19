@@ -1,0 +1,246 @@
+/**
+ * ElementCard.module.css
+ * Styling for individual element cards in the glossary list
+ */
+
+/* ============================================================================
+   CARD CONTAINER
+   ============================================================================ */
+
+.card {
+  position: relative;
+  padding: var(--spacing-lg);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  overflow: hidden;
+}
+
+.card:hover {
+  background-color: var(--bg-secondary);
+  border-color: var(--border-subtle);
+  box-shadow: var(--shadow-small);
+  transform: translateY(-2px);
+}
+
+.card:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(93, 197, 191, 0.1);
+}
+
+.cardSelected {
+  border-color: var(--color-brand-primary);
+  background-color: var(--bg-secondary);
+  box-shadow: 0 0 0 2px rgba(45, 226, 197, 0.2);
+}
+
+/* ============================================================================
+   HEADER SECTION
+   ============================================================================ */
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.elementName {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  flex: 1;
+  word-break: break-word;
+}
+
+.elementId {
+  flex-shrink: 0;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  font-family: monospace;
+  white-space: nowrap;
+}
+
+/* ============================================================================
+   META INFORMATION
+   ============================================================================ */
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  font-size: var(--font-size-sm);
+}
+
+.module {
+  color: var(--text-secondary);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background-color: rgba(45, 226, 197, 0.1);
+  border-radius: var(--radius-sm);
+}
+
+/* ============================================================================
+   BADGES ROW
+   ============================================================================ */
+
+.badgesRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.typeBadge {
+  display: inline-block;
+  padding: var(--spacing-xs) var(--spacing-md);
+  background-color: rgba(59, 130, 246, 0.2);
+  border: 1px solid var(--color-blue-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  color: var(--color-blue-accent);
+  font-weight: var(--font-weight-medium);
+}
+
+.interactiveBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-md);
+  background-color: rgba(16, 185, 129, 0.15);
+  border: 1px solid var(--border-success);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  color: var(--color-state-success);
+  font-weight: var(--font-weight-medium);
+}
+
+.interactiveIndicator {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background-color: var(--color-state-success);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* ============================================================================
+   HOVER PREVIEW
+   ============================================================================ */
+
+.preview {
+  position: absolute;
+  top: 100%;
+  left: var(--spacing-lg);
+  right: var(--spacing-lg);
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-md);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-large);
+  z-index: var(--z-elevated);
+  animation: slideDown 150ms ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.previewContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.previewSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.previewLabel {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.previewText {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  line-height: var(--line-height-normal);
+}
+
+/* ============================================================================
+   TAGS LIST
+   ============================================================================ */
+
+.tagsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+}
+
+.tag {
+  display: inline-block;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+/* ============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  .card {
+    padding: var(--spacing-md);
+  }
+
+  .header {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .elementName {
+    font-size: var(--font-size-sm);
+  }
+
+  .preview {
+    position: static;
+    margin-top: var(--spacing-md);
+    margin-left: 0;
+    margin-right: 0;
+  }
+}

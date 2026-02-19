@@ -1,0 +1,522 @@
+/**
+ * DevNav V2 Styles
+ *
+ * Premium dark navy design matching TopDog's aesthetic.
+ * Subtle cyan accents, clean typography, refined interactions.
+ */
+
+/* ============================================================================
+   Container - Base styles for both states
+   ============================================================================ */
+
+.container {
+  position: fixed;
+  z-index: 9999;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+
+/* ============================================================================
+   Collapsed State - Minimal pill
+   ============================================================================ */
+
+.collapsed {
+  width: 110px;
+  height: 36px;
+  background: #1a1f2e;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(56, 189, 248, 0.08);
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 12px;
+}
+
+.collapsed:hover {
+  border-color: rgba(56, 189, 248, 0.25);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(56, 189, 248, 0.15);
+}
+
+.collapsed:active {
+  cursor: grabbing;
+}
+
+.collapsedGrip {
+  display: flex;
+  gap: 2px;
+  opacity: 0.4;
+}
+
+.collapsedGrip span {
+  width: 3px;
+  height: 3px;
+  background: #64748b;
+  border-radius: 50%;
+}
+
+.collapsedLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
+}
+
+.collapsedHint {
+  font-size: 10px;
+  color: #64748b;
+  opacity: 0.7;
+}
+
+/* ============================================================================
+   Expanded State - Full panel
+   ============================================================================ */
+
+.expanded {
+  width: 260px;
+  max-height: 600px;
+  background: #1a1f2e;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(56, 189, 248, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ============================================================================
+   Header
+   ============================================================================ */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  cursor: grab;
+  flex-shrink: 0;
+}
+
+.header:active {
+  cursor: grabbing;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.headerGrip {
+  display: grid;
+  grid-template-columns: repeat(2, 4px);
+  gap: 3px;
+  opacity: 0.4;
+}
+
+.headerGrip span {
+  width: 4px;
+  height: 4px;
+  background: #64748b;
+  border-radius: 50%;
+}
+
+.headerTitle {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.headerButton {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: #64748b;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.headerButton:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #94a3b8;
+}
+
+/* ============================================================================
+   Content Area (Scrollable)
+   ============================================================================ */
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 12px;
+}
+
+.content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* ============================================================================
+   Section
+   ============================================================================ */
+
+.section {
+  margin-bottom: 16px;
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+.sectionTitle {
+  font-size: 10px;
+  font-weight: 600;
+  color: #64748b;
+  letter-spacing: 0.8px;
+  margin-bottom: 8px;
+  padding: 0 4px;
+}
+
+/* ============================================================================
+   Links List
+   ============================================================================ */
+
+.linksList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.linkItem {
+  display: block;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  border-left: 2px solid transparent;
+  border-radius: 6px;
+  color: #e2e8f0;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  text-align: left;
+  cursor: pointer;
+  transition: all 150ms ease;
+  width: 100%;
+}
+
+.linkItem:hover {
+  background: rgba(56, 189, 248, 0.08);
+}
+
+.linkItemActive {
+  background: rgba(56, 189, 248, 0.06);
+  border-left-color: #38bdf8;
+  color: #38bdf8;
+}
+
+/* ============================================================================
+   Divider
+   ============================================================================ */
+
+.divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
+  margin: 12px 0;
+}
+
+/* ============================================================================
+   Auth Toggle Section
+   ============================================================================ */
+
+.authSection {
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+}
+
+.authRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.authLabel {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.authLabelLoggedIn {
+  color: #10b981;
+}
+
+.authLabelLoggedOut {
+  color: #ef4444;
+}
+
+.authToggle {
+  width: 40px;
+  height: 22px;
+  background: #374151;
+  border: none;
+  border-radius: 11px;
+  cursor: pointer;
+  position: relative;
+  transition: background 200ms ease;
+}
+
+.authToggleOn {
+  background: #065f46;
+}
+
+.authToggleKnob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  background: #6b7280;
+  border-radius: 50%;
+  transition: all 200ms ease;
+}
+
+.authToggleOn .authToggleKnob {
+  left: 21px;
+  background: #10b981;
+}
+
+/* ============================================================================
+   Draft Controls Section
+   ============================================================================ */
+
+.draftControls {
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+}
+
+.draftStatus {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.draftStatusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.draftStatusDotActive {
+  background: #22c55e;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
+}
+
+.draftStatusDotPaused {
+  background: #f59e0b;
+}
+
+.draftStatusDotInactive {
+  background: #64748b;
+}
+
+.draftStatusText {
+  font-size: 11px;
+  font-weight: 500;
+  color: #94a3b8;
+}
+
+.draftButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.draftButton {
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.draftButtonPrimary {
+  background: #10b981;
+  color: white;
+}
+
+.draftButtonPrimary:hover {
+  background: #059669;
+}
+
+.draftButtonSecondary {
+  background: #374151;
+  color: white;
+}
+
+.draftButtonSecondary:hover {
+  background: #4b5563;
+}
+
+.draftButtonWarning {
+  background: #f97316;
+  color: white;
+}
+
+.draftButtonWarning:hover {
+  background: #ea580c;
+}
+
+.draftButtonDanger {
+  background: transparent;
+  border: 1px solid #ef4444;
+  color: #ef4444;
+}
+
+.draftButtonDanger:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.draftButtonDisabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ============================================================================
+   Footer
+   ============================================================================ */
+
+.footer {
+  padding: 10px 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+.browserNav {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 8px;
+}
+
+.navButton {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: #94a3b8;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.navButton:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #e2e8f0;
+}
+
+.keyboardHint {
+  text-align: center;
+  font-size: 10px;
+  color: #64748b;
+}
+
+.keyboardHintKey {
+  display: inline-block;
+  padding: 2px 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+  font-family: monospace;
+  margin: 0 2px;
+}
+
+/* ============================================================================
+   Dragging State
+   ============================================================================ */
+
+.dragging {
+  opacity: 0.9;
+  cursor: grabbing !important;
+}
+
+.dragging * {
+  cursor: grabbing !important;
+}
+
+/* ============================================================================
+   Animations
+   ============================================================================ */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+.animateIn {
+  animation: fadeIn 200ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animateOut {
+  animation: fadeOut 150ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}

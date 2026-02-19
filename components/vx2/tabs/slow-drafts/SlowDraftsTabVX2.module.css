@@ -1,0 +1,170 @@
+/**
+ * SlowDraftsTabVX2 - CSS Module
+ * Extracted styles for CSP compliance
+ */
+
+/* ============================================================================
+ * MAIN CONTAINER
+ * ============================================================================ */
+
+.mainContainer {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background-color: var(--bg-primary);
+}
+
+/* ============================================================================
+ * LOADING & SKELETON STATES
+ * ============================================================================ */
+
+.cardSkeletonContainer {
+  padding: 16px;
+  border-radius: 12px;
+  background-color: var(--bg-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.skeletonRosterMargin {
+  margin-bottom: 12px;
+}
+
+.skeletonRosterFlex {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.skeletonProgressMargin {
+  margin-top: 12px;
+}
+
+.skeletonHeaderMargin {
+  margin-top: 6px;
+}
+
+.skeletonProgressFlex {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.loadingStateContainer {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ============================================================================
+ * FILTER & SORT BAR AREA
+ * ============================================================================ */
+
+.filterSortAreaSkeleton {
+  padding: 8px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.filterSortSkeletonFlex {
+  display: flex;
+  gap: 8px;
+}
+
+/* ============================================================================
+ * EMPTY STATE
+ * ============================================================================ */
+
+.emptyStateWrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background-color: var(--bg-primary);
+}
+
+.emptyStateContent {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+/* ============================================================================
+ * ERROR STATE
+ * ============================================================================ */
+
+.errorStateContainer {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-primary);
+  padding: 24px;
+}
+
+/* ============================================================================
+ * DRAFTS LIST
+ * ============================================================================ */
+
+.draftsList {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.draftsList::-webkit-scrollbar {
+  display: none;
+}
+
+.draftsListInner {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bottomPadding {
+  height: 32px;
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+ * JOIN DRAFT BUTTON SECTION
+ * ============================================================================ */
+
+.joinDraftContainer {
+  padding: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.joinDraftButton {
+  width: 100%;
+  height: 48px;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-state-active);
+  color: #FFFFFF;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.joinDraftButton:active {
+  transform: scale(0.98);
+}
+
+.joinDraftButton:hover {
+  opacity: 0.9;
+}
+
+.joinDraftButton:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.2);
+  outline-offset: 2px;
+}

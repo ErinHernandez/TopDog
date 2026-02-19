@@ -1,0 +1,53 @@
+/**
+ * ProfileTab CSS Module
+ *
+ * Uses color tokens and spacing from tokens.css
+ */
+
+.container {
+  background-color: var(--bg-primary);
+}
+
+.header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.avatarCircle {
+  background-color: transparent;
+}
+
+.avatarText {
+  font-size: 32px;
+}
+
+.title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+}
+
+.username {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+.memberText {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.menuItem {
+  margin-bottom: var(--spacing-sm);
+  padding: var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: var(--radius-lg);
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.menuItem > span:last-child {
+  color: var(--text-secondary);
+}

@@ -1,0 +1,47 @@
+/**
+ * Idesaign — Skip Link Styles
+ * Visually hidden until focused, then appears at top of viewport
+ */
+
+.skipLink {
+  /* Visually hidden by default */
+  position: absolute;
+  top: -40px;
+  left: 0;
+  width: 100%;
+  padding: var(--space-3);
+  background-color: var(--color-accent);
+  color: #fff;
+  text-decoration: none;
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
+  text-align: center;
+  z-index: var(--z-modal);
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+.skipLink:focus,
+.skipLink:focus-visible {
+  /* Appear at top of viewport when focused */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  clip: auto;
+  overflow: visible;
+  outline: none;
+}
+
+.skipLink:hover:focus {
+  background-color: var(--color-accent-hover);
+}
+
+/* Reduced motion: remove any transition if it exists */
+@media (prefers-reduced-motion: reduce) {
+  .skipLink:focus,
+  .skipLink:focus-visible {
+    /* No animation, just appear */
+  }
+}

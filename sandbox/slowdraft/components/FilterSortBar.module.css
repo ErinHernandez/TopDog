@@ -1,0 +1,89 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sortDropdownContainer {
+  position: relative;
+}
+
+.sortButton {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 6px 12px;
+  border-radius: var(--radius-lg);
+  background-color: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: var(--font-weight-medium);
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.sortButton:active {
+  transform: scale(0.97);
+}
+
+.sortIcon {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.sortLabel {
+  color: var(--text-secondary);
+}
+
+.sortChevron {
+  color: var(--text-muted);
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
+}
+
+.sortChevronOpen {
+  transform: rotate(180deg);
+}
+
+.dropdownMenu {
+  position: absolute;
+  right: 0;
+  margin-top: 8px;
+  z-index: var(--z-dropdown);
+  min-width: 180px;
+  background-color: var(--bg-card);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+.dropdownMenuItem {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 13px;
+  background-color: transparent;
+  color: var(--text-primary);
+  border: none;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.dropdownMenuItem:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.dropdownMenuItemActive {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-state-active);
+  background-color: rgba(96, 165, 250, 0.1);
+}
+
+.dropdownMenuItemInactive {
+  font-weight: var(--font-weight-normal);
+}

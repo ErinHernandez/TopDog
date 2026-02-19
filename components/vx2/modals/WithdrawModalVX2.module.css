@@ -1,0 +1,801 @@
+/* WithdrawModalVX2.module.css - CSP Compliant Styles */
+
+/* ============================================================================
+   SHARED LAYOUTS & CONTAINERS
+   ============================================================================ */
+
+.flexCol {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.flexColCenter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: var(--spacing-sm, 6px);
+}
+
+.flexBetween {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  padding: var(--spacing-md, 12px) var(--spacing-lg, 16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.flexGap {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm, 6px);
+  flex-shrink: 0;
+  padding: var(--spacing-md, 12px) var(--spacing-lg, 16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.contentArea {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-lg, 16px);
+  scrollbar-width: none;
+}
+
+.footer {
+  flex-shrink: 0;
+  padding: var(--spacing-lg, 16px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================================================
+   AMOUNT STEP
+   ============================================================================ */
+
+.balanceCard {
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.balanceLabel {
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+.balanceAmount {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-state-success);
+  font-size: var(--font-size-2xl);
+}
+
+.amountInputSection {
+  margin-bottom: 24px;
+}
+
+.sectionLabel {
+  display: block;
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--spacing-md);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+}
+
+.quickAmountsGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.quickAmountButton {
+  padding: var(--spacing-md) 0;
+  border-radius: var(--radius-md);
+  font-weight: var(--font-weight-semibold);
+  transition: all 0.2s ease;
+  font-size: var(--font-size-sm);
+  border: none;
+  cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+}
+
+.quickAmountButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  color: var(--text-disabled);
+}
+
+.quickAmountButtonActive {
+  background-color: var(--color-state-active);
+  color: #000;
+}
+
+.customInputWrapper {
+  position: relative;
+}
+
+.currencySymbol {
+  position: absolute;
+  left: var(--spacing-lg);
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-secondary);
+  font-size: var(--font-size-lg);
+}
+
+.amountInput {
+  width: 100%;
+  padding-left: 32px;
+  padding-right: var(--spacing-lg);
+  padding-top: var(--spacing-lg);
+  padding-bottom: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-weight-semibold);
+  outline: none;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: var(--font-size-lg);
+}
+
+.amountInput::placeholder {
+  color: inherit;
+  opacity: 0.5;
+}
+
+.errorText {
+  margin-top: var(--spacing-sm);
+  color: var(--color-state-error);
+  font-size: var(--font-size-sm);
+}
+
+.payoutMethodsSection {
+  margin-bottom: 24px;
+}
+
+.methodList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.methodButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  transition: all 0.2s ease;
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 2px solid transparent;
+  cursor: pointer;
+}
+
+.methodButtonActive {
+  background-color: rgba(96, 165, 250, 0.15);
+  border-color: var(--color-state-active);
+}
+
+.methodIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+.methodInfo {
+  flex: 1;
+  text-align: left;
+}
+
+.methodLabel {
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+}
+
+.methodDetail {
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.defaultBadge {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-full);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+.addMethodButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 2px dashed rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+}
+
+.addMethodIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+}
+
+.addMethodText {
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.freeNotice {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--color-state-success);
+  font-size: var(--font-size-sm);
+}
+
+.continueButton {
+  width: 100%;
+  padding-top: var(--spacing-lg);
+  padding-bottom: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-weight-bold);
+  transition: all 0.2s ease;
+  font-size: var(--font-size-lg);
+  border: none;
+  cursor: pointer;
+  background-color: var(--color-state-active);
+  color: #000;
+}
+
+.continueButton:disabled {
+  background-color: var(--bg-tertiary);
+  color: var(--text-disabled);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================================================
+   HEADER STYLES
+   ============================================================================ */
+
+.headerTitle {
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  font-size: var(--font-size-lg);
+}
+
+.headerCloseButton {
+  padding: 0.5rem;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.headerCloseIcon {
+  color: var(--text-muted);
+}
+
+.headerBackButton {
+  padding: 0.5rem;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.headerBackIcon {
+  color: var(--text-muted);
+}
+
+.methodLabelConfirm {
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+.methodDetailConfirm {
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* ============================================================================
+   CONFIRM STEP
+   ============================================================================ */
+
+.confirmHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  padding: var(--spacing-md, 12px) var(--spacing-lg, 16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.confirmContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-lg, 16px);
+}
+
+.amountDisplay {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.amountLabel {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.amountLarge {
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  font-size: 36px;
+}
+
+.infoCard {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.infoCardLabel {
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.infoCardContent {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.summaryCard {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.summaryLabel {
+  color: var(--text-secondary);
+}
+
+.summaryValue {
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+.summaryValueSuccess {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-state-success);
+}
+
+.summaryDivider {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 8px;
+  margin-top: 8px;
+}
+
+.summaryTotal {
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  font-size: var(--font-size-lg);
+}
+
+.timelineNotice {
+  text-align: center;
+  margin-top: var(--spacing-xl);
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.confirmButton {
+  width: 100%;
+  padding-top: var(--spacing-lg);
+  padding-bottom: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-weight-bold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  background-color: var(--color-state-active);
+  color: #000;
+  font-size: var(--font-size-lg);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.confirmButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spinnerSmall {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #000;
+  border-color: #000 transparent transparent transparent;
+  animation: spin 1s linear infinite;
+}
+
+/* ============================================================================
+   PROCESSING STEP
+   ============================================================================ */
+
+.processingContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.processingBackButton {
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  flex-shrink: 0;
+}
+
+.processingContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-lg, 16px);
+}
+
+.statusIcon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.statusIconError {
+  background-color: rgba(239, 68, 68, 0.15);
+}
+
+.statusIconProcessing {
+  background-color: rgba(96, 165, 250, 0.15);
+}
+
+.statusTitle {
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--spacing-sm);
+  color: var(--text-primary);
+  font-size: var(--font-size-xl);
+}
+
+.statusMessage {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  color: var(--color-state-error);
+  font-size: var(--font-size-sm);
+}
+
+.statusMessageProcessing {
+  color: var(--text-secondary);
+}
+
+.retryButton {
+  width: 100%;
+  padding-top: var(--spacing-lg);
+  padding-bottom: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-weight-bold);
+  background-color: var(--color-state-active);
+  color: #000;
+  font-size: var(--font-size-base);
+  border: none;
+  cursor: pointer;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-color: var(--color-state-active) transparent transparent transparent;
+  animation: spin 1s linear infinite;
+}
+
+.spinnerSmallProcessing {
+  width: 24px;
+  height: 24px;
+  border: 2px solid;
+  border-radius: 50%;
+  border-color: var(--color-state-active) transparent transparent transparent;
+  animation: spin 1s linear infinite;
+}
+
+.processingLoadingContainer {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.processingLoadingText {
+  color: var(--text-secondary);
+}
+
+/* ============================================================================
+   BIOMETRIC STEP
+   ============================================================================ */
+
+.biometricContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.biometricBackButton {
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  flex-shrink: 0;
+}
+
+.biometricContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-lg, 16px);
+}
+
+.securityBadge {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+  padding-left: var(--spacing-md);
+  padding-right: var(--spacing-md);
+  padding-top: 6px;
+  padding-bottom: 6px;
+  border-radius: var(--radius-full);
+  background-color: rgba(96, 165, 250, 0.1);
+  color: var(--color-state-active);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.biometricIcon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--spacing-xl);
+  background-color: rgba(96, 165, 250, 0.15);
+}
+
+.biometricTitle {
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--spacing-sm);
+  color: var(--text-primary);
+  font-size: var(--font-size-xl);
+}
+
+.biometricDescription {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.biometricError {
+  width: 100%;
+  margin-bottom: var(--spacing-xl);
+}
+
+.biometricErrorBox {
+  text-align: center;
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--color-state-error);
+  font-size: var(--font-size-sm);
+}
+
+.biometricErrorButton {
+  width: 100%;
+  padding-top: var(--spacing-lg);
+  padding-bottom: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-weight-bold);
+  transition: all 0.2s ease;
+  background-color: var(--color-state-active);
+  color: #000;
+  font-size: var(--font-size-base);
+  border: none;
+  cursor: pointer;
+}
+
+.biometricNote {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.biometricFooter {
+  flex-shrink: 0;
+  padding-bottom: var(--spacing-xl);
+  text-align: center;
+}
+
+.skipButton {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* ============================================================================
+   SUCCESS STEP
+   ============================================================================ */
+
+.successContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: var(--spacing-lg, 16px);
+}
+
+.successIcon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--spacing-xl);
+  background-color: rgba(16, 185, 129, 0.15);
+}
+
+.successTitle {
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--spacing-sm);
+  color: var(--text-primary);
+  font-size: var(--font-size-2xl);
+}
+
+.successMessage {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  color: var(--text-secondary);
+  font-size: var(--font-size-lg);
+}
+
+.successDetail {
+  text-align: center;
+  margin-bottom: var(--spacing-2xl);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-md);
+  background-color: rgba(255, 255, 255, 0.03);
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.successButton {
+  width: 100%;
+  padding-top: var(--spacing-lg);
+  padding-bottom: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-weight-bold);
+  background-color: var(--color-state-active);
+  color: #000;
+  font-size: var(--font-size-lg);
+  border: none;
+  cursor: pointer;
+}
+
+/* ============================================================================
+   LOADING STATE
+   ============================================================================ */
+
+.loadingContainer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-secondary);
+  z-index: var(--z-modal);
+}
+
+.loadingSpinner {
+  animation: spin 1s linear infinite;
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.3) transparent transparent transparent;
+  border-radius: 50%;
+  border-width: 3px;
+}
+
+.loadingText {
+  margin-top: var(--spacing-lg);
+  color: var(--text-secondary);
+}
+
+.mainContainer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 60px;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-secondary);
+  z-index: var(--z-modal);
+}
+
+/* ============================================================================
+   ANIMATIONS
+   ============================================================================ */
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================================================
+   CSS CUSTOM PROPERTIES (Variables)
+   ============================================================================ */

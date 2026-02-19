@@ -1,0 +1,416 @@
+/**
+ * ConnectOnboardingModalVX2 CSS Module
+ *
+ * Stripe Connect Setup onboarding flow styling.
+ * Migrated from inline styles for CSP compliance.
+ */
+
+/* ============================================================================
+   MODAL OVERLAY & CONTAINER
+   ============================================================================ */
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: var(--z-modal, 1000);
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background-color: var(--modal-backdrop);
+}
+
+.modal {
+  position: relative;
+  width: 100%;
+  max-width: 28rem;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background-color: var(--modal-bg);
+}
+
+/* ============================================================================
+   MODAL HEADER
+   ============================================================================ */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.headerTitle {
+  font-weight: 600;
+  font-size: var(--title-font-size, 1.125rem);
+  color: var(--text-primary);
+}
+
+.closeButton {
+  padding: 0.5rem;
+  border-radius: 9999px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+
+.closeButton:hover {
+  background-color: var(--color-state-hover);
+}
+
+.closeIcon {
+  display: inline-block;
+  color: var(--text-muted);
+}
+
+/* ============================================================================
+   MODAL CONTENT
+   ============================================================================ */
+
+.content {
+  padding: 1.5rem;
+}
+
+.contentSpacing {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ============================================================================
+   INTRO STEP
+   ============================================================================ */
+
+.introContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.centerSection {
+  text-align: center;
+}
+
+.iconCircle {
+  width: 5rem;
+  height: 5rem;
+  border-radius: 9999px;
+  margin: 0 auto 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-color-success);
+}
+
+.introTitle {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: var(--intro-title-font-size, 1.25rem);
+  color: var(--text-primary);
+}
+
+.introDescription {
+  color: var(--text-secondary);
+}
+
+.featuresList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.featureItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background-color: var(--color-stat-bg);
+}
+
+.featureIcon {
+  color: var(--color-state-success);
+  flex-shrink: 0;
+}
+
+.featureContent {
+  flex: 1;
+}
+
+.featureTitle {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.featureDescription {
+  font-size: var(--small-font-size, 0.875rem);
+  color: var(--text-muted);
+}
+
+/* ============================================================================
+   BUTTONS
+   ============================================================================ */
+
+.primaryButton {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  background-color: var(--color-state-success);
+  color: var(--black-text);
+  border: none;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+}
+
+.primaryButton:hover {
+  opacity: 0.9;
+}
+
+.primaryButton:active {
+  opacity: 0.8;
+}
+
+/* ============================================================================
+   TEXT UTILITIES
+   ============================================================================ */
+
+.footer {
+  text-align: center;
+  font-size: var(--footer-font-size, 0.75rem);
+  color: var(--text-muted);
+}
+
+.textPrimary {
+  color: var(--text-primary);
+}
+
+.textSecondary {
+  color: var(--text-secondary);
+}
+
+.textMuted {
+  color: var(--text-muted);
+}
+
+/* ============================================================================
+   LOADING STEP
+   ============================================================================ */
+
+.loadingContainer {
+  text-align: center;
+  padding: 3rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.spinner {
+  width: 3rem;
+  height: 3rem;
+  margin: 0 auto;
+  animation: spin 1s linear infinite;
+  display: block;
+  border: 3px solid var(--status-bar-icon-inactive);
+  border-top-color: var(--text-primary);
+  border-radius: 50%;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loadingMessage {
+  color: var(--text-primary);
+}
+
+/* ============================================================================
+   ONBOARDING STEP
+   ============================================================================ */
+
+.onboardingContainer {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1rem 0;
+}
+
+.onboardingIconCircle {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 9999px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-color-success);
+}
+
+.onboardingTitle {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: var(--onboarding-title-font-size, 1.125rem);
+  color: var(--text-primary);
+}
+
+.onboardingDescription {
+  color: var(--text-secondary);
+}
+
+.openPortalButton {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  background-color: var(--color-state-success);
+  color: var(--black-text);
+  border: none;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+}
+
+.openPortalButton:hover {
+  opacity: 0.9;
+}
+
+.infoBox {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: var(--color-stat-bg);
+}
+
+.infoBoxText {
+  font-size: var(--small-font-size, 0.875rem);
+  color: var(--text-muted);
+}
+
+/* ============================================================================
+   COMPLETE STEP
+   ============================================================================ */
+
+.completeContainer {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 2rem 0;
+}
+
+.successIconCircle {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 9999px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-color-success);
+}
+
+.successTitle {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: var(--success-title-font-size, 1.25rem);
+  color: var(--color-state-success);
+}
+
+.successDescription {
+  color: var(--text-secondary);
+}
+
+.continueButton {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  background-color: var(--color-state-success);
+  color: var(--black-text);
+  border: none;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.continueButton:hover {
+  opacity: 0.9;
+}
+
+/* ============================================================================
+   ERROR STEP
+   ============================================================================ */
+
+.errorContainer {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 2rem 0;
+}
+
+.errorIconCircle {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 9999px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--error-bg);
+}
+
+.errorTitle {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: var(--error-title-font-size, 1.125rem);
+  color: var(--color-state-error);
+}
+
+.errorMessage {
+  color: var(--text-secondary);
+}
+
+.retryButton {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  background-color: var(--color-state-success);
+  color: var(--black-text);
+  border: none;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.retryButton:hover {
+  opacity: 0.9;
+}

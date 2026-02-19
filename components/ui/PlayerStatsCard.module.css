@@ -1,0 +1,178 @@
+/**
+ * PlayerStatsCard.module.css
+ * CSS Module for the ui/PlayerStatsCard component
+ * Replaces inline styles with static CSS classes
+ */
+
+/* ============================================================================
+   LAYOUT & CONTAINERS
+   ============================================================================ */
+
+.cardWrapper {
+  background: var(--team-gradient);
+  padding: 2px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-elevated);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: var(--header-padding-top);
+  padding-bottom: var(--header-padding-bottom);
+  padding-left: var(--header-padding-x);
+  padding-right: var(--header-padding-x);
+}
+
+.statsContainer {
+  padding-top: 0;
+  padding-bottom: var(--spacing-sm);
+  margin-top: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  cursor: grab;
+}
+
+.statsContainer::-webkit-scrollbar {
+  display: none;
+}
+
+/* ============================================================================
+   LOGO
+   ============================================================================ */
+
+.teamLogo {
+  width: var(--logo-size);
+  height: var(--logo-size);
+  flex-shrink: 0;
+  display: block;
+}
+
+/* ============================================================================
+   BADGES
+   ============================================================================ */
+
+.badgesContainer {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--badge-gap);
+  padding-left: var(--spacing-md);
+  padding-right: var(--spacing-md);
+}
+
+.badge {
+  text-align: center;
+  min-width: var(--badge-min-width);
+}
+
+.badgeLabel {
+  font-size: var(--font-size-xs);
+  color: var(--label-color);
+}
+
+.badgeValue {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+}
+
+/* ============================================================================
+   DRAFT BUTTON
+   ============================================================================ */
+
+.draftButton {
+  padding-top: var(--draft-button-padding-y);
+  padding-bottom: var(--draft-button-padding-y);
+  padding-left: var(--draft-button-padding-x);
+  padding-right: var(--draft-button-padding-x);
+  border-radius: var(--radius-sm);
+  font-size: var(--draft-button-font-size);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  border: none;
+  cursor: pointer;
+  background: var(--draft-button-bg);
+  background-size: var(--draft-button-bg-size);
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: var(--draft-button-opacity);
+  transition: var(--transition-fast);
+}
+
+.draftButton:active,
+.draftButton:focus {
+  outline: none;
+}
+
+/* ============================================================================
+   STATS TABLE
+   ============================================================================ */
+
+.statsTable {
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  min-width: var(--stats-table-min-width);
+}
+
+.statsHeader {
+  position: relative;
+  height: var(--stats-header-height, 24px);
+  padding-top: 3px;
+  padding-bottom: 4px;
+  color: var(--header-label-color);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.statsHeaderLine {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--line-color);
+}
+
+.statsHeaderColumn {
+  position: absolute;
+  left: var(--column-left);
+  width: var(--column-width);
+  text-align: var(--column-text-align, center);
+  display: flex;
+  justify-content: var(--column-justify, center);
+  align-items: center;
+}
+
+.statsRow {
+  position: relative;
+  height: var(--row-height, 20px);
+  padding: 4px 0;
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+}
+
+.statsRowLabel {
+  position: absolute;
+  left: var(--year-label-left, 10px);
+  width: var(--year-column-width, 35px);
+  text-align: left;
+}
+
+.statsRowValue {
+  position: absolute;
+  left: var(--value-left);
+  width: var(--value-width);
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.statsRowPadding {
+  padding: 0 0 6px 0;
+}

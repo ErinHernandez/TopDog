@@ -1,0 +1,894 @@
+/* PaystackDepositModalVX2 - CSS Module for CSP Compliance */
+
+/* ============================================================================
+ * MODAL CONTAINER
+ * ============================================================================ */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: var(--z-modal, 1000);
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+}
+
+.modalContainer {
+  position: relative;
+  width: 100%;
+  max-width: 28rem;
+  border-radius: var(--radius-xl, 12px);
+  overflow: hidden;
+  max-height: 90vh;
+  overflow-y: auto;
+  background-color: var(--bg-secondary, #1a1a1a);
+}
+
+/* ============================================================================
+ * HEADER
+ * ============================================================================ */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-default, #444444);
+  background-color: var(--bg-secondary, #1a1a1a);
+  position: sticky;
+  top: 0;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3, 12px);
+}
+
+.backButton {
+  padding: var(--spacing-2, 8px);
+  border-radius: var(--radius-lg, 8px);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-primary, #ffffff);
+  display: inline-block;
+  transition: background-color 0.2s;
+}
+
+.backButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.headerTitle {
+  font-weight: 600;
+  font-size: var(--font-lg, 18px);
+  color: var(--text-primary, #ffffff);
+}
+
+.closeButton {
+  padding: 0.5rem;
+  border-radius: var(--radius-full, 9999px);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted, #666666);
+  display: inline-block;
+  transition: background-color 0.2s;
+}
+
+.closeButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================================================
+ * CONTENT AREA
+ * ============================================================================ */
+
+.content {
+  padding: 1.5rem;
+}
+
+.spacingY6 {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6, 24px);
+}
+
+.textCenter {
+  text-align: center;
+}
+
+/* ============================================================================
+ * INFO BANNERS
+ * ============================================================================ */
+
+.infoBanner {
+  padding: 1rem;
+  border-radius: var(--radius-lg, 8px);
+  background-color: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+.infoBannerText {
+  font-size: var(--font-sm, 14px);
+  color: var(--text-primary, #ffffff);
+}
+
+.infoBannerSubtext {
+  font-size: var(--font-xs, 12px);
+  color: var(--text-secondary, #999999);
+  margin-top: var(--spacing-2, 8px);
+}
+
+.activeBanner {
+  padding: 1rem;
+  border-radius: var(--radius-lg, 8px);
+  background-color: rgba(0, 208, 132, 0.08);
+  border: 1px solid rgba(0, 208, 132, 0.25);
+}
+
+.activeBannerText {
+  font-size: var(--font-sm, 14px);
+  color: var(--text-primary, #ffffff);
+}
+
+.activeBannerSubtext {
+  font-size: var(--font-xs, 12px);
+  color: var(--text-secondary, #999999);
+  margin-top: var(--spacing-2, 8px);
+}
+
+.warningBanner {
+  padding: 1rem;
+  border-radius: var(--radius-lg, 8px);
+  background-color: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  text-align: left;
+}
+
+.warningBannerTitle {
+  font-weight: 500;
+  color: var(--color-state-warning, #f59e0b);
+  margin-bottom: var(--spacing-2, 8px);
+}
+
+.warningBannerList {
+  color: var(--text-secondary, #999999);
+  font-size: var(--font-sm, 14px);
+  list-style: decimal;
+  list-style-position: inside;
+}
+
+.warningBannerListItem {
+  margin-top: var(--spacing-1, 4px);
+}
+
+.instructionBanner {
+  padding: 1rem;
+  border-radius: var(--radius-lg, 8px);
+  background-color: rgba(0, 208, 132, 0.08);
+  border: 1px solid rgba(0, 208, 132, 0.25);
+}
+
+.instructionBannerText {
+  font-size: var(--font-sm, 14px);
+  color: var(--text-primary, #ffffff);
+}
+
+/* ============================================================================
+ * AMOUNT STEP
+ * ============================================================================ */
+
+.amountContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6, 24px);
+}
+
+.continueButton {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: var(--radius-lg, 8px);
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  background-color: var(--color-state-active, #00d084);
+  color: #000;
+}
+
+.continueButton:disabled {
+  background-color: var(--bg-tertiary, #2a2a2a);
+  color: var(--text-muted, #666666);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================================================
+ * METHOD STEP
+ * ============================================================================ */
+
+.methodSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6, 24px);
+}
+
+.methodHeader {
+  font-weight: 600;
+  font-size: var(--font-lg, 18px);
+  color: var(--text-primary, #ffffff);
+  margin-bottom: 1rem;
+}
+
+.methodNotice {
+  padding: 0.75rem;
+  border-radius: var(--radius-lg, 8px);
+  margin-bottom: 1rem;
+  background-color: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+.methodNoticeText {
+  font-size: var(--font-xs, 12px);
+  color: var(--text-secondary, #999999);
+}
+
+.methodList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.methodButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: var(--radius-lg, 8px);
+  border: 1px solid var(--border-default, #444444);
+  background-color: var(--bg-tertiary, #2a2a2a);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.methodButton:hover {
+  border-color: var(--color-state-active, #00d084);
+}
+
+.methodButtonSelected {
+  background-color: rgba(0, 208, 132, 0.125);
+  border-color: var(--color-state-active, #00d084);
+}
+
+.methodIcon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-full, 9999px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 208, 132, 0.2);
+  color: var(--color-state-active, #00d084);
+}
+
+.methodIconSelected {
+  background-color: var(--color-state-active, #00d084);
+  color: #000;
+}
+
+.methodContent {
+  flex: 1;
+  text-align: left;
+}
+
+.methodName {
+  font-weight: 500;
+  color: var(--text-primary, #ffffff);
+}
+
+.methodDescription {
+  font-size: var(--font-xs, 12px);
+  color: var(--text-muted, #666666);
+}
+
+.checkmarkIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: var(--radius-full, 9999px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-state-active, #00d084);
+  color: #000;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.actionButton {
+  flex: 1;
+  padding: 0.75rem;
+  border-radius: var(--radius-lg, 8px);
+  font-weight: 500;
+  border: 1px solid var(--border-default, #444444);
+  cursor: pointer;
+  transition: all 0.2s;
+  background-color: var(--bg-tertiary, #2a2a2a);
+  color: var(--text-primary, #ffffff);
+}
+
+.actionButton:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.primaryActionButton {
+  background-color: var(--color-state-active, #00d084);
+  color: #000;
+  font-weight: 600;
+  border-color: var(--color-state-active, #00d084);
+}
+
+.primaryActionButton:disabled {
+  background-color: var(--bg-tertiary, #2a2a2a);
+  color: var(--text-muted, #666666);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.primaryActionButton:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+/* ============================================================================
+ * USSD STEP
+ * ============================================================================ */
+
+.ussdContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6, 24px);
+  text-align: center;
+}
+
+.iconCircle {
+  width: 4rem;
+  height: 4rem;
+  border-radius: var(--radius-full, 9999px);
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 208, 132, 0.125);
+  color: var(--color-state-active, #00d084);
+}
+
+.iconCircleSuccess {
+  background-color: rgba(16, 185, 129, 0.125);
+  color: var(--color-state-success, #10b981);
+}
+
+.iconCircleError {
+  background-color: rgba(239, 68, 68, 0.125);
+  color: var(--color-state-error, #ef4444);
+}
+
+.sectionTitle {
+  font-weight: 600;
+  font-size: var(--font-xl, 20px);
+  color: var(--text-primary, #ffffff);
+  margin-bottom: 0.5rem;
+}
+
+.sectionSubtitle {
+  color: var(--text-secondary, #999999);
+}
+
+.ussdCodeBox {
+  padding: 1rem;
+  border-radius: var(--radius-lg, 8px);
+  background-color: var(--bg-tertiary, #2a2a2a);
+}
+
+.ussdCodeLabel {
+  font-size: var(--font-xs, 12px);
+  color: var(--text-muted, #666666);
+  margin-bottom: var(--spacing-2, 8px);
+}
+
+.ussdCodeDisplay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.ussdCodeText {
+  font-size: 1.5rem;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  color: var(--color-state-active, #00d084);
+}
+
+.copyButton {
+  padding: 0.5rem;
+  border-radius: var(--radius-lg, 8px);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted, #666666);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.copyButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.copyButtonCopied {
+  color: var(--color-state-success, #10b981);
+}
+
+.ussdAmount {
+  margin-top: var(--spacing-2, 8px);
+  font-size: var(--font-sm, 14px);
+  color: var(--text-secondary, #999999);
+}
+
+/* ============================================================================
+ * MOBILE MONEY STEP
+ * ============================================================================ */
+
+.mobileMoneyContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6, 24px);
+}
+
+.mobileMoneyWaiting {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  text-align: center;
+}
+
+.loadingIcon {
+  width: 4rem;
+  height: 4rem;
+  border-radius: var(--radius-full, 9999px);
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 208, 132, 0.125);
+  color: var(--color-state-active, #00d084);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.mobileMoneyTitle {
+  font-weight: 600;
+  font-size: var(--font-lg, 18px);
+  color: var(--text-primary, #ffffff);
+  margin-bottom: 0.5rem;
+}
+
+.mobileMoneySubtitle {
+  color: var(--text-secondary, #999999);
+}
+
+.mobileMoneyInfo {
+  padding: 1rem;
+  border-radius: var(--radius-lg, 8px);
+  background-color: var(--bg-tertiary, #2a2a2a);
+}
+
+.mobileMoneyInfoText {
+  font-size: var(--font-sm, 14px);
+  color: var(--text-muted, #666666);
+}
+
+.mobileMoneyPhoneText {
+  margin-top: var(--spacing-2, 8px);
+  font-size: var(--font-sm, 14px);
+  color: var(--text-muted, #666666);
+}
+
+.mobileMoneySelectForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6, 24px);
+}
+
+.providerLabel {
+  margin-bottom: var(--spacing-2, 8px);
+  font-size: var(--font-sm, 14px);
+  color: var(--text-secondary, #999999);
+}
+
+.providerGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.providerButton {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-lg, 8px);
+  font-weight: 500;
+  border: 1px solid var(--border-default, #444444);
+  cursor: pointer;
+  transition: all 0.2s;
+  background-color: var(--bg-tertiary, #2a2a2a);
+  color: var(--text-primary, #ffffff);
+}
+
+.providerButton:hover {
+  border-color: var(--color-state-active, #00d084);
+}
+
+.providerButtonSelected {
+  background-color: var(--color-state-active, #00d084);
+  color: #000;
+  border-color: var(--color-state-active, #00d084);
+}
+
+.phoneInput {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-lg, 8px);
+  border: 1px solid var(--border-default, #444444);
+  background-color: var(--bg-tertiary, #2a2a2a);
+  color: var(--text-primary, #ffffff);
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.phoneInput::placeholder {
+  color: var(--text-muted, #666666);
+}
+
+.phoneInput:focus {
+  outline: none;
+  border-color: var(--color-state-active, #00d084);
+  box-shadow: 0 0 0 2px rgba(0, 208, 132, 0.2);
+}
+
+.phoneInputLabel {
+  margin-bottom: var(--spacing-2, 8px);
+  font-size: var(--font-sm, 14px);
+  color: var(--text-secondary, #999999);
+}
+
+.phoneInputHelper {
+  margin-top: var(--spacing-2, 8px);
+  font-size: var(--font-xs, 12px);
+  color: var(--text-muted, #666666);
+}
+
+/* ============================================================================
+ * USSD BANK SELECTOR
+ * ============================================================================ */
+
+.bankSelectorContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6, 24px);
+}
+
+.bankHeader {
+  font-weight: 600;
+  font-size: var(--font-lg, 18px);
+  color: var(--text-primary, #ffffff);
+  margin-bottom: 1rem;
+}
+
+.bankList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 16rem;
+  overflow-y: auto;
+}
+
+.bankButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  border-radius: var(--radius-lg, 8px);
+  border: 1px solid var(--border-default, #444444);
+  background-color: var(--bg-tertiary, #2a2a2a);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.bankButton:hover {
+  border-color: var(--color-state-active, #00d084);
+}
+
+.bankButtonSelected {
+  background-color: rgba(0, 208, 132, 0.125);
+  border-color: var(--color-state-active, #00d084);
+}
+
+.bankName {
+  color: var(--text-primary, #ffffff);
+}
+
+.bankCode {
+  color: var(--text-muted, #666666);
+  font-size: var(--font-sm, 14px);
+}
+
+/* ============================================================================
+ * RESULT STEP
+ * ============================================================================ */
+
+.resultContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6, 24px);
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.resultTitle {
+  font-weight: 600;
+  font-size: var(--font-xl, 20px);
+  margin-bottom: 0.5rem;
+}
+
+.resultTitleSuccess {
+  color: var(--color-state-success, #10b981);
+}
+
+.resultTitleError {
+  color: var(--color-state-error, #ef4444);
+}
+
+.resultMessage {
+  color: var(--text-secondary, #999999);
+}
+
+.resultDetails {
+  margin-top: var(--spacing-2, 8px);
+  font-size: var(--font-xs, 12px);
+  color: var(--text-muted, #666666);
+}
+
+/* ============================================================================
+ * PROCESSING STATE
+ * ============================================================================ */
+
+.processingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 0;
+  text-align: center;
+}
+
+.spinner {
+  width: 3rem;
+  height: 3rem;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-top-color: white;
+  border-radius: var(--radius-full, 9999px);
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.processingText {
+  color: var(--text-primary, #ffffff);
+}
+
+/* ============================================================================
+ * LOADING SPINNER
+ * ============================================================================ */
+
+.miniSpinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-top-color: #000;
+  border-radius: var(--radius-full, 9999px);
+  animation: spin 1s linear infinite;
+}
+
+.spinnerContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* ============================================================================
+ * UTILITIES
+ * ============================================================================ */
+
+.flex {
+  display: flex;
+}
+
+.flexBetween {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flexCenter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flexCol {
+  display: flex;
+  flex-direction: column;
+}
+
+.gap1 {
+  gap: var(--spacing-1);
+}
+
+.gap2 {
+  gap: var(--spacing-2);
+}
+
+.gap3 {
+  gap: var(--spacing-3, 12px);
+}
+
+.gap4 {
+  gap: var(--spacing-4);
+}
+
+.gap6 {
+  gap: var(--spacing-6, 24px);
+}
+
+.w100 {
+  width: 100%;
+}
+
+.mt2 {
+  margin-top: var(--spacing-2, 8px);
+}
+
+.mt4 {
+  margin-top: var(--spacing-4);
+}
+
+.mb2 {
+  margin-bottom: var(--spacing-2, 8px);
+}
+
+.mb4 {
+  margin-bottom: var(--spacing-4);
+}
+
+.p4 {
+  padding: 1rem;
+}
+
+.rounded {
+  border-radius: var(--radius-lg, 8px);
+}
+
+.roundedFull {
+  border-radius: var(--radius-full, 9999px);
+}
+
+.fontSemibold {
+  font-weight: 600;
+}
+
+.fontMedium {
+  font-weight: 500;
+}
+
+.fontBold {
+  font-weight: 700;
+}
+
+.textSm {
+  font-size: var(--font-sm, 14px);
+}
+
+.textXs {
+  font-size: var(--font-xs, 12px);
+}
+
+.textLg {
+  font-size: var(--font-lg, 18px);
+}
+
+.textXl {
+  font-size: var(--font-xl, 20px);
+}
+
+.textPrimary {
+  color: var(--text-primary, #ffffff);
+}
+
+.textSecondary {
+  color: var(--text-secondary, #999999);
+}
+
+.textMuted {
+  color: var(--text-muted, #666666);
+}
+
+.textSuccess {
+  color: var(--color-state-success, #10b981);
+}
+
+.textError {
+  color: var(--color-state-error, #ef4444);
+}
+
+.textWarning {
+  color: var(--color-state-warning, #f59e0b);
+}
+
+.bgTertiary {
+  background-color: var(--bg-tertiary, #2a2a2a);
+}
+
+.bgActive {
+  background-color: var(--color-state-active, #00d084);
+}
+
+.borderDefault {
+  border: 1px solid var(--border-default, #444444);
+}
+
+.transitionAll {
+  transition: all 0.2s;
+}
+
+.cursorPointer {
+  cursor: pointer;
+}
+
+.opacity50 {
+  opacity: 0.5;
+}

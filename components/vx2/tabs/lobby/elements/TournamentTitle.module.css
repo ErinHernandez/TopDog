@@ -1,0 +1,16 @@
+.title {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: var(--font-size, 28px);
+  line-height: var(--line-height-snug);
+  text-transform: uppercase;
+  color: #ffffff;
+  text-align: center;
+  margin: 0;
+  margin-top: var(--spacing-md);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  letter-spacing: 2px;
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+/* Note: To override font-size, use inline styles or set --font-size CSS variable via JS */

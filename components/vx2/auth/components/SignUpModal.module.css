@@ -1,0 +1,547 @@
+/**
+ * SignUpModal CSS Module
+ *
+ * Migrated from inline styles for CSP compliance.
+ */
+
+/* ============================================================================
+   MODAL CONTAINER
+   ============================================================================ */
+
+.modalContainer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  top: var(--content-top-inset, 60px);
+  background-color: var(--modal-bg, #1a1f2e);
+  z-index: var(--z-modal, 100);
+}
+
+.blueOutline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url(/square_background.png) no-repeat center center;
+  background-size: cover;
+  border-radius: 2.5rem;
+  z-index: 10;
+  pointer-events: none;
+  padding: 4px;
+  box-sizing: border-box;
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+}
+
+/* ============================================================================
+   CONTENT AREA
+   ============================================================================ */
+
+.contentArea {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.contentArea::-webkit-scrollbar {
+  display: none;
+}
+
+/* ============================================================================
+   LOGO
+   ============================================================================ */
+
+.logo {
+  height: 56px;
+}
+
+/* ============================================================================
+   INPUT FIELD
+   ============================================================================ */
+
+.inputWrapper {
+  position: relative;
+}
+
+.input {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 12px;
+  outline: none;
+  transition: all 150ms ease;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary, rgba(255, 255, 255, 0.9));
+  border: 2px solid var(--input-border, rgba(255, 255, 255, 0.1));
+  font-size: 16px;
+  height: 50px;
+}
+
+.input:focus {
+  border-color: var(--focus-border, rgba(96, 165, 250, 0.5));
+}
+
+.input::placeholder {
+  color: var(--text-muted, rgba(255, 255, 255, 0.5));
+}
+
+.input:disabled {
+  opacity: 0.5;
+}
+
+.inputError {
+  border-color: var(--error-color, #ef4444) !important;
+}
+
+.inputWithRight {
+  padding-right: 52px;
+}
+
+.inputRightElement {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* ============================================================================
+   FIELD ERROR
+   ============================================================================ */
+
+.fieldError {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding-left: 4px;
+  color: var(--error-color, #ef4444);
+  font-size: 13px;
+}
+
+/* ============================================================================
+   ERROR MESSAGE BANNER
+   ============================================================================ */
+
+.errorBanner {
+  margin-bottom: 16px;
+  padding: 16px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.125);
+}
+
+.errorBannerText {
+  color: var(--error-color, #ef4444);
+  font-size: 15px;
+}
+
+/* ============================================================================
+   PASSWORD STRENGTH
+   ============================================================================ */
+
+.strengthContainer {
+  margin-top: 12px;
+  transition: opacity 0.2s;
+}
+
+.strengthBar {
+  flex: 1;
+  height: 6px;
+  border-radius: 9999px;
+  transition: background-color 150ms ease;
+  background-color: var(--bar-color, rgba(255, 255, 255, 0.1));
+}
+
+.strengthLabel {
+  font-size: 13px;
+}
+
+/* ============================================================================
+   PASSWORD REQUIREMENTS
+   ============================================================================ */
+
+.requirementsBox {
+  width: 280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 12px;
+  border-radius: 12px;
+  margin-top: 16px;
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.requirementsTitle {
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+  font-size: 14px;
+}
+
+.requirementItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+/* ============================================================================
+   STEP HEADER
+   ============================================================================ */
+
+.stepHeader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+  padding: 20px 16px 12px;
+}
+
+.backButton {
+  padding: 8px;
+  border-radius: 9999px;
+  transition: background-color 150ms ease;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.backButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================================================
+   ICON CIRCLE
+   ============================================================================ */
+
+.iconCircle {
+  width: 80px;
+  height: 80px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  background: url(/wr_blue.png) no-repeat center center;
+  background-size: cover;
+}
+
+.iconCircleSuccess {
+  width: 96px;
+  height: 96px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  background-color: rgba(16, 185, 129, 0.15);
+}
+
+/* ============================================================================
+   CODE INPUT
+   ============================================================================ */
+
+.codeInput {
+  width: 100%;
+  padding: 16px 20px;
+  border-radius: 12px;
+  outline: none;
+  transition: all 150ms ease;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary, rgba(255, 255, 255, 0.9));
+  border: 2px solid var(--border-default, rgba(255, 255, 255, 0.1));
+  font-size: 24px;
+  height: 64px;
+  text-align: center;
+  letter-spacing: 0.5em;
+  font-family: monospace;
+}
+
+.codeInput:disabled {
+  opacity: 0.5;
+}
+
+/* ============================================================================
+   PRIMARY BUTTON
+   ============================================================================ */
+
+.primaryButton {
+  width: 280px;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 12px;
+  font-weight: 700;
+  transition: all 150ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 16px;
+  height: 48px;
+}
+
+.primaryButtonEnabled {
+  background: url(/wr_blue.png) no-repeat center center;
+  background-size: cover;
+  color: #000;
+  border: none;
+}
+
+.primaryButtonDisabled {
+  background-color: var(--bg-tertiary, rgba(255, 255, 255, 0.1));
+  color: var(--text-disabled, rgba(255, 255, 255, 0.3));
+  opacity: 0.6;
+}
+
+/* ============================================================================
+   FOOTER
+   ============================================================================ */
+
+.footer {
+  flex-shrink: 0;
+  padding: var(--footer-padding, 8px 24px);
+  padding-bottom: max(env(safe-area-inset-bottom), 16px);
+}
+
+.footerWithBorder {
+  border-top: 1px solid var(--border-default, rgba(255, 255, 255, 0.1));
+}
+
+.footerText {
+  text-align: center;
+  color: var(--text-muted, rgba(255, 255, 255, 0.5));
+  font-size: 15px;
+}
+
+.footerLink {
+  font-weight: 600;
+  background: url(/wr_blue.png) no-repeat center center;
+  background-size: cover;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  font-size: 15px;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* ============================================================================
+   SPINNER
+   ============================================================================ */
+
+.spinner {
+  animation: spin 1s linear infinite;
+  border-radius: 50%;
+  height: 20px;
+  width: 20px;
+  border: 2px solid transparent;
+  border-top-color: #000;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================================================
+   TEXT UTILITIES
+   ============================================================================ */
+
+.textPrimary {
+  color: var(--text-primary, rgba(255, 255, 255, 0.9));
+}
+
+.textSecondary {
+  color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+}
+
+.textMuted {
+  color: var(--text-muted, rgba(255, 255, 255, 0.5));
+}
+
+.gradientText {
+  background: url(/wr_blue.png) no-repeat center center;
+  background-size: cover;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* ============================================================================
+   TOGGLE PASSWORD BUTTON
+   ============================================================================ */
+
+.togglePasswordButton {
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 150ms ease;
+  color: var(--text-muted, rgba(255, 255, 255, 0.5));
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.togglePasswordButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================================================
+   SUCCESS STEP
+   ============================================================================ */
+
+.successBox {
+  text-align: center;
+  margin-bottom: 24px;
+  padding: 20px;
+  border-radius: 12px;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.taxReminder {
+  text-align: center;
+  margin-bottom: 32px;
+  padding: 20px;
+  border-radius: 12px;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.03);
+  border-left: 3px solid var(--text-muted, rgba(255, 255, 255, 0.5));
+}
+
+.label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: var(--text-primary, rgba(255, 255, 255, 0.9));
+  font-size: 15px;
+}
+
+/* ============================================================================
+   REQUIREMENT ITEMS
+   ============================================================================ */
+
+.requirementItemSuccess {
+  color: var(--color-state-success, #10b981);
+}
+
+.requirementItemPending {
+  color: var(--text-muted, rgba(255, 255, 255, 0.5));
+}
+
+/* ============================================================================
+   ERROR ICON & SUCCESS CHECKMARK
+   ============================================================================ */
+
+.errorIcon {
+  color: var(--error-color, #ef4444);
+}
+
+.successCheckmark {
+  color: var(--color-state-success, #10b981);
+}
+
+/* ============================================================================
+   STRENGTH LABEL COLOR
+   ============================================================================ */
+
+.strengthLabelColor {
+  color: var(--strength-color, var(--text-muted, rgba(255, 255, 255, 0.5)));
+}
+
+.strengthContainer[data-has-password="false"] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.strengthContainer[data-has-password="true"] {
+  opacity: 1;
+  transition: opacity 0.2s;
+}
+
+/* ============================================================================
+   INLINE STYLE MIGRATIONS
+   ============================================================================ */
+
+.welcomeText {
+  font-size: 17px;
+}
+
+.formBlock {
+  width: 280px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.stepContentPadded {
+  padding: 0 var(--spacing-xl);
+}
+
+.usernamePromptTitle {
+  font-size: 24px;
+}
+
+.usernamePromptText {
+  font-size: 15px;
+}
+
+.emailPromptTitle {
+  font-size: 24px;
+}
+
+.emailPromptText {
+  font-size: 15px;
+}
+
+.resendHintText {
+  font-size: 14px;
+}
+
+.successStepPadding {
+  padding: 0 24px;
+}
+
+.successTitle {
+  font-size: 28px;
+}
+
+.successSubtitle {
+  font-size: 17px;
+}
+
+.verificationHintLabel {
+  font-size: 14px;
+}
+
+.emailDisplay {
+  font-weight: 500;
+  font-size: 15px;
+}
+
+.verificationHintNote {
+  font-size: 14px;
+}
+
+.taxReminderText {
+  font-size: 13px;
+}

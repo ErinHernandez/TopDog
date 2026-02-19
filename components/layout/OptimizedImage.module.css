@@ -1,0 +1,41 @@
+/**
+ * OptimizedImage Styles
+ * Layout stability and rendering optimization for images
+ */
+
+.container {
+  /* Prevent layout shift during image load (CLS optimization) */
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background-color: var(--color-bg-surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-subtle);
+
+  /* Smooth transition from placeholder to loaded image */
+  transition: background-color var(--transition-normal);
+}
+
+.container img {
+  /* Ensure image fills container */
+  width: 100%;
+  height: auto;
+  display: block;
+
+  /* Anti-aliasing for crisp rendering */
+  image-rendering: -webkit-optimize-contrast;
+}
+
+/* Optional: Add background pattern during load in light theme */
+@media (prefers-color-scheme: light) {
+  .container {
+    background-image:
+      linear-gradient(45deg, var(--color-border-subtle) 25%, transparent 25%),
+      linear-gradient(-45deg, var(--color-border-subtle) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, var(--color-border-subtle) 75%),
+      linear-gradient(-45deg, transparent 75%, var(--color-border-subtle) 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+    background-color: var(--color-bg-surface);
+  }
+}

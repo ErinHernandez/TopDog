@@ -1,0 +1,220 @@
+/* ExposureTabVX2 Styles */
+
+/* Main container */
+.mainContainer {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background-color: var(--bg-primary);
+}
+
+/* Header section */
+.header {
+  flex-shrink: 0;
+  padding-left: var(--spacing-lg);
+  padding-right: var(--spacing-lg);
+  padding-top: var(--spacing-md);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.headerSearchWrapper {
+  padding-top: 4px;
+}
+
+/* Position filters */
+.positionFiltersWrapper {
+  display: flex;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, 0.05);
+  margin-top: var(--spacing-md);
+  margin-bottom: var(--spacing-xs);
+}
+
+.positionButton {
+  flex: 1;
+  padding: 0.625rem 0.75rem;
+  font-weight: var(--font-weight-bold);
+  transition: all 0.2s ease;
+  font-size: var(--font-size-xs);
+  background-color: transparent;
+  color: var(--text-muted);
+  border: none;
+  border-bottom: 2px solid var(--position-color, #6B7280);
+  opacity: 0.4;
+  cursor: pointer;
+}
+
+/* Position-specific button colors */
+.positionButton[data-position="qb"] { --position-color: var(--color-position-qb); }
+.positionButton[data-position="rb"] { --position-color: var(--color-position-rb); }
+.positionButton[data-position="wr"] { --position-color: var(--color-position-wr); }
+.positionButton[data-position="te"] { --position-color: var(--color-position-te); }
+
+/* Selected state */
+.positionButton[data-selected="true"] {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--position-color, #6B7280);
+  opacity: 1;
+}
+
+.positionButton:hover {
+  opacity: 1;
+}
+
+/* Sort header */
+.sortHeader {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 20px;
+  padding-top: var(--spacing-xs);
+  padding-bottom: var(--spacing-xs);
+  color: var(--text-secondary);
+}
+
+.sortButton {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  width: 60px;
+  text-align: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.sortButton:hover {
+  color: var(--text-primary);
+}
+
+/* Player list container */
+.playerListContainer {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.playerListContainer::-webkit-scrollbar {
+  display: none;
+}
+
+.playerListContainer {
+  -ms-overflow-style: none;
+}
+
+/* Empty state container */
+.emptyStateContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: var(--spacing-xl);
+}
+
+/* Exposure row */
+.exposureRow {
+  position: relative;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: var(--row-padding-y);
+  padding-bottom: var(--row-padding-y);
+  min-height: var(--row-min-height);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.exposureRowNoBorderTop {
+  border-top: none;
+}
+
+.playerInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.playerName {
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+  padding: 0;
+}
+
+.playerDetails {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 2px;
+}
+
+.playerTeam {
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  margin: 0;
+}
+
+.exposureValue {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-primary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  width: 60px;
+  text-align: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.exposureValue:hover {
+  opacity: 0.8;
+}
+
+/* Exposure row skeleton */
+.skeletonRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: var(--spacing-md);
+  padding-right: var(--spacing-md);
+  padding-top: var(--row-padding-y);
+  padding-bottom: var(--row-padding-y);
+  min-height: var(--row-min-height);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.skeletonPlayerInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.skeletonDetails {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 2px;
+}
+
+/* Bottom padding for scroll space */
+.listBottomPadding {
+  height: var(--spacing-2xl);
+}
+
+/* Error state container */
+.errorStateContainer {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-primary);
+  padding: var(--spacing-xl);
+}

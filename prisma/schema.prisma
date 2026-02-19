@@ -1,0 +1,89 @@
+// TopDog Studio — Prisma Schema
+//
+// Database schema for TopDog Studio conversation and message storage.
+// Supports conversation tracking, message history, and conversation summaries.
+//
+// Provider: PostgreSQL
+// Features: Indexed queries, cascade deletes, JSON support for metadata
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────────────────────────────────────
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+  TOOL
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CONVERSATION MODEL
+// Represents a single conversation in TopDog Studio
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Conversation {
+  id            String    @id @default(cuid())
+  userId        String    @map("user_id")
+  title         String    @default("New Conversation")
+  mode          String    @default("recreation")
+  backendMode   String    @default("api") @map("backend_mode")
+  totalTokens   Int       @default(0) @map("total_tokens")
+  totalCostUSD  Decimal   @default(0) @db.Decimal(19, 4) @map("total_cost_usd")
+  model         String    @default("claude-sonnet-4-5-20250929")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  messages      Message[]
+  summaries     ConversationSummary[]
+
+  @@index([userId, updatedAt(sort: Desc)])
+  @@map("conversations")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MESSAGE MODEL
+// Represents a single message in a conversation
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Message {
+  id             String      @id @default(cuid())
+  conversationId String      @map("conversation_id")
+  role           MessageRole
+  content        String
+  model          String?
+  inputTokens    Int?        @map("input_tokens")
+  outputTokens   Int?        @map("output_tokens")
+  toolCalls      Json?       @map("tool_calls")
+  createdAt      DateTime    @default(now()) @map("created_at")
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+  @@map("messages")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CONVERSATION SUMMARY MODEL
+// Represents a summary of a portion of a conversation for context management
+// ─────────────────────────────────────────────────────────────────────────────
+
+model ConversationSummary {
+  id             String   @id @default(cuid())
+  conversationId String   @map("conversation_id")
+  summary        String
+  messageRange   Json     @map("message_range") // { startId: string, endId: string, count: number }
+  tokenCount     Int      @map("token_count")
+  createdAt      DateTime @default(now()) @map("created_at")
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@map("conversation_summaries")
+}

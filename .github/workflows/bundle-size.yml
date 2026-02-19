@@ -1,0 +1,75 @@
+# File: .github/workflows/bundle-size.yml
+name: Bundle Size Check
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  bundle-size:
+    name: Bundle Size Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL || 'http://localhost:3000' }}
+      
+      - name: Analyze bundle
+        run: npm run bundle:track
+      
+      - name: Check bundle size limit
+        id: bundle-check
+        run: |
+          if [ -f bundle-stats.json ]; then
+            SIZE=$(cat bundle-stats.json | jq -r '.totalSize // 0')
+            MAX_SIZE=5242880  # 5MB
+            if [ "$SIZE" -gt "$MAX_SIZE" ]; then
+              echo "❌ Bundle size ($SIZE bytes) exceeds limit ($MAX_SIZE bytes)"
+              echo "bundle_status=failed" >> $GITHUB_OUTPUT
+              exit 1
+            fi
+            echo "✅ Bundle size ($SIZE bytes) is within limit"
+            echo "bundle_size=$SIZE" >> $GITHUB_OUTPUT
+            echo "bundle_status=passed" >> $GITHUB_OUTPUT
+          else
+            echo "⚠️  bundle-stats.json not found, skipping size check"
+            echo "bundle_status=skipped" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Comment PR with bundle size
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const bundleSize = '${{ steps.bundle-check.outputs.bundle_size }}';
+            const bundleStatus = '${{ steps.bundle-check.outputs.bundle_status }}';
+
+            let comment = '';
+            if (bundleStatus === 'passed' && bundleSize) {
+              const sizeInMB = (parseInt(bundleSize) / 1024 / 1024).toFixed(2);
+              comment = `✅ **Bundle Size Check Passed**\n\nBundle size: **${sizeInMB}MB** (limit: 5MB)`;
+            } else if (bundleStatus === 'failed') {
+              comment = `❌ **Bundle Size Limit Exceeded**\n\nPlease optimize your bundle size.`;
+            } else if (bundleStatus === 'skipped') {
+              comment = `⚠️ **Bundle Stats Not Found**\n\nSkipped bundle size check.`;
+            }
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });

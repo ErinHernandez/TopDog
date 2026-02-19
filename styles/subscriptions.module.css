@@ -1,0 +1,249 @@
+/**
+ * Subscriptions Admin Page Styles
+ *
+ * Flat dark-navy theme with enterprise-grade design.
+ * Follows design system: bg #1e2a3a, cards #243447, borders rgba(255,255,255,0.08),
+ * text #e2e8f0, secondary #94a3b8, accent #3b82f6.
+ */
+
+.container {
+  min-height: 100vh;
+  background-color: #1e2a3a;
+  padding: 24px 32px;
+  font-family: inherit;
+  overflow-y: auto;
+}
+
+.header {
+  margin-bottom: 32px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #e2e8f0;
+  margin: 0 0 8px 0;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.summaryCard {
+  background-color: #243447;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.summaryCardLabel {
+  font-size: 12px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+  font-weight: 500;
+}
+
+.summaryCardValue {
+  font-size: 28px;
+  font-weight: 600;
+  color: #e2e8f0;
+  margin-top: 8px;
+  margin: 0;
+}
+
+.summaryCardSubtext {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 8px;
+}
+
+.eventsSection {
+  margin-top: 32px;
+}
+
+.sectionTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #e2e8f0;
+  margin: 0 0 16px 0;
+}
+
+.eventsList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.eventItem {
+  background-color: #243447;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.eventTypeIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.eventTypeCreated {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.eventTypeUpdated {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.eventTypeCanceled {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.eventTypeUpgraded {
+  background-color: rgba(168, 85, 247, 0.1);
+  color: #a855f7;
+}
+
+.eventTypeDowngraded {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+
+.eventContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.eventTitle {
+  color: #e2e8f0;
+  font-weight: 500;
+}
+
+.eventMeta {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.eventTime {
+  font-size: 12px;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.emptyState {
+  background-color: #243447;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 40px 20px;
+  text-align: center;
+  color: #94a3b8;
+}
+
+.emptyStateText {
+  font-size: 14px;
+  margin: 0;
+}
+
+.loadingState {
+  background-color: #243447;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 40px 20px;
+  text-align: center;
+  color: #94a3b8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.spinner {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.errorState {
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid #ef4444;
+  border-radius: 8px;
+  padding: 16px;
+  color: #fca5a5;
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 1024px) {
+  .summaryGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+
+  .summaryGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .title {
+    font-size: 20px;
+  }
+
+  .summaryCardValue {
+    font-size: 24px;
+  }
+
+  .eventItem {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .eventContent {
+    width: 100%;
+  }
+
+  .eventTime {
+    align-self: flex-start;
+  }
+}

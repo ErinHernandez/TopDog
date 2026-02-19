@@ -1,0 +1,135 @@
+/**
+ * CSS Custom Properties - Colors
+ *
+ * Mapped from components/vx2/core/constants/colors.ts
+ * These variables enable CSP-compliant dynamic styling.
+ */
+
+:root {
+  /* ============================================================================
+     POSITION COLORS (LOCKED - DO NOT CHANGE without user approval)
+     ============================================================================ */
+  --color-position-qb: #F472B6;
+  --color-position-rb: #0fba80;
+  --color-position-wr: #FBBF25;
+  --color-position-te: #7C3AED;
+  --color-position-bn: #6B7280;
+
+  /* Position end colors (for gradients) */
+  --color-position-qb-end: #EC4899;
+  --color-position-rb-end: #10B981;
+  --color-position-wr-end: #F59E0B;
+  --color-position-te-end: #8B5CF6;
+
+  /* Position RGBA (30% opacity for backgrounds) */
+  --color-position-qb-bg: rgba(244, 114, 182, 0.3);
+  --color-position-rb-bg: rgba(15, 186, 128, 0.3);
+  --color-position-wr-bg: rgba(251, 191, 37, 0.3);
+  --color-position-te-bg: rgba(124, 58, 237, 0.3);
+
+  /* ============================================================================
+     BRAND COLORS
+     ============================================================================ */
+  --color-brand-primary: #2DE2C5;
+  --color-brand-secondary: #59c5bf;
+  --color-brand-accent: #04FBB9;
+
+  /* ============================================================================
+     NAVBAR BLUE (matches /wr_blue.png gradient)
+     ============================================================================ */
+  --color-navbar-solid: #1DA1F2;
+  --color-navbar-light: #4DB5F5;
+  --color-navbar-dark: #1A91DA;
+
+  /* ============================================================================
+     BACKGROUND COLORS
+     ============================================================================ */
+  --bg-primary: #101927;
+  --bg-secondary: #1f2937;
+  --bg-tertiary: #111827;
+  --bg-elevated: rgba(255, 255, 255, 0.1);
+  --bg-card: #1f2833;
+  --bg-black: #000000;
+
+  /* ============================================================================
+     TEXT COLORS
+     ============================================================================ */
+  --text-primary: #ffffff;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+  --text-disabled: #4b5563;
+
+  /* ============================================================================
+     BORDER COLORS
+     ============================================================================ */
+  --border-default: rgba(255, 255, 255, 0.1);
+  --border-light: rgba(255, 255, 255, 0.05);
+  --border-subtle: rgba(255, 255, 255, 0.15);
+  --border-focus: #59c5bf;
+  --border-error: #ef4444;
+  --border-success: #10b981;
+
+  /* ============================================================================
+     UI STATE COLORS
+     ============================================================================ */
+  --color-on-the-clock: #EF4444;
+  --color-my-turn: #EF4444;
+  --color-active: #60A5FA;
+  --color-active-light: #3B82F6;
+  --color-user-highlight: #3B82F6;
+  --color-selected: #2DE2C5;
+  --color-hover: rgba(255, 255, 255, 0.1);
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  --color-info: #3B82F6;
+
+  /* ============================================================================
+     TAB BAR COLORS
+     ============================================================================ */
+  --tab-bar-bg: #000000;
+  --tab-bar-border: #374151;
+  --tab-bar-icon-active: var(--color-navbar-solid);
+  --tab-bar-icon-inactive: #9CA3AF;
+  --tab-bar-label-active: var(--color-navbar-solid);
+  --tab-bar-label-inactive: #9CA3AF;
+  --tab-bar-badge-bg: var(--color-navbar-solid);
+  --tab-bar-badge-text: #FFFFFF;
+  --tab-bar-home-indicator: rgba(255, 255, 255, 0.3);
+
+  /* ============================================================================
+     HEADER COLORS
+     ============================================================================ */
+  --header-bg: #2563EB;
+  --header-text: #ffffff;
+  --header-icon-default: #ffffff;
+  --header-icon-hover: rgba(255, 255, 255, 0.8);
+  --header-deposit-btn: rgba(255, 255, 255, 0.15);
+
+  /* ============================================================================
+     GRAY SCALE (Tailwind-compatible)
+     ============================================================================ */
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+
+  /* ============================================================================
+     BLUE SCALE
+     ============================================================================ */
+  --blue-400: #60a5fa;
+  --blue-500: #3b82f6;
+  --blue-600: #2563eb;
+
+  /* ============================================================================
+     OVERLAYS
+     ============================================================================ */
+  --overlay: rgba(0, 0, 0, 0.5);
+  --overlay-dark: rgba(0, 0, 0, 0.75);
+  --overlay-light: rgba(0, 0, 0, 0.25);
+}

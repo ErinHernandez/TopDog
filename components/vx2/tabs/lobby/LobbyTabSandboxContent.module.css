@@ -1,0 +1,189 @@
+/**
+ * LobbyTabSandboxContent styles
+ * CSS Modules for CSP compliance - no inline styles
+ */
+
+/* Main container with content outline */
+.contentArea {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  margin: var(--lobby-outline-margin, 0px);
+  border-width: var(--lobby-outline-thickness, 0px);
+  border-style: solid;
+  border-color: transparent;
+  border-radius: var(--lobby-outline-radius, 0px);
+  box-sizing: border-box;
+  transform: translateY(var(--outline-translate-y, 0px));
+}
+
+/* When outline is enabled, use wr_blue.png as border-image */
+.contentArea.outlineEnabled {
+  border-image-source: url('/wr_blue.png');
+  border-image-slice: 1;
+  border-image-repeat: round;
+}
+
+/* Inner padding and safe area */
+.safeAreaWrapper {
+  flex: 1;
+  min-height: 0;
+  padding-top: var(--safe-area-top);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Scaling container */
+.scaleWrapper {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  transform: scale(var(--content-scale));
+  transform-origin: top center;
+}
+
+/* Scrollable content area */
+.scrollContainer {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.scrollContainer.noScroll {
+  overflow: hidden;
+}
+
+/* Loading state */
+.loadingPlaceholder {
+  position: absolute;
+  inset: 16px;
+  background-color: var(--bg-elevated);
+  border-radius: 16px;
+  animation: pulse 2s infinite;
+}
+
+/* Error state container */
+.errorContainer {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.errorText {
+  color: var(--color-state-error);
+  font-size: var(--font-size-sm);
+}
+
+/* Empty state container */
+.emptyContainer {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.emptyText {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+/* Empty prompt for sandbox */
+.emptyPrompt {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  color: var(--text-muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+/* Hero content block */
+.heroBlock {
+  display: flex;
+  flex-direction: column;
+  padding: var(--outer-padding, 0px);
+  gap: var(--bottom-row-gap, 0px);
+}
+
+/* Logo and title container */
+.logoTitleContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translate(var(--logo-title-translate-x, 0px), var(--logo-title-translate-y, 0px));
+}
+
+.logoTitleInner {
+  margin-top: var(--logo-top-margin);
+  transform: translateY(-24px);
+}
+
+/* Globe container */
+.globeSlotContainer {
+  height: var(--globe-slot-height, 280px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  flex-shrink: 0;
+  margin-top: 24px;
+  overflow: hidden;
+  transform: translateY(-24px) translate(var(--globe-translate-x, 0px), var(--globe-translate-y, 0px));
+}
+
+.globeSlot {
+  width: var(--globe-size, 200px);
+  height: var(--globe-size, 200px);
+  min-width: 0;
+  min-height: 0;
+  max-width: 100%;
+  flex-shrink: 0;
+  background-image: var(--globe-bg-image);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* Progress bar container */
+.progressBarContainer {
+  transform: translateY(-14px) translate(var(--progress-bar-translate-x, 0px), var(--progress-bar-translate-y, 0px));
+}
+
+/* Join button container */
+.joinButtonContainer {
+  transform: translateY(-4px) translate(var(--join-button-translate-x, 0px), var(--join-button-translate-y, 0px));
+}
+
+/* Stats container */
+.statsContainer {
+  transform: translate(var(--stats-translate-x, 0px), var(--stats-translate-y, 0px));
+}
+
+/* Content wrapper */
+.contentWrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: min-content;
+}
+
+/* Pulse animation for loading state */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

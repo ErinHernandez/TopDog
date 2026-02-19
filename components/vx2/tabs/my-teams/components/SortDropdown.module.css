@@ -1,0 +1,96 @@
+.dropdownContainer {
+  position: relative;
+}
+
+.dropdownButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.dropdownButton:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.sortLabel {
+  color: var(--text-muted);
+}
+
+.sortValue {
+  color: var(--text-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.sortIcon {
+  width: 12px;
+  height: 12px;
+  transition: transform 0.2s ease;
+}
+
+.sortIcon.rotated {
+  transform: rotate(180deg);
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  z-index: 1000;
+  box-shadow: var(--shadow-large);
+  min-width: 160px;
+}
+
+.menuOption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 14px;
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-border-light);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.15s ease;
+}
+
+.menuOption:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.menuOption.active {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+}
+
+.menuOption:last-child {
+  border-bottom: none;
+}
+
+.optionText {
+  white-space: pre-line;
+}
+
+.optionCheckIcon {
+  width: 12px;
+  height: 12px;
+}
+
+.optionCheckIcon.rotated {
+  transform: rotate(180deg);
+}

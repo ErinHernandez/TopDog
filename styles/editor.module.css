@@ -1,0 +1,357 @@
+/**
+ * Idesaign — Editor Page Styles
+ *
+ * Full-viewport layout for the editor with:
+ * - 100vw × 100vh viewport (no scrolling)
+ * - Loading spinner animation
+ * - Error/404 state screens
+ * - Panel containers
+ * - Dark theme throughout
+ *
+ * @module styles/editor.module.css
+ */
+
+/* ================================================================
+   VIEWPORT & LAYOUT
+   ================================================================ */
+
+.editorContainer {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg-base);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+}
+
+.editorContent {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ================================================================
+   LOADING STATE
+   ================================================================ */
+
+.loadingContainer {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    135deg,
+    var(--color-bg-base) 0%,
+    var(--color-bg-elevated) 50%,
+    var(--color-bg-base) 100%
+  );
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  gap: var(--space-4);
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 3px solid var(--color-border-default);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: editorSpin 1s linear infinite;
+}
+
+@keyframes editorSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loadingContainer p {
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+/* ================================================================
+   ERROR & NOT FOUND STATES
+   ================================================================ */
+
+.errorContainer {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  background: linear-gradient(
+    135deg,
+    var(--color-bg-base) 0%,
+    var(--color-bg-elevated) 50%,
+    var(--color-bg-base) 100%
+  );
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  text-align: center;
+  gap: var(--space-4);
+}
+
+.errorContainer h1 {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0;
+  letter-spacing: -0.02em;
+  max-width: 600px;
+}
+
+.errorContainer p {
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+  margin: 0;
+  max-width: 600px;
+  line-height: var(--line-height-relaxed);
+}
+
+.errorButtonGroup {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.errorButton {
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: #fff;
+  background-color: var(--color-accent);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 200ms ease;
+  font-family: var(--font-sans);
+  letter-spacing: -0.01em;
+}
+
+.errorButton:hover {
+  background-color: var(--color-accent-hover);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+.errorButton:active {
+  background-color: var(--color-accent-active);
+}
+
+.errorButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ================================================================
+   PANELS CONTAINER
+   ================================================================ */
+
+.panelsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: var(--color-bg-panel);
+  border-left: 1px solid var(--color-border-default);
+  padding: var(--space-2);
+  width: 320px;
+  max-height: 100%;
+}
+
+.panelsContainer::-webkit-scrollbar {
+  width: 8px;
+}
+
+.panelsContainer::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.panelsContainer::-webkit-scrollbar-thumb {
+  background: var(--color-border-default);
+  border-radius: 4px;
+}
+
+.panelsContainer::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-strong);
+}
+
+/* ================================================================
+   RESPONSIVE BREAKPOINTS
+   ================================================================ */
+
+@media (max-width: 1440px) {
+  .panelsContainer {
+    width: 280px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .panelsContainer {
+    width: 240px;
+  }
+}
+
+@media (max-width: 768px) {
+  .editorContainer {
+    overflow: auto;
+  }
+
+  .editorContent {
+    flex-direction: column;
+  }
+
+  .panelsContainer {
+    width: 100%;
+    max-width: none;
+    max-height: 200px;
+    border-left: none;
+    border-top: 1px solid var(--color-border-default);
+  }
+}
+
+/* ================================================================
+   UTILITY: HIDDEN PANEL
+   ================================================================ */
+
+.panelHidden {
+  display: none;
+}
+
+.panelVisible {
+  display: flex;
+}
+
+/* ================================================================
+   SIDEBAR TOGGLE BUTTON
+   ================================================================ */
+
+.sidebarToggle {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 100;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm, 4px);
+  color: var(--color-text-secondary, #8892a4);
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+  padding: 0;
+}
+
+.sidebarToggle:hover {
+  background: var(--color-bg-hover, rgba(255, 255, 255, 0.08));
+  color: var(--color-text-primary, #e2e8f0);
+}
+
+.sidebarToggle:active {
+  background: var(--color-bg-active, rgba(255, 255, 255, 0.12));
+}
+
+.sidebarToggle:focus-visible {
+  outline: 2px solid var(--color-accent, #3b82f6);
+  outline-offset: 2px;
+}
+
+/* ================================================================
+   ADJUSTMENTS PANEL — replaces flat 230-tool list
+   ================================================================ */
+
+.adjustmentsPanelWrapper {
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.adjustmentsPanelWrapper:empty {
+  display: none;
+}
+
+/* ================================================================
+   FOCUS & ACCESSIBILITY
+   ================================================================ */
+
+.errorButton:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ================================================================
+   PRINT STYLES
+   ================================================================ */
+
+@media print {
+  .editorContainer {
+    display: none;
+  }
+}
+
+/* ================================================================
+   RESPONSIVE: 1024px (Tablet & Small Desktop)
+   ================================================================ */
+
+@media (max-width: 1024px) {
+  .adjustmentsPanelWrapper {
+    display: none;
+  }
+
+  .panelsContainer {
+    width: 240px;
+  }
+}
+
+/* ================================================================
+   RESPONSIVE: 768px (Tablet)
+   ================================================================ */
+
+@media (max-width: 768px) {
+  .panelsContainer {
+    width: 100%;
+    max-width: none;
+    max-height: 200px;
+    border-left: none;
+    border-top: 1px solid var(--color-border-default);
+  }
+}
+
+/* ================================================================
+   RESPONSIVE: 480px (Mobile)
+   ================================================================ */
+
+@media (max-width: 480px) {
+  .editorContainer {
+    width: 100vw;
+    height: 100vh;
+  }
+
+  .editorContent {
+    flex-direction: column;
+  }
+
+  .panelsContainer {
+    width: 100%;
+    max-height: 150px;
+    padding: var(--space-1);
+  }
+
+  .panelsContainer p,
+  .panelsContainer span {
+    font-size: var(--text-xs);
+  }
+}

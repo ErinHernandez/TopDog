@@ -1,0 +1,197 @@
+/**
+ * LobbyTabVX2 - CSS Module for CSP Compliance
+ *
+ * Migrated from inline styles to CSS Modules for Content Security Policy compliance.
+ * Uses CSS custom properties for dynamic values and spacing tokens from tokens.css.
+ *
+ * Spacing tokens used:
+ * - --spacing-sm (8px): Small gaps
+ * - --spacing-lg (16px): Standard padding and margins
+ * - --spacing-xl (24px): Large gaps between sections
+ *
+ * @module LobbyTabVX2.module.css
+ */
+
+/* ============================================================================
+   CSS CUSTOM PROPERTIES - CONSTANTS FROM colors and spacing tokens
+   ============================================================================ */
+
+/* ============================================================================
+   MAIN CONTAINER
+   ============================================================================ */
+
+.container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  flex: 1;
+  background-color: var(--bg-primary);
+  min-height: var(--card-min-height);
+}
+
+.container.inPhoneFrame {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================================================
+   LOADING STATE
+   ============================================================================ */
+
+.loadingState {
+  position: absolute;
+  top: 16px;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  max-width: var(--card-max-width);
+  background-color: var(--loading-bg);
+  border-radius: var(--card-border-radius);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* ============================================================================
+   CARD LAYOUT
+   ============================================================================ */
+
+.card {
+  position: absolute;
+  top: 16px;
+  bottom: 16px;
+  left: 50%;
+  transform: var(--card-x-center);
+  width: var(--card-width, 390px);
+  height: var(--card-height, 600px);
+  max-width: var(--card-max-width);
+  display: flex;
+  flex-direction: column;
+  background-color: var(--card-bg-fallback);
+  border-radius: var(--card-border-radius);
+  border: var(--card-border-width, 1px) solid var(--card-border-color, var(--card-border-default));
+  overflow: hidden;
+  contain: layout style paint;
+  isolation: isolate;
+}
+
+/* Modifier for featured cards */
+.card.featured {
+  --card-border-width: var(--card-border-width-featured);
+  --card-border-color: var(--card-border-featured);
+}
+
+/* ============================================================================
+   CARD CONTENT
+   ============================================================================ */
+
+.content {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 1;
+  position: relative;
+}
+
+.scrollableContent {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.contentPadding {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: var(--card-outer-padding);
+  gap: var(--bottom-row-gap);
+  min-height: 0;
+}
+
+/* ============================================================================
+   LOGO AND TITLE SECTION
+   ============================================================================ */
+
+.logoSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.titleWrapper {
+  margin-top: 14px;
+  transform: translateY(-24px);
+}
+
+/* ============================================================================
+   GLOBE SECTION
+   ============================================================================ */
+
+.globeSection {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: var(--globe-size);
+  margin-top: 24px;
+  transform: translateY(-24px);
+}
+
+.globeImage {
+  width: var(--globe-size);
+  height: var(--globe-size);
+  object-fit: contain;
+  display: block;
+}
+
+/* ============================================================================
+   BOTTOM STRIP
+   ============================================================================ */
+
+.bottomStrip {
+  flex-shrink: 0;
+  padding: 0 var(--spec-padding) var(--spec-padding);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spec-gap);
+}
+
+.progressBarWrapper {
+  transform: translateY(var(--progress-bar-y-offset));
+}
+
+.joinButtonWrapper {
+  transform: translateY(var(--join-button-y-offset));
+}
+
+/* ============================================================================
+   UTILITY CLASSES - Flex container helpers
+   ============================================================================ */
+
+.flexCol {
+  display: flex;
+  flex-direction: column;
+}
+
+.flexCenterAll {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.flexJustifyCenter {
+  display: flex;
+  justify-content: center;
+}

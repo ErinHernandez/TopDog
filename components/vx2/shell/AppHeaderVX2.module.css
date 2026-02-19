@@ -1,0 +1,90 @@
+/**
+ * AppHeaderVX2 CSS Module
+ *
+ * Migrated from inline styles for CSP compliance.
+ */
+
+/* ============================================================================
+   HEADER CONTAINER
+   ============================================================================ */
+
+.header {
+  width: 100%;
+  flex-shrink: 0;
+  position: relative;
+  z-index: var(--z-header);
+  --header-height: 56px;
+  --header-padding-x: 16px;
+  --button-size: 44px;
+}
+
+/* Background variants */
+.headerDefault {
+  background: url(/wr_blue.png) no-repeat center center;
+  background-size: cover;
+}
+
+.headerUrgent {
+  background-color: var(--color-state-warning, #f59e0b);
+}
+
+.headerSuccess {
+  background-color: var(--color-state-success, #10b981);
+}
+
+/* ============================================================================
+   INNER CONTENT
+   ============================================================================ */
+
+.innerContent {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: var(--header-height, 56px);
+  padding-left: var(--header-padding-x, 16px);
+  padding-right: var(--header-padding-x, 16px);
+}
+
+/* ============================================================================
+   LEFT SECTION
+   ============================================================================ */
+
+.leftSection {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  min-width: var(--button-size, 44px);
+}
+
+/* ============================================================================
+   BUTTONS
+   ============================================================================ */
+
+.iconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  transition: background-color 0.15s ease;
+  width: var(--button-size, 44px);
+  height: var(--button-size, 44px);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.iconButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.iconButton:active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ============================================================================
+   SPACER
+   ============================================================================ */
+
+.spacer {
+  width: var(--button-size, 44px);
+}

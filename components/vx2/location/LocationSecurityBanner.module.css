@@ -1,0 +1,151 @@
+/**
+ * LocationSecurityBanner CSS Module
+ *
+ * Zero-runtime CSS for CSP compliance.
+ * Uses data-severity attribute for different banner states.
+ */
+
+/* ============================================================================
+   CONTAINER - Base styles with severity variants
+   ============================================================================ */
+
+.container {
+  position: relative;
+  border-radius: var(--radius-lg);
+  border-width: 1px;
+  border-style: solid;
+  padding: var(--spacing-lg);
+}
+
+/* Severity: Error (blocked) */
+.container[data-severity="error"] {
+  background-color: var(--bg-color-red, rgba(239, 68, 68, 0.15));
+  border-color: var(--color-state-error);
+}
+
+/* Severity: Warning (verify required) */
+.container[data-severity="warning"] {
+  background-color: var(--bg-color-warning, rgba(245, 158, 11, 0.15));
+  border-color: var(--color-state-warning);
+}
+
+/* Severity: Info (new location) */
+.container[data-severity="info"] {
+  background-color: var(--bg-color-blue, rgba(59, 130, 246, 0.15));
+  border-color: var(--color-state-info);
+}
+
+/* ============================================================================
+   DISMISS BUTTON
+   ============================================================================ */
+
+.dismissButton {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.25rem;
+  border-radius: var(--radius-sm);
+  opacity: 0.6;
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.dismissButton:hover {
+  opacity: 1;
+}
+
+/* ============================================================================
+   CONTENT WRAPPER
+   ============================================================================ */
+
+.contentWrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+/* ============================================================================
+   ICON - Colored by severity
+   ============================================================================ */
+
+.iconContainer {
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.container[data-severity="error"] .iconContainer {
+  color: var(--color-state-error);
+}
+
+.container[data-severity="warning"] .iconContainer {
+  color: var(--color-state-warning);
+}
+
+.container[data-severity="info"] .iconContainer {
+  color: var(--color-state-info);
+}
+
+/* ============================================================================
+   TEXT CONTENT
+   ============================================================================ */
+
+.content {
+  flex: 1;
+}
+
+.title {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  padding: 0;
+}
+
+.message {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0.25rem 0 0 0;
+  padding: 0;
+}
+
+/* ============================================================================
+   ACTION BUTTONS
+   ============================================================================ */
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.actionButton {
+  padding: 0.375rem 0.75rem;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease-in-out;
+}
+
+/* Trust button (success) */
+.actionButton[data-action="trust"] {
+  background-color: var(--color-state-success);
+}
+
+/* Verify button (info) */
+.actionButton[data-action="verify"] {
+  background-color: var(--color-state-info);
+}
+
+.actionButton:hover {
+  opacity: 0.9;
+}
+
+.actionButton:active {
+  opacity: 0.8;
+}

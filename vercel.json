@@ -1,0 +1,57 @@
+{
+  "buildCommand": "next build",
+  "framework": "nextjs",
+  "functions": {
+    "pages/api/studio/ai/*.ts": {
+      "memory": 1024,
+      "maxDuration": 60
+    },
+    "pages/api/studio/generate/*.ts": {
+      "memory": 512,
+      "maxDuration": 60
+    },
+    "pages/api/studio/formats/*.ts": {
+      "memory": 512,
+      "maxDuration": 30
+    },
+    "pages/api/studio/upload/*.ts": {
+      "memory": 512,
+      "maxDuration": 30
+    },
+    "pages/api/studio/files/upload.ts": {
+      "memory": 512,
+      "maxDuration": 30
+    },
+    "pages/api/studio/webhooks/stripe.ts": {
+      "memory": 256,
+      "maxDuration": 30
+    },
+    "pages/api/studio/checkout/*.ts": {
+      "memory": 256,
+      "maxDuration": 15
+    },
+    "pages/api/studio/jobs/*/progress.ts": {
+      "memory": 256,
+      "maxDuration": 60
+    },
+    "pages/api/health.ts": {
+      "memory": 256,
+      "maxDuration": 10
+    },
+    "pages/api/docs/*.ts": {
+      "memory": 256,
+      "maxDuration": 10
+    },
+    "pages/api/**/*.ts": {
+      "memory": 256,
+      "maxDuration": 10
+    }
+  },
+  "headers": [],
+  "rewrites": [
+    {
+      "source": "/health",
+      "destination": "/api/health"
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+/**
+ * DraftInfo Component Styles
+ *
+ * CSS Module for DraftInfo component with CSP-compliant styling.
+ * Uses CSS custom properties for dynamic values from constants.
+ */
+
+/* Main Container */
+.container {
+  padding: var(--spacing-md);
+  padding-bottom: var(--spacing-xl);
+  background-color: var(--info-bg-primary);
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+
+.container::-webkit-scrollbar {
+  display: none;
+}
+
+/* Remove scrollbar for IE and Edge */
+.container {
+  -ms-overflow-style: none;
+}
+
+/* Top Actions (Exit Draft / Tutorial buttons) */
+.actionsBar {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-lg);
+}
+
+.actionButton {
+  background: none;
+  border: none;
+  color: var(--info-link-color);
+  font-size: var(--info-font-size-base);
+  font-weight: var(--info-font-weight-medium);
+  cursor: pointer;
+  padding: 0;
+}
+
+.actionButton:hover {
+  opacity: 0.8;
+}
+
+.actionSpacer {
+  flex: 0;
+}
+
+/* Section Styling */
+.section {
+  margin-bottom: var(--spacing-lg);
+}
+
+.sectionTitle {
+  font-size: var(--info-font-size-base);
+  font-weight: var(--info-font-weight-semibold);
+  color: var(--info-text-primary);
+  margin-bottom: var(--spacing-sm);
+  padding: 0;
+  margin-top: 0;
+}
+
+.sectionContent {
+  font-size: var(--info-font-size-sm);
+  color: var(--info-text-secondary);
+  line-height: 1.5;
+}
+
+.sectionContent p {
+  margin: 0;
+  margin-bottom: var(--spacing-sm);
+}
+
+.sectionContent p:last-child {
+  margin-bottom: 0;
+}
+
+.sectionContent ul {
+  margin: var(--spacing-sm) 0;
+  padding-left: 20px;
+}
+
+/* Info Row (Key-Value pairs) */
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1px solid var(--info-border-light);
+}
+
+.infoRowLabel {
+  color: var(--info-text-secondary);
+}
+
+.infoRowValue {
+  color: var(--info-text-primary);
+  font-weight: var(--info-font-weight-medium);
+}
