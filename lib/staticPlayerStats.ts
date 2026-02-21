@@ -86,18 +86,3 @@ export const getPlayerCountByPosition = _getPlayerCountByPosition;
 // ============================================================================
 // COMMONJS EXPORTS (for backward compatibility with require())
 // ============================================================================
-
-module.exports = {
-  STATIC_PLAYER_STATS,
-  getPlayerStats,
-  hasPlayerStats,
-  getStatsMetadata,
-  getPlayerCountByPosition,
-  // Also export hooks for CommonJS consumers
-  usePlayerStats: require('./playerStats').usePlayerStats,
-  usePlayerStatsById: require('./playerStats').usePlayerStatsById,
-  usePlayerStatsByPosition: require('./playerStats').usePlayerStatsByPosition,
-  prefetchPlayerStats: require('./playerStats').prefetchPlayerStats,
-  prefetchPlayerStatsByPosition: require('./playerStats').prefetchPlayerStatsByPosition,
-  prefetchAllPositions: require('./playerStats').prefetchAllPositions,
-};

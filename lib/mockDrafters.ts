@@ -66,7 +66,6 @@ export const MOCK_DRAFTER_NAMES: readonly string[] = [
   'X-Ray-2',
   'Yankee-2',
   'Zulu-2',
-
 ] as const;
 
 // ============================================================================
@@ -121,11 +120,4 @@ export const getRandomMockDrafters = (count: number = 11): string[] => {
  */
 export const getAllMockDrafters = (): string[] => {
   return [...MOCK_DRAFTER_NAMES];
-};
-
-// CommonJS exports for backward compatibility
-module.exports = {
-  MOCK_DRAFTER_NAMES,
-  getRandomMockDrafters,
-  getAllMockDrafters
 };

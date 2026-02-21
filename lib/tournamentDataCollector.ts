@@ -4,7 +4,6 @@
  * Based on Underdog's 24-field data model but optimized for TopDog
  */
 
- 
 import { serverLogger } from './logger/serverLogger';
 
 const { TournamentDatabase } = require('./tournamentDatabase');
@@ -157,41 +156,41 @@ class TournamentDataCollector {
       name: tournamentData.name,
       season: tournamentData.season || new Date().getFullYear(),
       format: tournamentData.format || 'bestball',
-      
+
       structure: {
         entryFee: tournamentData.entryFee,
         maxEntries: tournamentData.maxEntries || null,
         prizePool: tournamentData.prizePool || null,
         payoutStructure: tournamentData.payoutStructure || [],
-        
+
         draftType: 'snake',
         rounds: 18,
         draftTime: 90,
         positions: {
           QB: 2,
-          RB: 6, 
+          RB: 6,
           WR: 8,
-          TE: 3
-        }
+          TE: 3,
+        },
       },
-      
+
       scoring: tournamentData.scoring || this.getDefaultScoring(),
-      
+
       dates: {
         opened: tournamentData.openDate || new Date().toISOString(),
         draftStart: null,
         draftEnd: null,
         seasonStart: tournamentData.seasonStart || null,
-        seasonEnd: tournamentData.seasonEnd || null
+        seasonEnd: tournamentData.seasonEnd || null,
       },
-      
+
       results: {
         winner: null,
         topScores: [],
         averageScore: null,
-        totalEntrants: 0
+        totalEntrants: 0,
       },
-      
+
       analytics: {
         popularPicks: [],
         contrarian: [],
@@ -199,9 +198,9 @@ class TournamentDataCollector {
         draftTrends: {
           averageDraftTime: null,
           timeouts: 0,
-          autodrafts: 0
-        }
-      }
+          autodrafts: 0,
+        },
+      },
     };
 
     TournamentDatabase.addTournament(tournament);
@@ -217,39 +216,42 @@ class TournamentDataCollector {
       id: draftData.id || this.generateId(),
       tournamentId: draftData.tournamentId,
       roomNumber: draftData.roomNumber || 1,
-      
+
       participants: draftData.participants.map((p, idx) => ({
         userId: p.userId,
         username: p.username || `User ${idx + 1}`,
         teamName: p.teamName || `Team ${idx + 1}`,
         draftPosition: idx + 1,
-        isActive: true
+        isActive: true,
       })),
-      
+
       settings: {
         type: 'snake',
         rounds: 18,
         timePerPick: 90,
         startTime: new Date().toISOString(),
-        endTime: null
+        endTime: null,
       },
-      
+
       picks: [],
-      
+
       analytics: {
         totalTime: null,
         averagePickTime: null,
         timeouts: 0,
         autodrafts: 0,
         positionByRound: {},
-        draftGrades: []
-      }
+        draftGrades: [],
+      },
     };
 
     this.activeDrafts.set(draft.id, draft);
     TournamentDatabase.addDraft(draft);
 
-    serverLogger.info('Draft room initialized', { draftId: draft.id, participants: draft.participants.length });
+    serverLogger.info('Draft room initialized', {
+      draftId: draft.id,
+      participants: draft.participants.length,
+    });
     return draft;
   }
 
@@ -262,7 +264,7 @@ class TournamentDataCollector {
       tournamentId: pickData.tournamentId,
       draftId: pickData.draftId,
       userId: pickData.userId,
-      
+
       // Pick details
       round: pickData.round,
       pick: pickData.pick, // Overall pick number
@@ -270,14 +272,14 @@ class TournamentDataCollector {
       playerName: pickData.playerName,
       position: pickData.position,
       team: pickData.team,
-      
+
       // Pick context
       timestamp: new Date().toISOString(),
       timeUsed: pickData.timeUsed || null,
       wasTimeout: pickData.wasTimeout || false,
       wasAutodraft: pickData.wasAutodraft || false,
       pickSource: pickData.pickSource || 'user', // 'user', 'queue', 'auto'
-      
+
       // Analytics (populated post-draft)
       analytics: {
         adp: pickData.adp || null,
@@ -285,18 +287,18 @@ class TournamentDataCollector {
         ownership: null, // Will calculate across tournament
         projectedPoints: pickData.projectedPoints || null,
         actualPoints: null, // Updated weekly during season
-        
+
         expectedValue: null,
         leverage: null,
-        
+
         positionRank: null,
-        positionsRemaining: pickData.positionsRemaining || {}
-      }
+        positionsRemaining: pickData.positionsRemaining || {},
+      },
     };
 
     // Add to buffer
     this.pickBuffer.push(pick);
-    
+
     // Update active draft
     const draft = this.activeDrafts.get(pickData.draftId);
     if (draft) {
@@ -321,7 +323,12 @@ class TournamentDataCollector {
       this.flushPickBuffer();
     }
 
-    serverLogger.debug('Pick recorded', { playerName: pickData.playerName, position: pickData.position, round: pickData.round, pick: pickData.pick });
+    serverLogger.debug('Pick recorded', {
+      playerName: pickData.playerName,
+      position: pickData.position,
+      round: pickData.round,
+      pick: pickData.pick,
+    });
     return pick;
   }
 
@@ -337,31 +344,37 @@ class TournamentDataCollector {
 
     // Calculate final draft analytics
     draft.settings.endTime = new Date().toISOString();
-    
+
     const startTime = new Date(draft.settings.startTime);
     const endTime = new Date(draft.settings.endTime);
     draft.analytics.totalTime = Math.round((endTime.getTime() - startTime.getTime()) / 1000); // seconds
-    
+
     const validPicks = draft.picks.filter((p: Record<string, unknown>) => p.timeUsed !== null);
     if (validPicks.length > 0) {
-      const totalTime = validPicks.reduce((sum: number, p: Record<string, unknown>) => 
-        sum + (p.timeUsed as number), 0);
+      const totalTime = validPicks.reduce(
+        (sum: number, p: Record<string, unknown>) => sum + (p.timeUsed as number),
+        0,
+      );
       draft.analytics.averagePickTime = totalTime / validPicks.length;
     }
 
     // Calculate ownership rates across this tournament
     this.calculateOwnershipRates(draft.tournamentId);
-    
+
     // Calculate ADP differences
     this.calculateADPDifferences(draftId);
 
     // Remove from active drafts
     this.activeDrafts.delete(draftId);
-    
+
     // Flush any remaining picks
     this.flushPickBuffer();
 
-    serverLogger.info('Draft completed', { draftId, totalTime: draft.analytics.totalTime, avgPickTime: draft.analytics.averagePickTime?.toFixed(1) });
+    serverLogger.info('Draft completed', {
+      draftId,
+      totalTime: draft.analytics.totalTime,
+      avgPickTime: draft.analytics.averagePickTime?.toFixed(1),
+    });
     return draft;
   }
 
@@ -371,7 +384,7 @@ class TournamentDataCollector {
   updatePlayerPerformance(playerId: string, weeklyPoints: number, seasonTotal: number): void {
     // Find all picks of this player and update their performance
     const picks = this.findPicksByPlayer(playerId);
-    
+
     picks.forEach(pick => {
       const analytics = pick.analytics as Record<string, unknown>;
       analytics.actualPoints = seasonTotal;
@@ -406,7 +419,10 @@ class TournamentDataCollector {
       analytics.ownership = Math.round(ownership * 10) / 10; // Round to 1 decimal
     });
 
-    serverLogger.debug('Calculated ownership rates', { playersCount: Object.keys(playerCounts).length, draftsCount: totalDrafts });
+    serverLogger.debug('Calculated ownership rates', {
+      playersCount: Object.keys(playerCounts).length,
+      draftsCount: totalDrafts,
+    });
   }
 
   /**
@@ -447,19 +463,19 @@ class TournamentDataCollector {
         yards: 0.04,
         touchdowns: 4,
         interceptions: -2,
-        twoPointConversions: 2
+        twoPointConversions: 2,
       },
       rushing: {
         yards: 0.1,
         touchdowns: 6,
-        twoPointConversions: 2
+        twoPointConversions: 2,
       },
       receiving: {
         receptions: 0.5, // Half PPR
         yards: 0.1,
         touchdowns: 6,
-        twoPointConversions: 2
-      }
+        twoPointConversions: 2,
+      },
     };
   }
 
@@ -467,7 +483,7 @@ class TournamentDataCollector {
    * Utility functions
    */
   private generateId(): string {
-    return `td_${  Date.now()  }_${  Math.random().toString(36).substr(2, 9)}`;
+    return `td_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
   private findPicksByPlayer(playerId: string): Array<Record<string, unknown>> {
@@ -489,33 +505,44 @@ class TournamentDataCollector {
    * Export functions for historical analysis
    */
   exportTournamentData(tournamentId: string, format: string = 'json'): string {
-     
     const tournament = TournamentDatabase.TOURNAMENT_DATABASE?.tournaments?.[tournamentId];
     const picks = this.getAllPicksForTournament(tournamentId);
-    
+
     const exportData = {
       tournament,
       totalPicks: picks.length,
       totalDrafts: new Set(picks.map(p => p.draftId as string)).size,
-      picks: picks
+      picks: picks,
     };
 
     if (format === 'csv') {
       return this.convertToCSV(picks);
     }
-    
+
     return JSON.stringify(exportData, null, 2);
   }
 
   private convertToCSV(picks: Array<Record<string, unknown>>): string {
     if (!picks.length) return '';
-    
+
     const headers = [
-      'draft_id', 'user_id', 'tournament_id', 'round', 'pick', 'player_name', 
-      'position', 'team', 'timestamp', 'time_used', 'pick_source', 'adp', 
-      'ownership', 'projected_points', 'actual_points'
+      'draft_id',
+      'user_id',
+      'tournament_id',
+      'round',
+      'pick',
+      'player_name',
+      'position',
+      'team',
+      'timestamp',
+      'time_used',
+      'pick_source',
+      'adp',
+      'ownership',
+      'projected_points',
+      'actual_points',
     ];
-    
+
     const rows = picks.map(pick => {
       const analytics = pick.analytics as Record<string, unknown>;
       return [
@@ -533,7 +560,7 @@ class TournamentDataCollector {
         analytics.adp,
         analytics.ownership,
         analytics.projectedPoints,
-        analytics.actualPoints
+        analytics.actualPoints,
       ];
     });
 
@@ -549,9 +576,3 @@ class TournamentDataCollector {
 const tournamentCollector = new TournamentDataCollector();
 
 export { TournamentDataCollector, tournamentCollector };
-
-// CommonJS exports for backward compatibility
-module.exports = {
-  TournamentDataCollector,
-  tournamentCollector
-};

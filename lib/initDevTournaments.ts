@@ -2,7 +2,15 @@
  * Script to initialize development tournaments in the database
  */
 
-import { collection, addDoc, serverTimestamp, getDocs, Timestamp, query, limit } from 'firebase/firestore';
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+  getDocs,
+  Timestamp,
+  query,
+  limit,
+} from 'firebase/firestore';
 
 import { createScopedLogger } from './clientLogger';
 import { db } from './firebase';
@@ -35,10 +43,10 @@ export const initializeDevTournaments = async (): Promise<void> => {
   }
   try {
     logger.info('Initializing development tournaments');
-    
+
     // Check if tournaments already exist (only need to check for existence)
     const existingTournaments = await getDocs(query(collection(db, 'devTournaments'), limit(10)));
-    
+
     if (existingTournaments.empty) {
       // Add development tournament templates
       for (const [key, template] of Object.entries(devTournamentTemplates)) {
@@ -46,14 +54,16 @@ export const initializeDevTournaments = async (): Promise<void> => {
           ...template,
           createdAt: serverTimestamp() as Timestamp,
           updatedAt: serverTimestamp() as Timestamp,
-          id: `${key}-dev`
+          id: `${key}-dev`,
         } as DevTournament;
-        
+
         if (!db) {
           throw new Error('Firebase db not initialized');
         }
         await addDoc(collection(db, 'devTournaments'), tournament);
-        logger.debug('Tournament added to development', { name: (template as { name?: string }).name || key });
+        logger.debug('Tournament added to development', {
+          name: (template as { name?: string }).name || key,
+        });
       }
 
       logger.info('All development tournaments initialized successfully');
@@ -61,7 +71,10 @@ export const initializeDevTournaments = async (): Promise<void> => {
       logger.debug('Development tournaments already exist');
     }
   } catch (error) {
-    logger.error('Error initializing development tournaments', error instanceof Error ? error : new Error(String(error)));
+    logger.error(
+      'Error initializing development tournaments',
+      error instanceof Error ? error : new Error(String(error)),
+    );
     throw error;
   }
 };
@@ -78,26 +91,25 @@ export const addTournamentToDevelopment = async (tournamentKey: string): Promise
     if (!template) {
       throw new Error(`Tournament template '${tournamentKey}' not found`);
     }
-    
+
     const tournament: DevTournament = {
       ...template,
       createdAt: serverTimestamp() as Timestamp,
       updatedAt: serverTimestamp() as Timestamp,
-      id: `${tournamentKey}-dev`
+      id: `${tournamentKey}-dev`,
     } as DevTournament;
-    
+
     await addDoc(collection(db, 'devTournaments'), tournament);
-    logger.info('Tournament added to development', { name: (template as { name?: string }).name || tournamentKey });
+    logger.info('Tournament added to development', {
+      name: (template as { name?: string }).name || tournamentKey,
+    });
 
     return tournament;
   } catch (error) {
-    logger.error('Error adding tournament to development', error instanceof Error ? error : new Error(String(error)));
+    logger.error(
+      'Error adding tournament to development',
+      error instanceof Error ? error : new Error(String(error)),
+    );
     throw error;
   }
-};
-
-// CommonJS exports for backward compatibility
-module.exports = {
-  initializeDevTournaments,
-  addTournamentToDevelopment
 };

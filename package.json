@@ -25,6 +25,7 @@
     "eventemitter3": "^5.0.4",
     "firebase": "^11.6.0",
     "firebase-admin": "^13.4.0",
+    "html2canvas": "^1.4.1",
     "lucide-react": "^0.575.0",
     "micro": "^10.0.1",
     "next": "^15.3.3",

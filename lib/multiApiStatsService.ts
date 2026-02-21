@@ -1,6 +1,6 @@
 /**
  * Multi-API Sports Data Service
- * 
+ *
  * Aggregates NFL player statistics from multiple sources for maximum reliability and completeness.
  * Implements intelligent data merging, cross-referencing, and fallback strategies.
  */
@@ -175,29 +175,29 @@ class MultiApiStatsService {
         baseUrl: 'http://site.api.espn.com/apis/site/v2/sports/football/nfl',
         priority: 1,
         rateLimit: 100, // ms between requests
-        lastRequest: 0
+        lastRequest: 0,
       },
       sportsReference: {
         name: 'Sports Reference',
         baseUrl: 'https://www.pro-football-reference.com/players', // Web scraping
         priority: 2,
         rateLimit: 1000,
-        lastRequest: 0
+        lastRequest: 0,
       },
       rollingInsights: {
         name: 'Rolling Insights DataFeeds',
         baseUrl: 'https://api.datafeeds.rolling-insights.com/v1/nfl', // Note: May require API key
         priority: 3,
         rateLimit: 500,
-        lastRequest: 0
+        lastRequest: 0,
       },
       freeApi: {
         name: 'Sports Game Odds API',
         baseUrl: 'https://api.sportsgameodds.com/v2', // Has free tier
         priority: 4,
         rateLimit: 1000,
-        lastRequest: 0
-      }
+        lastRequest: 0,
+      },
     };
 
     // Player ID mappings across different APIs
@@ -214,29 +214,29 @@ class MultiApiStatsService {
       {
         name: "Ja'Marr Chase",
         ids: {
-          espn: "4426499",
-          sportsRef: "ChasJa00",
-          rollingInsights: "jamarr-chase-1",
-          freeApi: "chase_jamarr_001"
-        }
+          espn: '4426499',
+          sportsRef: 'ChasJa00',
+          rollingInsights: 'jamarr-chase-1',
+          freeApi: 'chase_jamarr_001',
+        },
       },
       {
-        name: "Justin Jefferson", 
+        name: 'Justin Jefferson',
         ids: {
-          espn: "4035687",
-          sportsRef: "JeffJu00",
-          rollingInsights: "justin-jefferson-1",
-          freeApi: "jefferson_justin_001"
-        }
+          espn: '4035687',
+          sportsRef: 'JeffJu00',
+          rollingInsights: 'justin-jefferson-1',
+          freeApi: 'jefferson_justin_001',
+        },
       },
       {
-        name: "Saquon Barkley",
+        name: 'Saquon Barkley',
         ids: {
-          espn: "3116365",
-          sportsRef: "BarkSa00", 
-          rollingInsights: "saquon-barkley-1",
-          freeApi: "barkley_saquon_001"
-        }
+          espn: '3116365',
+          sportsRef: 'BarkSa00',
+          rollingInsights: 'saquon-barkley-1',
+          freeApi: 'barkley_saquon_001',
+        },
       },
       // Add more mappings as we discover them
     ];
@@ -253,12 +253,12 @@ class MultiApiStatsService {
     const api = this.apis[apiKey];
     const now = Date.now();
     const timeSinceLastRequest = now - api.lastRequest;
-    
+
     if (timeSinceLastRequest < api.rateLimit) {
       const waitTime = api.rateLimit - timeSinceLastRequest;
       await new Promise(resolve => setTimeout(resolve, waitTime));
     }
-    
+
     api.lastRequest = Date.now();
   }
 
@@ -267,7 +267,7 @@ class MultiApiStatsService {
    */
   async fetchFromESPN(playerName: string): Promise<ApiSourceData | null> {
     await this.respectRateLimit('espn');
-    
+
     const playerIds = this.playerMappings.get(playerName);
     if (!playerIds?.espn) {
       throw new Error(`No ESPN ID for ${playerName}`);
@@ -277,7 +277,7 @@ class MultiApiStatsService {
       const [playerInfo, stats2024, stats2023] = await Promise.all([
         this.makeRequest(`${this.apis.espn.baseUrl}/athletes/${playerIds.espn}`),
         this.makeRequest(`${this.apis.espn.baseUrl}/athletes/${playerIds.espn}/stats/2024`),
-        this.makeRequest(`${this.apis.espn.baseUrl}/athletes/${playerIds.espn}/stats/2023`)
+        this.makeRequest(`${this.apis.espn.baseUrl}/athletes/${playerIds.espn}/stats/2023`),
       ]);
 
       return {
@@ -285,9 +285,9 @@ class MultiApiStatsService {
         data: {
           info: playerInfo,
           stats2024: stats2024,
-          stats2023: stats2023
+          stats2023: stats2023,
         },
-        reliability: 0.9 // ESPN is generally very reliable
+        reliability: 0.9, // ESPN is generally very reliable
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -301,7 +301,7 @@ class MultiApiStatsService {
    */
   async fetchFromSportsReference(playerName: string): Promise<ApiSourceData | null> {
     await this.respectRateLimit('sportsReference');
-    
+
     const playerIds = this.playerMappings.get(playerName);
     if (!playerIds?.sportsRef) {
       return null;
@@ -315,10 +315,10 @@ class MultiApiStatsService {
           careerStats: {
             games: 85,
             rushing: { attempts: 1200, yards: 5400, touchdowns: 45 },
-            receiving: { receptions: 280, yards: 2800, touchdowns: 22 }
-          }
+            receiving: { receptions: 280, yards: 2800, touchdowns: 22 },
+          },
         },
-        reliability: 0.95 // Sports Reference is extremely reliable
+        reliability: 0.95, // Sports Reference is extremely reliable
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -332,17 +332,17 @@ class MultiApiStatsService {
    */
   async fetchFromRollingInsights(playerName: string): Promise<ApiSourceData | null> {
     await this.respectRateLimit('rollingInsights');
-    
+
     // Note: This API may require authentication
     try {
       const response = await this.makeRequest(
-        `${this.apis.rollingInsights.baseUrl}/players/${playerName}/stats`
+        `${this.apis.rollingInsights.baseUrl}/players/${playerName}/stats`,
       );
 
       return {
         source: 'Rolling Insights',
         data: response as Record<string, unknown>,
-        reliability: 0.85
+        reliability: 0.85,
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -356,16 +356,16 @@ class MultiApiStatsService {
    */
   async fetchFromFreeApi(playerName: string): Promise<ApiSourceData | null> {
     await this.respectRateLimit('freeApi');
-    
+
     try {
       const response = await this.makeRequest(
-        `${this.apis.freeApi.baseUrl}/players?name=${encodeURIComponent(playerName)}`
+        `${this.apis.freeApi.baseUrl}/players?name=${encodeURIComponent(playerName)}`,
       );
 
       return {
         source: 'Sports Game Odds',
         data: response as Record<string, unknown>,
-        reliability: 0.75
+        reliability: 0.75,
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -384,12 +384,13 @@ class MultiApiStatsService {
       this.fetchFromESPN(playerName),
       this.fetchFromSportsReference(playerName),
       this.fetchFromRollingInsights(playerName),
-      this.fetchFromFreeApi(playerName)
+      this.fetchFromFreeApi(playerName),
     ]);
 
     const validSources = sources
-      .filter((result): result is PromiseFulfilledResult<ApiSourceData> =>
-        result.status === 'fulfilled' && result.value !== null
+      .filter(
+        (result): result is PromiseFulfilledResult<ApiSourceData> =>
+          result.status === 'fulfilled' && result.value !== null,
       )
       .map(result => result.value)
       .sort((a, b) => b.reliability - a.reliability); // Sort by reliability
@@ -398,8 +399,12 @@ class MultiApiStatsService {
       throw new Error(`No data sources available for ${playerName}`);
     }
 
-    logger.debug('Found data from sources', { playerName, sourceCount: validSources.length, sources: validSources.map(s => s.source).join(', ') });
-    
+    logger.debug('Found data from sources', {
+      playerName,
+      sourceCount: validSources.length,
+      sources: validSources.map(s => s.source).join(', '),
+    });
+
     return this.mergeDataSources(playerName, validSources);
   }
 
@@ -413,15 +418,15 @@ class MultiApiStatsService {
     // Merge 2024 season data
     const season2024 = this.mergeSeasonData(
       2024,
-      sources.map(s => this.extractSeasonData(s, 2024)).filter((s): s is SeasonData => s !== null)
+      sources.map(s => this.extractSeasonData(s, 2024)).filter((s): s is SeasonData => s !== null),
     );
     const seasons: MergedSeasonData[] = [];
     if (season2024) seasons.push(season2024);
 
-    // Merge 2023 season data  
+    // Merge 2023 season data
     const season2023 = this.mergeSeasonData(
       2023,
-      sources.map(s => this.extractSeasonData(s, 2023)).filter((s): s is SeasonData => s !== null)
+      sources.map(s => this.extractSeasonData(s, 2023)).filter((s): s is SeasonData => s !== null),
     );
     if (season2023) seasons.push(season2023);
 
@@ -439,7 +444,7 @@ class MultiApiStatsService {
       reliability: primarySource.reliability,
       seasons,
       career,
-      validation
+      validation,
     };
 
     return mergedData;
@@ -459,21 +464,21 @@ class MultiApiStatsService {
         completions: this.resolveConflicts('passing.completions', seasonData),
         yards: this.resolveConflicts('passing.yards', seasonData),
         touchdowns: this.resolveConflicts('passing.touchdowns', seasonData),
-        interceptions: this.resolveConflicts('passing.interceptions', seasonData)
+        interceptions: this.resolveConflicts('passing.interceptions', seasonData),
       },
       rushing: {
         attempts: this.resolveConflicts('rushing.attempts', seasonData),
         yards: this.resolveConflicts('rushing.yards', seasonData),
         touchdowns: this.resolveConflicts('rushing.touchdowns', seasonData),
-        yardsPerAttempt: this.resolveConflicts('rushing.yardsPerAttempt', seasonData)
+        yardsPerAttempt: this.resolveConflicts('rushing.yardsPerAttempt', seasonData),
       },
       receiving: {
         receptions: this.resolveConflicts('receiving.receptions', seasonData),
         yards: this.resolveConflicts('receiving.yards', seasonData),
         touchdowns: this.resolveConflicts('receiving.touchdowns', seasonData),
         targets: this.resolveConflicts('receiving.targets', seasonData),
-        yardsPerReception: this.resolveConflicts('receiving.yardsPerReception', seasonData)
-      }
+        yardsPerReception: this.resolveConflicts('receiving.yardsPerReception', seasonData),
+      },
     };
 
     return merged;
@@ -499,7 +504,7 @@ class MultiApiStatsService {
     let totalWeight = 0;
     let weightedSum = 0;
 
-    sources.forEach((source) => {
+    sources.forEach(source => {
       const value = this.getNestedValue(source, statPath);
       if (value !== null && value !== undefined && !isNaN(value)) {
         const weight = source.reliability || 0.5;
@@ -524,14 +529,20 @@ class MultiApiStatsService {
   private extractSeasonData(source: ApiSourceData, year: number): SeasonData | null {
     // This would need to be customized based on each API's response format
     // For now, return mock structure that matches our needs
-    
+
     if (source.source === 'ESPN') {
       return {
         reliability: source.reliability,
         games: 17,
         passing: { attempts: 450, completions: 290, yards: 3200, touchdowns: 22, interceptions: 8 },
         rushing: { attempts: 85, yards: 420, touchdowns: 6, yardsPerAttempt: 4.9 },
-        receiving: { receptions: 95, yards: 1350, touchdowns: 9, targets: 145, yardsPerReception: 14.2 }
+        receiving: {
+          receptions: 95,
+          yards: 1350,
+          touchdowns: 9,
+          targets: 145,
+          yardsPerReception: 14.2,
+        },
       };
     }
 
@@ -546,7 +557,7 @@ class MultiApiStatsService {
       sourceCount: sources.length,
       avgReliability: sources.reduce((sum, s) => sum + s.reliability, 0) / sources.length,
       conflicts: 0,
-      warnings: []
+      warnings: [],
     };
 
     // Add validation logic here
@@ -581,12 +592,12 @@ class MultiApiStatsService {
       games: 0,
       passing: { attempts: 0, completions: 0, yards: 0, touchdowns: 0, interceptions: 0 },
       rushing: { attempts: 0, yards: 0, touchdowns: 0, yardsPerAttempt: 0 },
-      receiving: { receptions: 0, yards: 0, touchdowns: 0, targets: 0, yardsPerReception: 0 }
+      receiving: { receptions: 0, yards: 0, touchdowns: 0, targets: 0, yardsPerReception: 0 },
     };
 
     seasons.forEach(season => {
       career.games += season.games || 0;
-      
+
       // Sum counting stats
       Object.keys(career.passing).forEach(key => {
         if (key !== 'yardsPerAttempt' && key !== 'yardsPerReception') {
@@ -594,14 +605,14 @@ class MultiApiStatsService {
           career.passing[statKey] += (season.passing[statKey] as number) || 0;
         }
       });
-      
+
       Object.keys(career.rushing).forEach(key => {
         if (key !== 'yardsPerAttempt') {
           const statKey = key as keyof typeof career.rushing;
           career.rushing[statKey] += (season.rushing[statKey] as number) || 0;
         }
       });
-      
+
       Object.keys(career.receiving).forEach(key => {
         if (key !== 'yardsPerReception') {
           const statKey = key as keyof typeof career.receiving;
@@ -611,13 +622,15 @@ class MultiApiStatsService {
     });
 
     // Calculate averages
-    career.rushing.yardsPerAttempt = career.rushing.attempts > 0 
-      ? Number((career.rushing.yards / career.rushing.attempts).toFixed(1))
-      : 0;
-      
-    career.receiving.yardsPerReception = career.receiving.receptions > 0 
-      ? Number((career.receiving.yards / career.receiving.receptions).toFixed(1))
-      : 0;
+    career.rushing.yardsPerAttempt =
+      career.rushing.attempts > 0
+        ? Number((career.rushing.yards / career.rushing.attempts).toFixed(1))
+        : 0;
+
+    career.receiving.yardsPerReception =
+      career.receiving.receptions > 0
+        ? Number((career.receiving.yards / career.receiving.receptions).toFixed(1))
+        : 0;
 
     return career;
   }
@@ -629,17 +642,25 @@ class MultiApiStatsService {
     return new Promise((resolve, reject) => {
       const request = https.get(url, (response: IncomingMessage) => {
         // Check for error status codes
-        if (response.statusCode === undefined || response.statusCode < 200 || response.statusCode >= 300) {
-          reject(new Error(`HTTP ${response.statusCode || 'unknown'}: ${response.statusMessage || 'Request failed'}`));
+        if (
+          response.statusCode === undefined ||
+          response.statusCode < 200 ||
+          response.statusCode >= 300
+        ) {
+          reject(
+            new Error(
+              `HTTP ${response.statusCode || 'unknown'}: ${response.statusMessage || 'Request failed'}`,
+            ),
+          );
           return;
         }
-        
+
         let data = '';
-        
+
         response.on('data', (chunk: Buffer) => {
           data += chunk.toString();
         });
-        
+
         response.on('end', () => {
           try {
             const jsonData = JSON.parse(data);
@@ -675,14 +696,14 @@ class MultiApiStatsService {
         games: season.games,
         passing: season.passing,
         rushing: season.rushing,
-        receiving: season.receiving
+        receiving: season.receiving,
       })),
       career: mergedData.career,
       metadata: {
         sources: [mergedData.source, ...mergedData.backupSources],
         reliability: mergedData.reliability,
-        validation: mergedData.validation
-      }
+        validation: mergedData.validation,
+      },
     };
   }
 }
@@ -695,6 +716,3 @@ class MultiApiStatsService {
 const multiApiStatsService = new MultiApiStatsService();
 
 export { multiApiStatsService };
-
-// CommonJS exports for backward compatibility
-module.exports = { multiApiStatsService };

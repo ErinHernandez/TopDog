@@ -12,7 +12,14 @@ const logger = createScopedLogger('[DataAccessControl]');
 // TYPES
 // ============================================================================
 
-export type DataType = 'personal' | 'tournament' | 'draft' | 'player' | 'aggregated' | 'all' | 'user';
+export type DataType =
+  | 'personal'
+  | 'tournament'
+  | 'draft'
+  | 'player'
+  | 'aggregated'
+  | 'all'
+  | 'user';
 
 export type Period = 'draft' | 'season' | 'restricted' | 'offseason';
 
@@ -72,8 +79,8 @@ class DataAccessControl {
         draftPeriodEnd: '2025-09-05',
         seasonStart: '2025-09-05',
         seasonEnd: '2025-01-13', // Following year
-        dataReleaseDate: '2025-01-20' // Week after season ends
-      }
+        dataReleaseDate: '2025-01-20', // Week after season ends
+      },
     };
   }
 
@@ -84,7 +91,7 @@ class DataAccessControl {
     const now = new Date();
     const currentSeason = this.getCurrentSeason();
     const config = this.seasonConfig[currentSeason];
-    
+
     if (!config) {
       logger.warn(`No season config found for ${currentSeason}`);
       return false; // Default to allowing access if no config
@@ -92,10 +99,10 @@ class DataAccessControl {
 
     const draftStart = new Date(config.draftPeriodStart);
     const dataRelease = new Date(config.dataReleaseDate);
-    
+
     // Check if we're in the restricted period (draft period through season end)
     const inRestrictedPeriod = now >= draftStart && now < dataRelease;
-    
+
     if (!inRestrictedPeriod) {
       return false; // Data freely available outside restricted period
     }
@@ -114,13 +121,13 @@ class DataAccessControl {
    */
   getDataAvailabilityMessage(dataType: DataType): string {
     const messages: Record<DataType, string> = {
-      'tournament': `Tournament data will be generated after the tournament concludes.`,
-      'draft': `Historical draft analytics will be available once the tournament is complete.`,
-      'player': `Player performance data across tournaments will be compiled after tournament completion.`,
-      'aggregated': `League-wide statistics will be available once the tournament concludes.`,
-      'all': `This data will be available after the tournament concludes.`,
-      'personal': `Your personal data is always available.`,
-      'user': `Your personal data is always available.`
+      tournament: `Tournament data will be generated after the tournament concludes.`,
+      draft: `Historical draft analytics will be available once the tournament is complete.`,
+      player: `Player performance data across tournaments will be compiled after tournament completion.`,
+      aggregated: `League-wide statistics will be available once the tournament concludes.`,
+      all: `This data will be available after the tournament concludes.`,
+      personal: `Your personal data is always available.`,
+      user: `Your personal data is always available.`,
     };
 
     return messages[dataType] || messages['all'];
@@ -132,12 +139,12 @@ class DataAccessControl {
   getAvailableDataTypes(userId: string | null = null): DataAvailability {
     const available: AvailableDataType[] = [];
     const restricted: RestrictedDataType[] = [];
-    
+
     const dataTypes: DataTypeInfo[] = [
       { type: 'personal', label: 'Your Draft History' },
       { type: 'tournament', label: 'Tournament Analytics' },
       { type: 'player', label: 'Player Performance Data' },
-      { type: 'aggregated', label: 'League-wide Statistics' }
+      { type: 'aggregated', label: 'League-wide Statistics' },
     ];
 
     dataTypes.forEach(({ type, label }) => {
@@ -154,13 +161,17 @@ class DataAccessControl {
   /**
    * Validate export request
    */
-  validateExportRequest(exportType: DataType, userId: string | null, requesterId: string): ExportValidationResult {
+  validateExportRequest(
+    exportType: DataType,
+    userId: string | null,
+    requesterId: string,
+  ): ExportValidationResult {
     // Personal data - only accessible by the user themselves
     if (exportType === 'personal' || exportType === 'user') {
       if (userId !== requesterId) {
         return {
           allowed: false,
-          reason: 'You can only export your own personal data.'
+          reason: 'You can only export your own personal data.',
         };
       }
       return { allowed: true };
@@ -170,7 +181,7 @@ class DataAccessControl {
     if (this.isDataRestricted(exportType, userId)) {
       return {
         allowed: false,
-        reason: this.getDataAvailabilityMessage(exportType)
+        reason: this.getDataAvailabilityMessage(exportType),
       };
     }
 
@@ -183,12 +194,13 @@ class DataAccessControl {
   getCurrentSeason(): number {
     const now = new Date();
     const year = now.getFullYear();
-    
+
     // If we're in early months, might be previous season
-    if (now.getMonth() < 4) { // Before May
+    if (now.getMonth() < 4) {
+      // Before May
       return year; // Still in the season that started previous year
     }
-    
+
     return year;
   }
 
@@ -208,12 +220,12 @@ class DataAccessControl {
   isDraftPeriodActive(): boolean {
     const now = new Date();
     const config = this.seasonConfig[this.getCurrentSeason()];
-    
+
     if (!config) return false;
-    
+
     const draftStart = new Date(config.draftPeriodStart);
     const draftEnd = new Date(config.draftPeriodEnd);
-    
+
     return now >= draftStart && now <= draftEnd;
   }
 
@@ -223,12 +235,12 @@ class DataAccessControl {
   isSeasonActive(): boolean {
     const now = new Date();
     const config = this.seasonConfig[this.getCurrentSeason()];
-    
+
     if (!config) return false;
-    
+
     const seasonStart = new Date(config.seasonStart);
     const seasonEnd = new Date(config.seasonEnd);
-    
+
     return now >= seasonStart && now <= seasonEnd;
   }
 
@@ -247,12 +259,13 @@ class DataAccessControl {
    */
   getPeriodMessage(): string {
     const period = this.getCurrentPeriod();
-    
+
     const messages: Record<Period, string> = {
-      'draft': 'Draft period is active. Only personal draft data is available.',
-      'season': 'Tournament is in progress. Historical analytics will be generated after tournament completion.',
-      'restricted': 'Tournament data will be generated after tournament completion.',
-      'offseason': 'All historical data is now available for export and analysis.'
+      draft: 'Draft period is active. Only personal draft data is available.',
+      season:
+        'Tournament is in progress. Historical analytics will be generated after tournament completion.',
+      restricted: 'Tournament data will be generated after tournament completion.',
+      offseason: 'All historical data is now available for export and analysis.',
     };
 
     return messages[period];
@@ -266,55 +279,48 @@ class DataAccessControl {
 // Export restrictions by data type during active season
 export const DATA_TYPE_RESTRICTIONS: Record<DataType, DataTypeRestriction> = {
   // Always allowed
-  'personal': {
+  personal: {
     restricted: false,
-    description: 'Your own draft picks and performance'
+    description: 'Your own draft picks and performance',
   },
-  
+
   // Restricted during active season
-  'tournament': {
+  tournament: {
     restricted: true,
     description: 'Tournament-wide analytics and ownership data',
-    reason: 'Could provide competitive advantages during active play'
+    reason: 'Could provide competitive advantages during active play',
   },
-  
-  'draft': {
-    restricted: true, 
+
+  draft: {
+    restricted: true,
     description: 'Historical draft data across all users',
-    reason: 'Could reveal opponent tendencies and strategies'
+    reason: 'Could reveal opponent tendencies and strategies',
   },
-  
-  'player': {
+
+  player: {
     restricted: true,
     description: 'Player performance across all tournaments',
-    reason: 'Could influence ongoing draft and roster decisions'
+    reason: 'Could influence ongoing draft and roster decisions',
   },
-  
-  'aggregated': {
+
+  aggregated: {
     restricted: true,
     description: 'League-wide statistics and trends',
-    reason: 'Could provide unfair analytical advantages'
+    reason: 'Could provide unfair analytical advantages',
   },
-  
-  'all': {
+
+  all: {
     restricted: true,
     description: 'All data types',
-    reason: 'Restricted during active season'
+    reason: 'Restricted during active season',
   },
-  
-  'user': {
+
+  user: {
     restricted: false,
-    description: 'User personal data'
-  }
+    description: 'User personal data',
+  },
 };
 
 const dataAccessControl = new DataAccessControl();
 
 export { DataAccessControl, dataAccessControl };
-
-// CommonJS exports for backward compatibility
-module.exports = {
-  DataAccessControl,
-  dataAccessControl,
-  DATA_TYPE_RESTRICTIONS
-};

@@ -144,29 +144,3 @@ import * as meta from './sportsdataio.meta';
 import * as players from './sportsdataio.players';
 import * as scores from './sportsdataio.scores';
 import * as teams from './sportsdataio.teams';
-
-module.exports = {
-  // Cache
-  ...cache,
-
-  // Core (projections, schedule, injuries, depth charts, player stats)
-  ...core,
-
-  // Teams
-  ...teams,
-
-  // Meta (news, bye weeks)
-  ...meta,
-
-  // Players
-  ...players,
-
-  // Scores
-  ...scores,
-
-  // Fantasy
-  ...fantasy,
-
-  // Base URL
-  BASE_URL: 'https://api.sportsdata.io/v3/nfl',
-};

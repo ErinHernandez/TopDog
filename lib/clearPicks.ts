@@ -41,9 +41,12 @@ export const clearPicksForRoom = async (roomId: string): Promise<void> => {
 
     await Promise.all(deletePromises);
     logger.debug('Successfully cleared picks', { roomId, count: picksSnapshot.docs.length });
-
   } catch (error) {
-    logger.error('Error clearing picks for room', error instanceof Error ? error : new Error(String(error)), { roomId });
+    logger.error(
+      'Error clearing picks for room',
+      error instanceof Error ? error : new Error(String(error)),
+      { roomId },
+    );
     throw error;
   }
 };
@@ -57,7 +60,11 @@ export const clearPicksForMultipleRooms = async (roomIds: string[]): Promise<voi
     try {
       await clearPicksForRoom(roomId);
     } catch (error) {
-      logger.error('Failed to clear picks for room', error instanceof Error ? error : new Error(String(error)), { roomId });
+      logger.error(
+        'Failed to clear picks for room',
+        error instanceof Error ? error : new Error(String(error)),
+        { roomId },
+      );
     }
   }
 };
@@ -73,9 +80,7 @@ export const clearPicksForCompletedRooms = async (): Promise<void> => {
     const roomsRef = collection(db, 'draftRooms');
     const roomsSnapshot = await getDocs(query(roomsRef, limit(100)));
 
-    const completedRooms = roomsSnapshot.docs.filter(doc =>
-      doc.data().status === 'completed'
-    );
+    const completedRooms = roomsSnapshot.docs.filter(doc => doc.data().status === 'completed');
 
     logger.debug('Found completed rooms', { count: completedRooms.length });
 
@@ -83,21 +88,22 @@ export const clearPicksForCompletedRooms = async (): Promise<void> => {
       try {
         await clearPicksForRoom(roomDoc.id);
       } catch (error) {
-        logger.error('Failed to clear picks for room', error instanceof Error ? error : new Error(String(error)), { roomId: roomDoc.id });
+        logger.error(
+          'Failed to clear picks for room',
+          error instanceof Error ? error : new Error(String(error)),
+          { roomId: roomDoc.id },
+        );
       }
     }
 
     logger.debug('Finished clearing picks for all completed rooms');
-
   } catch (error) {
-    logger.error('Error clearing picks for completed rooms', error instanceof Error ? error : new Error(String(error)));
+    logger.error(
+      'Error clearing picks for completed rooms',
+      error instanceof Error ? error : new Error(String(error)),
+    );
     throw error;
   }
 };
 
-// CommonJS exports for backward compatibility
-module.exports = {
-  clearPicksForRoom,
-  clearPicksForMultipleRooms,
-  clearPicksForCompletedRooms
-};
+// ESM-only — removed legacy module.exports to fix Next.js build error

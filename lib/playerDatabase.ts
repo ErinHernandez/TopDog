@@ -123,18 +123,18 @@ const PLAYER_DATABASE: PlayerDatabaseStructure = {
       projections: ['Mike Clay ESPN 2025'],
       historical: [],
       adp: [],
-      rankings: []
+      rankings: [],
     },
-    season: 2025
+    season: 2025,
   },
-  
+
   // Player data organized by position
   players: {
     QB: [],
     RB: [],
     WR: [],
-    TE: []
-  }
+    TE: [],
+  },
 };
 
 /**
@@ -147,7 +147,7 @@ export const PLAYER_TEMPLATE: PlayerData = {
   position: 'QB',
   team: '',
   bye: null,
-  
+
   // Current Season Projections (2025)
   projections: {
     mikeClay: {
@@ -161,26 +161,26 @@ export const PLAYER_TEMPLATE: PlayerData = {
         yards: null,
         touchdowns: null,
         interceptions: null,
-        sacks: null
+        sacks: null,
       },
       rushing: {
         attempts: null,
         yards: null,
-        touchdowns: null
+        touchdowns: null,
       },
       receiving: {
         targets: null,
         receptions: null,
         yards: null,
-        touchdowns: null
-      }
-    }
+        touchdowns: null,
+      },
+    },
     // Additional projection sources can be added here
     // fantasyPros: { ... },
     // underdog: { ... },
     // etc.
   },
-  
+
   // Historical Statistics
   historical: {
     2024: {
@@ -189,35 +189,35 @@ export const PLAYER_TEMPLATE: PlayerData = {
       // Position-specific historical stats
       passing: {},
       rushing: {},
-      receiving: {}
+      receiving: {},
     },
     2023: {
       fantasyPoints: null,
       games: null,
       passing: {},
       rushing: {},
-      receiving: {}
+      receiving: {},
     },
     2022: {
       fantasyPoints: null,
       games: null,
       passing: {},
       rushing: {},
-      receiving: {}
-    }
+      receiving: {},
+    },
     // Can extend to more years as needed
   },
-  
+
   // Draft and Rankings Data
   draft: {
     adp: null,
     adpSource: '',
     expertRankings: {
       overall: null,
-      position: null
-    }
+      position: null,
+    },
   },
-  
+
   // Advanced Analytics (for future expansion)
   analytics: {
     consistency: null,
@@ -226,15 +226,15 @@ export const PLAYER_TEMPLATE: PlayerData = {
     snapShare: null,
     targetShare: null,
     redZoneTargets: null,
-    goalLineCarries: null
+    goalLineCarries: null,
   },
-  
+
   // Injury/Risk Factors
   risk: {
     injuryHistory: [],
     ageRisk: null,
-    situationRisk: null
-  }
+    situationRisk: null,
+  },
 };
 
 // ============================================================================
@@ -250,21 +250,21 @@ class PlayerDatabase {
     if (!PLAYER_DATABASE.players[position]) {
       PLAYER_DATABASE.players[position] = [];
     }
-    
+
     // Generate unique ID if not provided
     if (!playerData.id) {
       playerData.id = `${position}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     }
-    
+
     PLAYER_DATABASE.players[position].push(playerData as PlayerData);
     PLAYER_DATABASE.meta.lastUpdated = new Date().toISOString();
   }
-  
+
   static findPlayer(name: string, position: Position | null = null): PlayerData | null {
     if (position) {
       return PLAYER_DATABASE.players[position]?.find(p => p.name === name) || null;
     }
-    
+
     // Search all positions
     for (const pos of POSITIONS) {
       const player = PLAYER_DATABASE.players[pos as Position]?.find(p => p.name === name);
@@ -272,8 +272,12 @@ class PlayerDatabase {
     }
     return null;
   }
-  
-  static updatePlayer(name: string, position: Position | null, updates: Partial<PlayerData>): boolean {
+
+  static updatePlayer(
+    name: string,
+    position: Position | null,
+    updates: Partial<PlayerData>,
+  ): boolean {
     const player = this.findPlayer(name, position);
     if (player) {
       Object.assign(player, updates);
@@ -282,7 +286,7 @@ class PlayerDatabase {
     }
     return false;
   }
-  
+
   static getAllPlayers(): PlayerData[] {
     const allPlayers: PlayerData[] = [];
     for (const position of POSITIONS) {
@@ -290,11 +294,11 @@ class PlayerDatabase {
     }
     return allPlayers;
   }
-  
+
   static getPlayersByPosition(position: Position): PlayerData[] {
     return PLAYER_DATABASE.players[position] || [];
   }
-  
+
   static sortByProjection(position: Position, source: string = 'mikeClay'): PlayerData[] {
     const players = this.getPlayersByPosition(position);
     return players
@@ -305,11 +309,11 @@ class PlayerDatabase {
         return bPoints - aPoints;
       });
   }
-  
+
   static exportToJSON(): string {
     return JSON.stringify(PLAYER_DATABASE, null, 2);
   }
-  
+
   static importFromJSON(jsonString: string): boolean {
     try {
       const data = JSON.parse(jsonString) as Partial<PlayerDatabaseStructure>;
@@ -317,7 +321,10 @@ class PlayerDatabase {
       return true;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      serverLogger.error('Error importing player database', error instanceof Error ? error : new Error(errorMessage));
+      serverLogger.error(
+        'Error importing player database',
+        error instanceof Error ? error : new Error(errorMessage),
+      );
       return false;
     }
   }
@@ -328,10 +335,3 @@ class PlayerDatabase {
 // ============================================================================
 
 export { PLAYER_DATABASE, PlayerDatabase };
-
-// CommonJS exports for backward compatibility
-module.exports = {
-  PLAYER_DATABASE,
-  PLAYER_TEMPLATE,
-  PlayerDatabase
-};

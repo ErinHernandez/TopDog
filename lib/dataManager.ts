@@ -29,13 +29,16 @@ export interface Player {
   name: string;
   position?: Position;
   team?: string;
-  historical?: Record<string, {
-    fantasyPoints?: number | null;
-    games?: number | null;
-    passing?: Record<string, unknown>;
-    rushing?: Record<string, unknown>;
-    receiving?: Record<string, unknown>;
-  }>;
+  historical?: Record<
+    string,
+    {
+      fantasyPoints?: number | null;
+      games?: number | null;
+      passing?: Record<string, unknown>;
+      rushing?: Record<string, unknown>;
+      receiving?: Record<string, unknown>;
+    }
+  >;
   draft?: {
     adp?: number | null;
     adpSource?: string;
@@ -111,7 +114,10 @@ class DataManager {
         this.database = this.createEmptyDatabase();
       }
     } catch (error) {
-      serverLogger.error('Error loading database', error instanceof Error ? error : new Error(String(error)));
+      serverLogger.error(
+        'Error loading database',
+        error instanceof Error ? error : new Error(String(error)),
+      );
       this.database = this.createEmptyDatabase();
     }
   }
@@ -124,16 +130,16 @@ class DataManager {
           projections: [],
           historical: [],
           adp: [],
-          rankings: []
+          rankings: [],
         },
-        season: 2025
+        season: 2025,
       },
       players: {
         QB: [],
         RB: [],
         WR: [],
-        TE: []
-      }
+        TE: [],
+      },
     };
   }
 
@@ -171,7 +177,10 @@ class DataManager {
 
       return true;
     } catch (error) {
-      serverLogger.error('Error saving database', error instanceof Error ? error : new Error(String(error)));
+      serverLogger.error(
+        'Error saving database',
+        error instanceof Error ? error : new Error(String(error)),
+      );
       return false;
     }
   }
@@ -192,20 +201,20 @@ class DataManager {
     if (!this.database) return null;
 
     const normalizedSearch = searchName.toLowerCase().trim();
-    
+
     const searchPositions: Position[] = position ? [position] : ['QB', 'RB', 'WR', 'TE'];
-    
+
     for (const pos of searchPositions) {
       const players = this.database.players[pos] || [];
-      
+
       // Exact match first
       let found = players.find(p => p.name.toLowerCase() === normalizedSearch);
       if (found) return found;
-      
+
       // Partial match
       found = players.find(p => p.name.toLowerCase().includes(normalizedSearch));
       if (found) return found;
-      
+
       // Last name match
       const searchLastName = normalizedSearch.split(' ').pop();
       if (searchLastName) {
@@ -213,12 +222,16 @@ class DataManager {
         if (found) return found;
       }
     }
-    
+
     return null;
   }
 
   // Add historical stats for a player
-  addHistoricalStats(playerName: string, year: number | string, stats: Record<string, unknown>): boolean {
+  addHistoricalStats(
+    playerName: string,
+    year: number | string,
+    stats: Record<string, unknown>,
+  ): boolean {
     if (!this.database) return false;
 
     const player = this.findPlayer(playerName);
@@ -238,7 +251,7 @@ class DataManager {
         games: null,
         passing: {},
         rushing: {},
-        receiving: {}
+        receiving: {},
       };
     }
 
@@ -265,8 +278,8 @@ class DataManager {
         adpSource: '',
         expertRankings: {
           overall: null,
-          position: null
-        }
+          position: null,
+        },
       };
     }
 
@@ -278,31 +291,46 @@ class DataManager {
   }
 
   // Batch import from CSV with validation
-  importFromCSV(csvFilePath: string, dataType: 'historical' | 'adp' = 'historical', year: number = 2024): ImportResult {
+  importFromCSV(
+    csvFilePath: string,
+    dataType: 'historical' | 'adp' = 'historical',
+    year: number = 2024,
+  ): ImportResult {
     if (!this.database) {
-      return { imported: 0, errors: 1, duplicateRanks: [], validationErrors: ['Database not loaded'] };
+      return {
+        imported: 0,
+        errors: 1,
+        duplicateRanks: [],
+        validationErrors: ['Database not loaded'],
+      };
     }
 
     try {
       const csvData = fs.readFileSync(csvFilePath, 'utf8');
       const lines = csvData.split('\n').filter(line => line.trim());
       const headers = lines[0]!.split(',').map(h => h.trim());
-      
+
       let imported = 0;
       let errors = 0;
       const duplicateRanks = new Set<number>();
       const usedRanks = new Set<number>();
       const validationErrors: string[] = [];
 
-      serverLogger.info('Starting CSV import', { dataType, file: path.basename(csvFilePath), headers: headers.join(', ') });
-      
+      serverLogger.info('Starting CSV import', {
+        dataType,
+        file: path.basename(csvFilePath),
+        headers: headers.join(', '),
+      });
+
       for (let i = 1; i < lines.length; i++) {
         const values = lines[i]!.split(',').map(v => v.trim());
         const rowNum = i + 1;
 
         // Validate row completeness
         if (values.length < headers.length) {
-          validationErrors.push(`Row ${rowNum}: Incomplete data (${values.length}/${headers.length} columns)`);
+          validationErrors.push(
+            `Row ${rowNum}: Incomplete data (${values.length}/${headers.length} columns)`,
+          );
           errors++;
           continue;
         }
@@ -313,14 +341,14 @@ class DataManager {
         });
 
         const playerName = values[0];
-        
+
         // Validate player name
         if (!playerName || playerName.trim() === '') {
           validationErrors.push(`Row ${rowNum}: Missing player name`);
           errors++;
           continue;
         }
-        
+
         if (dataType === 'historical') {
           if (this.addHistoricalStats(playerName, year, rowData)) {
             imported++;
@@ -329,14 +357,14 @@ class DataManager {
           }
         } else if (dataType === 'adp') {
           const adp = parseFloat(values[1]!);
-          
+
           // Validate ADP value
           if (isNaN(adp) || adp <= 0) {
             validationErrors.push(`Row ${rowNum}: Invalid ADP "${values[1]}" for ${playerName}`);
             errors++;
             continue;
           }
-          
+
           // Check for duplicate ranks
           const rank = Math.round(adp);
           if (usedRanks.has(rank)) {
@@ -345,7 +373,7 @@ class DataManager {
           } else {
             usedRanks.add(rank);
           }
-          
+
           const source = rowData.source || 'CSV Import';
           if (this.addADPData(playerName, adp, source)) {
             imported++;
@@ -359,26 +387,33 @@ class DataManager {
       if (validationErrors.length > 0) {
         serverLogger.warn('Validation errors found during import', null, {
           errorCount: validationErrors.length,
-          sampleErrors: validationErrors.slice(0, 10)
+          sampleErrors: validationErrors.slice(0, 10),
         });
       }
 
       if (duplicateRanks.size > 0) {
         serverLogger.error('Data quality issue: duplicate ranks detected', undefined, {
-          duplicateRanks: Array.from(duplicateRanks).join(', ')
+          duplicateRanks: Array.from(duplicateRanks).join(', '),
         });
       }
 
-      serverLogger.info('Import complete', { imported, errors, duplicateRanks: duplicateRanks.size });
-      return { 
-        imported, 
-        errors, 
+      serverLogger.info('Import complete', {
+        imported,
+        errors,
+        duplicateRanks: duplicateRanks.size,
+      });
+      return {
+        imported,
+        errors,
         duplicateRanks: Array.from(duplicateRanks),
-        validationErrors 
+        validationErrors,
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      serverLogger.error('Error importing CSV', error instanceof Error ? error : new Error(errorMessage));
+      serverLogger.error(
+        'Error importing CSV',
+        error instanceof Error ? error : new Error(errorMessage),
+      );
       return { imported: 0, errors: 1, duplicateRanks: [], validationErrors: [errorMessage] };
     }
   }
@@ -393,8 +428,8 @@ class DataManager {
           projections: 0,
           historical2024: 0,
           historical2023: 0,
-          adp: 0
-        }
+          adp: 0,
+        },
       };
     }
 
@@ -404,14 +439,14 @@ class DataManager {
         QB: 0,
         RB: 0,
         WR: 0,
-        TE: 0
+        TE: 0,
       },
       dataCoverage: {
         projections: 0,
         historical2024: 0,
         historical2023: 0,
-        adp: 0
-      }
+        adp: 0,
+      },
     };
 
     (['QB', 'RB', 'WR', 'TE'] as Position[]).forEach(pos => {
@@ -419,7 +454,10 @@ class DataManager {
       report.byPosition[pos] = players.length;
 
       players.forEach(player => {
-        if (player.projections?.mikeClay?.fantasyPoints && player.projections.mikeClay.fantasyPoints > 0) {
+        if (
+          player.projections?.mikeClay?.fantasyPoints &&
+          player.projections.mikeClay.fantasyPoints > 0
+        ) {
           report.dataCoverage.projections++;
         }
         if (player.historical?.['2024']?.fantasyPoints) {
@@ -439,8 +477,10 @@ class DataManager {
 
   getTotalPlayers(): number {
     if (!this.database) return 0;
-    return Object.values(this.database.players).reduce((total, posPlayers) => 
-      total + (posPlayers?.length || 0), 0);
+    return Object.values(this.database.players).reduce(
+      (total, posPlayers) => total + (posPlayers?.length || 0),
+      0,
+    );
   }
 
   // Utility to add team info to all players
@@ -448,7 +488,7 @@ class DataManager {
     if (!this.database) return 0;
 
     let updated = 0;
-    
+
     Object.keys(teamMappings).forEach(playerName => {
       const player = this.findPlayer(playerName);
       if (player) {
@@ -466,15 +506,17 @@ class DataManager {
     if (!this.database) return [];
 
     const players = this.database.players[position] || [];
-    
+
     return players
       .filter(p => {
         const projection = p.projections?.[sortBy] as { fantasyPoints?: number } | undefined;
         return projection?.fantasyPoints && projection.fantasyPoints > 0;
       })
       .sort((a, b) => {
-        const aProj = (a.projections?.[sortBy] as { fantasyPoints?: number } | undefined)?.fantasyPoints || 0;
-        const bProj = (b.projections?.[sortBy] as { fantasyPoints?: number } | undefined)?.fantasyPoints || 0;
+        const aProj =
+          (a.projections?.[sortBy] as { fantasyPoints?: number } | undefined)?.fantasyPoints || 0;
+        const bProj =
+          (b.projections?.[sortBy] as { fantasyPoints?: number } | undefined)?.fantasyPoints || 0;
         return bProj - aProj;
       })
       .slice(0, count);
@@ -485,7 +527,7 @@ class DataManager {
     if (!this.database) return [];
 
     const allPlayers: Player[] = [];
-    
+
     (['QB', 'RB', 'WR', 'TE'] as Position[]).forEach(pos => {
       const players = this.database!.players[pos] || [];
       players.forEach(player => {
@@ -505,7 +547,7 @@ class DataManager {
       const projection = player.projections?.mikeClay?.fantasyPoints;
       if (!projection || projection < filters.minProjection) return false;
     }
-    
+
     return true;
   }
 }
@@ -515,6 +557,3 @@ class DataManager {
 // ============================================================================
 
 export default DataManager;
-
-// CommonJS exports for backward compatibility
-module.exports = DataManager;

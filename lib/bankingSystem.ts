@@ -35,23 +35,20 @@ export type PaymentMethod = 'stripe' | 'paypal' | 'bank_transfer' | 'crypto' | s
 export const createDeposit = async (
   amount: number,
   method: PaymentMethod,
-  userData: UserData | null | undefined
+  userData: UserData | null | undefined,
 ): Promise<DepositResult> => {
   // Mock implementation - in real app this would integrate with actual banking system
   serverLogger.info(`Creating deposit of $${amount} using ${method} for user ${userData?.id}`);
-  
+
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 1000));
-  
+
   return {
     success: true,
     transactionId: `txn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     amount: amount,
     method: method,
     timestamp: new Date().toISOString(),
-    status: 'pending'
+    status: 'pending',
   };
 };
-
-// CommonJS exports for backward compatibility
-module.exports = { createDeposit };
