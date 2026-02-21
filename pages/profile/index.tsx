@@ -25,3 +25,6 @@ export default function ProfileIndex() {
 
   return null;
 }
+
+// Force SSR to avoid static prerender errors (useAuth needs provider at runtime)
+export const getServerSideProps = () => ({ props: {} });

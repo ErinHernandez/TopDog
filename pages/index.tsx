@@ -45,13 +45,13 @@ export default function Home(): React.ReactElement {
       <main style={s.main}>
         {(error || authError) && <p style={s.error}>{error || authError}</p>}
 
-        <form style={s.form} onSubmit={(e) => e.preventDefault()}>
+        <form style={s.form} onSubmit={e => e.preventDefault()}>
           <input
             type="text"
             style={s.input}
             placeholder=""
             value={identifier}
-            onChange={(e) => setIdentifier(e.target.value)}
+            onChange={e => setIdentifier(e.target.value)}
             disabled={isSubmitting}
             autoComplete="username"
           />
@@ -62,7 +62,7 @@ export default function Home(): React.ReactElement {
               style={{ ...s.input, paddingRight: '3rem' }}
               placeholder=""
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={e => setPassword(e.target.value)}
               onBlur={handlePasswordBlur}
               disabled={isSubmitting}
               autoComplete="current-password"
@@ -70,11 +70,20 @@ export default function Home(): React.ReactElement {
             <button
               type="button"
               style={s.eyeBtn}
-              onClick={() => setShowPassword((v) => !v)}
+              onClick={() => setShowPassword(v => !v)}
               tabIndex={-1}
               aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7a94" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#6b7a94"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 {showPassword ? (
                   <>
                     <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
@@ -149,3 +158,6 @@ const s: Record<string, React.CSSProperties> = {
     alignItems: 'center',
   },
 };
+
+// Force SSR to avoid static prerender errors (useAuth needs provider at runtime)
+export const getServerSideProps = () => ({ props: {} });

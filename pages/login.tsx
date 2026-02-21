@@ -94,9 +94,9 @@ export default function LoginPage() {
 
   /* ---- handle input change ---- */
   const handleInputChange = (field: keyof FormState, value: string) => {
-    setFormState((prev) => ({ ...prev, [field]: value }));
+    setFormState(prev => ({ ...prev, [field]: value }));
     if (formErrors[field]) {
-      setFormErrors((prev) => {
+      setFormErrors(prev => {
         const updated = { ...prev };
         delete updated[field];
         return updated;
@@ -145,7 +145,7 @@ export default function LoginPage() {
                 className={`${styles.input} ${formErrors.identifier ? styles.inputError : ''}`}
                 placeholder="username or email"
                 value={formState.identifier}
-                onChange={(e) => handleInputChange('identifier', e.target.value)}
+                onChange={e => handleInputChange('identifier', e.target.value)}
                 disabled={isSubmitting}
                 autoComplete="username"
               />
@@ -165,13 +165,11 @@ export default function LoginPage() {
                 className={`${styles.input} ${formErrors.password ? styles.inputError : ''}`}
                 placeholder="••••••••"
                 value={formState.password}
-                onChange={(e) => handleInputChange('password', e.target.value)}
+                onChange={e => handleInputChange('password', e.target.value)}
                 disabled={isSubmitting}
                 autoComplete="current-password"
               />
-              {formErrors.password && (
-                <p className={styles.fieldError}>{formErrors.password}</p>
-              )}
+              {formErrors.password && <p className={styles.fieldError}>{formErrors.password}</p>}
             </div>
 
             {/* Sign In Button */}
@@ -195,3 +193,6 @@ export default function LoginPage() {
     </>
   );
 }
+
+// Force SSR to avoid static prerender errors (useAuth needs provider at runtime)
+export const getServerSideProps = () => ({ props: {} });

@@ -63,3 +63,6 @@ export default function LocationResearch(): JSX.Element {
     </div>
   );
 }
+
+// Force SSR to avoid static prerender errors (useUser needs UserProvider at runtime)
+export const getServerSideProps = () => ({ props: {} });

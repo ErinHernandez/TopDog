@@ -278,3 +278,6 @@ export default function Page(): JSX.Element {
 
   return <AuthTestPage />;
 }
+
+// Force SSR to avoid static prerender errors (useAuth needs provider at runtime)
+export const getServerSideProps = () => ({ props: {} });

@@ -84,7 +84,9 @@ export default function ResetPasswordPage() {
     setIsSubmitting(true);
     try {
       await resetPassword(formState.email);
-      setSuccessMessage('Check your email for a password reset link. It may take a few minutes to arrive.');
+      setSuccessMessage(
+        'Check your email for a password reset link. It may take a few minutes to arrive.',
+      );
       setFormState({ email: '' });
     } catch {
       setDisplayError(authError || 'Failed to send reset email. Please try again.');
@@ -155,7 +157,7 @@ export default function ResetPasswordPage() {
                   className={`${styles.input} ${formErrors.email ? styles.inputError : ''}`}
                   placeholder="you@example.com"
                   value={formState.email}
-                  onChange={(e) => handleInputChange(e.target.value)}
+                  onChange={e => handleInputChange(e.target.value)}
                   disabled={isSubmitting}
                   autoComplete="email"
                 />
@@ -184,3 +186,6 @@ export default function ResetPasswordPage() {
     </>
   );
 }
+
+// Force SSR to avoid static prerender errors (useAuth needs provider at runtime)
+export const getServerSideProps = () => ({ props: {} });

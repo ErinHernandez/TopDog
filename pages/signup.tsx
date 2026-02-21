@@ -45,13 +45,7 @@ interface FormErrors {
 
 function GoogleIcon() {
   return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
         fill="currentColor"
@@ -166,10 +160,10 @@ export default function SignUpPage() {
 
   /* ---- handle input change ---- */
   const handleInputChange = (field: keyof FormState, value: string) => {
-    setFormState((prev) => ({ ...prev, [field]: value }));
+    setFormState(prev => ({ ...prev, [field]: value }));
     // Clear field error when user starts typing
     if (formErrors[field]) {
-      setFormErrors((prev) => {
+      setFormErrors(prev => {
         const updated = { ...prev };
         delete updated[field];
         return updated;
@@ -216,7 +210,7 @@ export default function SignUpPage() {
                 className={`${styles.input} ${formErrors.displayName ? styles.inputError : ''}`}
                 placeholder="Your name"
                 value={formState.displayName}
-                onChange={(e) => handleInputChange('displayName', e.target.value)}
+                onChange={e => handleInputChange('displayName', e.target.value)}
                 disabled={isSubmitting}
                 autoComplete="name"
               />
@@ -236,7 +230,7 @@ export default function SignUpPage() {
                 className={`${styles.input} ${formErrors.email ? styles.inputError : ''}`}
                 placeholder="you@example.com"
                 value={formState.email}
-                onChange={(e) => handleInputChange('email', e.target.value)}
+                onChange={e => handleInputChange('email', e.target.value)}
                 disabled={isSubmitting}
                 autoComplete="email"
               />
@@ -254,7 +248,7 @@ export default function SignUpPage() {
                 className={`${styles.input} ${formErrors.password ? styles.inputError : ''}`}
                 placeholder="••••••••"
                 value={formState.password}
-                onChange={(e) => handleInputChange('password', e.target.value)}
+                onChange={e => handleInputChange('password', e.target.value)}
                 disabled={isSubmitting}
                 autoComplete="new-password"
               />
@@ -272,7 +266,7 @@ export default function SignUpPage() {
                 className={`${styles.input} ${formErrors.confirmPassword ? styles.inputError : ''}`}
                 placeholder="••••••••"
                 value={formState.confirmPassword}
-                onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                onChange={e => handleInputChange('confirmPassword', e.target.value)}
                 disabled={isSubmitting}
                 autoComplete="new-password"
               />
@@ -321,3 +315,6 @@ export default function SignUpPage() {
     </>
   );
 }
+
+// Force SSR to avoid static prerender errors (useAuth needs provider at runtime)
+export const getServerSideProps = () => ({ props: {} });
