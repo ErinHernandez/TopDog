@@ -6,11 +6,11 @@
 import { Page } from '@playwright/test';
 
 export const DEV_USER = {
-  uid: 'dev-001',
-  email: 'newusername@idesaign.dev',
-  username: 'newusername',
-  password: 'newusername',
-  displayName: 'Teddy',
+  uid: process.env.E2E_DEV_UID || 'dev-001',
+  email: process.env.E2E_DEV_EMAIL || 'test@example.com',
+  username: process.env.E2E_DEV_USERNAME || 'testuser',
+  password: process.env.E2E_DEV_PASSWORD || 'testpassword',
+  displayName: process.env.E2E_DEV_DISPLAY_NAME || 'Test User',
 };
 
 /**
@@ -20,7 +20,7 @@ export const DEV_USER = {
  */
 export async function setupDevAuth(page: Page): Promise<void> {
   await page.goto('/');
-  await page.evaluate((account) => {
+  await page.evaluate(account => {
     localStorage.setItem('idesaign_dev_user', JSON.stringify(account));
   }, DEV_USER);
 }

@@ -11,15 +11,13 @@ import type { JSX } from 'react';
 import { createScopedLogger } from '@/lib/clientLogger';
 
 const logger = createScopedLogger('[PlayerDropdown]');
- 
+
 import type { PlayerPoolEntry } from '../../../lib/playerPool';
 import { PlayerExpandedCard } from '../PlayerExpandedCard';
 
 import PlayerDropdownRow from './PlayerDropdownRow';
-import { DROPDOWN_STYLES, DROPDOWN_DIMENSIONS, CONTEXT_OVERRIDES, type ContextOverride } from './PlayerDropdownStyles';
-
-const { playerDataService } = require('../../../lib/playerData/PlayerDataService');
-
+import { CONTEXT_OVERRIDES, type ContextOverride } from './PlayerDropdownStyles';
+import { playerDataService } from '../../../lib/playerData/PlayerDataService';
 
 // ============================================================================
 // TYPES
@@ -31,43 +29,47 @@ export interface PlayerDropdownProps {
   // Data props
   players?: PlayerPoolEntry[] | null;
   selectedPlayer?: PlayerPoolEntry | null;
-  
+
   // Context props
   context?: DropdownContext;
   isMyTurn?: boolean;
-  
+
   // Filter props
   position?: string | null;
   team?: string | null;
   searchTerm?: string;
   sortBy?: string;
-  
+
   // Action handlers
   onPlayerSelect?: (player: PlayerPoolEntry) => void;
   onDraftPlayer?: (player: PlayerPoolEntry) => void;
   onQueuePlayer?: (player: PlayerPoolEntry) => void;
-  
+
   // Display options
   showActions?: boolean;
   showStats?: boolean;
   maxHeight?: string;
-  
+
   // Custom styling
   customStyles?: React.CSSProperties;
   className?: string;
-  
+
   // Loading states
   loading?: boolean;
   error?: string | null;
-  
+
   // CRITICAL: Render prop for existing player cells
-  renderPlayerCell?: (player: PlayerPoolEntry, index: number, context: {
-    isExpanded: boolean;
-    isSelected: boolean;
-    isMyTurn: boolean;
-    context: DropdownContext;
-  }) => React.ReactNode;
-  
+  renderPlayerCell?: (
+    player: PlayerPoolEntry,
+    index: number,
+    context: {
+      isExpanded: boolean;
+      isSelected: boolean;
+      isMyTurn: boolean;
+      context: DropdownContext;
+    },
+  ) => React.ReactNode;
+
   // Dropdown positioning
   dropdownOffset?: number; // Pixels below player row to show dropdown
 }
@@ -80,38 +82,38 @@ export default function PlayerDropdown({
   // Data props
   players: externalPlayers = null,
   selectedPlayer = null,
-  
+
   // Context props
   context = 'DRAFT_ROOM',
   isMyTurn = false,
-  
+
   // Filter props
   position = null,
   team = null,
   searchTerm = '',
   sortBy = 'rank',
-  
+
   // Action handlers
   onPlayerSelect = () => {},
   onDraftPlayer = () => {},
   onQueuePlayer = () => {},
-  
+
   // Display options
-  showActions = true,
-  showStats = true,
+  showActions: _showActions = true,
+  showStats: _showStats = true,
   maxHeight = '400px',
-  
+
   // Custom styling
   customStyles = {},
   className = '',
-  
+
   // Loading states
   loading = false,
   error = null,
-  
+
   // CRITICAL: Render prop for existing player cells
   renderPlayerCell = undefined,
-  
+
   // Dropdown positioning
   dropdownOffset = 14, // Pixels below player row to show dropdown
 }: PlayerDropdownProps): JSX.Element {
@@ -122,14 +124,15 @@ export default function PlayerDropdown({
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Get context-specific configuration
-  const contextConfig: ContextOverride = CONTEXT_OVERRIDES[context] || CONTEXT_OVERRIDES.DRAFT_ROOM!;
+  const _contextConfig: ContextOverride =
+    CONTEXT_OVERRIDES[context] || CONTEXT_OVERRIDES.DRAFT_ROOM!;
 
   // Load player data if not provided externally
   useEffect(() => {
     if (!externalPlayers) {
       loadPlayers();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- loadPlayers is stable
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- loadPlayers is stable
   }, [position, team, searchTerm, sortBy, externalPlayers]);
 
   // Subscribe to player data updates
@@ -151,13 +154,13 @@ export default function PlayerDropdown({
     setDataError(null);
 
     try {
-      const playerData = await playerDataService.getPlayers({
+      const playerData = (await playerDataService.getPlayers({
         position,
         team,
         searchTerm,
-        sortBy
-      }) as PlayerPoolEntry[];
-      
+        sortBy,
+      })) as PlayerPoolEntry[];
+
       setPlayers(playerData);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
@@ -171,31 +174,34 @@ export default function PlayerDropdown({
   const handlePlayerClick = (player: PlayerPoolEntry): void => {
     const wasExpanded = expandedPlayer === player.name;
     const willExpand = !wasExpanded;
-    
+
     // Toggle expansion
     setExpandedPlayer(wasExpanded ? null : player.name);
-    
+
     // Auto-scroll to make expanded dropdown fully visible
     if (willExpand && context === 'TEAM_MANAGEMENT') {
       setTimeout(() => {
-        const playerElement = dropdownRef.current?.querySelector(`[data-player-name="${player.name}"]`);
+        const playerElement = dropdownRef.current?.querySelector(
+          `[data-player-name="${player.name}"]`,
+        );
         if (playerElement) {
           // Find the scroll container (should be the mobile scroll container)
-          const scrollContainer = playerElement.closest('.h-full.overflow-y-auto.overflow-x-hidden') || 
-                                 playerElement.closest('.h-full.overflow-y-auto') ||
-                                 playerElement.closest('[style*="overflow-y"]') ||
-                                 window;
-          
+          const scrollContainer =
+            playerElement.closest('.h-full.overflow-y-auto.overflow-x-hidden') ||
+            playerElement.closest('.h-full.overflow-y-auto') ||
+            playerElement.closest('[style*="overflow-y"]') ||
+            window;
+
           if (scrollContainer && scrollContainer !== window) {
             // Calculate the expanded dropdown height (approximate)
             const dropdownHeight = 200; // Approximate height of expanded dropdown
             const playerRect = playerElement.getBoundingClientRect();
             const containerRect = (scrollContainer as Element).getBoundingClientRect();
-            
+
             // Check if dropdown would be cut off at bottom
             const dropdownBottom = playerRect.bottom + dropdownHeight;
             const containerBottom = containerRect.bottom;
-            
+
             if (dropdownBottom > containerBottom) {
               // Scroll to show the full dropdown
               const scrollAmount = dropdownBottom - containerBottom + 20; // 20px padding
@@ -205,7 +211,7 @@ export default function PlayerDropdown({
         }
       }, 50); // Small delay to allow DOM to update
     }
-    
+
     // Notify parent of selection
     onPlayerSelect(player);
   };
@@ -213,16 +219,15 @@ export default function PlayerDropdown({
   const handleDraftPlayer = (player: PlayerPoolEntry, event?: React.MouseEvent): void => {
     event?.stopPropagation();
     onDraftPlayer(player);
-    
+
     // Close expansion after drafting
     setExpandedPlayer(null);
   };
 
-  const handleQueuePlayer = (player: PlayerPoolEntry, event?: React.MouseEvent): void => {
+  const _handleQueuePlayer = (player: PlayerPoolEntry, event?: React.MouseEvent): void => {
     event?.stopPropagation();
     onQueuePlayer(player);
   };
-
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -268,15 +273,15 @@ export default function PlayerDropdown({
   }
 
   return (
-    <div 
+    <div
       ref={dropdownRef}
       className={`player-dropdown ${className}`}
-      style={{ 
+      style={{
         maxHeight: context === 'TEAM_MANAGEMENT' ? 'none' : maxHeight,
         overflowY: context === 'TEAM_MANAGEMENT' ? 'visible' : 'auto',
         position: 'relative',
         zIndex: 1,
-        ...customStyles 
+        ...customStyles,
       }}
     >
       {/* Hide all scrollbars completely */}
@@ -315,7 +320,11 @@ export default function PlayerDropdown({
       `}</style>
 
       {players.map((player, index) => (
-            <div key={player.name} className="relative" style={{ zIndex: expandedPlayer === player.name ? 9999 : 1 }}>
+        <div
+          key={player.name}
+          className="relative"
+          style={{ zIndex: expandedPlayer === player.name ? 9999 : 1 }}
+        >
           {/* Pure Wrapper - Makes ANY existing player cell clickable */}
           <PlayerDropdownRow
             player={player}
@@ -353,7 +362,7 @@ export default function PlayerDropdown({
                 isExpanded: expandedPlayer === player.name,
                 isSelected: selectedPlayer?.name === player.name,
                 isMyTurn,
-                context
+                context,
               })
             ) : (
               // Fallback: Basic player display (only used if no renderPlayerCell provided)
@@ -375,17 +384,19 @@ export default function PlayerDropdown({
           {expandedPlayer === player.name && (
             <div className="mx-2 mt-3 mb-3" style={{ animation: 'slideDown 0.2s ease-out' }}>
               <PlayerExpandedCard
-                player={player as unknown as {
-                  name: string;
-                  team: string;
-                  position: string;
-                  adp?: number | string | null;
-                  projectedPoints?: number | string | null;
-                  proj?: string | null;
-                }}
+                player={
+                  player as unknown as {
+                    name: string;
+                    team: string;
+                    position: string;
+                    adp?: number | string | null;
+                    projectedPoints?: number | string | null;
+                    proj?: string | null;
+                  }
+                }
                 isMyTurn={isMyTurn}
                 showDraftButton={context !== 'TEAM_MANAGEMENT'}
-                onDraft={(playerData) => {
+                onDraft={_playerData => {
                   // Convert PlayerData back to PlayerPoolEntry for handleDraftPlayer
                   handleDraftPlayer(player);
                 }}

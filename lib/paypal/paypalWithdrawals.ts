@@ -10,33 +10,14 @@
 
 import crypto from 'crypto';
 
-import {
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc,
-  deleteDoc,
-  collection,
-  addDoc,
-  query,
-  where,
-  getDocs,
-  serverTimestamp,
-  runTransaction,
-} from 'firebase/firestore';
+import { doc, getDoc, updateDoc, collection, addDoc } from 'firebase/firestore';
 
 import { captureError } from '../errorTracking';
 import { getDb } from '../firebase-utils';
 import { serverLogger } from '../logger/serverLogger';
 
-
-import {
-  paypalApiRequest,
-  centsToPayPalAmount,
-} from './paypalClient';
-import {
-  getLinkedPayPalAccount,
-} from './paypalOAuth';
+import { paypalApiRequest, centsToPayPalAmount } from './paypalClient';
+import { getLinkedPayPalAccount } from './paypalOAuth';
 import {
   updateUserBalance,
   getWithdrawalCountLast24Hours,
@@ -51,12 +32,10 @@ import type {
   WithdrawalStatus,
   PendingWithdrawal,
   HeldWithdrawal,
-  SupportReviewWithdrawal,
   PayPalPayoutResponse,
   LinkedPayPalAccount,
 } from './paypalTypes';
 import { PAYPAL_WITHDRAWAL_LIMITS } from './paypalTypes';
-
 
 // ============================================================================
 // SECURITY TIER DETERMINATION
@@ -88,9 +67,7 @@ export function getSecurityTier(amountCents: number): WithdrawalSecurityTier {
  * Request a withdrawal
  * Routes to appropriate handler based on security tier
  */
-export async function requestWithdrawal(
-  request: WithdrawalRequest
-): Promise<WithdrawalResponse> {
+export async function requestWithdrawal(request: WithdrawalRequest): Promise<WithdrawalResponse> {
   const { userId, amountCents, linkedAccountId, confirmationMethod } = request;
 
   try {
@@ -140,7 +117,7 @@ export async function requestWithdrawal(
           userId,
           amountCents,
           linkedAccount,
-          confirmationMethod
+          confirmationMethod,
         );
         break;
 
@@ -184,14 +161,14 @@ export async function requestWithdrawal(
 async function processImmediateWithdrawal(
   userId: string,
   amountCents: number,
-  linkedAccount: LinkedPayPalAccount
+  linkedAccount: LinkedPayPalAccount,
 ): Promise<WithdrawalResponse> {
   // 1. Deduct balance first
   const balanceResult = await updateUserBalance(
     userId,
     amountCents,
     'subtract',
-    `withdrawal_${Date.now()}`
+    `withdrawal_${Date.now()}`,
   );
 
   if (!balanceResult.success) {
@@ -203,20 +180,11 @@ async function processImmediateWithdrawal(
 
   try {
     // 2. Create PayPal payout
-    const payoutResult = await createPayPalPayout(
-      userId,
-      linkedAccount.paypalEmail,
-      amountCents
-    );
+    const payoutResult = await createPayPalPayout(userId, linkedAccount.paypalEmail, amountCents);
 
     if (!payoutResult.success) {
       // Restore balance on failure
-      await updateUserBalance(
-        userId,
-        amountCents,
-        'add',
-        `withdrawal_reversal_${Date.now()}`
-      );
+      await updateUserBalance(userId, amountCents, 'add', `withdrawal_reversal_${Date.now()}`);
 
       return {
         success: false,
@@ -252,12 +220,7 @@ async function processImmediateWithdrawal(
     };
   } catch (error) {
     // Restore balance on error
-    await updateUserBalance(
-      userId,
-      amountCents,
-      'add',
-      `withdrawal_error_reversal_${Date.now()}`
-    );
+    await updateUserBalance(userId, amountCents, 'add', `withdrawal_error_reversal_${Date.now()}`);
 
     throw error;
   }
@@ -288,7 +251,7 @@ async function initiateConfirmedWithdrawal(
   userId: string,
   amountCents: number,
   linkedAccount: LinkedPayPalAccount,
-  confirmationMethod: 'email' | 'sms'
+  confirmationMethod: 'email' | 'sms',
 ): Promise<WithdrawalResponse> {
   const db = getDb();
 
@@ -337,7 +300,7 @@ async function initiateConfirmedWithdrawal(
 export async function confirmWithdrawal(
   pendingId: string,
   confirmationCode: string,
-  userId: string
+  userId: string,
 ): Promise<WithdrawalResponse> {
   const db = getDb();
   const pendingRef = doc(db, 'pending_withdrawals', pendingId);
@@ -400,11 +363,7 @@ export async function confirmWithdrawal(
   }
 
   // Process the withdrawal
-  const result = await processImmediateWithdrawal(
-    userId,
-    pending.amountCents,
-    linkedAccount
-  );
+  const result = await processImmediateWithdrawal(userId, pending.amountCents, linkedAccount);
 
   // Update pending record
   await updateDoc(pendingRef, {
@@ -424,7 +383,7 @@ export async function confirmWithdrawal(
 async function initiateHeldWithdrawal(
   userId: string,
   amountCents: number,
-  linkedAccount: LinkedPayPalAccount
+  linkedAccount: LinkedPayPalAccount,
 ): Promise<WithdrawalResponse> {
   const db = getDb();
   const releaseAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(); // 24 hours
@@ -434,7 +393,7 @@ async function initiateHeldWithdrawal(
     userId,
     amountCents,
     'subtract',
-    `held_withdrawal_${Date.now()}`
+    `held_withdrawal_${Date.now()}`,
   );
 
   if (!balanceResult.success) {
@@ -482,7 +441,7 @@ async function initiateHeldWithdrawal(
  */
 export async function cancelHeldWithdrawal(
   heldId: string,
-  userId: string
+  userId: string,
 ): Promise<{ success: boolean; error?: string }> {
   const db = getDb();
   const heldRef = doc(db, 'held_withdrawals', heldId);
@@ -503,12 +462,7 @@ export async function cancelHeldWithdrawal(
   }
 
   // Restore balance
-  await updateUserBalance(
-    userId,
-    held.amountCents,
-    'add',
-    `cancel_held_${heldId}`
-  );
+  await updateUserBalance(userId, held.amountCents, 'add', `cancel_held_${heldId}`);
 
   // Mark as cancelled
   await updateDoc(heldRef, { status: 'cancelled' });
@@ -554,7 +508,7 @@ export async function processHeldWithdrawal(heldId: string): Promise<void> {
   const payoutResult = await createPayPalPayout(
     held.userId,
     linkedAccount.paypalEmail,
-    held.amountCents
+    held.amountCents,
   );
 
   if (payoutResult.success) {
@@ -584,7 +538,7 @@ export async function processHeldWithdrawal(heldId: string): Promise<void> {
       held.userId,
       held.amountCents,
       'add',
-      `held_withdrawal_failed_${heldId}`
+      `held_withdrawal_failed_${heldId}`,
     );
 
     await updateDoc(heldRef, {
@@ -604,7 +558,7 @@ export async function processHeldWithdrawal(heldId: string): Promise<void> {
 async function initiateSupportReviewWithdrawal(
   userId: string,
   amountCents: number,
-  linkedAccount: LinkedPayPalAccount
+  linkedAccount: LinkedPayPalAccount,
 ): Promise<WithdrawalResponse> {
   const db = getDb();
 
@@ -613,7 +567,7 @@ async function initiateSupportReviewWithdrawal(
     userId,
     amountCents,
     'subtract',
-    `support_review_${Date.now()}`
+    `support_review_${Date.now()}`,
   );
 
   if (!balanceResult.success) {
@@ -654,7 +608,8 @@ async function initiateSupportReviewWithdrawal(
     success: true,
     withdrawalId: reviewRef.id,
     status: 'pending_support_review',
-    message: 'For withdrawals of $50,000 or more, our support team will contact you within 24 hours to verify and process your withdrawal securely.',
+    message:
+      'For withdrawals of $50,000 or more, our support team will contact you within 24 hours to verify and process your withdrawal securely.',
   };
 }
 
@@ -668,7 +623,7 @@ async function initiateSupportReviewWithdrawal(
 async function createPayPalPayout(
   userId: string,
   paypalEmail: string,
-  amountCents: number
+  amountCents: number,
 ): Promise<PayPalPayoutResponse> {
   try {
     const payoutPayload = {
@@ -732,56 +687,63 @@ async function createPayPalPayout(
 }
 
 // ============================================================================
-// NOTIFICATION HELPERS (Implement based on your notification system)
+// NOTIFICATION HELPERS
+// ============================================================================
+// These functions are stubs awaiting notification service integration.
+// When implementing, create a shared notification service in lib/notifications/
+// that supports multiple channels (email, SMS, push) and wire these up.
+//
+// Recommended services:
+//   Email: SendGrid (@sendgrid/mail) or AWS SES
+//   SMS:   Twilio (@twilio/runtime)
+//   Push:  Firebase Cloud Messaging (already have firebase-admin)
+//   Jobs:  Bull (bull) with Redis, or Firebase Cloud Functions scheduled triggers
 // ============================================================================
 
 async function sendWithdrawalConfirmationEmail(
   userId: string,
   amountCents: number,
-  code: string
+  code: string,
 ): Promise<void> {
-  // TODO: Integrate with your email service (SendGrid, SES, etc.)
-  serverLogger.info('Sending withdrawal confirmation email', {
+  // STUB: Wire to email service — send withdrawal confirmation with 2FA code
+  // Implementation: await notificationService.sendEmail(userId, 'withdrawal-confirmation', { code, amount: amountCents / 100 });
+  serverLogger.info('Sending withdrawal confirmation email (stub)', {
     userId,
     amountCents,
     codeLength: code.length,
   });
-  // Example: await sendEmail(userEmail, 'withdrawal-confirmation', { code, amount: amountCents / 100 });
 }
 
 async function sendWithdrawalConfirmationSMS(
   userId: string,
   amountCents: number,
-  code: string
+  code: string,
 ): Promise<void> {
-  // TODO: Integrate with your SMS service (Twilio, etc.)
-  serverLogger.info('Sending withdrawal confirmation SMS', {
+  // STUB: Wire to SMS service — send withdrawal 2FA code via SMS
+  // Implementation: await notificationService.sendSMS(userId, `Your TopDog withdrawal code is: ${code}`);
+  serverLogger.info('Sending withdrawal confirmation SMS (stub)', {
     userId,
     amountCents,
     codeLength: code.length,
   });
-  // Example: await sendSMS(userPhone, `Your TopDog withdrawal code is: ${code}`);
 }
 
 async function sendWithdrawalHoldNotification(
   userId: string,
   amountCents: number,
-  releaseAt: string
+  releaseAt: string,
 ): Promise<void> {
-  // TODO: Send notification about held withdrawal
-  serverLogger.info('Sending withdrawal hold notification', {
+  // STUB: Notify user their withdrawal is held pending review
+  serverLogger.info('Sending withdrawal hold notification (stub)', {
     userId,
     amountCents,
     releaseAt,
   });
 }
 
-async function sendSupportReviewNotification(
-  userId: string,
-  amountCents: number
-): Promise<void> {
-  // TODO: Send notification about support review
-  serverLogger.info('Sending support review notification', {
+async function sendSupportReviewNotification(userId: string, amountCents: number): Promise<void> {
+  // STUB: Notify user their withdrawal is under support review
+  serverLogger.info('Sending support review notification (stub)', {
     userId,
     amountCents,
   });
@@ -789,22 +751,20 @@ async function sendSupportReviewNotification(
 
 async function sendWithdrawalCompleteNotification(
   userId: string,
-  amountCents: number
+  amountCents: number,
 ): Promise<void> {
-  // TODO: Send notification about completed withdrawal
-  serverLogger.info('Sending withdrawal complete notification', {
+  // STUB: Notify user their withdrawal has been processed
+  serverLogger.info('Sending withdrawal complete notification (stub)', {
     userId,
     amountCents,
   });
 }
 
-async function scheduleWithdrawalRelease(
-  heldId: string,
-  releaseAt: string
-): Promise<void> {
-  // TODO: Schedule job to process withdrawal after hold period
-  // In production, use a job queue like Bull, Agenda, or cloud functions
-  serverLogger.info('Scheduled withdrawal release', {
+async function scheduleWithdrawalRelease(heldId: string, releaseAt: string): Promise<void> {
+  // STUB: Schedule background job to auto-release held withdrawal
+  // Implementation: Use Bull queue or Firebase scheduled function
+  // await jobQueue.add('release-withdrawal', { heldId }, { delay: Date.parse(releaseAt) - Date.now() });
+  serverLogger.info('Scheduled withdrawal release (stub)', {
     heldId,
     releaseAt,
   });

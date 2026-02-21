@@ -26,9 +26,11 @@ export * from './playerSchema';
 // Helpers and utilities
 export * from './helpers';
 
-// Legacy: re-export default from monolithic schemas file for backwards compatibility
-// Note: Using explicit default export to avoid duplicate named export conflicts
-// TODO: Migrate all imports to use domain-specific files, then remove this
+// Legacy: re-export default from monolithic schemas file for backwards compatibility.
+// Note: Using explicit default export to avoid duplicate named export conflicts.
+// MIGRATION NOTE: Prefer domain-specific imports (e.g., import { x } from '@/lib/validation/payment')
+// over `schemas.x`. Once all callers are migrated, remove this re-export and ./schemas.ts.
+// Tracked in: CODE_REVIEW_REMEDIATION_TRACKER.md Phase 4 #30
 export { default as schemas } from './schemas';
 
 // Re-export zod for convenience

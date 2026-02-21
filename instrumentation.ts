@@ -10,25 +10,26 @@
  */
 
 export async function register() {
-  // Only register on the server side
+  // Validate required environment variables early (fail-fast)
+  const { validateEnv } = await import('@/lib/validateEnv');
+  validateEnv();
+
+  // Only register OpenTelemetry on the server side
   if (process.env.NEXT_RUNTIME === 'nodejs') {
     const { NodeSDK } = await import('@opentelemetry/sdk-node');
     const { OTLPTraceExporter } = await import('@opentelemetry/exporter-trace-otlp-http');
-    const { Resource } = await import('@opentelemetry/resources');
-    const {
-      ATTR_SERVICE_NAME,
-      ATTR_SERVICE_VERSION,
-      ATTR_DEPLOYMENT_ENVIRONMENT_NAME,
-    } = await import('@opentelemetry/semantic-conventions');
-    const { SimpleSpanProcessor, ConsoleSpanExporter } = await import(
-      '@opentelemetry/sdk-trace-node'
-    );
+    const { resourceFromAttributes } = await import('@opentelemetry/resources');
+    const { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } =
+      await import('@opentelemetry/semantic-conventions');
+    const { SimpleSpanProcessor, ConsoleSpanExporter } =
+      await import('@opentelemetry/sdk-trace-node');
     const { HttpInstrumentation } = await import('@opentelemetry/instrumentation-http');
 
     const isDev = process.env.NODE_ENV === 'development';
     const otlpEndpoint = process.env.OTEL_EXPORTER_OTLP_ENDPOINT;
 
     // Build exporters: always OTLP if configured, console in dev as fallback
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic exporter types
     const exporters: any[] = [];
 
     if (otlpEndpoint) {
@@ -55,10 +56,10 @@ export async function register() {
     }
 
     const sdk = new NodeSDK({
-      resource: new Resource({
-        [ATTR_SERVICE_NAME]: 'idesaign',
+      resource: resourceFromAttributes({
+        [ATTR_SERVICE_NAME]: 'bestball-site',
         [ATTR_SERVICE_VERSION]: process.env.npm_package_version || '1.0.0',
-        [ATTR_DEPLOYMENT_ENVIRONMENT_NAME]:
+        'deployment.environment.name':
           process.env.VERCEL_ENV || process.env.NODE_ENV || 'development',
         'service.instance.id': process.env.VERCEL_REGION || 'local',
         'git.commit.sha': process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) || 'unknown',

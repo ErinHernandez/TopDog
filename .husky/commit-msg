@@ -1,6 +1,3 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
 # Color codes for output
 RED='\033[0;31m'
 YELLOW='\033[1;33m'
@@ -81,14 +78,14 @@ if [ "$FIRST_LINE_LENGTH" -gt 73 ]; then  # 72 + newline
 fi
 
 # Check if description starts with capital letter (after type and scope)
-DESCRIPTION=$(echo "$FIRST_LINE" | sed 's/^[a-z]*(\?[^)]*\)?!?: //')
+DESCRIPTION=$(echo "$FIRST_LINE" | sed -E 's/^[a-z]+(\([^)]*\))?!?: //')
 FIRST_CHAR=$(echo "$DESCRIPTION" | cut -c 1)
 
 if echo "$FIRST_CHAR" | grep -qE '[a-z]'; then
   echo ""
   echo "${YELLOW}TIP: Consider starting the description with a capital letter${NC}"
   echo "  Current: ${CYAN}${FIRST_LINE}${NC}"
-  echo "  Better:  ${CYAN}$(echo "$FIRST_LINE" | sed 's/\(.*: \)\([a-z]\)/\1\U\2/')${NC}"
+  echo "  Better:  ${CYAN}$(echo "$FIRST_LINE" | sed -E 's/(.*: )([a-z])/\1\u\2/')${NC}"
   echo ""
 fi
 

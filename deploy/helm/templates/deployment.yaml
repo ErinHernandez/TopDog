@@ -29,10 +29,25 @@ spec:
         accelerator: nvidia-gpu
       {{- end }}
 
+      # Pod-level security context
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+
       containers:
       - name: vllm
         image: "{{ .Values.vllm.image.repository }}:{{ .Values.vllm.image.tag }}"
         imagePullPolicy: {{ .Values.vllm.image.pullPolicy }}
+
+        # Container-level security context
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          capabilities:
+            drop:
+              - ALL
 
         ports:
         - name: http
