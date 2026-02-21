@@ -18,9 +18,12 @@ const withBundleAnalyzer = bundleAnalyzer({
 const nextConfig = {
   reactStrictMode: true,
 
-  // Decouple linting from builds — lint separately in CI
+  // Decouple linting and type-checking from builds — run separately in CI
   eslint: {
     ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
   },
 
   experimental: {
