@@ -1,6 +1,6 @@
 /**
  * VX2 Draft Logic - Draft Queue Hook
- * 
+ *
  * Manages the user's pick queue with persistence.
  * All new implementation - no code reuse.
  */
@@ -58,14 +58,12 @@ export interface UseDraftQueueResult {
 // ============================================================================
 
 function getStorageKey(roomId?: string): string {
-  return roomId 
-    ? `${STORAGE_KEYS.queue}_${roomId}` 
-    : STORAGE_KEYS.queue;
+  return roomId ? `${STORAGE_KEYS.queue}_${roomId}` : STORAGE_KEYS.queue;
 }
 
 function loadQueue(roomId?: string): QueuedPlayer[] {
   if (typeof window === 'undefined') return [];
-  
+
   try {
     const stored = localStorage.getItem(getStorageKey(roomId));
     return stored ? JSON.parse(stored) : [];
@@ -76,7 +74,7 @@ function loadQueue(roomId?: string): QueuedPlayer[] {
 
 function saveQueue(queue: QueuedPlayer[], roomId?: string): void {
   if (typeof window === 'undefined') return;
-  
+
   try {
     localStorage.setItem(getStorageKey(roomId), JSON.stringify(queue));
   } catch {
@@ -102,18 +100,13 @@ export function useDraftQueue({
   persist = true,
 }: UseDraftQueueOptions = {}): UseDraftQueueResult {
   // Load initial queue
-  const [queue, setQueue] = useState<QueuedPlayer[]>(() =>
-    persist ? loadQueue(roomId) : []
-  );
+  const [queue, setQueue] = useState<QueuedPlayer[]>(() => (persist ? loadQueue(roomId) : []));
 
   // Ref for debounced save timeout
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Create lookup set for O(1) checks
-  const queuedIds = useMemo(
-    () => new Set(queue.map(p => p.id)),
-    [queue]
-  );
+  const queuedIds = useMemo(() => new Set(queue.map(p => p.id)), [queue]);
 
   // Auto-remove picked players from queue
   useEffect(() => {
@@ -149,7 +142,7 @@ export function useDraftQueue({
       }
     };
   }, [queue, roomId, persist]);
-  
+
   // Add player to end of queue
   const addToQueue = useCallback((player: DraftPlayer) => {
     setQueue(prev => {
@@ -161,7 +154,7 @@ export function useDraftQueue({
       return [...prev, queued];
     });
   }, []);
-  
+
   // Remove player from queue
   const removeFromQueue = useCallback((playerId: string) => {
     setQueue(prev => {
@@ -170,67 +163,77 @@ export function useDraftQueue({
       return filtered.map((p, i) => ({ ...p, queuePosition: i }));
     });
   }, []);
-  
+
   // Move player up in queue
   const moveUp = useCallback((playerId: string) => {
     setQueue(prev => {
       const index = prev.findIndex(p => p.id === playerId);
       if (index <= 0) return prev; // Already at top or not found
-      
+
       const newQueue = [...prev];
-      [newQueue[index - 1]!, newQueue[index]!] = [newQueue[index]!, newQueue[index - 1]!];
-      
+      const temp = newQueue[index - 1]!;
+      newQueue[index - 1] = newQueue[index]!;
+      newQueue[index] = temp;
+
       // Update positions
       return newQueue.map((p, i) => ({ ...p, queuePosition: i }));
     });
   }, []);
-  
+
   // Move player down in queue
   const moveDown = useCallback((playerId: string) => {
     setQueue(prev => {
       const index = prev.findIndex(p => p.id === playerId);
       if (index < 0 || index >= prev.length - 1) return prev; // At bottom or not found
-      
+
       const newQueue = [...prev];
-      [newQueue[index]!, newQueue[index + 1]!] = [newQueue[index + 1]!, newQueue[index]!];
-      
+      const temp = newQueue[index]!;
+      newQueue[index] = newQueue[index + 1]!;
+      newQueue[index + 1] = temp;
+
       // Update positions
       return newQueue.map((p, i) => ({ ...p, queuePosition: i }));
     });
   }, []);
-  
+
   // Reorder via drag and drop
   const reorder = useCallback((fromIndex: number, toIndex: number) => {
     setQueue(prev => {
       if (fromIndex < 0 || fromIndex >= prev.length) return prev;
       if (toIndex < 0 || toIndex >= prev.length) return prev;
       if (fromIndex === toIndex) return prev;
-      
+
       const newQueue = [...prev];
       const [removed] = newQueue.splice(fromIndex, 1);
       newQueue.splice(toIndex, 0, removed!);
-      
+
       // Update positions
       return newQueue.map((p, i) => ({ ...p, queuePosition: i }));
     });
   }, []);
-  
+
   // Clear queue
   const clearQueue = useCallback(() => {
     setQueue([]);
   }, []);
-  
+
   // Check if player is queued
-  const isQueued = useCallback((playerId: string): boolean => {
-    return queuedIds.has(playerId);
-  }, [queuedIds]);
-  
+  const isQueued = useCallback(
+    (playerId: string): boolean => {
+      return queuedIds.has(playerId);
+    },
+    [queuedIds],
+  );
+
   // Get queue position (1-indexed for display)
-  const getQueuePosition = useCallback((playerId: string): number | null => {
-    const index = queue.findIndex(p => p.id === playerId);
-    return index >= 0 ? index + 1 : null;
-  }, [queue]);
-  
+  const getQueuePosition = useCallback(
+    (playerId: string): number | null => {
+      const index = queue.findIndex(p => p.id === playerId);
+      return index >= 0 ? index + 1 : null;
+    },
+    [queue],
+  );
+
   // Get next available player
   const getNextInQueue = useCallback((): QueuedPlayer | null => {
     // Find first player not already picked
@@ -241,7 +244,7 @@ export function useDraftQueue({
     }
     return null;
   }, [queue, pickedPlayerIds]);
-  
+
   return {
     queue,
     queueIds: queue.map(p => p.id),
@@ -259,4 +262,3 @@ export function useDraftQueue({
 }
 
 export default useDraftQueue;
-

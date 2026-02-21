@@ -11,7 +11,21 @@
 import React from 'react';
 import Link from 'next/link';
 import { useNotifications } from './NotificationProvider';
-import type { Notification, NotificationType } from '@/lib/studio/community/notifications/types';
+// Local type stubs (studio backend removed)
+type NotificationType = 'follow' | 'like' | 'comment' | 'remix';
+
+interface Notification {
+  id: string;
+  read: boolean;
+  type: NotificationType;
+  actorUsername: string;
+  actorId: string;
+  resourceId?: string;
+  resourceTitle?: string;
+  commentPreview?: string;
+  createdAt: number;
+  [key: string]: unknown;
+}
 import styles from './NotificationDropdown.module.css';
 
 interface NotificationDropdownProps {
@@ -49,7 +63,7 @@ export function NotificationDropdown({ onClose }: NotificationDropdownProps): Re
           <div className={styles.empty}>No notifications yet</div>
         ) : (
           <>
-            {notifications.map((n) => (
+            {notifications.map(n => (
               <NotificationItem
                 key={n.id}
                 notification={n}
@@ -88,7 +102,7 @@ function NotificationItem({ notification, onClick }: NotificationItemProps): Rea
       onClick={onClick}
       role="button"
       tabIndex={0}
-      onKeyDown={(e) => {
+      onKeyDown={e => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           onClick();
