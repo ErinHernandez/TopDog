@@ -16,7 +16,6 @@ export default function LoginSandboxPage(): React.ReactElement {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- setting mounted flag for hydration safety
     setMounted(true);
   }, []);
 

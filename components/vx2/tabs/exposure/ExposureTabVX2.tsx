@@ -67,9 +67,7 @@ function PositionFilters({ selected, onChange }: PositionFiltersProps): React.Re
   };
 
   return (
-    <div
-      className={styles.positionFiltersWrapper}
-    >
+    <div className={styles.positionFiltersWrapper}>
       {positions.map(pos => {
         const isSelected = selected.includes(pos);
 
@@ -96,8 +94,7 @@ interface SortHeaderProps {
 
 function SortHeader({ sortOrder, onToggle }: SortHeaderProps): React.ReactElement {
   return (
-    <div className={styles.sortHeader}
-    >
+    <div className={styles.sortHeader}>
       <button
         onClick={onToggle}
         className={styles.sortButton}
@@ -121,33 +118,24 @@ function ExposureRow({ player, isFirst = false }: ExposureRowProps): React.React
   return (
     <div
       className={`${styles.exposureRow} ${!isFirst ? styles.exposureRowNoBorderTop : ''}`}
-      style={{
-        '--row-padding-y': `${EXPOSURE_PX.rowPaddingY}px`,
-        '--row-min-height': `${EXPOSURE_PX.rowMinHeight}px`,
-      } as React.CSSProperties}
+      style={
+        {
+          '--row-padding-y': `${EXPOSURE_PX.rowPaddingY}px`,
+          '--row-min-height': `${EXPOSURE_PX.rowMinHeight}px`,
+        } as React.CSSProperties
+      }
     >
       {/* Player Info */}
       <div className={styles.playerInfo}>
-        <h3
-          className={styles.playerName}
-        >
-          {player.name}
-        </h3>
+        <h3 className={styles.playerName}>{player.name}</h3>
         <div className={styles.playerDetails}>
           <PositionBadge position={player.position} size="sm" />
-          <span
-            className={styles.playerTeam}
-          >
-            {player.team}
-          </span>
+          <span className={styles.playerTeam}>{player.team}</span>
         </div>
       </div>
 
       {/* Exposure - positioned 20px from right edge */}
-      <button
-        onClick={() => setShowShares(!showShares)}
-        className={styles.exposureValue}
-      >
+      <button onClick={() => setShowShares(!showShares)} className={styles.exposureValue}>
         {showShares ? `${player.teams} shares` : `${exposurePercent}%`}
       </button>
     </div>
@@ -158,10 +146,12 @@ function ExposureRowSkeleton(): React.ReactElement {
   return (
     <div
       className={styles.skeletonRow}
-      style={{
-        '--row-padding-y': `${EXPOSURE_PX.rowPaddingY}px`,
-        '--row-min-height': `${EXPOSURE_PX.rowMinHeight}px`,
-      } as React.CSSProperties}
+      style={
+        {
+          '--row-padding-y': `${EXPOSURE_PX.rowPaddingY}px`,
+          '--row-min-height': `${EXPOSURE_PX.rowMinHeight}px`,
+        } as React.CSSProperties
+      }
     >
       <div className={styles.skeletonPlayerInfo}>
         <Skeleton width={150} height={18} />
@@ -191,9 +181,10 @@ export default function ExposureTabVX2(_props: ExposureTabVX2Props): React.React
   useEffect(() => {
     // Use shared POSITIONS constant
     const allPositions: PositionFilter[] = [...POSITIONS];
-    if (selectedPositions.length === allPositions.length &&
-        allPositions.every(pos => selectedPositions.includes(pos))) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
+    if (
+      selectedPositions.length === allPositions.length &&
+      allPositions.every(pos => selectedPositions.includes(pos))
+    ) {
       setSelectedPositions([]);
     }
   }, [selectedPositions]);
@@ -210,29 +201,28 @@ export default function ExposureTabVX2(_props: ExposureTabVX2Props): React.React
     // Search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      result = result.filter(p =>
-        (p.name?.toLowerCase() || '').includes(query) ||
-        (p.position?.toLowerCase() || '').includes(query) ||
-        (p.team?.toLowerCase() || '').includes(query)
+      result = result.filter(
+        p =>
+          (p.name?.toLowerCase() || '').includes(query) ||
+          (p.position?.toLowerCase() || '').includes(query) ||
+          (p.team?.toLowerCase() || '').includes(query),
       );
     }
 
     // Sort
     return [...result].sort((a, b) =>
-      sortOrder === 'desc' ? b.exposure - a.exposure : a.exposure - b.exposure
+      sortOrder === 'desc' ? b.exposure - a.exposure : a.exposure - b.exposure,
     );
   }, [players, selectedPositions, searchQuery, sortOrder]);
 
   const handleToggleSort = useCallback(() => {
-    setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
+    setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'));
   }, []);
 
   // Error State
   if (error) {
     return (
-      <div
-        className={styles.errorStateContainer}
-      >
+      <div className={styles.errorStateContainer}>
         <ErrorState
           title="Failed to load exposure"
           description={error || undefined}
@@ -243,28 +233,15 @@ export default function ExposureTabVX2(_props: ExposureTabVX2Props): React.React
   }
 
   return (
-    <div
-      className={styles.mainContainer}
-      role="main"
-      aria-label="Player exposure report"
-    >
+    <div className={styles.mainContainer} role="main" aria-label="Player exposure report">
       {/* Header */}
-      <div
-        className={styles.header}
-      >
+      <div className={styles.header}>
         <div className={styles.headerSearchWrapper}>
-          <SearchInput
-            value={searchQuery}
-            onChange={setSearchQuery}
-            placeholder="Search..."
-          />
+          <SearchInput value={searchQuery} onChange={setSearchQuery} placeholder="Search..." />
         </div>
 
         {!searchQuery && (
-          <PositionFilters
-            selected={selectedPositions}
-            onChange={setSelectedPositions}
-          />
+          <PositionFilters selected={selectedPositions} onChange={setSelectedPositions} />
         )}
       </div>
 
@@ -284,12 +261,12 @@ export default function ExposureTabVX2(_props: ExposureTabVX2Props): React.React
           </>
         ) : filteredPlayers.length === 0 ? (
           // Empty state
-          <div
-            className={styles.emptyStateContainer}
-          >
+          <div className={styles.emptyStateContainer}>
             <EmptyState
               title="No Players Found"
-              description={searchQuery ? "Try a different search term" : "No exposure data available"}
+              description={
+                searchQuery ? 'Try a different search term' : 'No exposure data available'
+              }
             />
           </div>
         ) : (
@@ -299,9 +276,7 @@ export default function ExposureTabVX2(_props: ExposureTabVX2Props): React.React
               <ExposureRow key={player.id} player={player} isFirst={index === 0} />
             ))}
             {/* Bottom padding */}
-            <div
-              className={styles.listBottomPadding}
-            />
+            <div className={styles.listBottomPadding} />
           </>
         )}
       </div>

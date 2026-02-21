@@ -41,7 +41,6 @@ export default function MobileHomeContent() {
     if (router.isReady && router.query.tab) {
       const validTabs = ['Lobby', 'My Teams', 'Exposure', 'Profile'];
       if (validTabs.includes(router.query.tab)) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect -- initializing from query params
         setActiveTab(router.query.tab);
       }
     }

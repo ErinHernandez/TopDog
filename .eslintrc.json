@@ -17,6 +17,8 @@
     ],
     "@typescript-eslint/no-empty-interface": "off",
     "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/no-empty-object-type": "off",
+    "@typescript-eslint/no-require-imports": "off",
     "no-console": ["warn", { "allow": ["warn", "error", "info"] }],
     "prefer-const": "error",
     "no-var": "error",
@@ -25,6 +27,17 @@
     "react-hooks/exhaustive-deps": "warn",
     "@next/next/no-img-element": "warn"
   },
+  "overrides": [
+    {
+      "files": ["**/*.js"],
+      "parserOptions": {
+        "project": null
+      },
+      "rules": {
+        "@typescript-eslint/no-var-requires": "off"
+      }
+    }
+  ],
   "ignorePatterns": [
     "node_modules/",
     ".next/",

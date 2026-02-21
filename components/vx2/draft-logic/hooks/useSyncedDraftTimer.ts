@@ -156,7 +156,6 @@ export function useSyncedDraftTimer({
 
   useEffect(() => {
     if (!db || !roomId || !isActive) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
       setState('idle');
       return;
     }
@@ -165,7 +164,7 @@ export function useSyncedDraftTimer({
 
     const unsubscribe = onSnapshot(
       roomRef,
-      (snapshot) => {
+      snapshot => {
         if (!snapshot.exists()) {
           logger.warn('Room not found', { roomId });
           return;
@@ -191,10 +190,10 @@ export function useSyncedDraftTimer({
           setState('idle');
         }
       },
-      (error) => {
+      error => {
         logger.error('Timer subscription error', error as Error, { roomId });
         setIsSynced(false);
-      }
+      },
     );
 
     return () => unsubscribe();
@@ -221,7 +220,6 @@ export function useSyncedDraftTimer({
 
     // Initial calculation
     const remaining = calculateRemaining();
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
     setSecondsRemaining(Math.max(0, remaining));
 
     if (remaining > 0) {

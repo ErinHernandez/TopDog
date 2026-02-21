@@ -25,7 +25,6 @@ const ShareModal = ({
   useEffect(() => {
     if (isOpen && shareType) {
       const data = generateShareData(shareType, shareData);
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
       setGeneratedShareData(data);
     }
   }, [isOpen, shareType, shareData]);

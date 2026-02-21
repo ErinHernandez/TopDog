@@ -32,7 +32,6 @@ export function SearchBar({
   // Handle controlled vs uncontrolled component
   useEffect(() => {
     if (controlledValue !== undefined) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
       setValue(controlledValue);
     }
   }, [controlledValue]);
@@ -80,20 +79,8 @@ export function SearchBar({
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
-            <circle
-              cx="7"
-              cy="7"
-              r="5.5"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              fill="none"
-            />
-            <path
-              d="M11 11L14 14"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-            />
+            <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.5" fill="none" />
+            <path d="M11 11L14 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
         </div>
 
@@ -103,7 +90,7 @@ export function SearchBar({
           className={styles.searchInput}
           placeholder={placeholder}
           value={value}
-          onChange={(e) => setValue(e.target.value)}
+          onChange={e => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
           spellCheck="false"
         />
@@ -116,7 +103,7 @@ export function SearchBar({
             onClick={handleClear}
             aria-label="Clear search"
             title="Clear (Esc)"
-            onKeyDown={(e) => {
+            onKeyDown={e => {
               if (e.key === 'Escape') {
                 e.preventDefault();
                 handleClear();
@@ -145,8 +132,7 @@ export function SearchBar({
         {!value && (
           <div className={styles.shortcutHint}>
             <kbd className={styles.kbd}>
-              {typeof navigator !== 'undefined' &&
-              navigator.platform.toLowerCase().includes('mac')
+              {typeof navigator !== 'undefined' && navigator.platform.toLowerCase().includes('mac')
                 ? '⌘'
                 : 'Ctrl'}
               +K

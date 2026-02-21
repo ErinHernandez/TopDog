@@ -19,7 +19,6 @@ export default function DraftRoomVX2Route() {
 
   useEffect(() => {
     if (router.isReady && roomId && typeof roomId === 'string') {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- initializing from query params
       setIsReady(true);
       trackDraftVersion('vx2', roomId, null);
     }
@@ -28,9 +27,7 @@ export default function DraftRoomVX2Route() {
   const initialPickNumber = router.query.pickNumber
     ? parseInt(router.query.pickNumber as string, 10)
     : 1;
-  const teamCount = router.query.teamCount
-    ? parseInt(router.query.teamCount as string, 10)
-    : 12;
+  const teamCount = router.query.teamCount ? parseInt(router.query.teamCount as string, 10) : 12;
   const fastMode = router.query.fastMode === 'true';
 
   if (!isReady || !roomId || typeof roomId !== 'string') {

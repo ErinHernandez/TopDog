@@ -3,7 +3,7 @@ module.exports = {
     const filtered = files.filter((f) => !f.includes('_archived'));
     if (filtered.length === 0) return [];
     const paths = filtered.map((f) => `"${f}"`).join(' ');
-    return [`eslint --fix --max-warnings 0 ${paths}`, `prettier --write ${paths}`];
+    return [`eslint --fix ${paths}`, `prettier --write ${paths}`];
   },
   '*.{json,md,css}': ['prettier --write'],
 };

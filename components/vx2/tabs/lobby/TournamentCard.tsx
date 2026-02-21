@@ -1,6 +1,6 @@
 /**
  * TournamentCard - Tournament display card for lobby
- * 
+ *
  * A-Grade Requirements Met:
  * - TypeScript: Full type coverage
  * - Constants: All values from VX2 constants
@@ -23,7 +23,8 @@ import { TournamentCardBottomSection } from './TournamentCardBottomSection';
 const logger = createScopedLogger('[TournamentCard]');
 
 // Tiny blur placeholder (92 bytes) - loads instantly, shows while full image loads
-const BLUR_PLACEHOLDER = 'data:image/webp;base64,UklGRlQAAABXRUJQVlA4IEgAAABwAwCdASoUABsAPyl+uFOuKCWisAwBwCUJZQAAW+q+9Bpo4aAA/uvZ+YkAc4jvVTc7+oJAY99soPLjJTrwm3j5Y3VE0BWmGAA=';
+const BLUR_PLACEHOLDER =
+  'data:image/webp;base64,UklGRlQAAABXRUJQVlA4IEgAAABwAwCdASoUABsAPyl+uFOuKCWisAwBwCUJZQAAW+q+9Bpo4aAA/uvZ+YkAc4jvVTc7+oJAY99soPLjJTrwm3j5Y3VE0BWmGAA=';
 
 // ============================================================================
 // CONSTANTS
@@ -92,26 +93,25 @@ export function TournamentCard({
 }: TournamentCardProps): React.ReactElement {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [useFallback, setUseFallback] = useState(false);
-  
+
   // Merge style overrides with defaults
   // If backgroundImage URL is provided, wrap it in url(); otherwise use gradient/pattern
-  const resolvedBackground = styleOverrides.backgroundImage 
+  const resolvedBackground = styleOverrides.backgroundImage
     ? `url(${styleOverrides.backgroundImage})`
     : (styleOverrides.background ?? CARD_COLORS.background);
-  
+
   // Extract the URL from the background string for preloading
   const bgUrlMatch = resolvedBackground.match(/url\(['"]?([^'"]+)['"]?\)/);
   const bgUrl = bgUrlMatch ? bgUrlMatch[1] : null;
-  
+
   // Preload the full image with fallback support
   useEffect(() => {
     if (!bgUrl || bgUrl.startsWith('data:')) {
       // Skip preload for data URIs or gradients
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- loading data from preloader on mount
       setImageLoaded(true);
       return;
     }
-    
+
     // Try WebP first
     const img = new Image();
 
@@ -120,11 +120,11 @@ export function TournamentCard({
       if (bgUrl && (bgUrl.endsWith('.webp') || bgUrl.includes('.webp'))) {
         // Replace .webp with .png for fallback
         const pngUrl = bgUrl.replace('.webp', '.png').split('?')[0]!; // Remove query params if any
-        
+
         if (process.env.NODE_ENV === 'development') {
           logger.debug(`WebP failed, trying PNG fallback: ${pngUrl}`);
         }
-        
+
         const fallbackImg = new Image();
         fallbackImg.onload = () => {
           if (process.env.NODE_ENV === 'development') {
@@ -147,7 +147,7 @@ export function TournamentCard({
         setImageLoaded(true);
       }
     };
-    
+
     img.onload = () => {
       if (process.env.NODE_ENV === 'development') {
         logger.debug(`Background image loaded: ${bgUrl}`);
@@ -161,7 +161,7 @@ export function TournamentCard({
       tryFallback();
     };
     img.src = bgUrl;
-    
+
     // If already cached, onload fires synchronously
     if (img.complete) {
       setImageLoaded(true);
@@ -173,7 +173,7 @@ export function TournamentCard({
     backgroundFallback: styleOverrides.backgroundFallback ?? CARD_COLORS.backgroundFallback!,
     progressBg: styleOverrides.progressBg ?? CARD_COLORS.progressBg!,
   };
-  
+
   return (
     <div
       className={cn(styles.card, featured && { [styles.featured!]: true }, className)}
@@ -181,10 +181,7 @@ export function TournamentCard({
       aria-label={`${tournament.title} tournament`}
     >
       {/* Blur placeholder layer - shows instantly */}
-      <div
-        className={styles.blurPlaceholder}
-        aria-hidden="true"
-      />
+      <div className={styles.blurPlaceholder} aria-hidden="true" />
 
       {/* Full image layer - fades in when loaded */}
       <div
@@ -197,7 +194,8 @@ export function TournamentCard({
         {/* Tournament Title */}
         <div className={styles.titleContainer}>
           <h2 className={styles.title}>
-            The TopDog<br />
+            The TopDog
+            <br />
             International
           </h2>
         </div>
@@ -223,10 +221,7 @@ export function TournamentCard({
 
 export function TournamentCardSkeleton(): React.ReactElement {
   return (
-    <div
-      className={styles.skeleton}
-      aria-hidden="true"
-    >
+    <div className={styles.skeleton} aria-hidden="true">
       {/* Title skeleton */}
       <div className={styles.skeletonTitle} />
 
@@ -244,7 +239,7 @@ export function TournamentCardSkeleton(): React.ReactElement {
 
       {/* Stats skeleton */}
       <div className={styles.skeletonStats}>
-        {[1, 2, 3].map((i) => (
+        {[1, 2, 3].map(i => (
           <div key={i} className={styles.skeletonStatItem}>
             <div className={styles.skeletonStatValue} />
             <div className={styles.skeletonStatLabel} />
@@ -256,4 +251,3 @@ export function TournamentCardSkeleton(): React.ReactElement {
 }
 
 export default TournamentCard;
-

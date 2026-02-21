@@ -1,18 +1,18 @@
 /**
  * useCardHeight - Fixed Margin Card Sizing (ZOOM-STABLE VERSION)
- * 
+ *
  * CRITICAL FIX: This version locks dimensions on initial load and does NOT
  * recalculate on browser zoom or resize. This prevents the "jumpy card" issue
  * where zooming causes the card to resize.
- * 
+ *
  * The card size is calculated ONCE based on:
  * - Initial viewport dimensions (before any zoom)
  * - Device status bar height
  * - Fixed pixel margins
- * 
+ *
  * After initial calculation, dimensions are LOCKED and won't change until
  * the page is refreshed or the component remounts.
- * 
+ *
  * @module useCardHeight
  */
 
@@ -84,7 +84,7 @@ export interface UseCardHeightOptions {
   /**
    * If true, recalculates on resize/zoom (old behavior).
    * If false (default), locks dimensions after initial calculation.
-   * 
+   *
    * Set to false to prevent zoom-induced resizing.
    */
   allowResize?: boolean;
@@ -161,7 +161,7 @@ const DEFAULTS = {
 
 /**
  * Tab bar total height (constant across all iOS devices)
- * 
+ *
  * Breakdown:
  * - paddingTop: 10px
  * - content minHeight: 44px
@@ -169,7 +169,7 @@ const DEFAULTS = {
  * - homeIndicatorMarginTop: 8px
  * - homeIndicatorHeight: 5px
  * - homeIndicatorMarginBottom: 4px
- * 
+ *
  * Total: 81px
  */
 const TAB_BAR_HEIGHT = 81;
@@ -195,9 +195,9 @@ const STATUS_BAR_BY_DEVICE: Record<string, number> = {
  * Viewport height thresholds for status bar estimation
  */
 const VIEWPORT_THRESHOLDS = {
-  COMPACT: 700,   // iPhone SE and similar
-  STANDARD: 860,  // iPhone 12/13/14
-  LARGE: 960,     // Pro Max models
+  COMPACT: 700, // iPhone SE and similar
+  STANDARD: 860, // iPhone 12/13/14
+  LARGE: 960, // Pro Max models
 };
 
 // ============================================================================
@@ -206,7 +206,7 @@ const VIEWPORT_THRESHOLDS = {
 
 /**
  * Get the TRUE device viewport dimensions, ignoring zoom level.
- * 
+ *
  * For phone frames (device comparison page), we need to use the actual
  * rendered viewport (innerWidth/innerHeight), not screen dimensions.
  * Screen dimensions are in device pixels and don't match CSS pixels for frames.
@@ -232,7 +232,7 @@ function getTrueDeviceDimensions(): { width: number; height: number } {
 
 /**
  * Detect status bar height
- * 
+ *
  * Priority:
  * 1. Device preset (if provided)
  * 2. Viewport-based estimation
@@ -290,10 +290,10 @@ function clamp(value: number, min?: number, max?: number): number {
 
 /**
  * Calculate card dimensions based on fixed pixel margins
- * 
+ *
  * @param options - Configuration options
  * @returns Calculated dimensions and state
- * 
+ *
  * @example
  * ```tsx
  * function LobbyTab() {
@@ -304,9 +304,9 @@ function clamp(value: number, min?: number, max?: number): number {
  *     rightMargin: 16,
  *     maxWidth: 420,
  *   });
- * 
+ *
  *   return (
- *     <div style={{ 
+ *     <div style={{
  *       width: width ? `${width}px` : '100%',
  *       height: height ? `${height}px` : 'auto',
  *     }}>
@@ -360,7 +360,6 @@ export function useCardHeight(options: UseCardHeightOptions = {}): CardHeightRes
 
     // If already locked and not allowing resize, skip
     if (hasCalculatedRef.current && !allowResize) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- initializing isReady from browser APIs on mount
       setIsReady(true);
       return;
     }
@@ -443,8 +442,16 @@ export function useCardHeight(options: UseCardHeightOptions = {}): CardHeightRes
   return {
     height: lockedDimensions?.height,
     width: lockedDimensions?.width,
-    availableHeight: lockedDimensions ? lockedDimensions.viewportHeight - lockedDimensions.statusBarHeight - TAB_BAR_HEIGHT - topMargin - bottomMargin : undefined,
-    availableWidth: lockedDimensions ? lockedDimensions.viewportWidth - leftMargin - rightMargin : undefined,
+    availableHeight: lockedDimensions
+      ? lockedDimensions.viewportHeight -
+        lockedDimensions.statusBarHeight -
+        TAB_BAR_HEIGHT -
+        topMargin -
+        bottomMargin
+      : undefined,
+    availableWidth: lockedDimensions
+      ? lockedDimensions.viewportWidth - leftMargin - rightMargin
+      : undefined,
     statusBarHeight: lockedDimensions?.statusBarHeight,
     tabBarHeight: TAB_BAR_HEIGHT,
     viewportHeight: lockedDimensions?.viewportHeight,

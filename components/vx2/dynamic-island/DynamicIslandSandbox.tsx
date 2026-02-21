@@ -24,9 +24,9 @@ import styles from './DynamicIslandSandbox.module.css';
 // ============================================================================
 
 export type DynamicIslandState =
-  | 'in-draft'           // User is actively in the draft room
-  | 'out-of-draft'       // User is in app but not in a draft
-  | 'out-of-app-live';   // User left app but draft is still live
+  | 'in-draft' // User is actively in the draft room
+  | 'out-of-draft' // User is in app but not in a draft
+  | 'out-of-app-live'; // User left app but draft is still live
 
 export interface DynamicIslandSandboxProps {
   /** Current state to display */
@@ -97,7 +97,7 @@ export default function DynamicIslandSandbox({
 
     const states: DynamicIslandState[] = ['in-draft', 'out-of-draft', 'out-of-app-live'];
     const interval = setInterval(() => {
-      setCycleIndex((prev) => {
+      setCycleIndex(prev => {
         const next = (prev + 1) % states.length;
         const newState = states[next]!;
         setInternalState(newState);
@@ -111,12 +111,16 @@ export default function DynamicIslandSandbox({
 
   // Timer countdown for in-draft state
   useEffect(() => {
-    if (currentState !== 'in-draft' || draftStatus !== 'active' || externalTimerSeconds !== undefined) {
+    if (
+      currentState !== 'in-draft' ||
+      draftStatus !== 'active' ||
+      externalTimerSeconds !== undefined
+    ) {
       return;
     }
 
     const interval = setInterval(() => {
-      setTimerSeconds((prev) => {
+      setTimerSeconds(prev => {
         if (prev <= 0) {
           return totalSeconds; // Reset when expired
         }
@@ -130,7 +134,6 @@ export default function DynamicIslandSandbox({
   // Update timer when external timer changes
   useEffect(() => {
     if (externalTimerSeconds !== undefined) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
       setTimerSeconds(externalTimerSeconds);
     }
   }, [externalTimerSeconds]);
@@ -198,18 +201,21 @@ export default function DynamicIslandSandbox({
   ]);
 
   // Manual state controls
-  const handleStateChange = useCallback((newState: DynamicIslandState) => {
-    if (externalState === undefined) {
-      setInternalState(newState);
-    }
-    onStateChange?.(newState);
-  }, [externalState, onStateChange]);
+  const handleStateChange = useCallback(
+    (newState: DynamicIslandState) => {
+      if (externalState === undefined) {
+        setInternalState(newState);
+      }
+      onStateChange?.(newState);
+    },
+    [externalState, onStateChange],
+  );
 
   return (
     <div className={styles.container}>
       {/* State selector */}
       <div className={styles.stateSelector}>
-        {(['in-draft', 'out-of-draft', 'out-of-app-live'] as const).map((s) => (
+        {(['in-draft', 'out-of-draft', 'out-of-app-live'] as const).map(s => (
           <button
             key={s}
             onClick={() => handleStateChange(s)}
@@ -217,11 +223,11 @@ export default function DynamicIslandSandbox({
               styles.stateButton,
               currentState === s
                 ? undefined // Styles will be applied via CSS variables
-                : undefined
+                : undefined,
             )}
             data-active={currentState === s}
           >
-            {s.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
+            {s.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
           </button>
         ))}
       </div>
@@ -238,7 +244,7 @@ export default function DynamicIslandSandbox({
                 state={currentState}
                 content={islandContent}
                 roomId={roomId}
-                onNavigateToDraft={(id) => {
+                onNavigateToDraft={id => {
                   // Navigate to draft room
                   if (typeof window !== 'undefined') {
                     window.location.href = `/draft/topdog/${id}`;
@@ -254,7 +260,9 @@ export default function DynamicIslandSandbox({
                   {currentState === 'in-draft' && (
                     <div>
                       <div className={styles.appContentTitle}>Draft Room</div>
-                      <div className={styles.appContentSubtitle}>Pick #{currentPickNumber} / {totalPicks}</div>
+                      <div className={styles.appContentSubtitle}>
+                        Pick #{currentPickNumber} / {totalPicks}
+                      </div>
                     </div>
                   )}
                   {currentState === 'out-of-draft' && (
@@ -266,7 +274,9 @@ export default function DynamicIslandSandbox({
                   {currentState === 'out-of-app-live' && (
                     <div>
                       <div className={styles.appContentTitle}>Other App</div>
-                      <div className={styles.appContentSubtitle}>Draft continuing in background</div>
+                      <div className={styles.appContentSubtitle}>
+                        Draft continuing in background
+                      </div>
                     </div>
                   )}
                 </div>
@@ -288,8 +298,12 @@ export default function DynamicIslandSandbox({
           )}
           {currentState === 'in-draft' && (
             <>
-              <div className={styles.stateInfoItem}>Timer: {externalTimerSeconds ?? timerSeconds}s / {totalSeconds}s</div>
-              <div className={styles.stateInfoItem}>Pick: {currentPickNumber} / {totalPicks}</div>
+              <div className={styles.stateInfoItem}>
+                Timer: {externalTimerSeconds ?? timerSeconds}s / {totalSeconds}s
+              </div>
+              <div className={styles.stateInfoItem}>
+                Pick: {currentPickNumber} / {totalPicks}
+              </div>
               <div className={styles.stateInfoItem}>Your Turn: {isMyTurn ? 'Yes' : 'No'}</div>
               <div className={styles.stateInfoItem}>Status: {draftStatus}</div>
             </>
@@ -297,8 +311,12 @@ export default function DynamicIslandSandbox({
           {currentState === 'out-of-app-live' && (
             <>
               <div className={styles.stateInfoItem}>Room ID: {roomId}</div>
-              <div className={styles.stateInfoItem}>Timer: {externalTimerSeconds ?? timerSeconds}s</div>
-              <div className={styles.stateInfoItem}>Pick: {currentPickNumber} / {totalPicks}</div>
+              <div className={styles.stateInfoItem}>
+                Timer: {externalTimerSeconds ?? timerSeconds}s
+              </div>
+              <div className={styles.stateInfoItem}>
+                Pick: {currentPickNumber} / {totalPicks}
+              </div>
             </>
           )}
         </div>
@@ -351,9 +369,7 @@ function getInDraftContent({
   }
 
   const urgency: 'normal' | 'warning' | 'critical' =
-    timerSeconds <= 5 ? 'critical' :
-    timerSeconds <= 10 ? 'warning' :
-    'normal';
+    timerSeconds <= 5 ? 'critical' : timerSeconds <= 10 ? 'warning' : 'normal';
 
   if (isMyTurn) {
     const expandedText = autopickPlayerName
@@ -414,9 +430,7 @@ function getOutOfAppLiveContent({
   autopickPlayerName?: string;
 }): IslandContent {
   const urgency: 'normal' | 'warning' | 'critical' =
-    timerSeconds <= 5 ? 'critical' :
-    timerSeconds <= 10 ? 'warning' :
-    'normal';
+    timerSeconds <= 5 ? 'critical' : timerSeconds <= 10 ? 'warning' : 'normal';
 
   if (isMyTurn) {
     const expandedText = autopickPlayerName
@@ -500,9 +514,12 @@ function DynamicIslandVisualization({
         '--island-bg-color': UI_COLORS.tiledBg,
       } as React.CSSProperties;
     }
-    const bgColor = content.urgency === 'critical' ? STATE_COLORS.error :
-                    content.urgency === 'warning' ? STATE_COLORS.warning :
-                    BG_COLORS.black;
+    const bgColor =
+      content.urgency === 'critical'
+        ? STATE_COLORS.error
+        : content.urgency === 'warning'
+          ? STATE_COLORS.warning
+          : BG_COLORS.black;
     return {
       '--island-bg-color': bgColor,
     } as React.CSSProperties;
@@ -515,7 +532,10 @@ function DynamicIslandVisualization({
     }
   };
 
-  const timerProgress = content.totalSeconds && content.timerSeconds ? (content.timerSeconds / content.totalSeconds) * 100 : 0;
+  const timerProgress =
+    content.totalSeconds && content.timerSeconds
+      ? (content.timerSeconds / content.totalSeconds) * 100
+      : 0;
 
   return (
     <div className={styles.islandContainer}>
@@ -525,19 +545,25 @@ function DynamicIslandVisualization({
           styles.islandPill,
           getUrgencyClass(),
           content.isInDraft && content.isMyTurn ? styles.islandPillWithBackgroundImage : '',
-          state === 'out-of-draft' && content.isMyTurn ? styles.islandClickable : ''
+          state === 'out-of-draft' && content.isMyTurn ? styles.islandClickable : '',
         )}
-        style={{
-          ...getBackgroundStyle(),
-          '--island-width': islandWidth,
-          '--island-height': islandHeight,
-          '--timer-progress-percent': `${Math.min(100, timerProgress)}%`,
-        } as React.CSSProperties}
+        style={
+          {
+            ...getBackgroundStyle(),
+            '--island-width': islandWidth,
+            '--island-height': islandHeight,
+            '--timer-progress-percent': `${Math.min(100, timerProgress)}%`,
+          } as React.CSSProperties
+        }
         onClick={handleClick}
         role={state === 'out-of-draft' && content.isMyTurn ? 'button' : undefined}
         tabIndex={state === 'out-of-draft' && content.isMyTurn ? 0 : undefined}
-        onKeyDown={(e) => {
-          if (state === 'out-of-draft' && content.isMyTurn && (e.key === 'Enter' || e.key === ' ')) {
+        onKeyDown={e => {
+          if (
+            state === 'out-of-draft' &&
+            content.isMyTurn &&
+            (e.key === 'Enter' || e.key === ' ')
+          ) {
             e.preventDefault();
             handleClick();
           }
@@ -561,16 +587,12 @@ function DynamicIslandVisualization({
                 <span className={styles.timerBarSeconds}>{content.timerSeconds}</span>
                 {content.totalSeconds && (
                   <div className={styles.timerBarContainer}>
-                    <div
-                      className={styles.timerBarFill}
-                    />
+                    <div className={styles.timerBarFill} />
                   </div>
                 )}
               </div>
             )}
-            <div className={styles.expandedText}>
-              {content.expandedText || content.compactText}
-            </div>
+            <div className={styles.expandedText}>{content.expandedText || content.compactText}</div>
           </div>
         )}
       </div>

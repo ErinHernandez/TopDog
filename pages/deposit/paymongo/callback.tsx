@@ -1,9 +1,9 @@
 /**
  * PayMongo Callback Page
- * 
+ *
  * Handles redirect from PayMongo after GCash/Maya/GrabPay payment.
  * Verifies payment status and updates UI accordingly.
- * 
+ *
  * @module pages/deposit/paymongo/callback
  */
 
@@ -30,24 +30,29 @@ export default function PayMongoCallback(): React.ReactElement {
   const [status, setStatus] = useState<CallbackStatus>('loading');
   const [message, setMessage] = useState('Verifying your payment...');
 
-  const handleSuccessfulPayment = useCallback(async (sourceId: string) => {
-    try {
-      // The webhook should have already processed this
-      // We just need to verify and redirect
-      setStatus('success');
-      setMessage('Payment successful! Redirecting...');
+  const handleSuccessfulPayment = useCallback(
+    async (sourceId: string) => {
+      try {
+        // The webhook should have already processed this
+        // We just need to verify and redirect
+        setStatus('success');
+        setMessage('Payment successful! Redirecting...');
 
-      // Redirect to wallet after a short delay
-      setTimeout(() => {
-        router.push('/wallet?deposit=success');
-      }, 2000);
-
-    } catch (error) {
-      logger.error('Error processing callback', error instanceof Error ? error : new Error(String(error)));
-      setStatus('error');
-      setMessage('An error occurred. Your payment may still be processing.');
-    }
-  }, [router]);
+        // Redirect to wallet after a short delay
+        setTimeout(() => {
+          router.push('/wallet?deposit=success');
+        }, 2000);
+      } catch (error) {
+        logger.error(
+          'Error processing callback',
+          error instanceof Error ? error : new Error(String(error)),
+        );
+        setStatus('error');
+        setMessage('An error occurred. Your payment may still be processing.');
+      }
+    },
+    [router],
+  );
 
   useEffect(() => {
     const { status: urlStatus, source_id } = router.query;
@@ -56,7 +61,6 @@ export default function PayMongoCallback(): React.ReactElement {
 
     // Handle based on URL status
     if (urlStatus === 'success' && source_id) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
       handleSuccessfulPayment(source_id as string);
     } else if (urlStatus === 'failed') {
       setStatus('failed');
@@ -66,21 +70,21 @@ export default function PayMongoCallback(): React.ReactElement {
       setMessage('Invalid callback. Please contact support.');
     }
   }, [router.isReady, router.query, handleSuccessfulPayment, router]);
-  
+
   const handleRetry = () => {
     router.push('/deposit');
   };
-  
+
   const handleGoToWallet = () => {
     router.push('/wallet');
   };
-  
+
   return (
     <>
       <Head>
         <title>Payment Status | TopDog</title>
       </Head>
-      
+
       <div className="min-h-screen bg-[#0a1628] flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-[#101927] rounded-2xl p-8 text-center">
           {/* Status Icon */}
@@ -90,7 +94,7 @@ export default function PayMongoCallback(): React.ReactElement {
             {status === 'failed' && <FailedIcon />}
             {status === 'error' && <ErrorIcon />}
           </div>
-          
+
           {/* Title */}
           <h1 className="text-2xl font-bold text-white mb-2">
             {status === 'loading' && 'Processing Payment'}
@@ -98,10 +102,10 @@ export default function PayMongoCallback(): React.ReactElement {
             {status === 'failed' && 'Payment Failed'}
             {status === 'error' && 'Something Went Wrong'}
           </h1>
-          
+
           {/* Message */}
           <p className="text-gray-400 mb-8">{message}</p>
-          
+
           {/* Actions */}
           <div className="space-y-3">
             {status === 'failed' && (
@@ -112,7 +116,7 @@ export default function PayMongoCallback(): React.ReactElement {
                 Try Again
               </button>
             )}
-            
+
             {(status === 'failed' || status === 'error') && (
               <button
                 onClick={handleGoToWallet}
@@ -136,15 +140,17 @@ function LoadingIcon(): React.ReactElement {
   return (
     <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-blue-600/20">
       <svg className="animate-spin w-10 h-10 text-blue-500" fill="none" viewBox="0 0 24 24">
-        <circle 
-          className="opacity-25" 
-          cx="12" cy="12" r="10" 
-          stroke="currentColor" 
+        <circle
+          className="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
           strokeWidth="4"
         />
-        <path 
-          className="opacity-75" 
-          fill="currentColor" 
+        <path
+          className="opacity-75"
+          fill="currentColor"
           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
         />
       </svg>
@@ -155,7 +161,12 @@ function LoadingIcon(): React.ReactElement {
 function SuccessIcon(): React.ReactElement {
   return (
     <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-600/20">
-      <svg className="w-10 h-10 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg
+        className="w-10 h-10 text-green-500"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
       </svg>
     </div>
@@ -166,7 +177,12 @@ function FailedIcon(): React.ReactElement {
   return (
     <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-red-600/20">
       <svg className="w-10 h-10 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M6 18L18 6M6 6l12 12"
+        />
       </svg>
     </div>
   );
@@ -175,11 +191,19 @@ function FailedIcon(): React.ReactElement {
 function ErrorIcon(): React.ReactElement {
   return (
     <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-yellow-600/20">
-      <svg className="w-10 h-10 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+      <svg
+        className="w-10 h-10 text-yellow-500"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+        />
       </svg>
     </div>
   );
 }
-
-

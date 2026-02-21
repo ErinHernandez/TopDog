@@ -1,13 +1,20 @@
 /**
  * User Context Provider
- * 
+ *
  * Provides user authentication state and balance to the application.
  * Uses Firebase Auth for authentication and Firestore for user data.
  */
 
 import type { User as FirebaseUser } from 'firebase/auth';
 import { doc, getDoc, onSnapshot, updateDoc, type Unsubscribe } from 'firebase/firestore';
-import React, { createContext, useContext, useState, useEffect, useRef, type ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useRef,
+  type ReactNode,
+} from 'react';
 
 import { auth, db as firestore } from './firebase';
 
@@ -53,7 +60,7 @@ const UserContext = createContext<UserContextValue | undefined>(undefined);
 
 /**
  * User Provider Component
- * 
+ *
  * Provides user authentication state and balance to child components.
  * Listens to Firebase Auth state changes and user balance updates.
  */
@@ -61,14 +68,13 @@ export function UserProvider({ children }: { children: ReactNode }): React.React
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [userBalance, setUserBalance] = useState<UserBalance>({ balance: 0 });
   const [loading, setLoading] = useState<boolean>(true);
-  
+
   // Ref to store balance listener unsubscribe function
   const unsubscribeBalanceRef = useRef<Unsubscribe | null>(null);
 
   useEffect(() => {
     // Guard: If Firebase auth is not initialized, skip auth listener
     if (!auth) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- setting state from event listener
       setUser(null);
       setUserBalance({ balance: 0 });
       setLoading(false);
@@ -77,24 +83,24 @@ export function UserProvider({ children }: { children: ReactNode }): React.React
 
     const unsubscribe = auth.onAuthStateChanged(async (user: FirebaseUser | null) => {
       setUser(user);
-      
+
       // Clean up previous balance listener if it exists
       if (unsubscribeBalanceRef.current) {
         unsubscribeBalanceRef.current();
         unsubscribeBalanceRef.current = null;
       }
-      
+
       if (user && firestore) {
         try {
           // Listen to user balance changes
           const userDocRef = doc(firestore, 'users', user.uid);
           unsubscribeBalanceRef.current = onSnapshot(
             userDocRef,
-            (doc) => {
+            doc => {
               if (doc.exists()) {
                 const data = doc.data();
                 setUserBalance({
-                  balance: data.balance || 0
+                  balance: data.balance || 0,
                 });
               } else {
                 setUserBalance({ balance: 0 });
@@ -102,7 +108,7 @@ export function UserProvider({ children }: { children: ReactNode }): React.React
             },
             () => {
               setUserBalance({ balance: 0 });
-            }
+            },
           );
         } catch {
           setUserBalance({ balance: 0 });
@@ -135,16 +141,16 @@ export function UserProvider({ children }: { children: ReactNode }): React.React
    */
   const updateUserData = async (updates: UserDataUpdates): Promise<void> => {
     if (!user) return;
-    
+
     // If no updates provided, return early (useful for refresh calls)
     if (!updates || (typeof updates === 'object' && Object.keys(updates).length === 0)) {
       return;
     }
-    
+
     if (!firestore) {
       throw new Error('Firebase db not initialized');
     }
-    
+
     const userDocRef = doc(firestore, 'users', user.uid);
     await updateDoc(userDocRef, updates);
   };
@@ -153,14 +159,10 @@ export function UserProvider({ children }: { children: ReactNode }): React.React
     user,
     userBalance,
     updateUserData,
-    loading
+    loading,
   };
 
-  return (
-    <UserContext.Provider value={value}>
-      {children}
-    </UserContext.Provider>
-  );
+  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }
 
 // ============================================================================
@@ -169,18 +171,18 @@ export function UserProvider({ children }: { children: ReactNode }): React.React
 
 /**
  * Hook to access user context
- * 
+ *
  * @returns {UserContextValue} User context value
  * @throws {Error} If used outside UserProvider
- * 
+ *
  * @example
  * ```tsx
  * function MyComponent() {
  *   const { user, userBalance, loading } = useUser();
- *   
+ *
  *   if (loading) return <div>Loading...</div>;
  *   if (!user) return <div>Please sign in</div>;
- *   
+ *
  *   return <div>Balance: ${userBalance.balance}</div>;
  * }
  * ```

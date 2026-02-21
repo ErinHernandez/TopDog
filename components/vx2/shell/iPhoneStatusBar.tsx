@@ -68,14 +68,12 @@ export default function IPhoneStatusBar({
 
   // Track mount state to prevent hydration mismatch
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- setting state from event listener
     setIsMounted(true);
   }, []);
 
   // Update time every minute if time prop is not provided
   useEffect(() => {
     if (time) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- syncing external state on mount
       setDisplayTime(time);
       return;
     }
@@ -107,27 +105,25 @@ export default function IPhoneStatusBar({
     <div
       className={cn(
         styles.statusBar,
-        backgroundColor ? styles.statusBarColored : styles.statusBarDefault
+        backgroundColor ? styles.statusBarColored : styles.statusBarDefault,
       )}
       style={statusBarStyle}
       role="status"
       aria-label="Status bar"
     >
       {/* Left side - Time */}
-      <div className={styles.time}>
-        {displayTime}
-      </div>
+      <div className={styles.time}>{displayTime}</div>
 
       {/* Right side - Signal, WiFi, Battery */}
       <div className={styles.rightSide}>
         {/* Signal bars */}
         <div className={styles.signalBars}>
-          {[1, 2, 3, 4].map((bar) => (
+          {[1, 2, 3, 4].map(bar => (
             <div
               key={bar}
               className={cn(
                 styles.signalBar,
-                bar <= signalLevel ? styles.signalBarActive : styles.signalBarInactive
+                bar <= signalLevel ? styles.signalBarActive : styles.signalBarInactive,
               )}
               style={{ '--signal-bar-height': `${3 + (bar - 1) * 2}px` } as React.CSSProperties}
               aria-hidden="true"
@@ -163,9 +159,7 @@ export default function IPhoneStatusBar({
 
         {/* Battery icon */}
         <div className={styles.batterySection}>
-          <div className={styles.batteryLevel}>
-            {batteryLevel}
-          </div>
+          <div className={styles.batteryLevel}>{batteryLevel}</div>
           <svg
             width="24"
             height="12"
@@ -186,14 +180,7 @@ export default function IPhoneStatusBar({
               fill="none"
             />
             {/* Battery terminal */}
-            <rect
-              x="22"
-              y="4"
-              width="1"
-              height="4"
-              rx="0.5"
-              fill={TEXT_COLORS.primary}
-            />
+            <rect x="22" y="4" width="1" height="4" rx="0.5" fill={TEXT_COLORS.primary} />
             {/* Battery fill */}
             <rect
               x="2.5"

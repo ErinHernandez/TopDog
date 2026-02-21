@@ -1,6 +1,6 @@
 /**
  * useLocationTracking Hook
- * 
+ *
  * Manages location tracking with automatic detection and security checks.
  */
 
@@ -18,13 +18,10 @@ import {
   markLocationTrusted,
   untrustLocation,
 } from '@/lib/location/locationService';
-import {
-  checkLoginSecurity,
-  logSuspiciousAttempt,
-} from '@/lib/location/securityService';
-import type { 
-  GeoLocation, 
-  UserLocations, 
+import { checkLoginSecurity, logSuspiciousAttempt } from '@/lib/location/securityService';
+import type {
+  GeoLocation,
+  UserLocations,
   SecurityCheck,
   KnownLocation,
 } from '@/lib/location/types';
@@ -69,11 +66,10 @@ export function useLocationTracking(): UseLocationTrackingReturn {
   const [knownLocations, setKnownLocations] = useState<KnownLocation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  
+
   // Subscribe to location document changes
   useEffect(() => {
     if (!userId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- initializing from browser APIs on mount
       setIsLoading(false);
       return;
     }
@@ -85,39 +81,39 @@ export function useLocationTracking(): UseLocationTrackingReturn {
     }
 
     const docRef = doc(db, 'userLocations', userId);
-    
+
     const unsubscribe = onSnapshot(
       docRef,
-      (snap) => {
+      snap => {
         if (snap.exists()) {
           const data = snap.data();
-          
+
           // Update locations
           const locs = data?.locations || { countries: [], states: [] };
           setUserLocations(locs);
-          
+
           // Update unlocked flags
-          const flags: string[] = [
-            ...locs.countries,
-            ...locs.states.map((s: string) => `US-${s}`),
-          ];
+          const flags: string[] = [...locs.countries, ...locs.states.map((s: string) => `US-${s}`)];
           setUnlockedFlags(flags);
-          
+
           // Update known locations
           setKnownLocations(data?.security?.knownLocations || []);
         }
         setIsLoading(false);
       },
-      (err) => {
-        logger.error('Location tracking subscription error:', err instanceof Error ? err : new Error(String(err)));
+      err => {
+        logger.error(
+          'Location tracking subscription error:',
+          err instanceof Error ? err : new Error(String(err)),
+        );
         setError(err);
         setIsLoading(false);
-      }
+      },
     );
-    
+
     return () => unsubscribe();
   }, [userId]);
-  
+
   // Auto-track on mount when consent is granted
   useEffect(() => {
     if (!userId || !isGranted) return;
@@ -135,7 +131,7 @@ export function useLocationTracking(): UseLocationTrackingReturn {
 
     doTrack();
   }, [userId, isGranted]);
-  
+
   const detectAndTrack = useCallback(async (): Promise<GeoLocation | null> => {
     if (!userId) return null;
 
@@ -161,33 +157,39 @@ export function useLocationTracking(): UseLocationTrackingReturn {
       return null;
     }
   }, [userId, isGranted]);
-  
-  const trustLocation = useCallback(async (code: string) => {
-    if (!userId) return;
 
-    try {
-      await markLocationTrusted(userId, code);
-    } catch (err) {
-      setError(err as Error);
-    }
-  }, [userId]);
-  
-  const removeTrust = useCallback(async (code: string) => {
-    if (!userId) return;
+  const trustLocation = useCallback(
+    async (code: string) => {
+      if (!userId) return;
 
-    try {
-      await untrustLocation(userId, code);
-    } catch (err) {
-      setError(err as Error);
-    }
-  }, [userId]);
-  
+      try {
+        await markLocationTrusted(userId, code);
+      } catch (err) {
+        setError(err as Error);
+      }
+    },
+    [userId],
+  );
+
+  const removeTrust = useCallback(
+    async (code: string) => {
+      if (!userId) return;
+
+      try {
+        await untrustLocation(userId, code);
+      } catch (err) {
+        setError(err as Error);
+      }
+    },
+    [userId],
+  );
+
   const checkSecurity = useCallback(async (): Promise<SecurityCheck | null> => {
     if (!userId) return null;
 
     try {
       // Get current location first
-      const location = currentLocation || await getCurrentLocation();
+      const location = currentLocation || (await getCurrentLocation());
       if (!location) return null;
 
       const securityCheck = await checkLoginSecurity(userId, location);
@@ -197,10 +199,12 @@ export function useLocationTracking(): UseLocationTrackingReturn {
         await logSuspiciousAttempt(
           userId,
           location.countryCode,
-          securityCheck.action === 'block' ? 'blocked' :
-            securityCheck.action === 'verify' ? 'warned' : 'allowed',
-          `Risk score: ${securityCheck.riskScore}, ` +
-          `New: ${securityCheck.isNewLocation}`
+          securityCheck.action === 'block'
+            ? 'blocked'
+            : securityCheck.action === 'verify'
+              ? 'warned'
+              : 'allowed',
+          `Risk score: ${securityCheck.riskScore}, ` + `New: ${securityCheck.isNewLocation}`,
         );
       }
 
@@ -210,7 +214,7 @@ export function useLocationTracking(): UseLocationTrackingReturn {
       return null;
     }
   }, [userId, currentLocation]);
-  
+
   return {
     currentLocation,
     userLocations,

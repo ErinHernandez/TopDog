@@ -1,6 +1,6 @@
 /**
  * PaymentMethodsModalVX2 - Payment Method Management
- * 
+ *
  * Allows users to:
  * - View saved payment methods
  * - Add new payment methods
@@ -16,7 +16,6 @@ import { cn } from '@/lib/styles';
 import { createScopedLogger } from '../../../lib/clientLogger';
 import { Close, Plus } from '../components/icons';
 import { StripeProvider } from '../providers/StripeProvider';
-
 
 import styles from './PaymentMethodsModalVX2.module.css';
 
@@ -97,8 +96,12 @@ function CardBrandIcon({ brand }: { brand: string }): React.ReactElement {
 function TrashIcon(): React.ReactElement {
   return (
     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+      />
     </svg>
   );
 }
@@ -120,7 +123,7 @@ function ModalContent({
 }: ModalContentProps): React.ReactElement | null {
   const stripe = useStripe();
   const elements = useElements();
-  
+
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
@@ -150,39 +153,36 @@ function ModalContent({
       loadPaymentMethods();
     }
   }, [isOpen, userId, loadPaymentMethods]);
-  
+
   const handleAddCard = async () => {
     if (!stripe || !elements || !clientSecret) {
       setError('Payment system not ready');
       return;
     }
-    
+
     const cardElement = elements.getElement(CardElement);
     if (!cardElement) {
       setError('Card input not ready');
       return;
     }
-    
+
     setIsAdding(true);
     setError(null);
-    
+
     try {
-      const { error: confirmError, setupIntent } = await stripe.confirmCardSetup(
-        clientSecret,
-        {
-          payment_method: {
-            card: cardElement,
-            billing_details: {
-              email: userEmail,
-            },
+      const { error: confirmError, setupIntent } = await stripe.confirmCardSetup(clientSecret, {
+        payment_method: {
+          card: cardElement,
+          billing_details: {
+            email: userEmail,
           },
-        }
-      );
-      
+        },
+      });
+
       if (confirmError) {
         throw new Error(confirmError.message);
       }
-      
+
       if (setupIntent?.status === 'succeeded') {
         // Reload payment methods
         await loadPaymentMethods();
@@ -196,7 +196,7 @@ function ModalContent({
       setIsAdding(false);
     }
   };
-  
+
   const handleSetDefault = async (paymentMethodId: string) => {
     try {
       const response = await fetch('/api/stripe/payment-methods', {
@@ -204,22 +204,22 @@ function ModalContent({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, paymentMethodId }),
       });
-      
+
       const data = await response.json();
-      
+
       if (data.success) {
-        setPaymentMethods(prev => 
+        setPaymentMethods(prev =>
           prev.map(pm => ({
             ...pm,
             isDefault: pm.id === paymentMethodId,
-          }))
+          })),
         );
       }
     } catch (err) {
       logger.error('Failed to set default', err);
     }
   };
-  
+
   const handleDelete = async (paymentMethodId: string) => {
     setDeletingId(paymentMethodId);
     try {
@@ -228,9 +228,9 @@ function ModalContent({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, paymentMethodId }),
       });
-      
+
       const data = await response.json();
-      
+
       if (data.success) {
         setPaymentMethods(prev => prev.filter(pm => pm.id !== paymentMethodId));
       }
@@ -240,42 +240,26 @@ function ModalContent({
       setDeletingId(null);
     }
   };
-  
+
   if (!isOpen) return null;
 
   return (
-    <div
-      className={styles.modalContainer}
-    >
+    <div className={styles.modalContainer}>
       {/* Backdrop */}
-      <div
-        className={styles.backdrop}
-        onClick={onClose}
-      />
+      <div className={styles.backdrop} onClick={onClose} />
 
       {/* Modal */}
-      <div
-        className={styles.modal}
-      >
+      <div className={styles.modal}>
         {/* Header */}
-        <div
-          className={styles.header}
-        >
-          <h2
-            className={styles.headerTitle}
-          >
-            Payment Methods
-          </h2>
-          <button
-            onClick={onClose}
-            className={styles.closeButton}
-          >
+        <div className={styles.header}>
+          <h2 className={styles.headerTitle}>Payment Methods</h2>
+          <button onClick={onClose} className={styles.closeButton}>
             <span className={styles.closeIcon}>
               <Close className="w-5 h-5" />
             </span>
           </button>
         </div>
-        
+
         {/* Content */}
         <div className={styles.content}>
           {isLoading ? (
@@ -290,7 +274,7 @@ function ModalContent({
                   <p>No saved payment methods</p>
                 </div>
               )}
-              
+
               {paymentMethods.map(method => (
                 <div
                   key={method.id}
@@ -299,25 +283,18 @@ function ModalContent({
                   <CardBrandIcon brand={method.card.brand} />
 
                   <div className={styles.methodCardInfo}>
-                    <p
-                      className={styles.methodCardBrand}
-                    >
-                      {method.card.brand.charAt(0).toUpperCase() + method.card.brand.slice(1)} ****{method.card.last4}
+                    <p className={styles.methodCardBrand}>
+                      {method.card.brand.charAt(0).toUpperCase() + method.card.brand.slice(1)} ****
+                      {method.card.last4}
                     </p>
-                    <p
-                      className={styles.methodCardExpiry}
-                    >
+                    <p className={styles.methodCardExpiry}>
                       Expires {method.card.expMonth}/{method.card.expYear}
                     </p>
                   </div>
 
                   <div className={styles.methodCardActions}>
                     {method.isDefault ? (
-                      <span
-                        className={styles.defaultBadge}
-                      >
-                        Default
-                      </span>
+                      <span className={styles.defaultBadge}>Default</span>
                     ) : (
                       <button
                         onClick={() => handleSetDefault(method.id)}
@@ -341,25 +318,15 @@ function ModalContent({
                   </div>
                 </div>
               ))}
-              
+
               {/* Add new card form */}
               {showAddForm ? (
-                <div
-                  className={styles.addCardForm}
-                >
-                  <div
-                    className={styles.cardInputContainer}
-                  >
+                <div className={styles.addCardForm}>
+                  <div className={styles.cardInputContainer}>
                     <CardElement options={CARD_ELEMENT_OPTIONS} />
                   </div>
 
-                  {error && (
-                    <p
-                      className={styles.errorMessage}
-                    >
-                      {error}
-                    </p>
-                  )}
+                  {error && <p className={styles.errorMessage}>{error}</p>}
 
                   <div className={styles.formActions}>
                     <button
@@ -388,10 +355,7 @@ function ModalContent({
                   </div>
                 </div>
               ) : (
-                <button
-                  onClick={() => setShowAddForm(true)}
-                  className={styles.addNewCardButton}
-                >
+                <button onClick={() => setShowAddForm(true)} className={styles.addNewCardButton}>
                   <Plus className={styles.addIcon} />
                   Add New Card
                 </button>
@@ -408,7 +372,9 @@ function ModalContent({
 // MAIN EXPORT
 // ============================================================================
 
-export function PaymentMethodsModalVX2(props: PaymentMethodsModalVX2Props): React.ReactElement | null {
+export function PaymentMethodsModalVX2(
+  props: PaymentMethodsModalVX2Props,
+): React.ReactElement | null {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
 
   const { isOpen, userId, userEmail } = props;
@@ -434,20 +400,18 @@ export function PaymentMethodsModalVX2(props: PaymentMethodsModalVX2Props): Reac
   // Create setup intent when modal opens and user wants to add a card
   useEffect(() => {
     if (isOpen && userId && userEmail) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
       createSetupIntent();
     }
   }, [isOpen, userId, userEmail, createSetupIntent]);
 
   useEffect(() => {
     if (!isOpen) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
       setClientSecret(null);
     }
   }, [isOpen]);
-  
+
   if (!isOpen) return null;
-  
+
   return (
     <StripeProvider clientSecret={clientSecret || undefined}>
       <ModalContent {...props} clientSecret={clientSecret || undefined} />
@@ -456,4 +420,3 @@ export function PaymentMethodsModalVX2(props: PaymentMethodsModalVX2Props): Reac
 }
 
 export default PaymentMethodsModalVX2;
-

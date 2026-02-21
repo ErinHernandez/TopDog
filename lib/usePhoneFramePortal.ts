@@ -34,7 +34,6 @@ export function usePhoneFramePortal(): { portalRoot: HTMLElement | null } {
 
   useEffect(() => {
     if (!inPhoneFrame) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
       setPortalRoot(null);
       return;
     }

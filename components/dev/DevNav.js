@@ -338,7 +338,6 @@ export default function DevNav() {
     try {
       const savedPosition = localStorage.getItem(STORAGE_KEY);
       if (savedPosition) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect -- initializing state from localStorage on mount
         setPosition(JSON.parse(savedPosition));
       }
       const savedMinimized = localStorage.getItem(MINIMIZED_KEY);

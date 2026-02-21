@@ -37,10 +37,7 @@ const logger = createScopedLogger('[TabContentVX2]');
 
 // Create a stable loading component that's identical on server and client
 const LobbyTabLoading = () => (
-  <div
-    className={styles.lobbyLoading}
-    suppressHydrationWarning
-  >
+  <div className={styles.lobbyLoading} suppressHydrationWarning>
     <div>Loading tournaments...</div>
   </div>
 );
@@ -50,7 +47,7 @@ const LobbyTab = dynamic(
   {
     ssr: false,
     loading: () => <LobbyTabLoading />,
-  }
+  },
 );
 
 // Debug: Log what DraftsTab is (only in development, client-side)
@@ -74,11 +71,11 @@ export interface TabContentVX2Props {
 // ============================================================================
 
 const TAB_COMPONENTS: Record<TabId, React.ComponentType> = {
-  'lobby': LobbyTab,
+  lobby: LobbyTab,
   'live-drafts': DraftsTab,
   'my-teams': MyTeamsTab,
-  'exposure': ExposureTab,
-  'profile': ProfileTab,
+  exposure: ExposureTab,
+  profile: ProfileTab,
 };
 
 // ============================================================================
@@ -111,7 +108,6 @@ export default function TabContentVX2({
 
   // Track mount state for SSR
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
     setIsMounted(true);
   }, []);
 
@@ -149,21 +145,27 @@ export default function TabContentVX2({
     saveTabStateRef.current = saveTabState;
   }, [tabConfig, state.activeTab, saveTabState]);
 
-  const { debouncedCallback: handleScrollDebounced } = useDebouncedCallback((target: HTMLElement) => {
-    if (!tabConfigRef.current || !tabConfigRef.current.preserveState) return;
+  const { debouncedCallback: handleScrollDebounced } = useDebouncedCallback(
+    (target: HTMLElement) => {
+      if (!tabConfigRef.current || !tabConfigRef.current.preserveState) return;
 
-    saveTabStateRef.current(activeTabRef.current, {
-      scrollPosition: {
-        x: target.scrollLeft,
-        y: target.scrollTop
-      },
-    });
-  }, 100);
+      saveTabStateRef.current(activeTabRef.current, {
+        scrollPosition: {
+          x: target.scrollLeft,
+          y: target.scrollTop,
+        },
+      });
+    },
+    100,
+  );
 
   // Scroll event handler
-  const onScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
-    handleScrollDebounced(e.currentTarget);
-  }, [handleScrollDebounced]);
+  const onScroll = useCallback(
+    (e: React.UIEvent<HTMLDivElement>) => {
+      handleScrollDebounced(e.currentTarget);
+    },
+    [handleScrollDebounced],
+  );
 
   // Error retry handler
   const handleRetry = useCallback(() => {
@@ -175,20 +177,26 @@ export default function TabContentVX2({
   const router = useRouter();
 
   // Handle entering a draft room
-  const handleEnterDraft = useCallback((draft: { id: string; pickNumber: number; teamCount: number }) => {
-    logger.debug('Entering draft', { draftId: draft.id, pickNumber: draft.pickNumber });
-    const params = new URLSearchParams({
-      roomId: draft.id,
-      pickNumber: draft.pickNumber.toString(),
-      teamCount: draft.teamCount.toString(),
-    });
-    router.push(`/testing-grounds/vx2-draft-room?${params.toString()}`);
-  }, [router]);
+  const handleEnterDraft = useCallback(
+    (draft: { id: string; pickNumber: number; teamCount: number }) => {
+      logger.debug('Entering draft', { draftId: draft.id, pickNumber: draft.pickNumber });
+      const params = new URLSearchParams({
+        roomId: draft.id,
+        pickNumber: draft.pickNumber.toString(),
+        teamCount: draft.teamCount.toString(),
+      });
+      router.push(`/testing-grounds/vx2-draft-room?${params.toString()}`);
+    },
+    [router],
+  );
 
   // Get the active tab component
   const TabComponent = TAB_COMPONENTS[state.activeTab];
 
-  logger.debug('Tab component lookup', { activeTab: state.activeTab, hasTabComponent: !!TabComponent });
+  logger.debug('Tab component lookup', {
+    activeTab: state.activeTab,
+    hasTabComponent: !!TabComponent,
+  });
 
   if (!TabComponent) {
     logger.error('Tab component not found', undefined, { activeTab: state.activeTab });
@@ -201,11 +209,13 @@ export default function TabContentVX2({
         return (
           <DraftsTab
             onEnterFastDraft={handleEnterDraft}
-            onEnterSlowDraft={(draft) => handleEnterDraft({
-              id: draft.id,
-              pickNumber: draft.pickNumber,
-              teamCount: draft.teamCount,
-            })}
+            onEnterSlowDraft={draft =>
+              handleEnterDraft({
+                id: draft.id,
+                pickNumber: draft.pickNumber,
+                teamCount: draft.teamCount,
+              })
+            }
           />
         );
       default:
@@ -219,7 +229,7 @@ export default function TabContentVX2({
       className={cn(
         styles.contentContainer,
         isLobbyInPhone ? styles.contentContainerHidden : styles.contentContainerScrollable,
-        className
+        className,
       )}
       onScroll={onScroll}
       role="tabpanel"
@@ -228,11 +238,7 @@ export default function TabContentVX2({
       tabIndex={0}
       suppressHydrationWarning
     >
-      <TabErrorBoundary
-        tabId={state.activeTab}
-        onRetry={handleRetry}
-        fallback={errorComponent}
-      >
+      <TabErrorBoundary tabId={state.activeTab} onRetry={handleRetry} fallback={errorComponent}>
         {/* Only render content after mount to prevent hydration mismatch */}
         {isMounted && TabComponent ? (
           renderTabContent()

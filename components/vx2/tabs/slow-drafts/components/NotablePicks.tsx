@@ -8,11 +8,7 @@ import React, { useState, useEffect } from 'react';
 
 import { cn } from '@/lib/styles';
 
-import {
-  SLOW_DRAFT_COLORS,
-  SLOW_DRAFT_LAYOUT,
-  SLOW_DRAFT_THRESHOLDS,
-} from '../constants';
+import { SLOW_DRAFT_COLORS, SLOW_DRAFT_LAYOUT, SLOW_DRAFT_THRESHOLDS } from '../constants';
 import type { NotablePicksProps, NotableEvent, NotableEventType } from '../types';
 
 import styles from './NotablePicks.module.css';
@@ -128,7 +124,6 @@ function EventItem({ event, onTap }: EventItemProps): React.ReactElement {
 
   // Track mount state to prevent hydration mismatch with Date.now()
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- setting state from event listener
     setIsMounted(true);
   }, []);
 
@@ -136,41 +131,31 @@ function EventItem({ event, onTap }: EventItemProps): React.ReactElement {
     <button
       onClick={onTap}
       className={cn(styles.eventButton, 'w-full')}
-      style={{
-        '--event-bg-color': style.bgColor,
-        '--event-border-color': `${style.color}30`,
-      } as React.CSSProperties}
+      style={
+        {
+          '--event-bg-color': style.bgColor,
+          '--event-border-color': `${style.color}30`,
+        } as React.CSSProperties
+      }
     >
       {/* Pick number column */}
-      <div className={styles.pickNumber}>
-        {formatPickNumber(event.pickNumber)}
-      </div>
+      <div className={styles.pickNumber}>{formatPickNumber(event.pickNumber)}</div>
 
       {/* Content */}
       <div className={cn(styles.content, 'flex-1 min-w-0')}>
         {/* Main line: Drafter took Player (Position) */}
         <div className={styles.mainLine}>
-          <span
-            className={styles.drafterName}
-          >
-            {event.drafter?.name || 'Someone'}
-          </span>
-          <span
-            className={styles.actionText}
-          >
-            {' '}took{' '}
-          </span>
-          <span
-            className={styles.playerName}
-          >
-            {event.player?.name || 'Unknown'}
-          </span>
+          <span className={styles.drafterName}>{event.drafter?.name || 'Someone'}</span>
+          <span className={styles.actionText}> took </span>
+          <span className={styles.playerName}>{event.player?.name || 'Unknown'}</span>
           {event.player && (
             <span
               className={styles.playerPosition}
-              style={{
-                '--position-color': SLOW_DRAFT_COLORS.positions[event.player.position],
-              } as React.CSSProperties}
+              style={
+                {
+                  '--position-color': SLOW_DRAFT_COLORS.positions[event.player.position],
+                } as React.CSSProperties
+              }
             >
               ({event.player.position})
             </span>
@@ -182,10 +167,12 @@ function EventItem({ event, onTap }: EventItemProps): React.ReactElement {
           {/* Type badge */}
           <span
             className={styles.typeBadge}
-            style={{
-              '--event-color': style.color,
-              '--event-badge-bg': `${style.color}20`,
-            } as React.CSSProperties}
+            style={
+              {
+                '--event-color': style.color,
+                '--event-badge-bg': `${style.color}20`,
+              } as React.CSSProperties
+            }
           >
             {style.icon} {style.label}
           </span>
@@ -194,9 +181,11 @@ function EventItem({ event, onTap }: EventItemProps): React.ReactElement {
           {event.adpDelta !== undefined && Math.abs(event.adpDelta) > 0 && (
             <span
               className={styles.adpDelta}
-              style={{
-                '--event-color': style.color,
-              } as React.CSSProperties}
+              style={
+                {
+                  '--event-color': style.color,
+                } as React.CSSProperties
+              }
             >
               {formatAdpDelta(event.adpDelta)}
             </span>
@@ -205,9 +194,7 @@ function EventItem({ event, onTap }: EventItemProps): React.ReactElement {
       </div>
 
       {/* Timestamp */}
-      <div className={styles.timestamp}>
-        {formatTimestamp(event.timestamp, isMounted)}
-      </div>
+      <div className={styles.timestamp}>{formatTimestamp(event.timestamp, isMounted)}</div>
     </button>
   );
 }
@@ -229,33 +216,19 @@ export default function NotablePicks({
   if (events.length === 0) {
     return (
       <div className={styles.emptyContainer}>
-        <div
-          className={styles.sectionLabel}
-        >
-          NOTABLE ACTIVITY
-        </div>
-        <div className={styles.emptyMessage}>
-          No notable picks yet
-        </div>
+        <div className={styles.sectionLabel}>NOTABLE ACTIVITY</div>
+        <div className={styles.emptyMessage}>No notable picks yet</div>
       </div>
     );
   }
 
   return (
     <div>
-      <div
-        className={styles.sectionLabel}
-      >
-        NOTABLE ACTIVITY
-      </div>
+      <div className={styles.sectionLabel}>NOTABLE ACTIVITY</div>
 
       <div className="flex flex-col gap-2">
-        {visibleEvents.map((event) => (
-          <EventItem
-            key={event.id}
-            event={event}
-            onTap={() => onEventTap?.(event)}
-          />
+        {visibleEvents.map(event => (
+          <EventItem key={event.id} event={event} onTap={() => onEventTap?.(event)} />
         ))}
       </div>
 

@@ -85,12 +85,20 @@ interface PositionFilterProps {
   onPositionChange: (position: Position | null) => void;
 }
 
-function PositionFilter({ activePosition, onPositionChange }: PositionFilterProps): React.ReactElement {
+function PositionFilter({
+  activePosition,
+  onPositionChange,
+}: PositionFilterProps): React.ReactElement {
   return (
     <div className={styles.positionFilter}>
       <button
         onClick={() => onPositionChange(null)}
-        className={cn(styles.filterButton, 'all', activePosition === null && styles.active, activePosition !== null && styles.inactive)}
+        className={cn(
+          styles.filterButton,
+          'all',
+          activePosition === null && styles.active,
+          activePosition !== null && styles.inactive,
+        )}
       >
         ALL
       </button>
@@ -100,7 +108,11 @@ function PositionFilter({ activePosition, onPositionChange }: PositionFilterProp
           <button
             key={pos}
             onClick={() => onPositionChange(isActive ? null : pos)}
-            className={cn(styles.filterButton, isActive && styles.active, !isActive && styles.inactive)}
+            className={cn(
+              styles.filterButton,
+              isActive && styles.active,
+              !isActive && styles.inactive,
+            )}
             data-position={pos.toLowerCase()}
           >
             {pos}
@@ -119,7 +131,13 @@ interface PlayerListItemProps {
   onToggleExclude: () => void;
 }
 
-function PlayerListItem({ player, isRanked, isExcluded, onToggle, onToggleExclude }: PlayerListItemProps): React.ReactElement {
+function PlayerListItem({
+  player,
+  isRanked,
+  isExcluded,
+  onToggle,
+  onToggleExclude,
+}: PlayerListItemProps): React.ReactElement {
   const adp = typeof player.adp === 'number' ? player.adp.toFixed(1) : player.adp || '-';
   const proj = typeof player.proj === 'number' ? Math.round(player.proj) : player.proj || '-';
 
@@ -170,7 +188,16 @@ interface RankedPlayerRowProps {
   };
 }
 
-function RankedPlayerRow({ player, rank, totalRanked, onRemove, onMoveToRank, disabled, isDragging, dragHandleProps }: RankedPlayerRowProps): React.ReactElement {
+function RankedPlayerRow({
+  player,
+  rank,
+  totalRanked,
+  onRemove,
+  onMoveToRank,
+  disabled,
+  isDragging,
+  dragHandleProps,
+}: RankedPlayerRowProps): React.ReactElement {
   const proj = typeof player.proj === 'number' ? Math.round(player.proj) : player.proj || '-';
   const [showMovePopup, setShowMovePopup] = useState(false);
   const [customRank, setCustomRank] = useState(String(rank));
@@ -178,7 +205,6 @@ function RankedPlayerRow({ player, rank, totalRanked, onRemove, onMoveToRank, di
 
   useEffect(() => {
     if (showMovePopup) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
       setCustomRank(String(rank));
       setTimeout(() => inputRef.current?.select(), 50);
     }
@@ -224,21 +250,29 @@ function RankedPlayerRow({ player, rank, totalRanked, onRemove, onMoveToRank, di
 
       {/* Move Popup */}
       {showMovePopup && (
-        <div
-          className={styles.movePopupOverlay}
-          onClick={() => setShowMovePopup(false)}
-        >
-          <div
-            className={styles.movePopupContent}
-            onClick={e => e.stopPropagation()}
-          >
+        <div className={styles.movePopupOverlay} onClick={() => setShowMovePopup(false)}>
+          <div className={styles.movePopupContent} onClick={e => e.stopPropagation()}>
             <button
-              onClick={() => { if (rank > 1) { onMoveToRank(rank - 1); setShowMovePopup(false); } }}
+              onClick={() => {
+                if (rank > 1) {
+                  onMoveToRank(rank - 1);
+                  setShowMovePopup(false);
+                }
+              }}
               disabled={rank <= 1}
               className={styles.moveButton}
               aria-label="Move up"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <polyline points="18 15 12 9 6 15" />
               </svg>
             </button>
@@ -249,23 +283,37 @@ function RankedPlayerRow({ player, rank, totalRanked, onRemove, onMoveToRank, di
               max={totalRanked}
               value={customRank}
               onChange={e => setCustomRank(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter') handleMoveSubmit(); if (e.key === 'Escape') setShowMovePopup(false); }}
+              onKeyDown={e => {
+                if (e.key === 'Enter') handleMoveSubmit();
+                if (e.key === 'Escape') setShowMovePopup(false);
+              }}
               className={styles.rankInput}
             />
             <button
-              onClick={() => { if (rank < totalRanked) { onMoveToRank(rank + 1); setShowMovePopup(false); } }}
+              onClick={() => {
+                if (rank < totalRanked) {
+                  onMoveToRank(rank + 1);
+                  setShowMovePopup(false);
+                }
+              }}
               disabled={rank >= totalRanked}
               className={styles.moveButton}
               aria-label="Move down"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <polyline points="6 9 12 15 18 9" />
               </svg>
             </button>
-            <button
-              onClick={handleMoveSubmit}
-              className={styles.moveSubmitButton}
-            >
+            <button onClick={handleMoveSubmit} className={styles.moveSubmitButton}>
               Go
             </button>
             <button
@@ -286,7 +334,13 @@ function RankedPlayerRow({ player, rank, totalRanked, onRemove, onMoveToRank, di
 // MAIN COMPONENT
 // ============================================================================
 
-export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChange, externalCloseAttempt, onExternalCloseHandled }: RankingsModalVX2Props): React.ReactElement | null {
+export default function RankingsModalVX2({
+  isOpen,
+  onClose,
+  onUnsavedChangesChange,
+  externalCloseAttempt,
+  onExternalCloseHandled,
+}: RankingsModalVX2Props): React.ReactElement | null {
   const [activeTab, setActiveTab] = useState<TabType>('build');
   const [customRankings, setCustomRankings] = useState<string[]>([]);
   const [originalRankings, setOriginalRankings] = useState<string[]>([]);
@@ -309,12 +363,16 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const clearLongPressTimer = useRef<NodeJS.Timeout | null>(null);
 
-  const hasChanges = JSON.stringify(customRankings) !== JSON.stringify(originalRankings) || JSON.stringify(excludedPlayers) !== JSON.stringify(originalExcluded);
+  const hasChanges =
+    JSON.stringify(customRankings) !== JSON.stringify(originalRankings) ||
+    JSON.stringify(excludedPlayers) !== JSON.stringify(originalExcluded);
   const rankedCount = customRankings.length;
   const excludedCount = excludedPlayers.length;
   const canUndo = undoHistory.length > 0;
 
-  useEffect(() => { onUnsavedChangesChange?.(hasChanges); }, [hasChanges, onUnsavedChangesChange]);
+  useEffect(() => {
+    onUnsavedChangesChange?.(hasChanges);
+  }, [hasChanges, onUnsavedChangesChange]);
 
   useEffect(() => {
     if (externalCloseAttempt && isOpen) {
@@ -324,8 +382,16 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
     }
   }, [externalCloseAttempt, isOpen, hasChanges, onClose, onExternalCloseHandled]);
 
-  const handleClose = useCallback(() => { if (hasChanges) setShowUnsavedWarning(true); else onClose(); }, [hasChanges, onClose]);
-  const handleDiscardAndClose = useCallback(() => { setShowUnsavedWarning(false); setCustomRankings(originalRankings); setExcludedPlayers(originalExcluded); onClose(); }, [originalRankings, originalExcluded, onClose]);
+  const handleClose = useCallback(() => {
+    if (hasChanges) setShowUnsavedWarning(true);
+    else onClose();
+  }, [hasChanges, onClose]);
+  const handleDiscardAndClose = useCallback(() => {
+    setShowUnsavedWarning(false);
+    setCustomRankings(originalRankings);
+    setExcludedPlayers(originalExcluded);
+    onClose();
+  }, [originalRankings, originalExcluded, onClose]);
 
   const loadData = useCallback(async () => {
     setIsLoading(true);
@@ -357,7 +423,10 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
           savedRankings = JSON.parse(saved);
         } catch (error) {
           // If JSON is corrupted, clear it and use empty array
-          logger.error('Error parsing vx2Rankings from localStorage:', error instanceof Error ? error : new Error(String(error)));
+          logger.error(
+            'Error parsing vx2Rankings from localStorage:',
+            error instanceof Error ? error : new Error(String(error)),
+          );
           try {
             localStorage.removeItem('vx2Rankings');
           } catch (clearError) {
@@ -373,7 +442,10 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
           savedExcludedList = JSON.parse(savedExcluded);
         } catch (error) {
           // If JSON is corrupted, clear it and use empty array
-          logger.error('Error parsing vx2Excluded from localStorage:', error instanceof Error ? error : new Error(String(error)));
+          logger.error(
+            'Error parsing vx2Excluded from localStorage:',
+            error instanceof Error ? error : new Error(String(error)),
+          );
           try {
             localStorage.removeItem('vx2Excluded');
           } catch (clearError) {
@@ -403,41 +475,67 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
   }, [isOpen]);
 
   useEffect(() => {
-    if (isOpen) { loadData(); setUndoHistory([]); }
+    if (isOpen) {
+      loadData();
+      setUndoHistory([]);
+    }
   }, [isOpen, loadData]);
 
-  const getRank = useCallback((name: string) => { const idx = customRankings.indexOf(name); return idx >= 0 ? idx + 1 : undefined; }, [customRankings]);
-  const isPlayerRanked = useCallback((name: string) => customRankings.includes(name), [customRankings]);
-  const isPlayerExcluded = useCallback((name: string) => excludedPlayers.includes(name), [excludedPlayers]);
+  const getRank = useCallback(
+    (name: string) => {
+      const idx = customRankings.indexOf(name);
+      return idx >= 0 ? idx + 1 : undefined;
+    },
+    [customRankings],
+  );
+  const isPlayerRanked = useCallback(
+    (name: string) => customRankings.includes(name),
+    [customRankings],
+  );
+  const isPlayerExcluded = useCallback(
+    (name: string) => excludedPlayers.includes(name),
+    [excludedPlayers],
+  );
 
   // Helper to save current state to history before making changes
   const pushToHistory = useCallback(() => {
     setUndoHistory(prev => [...prev, customRankings]);
   }, [customRankings]);
 
-  const togglePlayerExclude = useCallback((name: string) => {
-    pushToHistory();
-    setExcludedPlayers(prev => {
-      const isCurrentlyExcluded = prev.includes(name);
-      if (isCurrentlyExcluded) {
-        return prev.filter(n => n !== name);
-      } else {
-        // Remove from rankings if excluding
-        setCustomRankings(prevRankings => prevRankings.filter(n => n !== name));
-        return [...prev, name];
-      }
-    });
-  }, [pushToHistory]);
+  const togglePlayerExclude = useCallback(
+    (name: string) => {
+      pushToHistory();
+      setExcludedPlayers(prev => {
+        const isCurrentlyExcluded = prev.includes(name);
+        if (isCurrentlyExcluded) {
+          return prev.filter(n => n !== name);
+        } else {
+          // Remove from rankings if excluding
+          setCustomRankings(prevRankings => prevRankings.filter(n => n !== name));
+          return [...prev, name];
+        }
+      });
+    },
+    [pushToHistory],
+  );
 
-  const togglePlayerRanking = useCallback((name: string) => {
-    pushToHistory();
-    setCustomRankings(prev => prev.includes(name) ? prev.filter(n => n !== name) : [...prev, name]);
-  }, [pushToHistory]);
+  const togglePlayerRanking = useCallback(
+    (name: string) => {
+      pushToHistory();
+      setCustomRankings(prev =>
+        prev.includes(name) ? prev.filter(n => n !== name) : [...prev, name],
+      );
+    },
+    [pushToHistory],
+  );
 
-  const removeFromRankings = useCallback((name: string) => {
-    pushToHistory();
-    setCustomRankings(prev => prev.filter(n => n !== name));
-  }, [pushToHistory]);
+  const removeFromRankings = useCallback(
+    (name: string) => {
+      pushToHistory();
+      setCustomRankings(prev => prev.filter(n => n !== name));
+    },
+    [pushToHistory],
+  );
 
   const reorderPlayer = useCallback((fromName: string, toIndex: number) => {
     setCustomRankings(prev => {
@@ -508,7 +606,9 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
     if (positionFilter) players = players.filter(p => p.position === positionFilter);
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      players = players.filter(p => (p.name?.toLowerCase() || '').includes(q) || (p.team?.toLowerCase() || '').includes(q));
+      players = players.filter(
+        p => (p.name?.toLowerCase() || '').includes(q) || (p.team?.toLowerCase() || '').includes(q),
+      );
     }
     // Always sort by ADP in Players tab
     players.sort((a, b) => {
@@ -521,20 +621,32 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
 
   // Excluded players list
   const excludedPlayersList = useMemo(() => {
-    return excludedPlayers.map(name => playerPool.find(p => p.name === name)).filter((p): p is Player => !!p);
+    return excludedPlayers
+      .map(name => playerPool.find(p => p.name === name))
+      .filter((p): p is Player => !!p);
   }, [excludedPlayers, playerPool]);
 
   const filteredExcludedPlayers = useMemo(() => {
     if (!searchQuery.trim()) return excludedPlayersList;
     const q = searchQuery.toLowerCase();
-    return excludedPlayersList.filter(p => (p.name?.toLowerCase() || '').includes(q) || (p.team?.toLowerCase() || '').includes(q));
+    return excludedPlayersList.filter(
+      p => (p.name?.toLowerCase() || '').includes(q) || (p.team?.toLowerCase() || '').includes(q),
+    );
   }, [excludedPlayersList, searchQuery]);
 
-  const rankedPlayers = useMemo(() => customRankings.map(name => playerPool.find(p => p.name === name)).filter((p): p is Player => !!p), [customRankings, playerPool]);
+  const rankedPlayers = useMemo(
+    () =>
+      customRankings
+        .map(name => playerPool.find(p => p.name === name))
+        .filter((p): p is Player => !!p),
+    [customRankings, playerPool],
+  );
   const filteredRankedPlayers = useMemo(() => {
     if (!searchQuery.trim()) return rankedPlayers;
     const q = searchQuery.toLowerCase();
-    return rankedPlayers.filter(p => (p.name?.toLowerCase() || '').includes(q) || (p.team?.toLowerCase() || '').includes(q));
+    return rankedPlayers.filter(
+      p => (p.name?.toLowerCase() || '').includes(q) || (p.team?.toLowerCase() || '').includes(q),
+    );
   }, [rankedPlayers, searchQuery]);
 
   const handleSave = useCallback(async () => {
@@ -559,17 +671,12 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
     }
   }, [isOpen, customRankings, excludedPlayers]);
 
-
   if (!isOpen) return null;
 
   return (
     <div className={styles.modalContainer}>
       {/* Close button */}
-      <button
-        onClick={handleClose}
-        className={styles.closeButton}
-        aria-label="Close"
-      >
+      <button onClick={handleClose} className={styles.closeButton} aria-label="Close">
         <Close size={24} />
       </button>
 
@@ -597,7 +704,10 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
             <div className={styles.scrollableContent}>
               {activeTab === 'build' ? (
                 <>
-                  <PositionFilter activePosition={positionFilter} onPositionChange={setPositionFilter} />
+                  <PositionFilter
+                    activePosition={positionFilter}
+                    onPositionChange={setPositionFilter}
+                  />
                   <div className={styles.playerList}>
                     {filteredPlayers.length === 0 ? (
                       <div className={styles.emptyState}>
@@ -617,7 +727,11 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
                           />
                         ))}
                         {filteredPlayers.length > 50 && (
-                          <p className={styles.infoText}>Showing 50 of <span className={styles.resultCount}>{filteredPlayers.length}</span>. Use search for more.</p>
+                          <p className={styles.infoText}>
+                            Showing 50 of{' '}
+                            <span className={styles.resultCount}>{filteredPlayers.length}</span>.
+                            Use search for more.
+                          </p>
                         )}
                       </>
                     )}
@@ -627,9 +741,23 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
                 <>
                   {rankedPlayers.length === 0 ? (
                     <div className={styles.emptyState}>
-                      <svg className={styles.emptyIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                      <svg
+                        className={styles.emptyIcon}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1.5}
+                          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                        />
+                      </svg>
                       <p className={styles.emptyTitle}>No rankings yet</p>
-                      <p className={styles.emptyDescription}>Go to &quot;Players&quot; tab to add players</p>
+                      <p className={styles.emptyDescription}>
+                        Go to &quot;Players&quot; tab to add players
+                      </p>
                     </div>
                   ) : filteredRankedPlayers.length === 0 ? (
                     <div className={styles.searchNoResults}>
@@ -639,7 +767,9 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
                   ) : (
                     <>
                       <p className={styles.infoText}>
-                        {searchQuery.trim() ? `Showing ${filteredRankedPlayers.length} of ${rankedPlayers.length}` : 'Drag to reorder'}
+                        {searchQuery.trim()
+                          ? `Showing ${filteredRankedPlayers.length} of ${rankedPlayers.length}`
+                          : 'Drag to reorder'}
                       </p>
                       <div className={styles.playerList}>
                         {filteredRankedPlayers.map((player, displayIndex) => {
@@ -652,7 +782,7 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
                             <div
                               key={player.name}
                               draggable={!searchQuery.trim()}
-                              onDragStart={(e) => {
+                              onDragStart={e => {
                                 setDraggedPlayer(player.name);
                                 e.dataTransfer.effectAllowed = 'move';
                               }}
@@ -663,7 +793,7 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
                                 setDraggedPlayer(null);
                                 setDragOverIndex(null);
                               }}
-                              onDragOver={(e) => {
+                              onDragOver={e => {
                                 e.preventDefault();
                                 if (draggedPlayer && draggedPlayer !== player.name) {
                                   setDragOverIndex(actualIndex);
@@ -675,9 +805,15 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
                                 }
                               }}
                               className={cn(
-                                isOver && draggedPlayer && customRankings.indexOf(draggedPlayer) > actualIndex && styles.dragIndicatorTop,
-                                isOver && draggedPlayer && customRankings.indexOf(draggedPlayer) < actualIndex && styles.dragIndicatorBottom,
-                                isOver && styles.dragIndicatorMargin
+                                isOver &&
+                                  draggedPlayer &&
+                                  customRankings.indexOf(draggedPlayer) > actualIndex &&
+                                  styles.dragIndicatorTop,
+                                isOver &&
+                                  draggedPlayer &&
+                                  customRankings.indexOf(draggedPlayer) < actualIndex &&
+                                  styles.dragIndicatorBottom,
+                                isOver && styles.dragIndicatorMargin,
                               )}
                             >
                               <RankedPlayerRow
@@ -685,12 +821,12 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
                                 rank={actualRank}
                                 totalRanked={rankedPlayers.length}
                                 onRemove={() => removeFromRankings(player.name)}
-                                onMoveToRank={(newRank) => moveToRank(player.name, newRank)}
+                                onMoveToRank={newRank => moveToRank(player.name, newRank)}
                                 disabled={isSaving}
                                 isDragging={isDragging}
                                 dragHandleProps={{
-                                  onMouseDown: (e) => e.stopPropagation(),
-                                  onTouchStart: (e) => e.stopPropagation(),
+                                  onMouseDown: e => e.stopPropagation(),
+                                  onTouchStart: e => e.stopPropagation(),
                                 }}
                               />
                             </div>
@@ -704,9 +840,23 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
                 <>
                   {excludedPlayersList.length === 0 ? (
                     <div className={styles.emptyState}>
-                      <svg className={styles.emptyIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
+                      <svg
+                        className={styles.emptyIcon}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1.5}
+                          d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
+                        />
+                      </svg>
                       <p className={styles.emptyTitle}>No excluded players</p>
-                      <p className={styles.emptyDescription}>Go to &quot;Players&quot; tab to exclude players</p>
+                      <p className={styles.emptyDescription}>
+                        Go to &quot;Players&quot; tab to exclude players
+                      </p>
                     </div>
                   ) : filteredExcludedPlayers.length === 0 ? (
                     <div className={styles.searchNoResults}>
@@ -716,7 +866,9 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
                   ) : (
                     <>
                       <p className={styles.infoText}>
-                        {searchQuery.trim() ? `Showing ${filteredExcludedPlayers.length} of ${excludedPlayersList.length}` : `${excludedPlayersList.length} excluded players`}
+                        {searchQuery.trim()
+                          ? `Showing ${filteredExcludedPlayers.length} of ${excludedPlayersList.length}`
+                          : `${excludedPlayersList.length} excluded players`}
                       </p>
                       <div className={styles.playerList}>
                         {filteredExcludedPlayers.map(player => {
@@ -726,7 +878,10 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
                               className={cn(styles.playerListItem, styles.excluded)}
                               data-position={player.position.toLowerCase()}
                             >
-                              <PositionBadge position={player.position as 'QB' | 'RB' | 'WR' | 'TE'} size="sm" />
+                              <PositionBadge
+                                position={player.position as 'QB' | 'RB' | 'WR' | 'TE'}
+                                size="sm"
+                              />
                               <div className={styles.playerInfo}>
                                 <span className={styles.playerName}>{player.name}</span>
                                 <span className={styles.playerTeam}>{player.team}</span>
@@ -768,7 +923,14 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
                 disabled={!hasChanges || isSaving}
                 className={cn(styles.actionButton, styles.saveButton)}
               >
-                {isSaving ? (<><div className={styles.loadingSpinner} />Saving...</>) : 'Save'}
+                {isSaving ? (
+                  <>
+                    <div className={styles.loadingSpinner} />
+                    Saving...
+                  </>
+                ) : (
+                  'Save'
+                )}
               </button>
             </div>
           </div>
@@ -780,7 +942,9 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
         <div className={styles.modalOverlay}>
           <div className={styles.modalDialog}>
             <h3 className={styles.modalDialogTitle}>Unsaved Changes</h3>
-            <p className={styles.modalDialogDescription}>You have unsaved changes. Are you sure you want to leave?</p>
+            <p className={styles.modalDialogDescription}>
+              You have unsaved changes. Are you sure you want to leave?
+            </p>
             <div className={styles.modalDialogButtons}>
               <button
                 onClick={() => setShowUnsavedWarning(false)}
@@ -804,7 +968,9 @@ export default function RankingsModalVX2({ isOpen, onClose, onUnsavedChangesChan
         <div className={styles.modalOverlay}>
           <div className={styles.modalDialog}>
             <h3 className={styles.modalDialogTitle}>Clear Rankings?</h3>
-            <p className={styles.modalDialogDescription}>Do you want to clear all your rankings? This can be undone.</p>
+            <p className={styles.modalDialogDescription}>
+              Do you want to clear all your rankings? This can be undone.
+            </p>
             <div className={styles.modalDialogButtons}>
               <button
                 onClick={() => setShowClearConfirm(false)}

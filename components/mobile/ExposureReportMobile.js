@@ -29,7 +29,6 @@ const ExposureReportMobile = () => {
 
   // Set mounted state to prevent hydration issues
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- setting mounted flag for hydration safety
     setMounted(true);
   }, []);
 
@@ -37,7 +36,6 @@ const ExposureReportMobile = () => {
   useEffect(() => {
     const preloadedData = exposurePreloader.getPreloadedData();
     if (preloadedData) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- loading data from preloader on mount
       setExposureData(preloadedData);
       setLoading(false);
       return;

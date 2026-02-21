@@ -43,7 +43,7 @@ function useSafeAuth() {
         const { getAuth, onAuthStateChanged } = await import('firebase/auth');
         const auth = getAuth();
 
-        unsubscribe = onAuthStateChanged(auth, (user) => {
+        unsubscribe = onAuthStateChanged(auth, user => {
           setAuthState({
             user: user
               ? {
@@ -59,7 +59,7 @@ function useSafeAuth() {
           });
         });
       } catch {
-        setAuthState((prev) => ({ ...prev, isLoading: false }));
+        setAuthState(prev => ({ ...prev, isLoading: false }));
       }
     }
 
@@ -90,7 +90,7 @@ function CollapsedView({
     <div
       className={`${styles.collapsed} ${isDragging ? styles.dragging : ''}`}
       onMouseDown={onStartDrag}
-      onClick={(e) => {
+      onClick={e => {
         if (!isDragging) {
           e.stopPropagation();
           onExpand();
@@ -98,9 +98,12 @@ function CollapsedView({
       }}
     >
       <div className={styles.collapsedGrip}>
-        <span /><span />
-        <span /><span />
-        <span /><span />
+        <span />
+        <span />
+        <span />
+        <span />
+        <span />
+        <span />
       </div>
       <span className={styles.collapsedLabel}>DEV</span>
       <span className={styles.collapsedHint}>`</span>
@@ -134,17 +137,17 @@ function DraftControls({
     state.status === 'active' && !state.isPaused
       ? styles.draftStatusDotActive
       : state.status === 'active' && state.isPaused
-      ? styles.draftStatusDotPaused
-      : styles.draftStatusDotInactive;
+        ? styles.draftStatusDotPaused
+        : styles.draftStatusDotInactive;
 
   const statusText =
     state.status === 'active' && !state.isPaused
       ? 'Running'
       : state.status === 'active' && state.isPaused
-      ? 'Paused'
-      : state.status === 'waiting'
-      ? 'Ready'
-      : 'Loading...';
+        ? 'Paused'
+        : state.status === 'waiting'
+          ? 'Ready'
+          : 'Loading...';
 
   return (
     <div className={styles.draftControls}>
@@ -159,21 +162,11 @@ function DraftControls({
             state.status === 'loading' ? styles.draftButtonDisabled : ''
           }`}
           onClick={() =>
-            onAction(
-              state.status !== 'active'
-                ? 'start'
-                : state.isPaused
-                ? 'resume'
-                : 'pause'
-            )
+            onAction(state.status !== 'active' ? 'start' : state.isPaused ? 'resume' : 'pause')
           }
           disabled={state.status === 'loading'}
         >
-          {state.status !== 'active'
-            ? '▶ Start'
-            : state.isPaused
-            ? '▶ Resume'
-            : '⏸ Pause'}
+          {state.status !== 'active' ? '▶ Start' : state.isPaused ? '▶ Resume' : '⏸ Pause'}
         </button>
 
         <button
@@ -236,7 +229,6 @@ export default function DevNavV2() {
   useEffect(() => {
     try {
       const savedExpanded = localStorage.getItem(STORAGE_KEYS.expanded);
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- initializing state from localStorage on mount
       if (savedExpanded) setIsExpanded(JSON.parse(savedExpanded));
 
       const savedPosition = localStorage.getItem(STORAGE_KEYS.position);
@@ -277,18 +269,14 @@ export default function DevNavV2() {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Don't trigger if typing in an input
       const target = e.target as HTMLElement;
-      if (
-        target.tagName === 'INPUT' ||
-        target.tagName === 'TEXTAREA' ||
-        target.isContentEditable
-      ) {
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
         return;
       }
 
       // Backtick toggles
       if (e.key === KEYBOARD_SHORTCUTS.toggle) {
         e.preventDefault();
-        setIsExpanded((prev) => !prev);
+        setIsExpanded(prev => !prev);
         return;
       }
 
@@ -299,7 +287,7 @@ export default function DevNavV2() {
         e.key.toLowerCase() === KEYBOARD_SHORTCUTS.toggleAlt
       ) {
         e.preventDefault();
-        setIsExpanded((prev) => !prev);
+        setIsExpanded(prev => !prev);
         return;
       }
 
@@ -340,9 +328,7 @@ export default function DevNavV2() {
   }, []);
 
   const handleDraftAction = useCallback((action: DraftControlAction) => {
-    window.dispatchEvent(
-      new CustomEvent('devnav-draft-action', { detail: action })
-    );
+    window.dispatchEvent(new CustomEvent('devnav-draft-action', { detail: action }));
   }, []);
 
   // ============================================================================
@@ -350,13 +336,11 @@ export default function DevNavV2() {
   // ============================================================================
 
   const handleAuthToggle = useCallback(() => {
-    setDevAuthOverride((prev) => {
+    setDevAuthOverride(prev => {
       const newValue = prev === 'logged-in' ? 'logged-out' : 'logged-in';
       try {
         localStorage.setItem(STORAGE_KEYS.authOverride, newValue);
-        window.dispatchEvent(
-          new CustomEvent('devAuthOverrideChange', { detail: newValue })
-        );
+        window.dispatchEvent(new CustomEvent('devAuthOverrideChange', { detail: newValue }));
       } catch {
         // Ignore
       }
@@ -394,7 +378,7 @@ export default function DevNavV2() {
         y: Math.max(0, Math.min(newY, maxY)),
       });
     },
-    [isDragging]
+    [isDragging],
   );
 
   const handleMouseUp = useCallback(() => {
@@ -418,14 +402,17 @@ export default function DevNavV2() {
   // ============================================================================
 
   // Group links by category
-  const linksByCategory = NAV_LINKS.reduce((acc, link) => {
-    if (!acc[link.category]) acc[link.category] = [];
-    const categoryLinks = acc[link.category];
-    if (categoryLinks) {
-      categoryLinks.push(link);
-    }
-    return acc;
-  }, {} as Record<DevNavCategory, typeof NAV_LINKS>);
+  const linksByCategory = NAV_LINKS.reduce(
+    (acc, link) => {
+      if (!acc[link.category]) acc[link.category] = [];
+      const categoryLinks = acc[link.category];
+      if (categoryLinks) {
+        categoryLinks.push(link);
+      }
+      return acc;
+    },
+    {} as Record<DevNavCategory, typeof NAV_LINKS>,
+  );
 
   // Position style
   const positionStyle: React.CSSProperties =
@@ -441,11 +428,7 @@ export default function DevNavV2() {
 
   if (!isExpanded) {
     return (
-      <div
-        ref={containerRef}
-        className={styles.container}
-        style={positionStyle}
-      >
+      <div ref={containerRef} className={styles.container} style={positionStyle}>
         <CollapsedView
           onExpand={() => setIsExpanded(true)}
           onStartDrag={handleStartDrag}
@@ -458,18 +441,19 @@ export default function DevNavV2() {
   return (
     <div
       ref={containerRef}
-      className={`${styles.container} ${styles.expanded} ${
-        isDragging ? styles.dragging : ''
-      }`}
+      className={`${styles.container} ${styles.expanded} ${isDragging ? styles.dragging : ''}`}
       style={positionStyle}
     >
       {/* Header */}
       <div className={styles.header} onMouseDown={handleStartDrag}>
         <div className={styles.headerLeft}>
           <div className={styles.headerGrip}>
-            <span /><span />
-            <span /><span />
-            <span /><span />
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
           </div>
           <span className={styles.headerTitle}>DEVELOPER TOOLS</span>
         </div>
@@ -487,10 +471,10 @@ export default function DevNavV2() {
       {/* Content */}
       <div className={styles.content}>
         {/* Navigation Links */}
-        {(Object.keys(linksByCategory) as DevNavCategory[]).map((category) => (
+        {(Object.keys(linksByCategory) as DevNavCategory[]).map(category => (
           <Section key={category} title={CATEGORY_LABELS[category]}>
             <div className={styles.linksList}>
-              {linksByCategory[category].map((link) => (
+              {linksByCategory[category].map(link => (
                 <a
                   key={link.id}
                   href={link.href}
@@ -521,8 +505,8 @@ export default function DevNavV2() {
                 {isLoading
                   ? 'Loading...'
                   : devAuthOverride === 'logged-in'
-                  ? 'Logged In'
-                  : 'Logged Out'}
+                    ? 'Logged In'
+                    : 'Logged Out'}
               </span>
               <button
                 className={`${styles.authToggle} ${
@@ -551,11 +535,7 @@ export default function DevNavV2() {
       {/* Footer */}
       <div className={styles.footer}>
         <div className={styles.browserNav}>
-          <button
-            className={styles.navButton}
-            onClick={() => router.back()}
-            title="Go back"
-          >
+          <button className={styles.navButton} onClick={() => router.back()} title="Go back">
             ‹
           </button>
           <button

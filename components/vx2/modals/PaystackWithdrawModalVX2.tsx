@@ -1,16 +1,16 @@
 /**
  * PaystackWithdrawModalVX2 - Paystack Withdrawal Modal
- * 
+ *
  * Multi-step withdrawal flow for African markets with CSS Modules for CSP compliance.
  * All inline styles have been extracted to CSS modules.
- * 
+ *
  * Steps:
  * 1. Amount Selection - Currency-specific amounts
- * 2. Bank Account Selection/Add - Nigerian NUBAN, SA BASA, Ghana/Kenya Mobile Money  
+ * 2. Bank Account Selection/Add - Nigerian NUBAN, SA BASA, Ghana/Kenya Mobile Money
  * 3. Confirmation - Review with fee breakdown
  * 4. 2FA Verification - 6-digit code
  * 5. Success/Error - Result display
- * 
+ *
  * @module components/vx2/modals/PaystackWithdrawModalVX2
  */
 
@@ -29,7 +29,7 @@ import {
   calculateTransferFee,
   PAYSTACK_CURRENCIES,
 } from '../../../lib/paystack/currencyConfig';
-import type { 
+import type {
   PaystackCurrencyConfig,
   PaystackTransferRecipient,
   TransferRecipientType,
@@ -56,15 +56,23 @@ export interface PaystackWithdrawModalVX2Props {
   onSuccess?: (transactionId: string, amount: number, currency: string) => void;
 }
 
-type WithdrawStep = 'amount' | 'recipient' | 'add_recipient' | 'confirm' | 'code' | 'processing' | 'success' | 'error';
+type WithdrawStep =
+  | 'amount'
+  | 'recipient'
+  | 'add_recipient'
+  | 'confirm'
+  | 'code'
+  | 'processing'
+  | 'success'
+  | 'error';
 
 interface Bank {
   code: string;
   name: string;
 }
 
-const DEFAULT_USER_BACKUP = { 
-  type: 'phone' as const, 
+const DEFAULT_USER_BACKUP = {
+  type: 'phone' as const,
   masked: '(***) ***-4567',
 };
 
@@ -76,23 +84,50 @@ const generateVerificationCode = () => Math.floor(100000 + Math.random() * 90000
 
 function BankIcon(): React.ReactElement {
   return (
-    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+    <svg
+      className="w-6 h-6"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={1.5}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+      />
     </svg>
   );
 }
 
 function MobileIcon(): React.ReactElement {
   return (
-    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+    <svg
+      className="w-6 h-6"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={1.5}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
+      />
     </svg>
   );
 }
 
 function CheckIcon(): React.ReactElement {
   return (
-    <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke={STATE_COLORS.success} strokeWidth={2.5}>
+    <svg
+      width="40"
+      height="40"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke={STATE_COLORS.success}
+      strokeWidth={2.5}
+    >
       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
     </svg>
   );
@@ -112,22 +147,22 @@ interface AmountStepProps {
   onClose: () => void;
 }
 
-function AmountStep({ 
-  balance, 
-  amount, 
-  setAmount, 
+function AmountStep({
+  balance,
+  amount,
+  setAmount,
   currency,
   currencyConfig,
-  onContinue, 
-  onClose 
+  onContinue,
+  onClose,
 }: AmountStepProps): React.ReactElement {
   const quickAmounts = useMemo(() => getQuickWithdrawalAmounts(currency), [currency]);
   const selectedAmount = parseFloat(amount) ? toSmallestUnit(parseFloat(amount), currency) : 0;
   const balanceSmallest = toSmallestUnit(balance, currency);
-  
+
   const validation = validatePaystackAmount(selectedAmount, currency);
   const isValidAmount = validation.isValid && selectedAmount <= balanceSmallest;
-  
+
   return (
     <div className={styles.amountStepContainer}>
       <div className={styles.header}>
@@ -148,7 +183,7 @@ function AmountStep({
           <label className={styles.amountLabel}>
             How much would you like to withdraw? ({currency})
           </label>
-          
+
           <div className={styles.quickAmountsGrid}>
             {quickAmounts.slice(0, 6).map(qa => {
               const qaDisplay = toDisplayAmount(qa, currency);
@@ -157,10 +192,7 @@ function AmountStep({
                   key={qa}
                   onClick={() => qa <= balanceSmallest && setAmount(qaDisplay.toString())}
                   disabled={qa > balanceSmallest}
-                  className={cn(
-                    styles.quickAmountButton,
-                    selectedAmount === qa && styles.selected
-                  )}
+                  className={cn(styles.quickAmountButton, selectedAmount === qa && styles.selected)}
                 >
                   {formatPaystackAmount(qa, currency, { decimals: 0 })}
                 </button>
@@ -173,7 +205,7 @@ function AmountStep({
             <input
               type="number"
               value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              onChange={e => setAmount(e.target.value)}
               placeholder="0"
               step="1"
               className={styles.numberInput}
@@ -212,10 +244,9 @@ function AmountStep({
           disabled={!isValidAmount}
           className={cn(styles.button, styles.buttonPrimary)}
         >
-          {isValidAmount 
-            ? `Continue with ${formatPaystackAmount(selectedAmount, currency)}` 
-            : 'Enter amount to continue'
-          }
+          {isValidAmount
+            ? `Continue with ${formatPaystackAmount(selectedAmount, currency)}`
+            : 'Enter amount to continue'}
         </button>
       </div>
     </div>
@@ -264,10 +295,7 @@ function RecipientStep({
             <p className={styles.emptyStateText}>
               Add a bank account or mobile money number to receive withdrawals
             </p>
-            <button
-              onClick={onAddNew}
-              className={cn(styles.button, styles.buttonPrimary)}
-            >
+            <button onClick={onAddNew} className={cn(styles.button, styles.buttonPrimary)}>
               Add Account
             </button>
           </div>
@@ -280,7 +308,7 @@ function RecipientStep({
                   onClick={() => onSelectRecipient(recipient)}
                   className={cn(
                     styles.recipientCard,
-                    selectedRecipient?.code === recipient.code && styles.selected
+                    selectedRecipient?.code === recipient.code && styles.selected,
                   )}
                 >
                   <div className={styles.recipientIcon}>
@@ -301,11 +329,8 @@ function RecipientStep({
                 </button>
               ))}
             </div>
-            
-            <button 
-              onClick={onAddNew}
-              className={styles.addNewButton}
-            >
+
+            <button onClick={onAddNew} className={styles.addNewButton}>
               <div className={styles.addNewIcon}>
                 <Plus size={20} />
               </div>
@@ -362,38 +387,35 @@ function AddRecipientStep({
   const [accountNumber, setAccountNumber] = useState('');
   const [bankCode, setBankCode] = useState('');
   const [accountName, setAccountName] = useState('');
-  
+
   useEffect(() => {
     if (country === 'GH' || country === 'KE') {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
       setRecipientType('mobile_money');
     } else {
       setRecipientType('bank');
     }
   }, [country]);
-  
+
   useEffect(() => {
     if (resolvedName) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
       setAccountName(resolvedName);
     }
   }, [resolvedName]);
-  
+
   const isBankTransfer = recipientType === 'bank';
-  const canSubmit = accountNumber.length >= 10 && 
+  const canSubmit =
+    accountNumber.length >= 10 &&
     (isBankTransfer ? bankCode && (resolvedName || accountName) : accountName);
-  
+
   const handleSubmit = () => {
     onAdd({
-      type: isBankTransfer 
-        ? (country === 'ZA' ? 'basa' : 'nuban') 
-        : 'mobile_money',
+      type: isBankTransfer ? (country === 'ZA' ? 'basa' : 'nuban') : 'mobile_money',
       name: accountName || resolvedName || '',
       accountNumber,
       bankCode: isBankTransfer ? bankCode : undefined,
     });
   };
-  
+
   return (
     <div className={styles.addRecipientStepContainer}>
       <div className={styles.header}>
@@ -410,10 +432,7 @@ function AddRecipientStep({
           <div className={styles.typeToggleGrid}>
             <button
               onClick={() => setRecipientType('bank')}
-              className={cn(
-                styles.typeToggleButton,
-                recipientType === 'bank' && styles.selected
-              )}
+              className={cn(styles.typeToggleButton, recipientType === 'bank' && styles.selected)}
             >
               Bank Account
             </button>
@@ -421,7 +440,7 @@ function AddRecipientStep({
               onClick={() => setRecipientType('mobile_money')}
               className={cn(
                 styles.typeToggleButton,
-                recipientType === 'mobile_money' && styles.selected
+                recipientType === 'mobile_money' && styles.selected,
               )}
             >
               Mobile Money
@@ -434,12 +453,14 @@ function AddRecipientStep({
             <label className={styles.formLabel}>Bank</label>
             <select
               value={bankCode}
-              onChange={(e) => setBankCode(e.target.value)}
+              onChange={e => setBankCode(e.target.value)}
               className={styles.select}
             >
               <option value="">Select bank</option>
               {banks.map(bank => (
-                <option key={bank.code} value={bank.code}>{bank.name}</option>
+                <option key={bank.code} value={bank.code}>
+                  {bank.name}
+                </option>
               ))}
             </select>
           </div>
@@ -452,7 +473,7 @@ function AddRecipientStep({
           <input
             type="tel"
             value={accountNumber}
-            onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, ''))}
+            onChange={e => setAccountNumber(e.target.value.replace(/\D/g, ''))}
             placeholder={isBankTransfer ? '0123456789' : '0712345678'}
             maxLength={isBankTransfer ? 10 : 12}
             className={styles.input}
@@ -467,17 +488,12 @@ function AddRecipientStep({
           <input
             type="text"
             value={resolvedName || accountName}
-            onChange={(e) => setAccountName(e.target.value)}
+            onChange={e => setAccountName(e.target.value)}
             placeholder="Account holder name"
             readOnly={!!resolvedName}
-            className={cn(
-              styles.input,
-              resolvedName && styles.inputVerified
-            )}
+            className={cn(styles.input, resolvedName && styles.inputVerified)}
           />
-          {resolvedName && (
-            <p className={styles.accountVerifiedText}>Account verified</p>
-          )}
+          {resolvedName && <p className={styles.accountVerifiedText}>Account verified</p>}
         </div>
       </div>
 
@@ -515,14 +531,14 @@ interface ConfirmStepProps {
   isLoading: boolean;
 }
 
-function ConfirmStep({ 
-  amount, 
-  currency, 
-  recipient, 
-  fee, 
-  onConfirm, 
-  onBack, 
-  isLoading 
+function ConfirmStep({
+  amount,
+  currency,
+  recipient,
+  fee,
+  onConfirm,
+  onBack,
+  isLoading,
 }: ConfirmStepProps): React.ReactElement {
   return (
     <div className={styles.confirmStepContainer}>
@@ -536,9 +552,7 @@ function ConfirmStep({
       <div className={styles.confirmContent}>
         <div className={styles.withdrawAmount}>
           <div className={styles.withdrawLabel}>You&apos;re withdrawing</div>
-          <div className={styles.withdrawValue}>
-            {formatPaystackAmount(amount, currency)}
-          </div>
+          <div className={styles.withdrawValue}>{formatPaystackAmount(amount, currency)}</div>
         </div>
 
         <div className={styles.recipientCard2}>
@@ -548,9 +562,7 @@ function ConfirmStep({
               {recipient.type === 'mobile_money' ? <MobileIcon /> : <BankIcon />}
             </div>
             <div>
-              <div className={styles.recipientName}>
-                {recipient.accountName || 'Account'}
-              </div>
+              <div className={styles.recipientName}>{recipient.accountName || 'Account'}</div>
               <div className={styles.recipientDetails}>
                 {recipient.bankName} - ****{recipient.accountNumber.slice(-4)}
               </div>
@@ -567,21 +579,15 @@ function ConfirmStep({
           </div>
           <div className={styles.feeBreakdownRow}>
             <span className={styles.feeBreakdownLabel}>Transfer Fee</span>
-            <span className={styles.feeBreakdownValue}>
-              {formatPaystackAmount(fee, currency)}
-            </span>
+            <span className={styles.feeBreakdownValue}>{formatPaystackAmount(fee, currency)}</span>
           </div>
           <div className={cn(styles.feeBreakdownRow, styles.feeBreakdownDivider)}>
             <span className={styles.receiveLabel}>You&apos;ll receive</span>
-            <span className={styles.receiveValue}>
-              {formatPaystackAmount(amount, currency)}
-            </span>
+            <span className={styles.receiveValue}>{formatPaystackAmount(amount, currency)}</span>
           </div>
         </div>
 
-        <div className={styles.typicalTimeText}>
-          Typically arrives within 24 hours
-        </div>
+        <div className={styles.typicalTimeText}>Typically arrives within 24 hours</div>
       </div>
 
       <div className={styles.footer}>
@@ -621,17 +627,21 @@ interface CodeStepProps {
   attemptsRemaining: number;
 }
 
-function CodeStep({ 
-  contact, 
-  onVerify, 
-  onResend, 
-  onBack, 
-  isVerifying, 
-  error, 
-  attemptsRemaining 
+function CodeStep({
+  contact,
+  onVerify,
+  onResend,
+  onBack,
+  isVerifying,
+  error,
+  attemptsRemaining,
 }: CodeStepProps): React.ReactElement {
   const [code, setCode] = useState(['', '', '', '', '', '']);
-  const { seconds: resendCooldown, isActive: cooldownActive, start: startCooldown } = useCountdown(60, { autoStart: true });
+  const {
+    seconds: resendCooldown,
+    isActive: cooldownActive,
+    start: startCooldown,
+  } = useCountdown(60, { autoStart: true });
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
@@ -678,21 +688,44 @@ function CodeStep({
 
       <div className={styles.codeContent}>
         <div className={styles.securityBadge}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={STATE_COLORS.success} strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke={STATE_COLORS.success}
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+            />
           </svg>
           <span>Two-Step Verification</span>
         </div>
-        
+
         <div className={styles.verificationIcon}>
-          <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke={STATE_COLORS.active} strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+          <svg
+            width="32"
+            height="32"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke={STATE_COLORS.active}
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+            />
           </svg>
         </div>
 
         <h3 className={styles.codeTitle}>Verify your withdrawal</h3>
         <p className={styles.codeDescription}>
-          We sent a 6-digit code to your {contact.type}<br />
+          We sent a 6-digit code to your {contact.type}
+          <br />
           <span className={styles.codeDescriptionHighlight}>{contact.masked}</span>
         </p>
 
@@ -700,21 +733,19 @@ function CodeStep({
           {code.map((digit, index) => (
             <input
               key={index}
-              ref={(el) => { inputRefs.current[index] = el; }}
+              ref={el => {
+                inputRefs.current[index] = el;
+              }}
               type="text"
               inputMode="numeric"
               pattern="[0-9]*"
               maxLength={1}
               autoComplete="off"
               value={digit}
-              onChange={(e) => handleChange(index, e.target.value)}
-              onKeyDown={(e) => handleKeyDown(index, e)}
+              onChange={e => handleChange(index, e.target.value)}
+              onKeyDown={e => handleKeyDown(index, e)}
               disabled={isVerifying}
-              className={cn(
-                styles.codeInput,
-                digit && styles.filled,
-                error && styles.error
-              )}
+              className={cn(styles.codeInput, digit && styles.filled, error && styles.error)}
             />
           ))}
         </div>
@@ -740,14 +771,9 @@ function CodeStep({
         <div className={styles.resendSection}>
           <p className={styles.resendLabel}>Didn&apos;t receive it?</p>
           {cooldownActive ? (
-            <p className={styles.resendCooldown}>
-              Resend in {resendCooldown}s
-            </p>
+            <p className={styles.resendCooldown}>Resend in {resendCooldown}s</p>
           ) : (
-            <button 
-              onClick={handleResend} 
-              className={styles.resendButton}
-            >
+            <button onClick={handleResend} className={styles.resendButton}>
               Resend Code
             </button>
           )}
@@ -768,7 +794,12 @@ interface SuccessStepProps {
   onClose: () => void;
 }
 
-function SuccessStep({ amount, currency, recipient, onClose }: SuccessStepProps): React.ReactElement {
+function SuccessStep({
+  amount,
+  currency,
+  recipient,
+  onClose,
+}: SuccessStepProps): React.ReactElement {
   return (
     <div className={styles.successStepContainer}>
       <div className={styles.successIcon}>
@@ -779,13 +810,11 @@ function SuccessStep({ amount, currency, recipient, onClose }: SuccessStepProps)
         {formatPaystackAmount(amount, currency)} is on its way to your account
       </p>
       <div className={styles.successDetails}>
-        {recipient.bankName} - ****{recipient.accountNumber.slice(-4)}<br />
+        {recipient.bankName} - ****{recipient.accountNumber.slice(-4)}
+        <br />
         Typically arrives within 24 hours
       </div>
-      <button 
-        onClick={onClose} 
-        className={cn(styles.button, styles.successButton)}
-      >
+      <button onClick={onClose} className={cn(styles.button, styles.successButton)}>
         Done
       </button>
     </div>
@@ -806,23 +835,24 @@ function ErrorStep({ message, onRetry, onClose }: ErrorStepProps): React.ReactEl
   return (
     <div className={styles.errorStepContainer}>
       <div className={styles.errorIcon}>
-        <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke={STATE_COLORS.error} strokeWidth={2.5}>
+        <svg
+          width="40"
+          height="40"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke={STATE_COLORS.error}
+          strokeWidth={2.5}
+        >
           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </div>
       <h2 className={styles.errorTitle}>Withdrawal Failed</h2>
       <p className={styles.errorMessage}>{message}</p>
       <div className={styles.errorButtonGroup}>
-        <button 
-          onClick={onRetry} 
-          className={cn(styles.button, styles.errorRetryButton)}
-        >
+        <button onClick={onRetry} className={cn(styles.button, styles.errorRetryButton)}>
           Try Again
         </button>
-        <button 
-          onClick={onClose} 
-          className={cn(styles.button, styles.errorCancelButton)}
-        >
+        <button onClick={onClose} className={cn(styles.button, styles.errorCancelButton)}>
           Cancel
         </button>
       </div>
@@ -834,8 +864,8 @@ function ErrorStep({ message, onRetry, onClose }: ErrorStepProps): React.ReactEl
 // MAIN COMPONENT
 // ============================================================================
 
-export function PaystackWithdrawModalVX2({ 
-  isOpen, 
+export function PaystackWithdrawModalVX2({
+  isOpen,
   onClose,
   userId,
   userEmail,
@@ -843,18 +873,28 @@ export function PaystackWithdrawModalVX2({
   userCountry,
   onSuccess,
 }: PaystackWithdrawModalVX2Props): React.ReactElement | null {
-  const currency = useMemo(() => PAYSTACK_CURRENCIES[
-    userCountry === 'NG' ? 'NGN' :
-    userCountry === 'GH' ? 'GHS' :
-    userCountry === 'ZA' ? 'ZAR' : 'KES'
-  ], [userCountry]);
+  const currency = useMemo(
+    () =>
+      PAYSTACK_CURRENCIES[
+        userCountry === 'NG'
+          ? 'NGN'
+          : userCountry === 'GH'
+            ? 'GHS'
+            : userCountry === 'ZA'
+              ? 'ZAR'
+              : 'KES'
+      ],
+    [userCountry],
+  );
 
   const currencyCode = currency?.code;
-  
+
   const [step, setStep] = useState<WithdrawStep>('amount');
   const [amount, setAmount] = useState('');
   const [recipients, setRecipients] = useState<PaystackTransferRecipient[]>([]);
-  const [selectedRecipient, setSelectedRecipient] = useState<PaystackTransferRecipient | null>(null);
+  const [selectedRecipient, setSelectedRecipient] = useState<PaystackTransferRecipient | null>(
+    null,
+  );
   const [banks, setBanks] = useState<Bank[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isResolving, setIsResolving] = useState(false);
@@ -873,7 +913,9 @@ export function PaystackWithdrawModalVX2({
       const data = await response.json();
       if (data.ok && data.data?.recipients) {
         setRecipients(data.data.recipients);
-        const defaultRecipient = data.data.recipients.find((r: PaystackTransferRecipient) => r.isDefault);
+        const defaultRecipient = data.data.recipients.find(
+          (r: PaystackTransferRecipient) => r.isDefault,
+        );
         if (defaultRecipient) setSelectedRecipient(defaultRecipient);
       }
     } catch (err) {
@@ -889,7 +931,9 @@ export function PaystackWithdrawModalVX2({
         ZA: 'south_africa',
         KE: 'kenya',
       };
-      const response = await fetch(`/api/paystack/transfer/recipient?banks=${countryMap[userCountry]}`);
+      const response = await fetch(
+        `/api/paystack/transfer/recipient?banks=${countryMap[userCountry]}`,
+      );
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
       if (data.ok && data.data?.banks) setBanks(data.data.banks);
@@ -941,10 +985,10 @@ export function PaystackWithdrawModalVX2({
           setAsDefault: recipients.length === 0,
         }),
       });
-      
+
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
-      
+
       if (data.ok && data.data?.recipient) {
         setRecipients(prev => [...prev, data.data.recipient]);
         setSelectedRecipient(data.data.recipient);
@@ -970,47 +1014,50 @@ export function PaystackWithdrawModalVX2({
     setStep('code');
   }, []);
 
-  const handleVerifyCode = useCallback(async (enteredCode: string) => {
-    setIsVerifying(true);
-    setCodeError(null);
+  const handleVerifyCode = useCallback(
+    async (enteredCode: string) => {
+      setIsVerifying(true);
+      setCodeError(null);
 
-    if (enteredCode === verificationCode || enteredCode === '123456') {
-      try {
-        const amountSmallest = toSmallestUnit(parseFloat(amount), currencyCode!);
-        const response = await fetch('/api/paystack/transfer/initiate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userId,
-            amountSmallestUnit: amountSmallest,
-            currency: currencyCode,
-            recipientCode: selectedRecipient?.code,
-            reason: 'Withdrawal from TopDog',
-          }),
-        });
+      if (enteredCode === verificationCode || enteredCode === '123456') {
+        try {
+          const amountSmallest = toSmallestUnit(parseFloat(amount), currencyCode!);
+          const response = await fetch('/api/paystack/transfer/initiate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userId,
+              amountSmallestUnit: amountSmallest,
+              currency: currencyCode,
+              recipientCode: selectedRecipient?.code,
+              reason: 'Withdrawal from TopDog',
+            }),
+          });
 
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const data = await response.json();
+          if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+          const data = await response.json();
 
-        if (data.ok) {
-          setTransactionId(data.data.transactionId);
-          setStep('success');
-          onSuccess?.(data.data.transactionId, amountSmallest, currencyCode!);
-        } else {
-          throw new Error(data.error?.message || 'Withdrawal failed');
+          if (data.ok) {
+            setTransactionId(data.data.transactionId);
+            setStep('success');
+            onSuccess?.(data.data.transactionId, amountSmallest, currencyCode!);
+          } else {
+            throw new Error(data.error?.message || 'Withdrawal failed');
+          }
+        } catch (err) {
+          const message = err instanceof Error ? err.message : 'Withdrawal failed';
+          setError(message);
+          setStep('error');
         }
-      } catch (err) {
-        const message = err instanceof Error ? err.message : 'Withdrawal failed';
-        setError(message);
-        setStep('error');
+      } else {
+        setAttemptsRemaining(prev => prev - 1);
+        setCodeError('Incorrect code. Please try again.');
       }
-    } else {
-      setAttemptsRemaining(prev => prev - 1);
-      setCodeError('Incorrect code. Please try again.');
-    }
-    
-    setIsVerifying(false);
-  }, [verificationCode, amount, currencyCode, userId, selectedRecipient, onSuccess]);
+
+      setIsVerifying(false);
+    },
+    [verificationCode, amount, currencyCode, userId, selectedRecipient, onSuccess],
+  );
 
   const handleResendCode = useCallback(() => {
     const code = generateVerificationCode();
@@ -1040,7 +1087,7 @@ export function PaystackWithdrawModalVX2({
             onClose={onClose}
           />
         )}
-        
+
         {step === 'recipient' && (
           <RecipientStep
             recipients={recipients}
@@ -1052,7 +1099,7 @@ export function PaystackWithdrawModalVX2({
             isLoading={isLoading}
           />
         )}
-        
+
         {step === 'add_recipient' && (
           <AddRecipientStep
             country={userCountry}
@@ -1064,7 +1111,7 @@ export function PaystackWithdrawModalVX2({
             resolvedName={resolvedName}
           />
         )}
-        
+
         {step === 'confirm' && selectedRecipient && (
           <ConfirmStep
             amount={selectedAmount}
@@ -1076,7 +1123,7 @@ export function PaystackWithdrawModalVX2({
             isLoading={isLoading}
           />
         )}
-        
+
         {step === 'code' && (
           <CodeStep
             contact={DEFAULT_USER_BACKUP}
@@ -1088,14 +1135,14 @@ export function PaystackWithdrawModalVX2({
             attemptsRemaining={attemptsRemaining}
           />
         )}
-        
+
         {step === 'processing' && (
           <div className={styles.processingStepContainer}>
             <span className={styles.processingLargeSpinner} />
             <p className={styles.processingStepText}>Processing withdrawal...</p>
           </div>
         )}
-        
+
         {step === 'success' && selectedRecipient && (
           <SuccessStep
             amount={selectedAmount}
@@ -1104,7 +1151,7 @@ export function PaystackWithdrawModalVX2({
             onClose={onClose}
           />
         )}
-        
+
         {step === 'error' && (
           <ErrorStep
             message={error || 'An error occurred'}

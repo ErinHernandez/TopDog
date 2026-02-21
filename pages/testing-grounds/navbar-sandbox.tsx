@@ -1,6 +1,6 @@
 /**
  * Navbar Sandbox
- * 
+ *
  * Isolated testing page for DraftNavbar component with timer.
  */
 
@@ -22,36 +22,35 @@ function NavbarSandboxPage(): JSX.Element {
   const [graceStatus, setGraceStatus] = useState<GraceStatus>('idle');
   const [isInfoModalOpen, setIsInfoModalOpen] = useState<boolean>(false);
   const [isTutorialOpen, setIsTutorialOpen] = useState<boolean>(false);
-  
+
   // Timer countdown
   useEffect(() => {
     if (!isRunning || timerSeconds <= 0) return;
-    
+
     const interval = setInterval(() => {
       setTimerSeconds(prev => Math.max(0, prev - 1));
     }, 1000);
-    
+
     return () => clearInterval(interval);
   }, [isRunning, timerSeconds]);
-  
+
   // Track when timer hits 0 (grace period starts)
   useEffect(() => {
     if (timerSeconds === 0 && isUserTurn && isRunning) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
       setGraceStatus('grace');
     }
   }, [timerSeconds, isUserTurn, isRunning]);
-  
+
   const handleLeave = (): void => {
     router.push('/testing-grounds/vx2-draft-room');
   };
-  
+
   const handleReset = useCallback((seconds: number): void => {
     setTimerSeconds(seconds);
     setIsRunning(false);
     setGraceStatus('idle');
   }, []);
-  
+
   const handleGracePeriodEnd = useCallback((): void => {
     setGraceStatus('expired');
     setIsRunning(false);
@@ -70,9 +69,12 @@ function NavbarSandboxPage(): JSX.Element {
     <>
       <Head>
         <title>Navbar Sandbox | TopDog</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+        />
       </Head>
-      
+
       <div className="min-h-screen bg-gray-900 flex items-start justify-center gap-8 p-8">
         {/* Phone Frame with Navbar */}
         <div>
@@ -88,8 +90,8 @@ function NavbarSandboxPage(): JSX.Element {
             {/* iPhone Status Bar - dev only */}
             <IPhoneStatusBar />
             {/* Content wrapper - pushed down to account for status bar */}
-            <div 
-              style={{ 
+            <div
+              style={{
                 position: 'absolute',
                 top: '28px',
                 left: 0,
@@ -109,8 +111,8 @@ function NavbarSandboxPage(): JSX.Element {
                   onInfo={handleInfo}
                 />
                 {/* Gray area below navbar to show context */}
-                <div 
-                  style={{ 
+                <div
+                  style={{
                     position: 'absolute',
                     top: 48,
                     left: 0,
@@ -132,7 +134,7 @@ function NavbarSandboxPage(): JSX.Element {
                     scoring: 'Best Ball',
                   }}
                 />
-                
+
                 {/* Tutorial Modal */}
                 <DraftTutorialModal
                   isOpen={isTutorialOpen}
@@ -144,16 +146,14 @@ function NavbarSandboxPage(): JSX.Element {
             </div>
           </div>
         </div>
-        
+
         {/* Controls Panel */}
         <div className="p-4 bg-gray-800 rounded-lg" style={{ width: 280 }}>
           <h3 className="text-white font-bold mb-4">Timer Controls</h3>
-          
+
           {/* Timer Display */}
           <div className="mb-4 p-3 bg-gray-900 rounded text-center">
-            <span className="text-3xl font-bold text-white tabular-nums">
-              {timerSeconds}
-            </span>
+            <span className="text-3xl font-bold text-white tabular-nums">{timerSeconds}</span>
             <div className="text-xs text-gray-500 mt-1">
               {graceStatus === 'grace' ? (
                 <span className="text-yellow-400">GRACE PERIOD (can still pick)</span>
@@ -168,21 +168,21 @@ function NavbarSandboxPage(): JSX.Element {
               )}
             </div>
           </div>
-          
+
           {/* Play/Pause */}
           <div className="flex gap-2 mb-4">
             <button
               onClick={() => setIsRunning(!isRunning)}
               className={`flex-1 py-2 px-4 rounded font-medium ${
-                isRunning 
-                  ? 'bg-yellow-600 hover:bg-yellow-700 text-white' 
+                isRunning
+                  ? 'bg-yellow-600 hover:bg-yellow-700 text-white'
                   : 'bg-green-600 hover:bg-green-700 text-white'
               }`}
             >
               {isRunning ? 'Pause' : 'Start'}
             </button>
           </div>
-          
+
           {/* Preset Buttons */}
           <div className="flex gap-2 mb-4">
             <button
@@ -210,7 +210,7 @@ function NavbarSandboxPage(): JSX.Element {
               90s
             </button>
           </div>
-          
+
           {/* User Turn Toggle */}
           <div className="flex items-center justify-between mb-4">
             <span className="text-gray-300 text-sm">User&apos;s Turn</span>
@@ -220,16 +220,16 @@ function NavbarSandboxPage(): JSX.Element {
                 isUserTurn ? 'bg-green-600' : 'bg-gray-600'
               }`}
             >
-              <div 
+              <div
                 className={`w-5 h-5 bg-white rounded-full transition-transform ${
                   isUserTurn ? 'translate-x-6' : 'translate-x-0.5'
-                }`} 
+                }`}
               />
             </button>
           </div>
-          
+
           <hr className="border-gray-700 my-4" />
-          
+
           {/* Specs */}
           <h3 className="text-white font-bold mb-3">Specs</h3>
           <div className="text-gray-300 text-sm space-y-2">

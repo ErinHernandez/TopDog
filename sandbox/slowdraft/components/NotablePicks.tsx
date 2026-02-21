@@ -6,11 +6,7 @@
 
 import React, { useState, useEffect } from 'react';
 
-import {
-  SLOW_DRAFT_COLORS,
-  SLOW_DRAFT_LAYOUT,
-  SLOW_DRAFT_THRESHOLDS,
-} from '../constants';
+import { SLOW_DRAFT_COLORS, SLOW_DRAFT_LAYOUT, SLOW_DRAFT_THRESHOLDS } from '../constants';
 import type { NotablePicksProps, NotableEvent, NotableEventType } from '../types';
 
 import styles from './NotablePicks.module.css';
@@ -90,7 +86,7 @@ function formatTimestamp(timestamp: number, isMounted: boolean): string {
   if (!isMounted) {
     return '—'; // Placeholder that matches on server and client
   }
-  
+
   const now = Date.now();
   const diffMs = now - timestamp;
   const diffMins = Math.floor(diffMs / 60000);
@@ -126,7 +122,6 @@ function EventItem({ event, onTap }: EventItemProps): React.ReactElement {
 
   // Track mount state to prevent hydration mismatch with Date.now()
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- setting state from event listener
     setIsMounted(true);
   }, []);
 
@@ -174,7 +169,8 @@ function EventItem({ event, onTap }: EventItemProps): React.ReactElement {
               color: 'rgba(255, 255, 255, 0.5)',
             }}
           >
-            {' '}took{' '}
+            {' '}
+            took{' '}
           </span>
           <span
             className={styles.eventHighlight}
@@ -294,12 +290,8 @@ export default function NotablePicks({
       </div>
 
       <div className="flex flex-col gap-2">
-        {visibleEvents.map((event) => (
-          <EventItem
-            key={event.id}
-            event={event}
-            onTap={() => onEventTap?.(event)}
-          />
+        {visibleEvents.map(event => (
+          <EventItem key={event.id} event={event} onTap={() => onEventTap?.(event)} />
         ))}
       </div>
 

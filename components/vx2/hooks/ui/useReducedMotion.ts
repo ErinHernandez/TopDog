@@ -1,19 +1,19 @@
 /**
  * useReducedMotion Hook
- * 
+ *
  * Detects user's motion preferences and device capabilities to determine
  * if animations should be reduced or disabled.
- * 
+ *
  * Respects:
  * - User's system preference (prefers-reduced-motion)
  * - Legacy device performance (auto-reduce on Tier 2/3 devices)
  * - Manual override via app settings
- * 
+ *
  * @example
  * ```tsx
  * function AnimatedComponent() {
  *   const { shouldReduce, animationDuration } = useReducedMotion();
- *   
+ *
  *   return (
  *     <motion.div
  *       animate={{ opacity: 1 }}
@@ -22,13 +22,16 @@
  *   );
  * }
  * ```
- * 
+ *
  * Created: December 30, 2024
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 
-import { getDeviceCapabilities, type DeviceCapabilities } from '../../core/utils/deviceCapabilities';
+import {
+  getDeviceCapabilities,
+  type DeviceCapabilities,
+} from '../../core/utils/deviceCapabilities';
 
 // ============================================================================
 // TYPES
@@ -90,60 +93,59 @@ const DISABLED_DURATION = 0.01; // Nearly instant for reduced motion
 // ============================================================================
 
 export function useReducedMotion(
-  config: Partial<ReducedMotionConfig> = {}
+  config: Partial<ReducedMotionConfig> = {},
 ): UseReducedMotionResult {
   const finalConfig = { ...DEFAULT_CONFIG, ...config };
-  
+
   // System preference state
   const [systemPrefersReduced, setSystemPrefersReduced] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   });
-  
+
   // Device capabilities
   const [deviceCapabilities, setDeviceCapabilities] = useState<DeviceCapabilities | null>(null);
-  
+
   // Initialize on mount
   useEffect(() => {
     // Get device capabilities
     const caps = getDeviceCapabilities();
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
     setDeviceCapabilities(caps);
-    
+
     // Listen for system preference changes
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    
+
     const handleChange = (e: MediaQueryListEvent) => {
       setSystemPrefersReduced(e.matches);
     };
-    
+
     // Set initial value
     setSystemPrefersReduced(mediaQuery.matches);
-    
+
     // Add listener
     mediaQuery.addEventListener('change', handleChange);
-    
+
     return () => {
       mediaQuery.removeEventListener('change', handleChange);
     };
   }, []);
-  
+
   // Derived values
   const isLegacyDevice = deviceCapabilities?.isLegacyDevice ?? false;
   const deviceTier = deviceCapabilities?.supportTier ?? 1;
-  
+
   // Should we reduce animations?
   const shouldReduce = useMemo(() => {
     // System preference takes highest priority if enabled
     if (finalConfig.respectSystemPreference && systemPrefersReduced) {
       return true;
     }
-    
+
     // Check legacy device setting
     if (finalConfig.reduceOnLegacyDevices && deviceTier >= finalConfig.legacyTierThreshold) {
       return true;
     }
-    
+
     return false;
   }, [
     systemPrefersReduced,
@@ -152,59 +154,65 @@ export function useReducedMotion(
     finalConfig.reduceOnLegacyDevices,
     finalConfig.legacyTierThreshold,
   ]);
-  
+
   // Calculate animation duration
-  const animationDuration = useCallback((baseDuration: number): number => {
-    // Full disable for reduced motion
-    if (systemPrefersReduced && finalConfig.respectSystemPreference) {
-      return DISABLED_DURATION;
-    }
-    
-    // Reduce for legacy devices
-    if (isLegacyDevice && finalConfig.reduceOnLegacyDevices) {
-      const multiplier = deviceTier === 3 ? 0.3 : finalConfig.legacyDurationMultiplier;
-      return Math.max(MIN_DURATION, baseDuration * multiplier);
-    }
-    
-    return baseDuration;
-  }, [
-    systemPrefersReduced,
-    isLegacyDevice,
-    deviceTier,
-    finalConfig.respectSystemPreference,
-    finalConfig.reduceOnLegacyDevices,
-    finalConfig.legacyDurationMultiplier,
-  ]);
-  
+  const animationDuration = useCallback(
+    (baseDuration: number): number => {
+      // Full disable for reduced motion
+      if (systemPrefersReduced && finalConfig.respectSystemPreference) {
+        return DISABLED_DURATION;
+      }
+
+      // Reduce for legacy devices
+      if (isLegacyDevice && finalConfig.reduceOnLegacyDevices) {
+        const multiplier = deviceTier === 3 ? 0.3 : finalConfig.legacyDurationMultiplier;
+        return Math.max(MIN_DURATION, baseDuration * multiplier);
+      }
+
+      return baseDuration;
+    },
+    [
+      systemPrefersReduced,
+      isLegacyDevice,
+      deviceTier,
+      finalConfig.respectSystemPreference,
+      finalConfig.reduceOnLegacyDevices,
+      finalConfig.legacyDurationMultiplier,
+    ],
+  );
+
   // Alias for transition duration
   const transitionDuration = animationDuration;
-  
+
   // Get animation style object
-  const getAnimationStyle = useCallback((baseDuration = DEFAULT_BASE_DURATION): AnimationStyle => {
-    const duration = animationDuration(baseDuration);
-    
-    return {
-      duration,
-      ease: shouldReduce ? 'linear' : 'ease-out',
-      disabled: duration <= DISABLED_DURATION,
-    };
-  }, [animationDuration, shouldReduce]);
-  
+  const getAnimationStyle = useCallback(
+    (baseDuration = DEFAULT_BASE_DURATION): AnimationStyle => {
+      const duration = animationDuration(baseDuration);
+
+      return {
+        duration,
+        ease: shouldReduce ? 'linear' : 'ease-out',
+        disabled: duration <= DISABLED_DURATION,
+      };
+    },
+    [animationDuration, shouldReduce],
+  );
+
   // Get CSS transition string
-  const getTransition = useCallback((
-    property: string,
-    baseDuration = DEFAULT_BASE_DURATION
-  ): string => {
-    const duration = animationDuration(baseDuration);
-    
-    if (duration <= DISABLED_DURATION) {
-      return 'none';
-    }
-    
-    const ease = shouldReduce ? 'linear' : 'ease-out';
-    return `${property} ${duration}ms ${ease}`;
-  }, [animationDuration, shouldReduce]);
-  
+  const getTransition = useCallback(
+    (property: string, baseDuration = DEFAULT_BASE_DURATION): string => {
+      const duration = animationDuration(baseDuration);
+
+      if (duration <= DISABLED_DURATION) {
+        return 'none';
+      }
+
+      const ease = shouldReduce ? 'linear' : 'ease-out';
+      return `${property} ${duration}ms ${ease}`;
+    },
+    [animationDuration, shouldReduce],
+  );
+
   return {
     shouldReduce,
     systemPrefersReduced,
@@ -252,5 +260,3 @@ export function getReducedMotionCSS(): string {
 // ============================================================================
 
 export default useReducedMotion;
-
-

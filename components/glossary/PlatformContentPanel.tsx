@@ -52,7 +52,7 @@ export function PlatformContentPanel({
 }: PlatformContentPanelProps) {
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(['implementation'])
+    new Set(['implementation']),
   );
 
   const platformInfo = PLATFORM_LABELS[platform];
@@ -64,7 +64,7 @@ export function PlatformContentPanel({
   };
 
   const toggleSection = (section: string) => {
-    setExpandedSections((prev) => {
+    setExpandedSections(prev => {
       const next = new Set(prev);
       if (next.has(section)) {
         next.delete(section);
@@ -77,7 +77,6 @@ export function PlatformContentPanel({
 
   // Reset expanded sections when platform changes - valid use case for derived state reset
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- Valid reset when platform prop changes
     setExpandedSections(new Set(['implementation']));
   }, [platform]);
 
@@ -93,10 +92,7 @@ export function PlatformContentPanel({
 
       {/* Implementation Section */}
       <section className={styles.section}>
-        <button
-          className={styles.sectionHeader}
-          onClick={() => toggleSection('implementation')}
-        >
+        <button className={styles.sectionHeader} onClick={() => toggleSection('implementation')}>
           {expandedSections.has('implementation') ? (
             <ChevronDown size={16} />
           ) : (
@@ -127,11 +123,7 @@ export function PlatformContentPanel({
                       }
                     }}
                   >
-                    {copiedField === 'code' ? (
-                      <Check size={14} />
-                    ) : (
-                      <Copy size={14} />
-                    )}
+                    {copiedField === 'code' ? <Check size={14} /> : <Copy size={14} />}
                   </button>
                 </div>
                 <pre className={styles.codeContent}>
@@ -162,7 +154,9 @@ export function PlatformContentPanel({
                           <code>{prop.name}</code>
                           {prop.required && <span className={styles.required}>*</span>}
                         </td>
-                        <td><code>{prop.type}</code></td>
+                        <td>
+                          <code>{prop.type}</code>
+                        </td>
                         <td>{prop.description}</td>
                       </tr>
                     ))}
@@ -176,10 +170,7 @@ export function PlatformContentPanel({
 
       {/* Architecture Section */}
       <section className={styles.section}>
-        <button
-          className={styles.sectionHeader}
-          onClick={() => toggleSection('architecture')}
-        >
+        <button className={styles.sectionHeader} onClick={() => toggleSection('architecture')}>
           {expandedSections.has('architecture') ? (
             <ChevronDown size={16} />
           ) : (
@@ -210,16 +201,16 @@ export function PlatformContentPanel({
                       <label>Dependencies</label>
                       <ul>
                         {content.architecture.dependencies.map((dep, idx) => (
-                          <li key={idx}><code>{dep}</code></li>
+                          <li key={idx}>
+                            <code>{dep}</code>
+                          </li>
                         ))}
                       </ul>
                     </div>
                   )}
               </div>
             ) : (
-              <div className={styles.emptyState}>
-                No architecture details available
-              </div>
+              <div className={styles.emptyState}>No architecture details available</div>
             )}
           </div>
         )}
@@ -227,10 +218,7 @@ export function PlatformContentPanel({
 
       {/* Best Practices Section */}
       <section className={styles.section}>
-        <button
-          className={styles.sectionHeader}
-          onClick={() => toggleSection('bestPractices')}
-        >
+        <button className={styles.sectionHeader} onClick={() => toggleSection('bestPractices')}>
           {expandedSections.has('bestPractices') ? (
             <ChevronDown size={16} />
           ) : (
@@ -259,9 +247,7 @@ export function PlatformContentPanel({
                 ))}
               </div>
             ) : (
-              <div className={styles.emptyState}>
-                No best practices documented yet
-              </div>
+              <div className={styles.emptyState}>No best practices documented yet</div>
             )}
           </div>
         )}
@@ -269,10 +255,7 @@ export function PlatformContentPanel({
 
       {/* Improvements Section */}
       <section className={styles.section}>
-        <button
-          className={styles.sectionHeader}
-          onClick={() => toggleSection('improvements')}
-        >
+        <button className={styles.sectionHeader} onClick={() => toggleSection('improvements')}>
           {expandedSections.has('improvements') ? (
             <ChevronDown size={16} />
           ) : (
@@ -286,19 +269,14 @@ export function PlatformContentPanel({
             {content?.improvements && content.improvements.length > 0 ? (
               <div className={styles.improvementsList}>
                 {content.improvements.map((item, idx) => (
-                  <div
-                    key={idx}
-                    className={`${styles.improvementItem} ${styles[item.priority]}`}
-                  >
+                  <div key={idx} className={`${styles.improvementItem} ${styles[item.priority]}`}>
                     <span className={styles.priorityBadge}>{item.priority}</span>
                     <p>{item.description}</p>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className={styles.emptyState}>
-                No improvements suggested
-              </div>
+              <div className={styles.emptyState}>No improvements suggested</div>
             )}
           </div>
         )}

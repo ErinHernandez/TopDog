@@ -1,8 +1,8 @@
 /**
  * React Hooks for Static Player Data
- * 
+ *
  * Provides React-friendly access to static player data.
- * 
+ *
  * Usage:
  *   const { registry, loading } = useRegistry();
  *   const { player, loading } = useFullPlayer('chase_jamarr');
@@ -10,10 +10,10 @@
 
 import { useState, useEffect, useMemo } from 'react';
 
-import type { 
-  RegistryData, 
-  CareerStatsData, 
-  RostersData, 
+import type {
+  RegistryData,
+  CareerStatsData,
+  RostersData,
   FullPlayer,
   SeasonStats,
   Position,
@@ -45,14 +45,14 @@ export function useRegistry(): UseRegistryResult {
   const [registry, setRegistry] = useState<RegistryData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  
+
   useEffect(() => {
     getRegistry()
       .then(setRegistry)
       .catch((err: unknown) => setError(err instanceof Error ? err : new Error(String(err))))
       .finally(() => setLoading(false));
   }, []);
-  
+
   return { registry, loading, error };
 }
 
@@ -69,14 +69,14 @@ export function useCareerStats(): UseCareerStatsResult {
   const [careerStats, setCareerStats] = useState<CareerStatsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  
+
   useEffect(() => {
     getCareerStats()
       .then(setCareerStats)
       .catch((err: unknown) => setError(err instanceof Error ? err : new Error(String(err))))
       .finally(() => setLoading(false));
   }, []);
-  
+
   return { careerStats, loading, error };
 }
 
@@ -93,14 +93,14 @@ export function useRosters(): UseRostersResult {
   const [rosters, setRosters] = useState<RostersData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  
+
   useEffect(() => {
     getRosters()
       .then(setRosters)
       .catch((err: unknown) => setError(err instanceof Error ? err : new Error(String(err))))
       .finally(() => setLoading(false));
   }, []);
-  
+
   return { rosters, loading, error };
 }
 
@@ -121,22 +121,21 @@ export function useFullPlayer(playerId: string): UseFullPlayerResult {
   const [player, setPlayer] = useState<FullPlayer | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  
+
   useEffect(() => {
     if (!playerId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
       setPlayer(null);
       setLoading(false);
       return;
     }
-    
+
     setLoading(true);
     getFullPlayer(playerId)
       .then(p => setPlayer(p ?? null))
       .catch((err: unknown) => setError(err instanceof Error ? err : new Error(String(err))))
       .finally(() => setLoading(false));
   }, [playerId]);
-  
+
   return { player, loading, error };
 }
 
@@ -153,14 +152,14 @@ export function useAllPlayers(): UseAllPlayersResult {
   const [players, setPlayers] = useState<FullPlayer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  
+
   useEffect(() => {
     getAllFullPlayers()
       .then(setPlayers)
       .catch((err: unknown) => setError(err instanceof Error ? err : new Error(String(err))))
       .finally(() => setLoading(false));
   }, []);
-  
+
   return { players, loading, error };
 }
 
@@ -178,12 +177,12 @@ interface UsePlayersByPositionResult {
  */
 export function usePlayersByPosition(position: Position | 'ALL'): UsePlayersByPositionResult {
   const { players: allPlayers, loading } = useAllPlayers();
-  
+
   const players = useMemo(() => {
     if (position === 'ALL') return allPlayers;
     return allPlayers.filter((p: FullPlayer) => p.position === position);
   }, [allPlayers, position]);
-  
+
   return { players, loading };
 }
 
@@ -197,12 +196,12 @@ interface UsePlayersByTeamResult {
  */
 export function usePlayersByTeam(team: string): UsePlayersByTeamResult {
   const { players: allPlayers, loading } = useAllPlayers();
-  
+
   const players = useMemo(() => {
     if (!team) return allPlayers;
     return allPlayers.filter((p: FullPlayer) => p.team === team);
   }, [allPlayers, team]);
-  
+
   return { players, loading };
 }
 
@@ -223,16 +222,15 @@ export function usePlayerStats(playerId: string): UsePlayerStatsResult {
   const [stats, setStats] = useState<Record<string, SeasonStats> | null>(null);
   const [totals, setTotals] = useState<SeasonStats | null>(null);
   const [loading, setLoading] = useState(true);
-  
+
   useEffect(() => {
     if (!playerId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
       setStats(null);
       setTotals(null);
       setLoading(false);
       return;
     }
-    
+
     setLoading(true);
     Promise.all([
       getCareerStats().then(data => data.players[playerId] ?? null),
@@ -244,7 +242,7 @@ export function usePlayerStats(playerId: string): UsePlayerStatsResult {
       })
       .finally(() => setLoading(false));
   }, [playerId]);
-  
+
   return { stats, totals, loading };
 }
 
@@ -262,18 +260,18 @@ interface UsePlayerSearchResult {
  */
 export function usePlayerSearch(query: string): UsePlayerSearchResult {
   const { players, loading } = useAllPlayers();
-  
+
   const results = useMemo(() => {
     const q = query.toLowerCase().trim();
     if (!q) return [];
-    
-    return players.filter((p: FullPlayer) => 
-      p.name.toLowerCase().includes(q) ||
-      p.team.toLowerCase().includes(q) ||
-      p.college.toLowerCase().includes(q)
+
+    return players.filter(
+      (p: FullPlayer) =>
+        p.name.toLowerCase().includes(q) ||
+        p.team.toLowerCase().includes(q) ||
+        p.college.toLowerCase().includes(q),
     );
   }, [players, query]);
-  
+
   return { results, loading };
 }
-

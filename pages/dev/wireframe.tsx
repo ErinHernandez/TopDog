@@ -27,23 +27,36 @@ const MCM = {
 
 const getColorForType = (type: string): string => {
   switch (type.toLowerCase()) {
-    case 'button': return MCM.orange;
+    case 'button':
+      return MCM.orange;
     case 'textfield':
-    case 'securefield': return MCM.teal;
+    case 'securefield':
+      return MCM.teal;
     case 'text':
-    case 'label': return MCM.gold;
+    case 'label':
+      return MCM.gold;
     case 'image':
-    case 'icon': return MCM.coral;
+    case 'icon':
+      return MCM.coral;
     case 'tab':
-    case 'tabbar': return MCM.sage;
-    case 'card': return MCM.teal;
-    case 'progress': return MCM.orange;
-    case 'badge': return MCM.gold;
-    case 'list': return MCM.lineActive;
-    case 'link': return MCM.textMuted;
-    case 'checkbox': return MCM.lineActive;
-    case 'segmented': return MCM.sage;
-    default: return MCM.lineActive;
+    case 'tabbar':
+      return MCM.sage;
+    case 'card':
+      return MCM.teal;
+    case 'progress':
+      return MCM.orange;
+    case 'badge':
+      return MCM.gold;
+    case 'list':
+      return MCM.lineActive;
+    case 'link':
+      return MCM.textMuted;
+    case 'checkbox':
+      return MCM.lineActive;
+    case 'segmented':
+      return MCM.sage;
+    default:
+      return MCM.lineActive;
   }
 };
 
@@ -90,11 +103,25 @@ const screens: WireframeScreen[] = [
     title: 'Sign In',
     annotations: [
       { id: '1', name: 'Logo', type: 'Image', notes: 'TopDog mark', y: 0.12, side: 'left' },
-      { id: '2', name: 'Email/Phone', type: 'TextField', notes: 'Blue border focus', y: 0.28, side: 'left' },
-      { id: '3', name: 'Password', type: 'SecureField', notes: 'Eye toggle', y: 0.38, side: 'left' },
-      { id: '4', name: 'Remember Me', type: 'Checkbox', y: 0.50, side: 'left' },
-      { id: '5', name: 'Forgot?', type: 'Link', notes: '→ Reset flow', y: 0.50, side: 'right' },
-      { id: '6', name: 'Sign In', type: 'Button', notes: 'Primary CTA', y: 0.60, side: 'right' },
+      {
+        id: '2',
+        name: 'Email/Phone',
+        type: 'TextField',
+        notes: 'Blue border focus',
+        y: 0.28,
+        side: 'left',
+      },
+      {
+        id: '3',
+        name: 'Password',
+        type: 'SecureField',
+        notes: 'Eye toggle',
+        y: 0.38,
+        side: 'left',
+      },
+      { id: '4', name: 'Remember Me', type: 'Checkbox', y: 0.5, side: 'left' },
+      { id: '5', name: 'Forgot?', type: 'Link', notes: '→ Reset flow', y: 0.5, side: 'right' },
+      { id: '6', name: 'Sign In', type: 'Button', notes: 'Primary CTA', y: 0.6, side: 'right' },
       { id: '7', name: 'Sign Up Link', type: 'Link', y: 0.78, side: 'right' },
     ],
   },
@@ -104,19 +131,54 @@ const screens: WireframeScreen[] = [
       { id: '1', name: 'Logo', type: 'Image', y: 0.08, side: 'left' },
       { id: '2', name: 'Header', type: 'Text', notes: 'Create account', y: 0.16, side: 'left' },
       { id: '3', name: 'Email', type: 'TextField', y: 0.26, side: 'left' },
-      { id: '4', name: 'Password', type: 'SecureField', notes: 'Live validation', y: 0.36, side: 'left' },
+      {
+        id: '4',
+        name: 'Password',
+        type: 'SecureField',
+        notes: 'Live validation',
+        y: 0.36,
+        side: 'left',
+      },
       { id: '5', name: 'Confirm', type: 'SecureField', y: 0.46, side: 'left' },
       { id: '6', name: 'Continue', type: 'Button', y: 0.58, side: 'right' },
-      { id: '7', name: 'Requirements', type: 'Card', notes: 'Password rules', y: 0.72, side: 'right' },
+      {
+        id: '7',
+        name: 'Requirements',
+        type: 'Card',
+        notes: 'Password rules',
+        y: 0.72,
+        side: 'right',
+      },
     ],
   },
   {
     title: 'Lobby',
     annotations: [
       { id: '1', name: 'Tournament Card', type: 'Card', y: 0.18, side: 'left' },
-      { id: '2', name: 'Globe Graphic', type: 'Image', notes: '3D unique art', y: 0.26, side: 'left' },
-      { id: '3', name: 'Progress Bar', type: 'Progress', notes: 'Entries %', y: 0.38, side: 'left' },
-      { id: '4', name: 'Join Button', type: 'Button', notes: 'Primary CTA', y: 0.46, side: 'right' },
+      {
+        id: '2',
+        name: 'Globe Graphic',
+        type: 'Image',
+        notes: '3D unique art',
+        y: 0.26,
+        side: 'left',
+      },
+      {
+        id: '3',
+        name: 'Progress Bar',
+        type: 'Progress',
+        notes: 'Entries %',
+        y: 0.38,
+        side: 'left',
+      },
+      {
+        id: '4',
+        name: 'Join Button',
+        type: 'Button',
+        notes: 'Primary CTA',
+        y: 0.46,
+        side: 'right',
+      },
       { id: '5', name: 'Entry Fee', type: 'Text', notes: '$25', y: 0.54, side: 'left' },
       { id: '6', name: 'Prize Pool', type: 'Text', notes: '$2.1M', y: 0.54, side: 'right' },
       { id: '7', name: 'Tab Bar', type: 'TabBar', notes: '5 tabs', y: 0.92, side: 'right' },
@@ -126,11 +188,11 @@ const screens: WireframeScreen[] = [
     title: 'Live Drafts',
     annotations: [
       { id: '1', name: 'Title', type: 'Text', notes: 'Live Drafts', y: 0.06, side: 'left' },
-      { id: '2', name: 'Fast Draft Card', type: 'Card', notes: '30s timer', y: 0.20, side: 'left' },
+      { id: '2', name: 'Fast Draft Card', type: 'Card', notes: '30s timer', y: 0.2, side: 'left' },
       { id: '3', name: '⚡ Badge', type: 'Badge', notes: 'FAST DRAFT', y: 0.15, side: 'right' },
       { id: '4', name: 'Timer', type: 'Text', notes: 'Countdown', y: 0.28, side: 'right' },
       { id: '5', name: 'Progress', type: 'Progress', y: 0.32, side: 'left' },
-      { id: '6', name: 'Slow Draft Card', type: 'Card', notes: '12h timer', y: 0.50, side: 'left' },
+      { id: '6', name: 'Slow Draft Card', type: 'Card', notes: '12h timer', y: 0.5, side: 'left' },
       { id: '7', name: 'Tab Bar', type: 'TabBar', y: 0.92, side: 'right' },
     ],
   },
@@ -139,11 +201,32 @@ const screens: WireframeScreen[] = [
     annotations: [
       { id: '1', name: 'Top Tabs', type: 'TabBar', notes: '5 draft tabs', y: 0.06, side: 'left' },
       { id: '2', name: 'Search', type: 'TextField', y: 0.14, side: 'left' },
-      { id: '3', name: 'Position Pills', type: 'Segmented', notes: 'ALL/QB/RB/WR/TE', y: 0.22, side: 'right' },
-      { id: '4', name: 'Player Row', type: 'List', notes: 'Tap = draft/queue', y: 0.42, side: 'left' },
+      {
+        id: '3',
+        name: 'Position Pills',
+        type: 'Segmented',
+        notes: 'ALL/QB/RB/WR/TE',
+        y: 0.22,
+        side: 'right',
+      },
+      {
+        id: '4',
+        name: 'Player Row',
+        type: 'List',
+        notes: 'Tap = draft/queue',
+        y: 0.42,
+        side: 'left',
+      },
       { id: '5', name: 'Position Badge', type: 'Badge', notes: 'Colored', y: 0.36, side: 'right' },
-      { id: '6', name: 'ADP / Proj', type: 'Text', y: 0.50, side: 'right' },
-      { id: '7', name: 'Timer Bar', type: 'Progress', notes: 'Pick countdown', y: 0.90, side: 'left' },
+      { id: '6', name: 'ADP / Proj', type: 'Text', y: 0.5, side: 'right' },
+      {
+        id: '7',
+        name: 'Timer Bar',
+        type: 'Progress',
+        notes: 'Pick countdown',
+        y: 0.9,
+        side: 'left',
+      },
     ],
   },
   {
@@ -152,18 +235,18 @@ const screens: WireframeScreen[] = [
       { id: '1', name: 'Top Tabs', type: 'TabBar', y: 0.06, side: 'left' },
       { id: '2', name: 'QB Slot', type: 'Card', notes: 'Pink', y: 0.16, side: 'left' },
       { id: '3', name: 'RB Slots', type: 'Card', notes: 'Green × 2', y: 0.26, side: 'left' },
-      { id: '4', name: 'WR Slots', type: 'Card', notes: 'Yellow × 3', y: 0.40, side: 'right' },
+      { id: '4', name: 'WR Slots', type: 'Card', notes: 'Yellow × 3', y: 0.4, side: 'right' },
       { id: '5', name: 'TE Slot', type: 'Card', notes: 'Purple', y: 0.54, side: 'right' },
       { id: '6', name: 'FLEX Slot', type: 'Card', notes: '3-stripe', y: 0.62, side: 'left' },
       { id: '7', name: 'Bench Slots', type: 'Card', notes: 'Gray × 4', y: 0.74, side: 'right' },
-      { id: '8', name: 'Position Tracker', type: 'Card', y: 0.90, side: 'left' },
+      { id: '8', name: 'Position Tracker', type: 'Card', y: 0.9, side: 'left' },
     ],
   },
   {
     title: 'Profile',
     annotations: [
       { id: '1', name: 'User Card', type: 'Card', y: 0.12, side: 'left' },
-      { id: '2', name: 'Avatar', type: 'Image', y: 0.10, side: 'right' },
+      { id: '2', name: 'Avatar', type: 'Image', y: 0.1, side: 'right' },
       { id: '3', name: 'Username', type: 'Text', y: 0.14, side: 'right' },
       { id: '4', name: 'Balance', type: 'Text', notes: 'Current funds', y: 0.18, side: 'left' },
       { id: '5', name: 'Menu List', type: 'List', notes: 'Settings nav', y: 0.45, side: 'left' },
@@ -173,7 +256,6 @@ const screens: WireframeScreen[] = [
     ],
   },
 ];
-
 
 // ============================================================================
 // Annotation Labels Component (SVG DASHED LINES)
@@ -208,7 +290,7 @@ const AnnotationLabels: React.FC<AnnotationLabelsProps> = ({
         pointerEvents: 'none',
       }}
     >
-      {annotations.map((ann) => {
+      {annotations.map(ann => {
         const phoneY = phoneRect.y + ann.y * phoneRect.height;
         const isLeft = ann.side === 'left';
         const labelX = isLeft ? margin : containerWidth - margin - labelWidth;
@@ -281,10 +363,15 @@ const AnnotationCard: React.FC<AnnotationCardProps> = ({
         textAlign: isLeft ? 'left' : 'right',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, justifyContent: isLeft ? 'flex-start' : 'flex-end' }}>
-        <span style={{ fontSize: 11, fontWeight: 500, color: MCM.text }}>
-          {annotation.name}
-        </span>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+          justifyContent: isLeft ? 'flex-start' : 'flex-end',
+        }}
+      >
+        <span style={{ fontSize: 11, fontWeight: 500, color: MCM.text }}>{annotation.name}</span>
         <span
           style={{
             fontSize: 8,
@@ -299,14 +386,11 @@ const AnnotationCard: React.FC<AnnotationCardProps> = ({
         </span>
       </div>
       {annotation.notes && (
-        <div style={{ fontSize: 9, color: MCM.textDim, marginTop: 2 }}>
-          {annotation.notes}
-        </div>
+        <div style={{ fontSize: 9, color: MCM.textDim, marginTop: 2 }}>{annotation.notes}</div>
       )}
     </div>
   );
 };
-
 
 // ============================================================================
 // Single Screen with Annotations Component (for All Screens View)
@@ -317,7 +401,10 @@ interface ScreenWithAnnotationsProps {
   showAnnotations: boolean;
 }
 
-const ScreenWithAnnotations: React.FC<ScreenWithAnnotationsProps> = ({ screen, showAnnotations }) => {
+const ScreenWithAnnotations: React.FC<ScreenWithAnnotationsProps> = ({
+  screen,
+  showAnnotations,
+}) => {
   const phoneWidth = 240;
   const phoneHeight = 500;
   const containerWidth = 900;
@@ -341,19 +428,51 @@ const ScreenWithAnnotations: React.FC<ScreenWithAnnotationsProps> = ({ screen, s
           borderBottom: `1px solid ${MCM.line}`,
         }}
       >
-        {screen.isCustom && '✦ '}{screen.title}
+        {screen.isCustom && '✦ '}
+        {screen.title}
       </div>
 
       {/* Main Content Area */}
-      <div style={{ position: 'relative', width: containerWidth, height: containerHeight, margin: '0 auto' }}>
-        
+      <div
+        style={{
+          position: 'relative',
+          width: containerWidth,
+          height: containerHeight,
+          margin: '0 auto',
+        }}
+      >
         {/* Grid Background */}
-        <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0.03 }}>
+        <svg
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            opacity: 0.03,
+          }}
+        >
           {Array.from({ length: Math.ceil(containerWidth / 32) }).map((_, i) => (
-            <line key={`v${i}`} x1={i * 32} y1={0} x2={i * 32} y2={containerHeight} stroke="white" strokeWidth={0.5} />
+            <line
+              key={`v${i}`}
+              x1={i * 32}
+              y1={0}
+              x2={i * 32}
+              y2={containerHeight}
+              stroke="white"
+              strokeWidth={0.5}
+            />
           ))}
           {Array.from({ length: Math.ceil(containerHeight / 32) }).map((_, i) => (
-            <line key={`h${i}`} x1={0} y1={i * 32} x2={containerWidth} y2={i * 32} stroke="white" strokeWidth={0.5} />
+            <line
+              key={`h${i}`}
+              x1={0}
+              y1={i * 32}
+              x2={containerWidth}
+              y2={i * 32}
+              stroke="white"
+              strokeWidth={0.5}
+            />
           ))}
         </svg>
 
@@ -366,14 +485,15 @@ const ScreenWithAnnotations: React.FC<ScreenWithAnnotationsProps> = ({ screen, s
         />
 
         {/* Annotation Cards */}
-        {showAnnotations && screen.annotations.map((ann) => (
-          <AnnotationCard
-            key={ann.id}
-            annotation={ann}
-            phoneRect={{ x: phoneX, y: phoneY, width: phoneWidth, height: phoneHeight }}
-            containerWidth={containerWidth}
-          />
-        ))}
+        {showAnnotations &&
+          screen.annotations.map(ann => (
+            <AnnotationCard
+              key={ann.id}
+              annotation={ann}
+              phoneRect={{ x: phoneX, y: phoneY, width: phoneWidth, height: phoneHeight }}
+              containerWidth={containerWidth}
+            />
+          ))}
 
         {/* Wireframe Phone */}
         <div style={{ position: 'absolute', left: phoneX, top: phoneY }}>
@@ -405,7 +525,6 @@ export default function WireframePage() {
       if (stored) {
         try {
           const extraction = JSON.parse(stored) as PendingExtraction;
-          // eslint-disable-next-line react-hooks/set-state-in-effect -- initializing state from localStorage on mount
           setPendingExtraction(extraction);
           setShowReviewPanel(true);
         } catch {
@@ -422,7 +541,6 @@ export default function WireframePage() {
       try {
         const elements = JSON.parse(stored) as PendingCatalogElement[];
         if (elements.length > 0) {
-          // eslint-disable-next-line react-hooks/set-state-in-effect -- initializing state from localStorage on mount
           setPendingCatalogElements(elements);
           setShowCatalogPanel(true);
         }
@@ -474,15 +592,15 @@ export default function WireframePage() {
     };
 
     setCustomScreens(prev => [...prev, newScreen]);
-    
+
     // Clear pending extraction
     localStorage.removeItem('pendingExtraction');
     setPendingExtraction(null);
     setShowReviewPanel(false);
-    
+
     // Navigate to the new screen
     setSelectedIndex(screens.length + customScreens.length);
-    
+
     // Clear URL param
     router.replace('/dev/wireframe', undefined, { shallow: true });
   };
@@ -514,15 +632,30 @@ export default function WireframePage() {
         <title>TopDog iOS Wireframes</title>
       </Head>
 
-      <div style={{ minHeight: '100vh', background: MCM.bg, color: MCM.text, fontFamily: 'system-ui, -apple-system, sans-serif' }}>
-        
+      <div
+        style={{
+          minHeight: '100vh',
+          background: MCM.bg,
+          color: MCM.text,
+          fontFamily: 'system-ui, -apple-system, sans-serif',
+        }}
+      >
         {/* ===== HEADER (outside phone) ===== */}
-        <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 24px', background: MCM.surface, borderBottom: `1px solid ${MCM.line}` }}>
+        <header
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '14px 24px',
+            background: MCM.surface,
+            borderBottom: `1px solid ${MCM.line}`,
+          }}
+        >
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <svg width={36} height={36} viewBox="0 0 36 36">
               <circle cx={18} cy={18} r={16} stroke={MCM.orange} strokeWidth={1.5} fill="none" />
               <circle cx={18} cy={18} r={4} fill={MCM.orange} />
-              {[0, 1, 2].map((i) => {
+              {[0, 1, 2].map(i => {
                 const angle = (i * Math.PI * 2) / 3 - Math.PI / 2;
                 const x = 18 + 12 * Math.cos(angle);
                 const y = 18 + 12 * Math.sin(angle);
@@ -536,16 +669,55 @@ export default function WireframePage() {
             </svg>
             <div>
               <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: 4 }}>TOPDOG</div>
-              <div style={{ fontSize: 10, fontWeight: 500, color: MCM.textMuted }}>iOS Developer Wireframes</div>
+              <div style={{ fontSize: 10, fontWeight: 500, color: MCM.textMuted }}>
+                iOS Developer Wireframes
+              </div>
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <button onClick={() => setShowAnnotations(!showAnnotations)} style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'none', border: 'none', cursor: 'pointer' }}>
-              <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 1, color: showAnnotations ? MCM.orange : MCM.textMuted }}>
+            <button
+              onClick={() => setShowAnnotations(!showAnnotations)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              <span
+                style={{
+                  fontSize: 9,
+                  fontWeight: 600,
+                  letterSpacing: 1,
+                  color: showAnnotations ? MCM.orange : MCM.textMuted,
+                }}
+              >
                 {showAnnotations ? 'ANNOTATIONS ON' : 'WIREFRAME ONLY'}
               </span>
-              <div style={{ width: 44, height: 24, borderRadius: 12, background: MCM.surface, border: `1.5px solid ${showAnnotations ? MCM.orange : MCM.line}`, position: 'relative' }}>
-                <div style={{ width: 14, height: 14, borderRadius: '50%', background: showAnnotations ? MCM.orange : MCM.textDim, position: 'absolute', top: 4, left: showAnnotations ? 26 : 4, transition: 'left 0.2s ease' }} />
+              <div
+                style={{
+                  width: 44,
+                  height: 24,
+                  borderRadius: 12,
+                  background: MCM.surface,
+                  border: `1.5px solid ${showAnnotations ? MCM.orange : MCM.line}`,
+                  position: 'relative',
+                }}
+              >
+                <div
+                  style={{
+                    width: 14,
+                    height: 14,
+                    borderRadius: '50%',
+                    background: showAnnotations ? MCM.orange : MCM.textDim,
+                    position: 'absolute',
+                    top: 4,
+                    left: showAnnotations ? 26 : 4,
+                    transition: 'left 0.2s ease',
+                  }}
+                />
               </div>
             </button>
             <div style={{ width: 1, height: 24, background: MCM.line }} />
@@ -579,34 +751,107 @@ export default function WireframePage() {
         </header>
 
         {/* ===== SCREEN SELECTOR NAV (outside phone) ===== */}
-        <nav style={{ display: 'flex', alignItems: 'center', gap: 0, padding: '12px 20px', overflowX: 'auto', background: `${MCM.bg}cc` }}>
+        <nav
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0,
+            padding: '12px 20px',
+            overflowX: 'auto',
+            background: `${MCM.bg}cc`,
+          }}
+        >
           {allScreens.map((screen, i) => (
             <React.Fragment key={`${screen.title}-${i}`}>
-              <button onClick={() => setSelectedIndex(i)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5, padding: '10px 14px', background: 'none', border: 'none', cursor: 'pointer' }}>
-                <span style={{ fontSize: 11, fontWeight: selectedIndex === i ? 600 : 400, color: selectedIndex === i ? MCM.text : MCM.textDim }}>
-                  {screen.isCustom && '✦ '}{screen.title}
+              <button
+                onClick={() => setSelectedIndex(i)}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 5,
+                  padding: '10px 14px',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontWeight: selectedIndex === i ? 600 : 400,
+                    color: selectedIndex === i ? MCM.text : MCM.textDim,
+                  }}
+                >
+                  {screen.isCustom && '✦ '}
+                  {screen.title}
                 </span>
                 {selectedIndex === i ? (
-                  <svg width={6} height={6} viewBox="0 0 6 6"><path d="M3 0 L6 3 L3 6 L0 3 Z" fill={screen.isCustom ? MCM.teal : MCM.orange} /></svg>
+                  <svg width={6} height={6} viewBox="0 0 6 6">
+                    <path
+                      d="M3 0 L6 3 L3 6 L0 3 Z"
+                      fill={screen.isCustom ? MCM.teal : MCM.orange}
+                    />
+                  </svg>
                 ) : (
-                  <div style={{ width: 4, height: 4, borderRadius: '50%', background: screen.isCustom ? MCM.teal : MCM.line }} />
+                  <div
+                    style={{
+                      width: 4,
+                      height: 4,
+                      borderRadius: '50%',
+                      background: screen.isCustom ? MCM.teal : MCM.line,
+                    }}
+                  />
                 )}
               </button>
-              {i < allScreens.length - 1 && <div style={{ width: 20, height: 1, background: MCM.line }} />}
+              {i < allScreens.length - 1 && (
+                <div style={{ width: 20, height: 1, background: MCM.line }} />
+              )}
             </React.Fragment>
           ))}
         </nav>
 
         {/* ===== MAIN CONTENT AREA ===== */}
-        <main style={{ position: 'relative', width: containerWidth, height: containerHeight, margin: '20px auto' }}>
-          
+        <main
+          style={{
+            position: 'relative',
+            width: containerWidth,
+            height: containerHeight,
+            margin: '20px auto',
+          }}
+        >
           {/* Grid Background */}
-          <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0.03 }}>
+          <svg
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              opacity: 0.03,
+            }}
+          >
             {Array.from({ length: Math.ceil(containerWidth / 32) }).map((_, i) => (
-              <line key={`v${i}`} x1={i * 32} y1={0} x2={i * 32} y2={containerHeight} stroke="white" strokeWidth={0.5} />
+              <line
+                key={`v${i}`}
+                x1={i * 32}
+                y1={0}
+                x2={i * 32}
+                y2={containerHeight}
+                stroke="white"
+                strokeWidth={0.5}
+              />
             ))}
             {Array.from({ length: Math.ceil(containerHeight / 32) }).map((_, i) => (
-              <line key={`h${i}`} x1={0} y1={i * 32} x2={containerWidth} y2={i * 32} stroke="white" strokeWidth={0.5} />
+              <line
+                key={`h${i}`}
+                x1={0}
+                y1={i * 32}
+                x2={containerWidth}
+                y2={i * 32}
+                stroke="white"
+                strokeWidth={0.5}
+              />
             ))}
           </svg>
 
@@ -619,14 +864,15 @@ export default function WireframePage() {
           />
 
           {/* ===== ANNOTATION CARDS (outside phone, left & right columns) ===== */}
-          {showAnnotations && currentScreen!.annotations.map((ann) => (
-            <AnnotationCard
-              key={ann.id}
-              annotation={ann}
-              phoneRect={{ x: phoneX, y: phoneY, width: phoneWidth, height: phoneHeight }}
-              containerWidth={containerWidth}
-            />
-          ))}
+          {showAnnotations &&
+            currentScreen!.annotations.map(ann => (
+              <AnnotationCard
+                key={ann.id}
+                annotation={ann}
+                phoneRect={{ x: phoneX, y: phoneY, width: phoneWidth, height: phoneHeight }}
+                containerWidth={containerWidth}
+              />
+            ))}
 
           {/* ===== WIREFRAME CONTENT ===== */}
           <div style={{ position: 'absolute', left: phoneX, top: phoneY }}>
@@ -642,7 +888,15 @@ export default function WireframePage() {
               marginBottom: 32,
             }}
           >
-            <div style={{ fontSize: 11, fontWeight: 600, color: MCM.orange, letterSpacing: 2, marginBottom: 8 }}>
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 600,
+                color: MCM.orange,
+                letterSpacing: 2,
+                marginBottom: 8,
+              }}
+            >
               ALL SCREENS
             </div>
             <div style={{ fontSize: 10, color: MCM.textMuted }}>
@@ -650,7 +904,7 @@ export default function WireframePage() {
             </div>
           </div>
 
-          {allScreens.map((screen) => (
+          {allScreens.map(screen => (
             <ScreenWithAnnotations
               key={screen.title}
               screen={screen}
@@ -711,7 +965,9 @@ export default function WireframePage() {
             {/* Screenshot Preview */}
             {pendingExtraction.screenshotPreview && (
               <div style={{ padding: 16, borderBottom: `1px solid ${MCM.line}` }}>
-                <div style={{ fontSize: 10, color: MCM.textMuted, marginBottom: 8, letterSpacing: 1 }}>
+                <div
+                  style={{ fontSize: 10, color: MCM.textMuted, marginBottom: 8, letterSpacing: 1 }}
+                >
                   SOURCE SCREENSHOT
                 </div>
                 <Image
@@ -733,10 +989,12 @@ export default function WireframePage() {
 
             {/* Extracted Elements */}
             <div style={{ flex: 1, overflowY: 'auto', padding: 16 }}>
-              <div style={{ fontSize: 10, color: MCM.textMuted, marginBottom: 12, letterSpacing: 1 }}>
+              <div
+                style={{ fontSize: 10, color: MCM.textMuted, marginBottom: 12, letterSpacing: 1 }}
+              >
                 EXTRACTED ELEMENTS ({pendingExtraction.elements.length})
               </div>
-              {pendingExtraction.elements.map((el) => (
+              {pendingExtraction.elements.map(el => (
                 <div
                   key={el.id}
                   style={{
@@ -747,7 +1005,13 @@ export default function WireframePage() {
                     border: `1px solid ${MCM.line}`,
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                    }}
+                  >
                     <span style={{ fontSize: 12, color: MCM.text }}>{el.name}</span>
                     <span
                       style={{
@@ -763,9 +1027,7 @@ export default function WireframePage() {
                     </span>
                   </div>
                   {el.notes && (
-                    <div style={{ fontSize: 10, color: MCM.textDim, marginTop: 4 }}>
-                      {el.notes}
-                    </div>
+                    <div style={{ fontSize: 10, color: MCM.textDim, marginTop: 4 }}>{el.notes}</div>
                   )}
                 </div>
               ))}
@@ -774,7 +1036,9 @@ export default function WireframePage() {
             {/* Swift Code Preview */}
             <div style={{ borderTop: `1px solid ${MCM.line}`, maxHeight: 200, overflowY: 'auto' }}>
               <div style={{ padding: '12px 16px', background: MCM.bg }}>
-                <div style={{ fontSize: 10, color: MCM.textMuted, marginBottom: 8, letterSpacing: 1 }}>
+                <div
+                  style={{ fontSize: 10, color: MCM.textMuted, marginBottom: 8, letterSpacing: 1 }}
+                >
                   SWIFT CODE PREVIEW
                 </div>
                 <pre
@@ -869,7 +1133,8 @@ export default function WireframePage() {
                   PENDING APPROVAL
                 </div>
                 <div style={{ fontSize: 10, color: MCM.textMuted, marginTop: 2 }}>
-                  {pendingCatalogElements.length} element{pendingCatalogElements.length !== 1 ? 's' : ''} from catalog
+                  {pendingCatalogElements.length} element
+                  {pendingCatalogElements.length !== 1 ? 's' : ''} from catalog
                 </div>
               </div>
               <button
@@ -889,7 +1154,7 @@ export default function WireframePage() {
 
             {/* Element List */}
             <div style={{ flex: 1, overflowY: 'auto', padding: 12 }}>
-              {pendingCatalogElements.map((element) => {
+              {pendingCatalogElements.map(element => {
                 const color = getColorForType(element.type);
                 return (
                   <div
@@ -903,8 +1168,17 @@ export default function WireframePage() {
                     }}
                   >
                     {/* Element Info */}
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                      <span style={{ fontSize: 13, fontWeight: 600, color: MCM.text }}>{element.name}</span>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        marginBottom: 8,
+                      }}
+                    >
+                      <span style={{ fontSize: 13, fontWeight: 600, color: MCM.text }}>
+                        {element.name}
+                      </span>
                       <span
                         style={{
                           fontSize: 9,
@@ -1001,18 +1275,20 @@ export default function WireframePage() {
               boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
             }}
           >
-            <span style={{ 
-              background: MCM.bg, 
-              color: MCM.gold, 
-              width: 20, 
-              height: 20, 
-              borderRadius: '50%', 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center',
-              fontSize: 10,
-              fontWeight: 700,
-            }}>
+            <span
+              style={{
+                background: MCM.bg,
+                color: MCM.gold,
+                width: 20,
+                height: 20,
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 10,
+                fontWeight: 700,
+              }}
+            >
               {pendingCatalogElements.length}
             </span>
             Pending Approval

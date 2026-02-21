@@ -1,11 +1,11 @@
 /**
  * ShareOptionsModal - iOS-style share sheet for draft content
- * 
+ *
  * Mimics the native Apple share sheet with:
  * - Bottom sheet slide-up animation
  * - App icon row (Messages, Mail, Copy, etc.)
  * - Action list below
- * 
+ *
  * A-Grade Requirements:
  * - TypeScript: Full type coverage
  * - iOS-native design patterns
@@ -69,7 +69,7 @@ function getShareTitle(shareType: ShareType, contentName?: string): string {
 function generateShareText(shareType: ShareType, contentName?: string): string {
   switch (shareType) {
     case 'roster':
-      return contentName 
+      return contentName
         ? `Check out ${contentName}'s roster on TopDog!`
         : 'Check out my roster on TopDog!';
     case 'draft-board':
@@ -88,7 +88,7 @@ function generateShareText(shareType: ShareType, contentName?: string): string {
 function MessagesIcon(): React.ReactElement {
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
-      <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+      <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
     </svg>
   );
 }
@@ -96,34 +96,61 @@ function MessagesIcon(): React.ReactElement {
 function MailIcon(): React.ReactElement {
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
-      <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+      <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
     </svg>
   );
 }
 
 function CopyLinkIcon(): React.ReactElement {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="white"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
     </svg>
   );
 }
 
 function SaveImageIcon(): React.ReactElement {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-      <circle cx="8.5" cy="8.5" r="1.5"/>
-      <polyline points="21 15 16 10 5 21"/>
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="white"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+      <circle cx="8.5" cy="8.5" r="1.5" />
+      <polyline points="21 15 16 10 5 21" />
     </svg>
   );
 }
 
 function CheckmarkIcon(): React.ReactElement {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="20 6 9 17 4 12"/>
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="white"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <polyline points="20 6 9 17 4 12" />
     </svg>
   );
 }
@@ -141,7 +168,14 @@ interface AppIconButtonProps {
   disabled?: boolean;
 }
 
-function AppIconButton({ label, bgColor, icon, onClick, showCheck, disabled }: AppIconButtonProps): React.ReactElement {
+function AppIconButton({
+  label,
+  bgColor,
+  icon,
+  onClick,
+  showCheck,
+  disabled,
+}: AppIconButtonProps): React.ReactElement {
   const getIconColorClass = (color: string): string => {
     switch (color) {
       case SHARE_OPTIONS_THEME.appIconBg.messages:
@@ -160,25 +194,18 @@ function AppIconButton({ label, bgColor, icon, onClick, showCheck, disabled }: A
   };
 
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      className={styles.appIconButton}
-    >
+    <button type="button" onClick={onClick} disabled={disabled} className={styles.appIconButton}>
       {/* Circular icon */}
       <div
         className={cn(
           styles.iconCircle,
-          showCheck ? styles.successIcon : getIconColorClass(bgColor)
+          showCheck ? styles.successIcon : getIconColorClass(bgColor),
         )}
       >
         {showCheck ? <CheckmarkIcon /> : icon}
       </div>
       {/* Label */}
-      <span className={styles.iconLabel}>
-        {label}
-      </span>
+      <span className={styles.iconLabel}>{label}</span>
     </button>
   );
 }
@@ -195,7 +222,13 @@ interface ActionRowProps {
   showCheck?: boolean;
 }
 
-function ActionRow({ label, onClick, isFirst, isLast, showCheck }: ActionRowProps): React.ReactElement {
+function ActionRow({
+  label,
+  onClick,
+  isFirst,
+  isLast,
+  showCheck,
+}: ActionRowProps): React.ReactElement {
   const [isPressed, setIsPressed] = useState(false);
 
   return (
@@ -209,15 +242,22 @@ function ActionRow({ label, onClick, isFirst, isLast, showCheck }: ActionRowProp
         styles.actionRow,
         isFirst && styles.firstRow,
         isLast && styles.lastRow,
-        isPressed && styles.actionRowActive
+        isPressed && styles.actionRowActive,
       )}
     >
-      <span className={styles.actionRowText}>
-        {label}
-      </span>
+      <span className={styles.actionRowText}>{label}</span>
       {showCheck && (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={SHARE_OPTIONS_THEME.successCheck} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <polyline points="20 6 9 17 4 12"/>
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke={SHARE_OPTIONS_THEME.successCheck}
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <polyline points="20 6 9 17 4 12" />
         </svg>
       )}
     </button>
@@ -241,11 +281,10 @@ export default function ShareOptionsModal({
   const sheetRef = useRef<HTMLDivElement>(null);
   const [copiedFeedback, setCopiedFeedback] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
-  
+
   // Handle open/close animation
   useEffect(() => {
     if (isOpen) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
       setIsAnimating(true);
       // Small delay to ensure animation plays
       requestAnimationFrame(() => {
@@ -255,34 +294,35 @@ export default function ShareOptionsModal({
       });
     }
   }, [isOpen]);
-  
+
   // Handle escape key
   useEffect(() => {
     if (!isOpen) return;
-    
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         onClose();
       }
     };
-    
+
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
-  
+
   // Reset feedback on close
   useEffect(() => {
     if (!isOpen) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
       setCopiedFeedback(false);
     }
   }, [isOpen]);
-  
+
   // Get the URL to share
   const getShareUrl = useCallback((): string => {
-    return shareUrl || (typeof window !== 'undefined' ? window.location.href : 'https://topdog.dog');
+    return (
+      shareUrl || (typeof window !== 'undefined' ? window.location.href : 'https://topdog.dog')
+    );
   }, [shareUrl]);
-  
+
   // Get formatted text content
   const getTextContent = useCallback((): string => {
     if (textContent) return textContent;
@@ -290,11 +330,11 @@ export default function ShareOptionsModal({
     const description = generateShareText(shareType, contentName);
     return `${title}\n\n${description}\n\n${getShareUrl()}`;
   }, [textContent, shareType, contentName, getShareUrl]);
-  
+
   // Share via Messages (native share)
   const handleShareMessages = useCallback(async () => {
     const title = getShareTitle(shareType, contentName);
-    
+
     try {
       if (navigator.share) {
         await navigator.share({
@@ -313,17 +353,17 @@ export default function ShareOptionsModal({
       }
     }
   }, [getTextContent, getShareUrl, shareType, contentName]);
-  
+
   // Share via Mail
   const handleShareMail = useCallback(() => {
     const title = getShareTitle(shareType, contentName);
     const text = generateShareText(shareType, contentName);
     const url = getShareUrl();
-    
+
     const mailtoUrl = `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(`${text}\n\n${url}`)}`;
     window.location.href = mailtoUrl;
   }, [shareType, contentName, getShareUrl]);
-  
+
   // Copy link to clipboard
   const handleCopyLink = useCallback(async () => {
     try {
@@ -337,7 +377,7 @@ export default function ShareOptionsModal({
       logger.error('Copy link failed', error instanceof Error ? error : new Error(String(error)));
     }
   }, [getShareUrl, onClose]);
-  
+
   // Share as image
   const handleShareImage = useCallback(() => {
     if (onShareImage) {
@@ -345,7 +385,7 @@ export default function ShareOptionsModal({
       onClose();
     }
   }, [onShareImage, onClose]);
-  
+
   if (!isOpen) return null;
 
   return (
@@ -354,7 +394,7 @@ export default function ShareOptionsModal({
       aria-modal="true"
       aria-labelledby="share-modal-title"
       className={styles.backdrop}
-      onClick={(e) => {
+      onClick={e => {
         if (e.target === e.currentTarget) {
           onClose();
         }
@@ -363,12 +403,8 @@ export default function ShareOptionsModal({
       {/* Bottom Sheet */}
       <div
         ref={sheetRef}
-        onClick={(e) => e.stopPropagation()}
-        className={cn(
-          styles.sheet,
-          isAnimating && styles.animating,
-          !isAnimating && styles.hidden
-        )}
+        onClick={e => e.stopPropagation()}
+        className={cn(styles.sheet, isAnimating && styles.animating, !isAnimating && styles.hidden)}
       >
         {/* Drag Handle */}
         <div className={styles.handleContainer}>
@@ -377,10 +413,7 @@ export default function ShareOptionsModal({
 
         {/* Content Name Header */}
         <div className={styles.header}>
-          <p
-            id="share-modal-title"
-            className={styles.headerTitle}
-          >
+          <p id="share-modal-title" className={styles.headerTitle}>
             {contentName || 'Share'}
           </p>
         </div>
@@ -416,7 +449,7 @@ export default function ShareOptionsModal({
             />
           )}
         </div>
-        
+
         {/* Actions List */}
         <div className={styles.actionsList}>
           <ActionRow
@@ -425,32 +458,14 @@ export default function ShareOptionsModal({
             isFirst
             showCheck={copiedFeedback}
           />
-          {onShareImage && (
-            <ActionRow
-              label="Save Image"
-              onClick={handleShareImage}
-              isLast
-            />
-          )}
-          {!onShareImage && (
-            <ActionRow
-              label="Share via Email"
-              onClick={handleShareMail}
-              isLast
-            />
-          )}
+          {onShareImage && <ActionRow label="Save Image" onClick={handleShareImage} isLast />}
+          {!onShareImage && <ActionRow label="Share via Email" onClick={handleShareMail} isLast />}
         </div>
 
         {/* Cancel Button */}
         <div className={styles.cancelContainer}>
-          <button
-            type="button"
-            onClick={onClose}
-            className={styles.cancelButton}
-          >
-            <span className={styles.cancelButtonText}>
-              Cancel
-            </span>
+          <button type="button" onClick={onClose} className={styles.cancelButton}>
+            <span className={styles.cancelButtonText}>Cancel</span>
           </button>
         </div>
       </div>

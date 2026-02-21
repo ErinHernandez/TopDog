@@ -1,6 +1,6 @@
 /**
  * VX2 Draft Logic - Draft Timer Hook
- * 
+ *
  * Timer with grace period support for draft picks.
  * All new implementation - no code reuse.
  */
@@ -77,7 +77,7 @@ export function useDraftTimer({
   const [secondsRemaining, setSecondsRemaining] = useState(initialSeconds);
   const [state, setState] = useState<TimerState>('idle');
   const [localPaused, setLocalPaused] = useState(false);
-  
+
   // Refs to prevent stale closures
   const onExpireRef = useRef(onExpire);
   const onGracePeriodStartRef = useRef(onGracePeriodStart);
@@ -85,7 +85,7 @@ export function useDraftTimer({
   const hasExpiredRef = useRef(false);
   const gracePeriodTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const gracePeriodSecondsRef = useRef(gracePeriodSeconds);
-  
+
   // Update refs when callbacks and values change
   useEffect(() => {
     onExpireRef.current = onExpire;
@@ -93,12 +93,12 @@ export function useDraftTimer({
     onTickRef.current = onTick;
     gracePeriodSecondsRef.current = gracePeriodSeconds;
   }, [onExpire, onGracePeriodStart, onTick, gracePeriodSeconds]);
-  
+
   // Derived state
   const isInGracePeriod = state === 'grace_period';
   const effectivePaused = isPaused || localPaused;
   const isRunning = isActive && !effectivePaused && state === 'running';
-  
+
   // Cleanup grace period timeout
   useEffect(() => {
     return () => {
@@ -107,36 +107,36 @@ export function useDraftTimer({
       }
     };
   }, []);
-  
+
   // Store interval in ref for cleanup
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   // Main countdown effect
   useEffect(() => {
     if (!isActive || effectivePaused || state !== 'running') {
       return;
     }
-    
+
     const intervalId = setInterval(() => {
       setSecondsRemaining(prev => {
         const newValue = prev - 1;
-        
+
         // Call tick callback
         onTickRef.current?.(newValue);
-        
+
         if (newValue <= 0) {
           // Enter grace period
           setState('grace_period');
           onGracePeriodStartRef.current?.();
           return 0;
         }
-        
+
         return newValue;
       });
     }, 1000);
-    
+
     intervalRef.current = intervalId;
-    
+
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -144,7 +144,7 @@ export function useDraftTimer({
       }
     };
   }, [isActive, effectivePaused, state]);
-  
+
   // Grace period effect
   useEffect(() => {
     if (state !== 'grace_period' || hasExpiredRef.current) {
@@ -163,46 +163,51 @@ export function useDraftTimer({
       }
     };
   }, [state]);
-  
+
   // Start running when activated
   useEffect(() => {
     if (isActive && state === 'idle') {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
       setState('running');
     }
   }, [isActive, state]);
-  
+
   // Actions
-  const reset = useCallback((newDuration?: number) => {
-    setSecondsRemaining(newDuration ?? initialSeconds);
-    setState('idle');
-    hasExpiredRef.current = false;
-    if (gracePeriodTimeoutRef.current) {
-      clearTimeout(gracePeriodTimeoutRef.current);
-    }
-  }, [initialSeconds]);
-  
+  const reset = useCallback(
+    (newDuration?: number) => {
+      setSecondsRemaining(newDuration ?? initialSeconds);
+      setState('idle');
+      hasExpiredRef.current = false;
+      if (gracePeriodTimeoutRef.current) {
+        clearTimeout(gracePeriodTimeoutRef.current);
+      }
+    },
+    [initialSeconds],
+  );
+
   const pause = useCallback(() => {
     setLocalPaused(true);
     if (state === 'running') {
       setState('paused');
     }
   }, [state]);
-  
+
   const resume = useCallback(() => {
     setLocalPaused(false);
     if (state === 'paused') {
       setState('running');
     }
   }, [state]);
-  
-  const start = useCallback((duration?: number) => {
-    setSecondsRemaining(duration ?? initialSeconds);
-    setState('running');
-    hasExpiredRef.current = false;
-    setLocalPaused(false);
-  }, [initialSeconds]);
-  
+
+  const start = useCallback(
+    (duration?: number) => {
+      setSecondsRemaining(duration ?? initialSeconds);
+      setState('running');
+      hasExpiredRef.current = false;
+      setLocalPaused(false);
+    },
+    [initialSeconds],
+  );
+
   const stop = useCallback(() => {
     setState('idle');
     setLocalPaused(false);
@@ -210,7 +215,7 @@ export function useDraftTimer({
       clearTimeout(gracePeriodTimeoutRef.current);
     }
   }, []);
-  
+
   // Build status object
   const status: TimerStatus = {
     state,
@@ -218,7 +223,7 @@ export function useDraftTimer({
     urgency: getTimerUrgency(secondsRemaining),
     isInGracePeriod,
   };
-  
+
   return {
     state,
     secondsRemaining,
@@ -236,4 +241,3 @@ export function useDraftTimer({
 }
 
 export default useDraftTimer;
-

@@ -29,10 +29,7 @@ import { useAuth, AuthGateVX2 } from '../auth';
 import { TabNavigationProvider, HeaderProvider, useTabNavigation } from '../core';
 import type { TabId } from '../core/types';
 import { useStableViewportHeight } from '../hooks/ui/useStableViewportHeight';
-import {
-  AutodraftLimitsModalVX2,
-  DepositHistoryModalVX2
-} from '../modals';
+import { AutodraftLimitsModalVX2, DepositHistoryModalVX2 } from '../modals';
 // Draft session management - handles return destination after leaving draft
 // Light modals - static imports
 // Type imports for dynamic modals
@@ -74,66 +71,82 @@ const DepositModalVX2 = dynamic<DepositModalVX2Props>(
   () => import('../modals/DepositModalVX2').then(mod => ({ default: mod.DepositModalVX2 })),
   {
     ssr: false,
-    loading: () => <PaymentModalLoadingPlaceholder />
-  }
+    loading: () => <PaymentModalLoadingPlaceholder />,
+  },
 );
 
 const WithdrawModalVX2 = dynamic<WithdrawModalVX2Props>(
   () => import('../modals/WithdrawModalVX2'),
   {
     ssr: false,
-    loading: () => <PaymentModalLoadingPlaceholder />
-  }
+    loading: () => <PaymentModalLoadingPlaceholder />,
+  },
 );
 
 // Payment Processor Deposit Modals
 const PaystackDepositModalVX2 = dynamic<PaystackDepositModalVX2Props>(
-  () => import('../modals/PaystackDepositModalVX2').then(mod => ({ default: mod.PaystackDepositModalVX2 })),
+  () =>
+    import('../modals/PaystackDepositModalVX2').then(mod => ({
+      default: mod.PaystackDepositModalVX2,
+    })),
   {
     ssr: false,
-    loading: () => <PaymentModalLoadingPlaceholder />
-  }
+    loading: () => <PaymentModalLoadingPlaceholder />,
+  },
 );
 
 const PayMongoDepositModalVX2 = dynamic<PayMongoDepositModalVX2Props>(
-  () => import('../modals/PayMongoDepositModalVX2').then(mod => ({ default: mod.PayMongoDepositModalVX2 })),
+  () =>
+    import('../modals/PayMongoDepositModalVX2').then(mod => ({
+      default: mod.PayMongoDepositModalVX2,
+    })),
   {
     ssr: false,
-    loading: () => <PaymentModalLoadingPlaceholder />
-  }
+    loading: () => <PaymentModalLoadingPlaceholder />,
+  },
 );
 
 const XenditDepositModalVX2 = dynamic<XenditDepositModalVX2Props>(
-  () => import('../modals/XenditDepositModalVX2').then(mod => ({ default: mod.XenditDepositModalVX2 })),
+  () =>
+    import('../modals/XenditDepositModalVX2').then(mod => ({ default: mod.XenditDepositModalVX2 })),
   {
     ssr: false,
-    loading: () => <PaymentModalLoadingPlaceholder />
-  }
+    loading: () => <PaymentModalLoadingPlaceholder />,
+  },
 );
 
 // Payment Processor Withdrawal Modals
 const PaystackWithdrawModalVX2 = dynamic<PaystackWithdrawModalVX2Props>(
-  () => import('../modals/PaystackWithdrawModalVX2').then(mod => ({ default: mod.PaystackWithdrawModalVX2 })),
+  () =>
+    import('../modals/PaystackWithdrawModalVX2').then(mod => ({
+      default: mod.PaystackWithdrawModalVX2,
+    })),
   {
     ssr: false,
-    loading: () => <PaymentModalLoadingPlaceholder />
-  }
+    loading: () => <PaymentModalLoadingPlaceholder />,
+  },
 );
 
 const PayMongoWithdrawModalVX2 = dynamic<PayMongoWithdrawModalVX2Props>(
-  () => import('../modals/PayMongoWithdrawModalVX2').then(mod => ({ default: mod.PayMongoWithdrawModalVX2 })),
+  () =>
+    import('../modals/PayMongoWithdrawModalVX2').then(mod => ({
+      default: mod.PayMongoWithdrawModalVX2,
+    })),
   {
     ssr: false,
-    loading: () => <PaymentModalLoadingPlaceholder />
-  }
+    loading: () => <PaymentModalLoadingPlaceholder />,
+  },
 );
 
 const XenditWithdrawModalVX2 = dynamic<XenditWithdrawModalVX2Props>(
-  () => import('../modals/XenditWithdrawModalVX2').then(mod => ({ default: mod.XenditWithdrawModalVX2 })),
+  () =>
+    import('../modals/XenditWithdrawModalVX2').then(mod => ({
+      default: mod.XenditWithdrawModalVX2,
+    })),
   {
     ssr: false,
-    loading: () => <PaymentModalLoadingPlaceholder />
-  }
+    loading: () => <PaymentModalLoadingPlaceholder />,
+  },
 );
 
 // Heavy modals opened on user action
@@ -141,8 +154,8 @@ const RankingsModalVX2 = dynamic<RankingsModalVX2Props>(
   () => import('../modals/RankingsModalVX2'),
   {
     ssr: false,
-    loading: () => <PaymentModalLoadingPlaceholder />
-  }
+    loading: () => <PaymentModalLoadingPlaceholder />,
+  },
 );
 
 import { ModalContext, type ModalContextType } from './useModalsContext';
@@ -186,7 +199,6 @@ function InnerShell({ badgeOverrides }: InnerShellProps): React.ReactElement {
 
   // Track mount state to prevent hydration mismatch with conditional modal rendering
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- setting state from event listener
     setIsMounted(true);
   }, []);
 
@@ -198,13 +210,16 @@ function InnerShell({ badgeOverrides }: InnerShellProps): React.ReactElement {
 
     const returnDest = draftSession.getReturnDestination();
     if (returnDest) {
-      logger.debug('Processing return destination', { tab: returnDest.tab, roomId: returnDest.roomId });
+      logger.debug('Processing return destination', {
+        tab: returnDest.tab,
+        roomId: returnDest.roomId,
+      });
 
       // Navigate to the specified tab
       // Map return tab names to actual TabId values
       const tabMapping: Record<string, TabId> = {
         'live-drafts': 'live-drafts',
-        'lobby': 'lobby',
+        lobby: 'lobby',
         'my-teams': 'my-teams',
       };
 
@@ -291,10 +306,7 @@ function InnerShell({ badgeOverrides }: InnerShellProps): React.ReactElement {
             userEmail={authState.user.email || ''}
           />
         )}
-        <RankingsModalVX2
-          isOpen={showRankings}
-          onClose={() => setShowRankings(false)}
-        />
+        <RankingsModalVX2 isOpen={showRankings} onClose={() => setShowRankings(false)} />
       </div>
     </ModalContext.Provider>
   );

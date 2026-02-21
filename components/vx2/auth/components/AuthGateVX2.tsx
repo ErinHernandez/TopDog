@@ -66,9 +66,7 @@ function LoadingSpinner(): React.ReactElement {
       <div className={styles.spinner} />
 
       {/* Loading text */}
-      <p className={styles.loadingText}>
-        Loading...
-      </p>
+      <p className={styles.loadingText}>Loading...</p>
     </div>
   );
 }
@@ -89,7 +87,6 @@ export function AuthGateVX2({ children }: AuthGateVX2Props): React.ReactElement 
 
   // Track mount state to prevent hydration mismatch
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- setting state from event listener
     setIsMounted(true);
   }, []);
 
@@ -98,10 +95,10 @@ export function AuthGateVX2({ children }: AuthGateVX2Props): React.ReactElement 
     if (typeof window !== 'undefined') {
       // Check if hostname contains vercel.app (client-side detection)
       const hostname = window.location.hostname;
-      const isVercelHost = hostname.includes('vercel.app') ||
-                          hostname.endsWith('.vercel.app') ||
-                          hostname.includes('.vercel-dns.com');
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
+      const isVercelHost =
+        hostname.includes('vercel.app') ||
+        hostname.endsWith('.vercel.app') ||
+        hostname.includes('.vercel-dns.com');
       setIsVercelDeployment(isVercelHost);
     }
   }, []);
@@ -114,7 +111,6 @@ export function AuthGateVX2({ children }: AuthGateVX2Props): React.ReactElement 
     try {
       const saved = localStorage.getItem(DEV_AUTH_OVERRIDE_KEY);
       if (saved === 'logged-in' || saved === 'logged-out') {
-        // eslint-disable-next-line react-hooks/set-state-in-effect -- initializing state from localStorage on mount
         setDevAuthOverride(saved);
       }
     } catch (e) {
@@ -196,7 +192,8 @@ export function AuthGateVX2({ children }: AuthGateVX2Props): React.ReactElement 
   }
 
   // If dev override is 'logged-out', always show auth screens regardless of real auth state
-  const showAuthScreens = devAuthOverride === 'logged-out' || (!authState.user || authState.user.isAnonymous);
+  const showAuthScreens =
+    devAuthOverride === 'logged-out' || !authState.user || authState.user.isAnonymous;
 
   // 1. Still initializing - show loading spinner (only if no dev override)
   if (!devAuthOverride && authState.isInitializing) {
@@ -215,20 +212,10 @@ export function AuthGateVX2({ children }: AuthGateVX2Props): React.ReactElement 
 
   // 4. Not authenticated - show login or signup screen
   if (currentView === 'signup') {
-    return (
-      <SignUpScreenVX2
-        onSwitchToLogin={handleSwitchToLogin}
-        onSuccess={handleAuthSuccess}
-      />
-    );
+    return <SignUpScreenVX2 onSwitchToLogin={handleSwitchToLogin} onSuccess={handleAuthSuccess} />;
   }
 
-  return (
-    <LoginScreenVX2
-      onSwitchToSignUp={handleSwitchToSignUp}
-      onSuccess={handleAuthSuccess}
-    />
-  );
+  return <LoginScreenVX2 onSwitchToSignUp={handleSwitchToSignUp} onSuccess={handleAuthSuccess} />;
 }
 
 export default AuthGateVX2;

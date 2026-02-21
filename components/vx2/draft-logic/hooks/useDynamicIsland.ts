@@ -1,6 +1,6 @@
 /**
  * useDynamicIsland Hook
- * 
+ *
  * React hook for managing Dynamic Island / Live Activity integration
  * with the draft timer. Automatically starts, updates, and ends
  * Live Activities based on draft state.
@@ -94,20 +94,19 @@ export function useDynamicIsland({
   const [isActivityRunning, setIsActivityRunning] = useState(false);
   const activityIdRef = useRef<string | null>(null);
   const lastUpdateRef = useRef<number>(0);
-  
+
   // Determine if we should show activity (pre-draft OR active draft)
   const shouldShowActivity = isPreDraft || isActive;
-  
+
   // Get effective timer (pre-draft countdown or pick timer)
   const effectiveTimerSeconds = isPreDraft ? preDraftSeconds : timerSeconds;
   const effectiveTotalSeconds = isPreDraft ? preDraftSeconds : totalSeconds;
-  
+
   // Refresh config on mount
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- initializing configuration on mount
     setConfig(getDynamicIslandConfig());
   }, []);
-  
+
   // Get current status
   const getStatus = useCallback((): DraftTimerActivityState['status'] => {
     if (isPreDraft) return 'pre_draft';
@@ -116,12 +115,12 @@ export function useDynamicIsland({
     if (timerSeconds <= 0) return 'expired';
     return 'active';
   }, [isPreDraft, isActive, isPaused, timerSeconds]);
-  
+
   // Start activity
   const startActivity = useCallback(async () => {
     if (!config.enabled || !config.isSupported) return;
     if (activityIdRef.current) return; // Already running
-    
+
     const activityId = await startDraftTimerActivity({
       roomId,
       secondsRemaining: effectiveTimerSeconds,
@@ -134,13 +133,27 @@ export function useDynamicIsland({
       lastPickedPlayer,
       draftStartTime: draftStartTime?.toISOString(),
     });
-    
+
     if (activityId) {
       activityIdRef.current = activityId;
       setIsActivityRunning(true);
     }
-  }, [config.enabled, config.isSupported, roomId, effectiveTimerSeconds, effectiveTotalSeconds, isPreDraft, isMyTurn, currentPickNumber, totalPicks, currentDrafter, getStatus, lastPickedPlayer, draftStartTime]);
-  
+  }, [
+    config.enabled,
+    config.isSupported,
+    roomId,
+    effectiveTimerSeconds,
+    effectiveTotalSeconds,
+    isPreDraft,
+    isMyTurn,
+    currentPickNumber,
+    totalPicks,
+    currentDrafter,
+    getStatus,
+    lastPickedPlayer,
+    draftStartTime,
+  ]);
+
   // End activity
   const endActivity = useCallback(async () => {
     if (activityIdRef.current) {
@@ -149,16 +162,16 @@ export function useDynamicIsland({
       setIsActivityRunning(false);
     }
   }, []);
-  
+
   // Update activity
   const updateActivity = useCallback(async () => {
     if (!activityIdRef.current) return;
-    
+
     // Throttle updates
     const now = Date.now();
     if (now - lastUpdateRef.current < UPDATE_THROTTLE_MS) return;
     lastUpdateRef.current = now;
-    
+
     await updateDraftTimerActivity({
       activityId: activityIdRef.current,
       secondsRemaining: effectiveTimerSeconds,
@@ -168,33 +181,39 @@ export function useDynamicIsland({
       status: getStatus(),
       lastPickedPlayer,
     });
-  }, [effectiveTimerSeconds, isPreDraft, isMyTurn, currentPickNumber, currentDrafter, getStatus, lastPickedPlayer]);
-  
+  }, [
+    effectiveTimerSeconds,
+    isPreDraft,
+    isMyTurn,
+    currentPickNumber,
+    currentDrafter,
+    getStatus,
+    lastPickedPlayer,
+  ]);
+
   // Auto-start when pre-draft countdown begins OR draft becomes active
   useEffect(() => {
     if (shouldShowActivity && config.enabled && !activityIdRef.current) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
       startActivity();
     }
   }, [shouldShowActivity, config.enabled, startActivity]);
-  
+
   // Auto-end when draft completes (not during transition from pre-draft to active)
   useEffect(() => {
     if (!shouldShowActivity && activityIdRef.current) {
       endDraftTimerActivity(activityIdRef.current, 'completed');
       activityIdRef.current = null;
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
       setIsActivityRunning(false);
     }
   }, [shouldShowActivity]);
-  
+
   // Update activity on state changes
   useEffect(() => {
     if (activityIdRef.current) {
       updateActivity();
     }
   }, [effectiveTimerSeconds, isMyTurn, currentPickNumber, isPaused, isPreDraft, updateActivity]);
-  
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -203,34 +222,37 @@ export function useDynamicIsland({
       }
     };
   }, []);
-  
+
   // Set enabled
-  const setEnabled = useCallback(async (enabled: boolean) => {
-    if (enabled && !config.hasPermission) {
-      const granted = await requestLiveActivityPermission();
-      if (!granted) {
-        // Permission denied - this is expected behavior, no need to log
-        return;
+  const setEnabled = useCallback(
+    async (enabled: boolean) => {
+      if (enabled && !config.hasPermission) {
+        const granted = await requestLiveActivityPermission();
+        if (!granted) {
+          // Permission denied - this is expected behavior, no need to log
+          return;
+        }
       }
-    }
-    
-    setDynamicIslandEnabled(enabled);
-    setConfig(getDynamicIslandConfig());
-    
-    if (enabled && shouldShowActivity && !activityIdRef.current) {
-      startActivity();
-    } else if (!enabled && activityIdRef.current) {
-      endActivity();
-    }
-  }, [config.hasPermission, shouldShowActivity, startActivity, endActivity]);
-  
+
+      setDynamicIslandEnabled(enabled);
+      setConfig(getDynamicIslandConfig());
+
+      if (enabled && shouldShowActivity && !activityIdRef.current) {
+        startActivity();
+      } else if (!enabled && activityIdRef.current) {
+        endActivity();
+      }
+    },
+    [config.hasPermission, shouldShowActivity, startActivity, endActivity],
+  );
+
   // Request permission
   const requestPermission = useCallback(async (): Promise<boolean> => {
     const granted = await requestLiveActivityPermission();
     setConfig(getDynamicIslandConfig());
     return granted;
   }, []);
-  
+
   return {
     config,
     isSupported: isLiveActivitySupported(),
@@ -243,4 +265,3 @@ export function useDynamicIsland({
 }
 
 export default useDynamicIsland;
-

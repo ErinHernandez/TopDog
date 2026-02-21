@@ -1,6 +1,6 @@
 /**
  * React Hooks for ADP Data
- * 
+ *
  * Usage:
  *   const { adp, loading } = useLiveADP();
  *   const { playerADP } = usePlayerADP('chase_jamarr');
@@ -39,20 +39,19 @@ export function useLiveADP(): UseLiveADPResult {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
-  
+
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
     setLoading(true);
     setError(null);
-    
+
     getLiveADP()
       .then(setADP)
       .catch((err: unknown) => setError(err instanceof Error ? err : new Error(String(err))))
       .finally(() => setLoading(false));
   }, [refreshKey]);
-  
+
   const refresh = () => setRefreshKey(k => k + 1);
-  
+
   return { adp, loading, error, refresh };
 }
 
@@ -73,22 +72,21 @@ export function usePlayerADP(playerId: string): UsePlayerADPResult {
   const [playerADP, setPlayerADP] = useState<PlayerADP | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  
+
   useEffect(() => {
     if (!playerId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
       setPlayerADP(null);
       setLoading(false);
       return;
     }
-    
+
     setLoading(true);
     getPlayerADP(playerId)
       .then(data => setPlayerADP(data ?? null))
       .catch((err: unknown) => setError(err instanceof Error ? err : new Error(String(err))))
       .finally(() => setLoading(false));
   }, [playerId]);
-  
+
   return { playerADP, loading, error };
 }
 
@@ -106,12 +104,12 @@ interface UseADPRankingsResult {
  */
 export function useADPRankings(): UseADPRankingsResult {
   const { adp, loading } = useLiveADP();
-  
+
   const rankings = useMemo(() => {
     if (!adp) return [];
     return getADPRankings(adp);
   }, [adp]);
-  
+
   return { rankings, loading };
 }
 
@@ -125,11 +123,13 @@ interface UseADPRangeResult {
  */
 export function useADPRange(minADP: number, maxADP: number): UseADPRangeResult {
   const { rankings, loading } = useADPRankings();
-  
+
   const players = useMemo(() => {
-    return rankings.filter((p: { playerId: string } & PlayerADP) => p.adp >= minADP && p.adp <= maxADP);
+    return rankings.filter(
+      (p: { playerId: string } & PlayerADP) => p.adp >= minADP && p.adp <= maxADP,
+    );
   }, [rankings, minADP, maxADP]);
-  
+
   return { players, loading };
 }
 
@@ -148,16 +148,16 @@ interface UseADPMoversResult {
  */
 export function useADPMovers(limit: number = 10): UseADPMoversResult {
   const { adp, loading } = useLiveADP();
-  
+
   const { risers, fallers } = useMemo(() => {
     if (!adp) return { risers: [], fallers: [] };
-    
+
     return {
       risers: getBiggestRisers(adp, limit),
       fallers: getBiggestFallers(adp, limit),
     };
   }, [adp, limit]);
-  
+
   return { risers, fallers, loading };
 }
 
@@ -177,7 +177,7 @@ interface UseADPMetadataResult {
  */
 export function useADPMetadata(maxAgeHours: number = 12): UseADPMetadataResult {
   const { adp, loading } = useLiveADP();
-  
+
   const metadata = useMemo(() => {
     if (!adp) {
       return {
@@ -190,7 +190,6 @@ export function useADPMetadata(maxAgeHours: number = 12): UseADPMetadataResult {
     const generatedAt = adp.metadata.generatedAt;
     const generatedTime = new Date(generatedAt).getTime();
     const maxAgeMs = maxAgeHours * 60 * 60 * 1000;
-    // eslint-disable-next-line react-hooks/purity -- checking staleness with current time is intentional
     const isStale = Date.now() - generatedTime > maxAgeMs;
 
     return {
@@ -199,7 +198,7 @@ export function useADPMetadata(maxAgeHours: number = 12): UseADPMetadataResult {
       isStale,
     };
   }, [adp, maxAgeHours]);
-  
+
   return { ...metadata, loading };
 }
 
@@ -216,26 +215,22 @@ interface UseADPComparisonResult {
 /**
  * Hook to compare a player's current pick position to their ADP.
  */
-export function useADPComparison(
-  playerId: string,
-  pickPosition: number
-): UseADPComparisonResult {
+export function useADPComparison(playerId: string, pickPosition: number): UseADPComparisonResult {
   const { playerADP, loading } = usePlayerADP(playerId);
-  
+
   const comparison = useMemo(() => {
     if (!playerADP || !pickPosition) {
       return { difference: null };
     }
-    
+
     // Negative = drafted earlier than ADP (good value)
     // Positive = drafted later than ADP (falling)
     const difference = pickPosition - playerADP.adp;
-    
+
     return {
       difference: Math.round(difference * 10) / 10,
     };
   }, [playerADP, pickPosition]);
-  
+
   return { ...comparison, loading };
 }
-

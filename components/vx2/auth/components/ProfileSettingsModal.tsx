@@ -1,6 +1,6 @@
 /**
  * VX2 ProfileSettingsModal - User Profile Management
- * 
+ *
  * Features:
  * - View and edit profile information
  * - Change username (with audit trail)
@@ -21,8 +21,6 @@ import { useTemporaryState } from '../../hooks/ui/useTemporaryState';
 import { RATE_LIMITS } from '../constants';
 import { useAuth } from '../hooks/useAuth';
 import { useUsernameValidation } from '../hooks/useUsernameValidation';
-
-
 
 import sharedStyles from './auth-shared.module.css';
 import { DeleteAccountModal } from './DeleteAccountModal';
@@ -56,7 +54,12 @@ interface ProfileTabContentProps {
   onOpenDeleteModal: () => void;
 }
 
-function ProfileTabContent({ onEditName, onAddEmail, onAddPhone, onOpenDeleteModal }: ProfileTabContentProps): React.ReactElement {
+function ProfileTabContent({
+  onEditName,
+  onAddEmail,
+  onAddPhone,
+  onOpenDeleteModal,
+}: ProfileTabContentProps): React.ReactElement {
   const { user, profile, sendVerificationEmail } = useAuth();
   const router = useRouter();
   const [emailSent, setEmailSent] = useTemporaryState(false, 30000);
@@ -68,9 +71,10 @@ function ProfileTabContent({ onEditName, onAddEmail, onAddPhone, onOpenDeleteMod
     }
   };
 
-  const displayName = profile?.firstName && profile?.lastName
-    ? `${profile.firstName} ${profile.lastName}`
-    : profile?.displayName || null;
+  const displayName =
+    profile?.firstName && profile?.lastName
+      ? `${profile.firstName} ${profile.lastName}`
+      : profile?.displayName || null;
 
   // Get inner cell background color from user preferences (default to dark gray)
   // Borders are fixed and not customizable
@@ -87,19 +91,18 @@ function ProfileTabContent({ onEditName, onAddEmail, onAddPhone, onOpenDeleteMod
         <div className={styles.playerBoxContainer}>
           <div
             className={styles.playerBox}
-            style={{
-              '--player-box-border': fixedBorderColor,
-              '--player-box-bg': innerCellColor,
-            } as React.CSSProperties}
+            style={
+              {
+                '--player-box-border': fixedBorderColor,
+                '--player-box-bg': innerCellColor,
+              } as React.CSSProperties
+            }
           >
             {/* Header - matches draft room card header structure */}
-            <div className={styles.playerBoxHeader}>
-              {profile?.username || 'Username'}
-            </div>
+            <div className={styles.playerBoxHeader}>{profile?.username || 'Username'}</div>
 
             {/* Content area - matches draft room card content */}
-            <div className={styles.playerBoxContent}>
-            </div>
+            <div className={styles.playerBoxContent}></div>
           </div>
         </div>
 
@@ -113,77 +116,56 @@ function ProfileTabContent({ onEditName, onAddEmail, onAddPhone, onOpenDeleteMod
         </div>
       </div>
 
-
       {/* Name */}
       <div className={styles.infoBox}>
         <div className={styles.infoBoxHeader}>
-          <span className={styles.infoLabel}>
-            Name
-          </span>
+          <span className={styles.infoLabel}>Name</span>
         </div>
-        <p className={styles.infoValue}>
-          {displayName || 'Not added yet'}
-        </p>
+        <p className={styles.infoValue}>{displayName || 'Not added yet'}</p>
       </div>
 
       {/* Email */}
       <div className={styles.infoBox}>
         <div className={styles.infoBoxHeader}>
-          <span className={styles.infoLabel}>
-            Email
-          </span>
+          <span className={styles.infoLabel}>Email</span>
           {user?.email ? (
             user?.emailVerified ? (
-            <span className={cn(styles.badge, styles.badgeVerified)}>
-              Verified
-            </span>
-          ) : (
-            <button
-              onClick={handleResendVerification}
-              disabled={emailSent}
-              className={styles.verifyButton}
-            >
-              {emailSent ? 'Email sent' : 'Verify'}
+              <span className={cn(styles.badge, styles.badgeVerified)}>Verified</span>
+            ) : (
+              <button
+                onClick={handleResendVerification}
+                disabled={emailSent}
+                className={styles.verifyButton}
+              >
+                {emailSent ? 'Email sent' : 'Verify'}
               </button>
             )
           ) : null}
         </div>
-        <p className={styles.infoValue}>
-          {user?.email || 'Not added yet'}
-        </p>
+        <p className={styles.infoValue}>{user?.email || 'Not added yet'}</p>
       </div>
 
       {/* Phone */}
       <div className={styles.infoBox}>
         <div className={styles.infoBoxHeader}>
-          <span className={styles.infoLabel}>
-            Phone
-          </span>
+          <span className={styles.infoLabel}>Phone</span>
         </div>
-        <p className={styles.infoValue}>
-          {user?.phoneNumber || 'Not added yet'}
-        </p>
+        <p className={styles.infoValue}>{user?.phoneNumber || 'Not added yet'}</p>
       </div>
 
       {/* Country */}
       <div className={styles.infoBox}>
-        <span className={cn(styles.infoLabel, 'block mb-2')}>
-          Country
-        </span>
-        <p className={styles.infoValue}>
-          {profile?.countryCode || 'Not set'}
-        </p>
+        <span className={cn(styles.infoLabel, 'block mb-2')}>Country</span>
+        <p className={styles.infoValue}>{profile?.countryCode || 'Not set'}</p>
       </div>
-      
+
       {/* Stats */}
       <div className={styles.statsGrid}>
         <div className={styles.statCard}>
           <span className={cn(styles.statValue, 'block font-bold text-xl')}>
             {profile?.tournamentsEntered || 0}
           </span>
-          <span className={styles.statLabel}>
-            Tournaments
-          </span>
+          <span className={styles.statLabel}>Tournaments</span>
         </div>
         <div className={styles.statCard}>
           <span
@@ -191,26 +173,19 @@ function ProfileTabContent({ onEditName, onAddEmail, onAddPhone, onOpenDeleteMod
           >
             ${(profile?.totalWinnings || 0).toLocaleString()}
           </span>
-          <span className={styles.statLabel}>
-            Winnings
-          </span>
+          <span className={styles.statLabel}>Winnings</span>
         </div>
       </div>
 
       {/* Delete account — opens modal (eligibility, maze, password) */}
       <div className={styles.deleteAccountSection}>
         <div className={styles.deleteAccountInfo}>
-          <span className={styles.deleteAccountTitle}>
-            Delete account
-          </span>
+          <span className={styles.deleteAccountTitle}>Delete account</span>
           <span className={styles.deleteAccountDescription}>
             Permanently delete your account and data
           </span>
         </div>
-        <button
-          onClick={onOpenDeleteModal}
-          className={styles.deleteButton}
-        >
+        <button onClick={onOpenDeleteModal} className={styles.deleteButton}>
           Delete account
         </button>
       </div>
@@ -232,7 +207,7 @@ function PreferencesTabContent(): React.ReactElement {
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useTemporaryState(false, 2000);
   const [dynamicIslandSupported, setDynamicIslandSupported] = useState(false);
-  
+
   // Alert preferences state
   const [alertPreferences, setAlertPreferences] = useState({
     roomFilled: profile?.preferences?.draftAlerts?.roomFilled ?? false,
@@ -241,9 +216,10 @@ function PreferencesTabContent(): React.ReactElement {
     onTheClock: profile?.preferences?.draftAlerts?.onTheClock ?? false,
     tenSecondsRemaining: profile?.preferences?.draftAlerts?.tenSecondsRemaining ?? false,
   });
-  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
+  const [notificationPermission, setNotificationPermission] =
+    useState<NotificationPermission>('default');
   const [savingKey, setSavingKey] = useState<string | null>(null);
-  
+
   // Check Dynamic Island support on mount
   useEffect(() => {
     // Check if iOS 16.1+ (Live Activities support)
@@ -261,25 +237,25 @@ function PreferencesTabContent(): React.ReactElement {
       return false;
     };
     setDynamicIslandSupported(checkSupport());
-    
+
     // Check notification permission
     if ('Notification' in window) {
       setNotificationPermission(Notification.permission);
     }
   }, []);
-  
+
   const requestNotificationPermission = async () => {
     if ('Notification' in window) {
       const permission = await Notification.requestPermission();
       setNotificationPermission(permission);
     }
   };
-  
+
   const handleAlertToggle = async (key: keyof typeof alertPreferences) => {
     setSavingKey(key);
     const newValue = !alertPreferences[key];
     setAlertPreferences(prev => ({ ...prev, [key]: newValue }));
-    
+
     try {
       await updateProfile({
         preferences: {
@@ -292,29 +268,32 @@ function PreferencesTabContent(): React.ReactElement {
       });
       setSaved(true);
     } catch (error) {
-      logger.error('Failed to update alert preferences:', error instanceof Error ? error : new Error(String(error)));
+      logger.error(
+        'Failed to update alert preferences:',
+        error instanceof Error ? error : new Error(String(error)),
+      );
       // Revert on error
       setAlertPreferences(prev => ({ ...prev, [key]: !newValue }));
     } finally {
       setSavingKey(null);
     }
   };
-  
+
   const handleToggle = async (key: keyof typeof preferences) => {
     const newValue = !preferences[key];
     setPreferences(prev => ({ ...prev, [key]: newValue }));
-    
+
     // For Dynamic Island, also update localStorage
     if (key === 'dynamicIslandEnabled') {
       if (typeof localStorage !== 'undefined') {
         localStorage.setItem('topdog_dynamic_island_enabled', String(newValue));
       }
     }
-    
+
     setIsSaving(true);
     try {
-      await updateProfile({ 
-        preferences: { ...profile?.preferences, [key]: newValue } 
+      await updateProfile({
+        preferences: { ...profile?.preferences, [key]: newValue },
       });
       setSaved(true);
     } catch (err) {
@@ -327,8 +306,16 @@ function PreferencesTabContent(): React.ReactElement {
       setIsSaving(false);
     }
   };
-  
-  const ToggleSwitch = ({ checked, onChange, disabled }: { checked: boolean; onChange: () => void; disabled?: boolean }) => (
+
+  const ToggleSwitch = ({
+    checked,
+    onChange,
+    disabled,
+  }: {
+    checked: boolean;
+    onChange: () => void;
+    disabled?: boolean;
+  }) => (
     <button
       onClick={onChange}
       disabled={disabled}
@@ -340,22 +327,16 @@ function PreferencesTabContent(): React.ReactElement {
       <div className={styles.toggleSwitchThumb} />
     </button>
   );
-  
+
   return (
     <div className={styles.preferencesContent}>
-      {saved && (
-        <div className={styles.savedMessage}>
-          Preferences saved
-        </div>
-      )}
+      {saved && <div className={styles.savedMessage}>Preferences saved</div>}
 
       {/* Dynamic Island / Live Activity toggle - only show on supported iOS devices */}
       {dynamicIslandSupported && (
         <div className={styles.preferenceItem}>
           <div className={styles.preferenceItemLabel}>
-            <span className={styles.preferenceItemTitle}>
-              Dynamic Island Timer
-            </span>
+            <span className={styles.preferenceItemTitle}>Dynamic Island Timer</span>
             <span className={styles.preferenceItemDescription}>
               See draft timer when using other apps
             </span>
@@ -366,17 +347,14 @@ function PreferencesTabContent(): React.ReactElement {
           />
         </div>
       )}
-      
+
       {/* Draft Alerts - Show for ALL users */}
       <div className={styles.alertPreferencesSection}>
-        <h3 className={styles.alertsTitle}>
-          Draft Alerts
-        </h3>
+        <h3 className={styles.alertsTitle}>Draft Alerts</h3>
         <p className={styles.alertsDescription}>
           {dynamicIslandSupported
             ? 'Alerts appear in Dynamic Island and Lock Screen'
-            : 'Alerts appear as browser notifications'
-          }
+            : 'Alerts appear as browser notifications'}
         </p>
 
         {/* Show permission request for non-Dynamic Island users */}
@@ -395,20 +373,36 @@ function PreferencesTabContent(): React.ReactElement {
         )}
 
         {[
-          { key: 'roomFilled' as const, label: 'Room Filled', desc: 'When draft room reaches capacity' },
-          { key: 'draftStarting' as const, label: 'Draft Starting', desc: 'When draft countdown begins' },
-          { key: 'twoPicksAway' as const, label: 'Two Picks Away', desc: "When you're 2 picks from your turn" },
-          { key: 'onTheClock' as const, label: 'On The Clock', desc: "When it's your turn to pick" },
-          { key: 'tenSecondsRemaining' as const, label: '10 Seconds Remaining', desc: 'When timer hits 10 seconds' },
+          {
+            key: 'roomFilled' as const,
+            label: 'Room Filled',
+            desc: 'When draft room reaches capacity',
+          },
+          {
+            key: 'draftStarting' as const,
+            label: 'Draft Starting',
+            desc: 'When draft countdown begins',
+          },
+          {
+            key: 'twoPicksAway' as const,
+            label: 'Two Picks Away',
+            desc: "When you're 2 picks from your turn",
+          },
+          {
+            key: 'onTheClock' as const,
+            label: 'On The Clock',
+            desc: "When it's your turn to pick",
+          },
+          {
+            key: 'tenSecondsRemaining' as const,
+            label: '10 Seconds Remaining',
+            desc: 'When timer hits 10 seconds',
+          },
         ].map(({ key, label, desc }) => (
           <div key={key} className={styles.preferenceItem}>
             <div className={styles.preferenceItemLabel}>
-              <span className={styles.preferenceItemTitle}>
-                {label}
-              </span>
-              <span className={styles.preferenceItemDescription}>
-                {desc}
-              </span>
+              <span className={styles.preferenceItemTitle}>{label}</span>
+              <span className={styles.preferenceItemDescription}>{desc}</span>
             </div>
             <div className={cn('flex items-center gap-2', styles.alertItemWithSaving)}>
               <ToggleSwitch
@@ -416,22 +410,16 @@ function PreferencesTabContent(): React.ReactElement {
                 onChange={() => handleAlertToggle(key)}
                 disabled={savingKey === key || isSaving}
               />
-              {savingKey === key && (
-                <div className={styles.savingSpinner} />
-              )}
+              {savingKey === key && <div className={styles.savingSpinner} />}
             </div>
           </div>
         ))}
       </div>
-      
+
       <div className={styles.preferenceItem}>
         <div className={styles.preferenceItemLabel}>
-          <span className={styles.preferenceItemTitle}>
-            Slow draft email updates
-          </span>
-          <span className={styles.preferenceItemDescription}>
-            Updates about your slow drafts
-          </span>
+          <span className={styles.preferenceItemTitle}>Slow draft email updates</span>
+          <span className={styles.preferenceItemDescription}>Updates about your slow drafts</span>
         </div>
         <ToggleSwitch
           checked={preferences.emailUpdates}
@@ -449,7 +437,7 @@ function PreferencesTabContent(): React.ReactElement {
 function SecurityTabContent(): React.ReactElement {
   const { user, sendPasswordResetEmail, linkEmailPassword } = useAuth();
   const [resetSent, setResetSent] = useState(false);
-  
+
   const handlePasswordReset = async () => {
     if (user?.email) {
       const result = await sendPasswordResetEmail(user.email);
@@ -458,15 +446,13 @@ function SecurityTabContent(): React.ReactElement {
       }
     }
   };
-  
+
   return (
     <div className={styles.securityContent}>
       {/* Password */}
       <div className={styles.securityItem}>
         <div className={styles.securityItemInfo}>
-          <span className={styles.securityItemTitle}>
-            Password
-          </span>
+          <span className={styles.securityItemTitle}>Password</span>
           <span className={styles.securityItemDescription}>
             {user?.email ? 'Change your password' : 'Add a password'}
           </span>
@@ -482,9 +468,7 @@ function SecurityTabContent(): React.ReactElement {
 
       {/* Session Info */}
       <div className={styles.securityItem}>
-        <span className={cn(styles.securityItemTitle, 'block mb-2')}>
-          Current Session
-        </span>
+        <span className={cn(styles.securityItemTitle, 'block mb-2')}>Current Session</span>
         <span className={styles.securityItemDescription}>
           Last login: {user?.lastLoginAt ? new Date(user.lastLoginAt).toLocaleString() : 'Unknown'}
         </span>
@@ -503,28 +487,32 @@ interface ChangeUsernameModalProps {
   currentUsername: string;
 }
 
-function ChangeUsernameModal({ isOpen, onClose, currentUsername }: ChangeUsernameModalProps): React.ReactElement | null {
+function ChangeUsernameModal({
+  isOpen,
+  onClose,
+  currentUsername,
+}: ChangeUsernameModalProps): React.ReactElement | null {
   const { profile, changeUsername } = useAuth();
   const [newUsername, setNewUsername] = useState('');
   const [reason, setReason] = useState('');
   const [isChanging, setIsChanging] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  
+
   const { canSubmit } = useUsernameValidation({
     initialValue: newUsername,
     countryCode: profile?.countryCode || 'US',
   });
-  
+
   const canChange = canSubmit && newUsername.toLowerCase() !== currentUsername.toLowerCase();
-  
+
   const handleChange = async () => {
     setIsChanging(true);
     setError(null);
-    
+
     try {
       const result = await changeUsername({ newUsername, reason });
-      
+
       if (result.success) {
         setSuccess(true);
         setTimeout(onClose, 2000);
@@ -537,7 +525,7 @@ function ChangeUsernameModal({ isOpen, onClose, currentUsername }: ChangeUsernam
       setIsChanging(false);
     }
   };
-  
+
   if (!isOpen) return null;
 
   return (
@@ -545,9 +533,7 @@ function ChangeUsernameModal({ isOpen, onClose, currentUsername }: ChangeUsernam
       <div className={styles.modalDialog}>
         {/* Header */}
         <div className={styles.modalHeader}>
-          <h3 className={styles.modalTitle}>
-            Change Username
-          </h3>
+          <h3 className={styles.modalTitle}>Change Username</h3>
           <button onClick={onClose} className={styles.modalCloseButton}>
             <Close size={20} className={styles.closingIcon} />
           </button>
@@ -557,7 +543,15 @@ function ChangeUsernameModal({ isOpen, onClose, currentUsername }: ChangeUsernam
         <div className={styles.modalContent}>
           {success ? (
             <div className={styles.successMessage}>
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={cn(styles.successIcon, 'mx-auto mb-4')}>
+              <svg
+                width="48"
+                height="48"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                className={cn(styles.successIcon, 'mx-auto mb-4')}
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
               <p className={cn(styles.successText, 'font-semibold')}>Username changed!</p>
@@ -566,20 +560,15 @@ function ChangeUsernameModal({ isOpen, onClose, currentUsername }: ChangeUsernam
             <>
               <div className={styles.warningBox}>
                 <p className={styles.warningText}>
-                  You can change your username {RATE_LIMITS.MAX_USERNAME_CHANGES_PER_YEAR} times per year.
+                  You can change your username {RATE_LIMITS.MAX_USERNAME_CHANGES_PER_YEAR} times per
+                  year.
                 </p>
               </div>
 
-              {error && (
-                <div className={styles.errorBox}>
-                  {error}
-                </div>
-              )}
+              {error && <div className={styles.errorBox}>{error}</div>}
 
               <div className={styles.formField}>
-                <label className={styles.fieldLabel}>
-                  Current username
-                </label>
+                <label className={styles.fieldLabel}>Current username</label>
                 <p className={styles.fieldValue}>@{currentUsername}</p>
               </div>
 
@@ -591,13 +580,11 @@ function ChangeUsernameModal({ isOpen, onClose, currentUsername }: ChangeUsernam
               />
 
               <div className={styles.formField}>
-                <label className={styles.fieldLabel}>
-                  Reason (optional)
-                </label>
+                <label className={styles.fieldLabel}>Reason (optional)</label>
                 <input
                   type="text"
                   value={reason}
-                  onChange={(e) => setReason(e.target.value)}
+                  onChange={e => setReason(e.target.value)}
                   placeholder="Why are you changing?"
                   className={styles.fieldInput}
                 />
@@ -608,7 +595,7 @@ function ChangeUsernameModal({ isOpen, onClose, currentUsername }: ChangeUsernam
                 disabled={!canChange || isChanging}
                 className={cn(
                   styles.primaryButton,
-                  canChange ? styles.primaryButtonEnabled : styles.primaryButtonDisabled
+                  canChange ? styles.primaryButtonEnabled : styles.primaryButtonDisabled,
                 )}
               >
                 {isChanging ? 'Changing...' : 'Change Username'}
@@ -631,25 +618,29 @@ interface AddContactModalProps {
   type: 'email' | 'phone';
 }
 
-function AddContactModal({ isOpen, onClose, type }: AddContactModalProps): React.ReactElement | null {
+function AddContactModal({
+  isOpen,
+  onClose,
+  type,
+}: AddContactModalProps): React.ReactElement | null {
   const [value, setValue] = useState('');
   const [isAdding, setIsAdding] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  
+
   const isEmail = type === 'email';
   const label = isEmail ? 'Email Address' : 'Phone Number';
   const placeholder = isEmail ? 'you@example.com' : '+1 (555) 123-4567';
   const inputType = isEmail ? 'email' : 'tel';
-  
-  const isValid = isEmail 
+
+  const isValid = isEmail
     ? /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
     : value.replace(/\D/g, '').length >= 10;
-  
+
   const handleAdd = async () => {
     setIsAdding(true);
     setError(null);
-    
+
     try {
       // Get Firebase auth token for API call
       let authToken: string | null = null;
@@ -705,13 +696,16 @@ function AddContactModal({ isOpen, onClose, type }: AddContactModalProps): React
         setValue('');
       }, 1500);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : `Failed to add ${label.toLowerCase()}. Please try again.`;
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : `Failed to add ${label.toLowerCase()}. Please try again.`;
       setError(errorMessage);
     } finally {
       setIsAdding(false);
     }
   };
-  
+
   // Reset on close
   useEffect(() => {
     if (!isOpen) {
@@ -720,7 +714,7 @@ function AddContactModal({ isOpen, onClose, type }: AddContactModalProps): React
       setSuccess(false);
     }
   }, [isOpen]);
-  
+
   if (!isOpen) return null;
 
   return (
@@ -728,9 +722,7 @@ function AddContactModal({ isOpen, onClose, type }: AddContactModalProps): React
       <div className={styles.modalDialog}>
         {/* Header */}
         <div className={styles.modalHeader}>
-          <h3 className={styles.modalTitle}>
-            Add {label}
-          </h3>
+          <h3 className={styles.modalTitle}>Add {label}</h3>
           <button onClick={onClose} className={styles.modalCloseButton}>
             <Close size={20} className={styles.closingIcon} />
           </button>
@@ -740,7 +732,15 @@ function AddContactModal({ isOpen, onClose, type }: AddContactModalProps): React
         <div className={styles.modalContent}>
           {success ? (
             <div className={styles.successMessage}>
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={cn(styles.successIcon, 'mx-auto mb-4')}>
+              <svg
+                width="48"
+                height="48"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                className={cn(styles.successIcon, 'mx-auto mb-4')}
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
               <p className={cn(styles.successText, 'font-semibold')}>{label} added!</p>
@@ -752,30 +752,22 @@ function AddContactModal({ isOpen, onClose, type }: AddContactModalProps): React
             <>
               <div className={styles.infoMessageBox}>
                 <p className={styles.infoMessageText}>
-                  Adding {isEmail ? 'an email' : 'a phone number'} gives you another way to sign in to your account.
+                  Adding {isEmail ? 'an email' : 'a phone number'} gives you another way to sign in
+                  to your account.
                 </p>
               </div>
 
-              {error && (
-                <div className={styles.errorBox}>
-                  {error}
-                </div>
-              )}
+              {error && <div className={styles.errorBox}>{error}</div>}
 
               <div className={styles.formField}>
-                <label className={styles.fieldLabel}>
-                  {label}
-                </label>
+                <label className={styles.fieldLabel}>{label}</label>
                 <input
                   type={inputType}
                   value={value}
-                  onChange={(e) => setValue(e.target.value)}
+                  onChange={e => setValue(e.target.value)}
                   placeholder={placeholder}
                   autoComplete={isEmail ? 'email' : 'tel'}
-                  className={cn(
-                    styles.fieldInput,
-                    value && !isValid && styles.fieldInputError
-                  )}
+                  className={cn(styles.fieldInput, value && !isValid && styles.fieldInputError)}
                 />
                 {value && !isValid && (
                   <span className={styles.fieldError}>
@@ -789,7 +781,7 @@ function AddContactModal({ isOpen, onClose, type }: AddContactModalProps): React
                 disabled={!isValid || isAdding}
                 className={cn(
                   styles.primaryButton,
-                  isValid ? styles.primaryButtonEnabled : styles.primaryButtonDisabled
+                  isValid ? styles.primaryButtonEnabled : styles.primaryButtonDisabled,
                 )}
               >
                 {isAdding ? (
@@ -820,24 +812,29 @@ interface EditNameModalProps {
   currentLastName: string;
 }
 
-function EditNameModal({ isOpen, onClose, currentFirstName, currentLastName }: EditNameModalProps): React.ReactElement | null {
+function EditNameModal({
+  isOpen,
+  onClose,
+  currentFirstName,
+  currentLastName,
+}: EditNameModalProps): React.ReactElement | null {
   const [firstName, setFirstName] = useState(currentFirstName);
   const [lastName, setLastName] = useState(currentLastName);
   const [isSaving, setIsSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const { updateProfile } = useAuth();
-  
+
   const isValid = firstName.trim().length >= 1 && lastName.trim().length >= 1;
   const hasChanges = firstName !== currentFirstName || lastName !== currentLastName;
-  
+
   const handleSave = async () => {
     if (!isValid || !hasChanges) return;
-    
+
     setIsSaving(true);
     setError(null);
-    
+
     try {
       await updateProfile({
         firstName: firstName.trim(),
@@ -855,7 +852,7 @@ function EditNameModal({ isOpen, onClose, currentFirstName, currentLastName }: E
       setIsSaving(false);
     }
   };
-  
+
   // Reset on open
   useEffect(() => {
     if (isOpen) {
@@ -865,7 +862,7 @@ function EditNameModal({ isOpen, onClose, currentFirstName, currentLastName }: E
       setSuccess(false);
     }
   }, [isOpen, currentFirstName, currentLastName]);
-  
+
   if (!isOpen) return null;
 
   return (
@@ -873,9 +870,7 @@ function EditNameModal({ isOpen, onClose, currentFirstName, currentLastName }: E
       <div className={styles.modalDialog}>
         {/* Header */}
         <div className={styles.modalHeader}>
-          <h3 className={styles.modalTitle}>
-            {currentFirstName ? 'Edit Name' : 'Add Name'}
-          </h3>
+          <h3 className={styles.modalTitle}>{currentFirstName ? 'Edit Name' : 'Add Name'}</h3>
           <button onClick={onClose} className={styles.modalCloseButton}>
             <Close size={20} className={styles.closingIcon} />
           </button>
@@ -885,27 +880,29 @@ function EditNameModal({ isOpen, onClose, currentFirstName, currentLastName }: E
         <div className={styles.modalContent}>
           {success ? (
             <div className={styles.successMessage}>
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={cn(styles.successIcon, 'mx-auto mb-4')}>
+              <svg
+                width="48"
+                height="48"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                className={cn(styles.successIcon, 'mx-auto mb-4')}
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
               <p className={cn(styles.successText, 'font-semibold')}>Name updated!</p>
             </div>
           ) : (
             <>
-              {error && (
-                <div className={styles.errorBox}>
-                  {error}
-                </div>
-              )}
+              {error && <div className={styles.errorBox}>{error}</div>}
 
               <div className={styles.formField}>
-                <label className={styles.fieldLabel}>
-                  First Name
-                </label>
+                <label className={styles.fieldLabel}>First Name</label>
                 <input
                   type="text"
                   value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
+                  onChange={e => setFirstName(e.target.value)}
                   placeholder="Enter first name"
                   autoComplete="given-name"
                   className={styles.fieldInput}
@@ -913,13 +910,11 @@ function EditNameModal({ isOpen, onClose, currentFirstName, currentLastName }: E
               </div>
 
               <div className={styles.formField}>
-                <label className={styles.fieldLabel}>
-                  Last Name
-                </label>
+                <label className={styles.fieldLabel}>Last Name</label>
                 <input
                   type="text"
                   value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
+                  onChange={e => setLastName(e.target.value)}
                   placeholder="Enter last name"
                   autoComplete="family-name"
                   className={styles.fieldInput}
@@ -931,7 +926,9 @@ function EditNameModal({ isOpen, onClose, currentFirstName, currentLastName }: E
                 disabled={!isValid || !hasChanges || isSaving}
                 className={cn(
                   styles.primaryButton,
-                  isValid && hasChanges ? styles.primaryButtonEnabled : styles.primaryButtonDisabled
+                  isValid && hasChanges
+                    ? styles.primaryButtonEnabled
+                    : styles.primaryButtonDisabled,
                 )}
               >
                 {isSaving ? (
@@ -971,46 +968,41 @@ export function ProfileSettingsModal({
   // Reset state when modal closes
   useEffect(() => {
     if (!isOpen) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
       setActiveTab('profile');
       setShowAddContactModal(null);
       setShowDeleteModal(false);
     }
   }, [isOpen]);
-  
+
   const tabs: { id: ProfileTab; label: string }[] = [
     { id: 'profile', label: 'Profile' },
     { id: 'preferences', label: 'Draft Alerts' },
     { id: 'security', label: 'Security' },
   ];
-  
+
   if (!isOpen) return null;
 
   return (
     <div
       className={styles.modal}
-      style={{
-        '--content-top-inset': `${contentTopInset}px`,
-      } as React.CSSProperties}
+      style={
+        {
+          '--content-top-inset': `${contentTopInset}px`,
+        } as React.CSSProperties
+      }
       data-inset={contentTopInset}
     >
       {/* Header — same top padding as Sign In/Sign Up/Forgot Password so X height is consistent */}
       <div className={styles.header}>
-        <h2 className={styles.headerTitle}>
-          Settings
-        </h2>
-        <button
-          onClick={onClose}
-          className={sharedStyles.closeButton}
-          aria-label="Close"
-        >
+        <h2 className={styles.headerTitle}>Settings</h2>
+        <button onClick={onClose} className={sharedStyles.closeButton} aria-label="Close">
           <Close size={24} className={styles.closingIcon} />
         </button>
       </div>
 
       {/* Tabs */}
       <div className={styles.tabsContainer}>
-        {tabs.map((tab) => (
+        {tabs.map(tab => (
           // eslint-disable-next-line jsx-a11y/role-supports-aria-props -- aria-selected is intentional for accessibility
           <button
             key={tab.id}
@@ -1019,9 +1011,7 @@ export function ProfileSettingsModal({
             aria-selected={activeTab === tab.id}
           >
             <span className={styles.tabLabel}>{tab.label}</span>
-            {activeTab === tab.id && (
-              <div className={styles.tabIndicator} />
-            )}
+            {activeTab === tab.id && <div className={styles.tabIndicator} />}
           </button>
         ))}
       </div>
@@ -1043,13 +1033,16 @@ export function ProfileSettingsModal({
       {/* Footer */}
       <div className={styles.footer}>
         <button
-          onClick={async () => { await signOut(); onClose(); }}
+          onClick={async () => {
+            await signOut();
+            onClose();
+          }}
           className={styles.signOutButton}
         >
           Sign Out
         </button>
       </div>
-      
+
       {/* Add Contact Modal */}
       <AddContactModal
         isOpen={showAddContactModal !== null}
@@ -1079,4 +1072,3 @@ export function ProfileSettingsModal({
 }
 
 export default ProfileSettingsModal;
-

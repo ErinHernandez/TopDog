@@ -1,20 +1,20 @@
 /**
  * useDeviceCapabilities Hook
- * 
+ *
  * React hook for accessing device capability information.
  * Detects iOS version, screen size, and feature support for legacy device handling.
- * 
+ *
  * @example
  * ```tsx
  * const { isLegacyDevice, supportTier, supportsFlexGap } = useDeviceCapabilities();
- * 
+ *
  * // Conditionally render based on device tier
  * if (isLegacyDevice) {
  *   return <SimplifiedComponent />;
  * }
  * return <FullFeaturedComponent />;
  * ```
- * 
+ *
  * Created: December 30, 2024
  */
 
@@ -37,7 +37,7 @@ import {
 
 /**
  * Hook to access device capabilities
- * 
+ *
  * @param applyClasses - Whether to apply CSS classes to html element (default: false)
  * @returns Device capabilities object
  */
@@ -67,7 +67,6 @@ export function useDeviceCapabilities(applyClasses = false): DeviceCapabilities 
   useEffect(() => {
     // Detect capabilities on mount (handles SSR -> client hydration)
     const detected = detectDeviceCapabilities();
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
     setCapabilities(detected);
 
     // Apply CSS classes if requested
@@ -125,10 +124,7 @@ export function useReducedAnimations(): boolean {
  */
 export function useAnimationDuration(baseDuration: number): number {
   useDeviceCapabilities(); // Read for side effects only
-  return useMemo(
-    () => getAnimationDuration(baseDuration),
-    [baseDuration]
-  );
+  return useMemo(() => getAnimationDuration(baseDuration), [baseDuration]);
 }
 
 /**
@@ -136,10 +132,7 @@ export function useAnimationDuration(baseDuration: number): number {
  */
 export function useBatchSize(): number {
   useDeviceCapabilities(); // Read for side effects only
-  return useMemo(
-    () => getRecommendedBatchSize(),
-    []
-  );
+  return useMemo(() => getRecommendedBatchSize(), []);
 }
 
 /**
@@ -147,10 +140,7 @@ export function useBatchSize(): number {
  */
 export function useDebounceDelay(): number {
   useDeviceCapabilities(); // Read for side effects only
-  return useMemo(
-    () => getRecommendedDebounceDelay(),
-    []
-  );
+  return useMemo(() => getRecommendedDebounceDelay(), []);
 }
 
 // ============================================================================
@@ -170,4 +160,3 @@ export {
 // ============================================================================
 
 export default useDeviceCapabilities;
-

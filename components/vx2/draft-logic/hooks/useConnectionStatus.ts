@@ -99,9 +99,7 @@ export function useConnectionStatus({
 }: UseConnectionStatusOptions = {}): UseConnectionStatusResult {
   // State
   const [state, setState] = useState<ConnectionState>('connecting');
-  const [isOnline, setIsOnline] = useState(
-    typeof window !== 'undefined' ? navigator.onLine : true
-  );
+  const [isOnline, setIsOnline] = useState(typeof window !== 'undefined' ? navigator.onLine : true);
   const [isFirestoreConnected, setIsFirestoreConnected] = useState(false);
   const [lastSyncAt, setLastSyncAt] = useState<number | null>(null);
   const [reconnectAttempts, setReconnectAttempts] = useState(0);
@@ -163,7 +161,6 @@ export function useConnectionStatus({
 
   useEffect(() => {
     if (!db) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
       setState('error');
       setErrorMessage('Firebase not initialized');
       return;
@@ -171,9 +168,7 @@ export function useConnectionStatus({
 
     // Monitor connection by subscribing to a lightweight document
     // We'll use the room document if available, otherwise use a health check doc
-    const monitorPath = roomId
-      ? `draftRooms/${roomId}`
-      : '.info/connected'; // Firestore doesn't have .info, so we'll use a different approach
+    const monitorPath = roomId ? `draftRooms/${roomId}` : '.info/connected'; // Firestore doesn't have .info, so we'll use a different approach
 
     // For room-specific monitoring
     if (roomId) {
@@ -200,7 +195,7 @@ export function useConnectionStatus({
             setLastSyncAt(Date.now());
           }
         },
-        (error) => {
+        error => {
           logger.error('Firestore subscription error', error as Error);
           setIsFirestoreConnected(false);
           setErrorMessage(error.message);
@@ -215,7 +210,7 @@ export function useConnectionStatus({
           }
 
           onDisconnectedRef.current?.();
-        }
+        },
       );
 
       return () => unsubscribe();
@@ -241,7 +236,7 @@ export function useConnectionStatus({
       const jitter = Math.random() * 1000; // Add up to 1 second of jitter
       return Math.min(exponentialDelay + jitter, maxReconnectDelay);
     },
-    [baseReconnectDelay, maxReconnectDelay]
+    [baseReconnectDelay, maxReconnectDelay],
   );
 
   const scheduleReconnect = useCallback(() => {
@@ -281,12 +276,12 @@ export function useConnectionStatus({
 
     logger.info('Attempting reconnection', { attempt: reconnectAttempts + 1 });
     setState('reconnecting');
-    setReconnectAttempts((prev) => prev + 1);
+    setReconnectAttempts(prev => prev + 1);
 
     try {
       // Force Firestore to reconnect by toggling network
       await disableNetwork(db);
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 500));
       await enableNetwork(db);
 
       // Connection restoration will be detected by the snapshot listener

@@ -1,25 +1,24 @@
 /**
  * TournamentCardV2 - CSS Grid-based tournament card with zero layout shift
- * 
+ *
  * Architecture:
  * - Main container: CSS Grid with 3 explicit rows
  * - Row 1: Title section (auto height, content-based)
  * - Row 2: Fixed spacer (24px)
  * - Row 3: Bottom section (auto height, contains nested grid)
- * 
+ *
  * Key Features:
  * - CSS containment isolates layout calculations
  * - All critical elements have fixed pixel heights
  * - No flexbox space-between dependencies
  * - Background layers are absolute-positioned (don't affect grid)
- * 
+ *
  * @module TournamentCardV2
  */
 
 import React, { useState, useEffect } from 'react';
 
 import { cn } from '@/lib/styles';
-
 
 // ============================================================================
 // IMPORTS
@@ -39,7 +38,8 @@ import styles from './TournamentCardV2.module.css';
  * Tiny blur placeholder (92 bytes) - displays instantly while full image loads
  * This is a base64-encoded WebP image, 20x27 pixels, heavily blurred
  */
-const BLUR_PLACEHOLDER = 'data:image/webp;base64,UklGRlQAAABXRUJQVlA4IEgAAABwAwCdASoUABsAPyl+uFOuKCWisAwBwCUJZQAAW+q+9Bpo4aAA/uvZ+YkAc4jvVTc7+oJAY99soPLjJTrwm3j5Y3VE0BWmGAA=';
+const BLUR_PLACEHOLDER =
+  'data:image/webp;base64,UklGRlQAAABXRUJQVlA4IEgAAABwAwCdASoUABsAPyl+uFOuKCWisAwBwCUJZQAAW+q+9Bpo4aAA/uvZ+YkAc4jvVTc7+oJAY99soPLjJTrwm3j5Y3VE0BWmGAA=';
 
 /**
  * Card dimension constants
@@ -65,7 +65,6 @@ const CARD_COLORS = {
   // Progress bar background (from LOBBY_THEME)
   progressBackground: LOBBY_THEME.progressBg,
 } as const;
-
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -140,12 +139,12 @@ interface BackgroundLayersProps {
 
 /**
  * BackgroundLayers - Renders blur placeholder and full image
- * 
+ *
  * Architecture:
  * - Two absolutely-positioned div layers
  * - Layer 1 (z-index: 0): Blur placeholder, visible immediately
  * - Layer 2 (z-index: 1): Full image, fades in when loaded
- * 
+ *
  * These layers are position: absolute, so they do NOT affect the grid layout.
  * This is critical for preventing layout shifts during image loading.
  */
@@ -158,24 +157,18 @@ function BackgroundLayers({
   originalUrl,
 }: BackgroundLayersProps): React.ReactElement {
   // Determine which image to show based on fallback status
-  const displayImageUrl = useFallback && originalUrl &&
-    (originalUrl.endsWith('.webp') || originalUrl.includes('.webp'))
-    ? CARD_COLORS.backgroundImagePng
-    : fullImageUrl;
+  const displayImageUrl =
+    useFallback && originalUrl && (originalUrl.endsWith('.webp') || originalUrl.includes('.webp'))
+      ? CARD_COLORS.backgroundImagePng
+      : fullImageUrl;
 
   return (
     <>
       {/* Layer 1: Blur placeholder - shows instantly */}
-      <div
-        aria-hidden="true"
-        className={styles.blurLayer}
-      />
+      <div aria-hidden="true" className={styles.blurLayer} />
 
       {/* Layer 2: Full image - fades in when loaded */}
-      <div
-        aria-hidden="true"
-        className={cn(styles.imageLayer, imageLoaded && styles.loaded)}
-      />
+      <div aria-hidden="true" className={cn(styles.imageLayer, imageLoaded && styles.loaded)} />
     </>
   );
 }
@@ -186,17 +179,16 @@ function BackgroundLayers({
 
 /**
  * TitleSection - Renders the tournament title
- * 
+ *
  * The title uses CSS containment to isolate its layout.
  * This prevents any potential shifts from affecting other elements.
  */
 function TitleSection(): React.ReactElement {
   return (
     <div className={styles.titleSectionWrapper}>
-      <h2
-        className={cn('vx2-tournament-title', styles.title)}
-      >
-        The TopDog<br />
+      <h2 className={cn('vx2-tournament-title', styles.title)}>
+        The TopDog
+        <br />
         International
       </h2>
     </div>
@@ -209,7 +201,7 @@ function TitleSection(): React.ReactElement {
 
 /**
  * TournamentCardV2 - Main tournament card component
- * 
+ *
  * This is a drop-in replacement for TournamentCard.
  * Same props interface, same visual output, but zero layout shifts.
  */
@@ -229,7 +221,7 @@ export function TournamentCardV2({
   // ----------------------------------------
   // Resolve style overrides
   // ----------------------------------------
-  
+
   // Determine the background image URL
   const resolvedBackground = styleOverrides.backgroundImage
     ? `url(${styleOverrides.backgroundImage})`
@@ -245,7 +237,6 @@ export function TournamentCardV2({
   useEffect(() => {
     // Skip preloading for data URLs (already embedded)
     if (!backgroundUrl || backgroundUrl.startsWith('data:')) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- loading data from preloader on mount
       setImageLoaded(true);
       return;
     }
@@ -330,10 +321,7 @@ export function TournamentCardV2({
         <TitleSection />
 
         {/* Grid Row 2: Flexible Spacer - expands to fill space */}
-        <div
-          className={styles.spacer}
-          aria-hidden="true"
-        />
+        <div className={styles.spacer} aria-hidden="true" />
 
         {/* Grid Row 3: Bottom Section - Uses flexbox to push content to bottom */}
         <div className={styles.bottomSectionWrapper}>
@@ -358,7 +346,7 @@ export function TournamentCardV2({
 
 /**
  * TournamentCardSkeleton - Loading state placeholder
- * 
+ *
  * Uses the same grid structure as the main card to prevent
  * layout shifts when the real content loads.
  */
@@ -387,7 +375,7 @@ export function TournamentCardSkeleton(): React.ReactElement {
 
         {/* Stats skeleton */}
         <div className={styles.skeletonStatsGrid}>
-          {[1, 2, 3].map((i) => (
+          {[1, 2, 3].map(i => (
             <div key={i} className={styles.skeletonStatItem}>
               <div className={styles.skeletonStatLabel} />
               <div className={styles.skeletonStatValue} />

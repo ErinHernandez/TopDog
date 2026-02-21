@@ -12,14 +12,16 @@ export function useIsMobileDevice(): boolean | null {
   useEffect(() => {
     const checkMobile = () => {
       const userAgent =
-        navigator.userAgent || navigator.vendor || (window as Window & { opera?: string }).opera || '';
+        navigator.userAgent ||
+        navigator.vendor ||
+        (window as Window & { opera?: string }).opera ||
+        '';
       const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
       const isNarrowScreen = window.innerWidth < 768;
       return mobileRegex.test(userAgent) || isNarrowScreen;
     };
 
     // Set immediately after mount
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
     setIsMobile(checkMobile());
 
     const handleResize = () => setIsMobile(checkMobile());

@@ -44,7 +44,6 @@ const PaymentSecurityDashboard = () => {
 
   useEffect(() => {
     // Initial load
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- calling async data loader on mount and interval setup
     refreshData();
 
     // Set up auto-refresh

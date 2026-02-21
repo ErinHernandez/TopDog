@@ -8,7 +8,6 @@ import { createScopedLogger } from '@/lib/clientLogger';
 import PaymentSecurityDashboard from '../components/PaymentSecurityDashboard';
 import { paymentSystem } from '../lib/paymentSystemIntegration';
 
-
 const logger = createScopedLogger('[PaymentSecurityDashboard]');
 
 interface AuthState {
@@ -47,17 +46,16 @@ function useSafeAuth() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- setting mounted flag for hydration safety
     setMounted(true);
     // Only use auth on client side - use Firebase auth directly
     // We don't use AuthContext here to avoid build-time issues
     if (typeof window !== 'undefined') {
       try {
         const auth = getAuth();
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
+        const unsubscribe = onAuthStateChanged(auth, user => {
           setAuthState({
             user: user,
-            isAuthenticated: !!user
+            isAuthenticated: !!user,
           });
         });
         return () => unsubscribe();
@@ -65,7 +63,7 @@ function useSafeAuth() {
         // Firebase not initialized, set default state
         setAuthState({
           user: null,
-          isAuthenticated: false
+          isAuthenticated: false,
         });
       }
     }
@@ -96,7 +94,7 @@ export default function PaymentSecurityDashboardPage() {
 
   useEffect(() => {
     if (!mounted) return;
-    
+
     const checkAdminAccess = async () => {
       // In development, allow access for testing (but still try to verify)
       if (process.env.NODE_ENV === 'development') {
@@ -107,12 +105,12 @@ export default function PaymentSecurityDashboardPage() {
             if (token) {
               const response = await fetch('/api/auth/verify-admin', {
                 headers: {
-                  'Authorization': `Bearer ${token}`,
+                  Authorization: `Bearer ${token}`,
                 },
               });
-              
+
               if (response.ok) {
-                const data = await response.json() as VerifyAdminResponse;
+                const data = (await response.json()) as VerifyAdminResponse;
                 if (data.isAdmin) {
                   // Admin verified, continue
                 } else {
@@ -132,40 +130,43 @@ export default function PaymentSecurityDashboardPage() {
           setLoading(false);
           return;
         }
-        
+
         try {
           const auth = getAuth();
           const token = await auth.currentUser?.getIdToken();
-          
+
           if (!token) {
             setError('Authentication token required.');
             setLoading(false);
             return;
           }
-          
+
           const response = await fetch('/api/auth/verify-admin', {
             headers: {
-              'Authorization': `Bearer ${token}`,
+              Authorization: `Bearer ${token}`,
             },
           });
-          
+
           if (!response.ok) {
-            const data = await response.json() as VerifyAdminResponse;
+            const data = (await response.json()) as VerifyAdminResponse;
             setError(data.error || 'Access denied. Admin privileges required.');
             setLoading(false);
             return;
           }
-          
-          const data = await response.json() as VerifyAdminResponse;
+
+          const data = (await response.json()) as VerifyAdminResponse;
           if (!data.isAdmin) {
             setError('Access denied. Admin privileges required.');
             setLoading(false);
             return;
           }
-          
+
           // Admin verified, continue
         } catch (err) {
-          logger.error('Admin verification error', err instanceof Error ? err : new Error(String(err)));
+          logger.error(
+            'Admin verification error',
+            err instanceof Error ? err : new Error(String(err)),
+          );
           setError('Failed to verify admin access. Please try again.');
           setLoading(false);
           return;
@@ -182,7 +183,7 @@ export default function PaymentSecurityDashboardPage() {
         setLoading(false);
       }
     };
-    
+
     checkAdminAccess();
   }, [user, isAuthenticated, mounted]);
 
@@ -217,7 +218,7 @@ export default function PaymentSecurityDashboardPage() {
           <div className="text-red-600 text-6xl mb-4">🚫</div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
           <p className="text-gray-600 mb-4">{error}</p>
-          <button 
+          <button
             onClick={() => window.history.back()}
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
           >
@@ -232,23 +233,25 @@ export default function PaymentSecurityDashboardPage() {
     <div>
       {/* System Status Banner */}
       {systemStatus && (
-        <div className={`w-full p-3 text-center text-sm font-medium ${
-          systemStatus.initialized && systemStatus.processors.healthPercentage > 90
-            ? 'bg-green-100 text-green-800'
-            : systemStatus.processors.healthPercentage > 70
-            ? 'bg-yellow-100 text-yellow-800'
-            : 'bg-red-100 text-red-800'
-        }`}>
-          🛡️ Payment System Status: {systemStatus.initialized ? 'OPERATIONAL' : 'INITIALIZING'} | 
-          {systemStatus.processors.healthy}/{systemStatus.processors.total} Processors Healthy ({systemStatus.processors.healthPercentage.toFixed(1)}%) |
-          {systemStatus.activeTransactions} Active Transactions |
-          Fraud Rate: {systemStatus.fraud.blockRate?.toFixed(2) || '0.00'}%
+        <div
+          className={`w-full p-3 text-center text-sm font-medium ${
+            systemStatus.initialized && systemStatus.processors.healthPercentage > 90
+              ? 'bg-green-100 text-green-800'
+              : systemStatus.processors.healthPercentage > 70
+                ? 'bg-yellow-100 text-yellow-800'
+                : 'bg-red-100 text-red-800'
+          }`}
+        >
+          🛡️ Payment System Status: {systemStatus.initialized ? 'OPERATIONAL' : 'INITIALIZING'} |
+          {systemStatus.processors.healthy}/{systemStatus.processors.total} Processors Healthy (
+          {systemStatus.processors.healthPercentage.toFixed(1)}%) |{systemStatus.activeTransactions}{' '}
+          Active Transactions | Fraud Rate: {systemStatus.fraud.blockRate?.toFixed(2) || '0.00'}%
         </div>
       )}
-      
+
       {/* Main Dashboard */}
       <PaymentSecurityDashboard />
-      
+
       {/* Development Notice */}
       {process.env.NODE_ENV === 'development' && (
         <div className="fixed bottom-4 right-4 bg-blue-600 text-white p-3 rounded-lg shadow-lg text-sm">

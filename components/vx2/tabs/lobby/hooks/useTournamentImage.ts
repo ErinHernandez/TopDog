@@ -1,10 +1,10 @@
 /**
  * useTournamentImage Hook
- * 
+ *
  * Handles image preloading for tournament background images.
  * Extracts image URL from CSS background values and preloads the image
  * to enable smooth fade-in transitions.
- * 
+ *
  * @module useTournamentImage
  */
 
@@ -28,17 +28,17 @@ export interface UseTournamentImageResult {
 
 /**
  * Hook to preload tournament background images
- * 
+ *
  * @param options - Configuration options
  * @returns Loading state and error state
- * 
+ *
  * @example
  * ```tsx
  * const { isLoaded } = useTournamentImage({
  *   image: 'url(/tournament-bg.webp)',
  *   placeholder: 'data:image/webp;base64,...',
  * });
- * 
+ *
  * <TournamentBackground
  *   image={image}
  *   placeholder={placeholder}
@@ -56,7 +56,6 @@ export function useTournamentImage({
 
   useEffect(() => {
     if (!enabled || !image) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
       setIsLoaded(true);
       return;
     }
@@ -90,12 +89,12 @@ export function useTournamentImage({
       if (imageUrl.endsWith('.webp') || imageUrl.includes('.webp')) {
         const pngUrl = imageUrl.replace('.webp', '.png').split('?')[0];
         const fallbackImg = new Image();
-        
+
         fallbackImg.onload = () => {
           setIsLoaded(true);
           setHasError(false);
         };
-        
+
         fallbackImg.onerror = () => {
           // Both failed, show anyway (will use fallback color)
           setIsLoaded(true);

@@ -17,7 +17,7 @@ import {
   SignInModal,
   ForgotPasswordModal,
   ProfileSettingsModal,
-  useAuth
+  useAuth,
 } from '../../components/vx2/auth';
 import MobilePhoneFrame from '../../components/vx2/shell/MobilePhoneFrame';
 import { useIsMobileDevice } from '../../hooks/useIsMobileDevice';
@@ -56,12 +56,8 @@ function AuthStatus(): JSX.Element {
           {profile?.username?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || '?'}
         </div>
         <div className={styles.authStatusUserInfo}>
-          <p className={styles.authStatusUsername}>
-            @{profile?.username || 'No username'}
-          </p>
-          <p className={styles.authStatusEmail}>
-            {user.email || 'No email'}
-          </p>
+          <p className={styles.authStatusUsername}>@{profile?.username || 'No username'}</p>
+          <p className={styles.authStatusEmail}>{user.email || 'No email'}</p>
         </div>
       </div>
 
@@ -74,16 +70,19 @@ function AuthStatus(): JSX.Element {
         </p>
         <p className={styles.authStatusDetailRow}>
           Email Verified:{' '}
-          <span style={{ color: user.emailVerified ? 'var(--color-state-success)' : 'var(--color-state-warning)' }}>
+          <span
+            style={{
+              color: user.emailVerified
+                ? 'var(--color-state-success)'
+                : 'var(--color-state-warning)',
+            }}
+          >
             {user.emailVerified ? 'Yes' : 'No'}
           </span>
         </p>
       </div>
 
-      <button
-        onClick={() => signOut()}
-        className={styles.authStatusSignOutButton}
-      >
+      <button onClick={() => signOut()} className={styles.authStatusSignOutButton}>
         Sign Out
       </button>
     </div>
@@ -96,10 +95,10 @@ function AuthStatus(): JSX.Element {
 
 function AuthTestContent(): JSX.Element {
   const [activeModal, setActiveModal] = useState<ModalType>(null);
-  
+
   const openModal = (modal: ModalType): void => setActiveModal(modal);
   const closeModal = (): void => setActiveModal(null);
-  
+
   return (
     <div className={styles.mainContainer}>
       {/* Phone: placeholder + modals under test render inside; modals go over safe area */}
@@ -108,13 +107,21 @@ function AuthTestContent(): JSX.Element {
           {!activeModal && (
             <div className={styles.emptyStateContent}>
               <div className={styles.emptyStateIcon}>
-                <svg className={styles.emptyStateIconSvg} viewBox="0 0 24 24" fill="none" strokeWidth="2">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" strokeLinecap="round" strokeLinejoin="round" stroke="currentColor"/>
+                <svg
+                  className={styles.emptyStateIconSvg}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  strokeWidth="2"
+                >
+                  <path
+                    d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    stroke="currentColor"
+                  />
                 </svg>
               </div>
-              <h2 className={styles.emptyStateTitle}>
-                Auth Components
-              </h2>
+              <h2 className={styles.emptyStateTitle}>Auth Components</h2>
               <p className={styles.emptyStateDescription}>
                 Select a modal from the controls panel to preview it here
               </p>
@@ -161,27 +168,19 @@ function AuthTestContent(): JSX.Element {
       <div className={styles.controlsPanel}>
         {/* Header */}
         <div className={styles.controlsHeader}>
-          <h1 className={styles.controlsTitle}>
-            Auth Components Test
-          </h1>
-          <p className={styles.controlsSubtitle}>
-            VX2 Authentication System
-          </p>
+          <h1 className={styles.controlsTitle}>Auth Components Test</h1>
+          <p className={styles.controlsSubtitle}>VX2 Authentication System</p>
         </div>
 
         {/* Auth Status */}
         <div className={styles.controlsSection}>
-          <h2 className={styles.controlsSectionTitle}>
-            Current Status
-          </h2>
+          <h2 className={styles.controlsSectionTitle}>Current Status</h2>
           <AuthStatus />
         </div>
 
         {/* Modal Buttons */}
         <div className={styles.controlsSection}>
-          <h2 className={styles.controlsSectionTitle}>
-            Open Modals
-          </h2>
+          <h2 className={styles.controlsSectionTitle}>Open Modals</h2>
           <div className="space-y-2">
             <button
               onClick={() => openModal('signup')}
@@ -223,9 +222,7 @@ function AuthTestContent(): JSX.Element {
 
         {/* Instructions */}
         <div className={styles.notesBox}>
-          <h3 className={styles.notesTitle}>
-            Testing Notes
-          </h3>
+          <h3 className={styles.notesTitle}>Testing Notes</h3>
           <ul className={styles.notesList}>
             <li className={styles.notesItem}>Firebase must be configured in .env.local</li>
             <li className={styles.notesItem}>Password: 8+ chars, uppercase, lowercase, number</li>
@@ -256,16 +253,11 @@ export default function Page(): JSX.Element {
   const isMobile = useIsMobileDevice();
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
     setIsClient(true);
   }, []);
 
   if (!isClient || isMobile === null) {
-    return (
-      <div className={styles.loadingScreen}>
-        Loading...
-      </div>
-    );
+    return <div className={styles.loadingScreen}>Loading...</div>;
   }
 
   // Auth Components Test is web-only — block access on real mobile devices
@@ -274,12 +266,10 @@ export default function Page(): JSX.Element {
       <div className={styles.mobileBlockScreen}>
         <p className={styles.mobileBlockMessage}>Auth Components Test is web-only</p>
         <p className={styles.mobileBlockDescription}>
-          Open this link on desktop to test auth modals and flows. They run outside the phone in the browser.
+          Open this link on desktop to test auth modals and flows. They run outside the phone in the
+          browser.
         </p>
-        <Link
-          href="/testing-grounds"
-          className={styles.backLink}
-        >
+        <Link href="/testing-grounds" className={styles.backLink}>
           Back to testing grounds
         </Link>
       </div>

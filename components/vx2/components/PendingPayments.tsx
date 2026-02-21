@@ -54,32 +54,48 @@ export interface PendingPaymentsProps {
 
 function getPaymentTypeLabel(type: PendingPaymentType): string {
   switch (type) {
-    case 'oxxo': return 'OXXO';
-    case 'boleto': return 'Boleto';
-    case 'pix': return 'Pix';
-    default: return 'Payment';
+    case 'oxxo':
+      return 'OXXO';
+    case 'boleto':
+      return 'Boleto';
+    case 'pix':
+      return 'Pix';
+    default:
+      return 'Payment';
   }
 }
 
 function getPaymentTypeDescription(type: PendingPaymentType): string {
   switch (type) {
-    case 'oxxo': return 'Pay at any OXXO store';
-    case 'boleto': return 'Pay at bank or lottery outlet';
-    case 'pix': return 'Scan QR code with banking app';
-    default: return 'Complete payment';
+    case 'oxxo':
+      return 'Pay at any OXXO store';
+    case 'boleto':
+      return 'Pay at bank or lottery outlet';
+    case 'pix':
+      return 'Scan QR code with banking app';
+    default:
+      return 'Complete payment';
   }
 }
 
 function getPaymentTypeIcon(type: PendingPaymentType): string {
   switch (type) {
-    case 'oxxo': return '🏪';
-    case 'boleto': return '🏦';
-    case 'pix': return '📱';
-    default: return '💳';
+    case 'oxxo':
+      return '🏪';
+    case 'boleto':
+      return '🏦';
+    case 'pix':
+      return '📱';
+    default:
+      return '💳';
   }
 }
 
-function formatTimeRemaining(expiresAt: string): { text: string; isExpiringSoon: boolean; isExpired: boolean } {
+function formatTimeRemaining(expiresAt: string): {
+  text: string;
+  isExpiringSoon: boolean;
+  isExpired: boolean;
+} {
   const now = new Date();
   const expires = new Date(expiresAt);
   const diff = expires.getTime() - now.getTime();
@@ -125,7 +141,6 @@ function PaymentCard({
 
   // Track mount state to prevent hydration mismatch with Date.now()
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- syncing external state on mount
     setIsMounted(true);
   }, []);
 
@@ -150,17 +165,13 @@ function PaymentCard({
         {/* Content */}
         <div className={styles.cardBody}>
           <div className={styles.cardHeader}>
-            <h4 className={styles.cardTitle}>
-              {getPaymentTypeLabel(payment.type)}
-            </h4>
+            <h4 className={styles.cardTitle}>{getPaymentTypeLabel(payment.type)}</h4>
             <span className={styles.cardAmount}>
               {formatSmallestUnit(payment.amount, { currency: payment.currency })}
             </span>
           </div>
 
-          <p className={styles.cardDescription}>
-            {getPaymentTypeDescription(payment.type)}
-          </p>
+          <p className={styles.cardDescription}>{getPaymentTypeDescription(payment.type)}</p>
 
           {/* Expiration */}
           <div className={styles.expirationContainer}>
@@ -171,7 +182,7 @@ function PaymentCard({
               <span
                 className={cn(
                   styles.expirationBadge,
-                  timeInfo.isExpiringSoon && styles.expiringSoon
+                  timeInfo.isExpiringSoon && styles.expiringSoon,
                 )}
               >
                 {timeInfo.text}
@@ -192,10 +203,7 @@ function PaymentCard({
             <button
               onClick={() => onCancel(payment.id)}
               disabled={isDisabled || isCancelling}
-              className={cn(
-                styles.cancelButton,
-                isCancelling && styles.cancelling
-              )}
+              className={cn(styles.cancelButton, isCancelling && styles.cancelling)}
             >
               {isCancelling ? '...' : 'Cancel'}
             </button>
@@ -260,39 +268,42 @@ export function PendingPayments({
   }, []);
 
   // Cancel payment
-  const handleCancel = useCallback(async (paymentId: string) => {
-    if (cancellingRef.current) return;
+  const handleCancel = useCallback(
+    async (paymentId: string) => {
+      if (cancellingRef.current) return;
 
-    cancellingRef.current = paymentId;
-    setCancellingId(paymentId);
+      cancellingRef.current = paymentId;
+      setCancellingId(paymentId);
 
-    try {
-      const response = await fetch('/api/stripe/cancel-payment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentIntentId: paymentId, userId }),
-      });
+      try {
+        const response = await fetch('/api/stripe/cancel-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ paymentIntentId: paymentId, userId }),
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (data.ok) {
-        setPayments(prev => prev.filter(p => p.id !== paymentId));
-        logger.debug('Payment cancelled', { paymentId });
-      } else {
-        const error = new Error(data.error || 'Failed to cancel payment');
-        logger.error('Failed to cancel payment', error);
+        if (data.ok) {
+          setPayments(prev => prev.filter(p => p.id !== paymentId));
+          logger.debug('Payment cancelled', { paymentId });
+        } else {
+          const error = new Error(data.error || 'Failed to cancel payment');
+          logger.error('Failed to cancel payment', error);
+        }
+      } catch (err) {
+        logger.error('Cancel payment error', err);
+      } finally {
+        cancellingRef.current = null;
+        setCancellingId(null);
       }
-    } catch (err) {
-      logger.error('Cancel payment error', err);
-    } finally {
-      cancellingRef.current = null;
-      setCancellingId(null);
-    }
-  }, [userId]);
+    },
+    [userId],
+  );
 
   // Filter to only show pending/active payments
-  const activePayments = payments.filter(p =>
-    p.status === 'pending' && new Date(p.expiresAt) > new Date()
+  const activePayments = payments.filter(
+    p => p.status === 'pending' && new Date(p.expiresAt) > new Date(),
   );
 
   // Don't render if no pending payments
@@ -340,9 +351,7 @@ export function PendingPayments({
             <span className={styles.spinner} />
           </div>
         ) : error ? (
-          <div className={styles.errorMessage}>
-            {error}
-          </div>
+          <div className={styles.errorMessage}>{error}</div>
         ) : (
           activePayments.map(payment => (
             <PaymentCard

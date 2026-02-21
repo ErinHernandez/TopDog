@@ -52,7 +52,6 @@ export function useWorkingLobbyConfig(): WorkingLobbyConfig | null {
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- setting state from event listener
     refresh();
     const onStorage = (e: StorageEvent) => {
       if (e.key === WORKING_LOBBY_CONFIG_KEY) refresh();

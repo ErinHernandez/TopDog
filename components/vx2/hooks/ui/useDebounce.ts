@@ -1,14 +1,14 @@
 /**
  * useDebounce - UI hook for debouncing values
- * 
+ *
  * Delays updating a value until after a specified delay.
  * Useful for search inputs, resize handlers, etc.
- * 
+ *
  * @example
  * ```tsx
  * const [searchQuery, setSearchQuery] = useState('');
  * const debouncedQuery = useDebounce(searchQuery, 300);
- * 
+ *
  * // Use debouncedQuery for API calls
  * useEffect(() => {
  *   if (debouncedQuery) {
@@ -40,17 +40,13 @@ export interface UseDebounceOptions {
 
 /**
  * Debounce a value
- * 
+ *
  * @param value - Value to debounce
  * @param delay - Delay in milliseconds
  * @param options - Additional options
  * @returns Debounced value
  */
-export function useDebounce<T>(
-  value: T, 
-  delay: number,
-  options: UseDebounceOptions = {}
-): T {
+export function useDebounce<T>(value: T, delay: number, options: UseDebounceOptions = {}): T {
   const { leading = false, maxWait } = options;
 
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
@@ -60,7 +56,6 @@ export function useDebounce<T>(
   useEffect(() => {
     // Handle leading edge
     if (leading && lastValueRef.current !== value) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- syncing debounced value on leading edge is intentional
       setDebouncedValue(value);
       lastUpdateRef.current = Date.now();
     }
@@ -76,7 +71,7 @@ export function useDebounce<T>(
     if (maxWait) {
       const timeSinceLastUpdate = Date.now() - lastUpdateRef.current;
       const remainingMaxWait = Math.max(0, maxWait - timeSinceLastUpdate);
-      
+
       if (remainingMaxWait < delay) {
         maxWaitHandler = setTimeout(() => {
           setDebouncedValue(value);
@@ -102,9 +97,9 @@ export function useDebounce<T>(
 
 /**
  * Return type for useDebouncedCallback
- * 
+ *
  * @template T - Function type to debounce (must be a function)
- * 
+ *
  * Note: Uses `any[]` for parameters so any callback signature is accepted; function signature is preserved via T.
  */
 export interface UseDebouncedCallbackResult<T extends (...args: any[]) => any> {
@@ -120,17 +115,17 @@ export interface UseDebouncedCallbackResult<T extends (...args: any[]) => any> {
 
 /**
  * Debounce a callback function
- * 
+ *
  * @template T - Function type to debounce (must be a function)
  * @param callback - Function to debounce
  * @param delay - Delay in milliseconds
  * @returns Debounced function with cancel/flush controls
- * 
+ *
  * Note: Uses `any[]` for parameters so any callback signature is accepted; function signature is preserved via T.
  */
 export function useDebouncedCallback<T extends (...args: any[]) => any>(
   callback: T,
-  delay: number
+  delay: number,
 ): UseDebouncedCallbackResult<T> {
   const callbackRef = useRef(callback);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -161,23 +156,26 @@ export function useDebouncedCallback<T extends (...args: any[]) => any>(
     }
   }, []);
 
-  const debouncedCallback = useCallback((...args: Parameters<T>) => {
-    argsRef.current = args;
-    setIsPending(true);
+  const debouncedCallback = useCallback(
+    (...args: Parameters<T>) => {
+      argsRef.current = args;
+      setIsPending(true);
 
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-    }
-
-    timerRef.current = setTimeout(() => {
-      if (argsRef.current) {
-        callbackRef.current(...argsRef.current);
-        argsRef.current = null;
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
       }
-      timerRef.current = null;
-      setIsPending(false);
-    }, delay);
-  }, [delay]) as T;
+
+      timerRef.current = setTimeout(() => {
+        if (argsRef.current) {
+          callbackRef.current(...argsRef.current);
+          argsRef.current = null;
+        }
+        timerRef.current = null;
+        setIsPending(false);
+      }, delay);
+    },
+    [delay],
+  ) as T;
 
   // Cleanup on unmount
   useEffect(() => {
@@ -197,4 +195,3 @@ export function useDebouncedCallback<T extends (...args: any[]) => any>(
 }
 
 export default useDebounce;
-

@@ -19,7 +19,6 @@ const nextConfig = {
   reactStrictMode: true,
 
   experimental: {
-    instrumentationHook: true,
     // Tree-shake heavy packages
     optimizePackageImports: [
       'lodash',

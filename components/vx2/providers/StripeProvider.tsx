@@ -1,16 +1,16 @@
 /**
  * Stripe Provider
- * 
+ *
  * Wraps the application with Stripe Elements provider.
  * Lazy-loads Stripe.js and configures appearance to match VX2 design system.
- * 
+ *
  * @example
  * ```tsx
  * // In _app.tsx or layout
  * <StripeProvider>
  *   <App />
  * </StripeProvider>
- * 
+ *
  * // In a component that needs Elements
  * import { useStripe, useElements } from '@stripe/react-stripe-js';
  * ```
@@ -23,7 +23,13 @@ import React, { useMemo, useState, useEffect } from 'react';
 
 import { createScopedLogger } from '@/lib/clientLogger';
 
-import { STATE_COLORS, TEXT_COLORS, BG_COLORS, BORDER_COLORS, UI_COLORS } from '../core/constants/colors';
+import {
+  STATE_COLORS,
+  TEXT_COLORS,
+  BG_COLORS,
+  BORDER_COLORS,
+  UI_COLORS,
+} from '../core/constants/colors';
 
 const logger = createScopedLogger('[StripeProvider]');
 
@@ -196,7 +202,7 @@ export interface StripeProviderProps {
 
 /**
  * Stripe Elements Provider
- * 
+ *
  * Wraps children with Stripe Elements context.
  * Can be used at the app level or around specific payment components.
  */
@@ -207,29 +213,30 @@ export function StripeProvider({
   locale = 'en',
 }: StripeProviderProps): React.ReactElement | null {
   const [stripeError, setStripeError] = useState<string | null>(null);
-  
+
   // Check if Stripe loaded successfully
   useEffect(() => {
     if (!stripePromise) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
       setStripeError('Stripe not configured');
       return;
     }
-    
-    stripePromise.then((stripe) => {
-      if (!stripe) {
-        setStripeError('Failed to load Stripe');
-      }
-    }).catch((error) => {
-      logger.warn(`Stripe load error: ${error}`);
-      setStripeError(error.message || 'Failed to load Stripe');
-    });
+
+    stripePromise
+      .then(stripe => {
+        if (!stripe) {
+          setStripeError('Failed to load Stripe');
+        }
+      })
+      .catch(error => {
+        logger.warn(`Stripe load error: ${error}`);
+        setStripeError(error.message || 'Failed to load Stripe');
+      });
   }, []);
-  
+
   // Merge custom appearance with VX2 defaults
   const finalAppearance = useMemo(() => {
     if (!appearance) return VX2_STRIPE_APPEARANCE;
-    
+
     return {
       ...VX2_STRIPE_APPEARANCE,
       ...appearance,
@@ -243,29 +250,31 @@ export function StripeProvider({
       },
     };
   }, [appearance]);
-  
+
   // Build Elements options
   const options: StripeElementsOptions = useMemo(() => {
     const opts: StripeElementsOptions = {
       appearance: finalAppearance,
       locale,
     };
-    
+
     if (clientSecret) {
       opts.clientSecret = clientSecret;
     }
-    
+
     return opts;
   }, [clientSecret, finalAppearance, locale]);
-  
+
   // Don't render if Stripe key is not configured or failed to load
   if (!stripePromise || stripeError) {
     if (process.env.NODE_ENV === 'development') {
-      logger.warn(`Stripe not available: ${stripeError || 'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY not configured'}`);
+      logger.warn(
+        `Stripe not available: ${stripeError || 'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY not configured'}`,
+      );
     }
     return <>{children}</>;
   }
-  
+
   return (
     <Elements stripe={stripePromise} options={options}>
       {children}
@@ -290,4 +299,3 @@ export function useStripeAvailable(): boolean {
 
 export { stripePromise };
 export default StripeProvider;
-

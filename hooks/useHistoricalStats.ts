@@ -1,6 +1,6 @@
 /**
  * React Hooks for Historical Player Statistics
- * 
+ *
  * Provides easy access to immutable historical NFL player data
  * from static JSON files.
  */
@@ -39,14 +39,14 @@ export function useHistoricalPlayer(playerId: string | null) {
 
   useEffect(() => {
     if (!playerId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
       setState({ data: null, loading: false, error: null });
       return;
     }
 
     setState(prev => ({ ...prev, loading: true, error: null }));
 
-    historicalService.getPlayer(playerId)
+    historicalService
+      .getPlayer(playerId)
       .then(data => setState({ data, loading: false, error: null }))
       .catch(error => setState({ data: null, loading: false, error }));
   }, [playerId]);
@@ -66,14 +66,14 @@ export function useHistoricalPlayerSearch(query: string) {
 
   useEffect(() => {
     if (!query || query.length < 2) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- initializing from query params
       setState({ data: null, loading: false, error: null });
       return;
     }
 
     setState(prev => ({ ...prev, loading: true, error: null }));
 
-    historicalService.searchPlayers(query)
+    historicalService
+      .searchPlayers(query)
       .then(data => setState({ data, loading: false, error: null }))
       .catch(error => setState({ data: null, loading: false, error }));
   }, [query]);
@@ -97,14 +97,14 @@ export function usePlayerSeasonStats(playerId: string | null, season: number) {
 
   useEffect(() => {
     if (!playerId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
       setState({ data: null, loading: false, error: null });
       return;
     }
 
     setState(prev => ({ ...prev, loading: true, error: null }));
 
-    historicalService.getPlayerSeasonStats(playerId, season)
+    historicalService
+      .getPlayerSeasonStats(playerId, season)
       .then(data => setState({ data, loading: false, error: null }))
       .catch(error => setState({ data: null, loading: false, error }));
   }, [playerId, season]);
@@ -124,14 +124,14 @@ export function usePlayerAllSeasons(playerId: string | null) {
 
   useEffect(() => {
     if (!playerId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
       setState({ data: null, loading: false, error: null });
       return;
     }
 
     setState(prev => ({ ...prev, loading: true, error: null }));
 
-    historicalService.getPlayerAllSeasons(playerId)
+    historicalService
+      .getPlayerAllSeasons(playerId)
       .then(data => setState({ data, loading: false, error: null }))
       .catch(error => setState({ data: null, loading: false, error }));
   }, [playerId]);
@@ -145,7 +145,7 @@ export function usePlayerAllSeasons(playerId: string | null) {
 export function useTopPerformers(
   position: 'QB' | 'RB' | 'WR' | 'TE',
   season: number,
-  limit: number = 20
+  limit: number = 20,
 ) {
   const [state, setState] = useState<UseHistoricalStatsState<SeasonStats[]>>({
     data: null,
@@ -154,10 +154,10 @@ export function useTopPerformers(
   });
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
     setState(prev => ({ ...prev, loading: true, error: null }));
 
-    historicalService.getTopPerformers(position, season, limit)
+    historicalService
+      .getTopPerformers(position, season, limit)
       .then(data => setState({ data, loading: false, error: null }))
       .catch(error => setState({ data: null, loading: false, error }));
   }, [position, season, limit]);
@@ -176,7 +176,8 @@ export function useHistoricalDataAvailable() {
   const [available, setAvailable] = useState<boolean | null>(null);
 
   useEffect(() => {
-    historicalService.isHistoricalDataAvailable()
+    historicalService
+      .isHistoricalDataAvailable()
       .then(setAvailable)
       .catch(() => setAvailable(false));
   }, []);
@@ -191,7 +192,8 @@ export function useAvailableSeasons() {
   const [seasons, setSeasons] = useState<number[]>([]);
 
   useEffect(() => {
-    historicalService.getAvailableSeasons()
+    historicalService
+      .getAvailableSeasons()
       .then(setSeasons)
       .catch(() => setSeasons([]));
   }, []);
@@ -209,7 +211,7 @@ export function usePreloadHistoricalData() {
 
   const preload = useCallback(async () => {
     if (preloaded) return;
-    
+
     setLoading(true);
     try {
       await historicalService.preloadHistoricalData();
@@ -337,15 +339,13 @@ function calculateCareerTotals(seasons: SeasonStats[]): CareerTotals {
   }
 
   // Calculate average PPG
-  totals.avgHalfPprPpg = totals.gamesPlayed > 0
-    ? Math.round((totals.totalHalfPprPoints / totals.gamesPlayed) * 10) / 10
-    : 0;
+  totals.avgHalfPprPpg =
+    totals.gamesPlayed > 0
+      ? Math.round((totals.totalHalfPprPoints / totals.gamesPlayed) * 10) / 10
+      : 0;
 
   // Round total points
   totals.totalHalfPprPoints = Math.round(totals.totalHalfPprPoints * 10) / 10;
 
   return totals;
 }
-
-
-

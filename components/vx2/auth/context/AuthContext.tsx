@@ -23,13 +23,8 @@
  * All business logic is delegated to service modules in ./services/
  */
 
-import {
-  getAuth,
-  onAuthStateChanged,
-} from 'firebase/auth';
-import {
-  getFirestore,
-} from 'firebase/firestore';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 import React, {
   createContext,
   useReducer,
@@ -62,11 +57,7 @@ import type {
 } from '../types';
 
 // Import service modules
-import {
-  calculateProfileCompleteness,
-  createAuthError,
-  firebaseUserToAuthUser,
-} from './services';
+import { calculateProfileCompleteness, createAuthError, firebaseUserToAuthUser } from './services';
 import * as AccountLinkingService from './services/AccountLinking';
 import * as AnonymousAuthService from './services/AnonymousAuth';
 import { setupAuthStateListener } from './services/AuthStateManager';
@@ -125,9 +116,7 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
     }
 
     case 'PROFILE_UPDATED': {
-      const updatedProfile = state.profile
-        ? { ...state.profile, ...action.payload.profile }
-        : null;
+      const updatedProfile = state.profile ? { ...state.profile, ...action.payload.profile } : null;
       const completeness = calculateProfileCompleteness(state.user, updatedProfile);
 
       return {
@@ -237,7 +226,8 @@ export function AuthProvider({
   }, []);
 
   // Build-time detection: used for conditional render only (all hooks must run first)
-  const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build' ||
+  const isBuildPhase =
+    process.env.NEXT_PHASE === 'phase-production-build' ||
     process.env.NEXT_PHASE === 'phase-export';
   const isSSR = typeof window === 'undefined';
   const isVercelBuild = process.env.VERCEL === '1';
@@ -272,7 +262,9 @@ export function AuthProvider({
 
     const timeoutId = setTimeout(() => {
       if (state.isInitializing) {
-        logger.warn('[AuthContext] Auth never initialized after 10s - forcing INITIALIZATION_COMPLETE');
+        logger.warn(
+          '[AuthContext] Auth never initialized after 10s - forcing INITIALIZATION_COMPLETE',
+        );
         dispatch({ type: 'INITIALIZATION_COMPLETE' });
       }
     }, 10000);
@@ -282,49 +274,58 @@ export function AuthProvider({
 
   // ========== Email/Password Auth ==========
 
-  const signUpWithEmail = useCallback(async (data: EmailSignUpData): Promise<SignUpResult> => {
-    if (!auth || !db) {
-      return { success: false, error: createAuthError(new Error('Auth not initialized')) };
-    }
+  const signUpWithEmail = useCallback(
+    async (data: EmailSignUpData): Promise<SignUpResult> => {
+      if (!auth || !db) {
+        return { success: false, error: createAuthError(new Error('Auth not initialized')) };
+      }
 
-    dispatch({ type: 'AUTH_LOADING' });
+      dispatch({ type: 'AUTH_LOADING' });
 
-    const result = await EmailPasswordAuthService.signUpWithEmail({ auth, db }, data);
-    if (!result.success) {
-      dispatch({ type: 'AUTH_ERROR', payload: { error: result.error! } });
-    }
-    return result;
-  }, [auth, db]);
+      const result = await EmailPasswordAuthService.signUpWithEmail({ auth, db }, data);
+      if (!result.success) {
+        dispatch({ type: 'AUTH_ERROR', payload: { error: result.error! } });
+      }
+      return result;
+    },
+    [auth, db],
+  );
 
-  const signInWithEmail = useCallback(async (data: EmailSignInData): Promise<SignInResult> => {
-    dispatch({ type: 'AUTH_LOADING' });
+  const signInWithEmail = useCallback(
+    async (data: EmailSignInData): Promise<SignInResult> => {
+      dispatch({ type: 'AUTH_LOADING' });
 
-    if (!auth || !db) {
-      return { success: false, error: createAuthError(new Error('Auth not initialized')) };
-    }
+      if (!auth || !db) {
+        return { success: false, error: createAuthError(new Error('Auth not initialized')) };
+      }
 
-    const result = await EmailPasswordAuthService.signInWithEmail({ auth, db }, data);
-    if (!result.success) {
-      dispatch({ type: 'AUTH_ERROR', payload: { error: result.error! } });
-    }
-    return result;
-  }, [auth, db]);
+      const result = await EmailPasswordAuthService.signInWithEmail({ auth, db }, data);
+      if (!result.success) {
+        dispatch({ type: 'AUTH_ERROR', payload: { error: result.error! } });
+      }
+      return result;
+    },
+    [auth, db],
+  );
 
   // ========== Phone Auth ==========
 
-  const signInWithPhone = useCallback(async (data: PhoneAuthData): Promise<PhoneVerifyResult> => {
-    if (!auth) {
-      return { success: false, error: createAuthError(new Error('Auth not initialized')) };
-    }
+  const signInWithPhone = useCallback(
+    async (data: PhoneAuthData): Promise<PhoneVerifyResult> => {
+      if (!auth) {
+        return { success: false, error: createAuthError(new Error('Auth not initialized')) };
+      }
 
-    dispatch({ type: 'AUTH_LOADING' });
+      dispatch({ type: 'AUTH_LOADING' });
 
-    const result = await PhoneAuthService.signInWithPhone(auth, phoneAuthStateRef.current, data);
-    if (!result.success) {
-      dispatch({ type: 'AUTH_ERROR', payload: { error: result.error! } });
-    }
-    return result;
-  }, [auth]);
+      const result = await PhoneAuthService.signInWithPhone(auth, phoneAuthStateRef.current, data);
+      if (!result.success) {
+        dispatch({ type: 'AUTH_ERROR', payload: { error: result.error! } });
+      }
+      return result;
+    },
+    [auth],
+  );
 
   const verifyPhoneCode = useCallback(async (data: PhoneVerifyData): Promise<SignInResult> => {
     dispatch({ type: 'AUTH_LOADING' });
@@ -370,84 +371,106 @@ export function AuthProvider({
 
   // ========== Profile Management ==========
 
-  const updateProfile = useCallback(async (data: ProfileUpdateData): Promise<AuthResult> => {
-    if (!db || !state.user) {
-      return { success: false, error: createAuthError(new Error('Not authenticated')) };
-    }
+  const updateProfile = useCallback(
+    async (data: ProfileUpdateData): Promise<AuthResult> => {
+      if (!db || !state.user) {
+        return { success: false, error: createAuthError(new Error('Not authenticated')) };
+      }
 
-    const result = await ProfileServiceModule.updateProfile({ db }, state.user, state.profile, data);
-    if (result.success) {
-      dispatch({
-        type: 'PROFILE_UPDATED',
-        payload: {
-          profile: {
-            ...data,
-            updatedAt: new Date(),
-          } as Partial<UserProfile>,
-        },
-      });
-    }
-    return result;
-  }, [db, state.user, state.profile]);
-
-  const changeUsername = useCallback(async (data: UsernameChangeData): Promise<AuthResult> => {
-    if (!db || !state.user) {
-      return { success: false, error: createAuthError(new Error('Not authenticated')) };
-    }
-
-    const result = await ProfileServiceModule.changeUsername({ db }, state.user, state.profile, data);
-    if (result.success) {
-      dispatch({
-        type: 'PROFILE_UPDATED',
-        payload: {
-          profile: {
-            username: data.newUsername.toLowerCase(),
-            updatedAt: new Date(),
+      const result = await ProfileServiceModule.updateProfile(
+        { db },
+        state.user,
+        state.profile,
+        data,
+      );
+      if (result.success) {
+        dispatch({
+          type: 'PROFILE_UPDATED',
+          payload: {
+            profile: {
+              ...data,
+              updatedAt: new Date(),
+            } as Partial<UserProfile>,
           },
-        },
-      });
-    }
-    return result;
-  }, [db, state.user, state.profile]);
+        });
+      }
+      return result;
+    },
+    [db, state.user, state.profile],
+  );
 
-  const deleteAccount = useCallback(async (password?: string): Promise<AuthResult> => {
-    if (!auth || !db || !state.user) {
-      return { success: false, error: createAuthError(new Error('Not authenticated')) };
-    }
+  const changeUsername = useCallback(
+    async (data: UsernameChangeData): Promise<AuthResult> => {
+      if (!db || !state.user) {
+        return { success: false, error: createAuthError(new Error('Not authenticated')) };
+      }
 
-    const currentUser = auth.currentUser;
-    if (!currentUser) {
-      return { success: false, error: createAuthError(new Error('Not authenticated')) };
-    }
+      const result = await ProfileServiceModule.changeUsername(
+        { db },
+        state.user,
+        state.profile,
+        data,
+      );
+      if (result.success) {
+        dispatch({
+          type: 'PROFILE_UPDATED',
+          payload: {
+            profile: {
+              username: data.newUsername.toLowerCase(),
+              updatedAt: new Date(),
+            },
+          },
+        });
+      }
+      return result;
+    },
+    [db, state.user, state.profile],
+  );
 
-    try {
-      // Email/password users must re-authenticate with password before deletion
-      if (currentUser.email && password != null && password.length > 0) {
-        const reauthResult = await AccountLinkingService.reauthenticateWithEmail(
-          { auth },
-          currentUser.email,
-          password
-        );
-        if (!reauthResult.success) {
-          return reauthResult;
+  const deleteAccount = useCallback(
+    async (password?: string): Promise<AuthResult> => {
+      if (!auth || !db || !state.user) {
+        return { success: false, error: createAuthError(new Error('Not authenticated')) };
+      }
+
+      const currentUser = auth.currentUser;
+      if (!currentUser) {
+        return { success: false, error: createAuthError(new Error('Not authenticated')) };
+      }
+
+      try {
+        // Email/password users must re-authenticate with password before deletion
+        if (currentUser.email && password != null && password.length > 0) {
+          const reauthResult = await AccountLinkingService.reauthenticateWithEmail(
+            { auth },
+            currentUser.email,
+            password,
+          );
+          if (!reauthResult.success) {
+            return reauthResult;
+          }
+        } else if (currentUser.email && !currentUser.isAnonymous) {
+          return {
+            success: false,
+            error: createAuthError(new Error('Password required to delete account')),
+          };
         }
-      } else if (currentUser.email && !currentUser.isAnonymous) {
-        return { success: false, error: createAuthError(new Error('Password required to delete account')) };
-      }
 
-      // Delete Firestore profile
-      const deleteResult = await ProfileServiceModule.deleteAccountData({ db }, state.user);
-      if (deleteResult.success) {
-        // Delete Firebase user
-        await currentUser.delete();
-        dispatch({ type: 'SIGN_OUT' });
+        // Delete Firestore profile
+        const deleteResult = await ProfileServiceModule.deleteAccountData({ db }, state.user);
+        if (deleteResult.success) {
+          // Delete Firebase user
+          await currentUser.delete();
+          dispatch({ type: 'SIGN_OUT' });
+        }
+        return deleteResult;
+      } catch (error) {
+        const authError = createAuthError(error);
+        return { success: false, error: authError };
       }
-      return deleteResult;
-    } catch (error) {
-      const authError = createAuthError(error);
-      return { success: false, error: authError };
-    }
-  }, [auth, db, state.user]);
+    },
+    [auth, db, state.user],
+  );
 
   // ========== Email Actions ==========
 
@@ -463,40 +486,54 @@ export function AuthProvider({
     return result;
   }, [auth]);
 
-  const sendPasswordResetEmail = useCallback(async (email: string): Promise<AuthResult> => {
-    if (!auth || !db) {
-      return { success: false, error: createAuthError(new Error('Auth not initialized')) };
-    }
+  const sendPasswordResetEmail = useCallback(
+    async (email: string): Promise<AuthResult> => {
+      if (!auth || !db) {
+        return { success: false, error: createAuthError(new Error('Auth not initialized')) };
+      }
 
-    const result = await EmailPasswordAuthService.sendPasswordResetEmail({ auth, db }, email);
-    if (!result.success) {
-      dispatch({ type: 'AUTH_ERROR', payload: { error: result.error! } });
-    }
-    return result;
-  }, [auth, db]);
+      const result = await EmailPasswordAuthService.sendPasswordResetEmail({ auth, db }, email);
+      if (!result.success) {
+        dispatch({ type: 'AUTH_ERROR', payload: { error: result.error! } });
+      }
+      return result;
+    },
+    [auth, db],
+  );
 
   // ========== Account Linking ==========
 
-  const linkEmailPassword = useCallback(async (email: string, password: string): Promise<AuthResult> => {
-    if (!auth) {
-      return { success: false, error: createAuthError(new Error('Auth not initialized')) };
-    }
+  const linkEmailPassword = useCallback(
+    async (email: string, password: string): Promise<AuthResult> => {
+      if (!auth) {
+        return { success: false, error: createAuthError(new Error('Auth not initialized')) };
+      }
 
-    const result = await AccountLinkingService.linkEmailPassword({ auth }, email, password);
-    if (!result.success) {
-      dispatch({ type: 'AUTH_ERROR', payload: { error: result.error! } });
-    }
-    return result;
-  }, [auth]);
+      const result = await AccountLinkingService.linkEmailPassword({ auth }, email, password);
+      if (!result.success) {
+        dispatch({ type: 'AUTH_ERROR', payload: { error: result.error! } });
+      }
+      return result;
+    },
+    [auth],
+  );
 
-  const linkPhoneNumber = useCallback(async (phoneNumber: string): Promise<PhoneVerifyResult> => {
-    if (!auth) {
-      return { success: false, error: createAuthError(new Error('Auth not initialized')) };
-    }
+  const linkPhoneNumber = useCallback(
+    async (phoneNumber: string): Promise<PhoneVerifyResult> => {
+      if (!auth) {
+        return { success: false, error: createAuthError(new Error('Auth not initialized')) };
+      }
 
-    const countryCode = state.profile?.countryCode || 'US';
-    return AccountLinkingService.linkPhoneNumber(auth, phoneAuthStateRef.current, phoneNumber, countryCode);
-  }, [auth, state.profile?.countryCode]);
+      const countryCode = state.profile?.countryCode || 'US';
+      return AccountLinkingService.linkPhoneNumber(
+        auth,
+        phoneAuthStateRef.current,
+        phoneNumber,
+        countryCode,
+      );
+    },
+    [auth, state.profile?.countryCode],
+  );
 
   // ========== Utilities ==========
 
@@ -518,51 +555,54 @@ export function AuthProvider({
 
   // ========== Context Value ==========
 
-  const value = useMemo<AuthContextValue>(() => ({
-    state,
-    user: state.user,
-    profile: state.profile,
-    isAuthenticated: state.status === 'authenticated' && !!state.user,
-    isLoading: state.isLoading || state.isInitializing,
-    error: state.error,
+  const value = useMemo<AuthContextValue>(
+    () => ({
+      state,
+      user: state.user,
+      profile: state.profile,
+      isAuthenticated: state.status === 'authenticated' && !!state.user,
+      isLoading: state.isLoading || state.isInitializing,
+      error: state.error,
 
-    signUpWithEmail,
-    signInWithEmail,
-    signInWithPhone,
-    verifyPhoneCode,
-    signInAnonymously,
-    signOut,
+      signUpWithEmail,
+      signInWithEmail,
+      signInWithPhone,
+      verifyPhoneCode,
+      signInAnonymously,
+      signOut,
 
-    updateProfile,
-    changeUsername,
-    deleteAccount,
+      updateProfile,
+      changeUsername,
+      deleteAccount,
 
-    sendVerificationEmail,
-    sendPasswordResetEmail,
+      sendVerificationEmail,
+      sendPasswordResetEmail,
 
-    linkEmailPassword,
-    linkPhoneNumber,
+      linkEmailPassword,
+      linkPhoneNumber,
 
-    refreshProfile,
-    clearError,
-  }), [
-    state,
-    signUpWithEmail,
-    signInWithEmail,
-    signInWithPhone,
-    verifyPhoneCode,
-    signInAnonymously,
-    signOut,
-    updateProfile,
-    changeUsername,
-    deleteAccount,
-    sendVerificationEmail,
-    sendPasswordResetEmail,
-    linkEmailPassword,
-    linkPhoneNumber,
-    refreshProfile,
-    clearError,
-  ]);
+      refreshProfile,
+      clearError,
+    }),
+    [
+      state,
+      signUpWithEmail,
+      signInWithEmail,
+      signInWithPhone,
+      verifyPhoneCode,
+      signInAnonymously,
+      signOut,
+      updateProfile,
+      changeUsername,
+      deleteAccount,
+      sendVerificationEmail,
+      sendPasswordResetEmail,
+      linkEmailPassword,
+      linkPhoneNumber,
+      refreshProfile,
+      clearError,
+    ],
+  );
 
   // Use safe defaults during build/SSR/before mount; otherwise use real auth value
   const providerValue = useSafeDefaults ? createBuildTimeSafeDefaults() : value;
@@ -663,7 +703,6 @@ export function useAuthContext(): AuthContextValue {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
     setIsMounted(true);
   }, []);
 
@@ -685,7 +724,8 @@ export function useAuthContext(): AuthContextValue {
 
   // Additional build-time detection for extra safety
   // Check multiple conditions to catch all build/prerender scenarios
-  const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build' ||
+  const isBuildPhase =
+    process.env.NEXT_PHASE === 'phase-production-build' ||
     process.env.NEXT_PHASE === 'phase-export';
   const isPrerender = process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE;
 

@@ -1,6 +1,6 @@
 /**
  * useLocationConsent Hook
- * 
+ *
  * Manages location consent state with real-time Firebase updates.
  */
 
@@ -10,7 +10,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/components/vx2/auth/hooks/useAuth';
 import { createScopedLogger } from '@/lib/clientLogger';
 import { db } from '@/lib/firebase';
-import { 
+import {
   getConsent,
   updateConsent as updateConsentFn,
   incrementPromptCount,
@@ -46,11 +46,10 @@ export function useLocationConsent(): UseLocationConsentReturn {
   const [consent, setConsent] = useState<LocationConsent | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  
+
   // Real-time listener for consent changes
   useEffect(() => {
     if (!userId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- setting state from event listener
       setConsent(null);
       setIsLoading(false);
       return;
@@ -66,14 +65,14 @@ export function useLocationConsent(): UseLocationConsentReturn {
     setError(null);
 
     const docRef = doc(db, 'userLocations', userId);
-    
+
     const unsubscribe = onSnapshot(
       docRef,
-      (snap) => {
+      snap => {
         if (snap.exists()) {
           const data = snap.data();
           const consentData = data?.consent;
-          
+
           if (consentData) {
             setConsent({
               status: consentData.status || 'pending',
@@ -99,27 +98,33 @@ export function useLocationConsent(): UseLocationConsentReturn {
         }
         setIsLoading(false);
       },
-      (err) => {
-        logger.error('Consent subscription error:', err instanceof Error ? err : new Error(String(err)));
+      err => {
+        logger.error(
+          'Consent subscription error:',
+          err instanceof Error ? err : new Error(String(err)),
+        );
         setError(err);
         setIsLoading(false);
-      }
+      },
     );
-    
+
     return () => unsubscribe();
   }, [userId]);
-  
-  const grantConsent = useCallback(async (dontAskAgain = false) => {
-    if (!userId) return;
 
-    try {
-      await updateConsentFn(userId, 'granted', dontAskAgain);
-    } catch (err) {
-      setError(err as Error);
-      throw err;
-    }
-  }, [userId]);
-  
+  const grantConsent = useCallback(
+    async (dontAskAgain = false) => {
+      if (!userId) return;
+
+      try {
+        await updateConsentFn(userId, 'granted', dontAskAgain);
+      } catch (err) {
+        setError(err as Error);
+        throw err;
+      }
+    },
+    [userId],
+  );
+
   const revokeConsent = useCallback(async () => {
     if (!userId) return;
 
@@ -130,21 +135,24 @@ export function useLocationConsent(): UseLocationConsentReturn {
       throw err;
     }
   }, [userId]);
-  
-  const dismissPrompt = useCallback(async (dontAskAgain = false) => {
-    if (!userId) return;
 
-    try {
-      if (dontAskAgain) {
-        await updateConsentFn(userId, 'denied', true);
-      } else {
-        await incrementPromptCount(userId);
+  const dismissPrompt = useCallback(
+    async (dontAskAgain = false) => {
+      if (!userId) return;
+
+      try {
+        if (dontAskAgain) {
+          await updateConsentFn(userId, 'denied', true);
+        } else {
+          await incrementPromptCount(userId);
+        }
+      } catch (err) {
+        setError(err as Error);
+        throw err;
       }
-    } catch (err) {
-      setError(err as Error);
-      throw err;
-    }
-  }, [userId]);
+    },
+    [userId],
+  );
 
   return {
     consent,

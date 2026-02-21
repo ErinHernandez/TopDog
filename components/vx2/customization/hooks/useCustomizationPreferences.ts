@@ -18,7 +18,6 @@ export function useCustomizationPreferences(): {
 
   useEffect(() => {
     if (!user?.uid) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
       setPreferences(null);
       setIsLoading(false);
       return;
@@ -26,7 +25,7 @@ export function useCustomizationPreferences(): {
 
     const unsubscribe = subscribeToPreferences(
       user.uid,
-      (prefs) => {
+      prefs => {
         setPreferences(prefs);
         setIsLoading(false);
       },
@@ -34,7 +33,7 @@ export function useCustomizationPreferences(): {
         // On error, use defaults
         setPreferences(DEFAULT_PREFERENCES);
         setIsLoading(false);
-      }
+      },
     );
 
     return unsubscribe;

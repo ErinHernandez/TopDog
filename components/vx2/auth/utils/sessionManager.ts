@@ -1,6 +1,6 @@
 /**
  * VX2 Session Manager
- * 
+ *
  * Client-side session management for auth:
  * - Session timeout detection
  * - Activity tracking
@@ -30,12 +30,7 @@ interface SessionState {
   tabId: string;
 }
 
-type SessionEventType = 
-  | 'activity'
-  | 'warning'
-  | 'timeout'
-  | 'extended'
-  | 'tab_conflict';
+type SessionEventType = 'activity' | 'warning' | 'timeout' | 'extended' | 'tab_conflict';
 
 interface SessionEvent {
   type: SessionEventType;
@@ -65,32 +60,32 @@ export class SessionManager {
   private activityHandler: (() => void) | null = null;
   private checkInterval: NodeJS.Timeout | null = null;
   private listeners: Map<SessionEventType, Set<(event: SessionEvent) => void>> = new Map();
-  
+
   constructor(config: Partial<SessionConfig> = {}) {
     this.config = { ...DEFAULT_CONFIG, ...config };
     this.tabId = this.generateTabId();
   }
-  
+
   /**
    * Generate unique tab ID
    */
   private generateTabId(): string {
     return `tab_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
-  
+
   /**
    * Get storage key
    */
   private getKey(suffix: string): string {
     return `${this.config.keyPrefix}${suffix}`;
   }
-  
+
   /**
    * Get session state from storage
    */
   private getState(): SessionState | null {
     if (typeof window === 'undefined') return null;
-    
+
     try {
       const stored = localStorage.getItem(this.getKey('state'));
       if (!stored) return null;
@@ -99,33 +94,33 @@ export class SessionManager {
       return null;
     }
   }
-  
+
   /**
    * Save session state to storage
    */
   private setState(state: SessionState): void {
     if (typeof window === 'undefined') return;
-    
+
     try {
       localStorage.setItem(this.getKey('state'), JSON.stringify(state));
     } catch {
       // Storage unavailable
     }
   }
-  
+
   /**
    * Clear session state
    */
   private clearState(): void {
     if (typeof window === 'undefined') return;
-    
+
     try {
       localStorage.removeItem(this.getKey('state'));
     } catch {
       // Ignore errors
     }
   }
-  
+
   /**
    * Emit event to listeners
    */
@@ -135,77 +130,77 @@ export class SessionManager {
       timestamp: Date.now(),
       data,
     };
-    
+
     const typeListeners = this.listeners.get(type);
     if (typeListeners) {
       typeListeners.forEach(listener => listener(event));
     }
   }
-  
+
   /**
    * Handle user activity
    */
   private handleActivity = (): void => {
     const now = Date.now();
     const state = this.getState();
-    
+
     if (!state?.isActive) return;
-    
+
     // Update last activity
     this.setState({
       ...state,
       lastActivity: now,
       expiresAt: now + this.config.timeoutMs,
     });
-    
+
     this.emit('activity');
   };
-  
+
   /**
    * Check session status
    */
   private checkSession = (): void => {
     const now = Date.now();
     const state = this.getState();
-    
+
     if (!state?.isActive) return;
-    
+
     // Check if another tab took over
     if (state.tabId !== this.tabId) {
       this.emit('tab_conflict', { activeTabId: state.tabId });
       return;
     }
-    
+
     // Check for timeout
     if (now >= state.expiresAt) {
       this.emit('timeout');
       this.end();
       return;
     }
-    
+
     // Check for warning
     const timeRemaining = state.expiresAt - now;
     if (timeRemaining <= this.config.warningMs) {
       this.emit('warning', { timeRemaining });
     }
   };
-  
+
   /**
    * Handle storage events (for multi-tab sync)
    */
   private handleStorageChange = (event: StorageEvent): void => {
     if (event.key !== this.getKey('state')) return;
-    
+
     if (!event.newValue) {
       // Session ended in another tab
       this.emit('timeout');
       this.cleanup();
       return;
     }
-    
+
     try {
       const newState = JSON.parse(event.newValue) as SessionState;
-      
+
       // Another tab extended the session
       if (newState.tabId !== this.tabId && newState.isActive) {
         this.emit('extended', { byTabId: newState.tabId });
@@ -214,7 +209,7 @@ export class SessionManager {
       // Ignore parse errors
     }
   };
-  
+
   /**
    * Clean up event listeners
    */
@@ -225,24 +220,24 @@ export class SessionManager {
       });
       this.activityHandler = null;
     }
-    
+
     if (this.checkInterval) {
       clearInterval(this.checkInterval);
       this.checkInterval = null;
     }
-    
+
     window.removeEventListener('storage', this.handleStorageChange);
     this.isInitialized = false;
   }
-  
+
   /**
    * Initialize session management
    */
   start(): void {
     if (typeof window === 'undefined' || this.isInitialized) return;
-    
+
     const now = Date.now();
-    
+
     // Set initial state
     this.setState({
       isActive: true,
@@ -250,22 +245,22 @@ export class SessionManager {
       expiresAt: now + this.config.timeoutMs,
       tabId: this.tabId,
     });
-    
+
     // Add activity listeners
     this.activityHandler = this.handleActivity;
     this.config.activityEvents.forEach(event => {
       window.addEventListener(event, this.activityHandler!, { passive: true });
     });
-    
+
     // Add storage listener for multi-tab sync
     window.addEventListener('storage', this.handleStorageChange);
-    
+
     // Start check interval
     this.checkInterval = setInterval(this.checkSession, 10000); // Check every 10 seconds
-    
+
     this.isInitialized = true;
   }
-  
+
   /**
    * End session
    */
@@ -274,14 +269,14 @@ export class SessionManager {
     this.cleanup();
     this.emit('timeout');
   }
-  
+
   /**
    * Extend session
    */
   extend(): void {
     const state = this.getState();
     if (!state?.isActive) return;
-    
+
     const now = Date.now();
     this.setState({
       ...state,
@@ -289,30 +284,30 @@ export class SessionManager {
       expiresAt: now + this.config.timeoutMs,
       tabId: this.tabId, // Take over as active tab
     });
-    
+
     this.emit('extended');
   }
-  
+
   /**
    * Get time remaining until timeout
    */
   getTimeRemaining(): number {
     const state = this.getState();
     if (!state?.isActive) return 0;
-    
+
     return Math.max(0, state.expiresAt - Date.now());
   }
-  
+
   /**
    * Check if session is active
    */
   isActive(): boolean {
     const state = this.getState();
     if (!state?.isActive) return false;
-    
+
     return Date.now() < state.expiresAt;
   }
-  
+
   /**
    * Add event listener
    */
@@ -325,13 +320,13 @@ export class SessionManager {
     if (listeners) {
       listeners.add(listener);
     }
-    
+
     // Return unsubscribe function
     return () => {
       this.listeners.get(type)?.delete(listener);
     };
   }
-  
+
   /**
    * Remove event listener
    */
@@ -349,12 +344,15 @@ const REMEMBER_ME_DURATION = 30 * 24 * 60 * 60 * 1000; // 30 days
 
 export function setRememberMe(email: string): void {
   if (typeof window === 'undefined') return;
-  
+
   try {
-    localStorage.setItem(REMEMBER_ME_KEY, JSON.stringify({
-      email,
-      expiresAt: Date.now() + REMEMBER_ME_DURATION,
-    }));
+    localStorage.setItem(
+      REMEMBER_ME_KEY,
+      JSON.stringify({
+        email,
+        expiresAt: Date.now() + REMEMBER_ME_DURATION,
+      }),
+    );
   } catch {
     // Storage unavailable
   }
@@ -362,17 +360,17 @@ export function setRememberMe(email: string): void {
 
 export function getRememberMe(): string | null {
   if (typeof window === 'undefined') return null;
-  
+
   try {
     const stored = localStorage.getItem(REMEMBER_ME_KEY);
     if (!stored) return null;
-    
+
     const data = JSON.parse(stored);
     if (Date.now() > data.expiresAt) {
       clearRememberMe();
       return null;
     }
-    
+
     return data.email;
   } catch {
     return null;
@@ -381,7 +379,7 @@ export function getRememberMe(): string | null {
 
 export function clearRememberMe(): void {
   if (typeof window === 'undefined') return;
-  
+
   try {
     localStorage.removeItem(REMEMBER_ME_KEY);
   } catch {
@@ -408,39 +406,38 @@ export function useSession(config: Partial<SessionConfig> = {}): UseSessionRetur
   const [isActive, setIsActive] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [showWarning, setShowWarning] = useState(false);
-  
+
   useEffect(() => {
     const manager = new SessionManager(config);
     managerRef.current = manager;
-    
+
     // Start session
     manager.start();
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
     setIsActive(true);
     setTimeRemaining(manager.getTimeRemaining());
-    
+
     // Listen for events
-    const unsubWarning = manager.on('warning', (event) => {
+    const unsubWarning = manager.on('warning', event => {
       setShowWarning(true);
       setTimeRemaining((event.data as { timeRemaining: number }).timeRemaining);
     });
-    
+
     const unsubTimeout = manager.on('timeout', () => {
       setIsActive(false);
       setShowWarning(false);
       setTimeRemaining(0);
     });
-    
+
     const unsubExtended = manager.on('extended', () => {
       setShowWarning(false);
       setTimeRemaining(manager.getTimeRemaining());
     });
-    
+
     // Update time remaining periodically
     const interval = setInterval(() => {
       setTimeRemaining(manager.getTimeRemaining());
     }, 1000);
-    
+
     return () => {
       unsubWarning();
       unsubTimeout();
@@ -449,16 +446,16 @@ export function useSession(config: Partial<SessionConfig> = {}): UseSessionRetur
       manager.end();
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  
+
   const extend = useCallback(() => {
     managerRef.current?.extend();
     setShowWarning(false);
   }, []);
-  
+
   const end = useCallback(() => {
     managerRef.current?.end();
   }, []);
-  
+
   return {
     isActive,
     timeRemaining,
@@ -469,4 +466,3 @@ export function useSession(config: Partial<SessionConfig> = {}): UseSessionRetur
 }
 
 export default SessionManager;
-

@@ -34,7 +34,6 @@ export default function PlayerRankingsMobile({
 
   // Load rankings on mount
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
     setMounted(true);
     const savedRankings = loadCustomRankings();
     if (savedRankings && savedRankings.length > 0) {

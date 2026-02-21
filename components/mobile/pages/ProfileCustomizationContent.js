@@ -103,7 +103,6 @@ export default function ProfileCustomizationContent() {
 
   // Prevent hydration mismatch by only rendering after mount
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- setting state from event listener
     setMounted(true);
   }, []);
 

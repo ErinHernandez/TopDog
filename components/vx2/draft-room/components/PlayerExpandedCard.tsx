@@ -1,6 +1,6 @@
 /**
  * PlayerExpandedCardVX2 - Enterprise-grade expanded player stats card
- * 
+ *
  * Features:
  * - Team gradient background with primary color border
  * - Team logo + Bye/ADP/Proj badges + Draft button header
@@ -9,7 +9,7 @@
  * - TypeScript with full type coverage
  * - VX2 constants for consistent styling
  * - Real historical stats from 2021-2024 seasons
- * 
+ *
  * A-Grade Standards:
  * - Accessibility: ARIA labels, keyboard navigation
  * - Type Safety: Full TypeScript coverage
@@ -30,8 +30,6 @@ import { createScopedLogger } from '../../../../lib/clientLogger';
 import { TEXT_COLORS, BG_COLORS, STATE_COLORS, UI_COLORS } from '../../core/constants/colors';
 import type { Position } from '../types';
 import { generatePlayerId } from '../utils';
-
-
 
 import styles from './PlayerExpandedCard.module.css';
 
@@ -77,18 +75,18 @@ const PX = {
   headerPaddingBottom: 4,
   headerPaddingX: 12,
   logoSize: 55,
-  
+
   // Badges
   badgeLabelSize: 12,
   badgeValueSize: 14,
   badgeMinWidths: { bye: 35, adp: 45, proj: 40 },
   badgeGap: 16,
-  
+
   // Draft button
   draftButtonPaddingX: 17,
   draftButtonPaddingY: 8,
   draftButtonFontSize: 12,
-  
+
   // Stats table
   headerHeight: 24,
   rowHeight: 20,
@@ -177,10 +175,10 @@ function formatStat(value: number | undefined | null, decimals?: number): string
  */
 function formatWRTEStats(stats: SeasonStats | null): string[] {
   if (!stats) return ['-', '-', '-', '-', '-', '-', '-', '-', '-', '-'];
-  
+
   const rec = stats.receiving;
   const rush = stats.rushing;
-  
+
   return [
     formatStat(rec?.receptions),
     formatStat(rec?.targets),
@@ -201,10 +199,10 @@ function formatWRTEStats(stats: SeasonStats | null): string[] {
  */
 function formatRBStats(stats: SeasonStats | null): string[] {
   if (!stats) return ['-', '-', '-', '-', '-', '-', '-', '-', '-', '-'];
-  
+
   const rush = stats.rushing;
   const rec = stats.receiving;
-  
+
   return [
     formatStat(rush?.attempts),
     formatStat(rush?.yards),
@@ -225,10 +223,10 @@ function formatRBStats(stats: SeasonStats | null): string[] {
  */
 function formatQBStats(stats: SeasonStats | null): string[] {
   if (!stats) return ['-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-'];
-  
+
   const pass = stats.passing;
   const rush = stats.rushing;
-  
+
   return [
     formatStat(pass?.completions),
     formatStat(pass?.attempts),
@@ -268,18 +266,20 @@ interface BadgeProps {
 }
 
 function Badge({ label, value, labelColor, badgeType }: BadgeProps): React.ReactElement {
-  const badgeClass = badgeType === 'bye'
-    ? styles.byeBadge
-    : badgeType === 'adp'
-    ? styles.adpBadge
-    : styles.projBadge;
+  const badgeClass =
+    badgeType === 'bye'
+      ? styles.byeBadge
+      : badgeType === 'adp'
+        ? styles.adpBadge
+        : styles.projBadge;
 
   return (
-    <div className={cn(styles.badge, badgeClass)} style={{ '--label-color': labelColor } as React.CSSProperties & { '--label-color': string }}>
+    <div
+      className={cn(styles.badge, badgeClass)}
+      style={{ '--label-color': labelColor } as React.CSSProperties & { '--label-color': string }}
+    >
       <div className={styles.badgeLabel}>{label}</div>
-      <div className={styles.badgeValue}>
-        {value}
-      </div>
+      <div className={styles.badgeValue}>{value}</div>
     </div>
   );
 }
@@ -303,14 +303,13 @@ function StatsHeader({ columns, isLightBg }: StatsHeaderProps): React.ReactEleme
       {columns.map((col, i) => (
         <div
           key={col.label + i}
-          className={cn(
-            styles.statsHeaderColumn,
-            i === 0 ? styles.first : styles.other
-          )}
-          style={{
-            '--column-left': `${col.left}px`,
-            '--column-width': `${col.width}px`,
-          } as React.CSSProperties & { '--column-left': string; '--column-width': string }}
+          className={cn(styles.statsHeaderColumn, i === 0 ? styles.first : styles.other)}
+          style={
+            {
+              '--column-left': `${col.left}px`,
+              '--column-width': `${col.width}px`,
+            } as React.CSSProperties & { '--column-left': string; '--column-width': string }
+          }
         >
           {col.label}
         </div>
@@ -332,19 +331,19 @@ function StatsRow({ label, values, columns }: StatsRowProps): React.ReactElement
   return (
     <div className={styles.statsRow}>
       {/* Year label */}
-      <div className={styles.statsRowYear}>
-        {label}
-      </div>
+      <div className={styles.statsRowYear}>{label}</div>
 
       {/* Data values */}
       {values.map((val, i) => (
         <div
           key={i}
           className={styles.statsRowValue}
-          style={{
-            '--row-value-left': `${dataColumns[i]?.left ?? 0}px`,
-            '--row-value-width': `${dataColumns[i]?.width ?? 30}px`,
-          } as React.CSSProperties & { '--row-value-left': string; '--row-value-width': string }}
+          style={
+            {
+              '--row-value-left': `${dataColumns[i]?.left ?? 0}px`,
+              '--row-value-width': `${dataColumns[i]?.width ?? 30}px`,
+            } as React.CSSProperties & { '--row-value-left': string; '--row-value-width': string }
+          }
         >
           {val}
         </div>
@@ -360,7 +359,12 @@ interface PositionStatsTableProps {
   projectedStats?: string[] | null;
 }
 
-function PositionStatsTable({ position, team, historicalStats, projectedStats }: PositionStatsTableProps): React.ReactElement {
+function PositionStatsTable({
+  position,
+  team,
+  historicalStats,
+  projectedStats,
+}: PositionStatsTableProps): React.ReactElement {
   const isLightBg = LIGHT_BG_TEAMS.includes(team);
 
   // Select columns based on position
@@ -421,29 +425,31 @@ export default function PlayerExpandedCard({
   onClose,
 }: PlayerExpandedCardProps): React.ReactElement | null {
   // State for historical stats
-  const [historicalStats, setHistoricalStats] = useState<Map<number, SeasonStats | null>>(new Map());
+  const [historicalStats, setHistoricalStats] = useState<Map<number, SeasonStats | null>>(
+    new Map(),
+  );
   const [loadingStats, setLoadingStats] = useState(false);
-  
+
   // Fetch historical stats when player changes
   useEffect(() => {
     if (!player?.name) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional setState in effect
       setHistoricalStats(new Map());
       return;
     }
-    
+
     const playerId = generatePlayerId(player.name);
     setLoadingStats(true);
-    
+
     // Fetch all historical seasons for this player
-    historicalService.getPlayerAllSeasons(playerId)
+    historicalService
+      .getPlayerAllSeasons(playerId)
       .then(seasons => {
         const statsMap = new Map<number, SeasonStats | null>();
         // Initialize all historical seasons as null
         HISTORICAL_SEASONS.forEach(year => statsMap.set(year, null));
         // Populate with actual data
         seasons.forEach(stat => {
-          if (HISTORICAL_SEASONS.includes(stat.season as typeof HISTORICAL_SEASONS[number])) {
+          if (HISTORICAL_SEASONS.includes(stat.season as (typeof HISTORICAL_SEASONS)[number])) {
             statsMap.set(stat.season, stat);
           }
         });
@@ -455,34 +461,40 @@ export default function PlayerExpandedCard({
       })
       .finally(() => setLoadingStats(false));
   }, [player?.name]);
-  
+
   if (!player) return null;
-  
+
   const { name, team, position, adp, projectedPoints } = player;
   const byeWeek = (BYE_WEEKS as Record<string, number>)[team] ?? 'N/A';
   const teamGradient = createTeamGradient(team);
   const isLightBg = LIGHT_BG_TEAMS.includes(team);
-  const labelColor = isLightBg ? EXPANDED_CARD_COLORS.headerLabelDark : EXPANDED_CARD_COLORS.headerLabel;
-  
+  const labelColor = isLightBg
+    ? EXPANDED_CARD_COLORS.headerLabelDark
+    : EXPANDED_CARD_COLORS.headerLabel;
+
   const handleDraft = (e: React.MouseEvent<HTMLButtonElement>): void => {
     e.stopPropagation();
     onDraft?.(player);
   };
-  
+
   const handleCardClick = (e: React.MouseEvent<HTMLDivElement>): void => {
     e.stopPropagation();
     onClose?.();
   };
-  
+
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>): void => {
     e.currentTarget.style.display = 'none';
   };
-  
+
   return (
     <div
       onClick={handleCardClick}
       className={styles.container}
-      style={{ '--card-background': teamGradient.firstGradient } as React.CSSProperties & { '--card-background': string }}
+      style={
+        { '--card-background': teamGradient.firstGradient } as React.CSSProperties & {
+          '--card-background': string;
+        }
+      }
     >
       {/* Header: Logo + Badges + Draft Button */}
       <div className={styles.header}>
@@ -496,7 +508,7 @@ export default function PlayerExpandedCard({
           unoptimized
           onError={handleImageError}
         />
-        
+
         {/* Badges */}
         <div className={styles.badgesContainer}>
           <Badge label="Bye" value={byeWeek} minWidth={0} labelColor={labelColor} badgeType="bye" />
@@ -515,24 +527,21 @@ export default function PlayerExpandedCard({
             badgeType="proj"
           />
         </div>
-        
+
         {/* Draft Button */}
         <button
           onClick={handleDraft}
           aria-label={`Draft ${name}`}
-          className={cn(
-            styles.draftButton,
-            isMyTurn ? styles.active : styles.inactive
-          )}
+          className={cn(styles.draftButton, isMyTurn ? styles.active : styles.inactive)}
         >
           DRAFT
         </button>
       </div>
-      
+
       {/* Stats Table - scrollable area (click doesn't close card) */}
       <div
-        onClick={(e) => e.stopPropagation()}
-        onTouchStart={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
+        onTouchStart={e => e.stopPropagation()}
         className={styles.statsArea}
       >
         <PositionStatsTable
@@ -544,4 +553,3 @@ export default function PlayerExpandedCard({
     </div>
   );
 }
-
