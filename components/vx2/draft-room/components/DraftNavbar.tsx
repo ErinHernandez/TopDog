@@ -1,12 +1,12 @@
 /**
  * DraftNavbar - Top navigation bar for draft room
- * 
+ *
  * Features:
  * - Blue tiled background (wr_blue.png)
  * - White back arrow (left)
  * - Countdown timer (center)
  * - Pulse animation at 3s, 2s, 1s, 0s
- * 
+ *
  * A-Grade Requirements:
  * - TypeScript: Full type coverage
  * - Accessibility: ARIA labels, proper semantics
@@ -32,11 +32,11 @@ const NAVBAR_PX = {
   // Container
   height: 26, // Compact for unified header
   paddingX: 16,
-  
+
   // Timer
   timerFontSize: 32, // Larger for centered display
   timerFontWeight: 700,
-  
+
   // Buttons
   buttonSize: 26,
   iconSize: 18,
@@ -65,7 +65,7 @@ export interface DraftNavbarProps {
   timerSeconds?: number;
   /** Whether it's the current user's turn */
   isUserTurn?: boolean;
-  /** 
+  /**
    * Callback when grace period ends (after shake animation completes).
    * Use this to trigger auto-pick - user can still make picks while timer shows 0
    * until this callback fires (600ms grace period).
@@ -84,11 +84,7 @@ export interface DraftNavbarProps {
 // Back button - white chevron (OLD - keeping for reference but not using)
 function BackButton({ onClick }: { onClick: () => void }): React.ReactElement {
   return (
-    <button
-      onClick={onClick}
-      aria-label="Leave draft"
-      className={styles.button}
-    >
+    <button onClick={onClick} aria-label="Leave draft" className={styles.button}>
       <svg
         className={styles.buttonSvg}
         width={NAVBAR_PX.iconSize}
@@ -109,25 +105,32 @@ function BackButton({ onClick }: { onClick: () => void }): React.ReactElement {
 }
 
 // Exit Draft Room Button - Opens confirmation modal
-function ExitDraftButton({ onLeaveCallback }: { onLeaveCallback?: () => void }): React.ReactElement {
-  const handleExitClick = React.useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
-    // Prevent any default behavior
-    event.preventDefault();
-    event.stopPropagation();
+function ExitDraftButton({
+  onLeaveCallback,
+}: {
+  onLeaveCallback?: () => void;
+}): React.ReactElement {
+  const handleExitClick = React.useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      // Prevent any default behavior
+      event.preventDefault();
+      event.stopPropagation();
 
-    logger.debug('Exit button clicked', { hasCallback: !!onLeaveCallback });
+      logger.debug('Exit button clicked', { hasCallback: !!onLeaveCallback });
 
-    // Call the callback to open confirmation modal (if provided)
-    if (onLeaveCallback) {
-      try {
-        onLeaveCallback();
-      } catch (error) {
-        logger.error('Error in exit callback', error as Error);
+      // Call the callback to open confirmation modal (if provided)
+      if (onLeaveCallback) {
+        try {
+          onLeaveCallback();
+        } catch (error) {
+          logger.error('Error in exit callback', error as Error);
+        }
+      } else {
+        logger.warn('No onLeave callback provided');
       }
-    } else {
-      logger.warn('No onLeave callback provided');
-    }
-  }, [onLeaveCallback]);
+    },
+    [onLeaveCallback],
+  );
 
   return (
     <button
@@ -158,11 +161,7 @@ function ExitDraftButton({ onLeaveCallback }: { onLeaveCallback?: () => void }):
 // Info button - circle with "i"
 function InfoButton({ onClick }: { onClick?: () => void }): React.ReactElement {
   return (
-    <button
-      onClick={onClick}
-      aria-label="Draft info"
-      className={styles.button}
-    >
+    <button onClick={onClick} aria-label="Draft info" className={styles.button}>
       <svg
         className={styles.buttonSvg}
         width={NAVBAR_PX.iconSize}
@@ -171,21 +170,9 @@ function InfoButton({ onClick }: { onClick?: () => void }): React.ReactElement {
         fill="none"
       >
         {/* Circle */}
-        <circle
-          cx="12"
-          cy="12"
-          r="10"
-          stroke={NAVBAR_COLORS.text}
-          strokeWidth={2}
-          fill="none"
-        />
+        <circle cx="12" cy="12" r="10" stroke={NAVBAR_COLORS.text} strokeWidth={2} fill="none" />
         {/* Dot of the "i" */}
-        <circle
-          cx="12"
-          cy="8"
-          r="1.5"
-          fill={NAVBAR_COLORS.text}
-        />
+        <circle cx="12" cy="8" r="1.5" fill={NAVBAR_COLORS.text} />
         {/* Stem of the "i" */}
         <line
           x1="12"
@@ -243,20 +230,19 @@ export default function DraftNavbar({
   const [shakeKey, setShakeKey] = useState(0);
   const shouldPulse = isUserTurn && timerSeconds <= 3 && timerSeconds >= 0;
   const shouldShake = isUserTurn && timerSeconds === 0;
-  
+
   // Use ref to track if grace period timeout has been scheduled
   const gracePeriodScheduledRef = useRef(false);
   const onGracePeriodEndRef = useRef(onGracePeriodEnd);
-  // eslint-disable-next-line react-hooks/refs -- ref mutation is intentional for callback storage
   onGracePeriodEndRef.current = onGracePeriodEnd;
-  
+
   // Reset grace period flag when timer resets (new pick)
   useEffect(() => {
     if (timerSeconds > 0) {
       gracePeriodScheduledRef.current = false;
     }
   }, [timerSeconds]);
-  
+
   // Trigger new pulse animation when timer hits 3, 2, 1, 0 (user only)
   useEffect(() => {
     if (isUserTurn && [3, 2, 1, 0].includes(timerSeconds)) {
@@ -266,12 +252,12 @@ export default function DraftNavbar({
     if (isUserTurn && timerSeconds === 0 && !gracePeriodScheduledRef.current) {
       gracePeriodScheduledRef.current = true;
       setShakeKey(prev => prev + 1);
-      
+
       // Call onGracePeriodEnd after shake animation completes
       const timeout = setTimeout(() => {
         onGracePeriodEndRef.current?.();
       }, DRAFT_TIMER.GRACE_PERIOD_MS);
-        return () => clearTimeout(timeout);
+      return () => clearTimeout(timeout);
     }
     return undefined;
   }, [timerSeconds, isUserTurn]);
@@ -302,14 +288,9 @@ export default function DraftNavbar({
   };
 
   return (
-    <header
-      key={shakeKey}
-      className={cn(styles.header, getBackgroundClass(), getPositionClass())}
-    >
+    <header key={shakeKey} className={cn(styles.header, getBackgroundClass(), getPositionClass())}>
       {/* Navbar content - fixed height below safe area */}
-      <div
-        className={cn(styles.navContent, shouldShake && styles.shake)}
-      >
+      <div className={cn(styles.navContent, shouldShake && styles.shake)}>
         {/* Left: Exit Button */}
         <ExitDraftButton onLeaveCallback={onLeave} />
 

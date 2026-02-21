@@ -1,11 +1,11 @@
 /**
  * DraftStatusBar - Unified header with status bar + centered timer
- * 
+ *
  * Background logic:
  * - Not user's turn: Dark background (#1F2937)
  * - User's turn + timer <= 9s: Red urgent background (#DC2626)
  * - User's turn + timer > 9s: Blue tiled background
- * 
+ *
  * Includes alarm clock shake animation when timer hits 0.
  */
 
@@ -68,7 +68,6 @@ const DraftStatusBar = React.memo(function DraftStatusBar({
   const [shakeKey, setShakeKey] = useState(0);
   const shakeScheduledRef = useRef(false);
   const onGracePeriodEndRef = useRef(onGracePeriodEnd);
-  // eslint-disable-next-line react-hooks/refs -- ref mutation is intentional for callback storage
   onGracePeriodEndRef.current = onGracePeriodEnd;
   const shouldShake = isUserTurn && timerSeconds === 0;
 
@@ -78,12 +77,12 @@ const DraftStatusBar = React.memo(function DraftStatusBar({
     if (timerSeconds > 0) {
       shakeScheduledRef.current = false;
     }
-    
+
     // Trigger shake when timer hits 0 and it's user's turn (only once per pick)
     if (isUserTurn && timerSeconds === 0 && !shakeScheduledRef.current) {
       shakeScheduledRef.current = true;
       setShakeKey(prev => prev + 1);
-      
+
       // Call onGracePeriodEnd after shake animation completes
       const timeout = setTimeout(() => {
         onGracePeriodEndRef.current?.();
@@ -116,7 +115,8 @@ const DraftStatusBar = React.memo(function DraftStatusBar({
   const containerStyles = getContainerStyles();
 
   // Determine if we should show tiled background (user's turn, timer > 9, not pre-draft)
-  const showTiledBg = isUserTurn &&
+  const showTiledBg =
+    isUserTurn &&
     timerSeconds > 9 &&
     !(draftStatus === 'waiting' && preDraftCountdown != null && preDraftCountdown > 0);
 
@@ -144,7 +144,7 @@ const DraftStatusBar = React.memo(function DraftStatusBar({
       )}
       style={containerStyles}
       role="banner"
-      aria-label={onLeave ? "Draft header - tap anywhere to leave draft" : "Draft header"}
+      aria-label={onLeave ? 'Draft header - tap anywhere to leave draft' : 'Draft header'}
     >
       {/* Centered Timer - large and prominent (hidden when shown in pick card) */}
       {/* Positioned below Dynamic Island */}
@@ -170,4 +170,3 @@ const DraftStatusBar = React.memo(function DraftStatusBar({
 });
 
 export default DraftStatusBar;
-

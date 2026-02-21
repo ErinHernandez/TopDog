@@ -18,6 +18,11 @@ const withBundleAnalyzer = bundleAnalyzer({
 const nextConfig = {
   reactStrictMode: true,
 
+  // Decouple linting from builds — lint separately in CI
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+
   experimental: {
     // Tree-shake heavy packages
     optimizePackageImports: [
