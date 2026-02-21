@@ -32,6 +32,7 @@
     "react-dom": "^19.2.4",
     "react-window": "^2.2.7",
     "stripe": "^18.1.0",
+    "swr": "^2.4.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
