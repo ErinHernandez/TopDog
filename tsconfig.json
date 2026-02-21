@@ -48,5 +48,5 @@
     }
   },
   "include": ["next-env.d.ts", "**/*.mts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "_archived"]
 }
